@@ -1,0 +1,12 @@
+{
+  "name": "@chisto/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "flutter run",
+    "build": "flutter build apk",
+    "build:ios": "flutter build ios",
+    "lint": "flutter analyze",
+    "test": "flutter test"
+  }
+}

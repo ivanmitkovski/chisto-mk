@@ -1,0 +1,72 @@
+# Chisto.mk
+
+Civic environmental platform for pollution reporting, site lifecycle management, cleanup events, and data transparency.
+
+## Stack
+
+- **Backend**: NestJS, TypeScript, Prisma, PostgreSQL
+- **Admin**: Next.js 15 (port 3001)
+- **Landing**: Next.js 15 (port 3002)
+- **Mobile**: Flutter
+
+## Quick start
+
+### Prerequisites
+
+- Node.js 20+
+- pnpm 9+
+- Docker (for local Postgres)
+- Flutter 3.x (for mobile app)
+
+### Setup
+
+```bash
+# Install dependencies (requires pnpm: npm i -g pnpm or corepack enable)
+pnpm install
+
+# Start Postgres
+docker compose up -d postgres
+
+# Copy env and run migrations
+cp .env.example .env
+pnpm db:push
+
+# Start dev servers
+pnpm dev
+```
+
+- API: http://localhost:3000
+- API docs: http://localhost:3000/api/docs
+- Admin: http://localhost:3001
+- Landing: http://localhost:3002
+
+### Scripts
+
+| Command | Description |
+|---------|-------------|
+| `pnpm dev` | Run API + Admin + Landing in parallel |
+| `pnpm dev:api` | Run API only |
+| `pnpm dev:admin` | Run Admin only |
+| `pnpm dev:landing` | Run Landing only |
+| `pnpm dev:mobile` | Run Flutter app (requires device/emulator) |
+| `pnpm build` | Build all Node apps |
+| `pnpm build:mobile` | Build Flutter APK |
+| `pnpm db:migrate` | Run Prisma migrations |
+| `pnpm db:studio` | Open Prisma Studio |
+
+## Project structure
+
+```
+chisto-mk/
+├── apps/
+│   ├── api/      # NestJS backend
+│   ├── admin/    # Next.js admin panel
+│   ├── landing/  # Next.js marketing site
+│   └── mobile/   # Flutter app
+├── docker-compose.yml
+└── package.json
+```
+
+## License
+
+Proprietary — Chisto.mk

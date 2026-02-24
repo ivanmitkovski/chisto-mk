@@ -1,0 +1,83 @@
+// Chisto.mk — Prisma schema
+// Civic environmental platform: pollution reporting, site lifecycle, cleanup events
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Canonical pollution/report site
+model Site {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  latitude    Float
+  longitude   Float
+  description String?
+  status      SiteStatus @default(REPORTED)
+
+  reports     Report[]
+  events      CleanupEvent[]
+
+  @@index([status])
+  @@index([latitude, longitude])
+}
+
+enum SiteStatus {
+  REPORTED
+  VERIFIED
+  CLEANUP_SCHEDULED
+  IN_PROGRESS
+  CLEANED
+  DISPUTED
+}
+
+// User-submitted pollution report
+model Report {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  reporterId String?
+  // Future: User model relation
+
+  description String?
+  mediaUrls   String[] @default([])
+
+  status    ReportStatus @default(PENDING)
+
+  @@index([siteId])
+  @@index([status])
+}
+
+enum ReportStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+// Cleanup event at a site
+model CleanupEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime
+  completedAt DateTime?
+
+  organizerId String?
+  participantCount Int @default(0)
+
+  @@index([siteId])
+  @@index([scheduledAt])
+}

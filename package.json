@@ -1,0 +1,28 @@
+{
+  "name": "chisto-mk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Chisto.mk — Civic environmental platform for pollution reporting and cleanup",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter '!@chisto/mobile' run dev",
+    "dev:api": "pnpm --filter @chisto/api dev",
+    "dev:admin": "pnpm --filter @chisto/admin dev",
+    "dev:landing": "pnpm --filter @chisto/landing dev",
+    "dev:mobile": "pnpm --filter @chisto/mobile dev",
+    "build": "pnpm -r --filter '!@chisto/mobile' run build",
+    "build:api": "pnpm --filter @chisto/api build",
+    "build:admin": "pnpm --filter @chisto/admin build",
+    "build:landing": "pnpm --filter @chisto/landing build",
+    "build:mobile": "pnpm --filter @chisto/mobile build",
+    "db:generate": "pnpm --filter @chisto/api exec prisma generate",
+    "db:migrate": "pnpm --filter @chisto/api exec prisma migrate dev",
+    "db:push": "pnpm --filter @chisto/api exec prisma db push",
+    "db:studio": "pnpm --filter @chisto/api exec prisma studio",
+    "lint": "pnpm -r --filter '!@chisto/mobile' run lint",
+    "test": "pnpm -r --filter '!@chisto/mobile' run test"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "pnpm@9.14.2"
+}
