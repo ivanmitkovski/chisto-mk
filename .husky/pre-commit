@@ -1,0 +1,10 @@
+blocked_env_files="$(git diff --cached --name-only --diff-filter=ACMR | awk '/(^|\/)\.env$/ { print }')"
+
+if [ -n "$blocked_env_files" ]; then
+  echo "Error: refusing to commit .env files:"
+  echo "$blocked_env_files"
+  echo "Commit .env.example or environment templates instead."
+  exit 1
+fi
+
+pnpm --filter @chisto/api exec prisma validate
