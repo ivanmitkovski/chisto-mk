@@ -32,6 +32,8 @@ jobs:
   validate:
     name: Build and Validate
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://chisto:chisto@localhost:5432/chisto_ci
 
     steps:
       - name: Checkout
