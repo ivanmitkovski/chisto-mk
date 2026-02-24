@@ -10,6 +10,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  firstName    String
+  lastName     String
+  email        String   @unique
+  phoneNumber  String   @unique
+  passwordHash String
+  role         Role     @default(USER)
+  status       UserStatus @default(ACTIVE)
+  isPhoneVerified Boolean @default(false)
+
+  pointsBalance     Int @default(0)
+  totalPointsEarned Int @default(0)
+  totalPointsSpent  Int @default(0)
+  lastActiveAt      DateTime?
+
+  reports      Report[]
+  pointTransactions PointTransaction[]
+
+  @@index([role])
+  @@index([status])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+model PointTransaction {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  delta       Int
+  balanceAfter Int
+  reasonCode  String
+  referenceType String?
+  referenceId   String?
+  metadata    Json?
+
+  @@index([userId, createdAt])
+  @@index([reasonCode])
+}
+
 // Canonical pollution/report site
 model Site {
   id          String   @id @default(cuid())
@@ -46,7 +101,7 @@ model Report {
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   reporterId String?
-  // Future: User model relation
+  reporter   User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
 
   description String?
   mediaUrls   String[] @default([])
@@ -54,6 +109,7 @@ model Report {
   status    ReportStatus @default(PENDING)
 
   @@index([siteId])
+  @@index([reporterId])
   @@index([status])
 }
 
