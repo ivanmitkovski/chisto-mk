@@ -1,7 +1,8 @@
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -11,8 +12,18 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
       transform: true,
+      exceptionFactory: (validationErrors) =>
+        new BadRequestException({
+          code: 'VALIDATION_ERROR',
+          message: 'Request validation failed',
+          details: validationErrors.map((error) => ({
+            field: error.property,
+            errors: error.constraints ? Object.values(error.constraints) : [],
+          })),
+        }),
     }),
   );
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Chisto.mk API')
