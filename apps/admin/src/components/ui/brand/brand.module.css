@@ -1,0 +1,29 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--text-primary);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  line-height: 1;
+}
+
+.logo {
+  width: 1.625rem;
+  height: auto;
+  object-fit: contain;
+}
+
+.text {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+.accent {
+  color: var(--color-primary);
+}
+
+.compact .text {
+  display: none;
+}

@@ -1,0 +1,90 @@
+.button {
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.01em;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    opacity 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.button :global(svg) {
+  flex-shrink: 0;
+}
+
+.sizeSm {
+  min-height: 2rem;
+  padding: 0 var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.sizeMd {
+  min-height: 2.125rem;
+  padding: 0 var(--space-4);
+  font-size: var(--font-size-base);
+}
+
+.variantSolid {
+  background: var(--color-primary);
+  color: var(--color-green-900);
+  box-shadow: 0 8px 20px rgba(37, 219, 134, 0.26);
+}
+
+.variantSolid:hover {
+  background: #1fcb79;
+  box-shadow: 0 10px 24px rgba(37, 219, 134, 0.34);
+}
+
+.variantOutline {
+  border-color: #20ca78;
+  background: transparent;
+  color: #15995f;
+}
+
+.variantOutline:hover {
+  background: rgba(37, 219, 134, 0.12);
+  border-color: #18b66d;
+}
+
+.variantGhost {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.variantGhost:hover {
+  background: rgba(8, 54, 39, 0.06);
+}
+
+.variantIcon {
+  width: 2.125rem;
+  height: 2.125rem;
+  border-radius: 50%;
+  background: rgba(37, 219, 134, 0.12);
+  border-color: rgba(37, 219, 134, 0.28);
+  color: #14935b;
+  padding: 0;
+}
+
+.variantIcon:hover {
+  background: rgba(37, 219, 134, 0.2);
+  border-color: rgba(37, 219, 134, 0.4);
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.loading,
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.64;
+  box-shadow: none;
+}
