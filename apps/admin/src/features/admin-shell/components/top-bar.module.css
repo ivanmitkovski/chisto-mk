@@ -1,0 +1,126 @@
+.topbar {
+  min-height: 4.625rem;
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom: 1px solid rgba(37, 219, 134, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: 0 var(--space-7);
+  position: sticky;
+  top: 0;
+  z-index: 15;
+  backdrop-filter: blur(8px);
+}
+
+.titleWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(var(--font-size-xl), 2vw, var(--font-size-3xl));
+  font-weight: var(--font-weight-bold);
+}
+
+.menuButton {
+  background: rgba(37, 219, 134, 0.14);
+  border-color: rgba(37, 219, 134, 0.28);
+  color: #0f8d56;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.searchInput {
+  width: clamp(11rem, 20vw, 17rem);
+  min-width: 9rem;
+}
+
+.iconCluster {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.notifyWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.notifyDot {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.2rem;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-error);
+  border: 2px solid var(--bg-surface);
+}
+
+.iconButton {
+  background: #f4f7ff;
+  border-color: #e8edf9;
+  color: #73849e;
+}
+
+.profileButton {
+  background: rgba(37, 219, 134, 0.24);
+  border-color: rgba(37, 219, 134, 0.4);
+  color: #0e8b53;
+}
+
+@media (max-width: 56rem) {
+  .topbar {
+    padding-inline: var(--space-5);
+  }
+
+  .searchInput {
+    width: 10rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .topbar {
+    padding-inline: var(--space-4);
+    flex-wrap: wrap;
+    padding-block: var(--space-3);
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: space-between;
+    gap: var(--space-2);
+  }
+
+  .searchInput {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .iconCluster {
+    flex-shrink: 0;
+  }
+
+  .titleWrap {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 36rem) {
+  .title {
+    font-size: var(--font-size-lg);
+  }
+
+  .searchInput {
+    max-width: 10rem;
+  }
+}

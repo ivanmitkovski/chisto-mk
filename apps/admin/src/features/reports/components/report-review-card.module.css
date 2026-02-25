@@ -1,0 +1,129 @@
+.card {
+  display: grid;
+  gap: var(--space-4);
+  border: 1px solid rgba(37, 219, 134, 0.1);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(var(--font-size-xl), 2.2vw, var(--font-size-2xl));
+  font-weight: var(--font-weight-bold);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1.15fr);
+  gap: var(--space-5);
+}
+
+.panel {
+  border: 1px solid var(--color-green-010);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.image {
+  min-height: 14rem;
+  background: linear-gradient(120deg, #8ea78f, #4d6b56);
+}
+
+.map {
+  min-height: 25rem;
+  background:
+    linear-gradient(90deg, rgba(200, 200, 200, 0.3) 1px, transparent 1px),
+    linear-gradient(rgba(200, 200, 200, 0.3) 1px, transparent 1px),
+    #f6f6f6;
+  background-size: 1.75rem 1.75rem;
+}
+
+.body {
+  padding: var(--space-4);
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.statusPill {
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 1.5rem;
+  padding: 0 var(--space-2);
+  margin-left: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+}
+
+.statusNew {
+  background: var(--color-yellow-100);
+  color: #8d6600;
+}
+
+.statusInReview {
+  background: var(--color-green-010);
+  color: var(--color-green-700);
+}
+
+.statusApproved {
+  background: rgba(37, 219, 134, 0.18);
+  color: var(--color-green-900);
+}
+
+.statusDeleted {
+  background: var(--color-red-050);
+  color: var(--color-error);
+}
+
+.location {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid rgba(37, 219, 134, 0.3);
+  border-radius: var(--radius-full);
+  padding: 0.15rem 0.55rem;
+  color: #148f58;
+}
+
+.reportTitle {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.reportText {
+  margin: 0 0 var(--space-4);
+  color: var(--text-secondary);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 64rem) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map {
+    min-height: 14rem;
+  }
+}
+
+@media (max-width: 36rem) {
+  .statusRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
