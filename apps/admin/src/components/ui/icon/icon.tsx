@@ -20,6 +20,7 @@ import {
   X,
   PanelLeftClose,
   PanelLeftOpen,
+  LogOut,
 } from 'lucide-react';
 
 export type IconName =
@@ -42,7 +43,8 @@ export type IconName =
   | 'menu'
   | 'x'
   | 'panel-left-close'
-  | 'panel-left-open';
+  | 'panel-left-open'
+  | 'log-out';
 
 const iconByName: Record<IconName, LucideIcon> = {
   home: House,
@@ -65,6 +67,7 @@ const iconByName: Record<IconName, LucideIcon> = {
   x: X,
   'panel-left-close': PanelLeftClose,
   'panel-left-open': PanelLeftOpen,
+  'log-out': LogOut,
 };
 
 type IconProps = {

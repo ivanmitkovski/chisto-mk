@@ -81,7 +81,7 @@ export function useReportTable({ initialRows, pageSize = 5 }: UseReportTableOpti
     return () => window.clearTimeout(timeoutId);
   }, [snack]);
 
-  function updateStatus(id: string, status: ReportStatus, action: ReportTableAction) {
+  function updateStatus(id: string, status: ReportStatus, action: ReportTableAction, reason?: string) {
     let isUpdated = false;
 
     setRows((prevRows) =>
@@ -116,7 +116,9 @@ export function useReportTable({ initialRows, pageSize = 5 }: UseReportTableOpti
     setSnack({
       tone: 'warning',
       title: 'Report rejected',
-      message: 'The report has been rejected and marked as removed.',
+      message: reason
+        ? `The report has been rejected. Reason: ${reason}`
+        : 'The report has been rejected and marked as removed.',
     });
   }
 
@@ -162,7 +164,7 @@ export function useReportTable({ initialRows, pageSize = 5 }: UseReportTableOpti
     handleSort,
     handlePageChange,
     approveReport: (id: string) => updateStatus(id, 'APPROVED', 'approve'),
-    rejectReport: (id: string) => updateStatus(id, 'DELETED', 'reject'),
+    rejectReport: (id: string, reason?: string) => updateStatus(id, 'DELETED', 'reject', reason),
     clearSnack: () => setSnack(null),
   };
 }

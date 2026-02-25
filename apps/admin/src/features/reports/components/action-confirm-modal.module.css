@@ -1,0 +1,105 @@
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(15, 23, 42, 0.36);
+  backdrop-filter: blur(3px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: max(4rem, 10vh) var(--space-4) var(--space-4);
+}
+
+.modal {
+  width: min(31rem, calc(100vw - 1.5rem));
+  max-height: calc(100vh - 2rem);
+  border-radius: calc(var(--radius-xl) + 0.15rem);
+  border: 1px solid rgba(8, 54, 39, 0.11);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow:
+    0 24px 48px rgba(8, 54, 39, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  padding: var(--space-4) var(--space-4) var(--space-2);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.08);
+}
+
+.title {
+  margin: 0;
+  color: rgba(8, 54, 39, 0.94);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+}
+
+.description {
+  margin: var(--space-2) 0 0;
+  color: rgba(8, 54, 39, 0.7);
+  font-size: var(--font-size-sm);
+}
+
+.body {
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  overflow-y: auto;
+}
+
+.label {
+  color: rgba(8, 54, 39, 0.78);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.select,
+.textarea {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(8, 54, 39, 0.16);
+  background: rgba(247, 250, 255, 0.84);
+  padding: var(--space-3);
+  font: inherit;
+  resize: vertical;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.select {
+  min-height: 2.5rem;
+}
+
+.textarea {
+  min-height: 6.25rem;
+}
+
+.select:focus,
+.textarea:focus {
+  border-color: rgba(37, 219, 134, 0.6);
+}
+
+.error {
+  margin: 0;
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+}
+
+.footer {
+  padding: var(--space-3) var(--space-4) var(--space-4);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.dangerButton {
+  background: rgba(241, 67, 54, 0.16);
+  color: #9f2d24;
+  border-color: rgba(241, 67, 54, 0.38);
+}
+
+.dangerButton:hover {
+  background: rgba(241, 67, 54, 0.24);
+  border-color: rgba(241, 67, 54, 0.46);
+}

@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, ReactNode, useId } from 'react';
+import { InputHTMLAttributes, ReactNode, RefObject, useId } from 'react';
 import styles from './input.module.css';
 
 export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
@@ -7,6 +7,7 @@ export type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> & {
   errorText?: string | undefined;
   leftSlot?: ReactNode | undefined;
   rightSlot?: ReactNode | undefined;
+  inputRef?: RefObject<HTMLInputElement | null> | undefined;
 };
 
 export function Input({
@@ -16,6 +17,7 @@ export function Input({
   errorText,
   leftSlot,
   rightSlot,
+  inputRef,
   className,
   ...rest
 }: InputProps) {
@@ -46,6 +48,7 @@ export function Input({
         <input
           {...rest}
           id={inputId}
+          ref={inputRef}
           className={inputClassName}
           aria-invalid={hasError}
           aria-describedby={descriptionId}

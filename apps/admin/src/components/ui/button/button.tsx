@@ -1,4 +1,4 @@
-import { ButtonHTMLAttributes } from 'react';
+import { ButtonHTMLAttributes, forwardRef } from 'react';
 import styles from './button.module.css';
 
 type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'icon';
@@ -23,17 +23,20 @@ const sizeClassByName: Record<ButtonSize, string> = {
   md: styles.sizeMd,
 };
 
-export function Button({
-  variant = 'solid',
-  size = 'md',
-  isLoading = false,
-  fullWidth = false,
-  className,
-  disabled,
-  type,
-  children,
-  ...rest
-}: ButtonProps) {
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    variant = 'solid',
+    size = 'md',
+    isLoading = false,
+    fullWidth = false,
+    className,
+    disabled,
+    type,
+    children,
+    ...rest
+  },
+  ref,
+) {
   const resolvedClassName = [
     styles.button,
     variantClassByName[variant],
@@ -46,8 +49,8 @@ export function Button({
     .trim();
 
   return (
-    <button {...rest} type={type ?? 'button'} className={resolvedClassName} disabled={disabled || isLoading}>
+    <button {...rest} ref={ref} type={type ?? 'button'} className={resolvedClassName} disabled={disabled || isLoading}>
       {isLoading ? 'Working...' : children}
     </button>
   );
-}
+});

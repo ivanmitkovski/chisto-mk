@@ -29,6 +29,11 @@
   font-size: var(--font-size-sm);
 }
 
+.statusCell {
+  display: grid;
+  gap: 0.25rem;
+}
+
 .headerControls {
   width: min(100%, 18rem);
 }
@@ -170,6 +175,41 @@
 .statusDeleted {
   background: var(--color-red-050);
   color: var(--color-error);
+}
+
+.queueMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.priorityChip {
+  border-radius: var(--radius-full);
+  padding: 0 0.5rem;
+  min-height: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  font-weight: var(--font-weight-medium);
+}
+
+.priorityCritical {
+  background: rgba(241, 67, 54, 0.14);
+  color: #a32f26;
+}
+
+.priorityHigh {
+  background: rgba(248, 187, 0, 0.16);
+  color: #8d6600;
+}
+
+.priorityNormal {
+  background: rgba(148, 163, 184, 0.16);
+  color: #334155;
+}
+
+.slaText {
+  color: #6b7b7a;
 }
 
 .actions {

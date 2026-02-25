@@ -1,0 +1,46 @@
+import { AdminNotification } from './types';
+
+export const notificationsMock: ReadonlyArray<AdminNotification> = [
+  {
+    id: 'n-1',
+    title: 'Report R-109 approved',
+    message: 'Downtown illegal dump report moved to approved state.',
+    timeLabel: '3m ago',
+    tone: 'success',
+    isUnread: true,
+    category: 'reports',
+    icon: 'check',
+    href: '/dashboard/reports?reportId=r-1',
+  },
+  {
+    id: 'n-2',
+    title: 'New report submitted',
+    message: 'A new incident was received from Karposh district.',
+    timeLabel: '11m ago',
+    tone: 'info',
+    isUnread: true,
+    category: 'reports',
+    icon: 'document-text',
+    href: '/dashboard/reports',
+  },
+  {
+    id: 'n-3',
+    title: 'Weekly moderation digest',
+    message: 'Summary of actions for the past 7 days is ready.',
+    timeLabel: '1h ago',
+    tone: 'neutral',
+    isUnread: false,
+    category: 'analytics',
+    icon: 'document-forward',
+  },
+  {
+    id: 'n-4',
+    title: 'System maintenance window',
+    message: 'Planned maintenance tomorrow at 02:00–02:30.',
+    timeLabel: 'Today',
+    tone: 'warning',
+    isUnread: false,
+    category: 'system',
+    icon: 'setting',
+  },
+];

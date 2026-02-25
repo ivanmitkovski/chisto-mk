@@ -2,6 +2,8 @@
   display: grid;
   gap: var(--space-4);
   border: 1px solid rgba(37, 219, 134, 0.1);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 .title {
@@ -84,12 +86,186 @@
   font-size: var(--font-size-md);
 }
 
+.securityLayout {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.section {
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(15, 141, 86, 0.12);
+  background: radial-gradient(circle at top left, rgba(37, 219, 134, 0.06), transparent 55%), #ffffff;
+  padding: var(--space-4);
+  display: grid;
+  gap: var(--space-3);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sectionDescription {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.sectionActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sessionsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.sessionItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.sessionLeading {
+  padding-top: 0.35rem;
+}
+
+.sessionDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, var(--color-green-400), var(--color-green-600));
+  box-shadow: 0 0 0 4px rgba(37, 219, 134, 0.18);
+  display: inline-block;
+}
+
+.sessionBody {
+  display: grid;
+  gap: 0.1rem;
+}
+
+.sessionTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.sessionTag {
+  padding-inline: 0.5rem;
+  padding-block: 0.125rem;
+  border-radius: 999px;
+  background: rgba(37, 219, 134, 0.1);
+  color: #0f8d56;
+  font-size: 0.7rem;
+  font-weight: var(--font-weight-medium);
+}
+
+.sessionMeta {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.sessionEmpty {
+  padding-block: var(--space-2);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.securityForm {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.activityList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.activityItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 141, 86, 0.02);
+}
+
+.activityIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 141, 86, 0.05);
+  color: var(--color-green-700);
+}
+
+.activityBody {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.activityTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.activityDetail {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.activityTime {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-green-700);
+}
+
+.activityToneSuccess {
+  border: 1px solid rgba(15, 141, 86, 0.14);
+}
+
+.activityToneWarning {
+  border: 1px solid rgba(253, 176, 34, 0.2);
+}
+
+.activityToneInfo {
+  border: 1px solid rgba(15, 141, 86, 0.08);
+}
+
 @media (max-width: 56rem) {
   .grid {
     grid-template-columns: 1fr;
   }
 
   .form {
+    grid-template-columns: 1fr;
+  }
+
+  .securityForm {
     grid-template-columns: 1fr;
   }
 }

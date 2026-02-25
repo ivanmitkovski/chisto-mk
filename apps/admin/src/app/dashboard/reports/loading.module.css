@@ -1,0 +1,96 @@
+.card {
+  border: 1px solid rgba(37, 219, 134, 0.11);
+  background: rgba(255, 255, 255, 0.92);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.line,
+.chip,
+.panelBody,
+.actionBar {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, rgba(8, 54, 39, 0.07), rgba(8, 54, 39, 0.12), rgba(8, 54, 39, 0.07));
+  background-size: 200% 100%;
+  animation: pulse 1.2s linear infinite;
+}
+
+.line {
+  height: 1rem;
+}
+
+.lineShort {
+  width: 45%;
+}
+
+.lineLong {
+  width: 70%;
+}
+
+.chips {
+  display: inline-flex;
+  gap: var(--space-2);
+}
+
+.chip {
+  width: 6rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.85fr);
+  gap: var(--space-4);
+}
+
+.column {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.panel {
+  border: 1px solid rgba(8, 54, 39, 0.1);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 6px 16px rgba(8, 54, 39, 0.06);
+}
+
+.panelBody {
+  min-height: 11rem;
+}
+
+.panelBodyTall {
+  min-height: 14rem;
+}
+
+.rail {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.actionBar {
+  height: 2.15rem;
+  border-radius: var(--radius-full);
+}
+
+@keyframes pulse {
+  from {
+    background-position: 0 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+@media (max-width: 76rem) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

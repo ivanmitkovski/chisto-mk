@@ -1,0 +1,223 @@
+.root {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(var(--font-size-xl), 2vw, var(--font-size-2xl));
+  font-weight: var(--font-weight-bold);
+}
+
+.subtitle {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filterChip {
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(148, 163, 184, 0.55);
+  background: rgba(248, 250, 252, 0.98);
+  padding: 0 var(--space-3);
+  min-height: 1.9rem;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.filterChipActive {
+  border-color: rgba(37, 219, 134, 0.5);
+  background: rgba(37, 219, 134, 0.1);
+  color: #0f8c55;
+}
+
+.filterChip:hover {
+  border-color: rgba(37, 219, 134, 0.4);
+  background: rgba(248, 250, 252, 0.96);
+}
+
+.filterChip:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.listCard {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.listHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.listTitle {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+}
+
+.markAllButton {
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  min-height: 1.75rem;
+  padding: 0 var(--space-3);
+  background: rgba(248, 250, 252, 0.98);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.markAllButton:hover:enabled {
+  border-color: rgba(37, 219, 134, 0.4);
+  background: rgba(241, 245, 249, 0.98);
+}
+
+.markAllButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.markAllButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.96);
+  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease;
+}
+
+.item:hover {
+  border-color: rgba(37, 219, 134, 0.16);
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
+  transform: translateY(-1px);
+}
+
+.item:focus-within {
+  border-color: rgba(37, 219, 134, 0.3);
+  box-shadow: 0 0 0 1px rgba(37, 219, 134, 0.28);
+}
+
+.iconWrap {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iconToneSuccess {
+  background: rgba(37, 219, 134, 0.16);
+  color: #047857;
+}
+
+.iconToneWarning {
+  background: rgba(248, 187, 0, 0.16);
+  color: #92400e;
+}
+
+.iconToneInfo {
+  background: rgba(36, 172, 249, 0.16);
+  color: #0369a1;
+}
+
+.iconToneNeutral {
+  background: rgba(148, 163, 184, 0.22);
+  color: #334155;
+}
+
+.textWrap {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.itemTitle {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.itemMessage {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: flex-end;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.unreadDot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--color-error);
+}
+
+.link {
+  color: #0f766e;
+  text-decoration: none;
+  font-size: var(--font-size-xs);
+  transition: color 140ms ease;
+}
+
+.link:hover {
+  text-decoration: underline;
+  color: #0b5f59;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 52rem) {
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filters {
+    flex-wrap: wrap;
+  }
+}

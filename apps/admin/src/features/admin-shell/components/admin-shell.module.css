@@ -15,6 +15,10 @@
   transition: grid-template-columns 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+.shellNoTransition {
+  transition: none;
+}
+
 .shellCollapsed {
   grid-template-columns: var(--sidebar-width-collapsed) minmax(0, 1fr);
 }

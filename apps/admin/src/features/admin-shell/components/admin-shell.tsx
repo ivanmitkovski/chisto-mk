@@ -3,6 +3,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { adminNavigation } from '../config/navigation';
+import { DESKTOP_SIDEBAR_COOKIE_KEY, DESKTOP_SIDEBAR_STORAGE_KEY } from '../constants';
 import { NavItemKey } from '../types';
 import { SidebarNav } from './sidebar-nav';
 import { TopBar } from './top-bar';
@@ -12,14 +13,22 @@ type AdminShellProps = {
   title: string;
   activeItem: NavItemKey;
   children: ReactNode;
+  initialSidebarCollapsed?: boolean;
 };
 
-const DESKTOP_SIDEBAR_KEY = 'chisto-admin-sidebar-collapsed';
+const SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
 
-export function AdminShell({ title, activeItem, children }: AdminShellProps) {
+function persistSidebarPreference(nextIsCollapsed: boolean) {
+  const serializedValue = nextIsCollapsed ? '1' : '0';
+  window.localStorage.setItem(DESKTOP_SIDEBAR_STORAGE_KEY, serializedValue);
+  document.cookie = `${DESKTOP_SIDEBAR_COOKIE_KEY}=${serializedValue}; path=/; max-age=${SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS}; samesite=lax`;
+}
+
+export function AdminShell({ title, activeItem, children, initialSidebarCollapsed = false }: AdminShellProps) {
   const [isMobile, setIsMobile] = useState(false);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(initialSidebarCollapsed);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const [isSidebarPreferenceHydrated, setIsSidebarPreferenceHydrated] = useState(false);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(max-width: 48rem)');
@@ -37,8 +46,23 @@ export function AdminShell({ title, activeItem, children }: AdminShellProps) {
   }, []);
 
   useEffect(() => {
-    const persistedValue = window.localStorage.getItem(DESKTOP_SIDEBAR_KEY);
-    setIsSidebarCollapsed(persistedValue === '1');
+    const persistedValue = window.localStorage.getItem(DESKTOP_SIDEBAR_STORAGE_KEY);
+
+    if (persistedValue === '1' || persistedValue === '0') {
+      const persistedIsCollapsed = persistedValue === '1';
+      if (persistedIsCollapsed !== initialSidebarCollapsed) {
+        setIsSidebarCollapsed(persistedIsCollapsed);
+      }
+      persistSidebarPreference(persistedIsCollapsed);
+    } else {
+      persistSidebarPreference(initialSidebarCollapsed);
+    }
+
+    const animationFrameId = window.requestAnimationFrame(() => {
+      setIsSidebarPreferenceHydrated(true);
+    });
+
+    return () => window.cancelAnimationFrame(animationFrameId);
   }, []);
 
   useEffect(() => {
@@ -84,7 +108,7 @@ export function AdminShell({ title, activeItem, children }: AdminShellProps) {
 
     setIsSidebarCollapsed((prev) => {
       const next = !prev;
-      window.localStorage.setItem(DESKTOP_SIDEBAR_KEY, next ? '1' : '0');
+      persistSidebarPreference(next);
       return next;
     });
   }
@@ -95,6 +119,7 @@ export function AdminShell({ title, activeItem, children }: AdminShellProps) {
 
   const shellClassName = [
     styles.shell,
+    !isSidebarPreferenceHydrated ? styles.shellNoTransition : '',
     isSidebarCollapsed && !isMobile ? styles.shellCollapsed : '',
     isMobile ? styles.shellMobile : '',
   ]
