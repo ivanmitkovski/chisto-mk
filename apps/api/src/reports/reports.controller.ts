@@ -20,6 +20,7 @@ import { CreateReportDto } from './dto/create-report.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportsService } from './reports.service';
+import { UserReportListItemDto } from './dto/user-report.dto';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -31,6 +32,19 @@ export class ReportsController {
   @ApiCreatedResponse({ description: 'Report created successfully' })
   create(@Body() dto: CreateReportDto) {
     return this.reportsService.create(dto);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List reports created by the authenticated user' })
+  @ApiOkResponse({
+    description: 'Reports for the current user fetched successfully',
+    type: UserReportListItemDto,
+    isArray: true,
+  })
+  findForCurrentUser(@CurrentUser() user: AuthenticatedUser): Promise<UserReportListItemDto[]> {
+    return this.reportsService.findForCurrentUser(user);
   }
 
   @Get()
