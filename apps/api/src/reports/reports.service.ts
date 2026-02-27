@@ -11,6 +11,7 @@ import {
 } from './dto/admin-report.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
+import { UserReportListItemDto } from './dto/user-report.dto';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -161,6 +162,45 @@ export class ReportsService {
 
       return newReport;
     });
+  }
+
+  async findForCurrentUser(user: AuthenticatedUser): Promise<UserReportListItemDto[]> {
+    const reports = await this.prisma.report.findMany({
+      where: {
+        reporterId: user.userId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        site: {
+          select: {
+            latitude: true,
+            longitude: true,
+            description: true,
+          },
+        },
+        coReporters: true,
+        potentialDuplicateOf: {
+          select: {
+            id: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+
+    return reports.map((report) => ({
+      id: report.id,
+      reportNumber: this.buildReportNumber(report),
+      title: report.site.description ?? 'Reported site',
+      location: this.buildLocationLabel(report.site),
+      submittedAt: report.createdAt.toISOString(),
+      status: report.status,
+      isPotentialDuplicate:
+        report.potentialDuplicateOfId !== null || report.coReporters.length > 0,
+      coReporterCount: report.coReporters.length,
+    }));
   }
 
   async findAllForModeration(query: ListReportsQueryDto): Promise<AdminReportListResponseDto> {

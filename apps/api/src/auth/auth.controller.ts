@@ -15,6 +15,7 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
 import { AuthenticatedUser } from './types/authenticated-user.type';
+import { AuthResponseDto } from './dto/auth-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -23,22 +24,31 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user account' })
-  @ApiCreatedResponse({ description: 'User registered and token issued' })
-  register(@Body() dto: RegisterDto) {
+  @ApiCreatedResponse({
+    description: 'User registered and token issued',
+    type: AuthResponseDto,
+  })
+  register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
     return this.authService.register(dto);
   }
 
   @Post('login')
   @ApiOperation({ summary: 'Authenticate existing user' })
-  @ApiOkResponse({ description: 'User authenticated and token issued' })
-  login(@Body() dto: LoginDto) {
+  @ApiOkResponse({
+    description: 'User authenticated and token issued',
+    type: AuthResponseDto,
+  })
+  login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.login(dto);
   }
 
   @Post('admin/login')
   @ApiOperation({ summary: 'Authenticate admin user for admin console' })
-  @ApiOkResponse({ description: 'Admin authenticated and token issued' })
-  adminLogin(@Body() dto: LoginDto) {
+  @ApiOkResponse({
+    description: 'Admin authenticated and token issued',
+    type: AuthResponseDto,
+  })
+  adminLogin(@Body() dto: LoginDto): Promise<AuthResponseDto> {
     return this.authService.adminLogin(dto);
   }
 
