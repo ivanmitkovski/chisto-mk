@@ -4,11 +4,16 @@ import { FormEvent, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ActionConfirmModal } from '@/features/reports/components/action-confirm-modal';
 import { Button, Card, Icon, Input, Snack, type SnackState } from '@/components/ui';
-import { mockAdminSessions, mockSecurityActivity, type AdminSession, type SecurityActivityEvent } from '../data/security';
+import type { AdminSession, SecurityActivityEvent } from '../data/security';
 import { useSettingsForm } from '../hooks/use-settings-form';
 import styles from './settings-profile.module.css';
 
 type SettingsTabId = 'profile' | 'preferences' | 'security';
+
+type SettingsProfileProps = {
+  initialSessions: AdminSession[];
+  initialActivity: SecurityActivityEvent[];
+};
 
 type PasswordFormValues = {
   current: string;
@@ -43,12 +48,12 @@ function validatePasswordForm(values: PasswordFormValues): PasswordFormErrors {
   return errors;
 }
 
-export function SettingsProfile() {
+export function SettingsProfile({ initialSessions, initialActivity }: SettingsProfileProps) {
   const [activeTab, setActiveTab] = useState<SettingsTabId>('profile');
   const { values, errors, successMessage, updateField, handleSubmit } = useSettingsForm();
 
-  const [sessions, setSessions] = useState<AdminSession[]>(() => mockAdminSessions.map((session) => ({ ...session })));
-  const [activity] = useState<SecurityActivityEvent[]>(() => mockSecurityActivity);
+  const [sessions, setSessions] = useState<AdminSession[]>(() => initialSessions.map((session) => ({ ...session })));
+  const [activity] = useState<SecurityActivityEvent[]>(() => initialActivity);
   const [securitySnack, setSecuritySnack] = useState<SnackState | null>(null);
 
   const [isSignOutModalOpen, setIsSignOutModalOpen] = useState(false);

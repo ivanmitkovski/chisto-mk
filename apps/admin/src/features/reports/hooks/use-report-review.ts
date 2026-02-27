@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { SnackState } from '@/components/ui';
-import { MOCK_DELAY_MS } from '@/features/shared/constants/mock';
-import { delay } from '@/features/shared/utils/delay';
 import { ReportDetail, ReportStatus, ReportTimelineEntry } from '../types';
 
 type ReviewAction = 'approve' | 'reject' | 'in-review';
@@ -56,13 +54,36 @@ export function useReportReview(initialReport: ReportDetail) {
 
   async function mutateStatus(nextStatus: ReportStatus, action: ReviewAction, reason?: string) {
     setIsUpdating(true);
-    await delay(MOCK_DELAY_MS + 60);
+    const res = await fetch(`/api/reports/${encodeURIComponent(report.id)}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status: nextStatus, reason: reason ?? undefined }),
+    });
+
+    const body = await res.json().catch(() => ({}));
+    const message =
+      body && typeof body.message === 'string'
+        ? body.message
+        : 'Unable to update this report right now.';
+
+    if (!res.ok) {
+      setSnack({
+        tone: 'error',
+        title: 'Action failed',
+        message,
+      });
+      setIsUpdating(false);
+      return;
+    }
+
     const timelineEntry = createTimelineEntry(nextStatus, reason);
     setReport((prev) => ({
       ...prev,
       status: nextStatus,
       timeline: [timelineEntry, ...prev.timeline],
     }));
+
     if (action === 'approve') {
       setSnack({
         tone: 'success',

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Card, Icon, SectionState, Snack } from '@/components/ui';
@@ -267,6 +268,14 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
               {formatReportStatus(currentReport.status)}
             </span>
             <span className={priorityClassName(currentReport.priority)}>{currentReport.priority} priority</span>
+            {currentReport.isPotentialDuplicate ? (
+              <span className={styles.duplicatePill}>
+                <Icon name="alert-triangle" size={12} />
+                {currentReport.potentialDuplicateOfReportNumber
+                  ? `Maybe duplicate of ${currentReport.potentialDuplicateOfReportNumber}`
+                  : 'Maybe duplicate report'}
+              </span>
+            ) : null}
           </div>
         </header>
         <div className={styles.grid}>
@@ -280,11 +289,13 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
                     aria-label="Open photo in fullscreen"
                     onClick={() => setIsLightboxOpen(true)}
                   >
-                    <img
+                    <Image
                       src={activePhoto.previewUrl}
                       alt={activePhoto.previewAlt ?? activePhoto.label}
                       className={styles.imagePhoto}
                       loading="lazy"
+                      fill
+                      sizes="(min-width: 768px) 50vw, 100vw"
                     />
                   </button>
                 ) : null}
@@ -307,7 +318,15 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
                       className={`${styles.photoThumb} ${item.id === activePhoto?.id ? styles.photoThumbActive : ''}`}
                       onClick={() => setActivePhotoId(item.id)}
                     >
-                      <img src={item.previewUrl} alt={item.previewAlt ?? item.label} loading="lazy" />
+                      {item.previewUrl ? (
+                        <Image
+                          src={item.previewUrl}
+                          alt={item.previewAlt ?? item.label}
+                          loading="lazy"
+                          width={86}
+                          height={64}
+                        />
+                      ) : null}
                     </button>
                   ))}
                 </div>
@@ -323,6 +342,12 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
                     <dt>Reporter</dt>
                     <dd>{currentReport.reporterAlias}</dd>
                   </div>
+                  {currentReport.coReporters.length > 0 ? (
+                    <div>
+                      <dt>Also reported by</dt>
+                      <dd>{currentReport.coReporters.join(', ')}</dd>
+                    </div>
+                  ) : null}
                   <div>
                     <dt>Trust tier</dt>
                     <dd>{currentReport.reporterTrust}</dd>
@@ -514,10 +539,13 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
                   <Icon name="chevron-left" size={18} />
                 </button>
               ) : null}
-              <img
+              <Image
                 src={activePhoto.previewUrl}
                 alt={activePhoto.previewAlt ?? activePhoto.label}
                 className={styles.lightboxImage}
+                loading="lazy"
+                width={1200}
+                height={800}
               />
               {photoEvidence.length > 1 ? (
                 <button type="button" className={styles.lightboxNav} aria-label="Next photo" onClick={showNextPhoto}>
