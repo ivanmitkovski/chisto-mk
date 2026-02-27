@@ -8,6 +8,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Skopje',
     dateReportedAt: '2025-10-23T09:15:00.000Z',
     status: 'NEW',
+    isPotentialDuplicate: true,
+    coReporterCount: 2,
   },
   {
     id: 'r-2',
@@ -16,6 +18,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Tetovo',
     dateReportedAt: '2025-10-22T10:45:00.000Z',
     status: 'IN_REVIEW',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-3',
@@ -24,6 +28,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Bitola',
     dateReportedAt: '2025-10-21T11:30:00.000Z',
     status: 'APPROVED',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-4',
@@ -32,6 +38,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Kumanovo',
     dateReportedAt: '2025-10-20T12:05:00.000Z',
     status: 'NEW',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-5',
@@ -40,6 +48,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Ohrid',
     dateReportedAt: '2025-10-19T13:10:00.000Z',
     status: 'DELETED',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-6',
@@ -48,6 +58,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Prilep',
     dateReportedAt: '2025-10-18T14:25:00.000Z',
     status: 'IN_REVIEW',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-7',
@@ -56,6 +68,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Veles',
     dateReportedAt: '2025-10-17T15:30:00.000Z',
     status: 'NEW',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
   {
     id: 'r-8',
@@ -64,6 +78,8 @@ export const reports: ReadonlyArray<ReportRow> = [
     location: 'Strumica',
     dateReportedAt: '2025-10-16T16:10:00.000Z',
     status: 'APPROVED',
+    isPotentialDuplicate: false,
+    coReporterCount: 0,
   },
 ];
 
@@ -149,4 +165,7 @@ export const reportDetail: ReportDetail = {
     longitude: 21.428,
     label: 'Skopje neighborhood park',
   },
+  isPotentialDuplicate: true,
+  coReporters: ['Citizen #5930', 'Citizen #6112'],
+  potentialDuplicateOfReportNumber: '00.',
 };

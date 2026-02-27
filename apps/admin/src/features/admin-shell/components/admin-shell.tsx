@@ -14,6 +14,7 @@ type AdminShellProps = {
   activeItem: NavItemKey;
   children: ReactNode;
   initialSidebarCollapsed?: boolean;
+  initialTopBarNotifications?: import('../types/top-bar').TopBarNotification[];
 };
 
 const SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
@@ -24,7 +25,13 @@ function persistSidebarPreference(nextIsCollapsed: boolean) {
   document.cookie = `${DESKTOP_SIDEBAR_COOKIE_KEY}=${serializedValue}; path=/; max-age=${SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS}; samesite=lax`;
 }
 
-export function AdminShell({ title, activeItem, children, initialSidebarCollapsed = false }: AdminShellProps) {
+export function AdminShell({
+  title,
+  activeItem,
+  children,
+  initialSidebarCollapsed = false,
+  initialTopBarNotifications,
+}: AdminShellProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(initialSidebarCollapsed);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -159,6 +166,7 @@ export function AdminShell({ title, activeItem, children, initialSidebarCollapse
             isSidebarCollapsed={isSidebarCollapsed && !isMobile}
             isMobileSidebarOpen={isMobileSidebarOpen}
             onMenuToggle={toggleSidebar}
+            initialNotifications={initialTopBarNotifications ?? []}
           />
           <div className={styles.content}>{children}</div>
         </main>

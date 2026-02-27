@@ -1,5 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { SnackState } from '@/components/ui';
+import { ApiError } from '@/lib/api';
+import { loginAdmin } from '../lib/admin-auth';
 
 type LoginValues = {
   identity: string;
@@ -7,11 +9,6 @@ type LoginValues = {
 };
 
 type LoginErrors = Partial<Record<keyof LoginValues, string>>;
-
-const MOCK_ADMIN_CREDENTIALS = {
-  identity: 'admin@chisto.mk',
-  password: 'chisto1234',
-};
 
 function validate(values: LoginValues): LoginErrors {
   const errors: LoginErrors = {};
@@ -43,7 +40,7 @@ export function useLoginForm() {
     setSnack(null);
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>): boolean {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>): Promise<boolean> {
     event.preventDefault();
     const nextErrors = validate(values);
     setErrors(nextErrors);
@@ -57,25 +54,37 @@ export function useLoginForm() {
       return false;
     }
 
-    const isMatchingIdentity = values.identity.trim().toLowerCase() === MOCK_ADMIN_CREDENTIALS.identity;
-    const isMatchingPassword = values.password.trim() === MOCK_ADMIN_CREDENTIALS.password;
+    try {
+      await loginAdmin(values.identity.trim(), values.password.trim());
 
-    if (!isMatchingIdentity || !isMatchingPassword) {
+      setSnack({
+        tone: 'success',
+        title: 'Welcome back',
+        message: 'Login successful. Opening your admin dashboard...',
+      });
+
+      return true;
+    } catch (error) {
+      if (error instanceof ApiError) {
+        const isAdminError = error.code === 'ADMIN_ACCESS_REQUIRED';
+
+        setSnack({
+          tone: 'error',
+          title: isAdminError ? 'Admin access required' : 'Login failed',
+          message: isAdminError
+            ? 'This account does not have admin privileges for the console.'
+            : 'Wrong email or password. Please try again.',
+        });
+        return false;
+      }
+
       setSnack({
         tone: 'error',
         title: 'Login failed',
-        message: 'Wrong username or password. Please try again.',
+        message: 'Unexpected error while logging in. Please try again.',
       });
       return false;
     }
-
-    setSnack({
-      tone: 'success',
-      title: 'Welcome back',
-      message: 'Login successful. Opening your admin dashboard...',
-    });
-
-    return true;
   }
 
   return {

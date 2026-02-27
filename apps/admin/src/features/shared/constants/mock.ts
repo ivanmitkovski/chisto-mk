@@ -1,1 +1,1 @@
-export const MOCK_DELAY_MS = 120;
+export const MOCK_DELAY_MS = 0;

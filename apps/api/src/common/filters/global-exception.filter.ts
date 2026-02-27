@@ -28,6 +28,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    // Log unexpected errors to aid debugging while keeping response generic
+    // eslint-disable-next-line no-console
+    console.error('Unhandled exception in request pipeline:', exception);
+
     const fallback: ErrorResponse = {
       code: 'INTERNAL_ERROR',
       message: 'Internal server error',

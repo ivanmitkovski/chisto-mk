@@ -81,28 +81,29 @@ export function useReportTable({ initialRows, pageSize = 5 }: UseReportTableOpti
     return () => window.clearTimeout(timeoutId);
   }, [snack]);
 
-  function updateStatus(id: string, status: ReportStatus, action: ReportTableAction, reason?: string) {
-    let isUpdated = false;
+  async function updateStatus(id: string, status: ReportStatus, action: ReportTableAction, reason?: string) {
+    const res = await fetch(`/api/reports/${encodeURIComponent(id)}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ status, reason: reason ?? undefined }),
+    });
 
-    setRows((prevRows) =>
-      prevRows.map((row) => {
-        if (row.id !== id) {
-          return row;
-        }
+    const body = await res.json().catch(() => ({}));
+    const message = typeof body?.message === 'string' ? body.message : 'Unable to update this report right now.';
 
-        isUpdated = true;
-        return { ...row, status };
-      }),
-    );
-
-    if (!isUpdated) {
+    if (!res.ok) {
       setSnack({
         tone: 'error',
         title: 'Action failed',
-        message: 'Unable to update this report right now.',
+        message,
       });
       return;
     }
+
+    setRows((prevRows) =>
+      prevRows.map((row) => (row.id !== id ? row : { ...row, status })),
+    );
 
     if (action === 'approve') {
       setSnack({

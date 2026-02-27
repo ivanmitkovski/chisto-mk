@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import { Button, Icon, Input } from '@/components/ui';
-import { initialTopBarNotifications, profileMenuActions, topBarCommands } from '../data/top-bar-mocks';
+import { profileMenuActions, topBarCommands } from '../data/top-bar-mocks';
 import { useCommandPalette } from '../hooks/use-command-palette';
 import { useOverlayDismiss } from '../hooks/use-overlay-dismiss';
 import { TopBarCommand, TopBarNotification } from '../types/top-bar';
@@ -17,6 +17,7 @@ type TopBarProps = {
   isSidebarCollapsed: boolean;
   isMobileSidebarOpen: boolean;
   onMenuToggle: () => void;
+  initialNotifications?: TopBarNotification[];
 };
 
 export function TopBar({
@@ -25,6 +26,7 @@ export function TopBar({
   isSidebarCollapsed,
   isMobileSidebarOpen,
   onMenuToggle,
+  initialNotifications = [],
 }: TopBarProps) {
   const router = useRouter();
   const searchTriggerRef = useRef<HTMLInputElement>(null);
@@ -42,7 +44,7 @@ export function TopBar({
   const [shortcutLabel, setShortcutLabel] = useState('Ctrl+K');
   const [preferencesMessage, setPreferencesMessage] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<TopBarNotification[]>(() =>
-    initialTopBarNotifications.map((notification) => ({ ...notification })),
+    initialNotifications.map((notification) => ({ ...notification })),
   );
 
   const {

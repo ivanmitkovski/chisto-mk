@@ -3,14 +3,24 @@ import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import { getDashboardStats, StatsOverview } from '@/features/dashboard-overview';
 import { getReports, ReportsTable } from '@/features/reports';
+import { getAdminNotifications } from '@/features/notifications';
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
-  const [stats, reports] = await Promise.all([getDashboardStats(), getReports()]);
+  const [{ items: notifications }, stats, reports] = await Promise.all([
+    getAdminNotifications(),
+    getDashboardStats(),
+    getReports(),
+  ]);
 
   return (
-    <AdminShell title="Overview" activeItem="dashboard" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell
+      title="Overview"
+      activeItem="dashboard"
+      initialSidebarCollapsed={initialSidebarCollapsed}
+      initialTopBarNotifications={notifications.slice(0, 3)}
+    >
       <StatsOverview cards={stats} />
       <ReportsTable rows={reports} />
     </AdminShell>

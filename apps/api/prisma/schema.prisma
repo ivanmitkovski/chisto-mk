@@ -29,8 +29,11 @@ model User {
   totalPointsSpent  Int @default(0)
   lastActiveAt      DateTime?
 
-  reports      Report[]
+  reports              Report[]             @relation("ReporterReports")
+  moderatedReports     Report[]             @relation("ModeratorReports")
+  adminNotifications   AdminNotification[]
   pointTransactions PointTransaction[]
+  coReportedReports    ReportCoReporter[]
 
   @@index([role])
   @@index([status])
@@ -45,6 +48,40 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   DELETED
+}
+
+// Admin notifications for console activity
+model AdminNotification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  title     String
+  message   String
+  timeLabel String
+  tone      AdminNotificationTone
+  category  AdminNotificationCategory
+  isUnread  Boolean @default(true)
+  href      String?
+
+  @@index([userId, createdAt])
+  @@index([category, createdAt])
+}
+
+enum AdminNotificationTone {
+  success
+  warning
+  info
+  neutral
+}
+
+enum AdminNotificationCategory {
+  reports
+  system
+  analytics
 }
 
 model PointTransaction {
@@ -101,22 +138,50 @@ model Report {
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   reporterId String?
-  reporter   User?    @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  reporter   User?    @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: SetNull)
 
   description String?
   mediaUrls   String[] @default([])
 
-  status    ReportStatus @default(PENDING)
+  status          ReportStatus @default(NEW)
+  moderatedAt     DateTime?
+  moderationReason String?
+  moderatedById   String?
+  moderatedBy     User?        @relation("ModeratorReports", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  // Optional link to a primary report this one is considered a potential duplicate of
+  potentialDuplicateOfId String?
+  potentialDuplicateOf   Report? @relation("ReportPotentialDuplicate", fields: [potentialDuplicateOfId], references: [id])
+  potentialDuplicates    Report[] @relation("ReportPotentialDuplicate")
+
+  coReporters ReportCoReporter[]
 
   @@index([siteId])
   @@index([reporterId])
   @@index([status])
+  @@index([potentialDuplicateOfId])
 }
 
 enum ReportStatus {
-  PENDING
+  NEW
+  IN_REVIEW
   APPROVED
-  REJECTED
+  DELETED
+}
+
+// Additional reporters attached to an existing report
+model ReportCoReporter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  reportId String
+  report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  userId   String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, userId])
+  @@index([userId])
 }
 
 // Cleanup event at a site

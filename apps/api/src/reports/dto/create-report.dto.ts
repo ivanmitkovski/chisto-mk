@@ -35,4 +35,12 @@ export class CreateReportDto {
   @ArrayMaxSize(5)
   @IsUrl({}, { each: true })
   mediaUrls?: string[];
+
+  @ApiPropertyOptional({
+    description:
+      'Optional reporter identifier when the report is created on behalf of an authenticated user',
+  })
+  @IsOptional()
+  @IsString()
+  reporterId?: string;
 }

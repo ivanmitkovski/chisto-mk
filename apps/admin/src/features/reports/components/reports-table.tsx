@@ -248,6 +248,13 @@ export function ReportsTable({ rows }: ReportsTableProps) {
                                 </span>
                                 <span className={styles.slaText}>{meta.slaLabel}</span>
                               </div>
+                              {row.isPotentialDuplicate ? (
+                                <span className={styles.duplicateBadge}>
+                                  <Icon name="alert-triangle" size={12} />
+                                  Maybe duplicate
+                                  {row.coReporterCount > 0 ? ` · +${row.coReporterCount} co-reporters` : ''}
+                                </span>
+                              ) : null}
                             </div>
                           );
                         })()}

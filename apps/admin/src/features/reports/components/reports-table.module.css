@@ -184,6 +184,19 @@
   font-size: var(--font-size-xs);
 }
 
+.duplicateBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0 0.5rem;
+  min-height: 1.25rem;
+  border-radius: var(--radius-full);
+  background: rgba(248, 187, 0, 0.14);
+  color: #8d6600;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+}
+
 .priorityChip {
   border-radius: var(--radius-full);
   padding: 0 0.5rem;

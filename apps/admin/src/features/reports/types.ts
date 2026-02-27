@@ -39,6 +39,8 @@ export type ReportRow = {
   location: string;
   dateReportedAt: string;
   status: ReportStatus;
+  isPotentialDuplicate: boolean;
+  coReporterCount: number;
 };
 
 export type ReportDetail = {
@@ -56,6 +58,9 @@ export type ReportDetail = {
   timeline: ReportTimelineEntry[];
   moderation: ReportModerationMeta;
   mapPin: ReportMapPin;
+  isPotentialDuplicate: boolean;
+  coReporters: string[];
+  potentialDuplicateOfReportNumber?: string;
 };
 
 export type StatusFilter = 'ALL' | ReportStatus;

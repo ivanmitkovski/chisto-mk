@@ -34,6 +34,20 @@
   flex-wrap: wrap;
 }
 
+.duplicatePill {
+  border-radius: var(--radius-full);
+  min-height: 1.5rem;
+  padding: 0 var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.02em;
+  background: rgba(248, 187, 0, 0.16);
+  color: #8d6600;
+}
+
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(16rem, 0.85fr);

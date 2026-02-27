@@ -91,6 +91,19 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
+  async adminLogin(dto: LoginDto): Promise<AuthResponse> {
+    const response = await this.login(dto);
+
+    if (response.user.role !== Role.ADMIN) {
+      throw new UnauthorizedException({
+        code: 'ADMIN_ACCESS_REQUIRED',
+        message: 'Admin role is required to access the admin console',
+      });
+    }
+
+    return response;
+  }
+
   async me(authenticatedUser: AuthenticatedUser): Promise<{
     id: string;
     firstName: string;

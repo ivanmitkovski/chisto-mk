@@ -1,75 +1,54 @@
-import { MOCK_DELAY_MS } from '@/features/shared/constants/mock';
-import { delay } from '@/features/shared/utils/delay';
+import { apiFetch } from '@/lib/api';
+import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-server';
 import { ReportDetail, ReportRow } from '../../types';
-import { reportDetail, reports } from '../mock-data';
+
+type AdminReportListItem = {
+  id: string;
+  reportNumber: string;
+  name: string;
+  location: string;
+  dateReportedAt: string;
+  status: ReportRow['status'];
+  isPotentialDuplicate: boolean;
+  coReporterCount: number;
+};
+
+type AdminReportListResponse = {
+  data: AdminReportListItem[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+};
 
 export async function getReports(): Promise<ReportRow[]> {
-  await delay(MOCK_DELAY_MS);
-  return reports.map((report) => ({ ...report }));
+  const token = await getAdminAuthTokenFromCookies();
+
+  const response = await apiFetch<AdminReportListResponse>('/reports', {
+    method: 'GET',
+    authToken: token,
+  });
+
+  return response.data.map((item) => ({
+    id: item.id,
+    reportNumber: item.reportNumber,
+    name: item.name,
+    location: item.location,
+    dateReportedAt: item.dateReportedAt,
+    status: item.status,
+    isPotentialDuplicate: item.isPotentialDuplicate,
+    coReporterCount: item.coReporterCount,
+  }));
 }
 
 export async function getReportDetail(reportId: string): Promise<ReportDetail> {
-  await delay(MOCK_DELAY_MS);
+  const token = await getAdminAuthTokenFromCookies();
 
-  if (reportDetail.id === reportId) {
-    return { ...reportDetail };
-  }
+  const detail = await apiFetch<ReportDetail>(`/reports/${reportId}`, {
+    method: 'GET',
+    authToken: token,
+  });
 
-  const fallback = reports.find((report) => report.id === reportId);
-
-  if (!fallback) {
-    throw new Error('Report not found');
-  }
-
-  return {
-    id: fallback.id,
-    reportNumber: fallback.reportNumber,
-    status: fallback.status,
-    priority: 'MEDIUM',
-    title: fallback.name,
-    description: `Review details for ${fallback.name}.`,
-    location: fallback.location,
-    submittedAt: fallback.dateReportedAt,
-    reporterAlias: 'Citizen (unverified)',
-    reporterTrust: 'Bronze',
-    evidence: [
-      {
-        id: `${fallback.id}-ev-1`,
-        label: 'Submitted photo evidence',
-        kind: 'image',
-        sizeLabel: '2.1 MB',
-        uploadedAt: fallback.dateReportedAt,
-        previewUrl: '/mock/reports/r-1-photo-1.svg',
-        previewAlt: 'Submitted evidence image preview',
-      },
-    ],
-    timeline: [
-      {
-        id: `${fallback.id}-tl-1`,
-        title: 'Report submitted',
-        detail: 'Report received through citizen reporting flow.',
-        actor: 'Citizen',
-        occurredAt: fallback.dateReportedAt,
-        tone: 'info',
-      },
-      {
-        id: `${fallback.id}-tl-2`,
-        title: 'Added to moderation queue',
-        detail: 'Queued for manual moderation review.',
-        actor: 'System',
-        occurredAt: fallback.dateReportedAt,
-        tone: 'neutral',
-      },
-    ],
-    moderation: {
-      queueLabel: 'General Queue',
-      slaLabel: '4h remaining',
-      assignedTeam: 'City Moderation',
-    },
-    mapPin: {
-      latitude: 41.9981,
-      longitude: 21.4254,
-      label: fallback.location,
-    },
-  };
+  return detail;
 }
