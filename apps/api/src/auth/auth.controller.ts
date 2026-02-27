@@ -35,6 +35,13 @@ export class AuthController {
     return this.authService.login(dto);
   }
 
+  @Post('admin/login')
+  @ApiOperation({ summary: 'Authenticate admin user for admin console' })
+  @ApiOkResponse({ description: 'Admin authenticated and token issued' })
+  adminLogin(@Body() dto: LoginDto) {
+    return this.authService.adminLogin(dto);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
