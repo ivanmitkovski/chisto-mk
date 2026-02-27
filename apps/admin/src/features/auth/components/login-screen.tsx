@@ -13,13 +13,13 @@ export function LoginScreen() {
   const currentYear = new Date().getFullYear();
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
-    const isValid = handleSubmit(event);
-
-    if (isValid) {
-      window.setTimeout(() => {
-        router.push('/dashboard');
-      }, 480);
-    }
+    handleSubmit(event).then((isValid) => {
+      if (isValid) {
+        window.setTimeout(() => {
+          router.push('/dashboard');
+        }, 480);
+      }
+    });
   }
 
   return (

@@ -1,4 +1,4 @@
-import { ProfileMenuAction, TopBarCommand, TopBarNotification } from '../types/top-bar';
+import { ProfileMenuAction, TopBarCommand } from '../types/top-bar';
 
 export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   {
@@ -75,30 +75,6 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
       type: 'navigate',
       href: '/login',
     },
-  },
-];
-
-export const initialTopBarNotifications: ReadonlyArray<TopBarNotification> = [
-  {
-    id: 'notif-1',
-    title: 'Report R-109 approved',
-    message: 'Downtown illegal dump report moved to approved state.',
-    timeLabel: '3m ago',
-    isUnread: true,
-  },
-  {
-    id: 'notif-2',
-    title: 'New report submitted',
-    message: 'A new incident was received from Karposh district.',
-    timeLabel: '11m ago',
-    isUnread: true,
-  },
-  {
-    id: 'notif-3',
-    title: 'Weekly digest ready',
-    message: 'Report activity summary is available for review.',
-    timeLabel: '1h ago',
-    isUnread: false,
   },
 ];
 

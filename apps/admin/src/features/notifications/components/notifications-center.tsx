@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from 'react';
 import { Card, Icon, SectionState } from '@/components/ui';
-import { notificationsMock } from '../data';
 import { AdminNotification } from '../types';
 import styles from './notifications-center.module.css';
 
@@ -28,9 +27,13 @@ function toneClassName(tone: AdminNotification['tone']) {
   return styles.iconToneNeutral;
 }
 
-export function NotificationsCenter() {
+type NotificationsCenterProps = {
+  initialItems: AdminNotification[];
+};
+
+export function NotificationsCenter({ initialItems }: NotificationsCenterProps) {
   const [filter, setFilter] = useState<FilterKey>('all');
-  const [items, setItems] = useState(() => notificationsMock.map((item) => ({ ...item })));
+  const [items, setItems] = useState<AdminNotification[]>(() => initialItems.map((item) => ({ ...item })));
 
   const { filtered, unreadCount } = useMemo(() => {
     const unread = items.filter((item) => item.isUnread).length;

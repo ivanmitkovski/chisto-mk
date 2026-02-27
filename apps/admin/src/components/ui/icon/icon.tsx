@@ -21,6 +21,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
+  AlertTriangle,
 } from 'lucide-react';
 
 export type IconName =
@@ -44,7 +45,8 @@ export type IconName =
   | 'x'
   | 'panel-left-close'
   | 'panel-left-open'
-  | 'log-out';
+  | 'log-out'
+  | 'alert-triangle';
 
 const iconByName: Record<IconName, LucideIcon> = {
   home: House,
@@ -68,6 +70,7 @@ const iconByName: Record<IconName, LucideIcon> = {
   'panel-left-close': PanelLeftClose,
   'panel-left-open': PanelLeftOpen,
   'log-out': LogOut,
+  'alert-triangle': AlertTriangle,
 };
 
 type IconProps = {
