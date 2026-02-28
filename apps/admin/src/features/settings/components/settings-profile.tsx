@@ -364,21 +364,32 @@ export function SettingsProfile({ initialSessions, initialActivity }: SettingsPr
                     </p>
                   </header>
                   <ol className={styles.activityList}>
-                    {activity.map((event) => (
-                      <li
-                        key={event.id}
-                        className={`${styles.activityItem} ${styles[`activityTone${event.tone[0].toUpperCase()}${event.tone.slice(1)}`]}`}
-                      >
-                        <span className={styles.activityIcon} aria-hidden>
-                          <Icon name={event.icon} size={14} />
-                        </span>
+                    {activity.length === 0 ? (
+                      <li className={styles.activityItem}>
                         <div className={styles.activityBody}>
-                          <p className={styles.activityTitle}>{event.title}</p>
-                          <p className={styles.activityDetail}>{event.detail}</p>
-                          <p className={styles.activityTime}>{event.occurredAtLabel}</p>
+                          <p className={styles.activityTitle}>No recent security activity</p>
+                          <p className={styles.activityDetail}>
+                            Security events such as password changes and new device sign-ins will appear here.
+                          </p>
                         </div>
                       </li>
-                    ))}
+                    ) : (
+                      activity.map((event) => (
+                        <li
+                          key={event.id}
+                          className={`${styles.activityItem} ${styles[`activityTone${event.tone[0].toUpperCase()}${event.tone.slice(1)}`]}`}
+                        >
+                          <span className={styles.activityIcon} aria-hidden>
+                            <Icon name={event.icon} size={14} />
+                          </span>
+                          <div className={styles.activityBody}>
+                            <p className={styles.activityTitle}>{event.title}</p>
+                            <p className={styles.activityDetail}>{event.detail}</p>
+                            <p className={styles.activityTime}>{event.occurredAtLabel}</p>
+                          </div>
+                        </li>
+                      ))
+                    )}
                   </ol>
                 </section>
               </motion.div>

@@ -1,0 +1,49 @@
+.card {
+  border: 1px solid rgba(37, 219, 134, 0.11);
+  background: rgba(255, 255, 255, 0.92);
+  display: grid;
+  gap: var(--space-4);
+}
+
+.header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.line,
+.panelBody {
+  border-radius: var(--radius-lg);
+  background: linear-gradient(90deg, rgba(8, 54, 39, 0.07), rgba(8, 54, 39, 0.12), rgba(8, 54, 39, 0.07));
+  background-size: 200% 100%;
+  animation: pulse 1.2s linear infinite;
+}
+
+.line {
+  height: 1rem;
+}
+
+.lineShort {
+  width: 45%;
+}
+
+.lineLong {
+  width: 70%;
+}
+
+.section {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.panelBody {
+  min-height: 8rem;
+}
+
+@keyframes pulse {
+  from {
+    background-position: 0 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}

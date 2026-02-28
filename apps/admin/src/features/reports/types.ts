@@ -63,6 +63,31 @@ export type ReportDetail = {
   potentialDuplicateOfReportNumber?: string;
 };
 
-export type StatusFilter = 'ALL' | ReportStatus;
+export type DuplicateReportItem = {
+  id: string;
+  reportNumber: string;
+  title: string;
+  location: string;
+  submittedAt: string;
+  status: ReportStatus;
+  coReporterCount: number;
+  mediaCount: number;
+};
+
+export type DuplicateReportGroup = {
+  primaryReport: DuplicateReportItem;
+  duplicateReports: DuplicateReportItem[];
+  totalReports: number;
+};
+
+export type MergeDuplicateReportsResult = {
+  primaryReportId: string;
+  mergedChildCount: number;
+  mergedMediaCount: number;
+  mergedCoReporterCount: number;
+  primaryStatus: ReportStatus;
+};
+
+export type StatusFilter = 'ALL' | 'DUPLICATES' | ReportStatus;
 export type SortDirection = 'asc' | 'desc';
 export type SortKey = 'reportNumber' | 'name' | 'location' | 'dateReportedAt' | 'status';

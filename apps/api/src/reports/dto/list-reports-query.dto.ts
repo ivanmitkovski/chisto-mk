@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ReportStatus } from '@prisma/client';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
 
 export class ListReportsQueryDto {
   @ApiPropertyOptional({ enum: ReportStatus })
@@ -16,6 +16,15 @@ export class ListReportsQueryDto {
   @IsOptional()
   @IsString()
   siteId?: string;
+
+  @ApiPropertyOptional({
+    description: 'When true, returns only reports that are in a duplicate relationship',
+    default: false,
+  })
+  @Type(() => Boolean)
+  @IsOptional()
+  @IsBoolean()
+  duplicatesOnly?: boolean;
 
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @Type(() => Number)

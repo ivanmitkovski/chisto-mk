@@ -33,7 +33,12 @@ export function useReportTable({ initialRows, pageSize = 5 }: UseReportTableOpti
         normalize(row.location).includes(query) ||
         normalize(row.status).includes(query);
 
-      const matchesStatus = statusFilter === 'ALL' || row.status === statusFilter;
+      const matchesStatus =
+        statusFilter === 'ALL'
+          ? true
+          : statusFilter === 'DUPLICATES'
+            ? row.isPotentialDuplicate
+            : row.status === statusFilter;
 
       return matchesQuery && matchesStatus;
     });

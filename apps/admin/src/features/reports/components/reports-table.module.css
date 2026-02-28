@@ -187,14 +187,26 @@
 .duplicateBadge {
   display: inline-flex;
   align-items: center;
-  gap: 0.2rem;
   padding: 0 0.5rem;
-  min-height: 1.25rem;
+  min-height: 1.2rem;
   border-radius: var(--radius-full);
-  background: rgba(248, 187, 0, 0.14);
-  color: #8d6600;
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-medium);
+  background: rgba(8, 54, 39, 0.06);
+  color: rgba(8, 54, 39, 0.65);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 120ms ease;
+}
+
+.duplicateBadge:hover {
+  background: rgba(8, 54, 39, 0.12);
+}
+
+.duplicateBadge:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 1px;
 }
 
 .priorityChip {
@@ -294,6 +306,13 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
+}
+
+.mobileStatusRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .mobileActions {
