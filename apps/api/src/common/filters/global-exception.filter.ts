@@ -29,7 +29,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     }
 
     // Log unexpected errors to aid debugging while keeping response generic
-    // eslint-disable-next-line no-console
     console.error('Unhandled exception in request pipeline:', exception);
 
     const fallback: ErrorResponse = {
