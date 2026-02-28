@@ -21,7 +21,7 @@
     "db:push": "pnpm --filter @chisto/api exec prisma db push",
     "db:studio": "pnpm --filter @chisto/api exec prisma studio",
     "ci:check": "pnpm --filter @chisto/api exec prisma generate && pnpm --filter @chisto/api exec prisma validate && pnpm build",
-    "lint": "pnpm -r --filter '!@chisto/mobile' --filter '!@chisto/api' run lint",
+    "lint": "pnpm -r --filter '!@chisto/mobile' run lint",
     "test": "pnpm -r --filter '!@chisto/mobile' run test",
     "prepare": "husky"
   },

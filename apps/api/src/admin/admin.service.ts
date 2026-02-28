@@ -98,8 +98,9 @@ export class AdminService {
     };
   }
 
-  async getSecurityOverview(_admin: AuthenticatedUser): Promise<AdminSecurityOverview> {
+  async getSecurityOverview(admin: AuthenticatedUser): Promise<AdminSecurityOverview> {
     // No session or audit storage yet; return empty. Wire to real tables when available.
+    void admin;
     return {
       sessions: [],
       activity: [],
