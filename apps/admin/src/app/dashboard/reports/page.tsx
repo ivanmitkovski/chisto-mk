@@ -11,12 +11,31 @@ type ReportsPageProps = {
   }>;
 };
 
+function reportsErrorShell(
+  initialSidebarCollapsed: boolean,
+  message: string,
+) {
+  return (
+    <AdminShell title="Reports" activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
+      <SectionState variant="error" message={message} />
+    </AdminShell>
+  );
+}
+
 export default async function ReportsPage({ searchParams }: ReportsPageProps) {
   const cookieStore = await cookies();
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
   const resolvedSearchParams = await searchParams;
 
-  const [reports] = await Promise.all([getReports()]);
+  let reports: Awaited<ReturnType<typeof getReports>>;
+  try {
+    [reports] = await Promise.all([getReports()]);
+  } catch {
+    return reportsErrorShell(
+      initialSidebarCollapsed,
+      'Unable to load reports. Please try again or sign in again.',
+    );
+  }
 
   if (!reports.length) {
     return (
@@ -45,6 +64,9 @@ export default async function ReportsPage({ searchParams }: ReportsPageProps) {
       );
     }
 
-    throw error;
+    return reportsErrorShell(
+      initialSidebarCollapsed,
+      'Unable to load reports. Please try again or sign in again.',
+    );
   }
 }

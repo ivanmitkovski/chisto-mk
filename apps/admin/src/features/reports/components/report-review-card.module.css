@@ -34,18 +34,34 @@
   flex-wrap: wrap;
 }
 
-.duplicatePill {
-  border-radius: var(--radius-full);
-  min-height: 1.5rem;
-  padding: 0 var(--space-2);
+.duplicateNotice {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  border-left: 3px solid rgba(8, 54, 39, 0.2);
+  background: rgba(8, 54, 39, 0.04);
+}
+
+.duplicateNoticeText {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: rgba(8, 54, 39, 0.72);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.duplicateNoticeLink {
+  margin-top: var(--space-2);
+  color: #127e4c;
+  text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-bold);
-  letter-spacing: 0.02em;
-  background: rgba(248, 187, 0, 0.16);
-  color: #8d6600;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.duplicateNoticeLink:hover {
+  text-decoration: underline;
 }
 
 .grid {

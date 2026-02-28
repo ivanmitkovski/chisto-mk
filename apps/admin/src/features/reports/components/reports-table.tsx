@@ -249,11 +249,14 @@ export function ReportsTable({ rows }: ReportsTableProps) {
                                 <span className={styles.slaText}>{meta.slaLabel}</span>
                               </div>
                               {row.isPotentialDuplicate ? (
-                                <span className={styles.duplicateBadge}>
-                                  <Icon name="alert-triangle" size={12} />
-                                  Maybe duplicate
-                                  {row.coReporterCount > 0 ? ` · +${row.coReporterCount} co-reporters` : ''}
-                                </span>
+                                <Link
+                                  href={`/dashboard/reports/duplicates?reportId=${row.id}`}
+                                  className={styles.duplicateBadge}
+                                  aria-label={`View possible duplicates for ${row.reportNumber}`}
+                                >
+                                  Duplicate
+                                  {row.coReporterCount > 0 ? ` (+${row.coReporterCount})` : ''}
+                                </Link>
                               ) : null}
                             </div>
                           );
@@ -302,10 +305,22 @@ export function ReportsTable({ rows }: ReportsTableProps) {
                     <Icon name="location" size={14} />
                     {row.location}
                   </p>
-                  <span className={statusClassName(row.status)}>
-                    <Icon name={statusIconName(row.status)} size={12} />
-                    {formatReportStatus(row.status)}
-                  </span>
+                  <div className={styles.mobileStatusRow}>
+                    <span className={statusClassName(row.status)}>
+                      <Icon name={statusIconName(row.status)} size={12} />
+                      {formatReportStatus(row.status)}
+                    </span>
+                    {row.isPotentialDuplicate ? (
+                      <Link
+                        href={`/dashboard/reports/duplicates?reportId=${row.id}`}
+                        className={styles.duplicateBadge}
+                        aria-label={`View possible duplicates for ${row.reportNumber}`}
+                      >
+                        Duplicate
+                        {row.coReporterCount > 0 ? ` (+${row.coReporterCount})` : ''}
+                      </Link>
+                    ) : null}
+                  </div>
                   <div className={styles.mobileActions}>
                     <Button size="sm" onClick={() => openApproveModal(row)}>
                       <Icon name="check" size={14} />

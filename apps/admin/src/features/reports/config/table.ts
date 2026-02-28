@@ -2,6 +2,7 @@ import { SortKey, StatusFilter } from '../types';
 
 export const statusFilterOptions: ReadonlyArray<{ key: StatusFilter; label: string }> = [
   { key: 'ALL', label: 'All' },
+  { key: 'DUPLICATES', label: 'Duplicates' },
   { key: 'NEW', label: 'New' },
   { key: 'IN_REVIEW', label: 'In review' },
   { key: 'APPROVED', label: 'Approved' },

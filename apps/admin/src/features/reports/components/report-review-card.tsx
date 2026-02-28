@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Card, Icon, SectionState, Snack } from '@/components/ui';
@@ -268,16 +269,24 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
               {formatReportStatus(currentReport.status)}
             </span>
             <span className={priorityClassName(currentReport.priority)}>{currentReport.priority} priority</span>
-            {currentReport.isPotentialDuplicate ? (
-              <span className={styles.duplicatePill}>
-                <Icon name="alert-triangle" size={12} />
-                {currentReport.potentialDuplicateOfReportNumber
-                  ? `Maybe duplicate of ${currentReport.potentialDuplicateOfReportNumber}`
-                  : 'Maybe duplicate report'}
-              </span>
-            ) : null}
           </div>
         </header>
+        {currentReport.isPotentialDuplicate ? (
+          <div className={styles.duplicateNotice} role="status">
+            <p className={styles.duplicateNoticeText}>
+              {currentReport.potentialDuplicateOfReportNumber
+                ? `This report may be a duplicate of ${currentReport.potentialDuplicateOfReportNumber}.`
+                : 'This report may be a duplicate of another.'}
+              {currentReport.coReporters.length > 0
+                ? ` Also reported by ${currentReport.coReporters.join(', ')}.`
+                : ''}
+            </p>
+            <Link href={`/dashboard/reports/duplicates?reportId=${currentReport.id}`} className={styles.duplicateNoticeLink}>
+              View all duplicate reports
+              <Icon name="document-forward" size={14} />
+            </Link>
+          </div>
+        ) : null}
         <div className={styles.grid}>
           <section className={styles.mainColumn}>
             <motion.article className={styles.panel} whileHover={{ y: -2 }} transition={{ duration: 0.15 }} aria-label="Report summary">
@@ -342,7 +351,7 @@ export function ReportReviewCard({ report }: ReportReviewCardProps) {
                     <dt>Reporter</dt>
                     <dd>{currentReport.reporterAlias}</dd>
                   </div>
-                  {currentReport.coReporters.length > 0 ? (
+                  {currentReport.coReporters.length > 0 && !currentReport.isPotentialDuplicate ? (
                     <div>
                       <dt>Also reported by</dt>
                       <dd>{currentReport.coReporters.join(', ')}</dd>
