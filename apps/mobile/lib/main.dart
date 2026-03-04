@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:chisto_mobile/core/app_theme.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const ChistoApp());
 }
 
@@ -12,28 +19,9 @@ class ChistoApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chisto.mk',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true),
-      home: const ChistoHomePage(),
-    );
-  }
-}
-
-class ChistoHomePage extends StatelessWidget {
-  const ChistoHomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Text(
-          'Chisto.mk',
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.black,
-                fontWeight: FontWeight.normal,
-              ),
-        ),
-      ),
+      theme: AppTheme.light,
+      initialRoute: AppRoutes.splash,
+      onGenerateRoute: AppRouter.onGenerateRoute,
     );
   }
 }
