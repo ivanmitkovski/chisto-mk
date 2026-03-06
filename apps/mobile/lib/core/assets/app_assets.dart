@@ -8,6 +8,20 @@ class AppAssets {
   static const String otpIllustration = 'assets/icons/otp-Illustration.svg';
   static const String arrowLeft = 'assets/icons/fi-br-arrow-left.svg';
   static const String searchNormal = 'assets/icons/search-normal.svg';
+  static const String takeActionDrawing = 'assets/icons/take-action-drawing.svg';
+  static const String notificationBing = 'assets/icons/notification-bing.svg';
+
+  // Bottom navigation icons.
+  static const String navHome = 'assets/icons/home.svg';
+  static const String navReports = 'assets/icons/document-text.svg';
+  static const String navMap = 'assets/icons/map.svg';
+  static const String navEvents = 'assets/icons/people.svg';
+
+  // Card / feed icons.
+  static const String cardLocation = 'assets/icons/location.svg';
+  static const String cardArrowUp = 'assets/icons/arrow-square-up.svg';
+  static const String cardComments = 'assets/icons/comment.svg';
+  static const String cardShare = 'assets/icons/paper-plane-share.svg';
 
   // Reference images supplied from design handoff.
   static const String splashReference = 'assets/images/references/splash_reference.png';

@@ -5,6 +5,7 @@ import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -15,6 +16,7 @@ class AppRoutes {
   static const String signUp = '/auth/sign-up';
   static const String otp = '/auth/otp';
   static const String location = '/auth/location';
+  static const String home = '/home';
 }
 
 class AppRouter {
@@ -53,6 +55,11 @@ class AppRouter {
       case AppRoutes.location:
         return MaterialPageRoute<void>(
           builder: (_) => const LocationScreen(),
+          settings: settings,
+        );
+      case AppRoutes.home:
+        return MaterialPageRoute<void>(
+          builder: (_) => const HomeShell(),
           settings: settings,
         );
       default:
