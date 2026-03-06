@@ -4,8 +4,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -36,8 +38,10 @@ class _LocationScreenState extends State<LocationScreen> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Location services are disabled. Please enable them in Settings.')),
+        AppSnack.show(
+          context,
+          message: 'Location services are disabled. Please enable them in Settings.',
+          type: AppSnackType.warning,
         );
       }
       return false;
@@ -50,10 +54,11 @@ class _LocationScreenState extends State<LocationScreen> {
 
     if (permission == LocationPermission.denied) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Location permission denied. You can enable it in Settings to use this feature.'),
-          ),
+        AppSnack.show(
+          context,
+          message:
+              'Location permission denied. You can enable it in Settings to use this feature.',
+          type: AppSnackType.warning,
         );
       }
       return false;
@@ -61,11 +66,11 @@ class _LocationScreenState extends State<LocationScreen> {
 
     if (permission == LocationPermission.deniedForever) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Location permission is permanently denied. Opening Settings…'),
-            duration: Duration(seconds: 3),
-          ),
+        AppSnack.show(
+          context,
+          message: 'Location permission is permanently denied. Opening Settings…',
+          type: AppSnackType.warning,
+          duration: const Duration(seconds: 3),
         );
       }
       await Geolocator.openAppSettings();
@@ -94,10 +99,10 @@ class _LocationScreenState extends State<LocationScreen> {
       );
       if (!_isInMacedonia(pos.latitude, pos.longitude)) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Currently we only support locations in North Macedonia.'),
-            ),
+          AppSnack.show(
+            context,
+            message: 'Currently we only support locations in North Macedonia.',
+            type: AppSnackType.info,
           );
         }
         setState(() => _resolvingLocation = false);
@@ -135,13 +140,19 @@ class _LocationScreenState extends State<LocationScreen> {
         _resolvingLocation = false;
       });
       _mapController.move(_selectedPosition!, 14);
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.home,
+        (Route<dynamic> route) => false,
+      );
     } catch (_) {
       if (!mounted) {
         return;
       }
       setState(() => _resolvingLocation = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not resolve your location. Please try again.')),
+      AppSnack.show(
+        context,
+        message: 'Could not resolve your location. Please try again.',
+        type: AppSnackType.error,
       );
     }
   }
