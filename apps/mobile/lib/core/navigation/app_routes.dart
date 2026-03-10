@@ -6,6 +6,8 @@ import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
+import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:image_picker/image_picker.dart';
 
 class AppRoutes {
   const AppRoutes._();
@@ -17,6 +19,7 @@ class AppRoutes {
   static const String otp = '/auth/otp';
   static const String location = '/auth/location';
   static const String home = '/home';
+  static const String newReport = '/reports/new';
 }
 
 class AppRouter {
@@ -45,8 +48,9 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.otp:
-        final String phoneNumber =
-            settings.arguments is String ? settings.arguments! as String : '+389 70 123 456';
+        final String phoneNumber = settings.arguments is String
+            ? settings.arguments! as String
+            : '+389 70 123 456';
 
         return MaterialPageRoute<void>(
           builder: (_) => OtpScreen(phoneNumber: phoneNumber),
@@ -60,6 +64,20 @@ class AppRouter {
       case AppRoutes.home:
         return MaterialPageRoute<void>(
           builder: (_) => const HomeShell(),
+          settings: settings,
+        );
+      case AppRoutes.newReport:
+        final XFile? photo = settings.arguments is XFile
+            ? settings.arguments! as XFile
+            : null;
+        return MaterialPageRoute<bool>(
+          builder: (_) => NewReportScreen(
+            initialPhoto: photo,
+            entryLabel: photo != null ? 'Camera report' : 'Guided report',
+            entryHint: photo != null
+                ? 'Starting from a live photo can speed up moderation because the evidence is already attached.'
+                : null,
+          ),
           settings: settings,
         );
       default:

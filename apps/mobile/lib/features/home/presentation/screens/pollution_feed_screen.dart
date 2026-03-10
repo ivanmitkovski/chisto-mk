@@ -123,7 +123,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
   }
 
   Future<void> _openNotifications() async {
-    AppHaptics.tap();
+    AppHaptics.softTransition();
     final List<FeedNotification> currentNotifications =
         List<FeedNotification>.from(_ensureNotificationsSeeded());
     final List<FeedNotification>? updated =

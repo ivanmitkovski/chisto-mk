@@ -30,7 +30,7 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   bool _isInMacedonia(double lat, double lng) {
-    // Rough bounding box for North Macedonia.
+    // Rough bounding box for Macedonia.
     return lat >= 40.8 && lat <= 42.4 && lng >= 20.4 && lng <= 23.1;
   }
 
@@ -101,7 +101,7 @@ class _LocationScreenState extends State<LocationScreen> {
         if (mounted) {
           AppSnack.show(
             context,
-            message: 'Currently we only support locations in North Macedonia.',
+            message: 'Currently we only support locations in Macedonia.',
             type: AppSnackType.info,
           );
         }
@@ -139,7 +139,9 @@ class _LocationScreenState extends State<LocationScreen> {
         _selectedPosition = LatLng(pos.latitude, pos.longitude);
         _resolvingLocation = false;
       });
-      _mapController.move(_selectedPosition!, 14);
+      // Zoom in closer when auto-detecting location so the user can better
+      // verify the exact spot.
+      _mapController.move(_selectedPosition!, 17);
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.home,
         (Route<dynamic> route) => false,
@@ -209,8 +211,10 @@ class _LocationScreenState extends State<LocationScreen> {
                               ),
                               children: [
                                 TileLayer(
+                                  // Lightweight OSM tiles for auth/onboarding flow.
                                   urlTemplate:
                                       'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  maxNativeZoom: 19,
                                   userAgentPackageName: 'chisto_mobile',
                                 ),
                                 if (_selectedPosition != null)
@@ -222,7 +226,10 @@ class _LocationScreenState extends State<LocationScreen> {
                                         height: 30,
                                         child: Container(
                                           decoration: BoxDecoration(
-                                            color: AppColors.primaryDark,
+                                            // Keep the green pin but soften it so
+                                            // underlying imagery stays readable.
+                                            color: AppColors.primaryDark
+                                                .withValues(alpha: 0.82),
                                             shape: BoxShape.circle,
                                             border: Border.all(
                                               color: Colors.white,
