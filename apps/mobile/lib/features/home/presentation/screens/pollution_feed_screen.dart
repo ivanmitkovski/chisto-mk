@@ -12,6 +12,7 @@ import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/notifications_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
+import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -254,19 +255,31 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         ),
         child: Row(
           children: <Widget>[
-            Container(
-              width: 46,
-              height: 46,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppColors.primary.withValues(alpha: 0.25),
-                  width: 2,
+            GestureDetector(
+              onTap: () {
+                AppHaptics.softTransition();
+                Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) => const ProfileScreen(),
+                  ),
+                );
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.25),
+                    width: 2,
+                  ),
                 ),
-              ),
-              child: const CircleAvatar(
-                radius: 21,
-                backgroundImage: AssetImage('assets/images/content/people_cleaning.png'),
+                child: const CircleAvatar(
+                  radius: 21,
+                  backgroundImage:
+                      AssetImage('assets/images/content/people_cleaning.png'),
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.md),
