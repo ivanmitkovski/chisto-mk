@@ -1,18 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
+import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action_bottom_sheet.dart';
+import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 
 class PollutionSiteDetailScreen extends StatelessWidget {
   const PollutionSiteDetailScreen({
@@ -57,7 +56,7 @@ class PollutionSiteDetailScreen extends StatelessWidget {
 
   Future<void> _openTakeActionDialog(BuildContext context) async {
     AppHaptics.medium();
-    await showDialog<String>(
+    final String? action = await showDialog<String>(
       context: context,
       barrierDismissible: true,
       barrierColor: AppColors.overlay,
@@ -75,6 +74,19 @@ class PollutionSiteDetailScreen extends StatelessWidget {
         );
       },
     );
+    if (action == null || !context.mounted) return;
+    if (action == 'Report Issue') {
+      AppHaptics.softTransition();
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => NewReportScreen(
+            entryLabel: 'Site follow-up',
+            entryHint:
+                'Use this to report new evidence or changes for ${site.title}.',
+          ),
+        ),
+      );
+    }
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -95,9 +107,9 @@ class PollutionSiteDetailScreen extends StatelessWidget {
               child: Text(
                 site.title,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
-                    ),
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
@@ -185,10 +197,7 @@ class PollutionSiteDetailScreen extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _PollutionSiteTab extends StatelessWidget {
-  const _PollutionSiteTab({
-    required this.site,
-    required this.onTakeAction,
-  });
+  const _PollutionSiteTab({required this.site, required this.onTakeAction});
 
   final PollutionSite site;
   final VoidCallback onTakeAction;
@@ -218,16 +227,16 @@ class _PollutionSiteTab extends StatelessWidget {
               Text(
                 site.title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 site.description,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.45,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(height: 1.45),
               ),
               const SizedBox(height: AppSpacing.md),
               _buildReportedRow(context),
@@ -238,10 +247,7 @@ class _PollutionSiteTab extends StatelessWidget {
             ],
           ),
         ),
-        _StickyBottomCTA(
-          label: 'Take action',
-          onPressed: onTakeAction,
-        ),
+        _StickyBottomCTA(label: 'Take action', onPressed: onTakeAction),
       ],
     );
   }
@@ -278,7 +284,11 @@ class _PollutionSiteTab extends StatelessWidget {
         ),
         const SizedBox(width: AppSpacing.sm),
         _StatChip(
-          iconWidget: const Icon(Icons.groups_rounded, size: 16, color: AppColors.textMuted),
+          iconWidget: const Icon(
+            Icons.groups_rounded,
+            size: 16,
+            color: AppColors.textMuted,
+          ),
           label: '${site.participantCount}',
           color: AppColors.textMuted,
         ),
@@ -286,13 +296,17 @@ class _PollutionSiteTab extends StatelessWidget {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            const Icon(Icons.place_rounded, size: 16, color: AppColors.textMuted),
+            const Icon(
+              Icons.place_rounded,
+              size: 16,
+              color: AppColors.textMuted,
+            ),
             const SizedBox(width: 3),
             Text(
               '${site.distanceKm.toStringAsFixed(0)} km',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -320,16 +334,17 @@ class _PollutionSiteTab extends StatelessWidget {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    height: 1.35,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(height: 1.35),
               children: const <TextSpan>[
-                TextSpan(
-                  text: 'Reported by ',
-                ),
+                TextSpan(text: 'Reported by '),
                 TextSpan(
                   text: 'eco_maria',
-                  style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 TextSpan(text: '  •  2 days ago'),
               ],
@@ -357,7 +372,11 @@ class _PollutionSiteTab extends StatelessWidget {
               color: AppColors.primaryDark.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.eco_rounded, size: 20, color: AppColors.primaryDark),
+            child: const Icon(
+              Icons.eco_rounded,
+              size: 20,
+              color: AppColors.primaryDark,
+            ),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -367,15 +386,17 @@ class _PollutionSiteTab extends StatelessWidget {
                 Text(
                   'Community action needed',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        fontSize: 15,
-                      ),
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontSize: 15,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Join a cleanup, report changes, or help spread the word so we can act faster.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(height: 1.4),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(height: 1.4),
                 ),
               ],
             ),
@@ -427,10 +448,7 @@ class _PollutionSiteTab extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _CleaningEventsTab extends StatelessWidget {
-  const _CleaningEventsTab({
-    required this.site,
-    required this.onCreateEvent,
-  });
+  const _CleaningEventsTab({required this.site, required this.onCreateEvent});
 
   final PollutionSite site;
   final VoidCallback onCreateEvent;
@@ -457,12 +475,16 @@ class _CleaningEventsTab extends StatelessWidget {
               if (events.isEmpty)
                 _buildEmptyState(context)
               else
-                ...events.map((CleaningEvent event) => _buildEventCard(context, event)),
+                ...events.map(
+                  (CleaningEvent event) => _buildEventCard(context, event),
+                ),
             ],
           ),
         ),
         _StickyBottomCTA(
-          label: events.isEmpty ? 'Create eco action' : 'Schedule another action',
+          label: events.isEmpty
+              ? 'Create eco action'
+              : 'Schedule another action',
           onPressed: onCreateEvent,
         ),
       ],
@@ -482,18 +504,26 @@ class _CleaningEventsTab extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.groups_rounded, size: 32, color: AppColors.primaryDark),
+            child: const Icon(
+              Icons.groups_rounded,
+              size: 32,
+              color: AppColors.primaryDark,
+            ),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
             'No cleaning events yet',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Be the first to organize an eco action\nand rally volunteers for this site.',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(height: 1.45),
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(height: 1.45),
           ),
         ],
       ),
@@ -530,7 +560,11 @@ class _CleaningEventsTab extends StatelessWidget {
                   color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.eco_rounded, size: 22, color: AppColors.primaryDark),
+                child: const Icon(
+                  Icons.eco_rounded,
+                  size: 22,
+                  color: AppColors.primaryDark,
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
@@ -540,21 +574,26 @@ class _CleaningEventsTab extends StatelessWidget {
                     Text(
                       event.title,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.textPrimary,
-                          ),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       dateLabel,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(fontSize: 13),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodySmall?.copyWith(fontSize: 13),
                     ),
                   ],
                 ),
               ),
               if (event.statusLabel != null && event.statusColor != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.sm,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: event.statusColor!.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(999),
@@ -572,7 +611,10 @@ class _CleaningEventsTab extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
               color: AppColors.inputFill,
               borderRadius: BorderRadius.circular(10),
@@ -580,15 +622,19 @@ class _CleaningEventsTab extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                const Icon(Icons.groups_rounded, size: 16, color: AppColors.primaryDark),
+                const Icon(
+                  Icons.groups_rounded,
+                  size: 16,
+                  color: AppColors.primaryDark,
+                ),
                 const SizedBox(width: 4),
                 Text(
                   '${event.participantCount} volunteers joined',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        fontSize: 13,
-                        color: AppColors.textSecondary,
-                      ),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ],
             ),
@@ -599,9 +645,9 @@ class _CleaningEventsTab extends StatelessWidget {
                 ? 'You\'re organizing this action. Upload "after" photos once it\'s completed.'
                 : 'Join the action to help clean this site.',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.35,
-                ),
+              color: AppColors.textMuted,
+              height: 1.35,
+            ),
           ),
           if (!event.isOrganizer) ...<Widget>[
             const SizedBox(height: AppSpacing.sm),
@@ -617,7 +663,9 @@ class _CleaningEventsTab extends StatelessWidget {
                   elevation: 0,
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.textPrimary,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
                 child: const Text(
                   'Join action',
@@ -685,7 +733,10 @@ class _StatChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
         borderRadius: BorderRadius.circular(999),
@@ -704,7 +755,11 @@ class _StatChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color),
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
           ),
         ],
       ),
@@ -762,391 +817,94 @@ class _QuickActionTile extends StatelessWidget {
 }
 
 // ---------------------------------------------------------------------------
-// Fullscreen image gallery viewer
-// ---------------------------------------------------------------------------
-
-class _FullscreenGalleryScreen extends StatefulWidget {
-  const _FullscreenGalleryScreen({
-    required this.images,
-    required this.initialIndex,
-    required this.heroTag,
-  });
-
-  final List<ImageProvider> images;
-  final int initialIndex;
-  final String heroTag;
-
-  @override
-  State<_FullscreenGalleryScreen> createState() => _FullscreenGalleryScreenState();
-}
-
-class _FullscreenGalleryScreenState extends State<_FullscreenGalleryScreen> {
-  late final PageController _pageController;
-  late int _currentIndex;
-  double _verticalDrag = 0;
-  double _opacity = 1.0;
-  bool _didPrefetchImages = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentIndex = widget.initialIndex;
-    _pageController = PageController(initialPage: widget.initialIndex);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_didPrefetchImages) return;
-    _didPrefetchImages = true;
-    for (int i = 0; i < widget.images.length && i < 3; i++) {
-      precacheImage(widget.images[i], context);
-    }
-  }
-
-  void _onVerticalDragUpdate(DragUpdateDetails details) {
-    setState(() {
-      _verticalDrag += details.delta.dy;
-      _opacity = (1.0 - (_verticalDrag.abs() / 300)).clamp(0.4, 1.0);
-    });
-  }
-
-  void _onVerticalDragEnd(DragEndDetails details) {
-    if (_verticalDrag.abs() > 100 ||
-        (details.primaryVelocity != null && details.primaryVelocity!.abs() > 600)) {
-      Navigator.of(context).pop();
-    } else {
-      setState(() {
-        _verticalDrag = 0;
-        _opacity = 1.0;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      body: GestureDetector(
-        onVerticalDragUpdate: _onVerticalDragUpdate,
-        onVerticalDragEnd: _onVerticalDragEnd,
-        child: AnimatedContainer(
-          duration: _verticalDrag == 0 ? AppMotion.medium : Duration.zero,
-          curve: AppMotion.emphasized,
-          color: Colors.black.withValues(alpha: _opacity),
-          child: SafeArea(
-            child: Stack(
-              children: <Widget>[
-                Center(
-                  child: Transform.translate(
-                    offset: Offset(0, _verticalDrag),
-                    child: PageView.builder(
-                      controller: _pageController,
-                      itemCount: widget.images.length,
-                      onPageChanged: (int index) {
-                        AppHaptics.tap();
-                        setState(() => _currentIndex = index);
-                        _prefetchAround(index);
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        final Widget image = AppSmartImage(
-                          image: widget.images[index],
-                          fit: BoxFit.contain,
-                        );
-                        if (index == widget.initialIndex) {
-                          return Hero(
-                            tag: widget.heroTag,
-                            child: image,
-                          );
-                        }
-                        return image;
-                      },
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: AppSpacing.sm,
-                  left: AppSpacing.md,
-                  child: Semantics(
-                    button: true,
-                    label: 'Close full-screen gallery',
-                    child: GestureDetector(
-                      onTap: () {
-                        AppHaptics.tap();
-                        Navigator.of(context).pop();
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.close_rounded, color: Colors.white, size: 22),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                if (widget.images.length > 1)
-                  Positioned(
-                    top: AppSpacing.sm,
-                    right: AppSpacing.md,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.4),
-                        borderRadius: BorderRadius.circular(999),
-                      ),
-                      child: Text(
-                        '${_currentIndex + 1} / ${widget.images.length}',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                if (widget.images.length > 1)
-                  Positioned(
-                    bottom: AppSpacing.xl,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List<Widget>.generate(widget.images.length, (int index) {
-                          final bool isActive = index == _currentIndex;
-                          return AnimatedContainer(
-                            duration: AppMotion.fast,
-                            curve: AppMotion.emphasized,
-                            margin: const EdgeInsets.symmetric(horizontal: 3),
-                            width: isActive ? 20 : 8,
-                            height: 4,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: isActive ? 0.95 : 0.35),
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _prefetchAround(int index) {
-    final int previous = index - 1;
-    final int next = index + 1;
-    if (previous >= 0 && previous < widget.images.length) {
-      precacheImage(widget.images[previous], context);
-    }
-    if (next >= 0 && next < widget.images.length) {
-      precacheImage(widget.images[next], context);
-    }
-  }
-}
-
-// ---------------------------------------------------------------------------
 // Hero image carousel
 // ---------------------------------------------------------------------------
 
-class _DetailHeroCarousel extends StatefulWidget {
+class _DetailHeroCarousel extends StatelessWidget {
   const _DetailHeroCarousel({required this.site});
 
   final PollutionSite site;
 
   @override
-  State<_DetailHeroCarousel> createState() => _DetailHeroCarouselState();
-}
-
-class _DetailHeroCarouselState extends State<_DetailHeroCarousel> {
-  late final PageController _pageController;
-  int _currentIndex = 0;
-  bool _didPrefetchImages = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    if (_didPrefetchImages) return;
-    _didPrefetchImages = true;
-    final List<ImageProvider> images = widget.site.galleryImages;
-    for (int i = 0; i < images.length && i < 3; i++) {
-      precacheImage(images[i], context);
-    }
-  }
-
-  void _openFullscreen(BuildContext context) {
-    AppHaptics.tap();
-    Navigator.of(context).push(
-      PageRouteBuilder<void>(
-        opaque: false,
-        barrierColor: Colors.transparent,
-        pageBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-        ) {
-          return _FullscreenGalleryScreen(
-            images: widget.site.galleryImages,
-            initialIndex: _currentIndex,
-            heroTag: 'site-image-${widget.site.id}',
-          );
-        },
-        transitionsBuilder: (
-          BuildContext context,
-          Animation<double> animation,
-          Animation<double> secondaryAnimation,
-          Widget child,
-        ) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-        transitionDuration: AppMotion.medium,
-        reverseTransitionDuration: AppMotion.fast,
+  Widget build(BuildContext context) {
+    final List<GalleryImageItem> items = List<GalleryImageItem>.generate(
+      site.galleryImages.length,
+      (int index) => GalleryImageItem(
+        image: site.galleryImages[index],
+        heroTag: 'site-image-${site.id}-$index',
+        semanticLabel: 'Pollution site photo ${index + 1}',
       ),
     );
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    final List<ImageProvider> images = widget.site.galleryImages;
-
-    return Semantics(
-      image: true,
-      label: 'Photos of pollution site. Tap to view fullscreen.',
-      child: GestureDetector(
-        onTap: () => _openFullscreen(context),
-        child: Hero(
-          tag: 'site-image-${widget.site.id}',
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
-              child: Stack(
-                fit: StackFit.expand,
-                children: <Widget>[
-                  PageView.builder(
-                    controller: _pageController,
-                    itemCount: images.length,
-                    onPageChanged: (int index) {
-                      setState(() => _currentIndex = index);
-                      _prefetchAround(index, images);
-                    },
-                    physics: const BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return SizedBox.expand(
-                        child: AppSmartImage(image: images[index]),
-                      );
-                    },
-                  ),
-                  Positioned(
-                    top: AppSpacing.sm,
-                    left: AppSpacing.sm,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.primaryDark.withValues(alpha: 0.08),
+            blurRadius: 28,
+            offset: const Offset(0, 14),
+          ),
+        ],
+      ),
+      child: ImmersivePhotoGallery(
+        items: items,
+        borderRadius: 24,
+        openLabel: 'Open pollution site gallery',
+        topLeftBuilder:
+            (BuildContext context, int currentIndex, int totalCount) {
+              return GalleryGlassPill(
+                emphasis: GalleryGlassPillEmphasis.strong,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      width: 8,
+                      height: 8,
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.4),
+                        color: site.statusColor,
                         borderRadius: BorderRadius.circular(999),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: widget.site.statusColor,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            widget.site.statusLabel,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      site.statusLabel,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
                       ),
                     ),
-                  ),
-                  if (images.length > 1)
-                    Positioned(
-                      top: AppSpacing.sm,
-                      right: AppSpacing.sm,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.sm,
-                          vertical: AppSpacing.xs,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withValues(alpha: 0.4),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          '${_currentIndex + 1}/${images.length}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
+                  ],
+                ),
+              );
+            },
+        bottomCenterBuilder:
+            (BuildContext context, int currentIndex, int totalCount) {
+              return GalleryGlassPill(
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const Icon(
+                      CupertinoIcons.sparkles,
+                      size: 13,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      totalCount > 1 ? 'Tap to expand' : 'Open photo',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        letterSpacing: -0.1,
                       ),
                     ),
-                  // Bottom pager bars removed on detail hero; the top-right
-                  // counter already communicates image position and keeps this
-                  // area visually cleaner during feed->detail transition.
-                ],
-              ),
-            ),
-          ),
-        ),
+                  ],
+                ),
+              );
+            },
       ),
     );
-  }
-
-  void _prefetchAround(int index, List<ImageProvider> images) {
-    final int previous = index - 1;
-    final int next = index + 1;
-    if (previous >= 0 && previous < images.length) {
-      precacheImage(images[previous], context);
-    }
-    if (next >= 0 && next < images.length) {
-      precacheImage(images[next], context);
-    }
   }
 }

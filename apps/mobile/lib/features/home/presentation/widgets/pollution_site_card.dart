@@ -11,16 +11,15 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action_bottom_sheet.dart';
+import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
+import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class PollutionSiteCard extends StatefulWidget {
-  const PollutionSiteCard({
-    super.key,
-    required this.site,
-  });
+  const PollutionSiteCard({super.key, required this.site});
 
   final PollutionSite site;
 
@@ -134,11 +133,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
           ),
         );
       },
-      child: Text(
-        '$value',
-        key: ValueKey<int>(value),
-        style: style,
-      ),
+      child: Text('$value', key: ValueKey<int>(value), style: style),
     );
   }
 
@@ -157,7 +152,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       textDirection: TextDirection.ltr,
     )..layout();
     final double ellipsisWidth = ellipsisPainter.width;
-    final double availableWidth = (maxWidth - ellipsisWidth).clamp(1.0, double.infinity);
+    final double availableWidth = (maxWidth - ellipsisWidth).clamp(
+      1.0,
+      double.infinity,
+    );
     final TextPainter painter = TextPainter(
       text: TextSpan(text: text, style: style),
       maxLines: maxLines,
@@ -206,96 +204,105 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
               splashColor: AppColors.primary.withValues(alpha: 0.08),
               highlightColor: Colors.black.withValues(alpha: 0.02),
               child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    _buildImage(context),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        AppSpacing.lg,
-                        AppSpacing.md,
-                        AppSpacing.lg,
-                        AppSpacing.lg,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          _buildEngagementRow(context),
-                          const SizedBox(height: AppSpacing.md),
-                          LayoutBuilder(
-                            builder: (BuildContext context, BoxConstraints constraints) {
-                              final double maxWidth = constraints.maxWidth;
-                              final TextStyle titleStyle = AppTypography.textTheme.titleMedium!;
-                              final TextStyle descStyle = AppTypography.textTheme.bodyMedium!.copyWith(
-                                color: AppColors.textSecondary,
-                                height: 1.35,
-                                fontSize: 15,
-                              );
-                              final bool cacheValid = _cachedTruncationWidth == maxWidth &&
-                                  _cachedTitleKey == site.title &&
-                                  _cachedDescKey == site.description &&
-                                  _cachedTitleTruncated != null &&
-                                  _cachedDescTruncated != null;
-                              String titleDisplay;
-                              String descDisplay;
-                              if (cacheValid) {
-                                titleDisplay = _cachedTitleTruncated!;
-                                descDisplay = _cachedDescTruncated!;
-                              } else {
-                                titleDisplay = _truncateAtWordBoundary(
-                                  site.title,
-                                  style: titleStyle,
-                                  maxWidth: maxWidth,
-                                  maxLines: 1,
-                                );
-                                descDisplay = _truncateAtWordBoundary(
-                                  site.description,
-                                  style: descStyle,
-                                  maxWidth: maxWidth,
-                                  maxLines: 2,
-                                );
-                                _cachedTitleTruncated = titleDisplay;
-                                _cachedDescTruncated = descDisplay;
-                                _cachedTitleKey = site.title;
-                                _cachedDescKey = site.description;
-                                _cachedTruncationWidth = maxWidth;
-                              }
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  SizedBox(
-                                    width: maxWidth,
-                                    child: Text(
-                                      titleDisplay,
-                                      style: titleStyle,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  SizedBox(
-                                    width: maxWidth,
-                                    child: Text(
-                                      descDisplay,
-                                      style: descStyle,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          PrimaryButton(
-                            label: 'Take action',
-                            onPressed: () => _openTakeActionSheet(context),
-                          ),
-                        ],
-                      ),
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  _buildImage(context),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.md,
+                      AppSpacing.lg,
+                      AppSpacing.lg,
                     ),
-                  ],
-                ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        _buildEngagementRow(context),
+                        const SizedBox(height: AppSpacing.md),
+                        LayoutBuilder(
+                          builder:
+                              (
+                                BuildContext context,
+                                BoxConstraints constraints,
+                              ) {
+                                final double maxWidth = constraints.maxWidth;
+                                final TextStyle titleStyle =
+                                    AppTypography.textTheme.titleMedium!;
+                                final TextStyle descStyle = AppTypography
+                                    .textTheme
+                                    .bodyMedium!
+                                    .copyWith(
+                                      color: AppColors.textSecondary,
+                                      height: 1.35,
+                                      fontSize: 15,
+                                    );
+                                final bool cacheValid =
+                                    _cachedTruncationWidth == maxWidth &&
+                                    _cachedTitleKey == site.title &&
+                                    _cachedDescKey == site.description &&
+                                    _cachedTitleTruncated != null &&
+                                    _cachedDescTruncated != null;
+                                String titleDisplay;
+                                String descDisplay;
+                                if (cacheValid) {
+                                  titleDisplay = _cachedTitleTruncated!;
+                                  descDisplay = _cachedDescTruncated!;
+                                } else {
+                                  titleDisplay = _truncateAtWordBoundary(
+                                    site.title,
+                                    style: titleStyle,
+                                    maxWidth: maxWidth,
+                                    maxLines: 1,
+                                  );
+                                  descDisplay = _truncateAtWordBoundary(
+                                    site.description,
+                                    style: descStyle,
+                                    maxWidth: maxWidth,
+                                    maxLines: 2,
+                                  );
+                                  _cachedTitleTruncated = titleDisplay;
+                                  _cachedDescTruncated = descDisplay;
+                                  _cachedTitleKey = site.title;
+                                  _cachedDescKey = site.description;
+                                  _cachedTruncationWidth = maxWidth;
+                                }
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: maxWidth,
+                                      child: Text(
+                                        titleDisplay,
+                                        style: titleStyle,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(height: AppSpacing.xs),
+                                    SizedBox(
+                                      width: maxWidth,
+                                      child: Text(
+                                        descDisplay,
+                                        style: descStyle,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                        ),
+                        const SizedBox(height: AppSpacing.lg),
+                        PrimaryButton(
+                          label: 'Take action',
+                          onPressed: () => _openTakeActionSheet(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -309,42 +316,51 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     return Semantics(
       image: true,
       label: 'Photo of pollution site',
-      child: Hero(
-        tag: 'site-image-${site.id}',
-        child: AspectRatio(
-          aspectRatio: 16 / 9,
-          child: Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              PageView.builder(
-                controller: _pageController,
-                itemCount: images.length,
-                onPageChanged: (int index) {
-                  setState(() {
-                    _currentImageIndex = index;
-                  });
-                  _prefetchAround(index, images);
-                },
-                physics: const BouncingScrollPhysics(),
-                itemBuilder: (BuildContext context, int index) {
-                  return SizedBox.expand(
-                    child: AppSmartImage(image: images[index]),
-                  );
-                },
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Stack(
+          fit: StackFit.expand,
+          children: <Widget>[
+            PageView.builder(
+              controller: _pageController,
+              itemCount: images.length,
+              onPageChanged: (int index) {
+                setState(() {
+                  _currentImageIndex = index;
+                });
+                _prefetchAround(index, images);
+              },
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (BuildContext context, int index) {
+                return SizedBox.expand(
+                  child: AppSmartImage(image: images[index]),
+                );
+              },
+            ),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: <Color>[
+                        Colors.black.withValues(alpha: 0.28),
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.2),
+                      ],
+                      stops: const <double>[0, 0.45, 1],
+                    ),
+                  ),
+                ),
               ),
+            ),
             // Top-left status + distance pill overlay.
             Positioned(
               top: AppSpacing.sm,
               left: AppSpacing.sm,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.35),
-                  borderRadius: BorderRadius.circular(999),
-                ),
+              child: GalleryGlassPill(
+                emphasis: GalleryGlassPillEmphasis.strong,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
@@ -360,9 +376,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                     Text(
                       '${site.statusLabel} • ${site.distanceKm.toStringAsFixed(0)} km',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ],
                 ),
@@ -374,39 +390,19 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                 left: 0,
                 right: 0,
                 child: Center(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.sm,
-                      vertical: AppSpacing.xs,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withValues(alpha: 0.28),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: List<Widget>.generate(images.length, (int index) {
-                        final bool isActive = index == _currentImageIndex;
-                        return AnimatedContainer(
-                          duration: AppMotion.fast,
-                          curve: AppMotion.emphasized,
-                          margin: const EdgeInsets.symmetric(horizontal: 2),
-                          width: isActive ? 10 : 6,
-                          height: 3,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(
-                              alpha: isActive ? 0.9 : 0.5,
-                            ),
-                            borderRadius: BorderRadius.circular(999),
-                          ),
-                        );
-                      }),
+                  child: SizedBox(
+                    width: 52,
+                    child: Center(
+                      child: GalleryPageIndicators(
+                        currentIndex: _currentImageIndex,
+                        totalCount: images.length,
+                        maxVisible: 4,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
       ),
     );
@@ -424,7 +420,8 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   Widget _buildEngagementRow(BuildContext context) {
-    final TextStyle countStyle = Theme.of(context).textTheme.bodySmall!.copyWith(
+    final TextStyle countStyle = Theme.of(context).textTheme.bodySmall!
+        .copyWith(
           fontSize: _actionCountFontSize,
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w500,
@@ -443,150 +440,161 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-            // Upvote (icon toggles, count opens upvoters list)
-            SizedBox(
-              height: 44,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Semantics(
-                    button: true,
-                    label: _isUpvoted ? 'Remove upvote' : 'Upvote',
-                    child: GestureDetector(
-                      onTap: _onUpvoteTap,
-                      behavior: HitTestBehavior.opaque,
-                      child: SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            AppAssets.cardArrowUp,
-                            width: _actionIconSize,
-                            height: _actionIconSize,
-                            colorFilter: ColorFilter.mode(
-                              _isUpvoted ? AppColors.primaryDark : AppColors.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Semantics(
-                    button: true,
-                    label: '$_upvoteCount upvotes, tap to see who',
-                    child: GestureDetector(
-                      onTap: () async {
-                        AppHaptics.tap();
-                        await _showUpvotersSheet(context);
-                      },
-                      behavior: HitTestBehavior.opaque,
-                      child: SizedBox(
-                        width: _counterMinWidth,
-                        height: 44,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: _buildAnimatedCount(_upvoteCount, countStyle),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 14),
-            // Comment + count (using custom comments icon)
-            Semantics(
-              button: true,
-              label: 'Comments, $commentCount',
-              child: GestureDetector(
-                onTap: () {
-                  AppHaptics.tap();
-                  _openCommentsSheet(context);
-                },
-                behavior: HitTestBehavior.opaque,
-                child: SizedBox(
+                // Upvote (icon toggles, count opens upvoters list)
+                SizedBox(
                   height: 44,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            AppAssets.cardComments,
-                            width: _actionIconSize,
-                            height: _actionIconSize,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.textPrimary,
-                              BlendMode.srcIn,
+                      Semantics(
+                        button: true,
+                        label: _isUpvoted ? 'Remove upvote' : 'Upvote',
+                        child: GestureDetector(
+                          onTap: _onUpvoteTap,
+                          behavior: HitTestBehavior.opaque,
+                          child: SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.cardArrowUp,
+                                width: _actionIconSize,
+                                height: _actionIconSize,
+                                colorFilter: ColorFilter.mode(
+                                  _isUpvoted
+                                      ? AppColors.primaryDark
+                                      : AppColors.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(width: 4),
-                      SizedBox(
-                        width: _counterMinWidth,
-                        height: 44,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: _buildAnimatedCount(commentCount, countStyle),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 14),
-            // Share + count
-            Semantics(
-              button: true,
-              label: 'Shares, $shareCount',
-              child: GestureDetector(
-                onTap: () {
-                  AppHaptics.tap();
-                  _openShareSheet(context);
-                },
-                behavior: HitTestBehavior.opaque,
-                child: SizedBox(
-                  height: 44,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(
-                        width: 44,
-                        height: 44,
-                        child: Center(
-                          child: SvgPicture.asset(
-                            AppAssets.cardShare,
-                            width: _actionIconSize,
-                            height: _actionIconSize,
-                            colorFilter: const ColorFilter.mode(
-                              AppColors.textPrimary,
-                              BlendMode.srcIn,
+                      Semantics(
+                        button: true,
+                        label: '$_upvoteCount upvotes, tap to see who',
+                        child: GestureDetector(
+                          onTap: () async {
+                            AppHaptics.tap();
+                            await _showUpvotersSheet(context);
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: SizedBox(
+                            width: _counterMinWidth,
+                            height: 44,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: _buildAnimatedCount(
+                                _upvoteCount,
+                                countStyle,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(width: 4),
-                      SizedBox(
-                        width: _counterMinWidth,
-                        height: 44,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: _buildAnimatedCount(shareCount, countStyle),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-              ),
-            ),
+                const SizedBox(width: 14),
+                // Comment + count (using custom comments icon)
+                Semantics(
+                  button: true,
+                  label: 'Comments, $commentCount',
+                  child: GestureDetector(
+                    onTap: () {
+                      AppHaptics.tap();
+                      _openCommentsSheet(context);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
+                      height: 44,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.cardComments,
+                                width: _actionIconSize,
+                                height: _actionIconSize,
+                                colorFilter: const ColorFilter.mode(
+                                  AppColors.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          SizedBox(
+                            width: _counterMinWidth,
+                            height: 44,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: _buildAnimatedCount(
+                                commentCount,
+                                countStyle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                // Share + count
+                Semantics(
+                  button: true,
+                  label: 'Shares, $shareCount',
+                  child: GestureDetector(
+                    onTap: () {
+                      AppHaptics.tap();
+                      _openShareSheet(context);
+                    },
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
+                      height: 44,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(
+                            width: 44,
+                            height: 44,
+                            child: Center(
+                              child: SvgPicture.asset(
+                                AppAssets.cardShare,
+                                width: _actionIconSize,
+                                height: _actionIconSize,
+                                colorFilter: const ColorFilter.mode(
+                                  AppColors.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          SizedBox(
+                            width: _counterMinWidth,
+                            height: 44,
+                            child: Align(
+                              alignment: Alignment.centerLeft,
+                              child: _buildAnimatedCount(
+                                shareCount,
+                                countStyle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -610,9 +618,13 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   curve: AppMotion.emphasized,
                   scale: _saveIconScale,
                   child: Icon(
-                    _isSaved ? Icons.bookmark_rounded : Icons.bookmark_border_rounded,
+                    _isSaved
+                        ? Icons.bookmark_rounded
+                        : Icons.bookmark_border_rounded,
                     size: _actionIconSize,
-                    color: _isSaved ? AppColors.primaryDark : AppColors.textPrimary,
+                    color: _isSaved
+                        ? AppColors.primaryDark
+                        : AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -624,6 +636,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   void _openDetails(BuildContext context) {
+    AppHaptics.softTransition();
     for (int i = 0; i < site.galleryImages.length && i < 3; i++) {
       precacheImage(site.galleryImages[i], context);
     }
@@ -694,7 +707,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   Future<void> _openTakeActionSheet(BuildContext context) async {
-    await showDialog<String>(
+    final String? action = await showDialog<String>(
       context: context,
       barrierDismissible: true,
       barrierColor: AppColors.overlay,
@@ -712,6 +725,19 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         );
       },
     );
+    if (action == null || !context.mounted) return;
+    if (action == 'Report Issue') {
+      AppHaptics.softTransition();
+      await Navigator.of(context).push<bool>(
+        MaterialPageRoute<bool>(
+          builder: (_) => NewReportScreen(
+            entryLabel: 'Site follow-up',
+            entryHint:
+                'Use this to report new evidence or changes for ${site.title}.',
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _openShareSheet(BuildContext context) async {
@@ -728,11 +754,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       },
     );
 
-    if (action == null || !mounted) return;
+    if (action == null || !context.mounted) return;
 
     final String siteUrl = 'https://chisto.mk/sites/${site.id}';
     if (action == _ShareAction.copyLink) {
       await Clipboard.setData(ClipboardData(text: siteUrl));
+      if (!context.mounted) return;
     }
     final String feedback = switch (action) {
       _ShareAction.copyLink => 'Link copied',
@@ -801,11 +828,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 }
 
-enum _ShareAction {
-  copyLink,
-  sendMessage,
-  shareProfile,
-}
+enum _ShareAction { copyLink, sendMessage, shareProfile }
 
 class _ShareSheet extends StatelessWidget {
   const _ShareSheet();
@@ -844,16 +867,16 @@ class _ShareSheet extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Share report',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 4),
               Text(
                 'Help others discover and support this site',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: AppSpacing.md),
               _ShareActionTile(
@@ -866,13 +889,15 @@ class _ShareSheet extends StatelessWidget {
                 icon: Icons.send_rounded,
                 title: 'Send to people',
                 subtitle: 'Share in messages',
-                onTap: () => Navigator.of(context).pop(_ShareAction.sendMessage),
+                onTap: () =>
+                    Navigator.of(context).pop(_ShareAction.sendMessage),
               ),
               _ShareActionTile(
                 icon: Icons.auto_awesome_rounded,
                 title: 'Share to profile',
                 subtitle: 'Post this report to your profile',
-                onTap: () => Navigator.of(context).pop(_ShareAction.shareProfile),
+                onTap: () =>
+                    Navigator.of(context).pop(_ShareAction.shareProfile),
               ),
             ],
           ),
@@ -918,16 +943,9 @@ class _ShareActionTile extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: AppColors.panelBackground,
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AppColors.divider,
-                      width: 1,
-                    ),
+                    border: Border.all(color: AppColors.divider, width: 1),
                   ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: AppColors.textPrimary,
-                  ),
+                  child: Icon(icon, size: 18, color: AppColors.textPrimary),
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -937,15 +955,15 @@ class _ShareActionTile extends StatelessWidget {
                       Text(
                         title,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -1003,16 +1021,16 @@ class _UpvotersSheetContent extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Text(
                 'Upvoters',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 4),
               Text(
                 '$count supporters',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: AppSpacing.xs),
               const Divider(height: 1, color: AppColors.divider),
@@ -1032,10 +1050,8 @@ class _UpvotersSheetContent extends StatelessWidget {
               AppSpacing.md,
             ),
             itemCount: names.length,
-            separatorBuilder: (_, __) => const Divider(
-              height: 1,
-              color: AppColors.divider,
-            ),
+            separatorBuilder: (BuildContext context, int index) =>
+                const Divider(height: 1, color: AppColors.divider),
             itemBuilder: (BuildContext context, int index) {
               final String name = names[index];
               return ListTile(
@@ -1054,14 +1070,14 @@ class _UpvotersSheetContent extends StatelessWidget {
                 title: Text(
                   name,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                      ),
+                    color: AppColors.textPrimary,
+                  ),
                 ),
                 trailing: Text(
                   'Supporting',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                 ),
               );
             },
@@ -1071,4 +1087,3 @@ class _UpvotersSheetContent extends StatelessWidget {
     );
   }
 }
-

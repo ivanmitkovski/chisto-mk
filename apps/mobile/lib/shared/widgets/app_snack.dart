@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -17,12 +18,64 @@ class AppSnack {
     BuildContext context, {
     required String message,
     AppSnackType type = AppSnackType.info,
-    Duration duration = const Duration(milliseconds: 1400),
+      Duration duration = const Duration(milliseconds: 2600),
   }) {
+    _triggerHaptic(type);
+    // Platform-adaptive behavior:
+    // - iOS/macOS: lightweight top banner (Apple-style).
+    // - Android/others: Material floating SnackBar from bottom.
+    final TargetPlatform platform = Theme.of(context).platform;
+    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+      final BuildContext? navigatorContext = Navigator.maybeOf(context)?.context;
+      if (navigatorContext == null) return null;
+
+      showGeneralDialog<void>(
+        context: navigatorContext,
+        barrierDismissible: false,
+        barrierLabel: 'app_snack',
+        barrierColor: Colors.transparent,
+        transitionDuration: const Duration(milliseconds: 220),
+        pageBuilder: (
+          BuildContext dialogContext,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+        ) {
+          return _AppSnackOverlay(
+            message: message,
+            type: type,
+            duration: duration,
+          );
+        },
+        transitionBuilder: (
+          BuildContext dialogContext,
+          Animation<double> animation,
+          Animation<double> secondaryAnimation,
+          Widget child,
+        ) {
+          final CurvedAnimation curved = CurvedAnimation(
+            parent: animation,
+            curve: Curves.easeOutCubic,
+            reverseCurve: Curves.easeInCubic,
+          );
+          return SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0, -0.12),
+              end: Offset.zero,
+            ).animate(curved),
+            child: FadeTransition(
+              opacity: curved,
+              child: child,
+            ),
+          );
+        },
+      );
+
+      return null;
+    }
+
     final ScaffoldMessengerState? messenger = ScaffoldMessenger.maybeOf(context);
     if (messenger == null) return null;
 
-    _triggerHaptic(type);
     messenger.hideCurrentSnackBar(reason: SnackBarClosedReason.hide);
     return messenger.showSnackBar(
       SnackBar(
@@ -121,6 +174,55 @@ class _AppSnackCard extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AppSnackOverlay extends StatefulWidget {
+  const _AppSnackOverlay({
+    required this.message,
+    required this.type,
+    required this.duration,
+  });
+
+  final String message;
+  final AppSnackType type;
+  final Duration duration;
+
+  @override
+  State<_AppSnackOverlay> createState() => _AppSnackOverlayState();
+}
+
+class _AppSnackOverlayState extends State<_AppSnackOverlay> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(widget.duration, () {
+      if (!mounted) return;
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            0,
+          ),
+          child: _AppSnackCard(
+            message: widget.message,
+            type: widget.type,
+          ),
         ),
       ),
     );

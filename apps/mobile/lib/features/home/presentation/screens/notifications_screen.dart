@@ -161,6 +161,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       return;
     }
 
+    AppHaptics.softTransition();
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(
