@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
@@ -25,16 +26,22 @@ class _HomeShellState extends State<HomeShell> {
   final GlobalKey _feedKey = GlobalKey();
   bool _isLaunchingReportFlow = false;
 
+  /// Map loads only after the user opens the map tab, avoiding tile fetch on app start.
+  bool _hasVisitedMap = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: _currentIndex,
         children: <Widget>[
           PollutionFeedScreen(key: _feedKey),
           const ReportsListScreen(),
-          const _PlaceholderScreen(title: 'Map'),
+          _hasVisitedMap
+              ? const PollutionMapScreen()
+              : _MapTabPlaceholder(),
           const _PlaceholderScreen(title: 'Events'),
         ],
       ),
@@ -88,6 +95,7 @@ class _HomeShellState extends State<HomeShell> {
 
     setState(() {
       _currentIndex = index;
+      if (index == 2) _hasVisitedMap = true;
     });
 
     if (index == 0) {
@@ -245,6 +253,23 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
                     ),
                   ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Lightweight placeholder until the user opens the map tab (lazy loading).
+class _MapTabPlaceholder extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.appBackground,
+      child: Center(
+        child: Icon(
+          Icons.map_outlined,
+          size: 48,
+          color: AppColors.textMuted.withValues(alpha: 0.4),
         ),
       ),
     );

@@ -22,6 +22,7 @@ class PollutionSite {
     this.comments = const [],
     this.urgencyLabel,
     this.cleaningEvents = const <CleaningEvent>[],
+    this.pollutionType,
   });
 
   final String id;
@@ -50,5 +51,8 @@ class PollutionSite {
   int get commentCount => comments.length;
 
   final String? urgencyLabel;
+
+  /// Pollution category for filtering (e.g. Plastic, Construction, Landfill).
+  final String? pollutionType;
 }
 

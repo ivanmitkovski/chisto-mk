@@ -71,6 +71,10 @@ enum ReportCategory {
   final IconData icon;
 }
 
+/// Canonical pollution types for filtering and reporting (aligned with ReportCategory).
+List<String> get reportPollutionTypeLabels =>
+    ReportCategory.values.map((ReportCategory c) => c.label).toList();
+
 enum ReportRequirement {
   photos('Add at least one photo'),
   category('Choose a category'),

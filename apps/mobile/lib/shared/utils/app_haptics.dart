@@ -127,4 +127,38 @@ class AppHaptics {
       HapticFeedback.mediumImpact();
     });
   }
+
+  /// Cluster expanding into individual markers — medium snap then crisp click.
+  static void clusterExpand() {
+    HapticFeedback.mediumImpact();
+    Future<void>.delayed(const Duration(milliseconds: 40), () {
+      HapticFeedback.selectionClick();
+    });
+  }
+
+  /// Map pin selected — selection click then soft land.
+  static void pinSelect() {
+    HapticFeedback.selectionClick();
+    Future<void>.delayed(const Duration(milliseconds: 30), () {
+      HapticFeedback.lightImpact();
+    });
+  }
+
+  /// Map pin deselected — single light for minimal presence.
+  static void pinDeselect() {
+    HapticFeedback.lightImpact();
+  }
+
+  /// Bottom sheet dismissed via swipe — light land then crisp click.
+  static void sheetDismiss() {
+    HapticFeedback.lightImpact();
+    Future<void>.delayed(const Duration(milliseconds: 35), () {
+      HapticFeedback.selectionClick();
+    });
+  }
+
+  /// Long-press on map — hint for future actions, single selection click.
+  static void mapLongPress() {
+    HapticFeedback.selectionClick();
+  }
 }
