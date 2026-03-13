@@ -7,6 +7,7 @@ import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -14,7 +15,9 @@ import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/services.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key});
+  const HomeShell({super.key, this.initialTabIndex = 0});
+
+  final int initialTabIndex;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -24,10 +27,18 @@ class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
   final ImagePicker _imagePicker = ImagePicker();
   final GlobalKey _feedKey = GlobalKey();
+  final GlobalKey _eventsFeedKey = GlobalKey();
   bool _isLaunchingReportFlow = false;
 
   /// Map loads only after the user opens the map tab, avoiding tile fetch on app start.
   bool _hasVisitedMap = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentIndex = widget.initialTabIndex.clamp(0, 3);
+    _hasVisitedMap = _currentIndex == 2;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +53,9 @@ class _HomeShellState extends State<HomeShell> {
           _hasVisitedMap
               ? const PollutionMapScreen()
               : _MapTabPlaceholder(),
-          const _PlaceholderScreen(title: 'Events'),
+          EventsFeedScreen(
+            key: _eventsFeedKey,
+          ),
         ],
       ),
       bottomNavigationBar: Container(
@@ -86,9 +99,10 @@ class _HomeShellState extends State<HomeShell> {
     if (index == _currentIndex) {
       if (index == 0) {
         final dynamic state = _feedKey.currentState;
-        if (state != null) {
-          state.scrollToTop();
-        }
+        if (state != null) state.scrollToTop();
+      } else if (index == 3) {
+        final dynamic state = _eventsFeedKey.currentState;
+        if (state != null) state.scrollToTop();
       }
       return;
     }
@@ -101,9 +115,12 @@ class _HomeShellState extends State<HomeShell> {
     if (index == 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final dynamic state = _feedKey.currentState;
-        if (state != null) {
-          state.scrollToTop();
-        }
+        if (state != null) state.scrollToTop();
+      });
+    } else if (index == 3) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final dynamic state = _eventsFeedKey.currentState;
+        if (state != null) state.scrollToTop();
       });
     }
   }
@@ -272,19 +289,6 @@ class _MapTabPlaceholder extends StatelessWidget {
           color: AppColors.textMuted.withValues(alpha: 0.4),
         ),
       ),
-    );
-  }
-}
-
-class _PlaceholderScreen extends StatelessWidget {
-  const _PlaceholderScreen({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(title, style: Theme.of(context).textTheme.titleMedium),
     );
   }
 }

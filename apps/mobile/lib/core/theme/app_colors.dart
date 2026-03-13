@@ -13,7 +13,20 @@ class AppColors {
   static const Color inputFill = Color(0xFFF0F1F7);
   static const Color inputBorder = Color(0xFFDDE1EA);
   static const Color accentDanger = Color(0xFFE6513D);
+  static const Color accentWarning = Color(0xFFF5A623);
+  static const Color accentWarningDark = Color(0xFFD4910C);
   static const Color divider = Color(0xFFE5E7ED);
   static const Color overlay = Color(0x80000000);
   static const Color error = Color(0xFFD73636);
+
+  static const List<Color> avatarPalette = <Color>[
+    Color(0xFF2FD788),
+    Color(0xFF3BA3F7),
+    Color(0xFFF5A623),
+    Color(0xFFE6513D),
+    Color(0xFF9B59B6),
+    Color(0xFF1ABC9C),
+    Color(0xFFE91E63),
+    Color(0xFF607D8B),
+  ];
 }

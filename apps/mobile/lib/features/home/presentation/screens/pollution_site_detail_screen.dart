@@ -4,12 +4,18 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
+import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
+import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action_bottom_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 
@@ -43,7 +49,24 @@ class PollutionSiteDetailScreen extends StatelessWidget {
                   ),
                   _CleaningEventsTab(
                     site: site,
-                    onCreateEvent: () => _openTakeActionDialog(context),
+                    onCreateEvent: () async {
+                      AppHaptics.softTransition();
+                      final EcoEvent? createdEvent = await EventsNavigation.openCreate(
+                        context,
+                        preselectedSiteId: site.id,
+                        preselectedSiteName: site.title,
+                        preselectedSiteImageUrl:
+                            'assets/images/references/onboarding_reference.png',
+                        preselectedSiteDistanceKm: site.distanceKm.toDouble(),
+                      );
+                      if (createdEvent == null || !context.mounted) {
+                        return;
+                      }
+                      await EventsNavigation.openDetail(
+                        context,
+                        eventId: createdEvent.id,
+                      );
+                    },
                   ),
                 ],
               ),
@@ -455,39 +478,49 @@ class _CleaningEventsTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<CleaningEvent> events = site.cleaningEvents;
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
     final double ctaHeight = 56 + AppSpacing.md * 2 + bottomSafe;
+    final EventsRepository store = EventsRepositoryRegistry.instance;
+    store.loadInitialIfNeeded();
 
-    return Stack(
-      children: <Widget>[
-        SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.md,
-            AppSpacing.lg,
-            ctaHeight + AppSpacing.md,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              if (events.isEmpty)
-                _buildEmptyState(context)
-              else
-                ...events.map(
-                  (CleaningEvent event) => _buildEventCard(context, event),
-                ),
-            ],
-          ),
-        ),
-        _StickyBottomCTA(
-          label: events.isEmpty
-              ? 'Create eco action'
-              : 'Schedule another action',
-          onPressed: onCreateEvent,
-        ),
-      ],
+    return ListenableBuilder(
+      listenable: store,
+      builder: (BuildContext context, Widget? child) {
+        final List<CleaningEvent> events = EventSiteResolver.cleaningEventsForSite(
+          siteId: site.id,
+          events: store.events,
+        );
+        return Stack(
+          children: <Widget>[
+            SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              padding: EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                ctaHeight + AppSpacing.md,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  if (events.isEmpty)
+                    _buildEmptyState(context)
+                  else
+                    ...events.map(
+                      (CleaningEvent event) => _buildEventCard(context, event),
+                    ),
+                ],
+              ),
+            ),
+            _StickyBottomCTA(
+              label: events.isEmpty
+                  ? 'Create eco action'
+                  : 'Schedule another action',
+              onPressed: onCreateEvent,
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -530,24 +563,43 @@ class _CleaningEventsTab extends StatelessWidget {
     );
   }
 
+  void _navigateToEcoEvent(BuildContext context, CleaningEvent event) {
+    final EventsRepository store = EventsRepositoryRegistry.instance;
+    store.loadInitialIfNeeded();
+    final EcoEvent? match = store.findById(event.id);
+    if (match != null) {
+      AppHaptics.softTransition();
+      EventsNavigation.openDetail(context, eventId: match.id);
+      return;
+    }
+    AppHaptics.warning();
+    AppSnack.show(
+      context,
+      message: 'Event details are unavailable right now.',
+      type: AppSnackType.warning,
+    );
+  }
+
   Widget _buildEventCard(BuildContext context, CleaningEvent event) {
     final String dateLabel =
         '${event.dateTime.day.toString().padLeft(2, '0')}.${event.dateTime.month.toString().padLeft(2, '0')}.${event.dateTime.year}';
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    return GestureDetector(
+      onTap: () => _navigateToEcoEvent(context, event),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: AppColors.panelBackground,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
@@ -655,10 +707,7 @@ class _CleaningEventsTab extends StatelessWidget {
               width: double.infinity,
               height: 40,
               child: ElevatedButton(
-                onPressed: () {
-                  AppHaptics.medium();
-                  // TODO: Join event flow.
-                },
+                onPressed: () => _navigateToEcoEvent(context, event),
                 style: ElevatedButton.styleFrom(
                   elevation: 0,
                   backgroundColor: AppColors.primary,
@@ -676,6 +725,7 @@ class _CleaningEventsTab extends StatelessWidget {
           ],
         ],
       ),
+    ),
     );
   }
 }

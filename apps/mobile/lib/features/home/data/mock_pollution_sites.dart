@@ -57,9 +57,9 @@ List<PollutionSite> buildMockPollutionSites() {
   final DateTime now = DateTime.now();
   final List<CleaningEvent> eventsForSite1 = <CleaningEvent>[
     CleaningEvent(
-      id: 'e1',
-      title: 'Weekend eco action',
-      dateTime: now.add(const Duration(days: 3)),
+      id: 'evt-1',
+      title: 'New cleanup in some place',
+      dateTime: now.add(const Duration(days: 2)),
       participantCount: 18,
       isOrganizer: true,
       statusLabel: 'Upcoming',
