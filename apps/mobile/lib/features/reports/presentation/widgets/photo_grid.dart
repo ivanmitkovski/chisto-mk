@@ -83,10 +83,9 @@ class _PhotoGridState extends State<PhotoGrid> {
                   return GalleryGlassPill(
                     child: Text(
                       totalCount > 1 ? 'Tap to review photos' : 'Tap to review',
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                        color: AppColors.textOnDark,
                         letterSpacing: -0.1,
                       ),
                     ),
@@ -184,7 +183,7 @@ class _PhotoThumbnail extends StatelessWidget {
                   curve: AppMotion.emphasized,
                   padding: const EdgeInsets.all(2),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(AppSpacing.radius18),
                     border: Border.all(
                       color: isSelected
                           ? AppColors.primaryDark
@@ -204,7 +203,7 @@ class _PhotoThumbnail extends StatelessWidget {
                         : const <BoxShadow>[],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15),
+                    borderRadius: BorderRadius.circular(AppSpacing.radius14),
                     child: AppSmartImage(image: FileImage(File(file.path))),
                   ),
                 ),
@@ -224,13 +223,13 @@ class _PhotoThumbnail extends StatelessWidget {
                       width: 28,
                       height: 28,
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.55),
+                        color: AppColors.black.withValues(alpha: 0.55),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
                         Icons.close_rounded,
                         size: 16,
-                        color: Colors.white,
+                        color: AppColors.white,
                       ),
                     ),
                   ),
@@ -250,7 +249,7 @@ class _PhotoThumbnail extends StatelessWidget {
                     child: const Icon(
                       Icons.check_rounded,
                       size: 13,
-                      color: Colors.white,
+                      color: AppColors.white,
                     ),
                   ),
                 ),
@@ -284,7 +283,7 @@ class _AddPhotoTile extends StatelessWidget {
           width: _isCompact ? 72 : double.infinity,
           height: _isCompact ? 86 : null,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(_isCompact ? 18 : 20),
+            borderRadius: BorderRadius.circular(_isCompact ? AppSpacing.radius18 : AppSpacing.radiusXl),
             border: Border.all(
               color: AppColors.divider.withValues(alpha: 0.9),
               width: 1.2,
@@ -300,7 +299,7 @@ class _AddPhotoTile extends StatelessWidget {
                   height: _isCompact ? 32 : 42,
                   decoration: BoxDecoration(
                     color: AppColors.primaryDark.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(_isCompact ? 10 : 12),
+                    borderRadius: BorderRadius.circular(_isCompact ? AppSpacing.radius10 : AppSpacing.radiusMd),
                   ),
                   child: Icon(
                     _isCompact ? Icons.add_rounded : Icons.camera_alt_rounded,
@@ -308,7 +307,7 @@ class _AddPhotoTile extends StatelessWidget {
                     color: AppColors.primaryDark,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   _isCompact ? 'Add' : 'Add a photo',
                   style: const TextStyle(
@@ -319,7 +318,7 @@ class _AddPhotoTile extends StatelessWidget {
                   ),
                 ),
                 if (!_isCompact) ...<Widget>[
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xxs),
                   const Text(
                     'Camera or library',
                     style: TextStyle(
@@ -351,11 +350,11 @@ class _EmptyPhotoGalleryCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: AppColors.inputFill,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
           border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.025),
+              color: AppColors.black.withValues(alpha: 0.025),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),

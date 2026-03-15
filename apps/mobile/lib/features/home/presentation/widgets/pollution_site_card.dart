@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -10,13 +9,15 @@ import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/take_action_bottom_sheet.dart';
-import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
+import 'package:chisto_mobile/features/home/presentation/navigation/take_action_coordinator.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/take_action_sheet.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_widgets.dart';
 
 class PollutionSiteCard extends StatefulWidget {
   const PollutionSiteCard({super.key, required this.site});
@@ -46,7 +47,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   String? _cachedTitleKey;
   String? _cachedDescKey;
 
-  static const double _cardRadius = 20.0;
+  static const double _cardRadius = AppSpacing.radiusXl;
   static const double _counterMinWidth = 28.0;
   static const double _actionIconSize = 24.0;
   static const double _actionCountFontSize = 13.0;
@@ -184,13 +185,13 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
           borderRadius: BorderRadius.circular(_cardRadius),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 16,
+              color: AppColors.shadowLight,
+              blurRadius: AppSpacing.md,
               offset: const Offset(0, 4),
             ),
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 24,
+              color: AppColors.shadowMedium,
+              blurRadius: AppSpacing.lg,
               offset: const Offset(0, 8),
             ),
           ],
@@ -198,11 +199,11 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(_cardRadius),
           child: Material(
-            color: Colors.transparent,
+            color: AppColors.transparent,
             child: InkWell(
               onTap: () => _openDetails(context),
               splashColor: AppColors.primary.withValues(alpha: 0.08),
-              highlightColor: Colors.black.withValues(alpha: 0.02),
+              highlightColor: AppColors.black.withValues(alpha: 0.02),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
@@ -345,9 +346,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
-                        Colors.black.withValues(alpha: 0.28),
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.2),
+                        AppColors.black.withValues(alpha: 0.28),
+                        AppColors.transparent,
+                        AppColors.black.withValues(alpha: 0.2),
                       ],
                       stops: const <double>[0, 0.45, 1],
                     ),
@@ -355,7 +356,6 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                 ),
               ),
             ),
-            // Top-left status + distance pill overlay.
             Positioned(
               top: AppSpacing.sm,
               left: AppSpacing.sm,
@@ -376,7 +376,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                     Text(
                       '${site.statusLabel} • ${site.distanceKm.toStringAsFixed(0)} km',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.white,
+                        color: AppColors.textOnDark,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -432,15 +432,13 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
 
     return Row(
       children: <Widget>[
-        // Left group: upvote, comment, share (scale down on narrow screens to avoid overflow).
         Expanded(
           child: FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                // Upvote (icon toggles, count opens upvoters list)
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
                 SizedBox(
                   height: 44,
                   child: Row(
@@ -498,7 +496,6 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   ),
                 ),
                 const SizedBox(width: 14),
-                // Comment + count (using custom comments icon)
                 Semantics(
                   button: true,
                   label: 'Comments, $commentCount',
@@ -547,7 +544,6 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   ),
                 ),
                 const SizedBox(width: 14),
-                // Share + count
                 Semantics(
                   button: true,
                   label: 'Shares, $shareCount',
@@ -599,7 +595,6 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             ),
           ),
         ),
-        // Far right: save / follow (Instagram-style bookmark)
         Semantics(
           button: true,
           label: _isSaved ? 'Unsave, stop updates' : 'Save and get updates',
@@ -657,7 +652,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       enableDrag: false,
       useSafeArea: true,
       barrierColor: AppColors.overlay,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext context) {
         final bool keyboardOpen = MediaQuery.of(context).viewInsets.bottom > 0;
         if (keyboardOpen) {
@@ -683,7 +678,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.panelBackground,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusPill)),
               ),
               clipBehavior: Clip.antiAlias,
               child: CommentsBottomSheet(
@@ -707,72 +702,28 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   Future<void> _openTakeActionSheet(BuildContext context) async {
-    final String? action = await showDialog<String>(
-      context: context,
-      barrierDismissible: true,
-      barrierColor: AppColors.overlay,
-      builder: (BuildContext context) {
-        return Dialog(
-          backgroundColor: AppColors.panelBackground,
-          insetPadding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.lg,
-            vertical: AppSpacing.xl,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
-          ),
-          child: const TakeActionBottomSheet(),
-        );
+    final TakeActionType? action = await TakeActionSheet.show(context);
+    if (action == null || !context.mounted) return;
+    await TakeActionCoordinator.execute(
+      context,
+      action: action,
+      site: site,
+      isFromSiteDetail: false,
+      onShareCountChanged: () {
+        if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
       },
     );
-    if (action == null || !context.mounted) return;
-    if (action == 'Report Issue') {
-      AppHaptics.softTransition();
-      await Navigator.of(context).push<bool>(
-        MaterialPageRoute<bool>(
-          builder: (_) => NewReportScreen(
-            entryLabel: 'Site follow-up',
-            entryHint:
-                'Use this to report new evidence or changes for ${site.title}.',
-          ),
-        ),
-      );
-    }
   }
 
   Future<void> _openShareSheet(BuildContext context) async {
-    final _ShareAction? action = await showModalBottomSheet<_ShareAction>(
-      context: context,
-      isScrollControlled: false,
-      isDismissible: true,
-      enableDrag: true,
-      useSafeArea: true,
-      barrierColor: AppColors.overlay,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return const _ShareSheet();
-      },
-    );
-
-    if (action == null || !context.mounted) return;
-
-    final String siteUrl = 'https://chisto.mk/sites/${site.id}';
-    if (action == _ShareAction.copyLink) {
-      await Clipboard.setData(ClipboardData(text: siteUrl));
-      if (!context.mounted) return;
-    }
-    final String feedback = switch (action) {
-      _ShareAction.copyLink => 'Link copied',
-      _ShareAction.sendMessage => 'Share flow coming next',
-      _ShareAction.shareProfile => 'Shared to your profile',
-    };
-
-    setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
-    AppSnack.show(
+    await TakeActionCoordinator.execute(
       context,
-      message: feedback,
-      type: AppSnackType.success,
-      duration: const Duration(milliseconds: 1200),
+      action: TakeActionType.shareSite,
+      site: site,
+      isFromSiteDetail: false,
+      onShareCountChanged: () {
+        if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
+      },
     );
   }
 
@@ -799,7 +750,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       enableDrag: false,
       useSafeArea: true,
       barrierColor: AppColors.overlay,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
           expand: false,
@@ -812,10 +763,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.panelBackground,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusPill)),
               ),
               clipBehavior: Clip.antiAlias,
-              child: _UpvotersSheetContent(
+              child: UpvotersSheetContent(
                 count: count,
                 names: names,
                 scrollController: scrollController,
@@ -828,262 +779,3 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 }
 
-enum _ShareAction { copyLink, sendMessage, shareProfile }
-
-class _ShareSheet extends StatelessWidget {
-  const _ShareSheet();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.panelBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            AppSpacing.md,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Share report',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Help others discover and support this site',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              _ShareActionTile(
-                icon: Icons.link_rounded,
-                title: 'Copy link',
-                subtitle: 'Copy report link to clipboard',
-                onTap: () => Navigator.of(context).pop(_ShareAction.copyLink),
-              ),
-              _ShareActionTile(
-                icon: Icons.send_rounded,
-                title: 'Send to people',
-                subtitle: 'Share in messages',
-                onTap: () =>
-                    Navigator.of(context).pop(_ShareAction.sendMessage),
-              ),
-              _ShareActionTile(
-                icon: Icons.auto_awesome_rounded,
-                title: 'Share to profile',
-                subtitle: 'Post this report to your profile',
-                onTap: () =>
-                    Navigator.of(context).pop(_ShareAction.shareProfile),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ShareActionTile extends StatelessWidget {
-  const _ShareActionTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(14),
-          onTap: onTap,
-          child: Ink(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(14),
-              color: AppColors.inputFill.withValues(alpha: 0.6),
-            ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.divider, width: 1),
-                  ),
-                  child: Icon(icon, size: 18, color: AppColors.textPrimary),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        title,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        subtitle,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 18,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _UpvotersSheetContent extends StatelessWidget {
-  const _UpvotersSheetContent({
-    required this.count,
-    required this.names,
-    required this.scrollController,
-  });
-
-  final int count;
-  final List<String> names;
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.lg,
-            AppSpacing.sm,
-            AppSpacing.lg,
-            AppSpacing.sm,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBorder,
-                    borderRadius: BorderRadius.circular(999),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                'Upvoters',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                '$count supporters',
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-              ),
-              const SizedBox(height: AppSpacing.xs),
-              const Divider(height: 1, color: AppColors.divider),
-            ],
-          ),
-        ),
-        Expanded(
-          child: ListView.separated(
-            controller: scrollController,
-            physics: const BouncingScrollPhysics(
-              parent: AlwaysScrollableScrollPhysics(),
-            ),
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg,
-              0,
-              AppSpacing.lg,
-              AppSpacing.md,
-            ),
-            itemCount: names.length,
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(height: 1, color: AppColors.divider),
-            itemBuilder: (BuildContext context, int index) {
-              final String name = names[index];
-              return ListTile(
-                contentPadding: const EdgeInsets.symmetric(vertical: 2),
-                leading: CircleAvatar(
-                  radius: 18,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.12),
-                  child: Text(
-                    name.substring(0, 1),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                ),
-                title: Text(
-                  name,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                trailing: Text(
-                  'Supporting',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-}

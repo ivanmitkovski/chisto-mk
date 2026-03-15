@@ -44,4 +44,13 @@ class InputValidators {
     }
     return null;
   }
+
+  static String? Function(String?) validateConfirmPassword(String password) {
+    return (String? value) {
+      final String trimmed = value?.trim() ?? '';
+      if (trimmed.isEmpty) return 'Please confirm your password';
+      if (trimmed != password) return 'Passwords do not match';
+      return null;
+    };
+  }
 }

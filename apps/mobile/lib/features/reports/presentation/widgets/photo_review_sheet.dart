@@ -127,9 +127,9 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                         color: AppColors.divider.withValues(alpha: 0.8),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                     ),
                     child: const Text(
                       'Retake',
@@ -154,12 +154,12 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                     },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                     ),
                     child: const Text(
                       'Use this photo',
@@ -179,23 +179,23 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
             image: true,
             child: Container(
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(AppSpacing.radius22),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: AppColors.black.withValues(alpha: 0.08),
                     blurRadius: 24,
                     offset: const Offset(0, 10),
                   ),
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(22),
+                borderRadius: BorderRadius.circular(AppSpacing.radius22),
                 child: Container(
                   decoration: const BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: <Color>[Color(0xFF181A1B), Colors.black],
+                      colors: <Color>[AppColors.black, AppColors.black],
                     ),
                   ),
                   child: Stack(
@@ -263,10 +263,9 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                               _isZoomed
                                   ? 'Double-tap to reset zoom'
                                   : 'Pinch or double-tap to inspect',
-                              style: const TextStyle(
-                                fontSize: 12,
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white,
+                                color: AppColors.textOnDark,
                                 letterSpacing: -0.1,
                               ),
                             ),

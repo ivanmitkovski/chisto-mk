@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
-import 'comment.dart';
 import 'cleaning_event.dart';
+import 'comment.dart';
+import 'site_report.dart';
 
-/// Lightweight UI model for a pollution site item in the feed.
-///
-/// This keeps the home feature decoupled from any future API/DB models
-/// while still giving us strong typing and clarity.
 class PollutionSite {
   const PollutionSite({
     required this.id,
@@ -23,7 +20,9 @@ class PollutionSite {
     this.urgencyLabel,
     this.cleaningEvents = const <CleaningEvent>[],
     this.pollutionType,
-  });
+    this.firstReport,
+    List<String>? coReporterNames,
+  }) : coReporterNames = coReporterNames ?? const [];
 
   final String id;
   final String title;
@@ -51,8 +50,8 @@ class PollutionSite {
   int get commentCount => comments.length;
 
   final String? urgencyLabel;
-
-  /// Pollution category for filtering (e.g. Plastic, Construction, Landfill).
   final String? pollutionType;
+  final SiteReport? firstReport;
+  final List<String> coReporterNames;
 }
 

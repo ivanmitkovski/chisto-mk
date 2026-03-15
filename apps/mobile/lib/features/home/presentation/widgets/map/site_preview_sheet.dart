@@ -88,20 +88,20 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
       },
       onTap: widget.onViewDetails,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.94),
-              borderRadius: BorderRadius.circular(16),
+              color: AppColors.white.withValues(alpha: 0.94),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.6),
+                color: AppColors.white.withValues(alpha: 0.6),
                 width: 1,
               ),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
+                  color: AppColors.shadowLight,
                   blurRadius: 20,
                   offset: const Offset(0, 6),
                 ),
@@ -172,13 +172,13 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
                         ),
                       ),
                       Material(
-                        color: Colors.transparent,
+                        color: AppColors.transparent,
                         child: InkWell(
                           onTap: () {
                             AppHaptics.sheetDismiss();
                             widget.onDismiss();
                           },
-                          borderRadius: BorderRadius.circular(20),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                           child: Padding(
                             padding: const EdgeInsets.all(6),
                             child: Icon(
@@ -240,9 +240,9 @@ class SitePreviewImage extends StatelessWidget {
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+      boxShadow: <BoxShadow>[
+            BoxShadow(
+            color: AppColors.shadowLight,
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -272,10 +272,10 @@ class CompactBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Text(
         label,
@@ -305,7 +305,7 @@ class ActionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color fg = primary ? Colors.white : AppColors.primaryDark;
+        final Color fg = primary ? AppColors.textOnDark : AppColors.primaryDark;
     final Color bg = primary
         ? AppColors.primaryDark
         : AppColors.primary.withValues(alpha: 0.12);
@@ -313,12 +313,12 @@ class ActionPill extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
           decoration: BoxDecoration(
             color: bg,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

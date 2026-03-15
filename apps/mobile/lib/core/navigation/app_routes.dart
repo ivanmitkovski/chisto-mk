@@ -4,6 +4,10 @@ import 'package:chisto_mobile/features/auth/presentation/screens/location_screen
 import 'package:chisto_mobile/features/events/presentation/navigation/event_page_transitions.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_otp_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_request_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_success_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
@@ -25,6 +29,10 @@ class AppRoutes {
   static const String signIn = '/auth/sign-in';
   static const String signUp = '/auth/sign-up';
   static const String otp = '/auth/otp';
+  static const String forgotPasswordRequest = '/auth/forgot-password';
+  static const String forgotPasswordOtp = '/auth/forgot-password/otp';
+  static const String forgotPasswordNew = '/auth/forgot-password/new';
+  static const String forgotPasswordSuccess = '/auth/forgot-password/success';
   static const String location = '/auth/location';
   static const String home = '/home';
   static const String homeEvents = '/home/events';
@@ -90,6 +98,32 @@ class AppRouter {
           builder: (_) => OtpScreen(phoneNumber: phoneNumber),
           settings: settings,
         );
+      case AppRoutes.forgotPasswordRequest:
+        return MaterialPageRoute<void>(
+          builder: (_) => const ForgotPasswordRequestScreen(),
+          settings: settings,
+        );
+      case AppRoutes.forgotPasswordOtp:
+        final String fpPhoneNumber = settings.arguments is String
+            ? settings.arguments! as String
+            : '+389 70 123 456';
+        return MaterialPageRoute<void>(
+          builder: (_) => ForgotPasswordOtpScreen(phoneNumber: fpPhoneNumber),
+          settings: settings,
+        );
+      case AppRoutes.forgotPasswordNew:
+        final String fpNewPhone = settings.arguments is String
+            ? settings.arguments! as String
+            : '+389 70 123 456';
+        return MaterialPageRoute<void>(
+          builder: (_) => ForgotPasswordNewScreen(phoneNumber: fpNewPhone),
+          settings: settings,
+        );
+      case AppRoutes.forgotPasswordSuccess:
+        return MaterialPageRoute<void>(
+          builder: (_) => const ForgotPasswordSuccessScreen(),
+          settings: settings,
+        );
       case AppRoutes.location:
         return MaterialPageRoute<void>(
           builder: (_) => const LocationScreen(),
@@ -138,7 +172,7 @@ class AppRouter {
       case AppRoutes.eventsDetail:
         final EventRouteArguments args =
             settings.arguments as EventRouteArguments;
-        return EventDetailPageRoute<void>(
+        return CupertinoPageRoute<void>(
           builder: (_) => EventDetailScreen(eventId: args.eventId),
           settings: settings,
         );

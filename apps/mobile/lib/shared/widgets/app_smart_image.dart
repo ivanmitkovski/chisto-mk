@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 class AppSmartImage extends StatelessWidget {
@@ -43,7 +44,7 @@ class AppSmartImage extends StatelessWidget {
             child: const Icon(
               Icons.image_not_supported_outlined,
               color: AppColors.textMuted,
-              size: 24,
+              size: AppSpacing.iconLg,
             ),
           );
         },

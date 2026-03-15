@@ -37,7 +37,7 @@ class TimeRangePicker extends StatelessWidget {
       context: context,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
       ),
       builder: (BuildContext ctx) {
         return SafeArea(
@@ -48,11 +48,11 @@ class TimeRangePicker extends StatelessWidget {
               children: <Widget>[
                 const SizedBox(height: AppSpacing.xs),
                 Container(
-                  width: 36,
-                  height: 4,
+                  width: AppSpacing.sheetHandle,
+                  height: AppSpacing.sheetHandleHeight,
                   decoration: BoxDecoration(
                     color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                   ),
                 ),
                 Expanded(
@@ -85,7 +85,7 @@ class TimeRangePicker extends StatelessWidget {
                         backgroundColor: AppColors.primary,
                         foregroundColor: AppColors.textPrimary,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                         ),
                       ),
                       child: Text(
@@ -124,7 +124,7 @@ class TimeRangePicker extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: AppColors.panelBackground,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             border: hasError
                 ? Border.all(
                     color: AppColors.accentDanger.withValues(alpha: 0.4),
@@ -132,7 +132,7 @@ class TimeRangePicker extends StatelessWidget {
                 : null,
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: AppColors.black.withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -175,10 +175,6 @@ class TimeRangePicker extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Individual time block
-// ---------------------------------------------------------------------------
-
 class _TimeBlock extends StatelessWidget {
   const _TimeBlock({
     required this.label,
@@ -199,7 +195,10 @@ class _TimeBlock extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: 2),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.xs,
+            vertical: AppSpacing.xxs / 2,
+          ),
           child: Column(
             children: <Widget>[
               Text(
@@ -210,7 +209,7 @@ class _TimeBlock extends StatelessWidget {
                       fontSize: 13,
                     ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xxs),
               AnimatedDefaultTextStyle(
                 duration: AppMotion.fast,
                 style: Theme.of(context).textTheme.headlineLarge!.copyWith(

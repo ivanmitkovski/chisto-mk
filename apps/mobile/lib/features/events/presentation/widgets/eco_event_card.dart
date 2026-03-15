@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -51,7 +52,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         border: event.status == EcoEventStatus.inProgress
             ? Border(
                 left: BorderSide(
@@ -62,7 +63,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
             : null,
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: _pressed ? 0.02 : 0.05),
+            color: AppColors.black.withValues(alpha: _pressed ? 0.02 : 0.05),
             blurRadius: _pressed ? 6 : 14,
             offset: Offset(0, _pressed ? 2 : 5),
           ),
@@ -185,13 +186,13 @@ class _EcoEventCardState extends State<EcoEventCard> {
             duration: AppMotion.xFast,
             curve: AppMotion.emphasized,
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
                   AppHaptics.softTransition();
                   widget.onTap();
                 },
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 child: card,
               ),
             ),
@@ -205,75 +206,107 @@ class _EcoEventCardState extends State<EcoEventCard> {
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.panelBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: AppColors.transparent,
+      barrierColor: AppColors.overlay,
       builder: (BuildContext sheetCtx) {
-        return SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const SizedBox(height: 8),
-              Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: AppColors.divider,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppSpacing.radiusSheet),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
-              const SizedBox(height: 8),
-              ListTile(
-                leading: const Icon(CupertinoIcons.doc_on_doc),
-                title: const Text('Copy event details'),
-                onTap: () {
-                  Clipboard.setData(
-                    ClipboardData(
-                      text:
-                          '${event.title}\n${event.formattedDate} (${event.formattedTimeRange})\n${event.siteName}',
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Center(
+                    child: Container(
+                      width: AppSpacing.sheetHandle,
+                      height: AppSpacing.sheetHandleHeight,
+                      decoration: BoxDecoration(
+                        color: AppColors.divider,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.radiusXs),
+                      ),
                     ),
-                  );
-                  Navigator.of(sheetCtx).pop();
-                  if (mounted) {
-                    AppSnack.show(
-                      this.context,
-                      message: 'Event details copied.',
-                      type: AppSnackType.success,
-                    );
-                  }
-                },
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Event actions',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.3,
+                        ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    event.title,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textMuted,
+                        ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  _EventActionTile(
+                    icon: CupertinoIcons.doc_on_doc,
+                    title: 'Copy event details',
+                    subtitle: 'Copy title, date and location',
+                    onTap: () {
+                      Clipboard.setData(
+                        ClipboardData(
+                          text:
+                              '${event.title}\n${event.formattedDate} (${event.formattedTimeRange})\n${event.siteName}',
+                        ),
+                      );
+                      Navigator.of(sheetCtx).pop();
+                      if (mounted) {
+                        AppSnack.show(
+                          this.context,
+                          message: 'Event details copied.',
+                          type: AppSnackType.success,
+                        );
+                      }
+                    },
+                  ),
+                  if (widget.onShare != null)
+                    _EventActionTile(
+                      icon: CupertinoIcons.share,
+                      title: 'Share event',
+                      subtitle: 'Share with friends',
+                      onTap: () {
+                        Navigator.of(sheetCtx).pop();
+                        widget.onShare?.call();
+                      },
+                    ),
+                  _EventActionTile(
+                    icon: CupertinoIcons.arrow_right_circle,
+                    title: 'Open event',
+                    subtitle: 'View full event details',
+                    onTap: () {
+                      Navigator.of(sheetCtx).pop();
+                      widget.onTap();
+                    },
+                  ),
+                ],
               ),
-              if (widget.onShare != null)
-                ListTile(
-                  leading: const Icon(CupertinoIcons.share),
-                  title: const Text('Share event'),
-                  onTap: () {
-                    Navigator.of(sheetCtx).pop();
-                    widget.onShare?.call();
-                  },
-                ),
-              ListTile(
-                leading: const Icon(CupertinoIcons.arrow_right_circle),
-                title: const Text('Open event'),
-                onTap: () {
-                  Navigator.of(sheetCtx).pop();
-                  widget.onTap();
-                },
-              ),
-              const SizedBox(height: AppSpacing.xs),
-            ],
+            ),
           ),
         );
       },
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Thumbnail with Hero support
-// ---------------------------------------------------------------------------
 
 class _Thumbnail extends StatelessWidget {
   const _Thumbnail({
@@ -287,26 +320,26 @@ class _Thumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget image = ClipRRect(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(AppSpacing.radius14),
       child: Container(
         width: 80,
         height: 80,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppSpacing.radius14),
           border: Border.all(
-            color: Colors.white,
+            color: AppColors.white,
             width: 2,
           ),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: AppColors.black.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 1),
             ),
           ],
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           child: Image.asset(
             imageAsset,
             fit: BoxFit.cover,
@@ -345,7 +378,7 @@ class _Thumbnail extends StatelessWidget {
               child: Image.asset(
                 imageAsset,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: AppColors.inputFill),
+                errorBuilder: (_, _, _) => Container(color: AppColors.inputFill),
               ),
             );
           },
@@ -355,10 +388,6 @@ class _Thumbnail extends StatelessWidget {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Status chip with optional live pulse
-// ---------------------------------------------------------------------------
 
 class _StatusChip extends StatefulWidget {
   const _StatusChip({
@@ -397,10 +426,10 @@ class _StatusChipState extends State<_StatusChip>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
       decoration: BoxDecoration(
         color: widget.status.color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -427,9 +456,7 @@ class _StatusChipState extends State<_StatusChip>
           ],
           Text(
             widget.status.label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+            style: AppTypography.badgeLabel.copyWith(
               color: widget.status.color,
             ),
           ),
@@ -439,34 +466,25 @@ class _StatusChipState extends State<_StatusChip>
   }
 }
 
-// ---------------------------------------------------------------------------
-// "Starting soon" badge
-// ---------------------------------------------------------------------------
-
 class _StartingSoonBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
       decoration: BoxDecoration(
         color: AppColors.accentWarning.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
-      child: const Text(
+      child: Text(
         'Soon',
-        style: TextStyle(
+        style: AppTypography.badgeLabel.copyWith(
           fontSize: 10,
-          fontWeight: FontWeight.w700,
           color: AppColors.accentWarningDark,
         ),
       ),
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Participant row with stacked avatars
-// ---------------------------------------------------------------------------
 
 class _ParticipantRow extends StatelessWidget {
   const _ParticipantRow({
@@ -510,8 +528,7 @@ class _ParticipantRow extends StatelessWidget {
               : maxParticipants != null
                   ? '$count / $maxParticipants'
                   : '$count joined',
-          style: TextStyle(
-            fontSize: 12,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w500,
             color: AppColors.textMuted,
           ),
@@ -540,20 +557,17 @@ class _MiniAvatar extends StatelessWidget {
       child: Center(
         child: Text(
           label.isNotEmpty ? label[0].toUpperCase() : '?',
-          style: const TextStyle(
+          style: AppTypography.badgeLabel.copyWith(
             fontSize: 9,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            letterSpacing: 0,
+            color: AppColors.white,
           ),
         ),
       ),
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Distance badge
-// ---------------------------------------------------------------------------
 
 class _DistanceBadge extends StatelessWidget {
   const _DistanceBadge({required this.km});
@@ -569,10 +583,10 @@ class _DistanceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
       decoration: BoxDecoration(
         color: AppColors.textMuted.withValues(alpha: 0.10),
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -582,11 +596,10 @@ class _DistanceBadge extends StatelessWidget {
             size: 10,
             color: AppColors.textMuted,
           ),
-          const SizedBox(width: 3),
+          const SizedBox(width: AppSpacing.xxs),
           Text(
             _label,
-            style: TextStyle(
-              fontSize: 11,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
               fontWeight: FontWeight.w500,
               color: AppColors.textMuted,
             ),
@@ -596,10 +609,6 @@ class _DistanceBadge extends StatelessWidget {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Three-dot menu
-// ---------------------------------------------------------------------------
 
 class _MoreButton extends StatelessWidget {
   const _MoreButton({required this.onTap});
@@ -622,6 +631,89 @@ class _MoreButton extends StatelessWidget {
             CupertinoIcons.ellipsis,
             size: 18,
             color: AppColors.textMuted,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _EventActionTile extends StatelessWidget {
+  const _EventActionTile({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppSpacing.radius14),
+          onTap: onTap,
+          child: Ink(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.sm,
+            ),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              color: AppColors.inputFill.withValues(alpha: 0.6),
+            ),
+            child: Row(
+              children: <Widget>[
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: AppColors.panelBackground,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.divider,
+                      width: 1,
+                    ),
+                  ),
+                  child: Icon(icon, size: 18, color: AppColors.textPrimary),
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        title,
+                        style:
+                            Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        subtitle,
+                        style:
+                            Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.textMuted,
+                                ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: AppColors.textMuted,
+                ),
+              ],
+            ),
           ),
         ),
       ),

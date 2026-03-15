@@ -39,9 +39,9 @@ class _FeedSkeletonCardState extends State<FeedSkeletonCard>
               begin: Alignment.topLeft,
               end: Alignment.centerRight,
               colors: const <Color>[
-                Color(0xFFEBECF0),
-                Color(0xFFF5F6FA),
-                Color(0xFFEBECF0),
+                AppColors.inputFill,
+                AppColors.panelBackground,
+                AppColors.inputFill,
               ],
               stops: <double>[
                 (_shimmerController.value - 0.3).clamp(0.0, 1.0),
@@ -57,7 +57,7 @@ class _FeedSkeletonCardState extends State<FeedSkeletonCard>
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -118,7 +118,7 @@ class _SkeletonLine extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: AppColors.inputFill,
-          borderRadius: BorderRadius.circular(height > 20 ? 12 : 999),
+          borderRadius: BorderRadius.circular(height > 20 ? AppSpacing.radiusMd : AppSpacing.radiusCircle),
         ),
       ),
     );
@@ -144,7 +144,7 @@ class _SkeletonBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.inputFill,
         shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-        borderRadius: isCircle ? null : BorderRadius.circular(6),
+        borderRadius: isCircle ? null : BorderRadius.circular(AppSpacing.radiusXs),
       ),
     );
   }

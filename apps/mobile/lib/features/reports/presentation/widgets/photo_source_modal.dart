@@ -33,10 +33,9 @@ Future<ImageSource?> showPhotoSourceModal(BuildContext context) async {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const SizedBox(height: AppSpacing.xs),
-              const Text(
+              Text(
                 'You can review the photo before it is added.',
-                style: TextStyle(
-                  fontSize: 12,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   fontWeight: FontWeight.w500,
                   color: AppColors.textMuted,
                   height: 1.35,
@@ -112,10 +111,10 @@ class _PhotoSourceTile extends StatelessWidget {
       label: label,
       hint: subtitle,
       child: Material(
-        color: Colors.transparent,
+        color: AppColors.transparent,
         child: InkWell(
           onTap: onTap,
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppSpacing.radius22),
           child: Ink(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
@@ -123,11 +122,11 @@ class _PhotoSourceTile extends StatelessWidget {
             ),
             decoration: BoxDecoration(
               color: surfaceColor,
-              borderRadius: BorderRadius.circular(22),
+              borderRadius: BorderRadius.circular(AppSpacing.radius22),
               border: Border.all(color: borderColor),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withValues(
+                  color: AppColors.black.withValues(
                     alpha: emphasized ? 0.02 : 0.012,
                   ),
                   blurRadius: emphasized ? 14 : 10,
@@ -143,7 +142,7 @@ class _PhotoSourceTile extends StatelessWidget {
                   height: 44,
                   decoration: BoxDecoration(
                     color: iconBackground,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   ),
                   child: Icon(
                     icon,
@@ -191,7 +190,7 @@ class _PhotoSourceTile extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Padding(
-                  padding: const EdgeInsets.only(top: 8),
+                  padding: const EdgeInsets.only(top: AppSpacing.sm),
                   child: Container(
                     width: 28,
                     height: 28,

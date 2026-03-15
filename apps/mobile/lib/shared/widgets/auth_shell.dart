@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 class AuthShell extends StatelessWidget {
   const AuthShell({
@@ -16,6 +19,7 @@ class AuthShell extends StatelessWidget {
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
     final double topInset = MediaQuery.paddingOf(context).top;
     final bool keyboardVisible = keyboardInset > 0;
+    final Size screenSize = MediaQuery.sizeOf(context);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -24,18 +28,49 @@ class AuthShell extends StatelessWidget {
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         behavior: HitTestBehavior.translucent,
         child: Stack(
-          children: [
+          children: <Widget>[
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
+                    stops: const <double>[0.0, 0.28, 0.5, 1.0],
                     colors: <Color>[
-                      AppColors.primary.withValues(alpha: 0.16),
+                      AppColors.primary.withValues(alpha: 0.22),
+                      AppColors.primary.withValues(alpha: 0.14),
+                      AppColors.primary.withValues(alpha: 0.06),
                       AppColors.appBackground,
                     ],
                   ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: -screenSize.height * 0.06,
+              right: -screenSize.width * 0.18,
+              child: Opacity(
+                opacity: 0.08,
+                child: SvgPicture.asset(
+                  AppAssets.brandLogoGreen,
+                  width: screenSize.width * 1.12,
+                  height: screenSize.width * 1.3,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.bottomLeft,
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: screenSize.height * 0.42,
+              left: -screenSize.width * 0.3,
+              child: Opacity(
+                opacity: 0.045,
+                child: SvgPicture.asset(
+                  AppAssets.brandLogoGreen,
+                  width: screenSize.width * 0.9,
+                  height: screenSize.width * 1.04,
+                  fit: BoxFit.contain,
+                  alignment: Alignment.topRight,
                 ),
               ),
             ),
@@ -43,17 +78,19 @@ class AuthShell extends StatelessWidget {
               top: true,
               bottom: false,
               child: Column(
-                children: [
+                children: <Widget>[
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
+                      children: <Widget>[
                         Padding(
                           padding: EdgeInsets.fromLTRB(
-                            20,
-                            topInset > 20 ? 20 : 16,
-                            20,
-                            24,
+                            AppSpacing.radiusXl,
+                            topInset > AppSpacing.radiusXl
+                                ? AppSpacing.radiusXl
+                                : AppSpacing.md,
+                            AppSpacing.radiusXl,
+                            AppSpacing.lg,
                           ),
                           child: Align(
                             alignment: Alignment.centerLeft,
@@ -68,13 +105,22 @@ class AuthShell extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: AppColors.panelBackground,
                               borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(keyboardVisible ? 24 : 36),
+                                top: Radius.circular(
+                                  keyboardVisible
+                                      ? AppSpacing.radiusCard
+                                      : AppSpacing.radiusSheet,
+                                ),
                               ),
                               boxShadow: <BoxShadow>[
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.08),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, -6),
+                                  color: AppColors.shadowLight,
+                                  blurRadius: keyboardVisible
+                                      ? 32
+                                      : AppSpacing.radiusXl,
+                                  offset: Offset(
+                                    0,
+                                    keyboardVisible ? -2 : -AppSpacing.xs,
+                                  ),
                                 ),
                               ],
                             ),

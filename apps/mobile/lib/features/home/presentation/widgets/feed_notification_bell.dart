@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -96,12 +97,12 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                     end: Alignment.bottomRight,
                     colors: hasUnread
                         ? <Color>[
-                            const Color(0xFFFFFFFF),
-                            const Color(0xFFFFF3F3),
+                            AppColors.white,
+                            AppColors.accentDanger.withValues(alpha: 0.04),
                           ]
                         : <Color>[
-                            const Color(0xFFFFFFFF),
-                            const Color(0xFFF8F9FB),
+                            AppColors.white,
+                            AppColors.inputFill,
                           ],
                   ),
                   border: Border.all(
@@ -112,7 +113,7 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                   ),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: AppColors.shadowLight,
                       blurRadius: 10,
                       offset: const Offset(0, 3),
                     ),
@@ -140,7 +141,7 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
                       color: AppColors.accentDanger,
-                      borderRadius: BorderRadius.circular(999),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                       border: Border.all(
                           color: AppColors.panelBackground, width: 1.5),
                       boxShadow: <BoxShadow>[
@@ -155,7 +156,7 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
                       child: Text(
                         widget.unreadCount > 9 ? '9+' : '${widget.unreadCount}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.white,
+                              color: AppColors.textOnDark,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                               height: 1,

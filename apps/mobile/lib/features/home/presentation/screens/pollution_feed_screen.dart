@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/notifications_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
@@ -25,6 +29,7 @@ class PollutionFeedScreen extends StatefulWidget {
 class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     with SingleTickerProviderStateMixin {
   bool _isLoading = true;
+  AppError? _loadError;
   List<PollutionSite> _allSites = <PollutionSite>[];
   List<FeedNotification> _notifications = <FeedNotification>[];
   FeedFilter _activeFilter = FeedFilter.all;
@@ -71,20 +76,44 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
   @override
   void initState() {
     super.initState();
-    _allSites = _buildMockSites();
-    _notifications = _buildMockNotifications();
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
     );
+    _loadFeed();
+  }
 
-    Future<void>.delayed(const Duration(milliseconds: 600), () {
+  Future<void> _loadFeed() async {
+    setState(() {
+      _loadError = null;
+      _isLoading = true;
+    });
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 600));
       if (!mounted) return;
+      final List<PollutionSite> sites = _buildMockSites();
+      final List<FeedNotification> notifications = _buildMockNotifications();
       setState(() {
+        _allSites = sites;
+        _notifications = notifications;
         _isLoading = false;
+        _loadError = null;
       });
       _entranceController?.forward();
-    });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = AppError.network(cause: e);
+        _isLoading = false;
+      });
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'No connection',
+          type: AppSnackType.warning,
+        );
+      }
+    }
   }
 
   @override
@@ -96,8 +125,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
-    // TODO: Wire this into real data loading once backend is available.
-    await Future<void>.delayed(const Duration(milliseconds: 600));
+    await _loadFeed();
   }
 
   Future<void> scrollToTop() async {
@@ -115,7 +143,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         List<FeedNotification>.from(_ensureNotificationsSeeded());
     final List<FeedNotification>? updated =
         await Navigator.of(context).push<List<FeedNotification>>(
-      MaterialPageRoute<List<FeedNotification>>(
+      CupertinoPageRoute<List<FeedNotification>>(
         builder: (_) => NotificationsScreen(
           notifications: currentNotifications,
           availableSites: _ensureSitesSeeded(),
@@ -130,7 +158,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   @override
   Widget build(BuildContext context) {
-    final double topHotZoneHeight = MediaQuery.of(context).padding.top + 8;
+    final double topHotZoneHeight = MediaQuery.of(context).padding.top + AppSpacing.xs;
     return Stack(
       children: <Widget>[
         RefreshIndicator(
@@ -168,6 +196,14 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
               ),
               if (_isLoading)
                 SliverToBoxAdapter(child: _buildSkeletonList())
+              else if (_loadError != null)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: AppErrorView(
+                    error: _loadError!,
+                    onRetry: _loadFeed,
+                  ),
+                )
               else if (_sites.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
@@ -205,7 +241,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     );
                   },
                 ),
-              if (!_isLoading && _sites.isNotEmpty)
+              if (!_isLoading && _loadError == null && _sites.isNotEmpty)
                 SliverToBoxAdapter(child: _buildFooter(context)),
             ],
           ),
@@ -250,9 +286,12 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   void _openFilterSheet(BuildContext context) {
     AppHaptics.tap();
-    showCupertinoModalPopup<void>(
+    showModalBottomSheet<void>(
       context: context,
-        builder: (BuildContext context) => FeedFilterSheet(
+      isScrollControlled: true,
+      backgroundColor: AppColors.transparent,
+      barrierColor: AppColors.overlay,
+      builder: (BuildContext context) => FeedFilterSheet(
         activeFilter: _activeFilter,
         onSelected: (FeedFilter filter) {
           if (filter != _activeFilter) {
@@ -273,17 +312,17 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         AppSpacing.lg,
         AppSpacing.xl,
         AppSpacing.lg,
-        AppSpacing.xxl + 24,
+        AppSpacing.xxl + AppSpacing.lg,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Container(
-            width: 32,
-            height: 4,
+            width: AppSpacing.xl,
+            height: AppSpacing.sheetHandleHeight,
             decoration: BoxDecoration(
               color: AppColors.divider,
-              borderRadius: BorderRadius.circular(999),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
             ),
           ),
           const SizedBox(height: AppSpacing.md),
@@ -294,12 +333,12 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   fontWeight: FontWeight.w500,
                 ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             'Pull to refresh for new reports',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.textMuted.withValues(alpha: 0.6),
-                  fontSize: 12,
+                  fontSize: 13,
                 ),
           ),
         ],
@@ -354,7 +393,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                 height: 64,
                 decoration: BoxDecoration(
                   color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 ),
                 child: Icon(
                   _activeFilter.icon,
@@ -367,19 +406,13 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
             Text(
               _getEmptyFilterMessage(),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                  ),
+              style: AppTypography.emptyStateTitle,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               _getEmptyFilterHint(),
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.4,
-                  ),
+              style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
             ),
             const SizedBox(height: AppSpacing.lg),
             if (_activeFilter != FeedFilter.all)
@@ -393,7 +426,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   backgroundColor: AppColors.primaryDark.withValues(alpha: 0.12),
                   foregroundColor: AppColors.primaryDark,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.lg,
@@ -412,7 +445,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   foregroundColor: AppColors.textPrimary,
                   side: const BorderSide(color: AppColors.divider),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(999),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                   ),
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class AppMotion {
   const AppMotion._();
 
-  // ── Durations ──────────────────────────────────────────────
   static const Duration xFast = Duration(milliseconds: 140);
   static const Duration fast = Duration(milliseconds: 180);
   static const Duration medium = Duration(milliseconds: 220);
@@ -11,14 +10,12 @@ class AppMotion {
   static const Duration emphasizedDuration = Duration(milliseconds: 420);
   static const Duration slow = Duration(milliseconds: 700);
 
-  // ── Curves ─────────────────────────────────────────────────
   static const Curve emphasized = Curves.easeOutCubic;
   static const Curve spring = Curves.easeOutBack;
   static const Curve standardCurve = Curves.easeOut;
   static const Curve decelerate = Curves.easeInOut;
   static const Curve sharpDecelerate = Cubic(0.2, 0.0, 0.0, 1.0);
 
-  // ── Spring simulations ─────────────────────────────────────
   static SpringDescription get snappySpring => const SpringDescription(
         mass: 1.0,
         stiffness: 400.0,
@@ -36,8 +33,6 @@ class AppMotion {
         stiffness: 180.0,
         damping: 22.0,
       );
-
-  // ── Stagger helpers ────────────────────────────────────────
 
   static Duration staggerDelay(int index, {int perItemMs = 35}) =>
       Duration(milliseconds: fast.inMilliseconds + index * perItemMs);

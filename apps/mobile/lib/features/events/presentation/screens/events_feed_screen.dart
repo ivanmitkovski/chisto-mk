@@ -4,21 +4,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/events_discovery_preferences.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_card_skeleton.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_calendar_view.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_feed_widgets.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
 
 class EventsFeedScreen extends StatefulWidget {
   const EventsFeedScreen({super.key});
@@ -36,6 +38,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
   late List<EcoEvent> _allEvents;
   EcoEventFilter _activeFilter = EcoEventFilter.all;
   bool _isLoading = true;
+  AppError? _loadError;
   String _searchQuery = '';
   bool _calendarView = false;
   List<String> _recentSearches = const <String>[];
@@ -44,15 +47,40 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
   @override
   void initState() {
     super.initState();
-    _eventsStore.loadInitialIfNeeded();
     _eventsStore.addListener(_onEventsUpdated);
     _allEvents = _eventsStore.events;
     _loadDiscoveryPreferences();
-    Future<void>.delayed(AppMotion.slow, () {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    setState(() {
+      _loadError = null;
+      _isLoading = true;
     });
+    try {
+      await Future<void>.delayed(AppMotion.slow);
+      if (!mounted) return;
+      _eventsStore.loadInitialIfNeeded();
+      setState(() {
+        _allEvents = _eventsStore.events;
+        _isLoading = false;
+        _loadError = null;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = AppError.network(cause: e);
+        _isLoading = false;
+      });
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'No connection',
+          type: AppSnackType.warning,
+        );
+      }
+    }
   }
 
   @override
@@ -222,9 +250,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
 
   Future<void> _onRefresh() async {
     AppHaptics.medium();
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) return;
-    setState(() => _allEvents = _eventsStore.events);
+    await _loadEvents();
   }
 
   Future<void> _navigateToDetail(EcoEvent event) async {
@@ -260,8 +286,11 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
         ? filtered.where((EcoEvent e) => e.id != hero.id).toList()
         : filtered;
 
+    final double keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Scaffold(
       backgroundColor: AppColors.appBackground,
+      resizeToAvoidBottomInset: true,
       body: Semantics(
         label: 'Events feed',
         child: RefreshIndicator(
@@ -274,6 +303,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
             physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics(),
             ),
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
             slivers: <Widget>[
               // ── Header ──
               SliverToBoxAdapter(
@@ -296,13 +326,13 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                         button: true,
                         label: 'Create event',
                         child: Material(
-                          color: Colors.transparent,
+                          color: AppColors.transparent,
                           child: InkWell(
                             onTap: _navigateToCreate,
                             customBorder: const CircleBorder(),
                             child: Container(
                               width: 44,
-                              height: 44,
+                              height: AppSpacing.avatarMd,
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withValues(alpha: 0.12),
                                 shape: BoxShape.circle,
@@ -333,11 +363,18 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                         child: CupertinoSearchTextField(
                           controller: _searchController,
                           placeholder: 'Search events',
-                          style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
-                          placeholderStyle: const TextStyle(color: AppColors.textMuted, fontSize: 16),
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                          placeholderStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.textMuted,
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.sm,
+                            vertical: AppSpacing.radius10,
+                          ),
                           backgroundColor: AppColors.panelBackground,
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                           onChanged: _onSearchChanged,
                           onSubmitted: _rememberSearch,
                           onSuffixTap: () {
@@ -349,7 +386,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                         ),
                       ),
                       const SizedBox(width: AppSpacing.sm),
-                      _ViewToggleButton(
+                      ViewToggleButton(
                         icon: CupertinoIcons.square_list_fill,
                         selected: !_calendarView,
                         onTap: () {
@@ -358,7 +395,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                         },
                       ),
                       const SizedBox(width: 4),
-                      _ViewToggleButton(
+                      ViewToggleButton(
                         icon: CupertinoIcons.calendar,
                         selected: _calendarView,
                         onTap: () {
@@ -373,7 +410,7 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
 
               if (!_calendarView && _searchQuery.trim().isEmpty)
                 SliverToBoxAdapter(
-                  child: _RecentSearchesShelf(
+                  child: RecentSearchesShelf(
                     recentSearches: _recentSearches,
                     onSearchTap: _applySearchSuggestion,
                   ),
@@ -390,25 +427,31 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                 ),
               ),
 
-              // ── Hero card ("Up Next") ──
-              if (showHero)
+              if (_loadError != null)
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: AppErrorView(
+                    error: _loadError!,
+                    onRetry: _loadEvents,
+                  ),
+                ),
+              if (_loadError == null && showHero)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
                       AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.md,
                     ),
-                    child: _HeroEventCard(
+                    child: HeroEventCard(
                       event: hero,
                       onTap: () => _navigateToDetail(hero),
                     ),
                   ),
                 ),
 
-              // ── Sections for "All" filter ──
-              if (showSections && !_calendarView && !_isLoading) ...<Widget>[
+              if (_loadError == null && showSections && !_calendarView && !_isLoading) ...<Widget>[
                 if (_happeningNow.isNotEmpty) ...<Widget>[
-                  _SectionHeader(title: 'Happening now'),
-                  _EventsSliverList(
+                  SectionHeader(title: 'Happening now'),
+                  EventsSliverList(
                     events: _happeningNow,
                     onTap: _navigateToDetail,
                     startIndex: 0,
@@ -416,8 +459,8 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                   const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
                 ],
                 if (_comingUp.where((EcoEvent e) => hero == null || e.id != hero.id).isNotEmpty) ...<Widget>[
-                  _SectionHeader(title: 'Coming up'),
-                  _EventsSliverList(
+                  SectionHeader(title: 'Coming up'),
+                  EventsSliverList(
                     events: _comingUp.where((EcoEvent e) => hero == null || e.id != hero.id).toList(),
                     onTap: _navigateToDetail,
                     startIndex: _happeningNow.length,
@@ -425,8 +468,8 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                   const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.lg)),
                 ],
                 if (_recentlyCompleted.isNotEmpty) ...<Widget>[
-                  _SectionHeader(title: 'Recently completed'),
-                  _EventsSliverList(
+                  SectionHeader(title: 'Recently completed'),
+                  EventsSliverList(
                     events: _recentlyCompleted.take(3).toList(),
                     onTap: _navigateToDetail,
                     startIndex: _happeningNow.length + _comingUp.length,
@@ -438,27 +481,25 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                     hero == null)
                   SliverFillRemaining(
                     hasScrollBody: false,
-                    child: _EmptyState(filter: _activeFilter),
+                    child: EventsEmptyState(filter: _activeFilter),
                   ),
               ]
-              // ── Non-sectioned list or calendar ──
-              else if (!showSections && !_calendarView && !_isLoading) ...<Widget>[
+              else if (_loadError == null && !showSections && !_calendarView && !_isLoading) ...<Widget>[
                 if (filtered.isEmpty)
                   SliverFillRemaining(
                     hasScrollBody: false,
                     child: _searchQuery.isNotEmpty
-                        ? _SearchEmptyState(query: _searchQuery)
-                        : _EmptyState(filter: _activeFilter),
+                        ? SearchEmptyState(query: _searchQuery)
+                        : EventsEmptyState(filter: _activeFilter),
                   )
                 else
-                  _EventsSliverList(
+                  EventsSliverList(
                     events: listToShow,
                     onTap: _navigateToDetail,
                   ),
               ],
 
-              // ── Calendar view ──
-              if (_calendarView && !_isLoading)
+              if (_loadError == null && _calendarView && !_isLoading)
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(
@@ -471,530 +512,26 @@ class _EventsFeedScreenState extends State<EventsFeedScreen> {
                   ),
                 ),
 
-              // ── Loading skeletons ──
-              if (_isLoading)
+              if (_loadError == null && _isLoading)
                 SliverPadding(
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.xxl,
                   ),
                   sliver: SliverList.separated(
                     itemCount: 4,
-                    separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-                    itemBuilder: (_, __) => const EventCardSkeleton(),
+                    separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+                    itemBuilder: (_, _) => const EventCardSkeleton(),
                   ),
                 ),
 
-              // Bottom padding
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Hero "Up Next" card
-// ---------------------------------------------------------------------------
-
-class _HeroEventCard extends StatelessWidget {
-  const _HeroEventCard({required this.event, required this.onTap});
-
-  final EcoEvent event;
-  final VoidCallback onTap;
-
-  String get _countdownLabel {
-    final Duration diff = event.startDateTime.difference(DateTime.now());
-    if (diff.isNegative) return 'Started';
-    if (diff.inDays > 0) return 'Starts in ${diff.inDays}d ${diff.inHours % 24}h';
-    if (diff.inHours > 0) return 'Starts in ${diff.inHours}h ${diff.inMinutes % 60}m';
-    return 'Starts in ${diff.inMinutes}m';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.96, end: 1),
-      duration: AppMotion.standard,
-      curve: AppMotion.emphasized,
-      builder: (BuildContext context, double value, Widget? child) {
-        return Opacity(
-          opacity: value.clamp(0.0, 1.0),
-          child: Transform.scale(
-            scale: value,
-            alignment: Alignment.topCenter,
-            child: child,
-          ),
-        );
-      },
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          clipBehavior: Clip.antiAlias,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 20,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: <Widget>[
-              // Background image
-              Hero(
-                tag: 'event-thumb-${event.id}',
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 200,
-                    child: Image.asset(
-                      event.siteImageUrl,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              // Gradient overlay
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: <Color>[
-                        Colors.transparent,
-                        Colors.black.withValues(alpha: 0.7),
-                      ],
-                      stops: const <double>[0.3, 1.0],
-                    ),
-                  ),
-                ),
-              ),
-              // Content
-              Positioned(
-                left: AppSpacing.lg,
-                right: AppSpacing.lg,
-                bottom: AppSpacing.lg,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        _countdownLabel,
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      event.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        height: 1.2,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: <Widget>[
-                        const Icon(CupertinoIcons.location_solid, size: 12, color: Colors.white70),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            event.siteName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          event.formattedTimeRange,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              // Top-right "Up Next" label
-              Positioned(
-                top: AppSpacing.sm,
-                right: AppSpacing.sm,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text(
-                    'Up next',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                      letterSpacing: 0.3,
-                    ),
-                  ),
+              SliverToBoxAdapter(
+                child: SizedBox(
+                  height: AppSpacing.xxl + keyboardInset,
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Section header
-// ---------------------------------------------------------------------------
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          AppSpacing.lg, AppSpacing.xs, AppSpacing.lg, AppSpacing.sm,
-        ),
-        child: Text(
-          title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.2,
-              ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Events sliver list with stagger
-// ---------------------------------------------------------------------------
-
-class _EventsSliverList extends StatelessWidget {
-  const _EventsSliverList({
-    required this.events,
-    required this.onTap,
-    this.startIndex = 0,
-  });
-
-  final List<EcoEvent> events;
-  final ValueChanged<EcoEvent> onTap;
-  final int startIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      sliver: SliverList.separated(
-        itemCount: events.length,
-        separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-        itemBuilder: (BuildContext context, int index) {
-          final EcoEvent event = events[index];
-          return AnimatedListItem(
-            index: startIndex + index,
-            child: EcoEventCard(
-              event: event,
-              onTap: () => onTap(event),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// View toggle button
-// ---------------------------------------------------------------------------
-
-class _ViewToggleButton extends StatelessWidget {
-  const _ViewToggleButton({
-    required this.icon,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          customBorder: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: AnimatedContainer(
-            duration: AppMotion.fast,
-            curve: AppMotion.emphasized,
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: selected
-                  ? AppColors.primary.withValues(alpha: 0.12)
-                  : AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              size: 20,
-              color: selected ? AppColors.primaryDark : AppColors.textMuted,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Discovery shelf (recent searches)
-// ---------------------------------------------------------------------------
-
-class _RecentSearchesShelf extends StatelessWidget {
-  const _RecentSearchesShelf({
-    required this.recentSearches,
-    required this.onSearchTap,
-  });
-
-  final List<String> recentSearches;
-  final ValueChanged<String> onSearchTap;
-
-  @override
-  Widget build(BuildContext context) {
-    if (recentSearches.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        0,
-        AppSpacing.lg,
-        AppSpacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Recent searches',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xxs),
-          SizedBox(
-            height: 34,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: recentSearches.length,
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(width: AppSpacing.xs),
-              itemBuilder: (BuildContext context, int index) {
-                final String query = recentSearches[index];
-                return ActionChip(
-                  avatar: const Icon(
-                    CupertinoIcons.time,
-                    size: 14,
-                    color: AppColors.textMuted,
-                  ),
-                  label: Text(query),
-                  onPressed: () => onSearchTap(query),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Empty state
-// ---------------------------------------------------------------------------
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.filter});
-
-  final EcoEventFilter filter;
-
-  @override
-  Widget build(BuildContext context) {
-    final String title;
-    final String subtitle;
-    final IconData icon;
-    switch (filter) {
-      case EcoEventFilter.all:
-        title = 'No eco events yet';
-        subtitle = 'Be the first to create one! Tap + above to get started.';
-        icon = CupertinoIcons.calendar_badge_plus;
-      case EcoEventFilter.upcoming:
-        title = 'No upcoming events';
-        subtitle = 'Create one to get volunteers together.';
-        icon = CupertinoIcons.clock;
-      case EcoEventFilter.nearby:
-        title = 'No nearby events';
-        subtitle = 'Try a different filter or create an event in your area.';
-        icon = CupertinoIcons.location;
-      case EcoEventFilter.past:
-        title = 'No past events';
-        subtitle = 'Completed events will show here.';
-        icon = CupertinoIcons.checkmark_circle;
-      case EcoEventFilter.myEvents:
-        title = 'No events yet';
-        subtitle = 'Join or create an event to see it here.';
-        icon = CupertinoIcons.person_crop_circle;
-    }
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 80),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          TweenAnimationBuilder<double>(
-            tween: Tween<double>(begin: 0.8, end: 1.0),
-            duration: AppMotion.slow,
-            curve: AppMotion.emphasized,
-            builder: (_, double value, Widget? child) {
-              return Opacity(
-                opacity: value,
-                child: Transform.scale(scale: value, child: child),
-              );
-            },
-            child: Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 36, color: AppColors.primaryDark),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Text(
-              subtitle,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Search-specific empty state
-// ---------------------------------------------------------------------------
-
-class _SearchEmptyState extends StatelessWidget {
-  const _SearchEmptyState({required this.query});
-
-  final String query;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 80),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.textMuted.withValues(alpha: 0.08),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              CupertinoIcons.search,
-              size: 36,
-              color: AppColors.textMuted,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            'No results for "$query"',
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-            child: Text(
-              'Try a different search term or check your spelling.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
-            ),
-          ),
-        ],
       ),
     );
   }

@@ -12,6 +12,7 @@ class SettingsListTile extends StatelessWidget {
     this.onTap,
     this.isDestructive = false,
     this.showDividerBelow = false,
+    this.showTrailingChevron = true,
   });
 
   final IconData leadingIcon;
@@ -20,6 +21,7 @@ class SettingsListTile extends StatelessWidget {
   final VoidCallback? onTap;
   final bool isDestructive;
   final bool showDividerBelow;
+  final bool showTrailingChevron;
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +29,10 @@ class SettingsListTile extends StatelessWidget {
     return Column(
       children: <Widget>[
         Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: InkWell(
             onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.md,
@@ -46,7 +48,7 @@ class SettingsListTile extends StatelessWidget {
                     height: 32,
                     decoration: BoxDecoration(
                       color: AppColors.inputFill,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
                     child: Icon(
                       leadingIcon,
@@ -67,7 +69,7 @@ class SettingsListTile extends StatelessWidget {
                               ),
                         ),
                         if (subtitle != null) ...<Widget>[
-                          const SizedBox(height: 2),
+                          SizedBox(height: AppSpacing.xxs / 2),
                           Text(
                             subtitle!,
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -79,10 +81,11 @@ class SettingsListTile extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const Icon(
-                    Icons.chevron_right_rounded,
-                    color: AppColors.textMuted,
-                  ),
+                  if (showTrailingChevron)
+                    const Icon(
+                      Icons.chevron_right_rounded,
+                      color: AppColors.textMuted,
+                    ),
                 ],
               ),
             ),
@@ -90,7 +93,7 @@ class SettingsListTile extends StatelessWidget {
         ),
         if (showDividerBelow)
           Padding(
-            padding: const EdgeInsets.only(left: 60),
+            padding: const EdgeInsets.only(left: AppSpacing.avatarLg),
             child: Divider(
               height: 1,
               color: AppColors.divider.withValues(alpha: 0.9),

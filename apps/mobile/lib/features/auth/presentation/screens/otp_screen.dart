@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
@@ -72,7 +75,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _handleCodeChanged(String value) {
-    HapticFeedback.selectionClick();
+    AppHaptics.tap();
     setState(() {});
 
     if (_isComplete && !_isLoading) {
@@ -86,20 +89,21 @@ class _OtpScreenState extends State<OtpScreen> {
     }
 
     setState(() => _isLoading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 800));
+    await Future<void>.delayed(AppMotion.standard);
     if (!mounted) {
       return;
     }
     setState(() => _isLoading = false);
+    AppHaptics.success();
     Navigator.of(context).pushNamed(AppRoutes.location);
   }
 
   void _handleResend() {
     if (!_canResend) {
-      HapticFeedback.selectionClick();
+      AppHaptics.tap();
       return;
     }
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     _codeController.clear();
     _codeFocusNode.requestFocus();
     setState(() {
@@ -122,20 +126,28 @@ class _OtpScreenState extends State<OtpScreen> {
             behavior: HitTestBehavior.translucent,
             child: SafeArea(
               child: AnimatedPadding(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.medium,
+                curve: AppMotion.emphasized,
                 padding: EdgeInsets.only(bottom: keyboardInset),
                 child: SingleChildScrollView(
                   keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const AppBackButton(),
-                      const SizedBox(height: 40),
+                      Tooltip(
+                        message: 'Go back',
+                        child: const AppBackButton(),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
                       Center(
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(22),
+                          borderRadius: BorderRadius.circular(AppSpacing.radius22),
                           child: SizedBox(
                             width: 146,
                             height: 146,
@@ -146,22 +158,24 @@ class _OtpScreenState extends State<OtpScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 26),
+                      const SizedBox(height: AppSpacing.radius22),
                       const Center(
                         child: Text(
                           'Enter code',
                           style: AppTypography.authHeadline,
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: AppSpacing.xs),
                       Center(
                         child: Text(
                           'We just sent a 4‑digit code to ${widget.phoneNumber}',
                           textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: AppTypography.authSubtitle,
                         ),
                       ),
-                      const SizedBox(height: 28),
+                      const SizedBox(height: AppSpacing.radiusPill),
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () => _codeFocusNode.requestFocus(),
@@ -201,18 +215,18 @@ class _OtpScreenState extends State<OtpScreen> {
                           onChanged: _handleCodeChanged,
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      const SizedBox(height: AppSpacing.radiusPill),
                       PrimaryButton(
                         label: 'Continue',
                         enabled: _isComplete && !_isLoading,
                         onPressed: _isLoading ? null : _onContinue,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.lg),
                       Center(
                         child: TextButton(
                           onPressed: _canResend ? _handleResend : null,
                           child: AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 200),
+                            duration: AppMotion.fast,
                             child: _canResend
                                 ? const Text.rich(
                                     key: ValueKey('resend-active'),
@@ -236,23 +250,19 @@ class _OtpScreenState extends State<OtpScreen> {
                                 : Text(
                                     key: const ValueKey('resend-countdown'),
                                     'Resend code in ${_secondsRemaining}s',
-                                    style: const TextStyle(
-                                      color: AppColors.textSecondary,
-                                      fontSize: 16,
-                                    ),
+                                    style: AppTypography.authSubtitle,
                                   ),
                           ),
                         ),
                       ),
                       if (_hasResentOnce) ...<Widget>[
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.radiusSm),
                         Text(
                           'We’ve sent a new code to ${widget.phoneNumber}.',
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: AppColors.textSecondary,
-                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.cardSubtitle,
                         ),
                       ],
                     ],
@@ -282,25 +292,24 @@ class _OtpDigitBox extends StatelessWidget {
     final bool hasValue = value.isNotEmpty;
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 160),
-      curve: Curves.easeOutCubic,
+      duration: AppMotion.xFast,
+      curve: AppMotion.emphasized,
       width: 72,
       height: 56,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: AppColors.appBackground,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         border: Border.all(
           color: hasValue
               ? AppColors.primaryDark
-              : (isActive ? AppColors.inputBorder : AppColors.inputBorder),
+              : (isActive ? AppColors.primary : AppColors.inputBorder),
           width: hasValue || isActive ? 1.6 : 1.0,
         ),
       ),
       child: Text(
         value,
-        style: const TextStyle(
-          fontSize: 22,
+        style: AppTypography.textTheme.titleMedium!.copyWith(
           fontWeight: FontWeight.w500,
           color: AppColors.textPrimary,
         ),

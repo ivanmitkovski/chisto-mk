@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -29,8 +31,8 @@ class _WeeklyRankingsScreenState extends State<WeeklyRankingsScreen> {
     if (rowContext == null) return;
     Scrollable.ensureVisible(
       rowContext,
-      duration: const Duration(milliseconds: 420),
-      curve: Curves.easeInOutCubicEmphasized,
+      duration: AppMotion.emphasizedDuration,
+      curve: AppMotion.decelerate,
       alignment: 0.3,
     );
   }
@@ -108,7 +110,7 @@ class _WeeklyRankingsScreenState extends State<WeeklyRankingsScreen> {
                   AppSpacing.md,
                 ),
                 child: _CurrentUserRankCard(
-                  entry: currentUserEntry!,
+                  entry: currentUserEntry,
                   onTap: _scrollToCurrentUser,
                 ),
               ),
@@ -131,7 +133,7 @@ class _WeeklyRankingsScreenState extends State<WeeklyRankingsScreen> {
                   }
                   return _RankingRow(entry: entry);
                 },
-                separatorBuilder: (_, __) => const SizedBox(height: 6),
+                separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.xs),
                 itemCount: entries.length,
               ),
             ),
@@ -155,10 +157,10 @@ class _CurrentUserRankCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.panelBackground,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         splashColor: AppColors.primary.withValues(alpha: 0.06),
         highlightColor: AppColors.primary.withValues(alpha: 0.04),
         child: Padding(
@@ -166,16 +168,16 @@ class _CurrentUserRankCard extends StatelessWidget {
           child: Row(
             children: <Widget>[
               Container(
-                width: 40,
-                height: 40,
+                width: AppSpacing.xxl,
+                height: AppSpacing.xxl,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
                 ),
                 child: const Icon(
                   Icons.person_outline_rounded,
                   color: AppColors.primaryDark,
-                  size: 22,
+                  size: AppSpacing.iconLg,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -198,19 +200,18 @@ class _CurrentUserRankCard extends StatelessWidget {
                         const SizedBox(width: AppSpacing.xs),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
+                            horizontal: AppSpacing.radiusSm,
                             vertical: 2,
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(999),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
                           ),
-                          child: const Text(
+                          child: Text(
                             'You',
-                            style: TextStyle(
+                            style: AppTypography.badgeLabel.copyWith(
                               color: AppColors.primaryDark,
                               fontSize: 10,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -250,13 +251,13 @@ class _RankingRow extends StatelessWidget {
     Color iconColor = AppColors.textMuted;
     if (entry.position == 1) {
       leadingIcon = Icons.emoji_events_rounded;
-      iconColor = const Color(0xFFFFC107);
+      iconColor = AppColors.accentWarning;
     } else if (entry.position == 2) {
       leadingIcon = Icons.emoji_events_rounded;
-      iconColor = const Color(0xFFB0BEC5);
+      iconColor = AppColors.textMuted;
     } else if (entry.position == 3) {
       leadingIcon = Icons.emoji_events_rounded;
-      iconColor = const Color(0xFFFFA000);
+      iconColor = AppColors.accentWarningDark;
     }
 
     Color backgroundColor = isCurrentUser
@@ -273,18 +274,18 @@ class _RankingRow extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(color: borderColor),
       ),
       child: Row(
         children: <Widget>[
           SizedBox(
-            width: 32,
+            width: AppSpacing.xl,
             child: Center(
               child: isTopThree && leadingIcon != null
                   ? Icon(
                       leadingIcon,
-                      size: 18,
+                      size: AppSpacing.iconMd,
                       color: iconColor,
                     )
                   : Text(
@@ -298,13 +299,12 @@ class _RankingRow extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.sm),
           CircleAvatar(
-            radius: 18,
+            radius: AppSpacing.radius18,
             backgroundColor: AppColors.inputFill,
             child: Text(
               entry.name.isNotEmpty ? entry.name[0] : '?',
-              style: const TextStyle(
+              style: AppTypography.cardTitle.copyWith(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
               ),
             ),
           ),

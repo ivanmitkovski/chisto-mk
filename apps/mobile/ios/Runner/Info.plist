@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Add cleanup events to your calendar so you don't miss them.</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Used by the calendar when adding events with location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We use your location to help autofill your city and improve report accuracy.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>

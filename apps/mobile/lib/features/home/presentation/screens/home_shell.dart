@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_screen.dart';
@@ -175,7 +176,7 @@ class _HomeShellState extends State<HomeShell> {
           isScrollControlled: true,
           backgroundColor: AppColors.panelBackground,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusSheet)),
           ),
           builder: (_) => PhotoReviewSheet(file: selectedFile),
         );
@@ -251,21 +252,21 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
                   offset: const Offset(0, 10),
                 ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
+                  color: AppColors.shadowLight,
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
             ),
             child: widget.enabled
-                ? const Icon(CupertinoIcons.add, color: Colors.white, size: 28)
+                ? const Icon(CupertinoIcons.add, color: AppColors.textOnDark, size: 28)
                 : const Center(
                     child: SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.4,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
                       ),
                     ),
                   ),

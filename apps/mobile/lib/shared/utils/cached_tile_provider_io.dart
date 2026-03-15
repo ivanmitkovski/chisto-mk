@@ -12,7 +12,7 @@ TileProvider? createCachedTileProvider({int maxStaleDays = 30}) =>
 
 /// Fallback offline tile caching for flutter_map (mobile only).
 class _CachedTileProvider extends TileProvider {
-  _CachedTileProvider({super.headers, this.maxStaleDays = 30}) {
+  _CachedTileProvider({this.maxStaleDays = 30}) {
     _warmCache();
   }
 

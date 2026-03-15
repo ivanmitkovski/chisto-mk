@@ -45,6 +45,7 @@ dependencies:
   shared_preferences: ^2.3.3
   flutter_map_animations: ^0.6.0
   flutter_map_heatmap: ^0.0.7
+  add_2_calendar: ^3.0.1
   share_plus: ^10.0.0
   url_launcher: ^6.3.1
   flutter_tts: ^4.0.0

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 class LoadingOverlay extends StatefulWidget {
   const LoadingOverlay({super.key, required this.visible});
@@ -69,13 +70,13 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(32),
+                    color: AppColors.white.withValues(alpha: 0.94),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                     boxShadow: <BoxShadow>[
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.12),
+                        color: AppColors.shadowMedium,
                         blurRadius: 26,
-                        offset: const Offset(0, 10),
+                        offset: const Offset(0, AppSpacing.radius10),
                       ),
                     ],
                   ),
@@ -87,7 +88,6 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
                       return Stack(
                         alignment: Alignment.center,
                         children: [
-                          // Soft rotating ring to indicate activity.
                           Transform.rotate(
                             angle: 2 * math.pi * t,
                             child: SizedBox(

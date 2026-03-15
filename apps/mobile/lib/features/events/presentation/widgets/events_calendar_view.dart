@@ -188,7 +188,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                       ? AppColors.primary
                       : (hasEvent && inMonth
                           ? AppColors.primary.withValues(alpha: 0.08)
-                          : Colors.transparent),
+                          : AppColors.transparent),
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -201,7 +201,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                         fontWeight:
                             isSelected || isToday ? FontWeight.w700 : FontWeight.w500,
                         color: isSelected
-                            ? Colors.white
+                            ? AppColors.white
                             : inMonth
                                 ? (isPast && !isToday
                                     ? AppColors.textMuted.withValues(alpha: 0.5)
@@ -250,7 +250,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
             (EcoEvent e) => Padding(
               padding: const EdgeInsets.only(bottom: AppSpacing.sm),
               child: Material(
-                color: Colors.transparent,
+                color: AppColors.transparent,
                 child: InkWell(
                   onTap: () => widget.onEventTap(e),
                   borderRadius: BorderRadius.circular(16),
@@ -258,7 +258,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                     padding: const EdgeInsets.all(AppSpacing.md),
                     decoration: BoxDecoration(
                       color: AppColors.panelBackground,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                     ),
                     child: Row(
                       children: <Widget>[
@@ -267,7 +267,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                           height: 40,
                           decoration: BoxDecoration(
                             color: e.status.color.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(AppSpacing.radius10),
                           ),
                           child: Icon(
                             e.category.icon,

@@ -16,6 +16,7 @@ import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dar
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/organizer_checkin/organizer_checkin_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -154,7 +155,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         return CupertinoAlertDialog(
           title: const Text('Manual check-in'),
           content: Padding(
-            padding: const EdgeInsets.only(top: 12),
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: CupertinoTextField(
               controller: _manualNameController,
               placeholder: 'Attendee name',
@@ -276,10 +277,10 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                 children: <Widget>[
                   Container(
                     width: 40,
-                    height: 4,
+                    height: AppSpacing.sheetHandleHeight,
                     decoration: BoxDecoration(
                       color: AppColors.divider,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xl),
@@ -475,7 +476,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: <Widget>[
-            // QR section
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.md),
@@ -485,8 +485,8 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(18),
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
                         border: Border.all(color: AppColors.divider),
                       ),
                       child: Column(
@@ -519,16 +519,16 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _PulsingQRContainer(
+                    PulsingQRContainer(
                       isActive: isOpen && _payload != null,
                       child: Container(
                         padding: const EdgeInsets.all(AppSpacing.lg),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
+                          color: AppColors.white,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.06),
+                              color: AppColors.black.withValues(alpha: 0.06),
                               blurRadius: 24,
                               offset: const Offset(0, 8),
                             ),
@@ -558,7 +558,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                   data: _payload!.encode(),
                                   version: QrVersions.auto,
                                   size: 220,
-                                  backgroundColor: Colors.white,
+                                  backgroundColor: AppColors.white,
                                   eyeStyle: const QrEyeStyle(
                                     eyeShape: QrEyeShape.square,
                                     color: AppColors.textPrimary,
@@ -598,13 +598,13 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
-                        _StatusPill(
+                        StatusPill(
                           label: isOpen ? 'Open' : 'Paused',
                           color: isOpen ? AppColors.primaryDark : AppColors.textMuted,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         if (isOpen && _payload != null) ...<Widget>[
-                          _StatusPill(
+                          StatusPill(
                             label: 'Refresh in ${_remainingPayloadSeconds}s',
                             color: _remainingPayloadSeconds <= 10
                                 ? AppColors.accentDanger
@@ -646,7 +646,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
               ),
             ),
 
-            // Checked-in list header
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.sm),
@@ -667,7 +666,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       ),
                       child: Text(
                         '${attendees.length}',
@@ -682,7 +681,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
               ),
             ),
 
-            // Attendees list
             if (attendees.isEmpty)
               SliverToBoxAdapter(
                 child: Padding(
@@ -721,7 +719,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
                       final CheckedInAttendee attendee = attendees[index];
-                      return _CheckedInRow(
+                      return CheckedInRow(
                         attendee: attendee,
                         onRemove: () => _removeAttendee(attendee),
                         avatarIndex: index,
@@ -734,7 +732,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
 
             const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
 
-            // End event button
             SliverToBoxAdapter(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(
@@ -759,7 +756,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: AppColors.primaryDark),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(28),
+                            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                           ),
                         ),
                         child: Text(
@@ -800,184 +797,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PulsingQRContainer extends StatefulWidget {
-  const _PulsingQRContainer({
-    required this.isActive,
-    required this.child,
-  });
-
-  final bool isActive;
-  final Widget child;
-
-  @override
-  State<_PulsingQRContainer> createState() => _PulsingQRContainerState();
-}
-
-class _PulsingQRContainerState extends State<_PulsingQRContainer>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.01).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (!widget.isActive) {
-      return widget.child;
-    }
-    return AnimatedBuilder(
-      animation: _scaleAnimation,
-      builder: (BuildContext context, Widget? child) {
-        return Transform.scale(
-          scale: _scaleAnimation.value,
-          child: child,
-        );
-      },
-      child: widget.child,
-    );
-  }
-}
-
-class _CheckedInRow extends StatelessWidget {
-  const _CheckedInRow({
-    required this.attendee,
-    required this.onRemove,
-    required this.avatarIndex,
-  });
-
-  final CheckedInAttendee attendee;
-  final VoidCallback onRemove;
-  final int avatarIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final Color avatarColor =
-        AppColors.avatarPalette[avatarIndex % AppColors.avatarPalette.length];
-    final String initial = attendee.name.isNotEmpty
-        ? attendee.name[0].toUpperCase()
-        : '?';
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: avatarColor,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              initial,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Text(
-              attendee.name,
-              style: textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            '${attendee.checkedInAt.hour.toString().padLeft(2, '0')}:${attendee.checkedInAt.minute.toString().padLeft(2, '0')}',
-            style: textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Semantics(
-            label: 'Remove attendee',
-            button: true,
-            child: CupertinoButton(
-              minimumSize: const Size(30, 30),
-              padding: EdgeInsets.zero,
-              onPressed: onRemove,
-              child: const Icon(
-                CupertinoIcons.xmark_circle_fill,
-                size: 22,
-                color: AppColors.accentDanger,
-              ),
-            ),
-          ),
-          Icon(
-            CupertinoIcons.checkmark_circle_fill,
-            size: 22,
-            color: AppColors.primary,
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatusPill extends StatelessWidget {
-  const _StatusPill({
-    required this.label,
-    required this.color,
-  });
-
-  final String label;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: color,
-          fontWeight: FontWeight.w700,
         ),
       ),
     );

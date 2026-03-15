@@ -136,17 +136,17 @@ class _MapSearchModalState extends State<MapSearchModal> {
                       color: AppColors.panelBackground.withValues(alpha: 0.98),
                       borderRadius: BorderRadius.circular(isCompact ? 18 : 22),
                       border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: AppColors.white.withValues(alpha: 0.7),
                         width: 1,
                       ),
                       boxShadow: <BoxShadow>[
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.08),
+                          color: AppColors.shadowLight,
                           blurRadius: 32,
                           offset: const Offset(0, 8),
                         ),
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
+                          color: AppColors.shadowMedium,
                           blurRadius: 12,
                           offset: const Offset(0, 2),
                         ),
@@ -486,7 +486,7 @@ class _SearchResultTile extends StatelessWidget {
           AppHaptics.light();
           onTap();
         },
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: AppSpacing.sm,
@@ -496,17 +496,17 @@ class _SearchResultTile extends StatelessWidget {
             children: <Widget>[
               Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   boxShadow: <BoxShadow>[
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: AppColors.shadowLight,
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   child: SizedBox(
                     width: thumbSize,
                     height: thumbSize,

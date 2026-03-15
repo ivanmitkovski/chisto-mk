@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
 import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
 import 'package:chisto_mobile/shared/widgets/brand_logo.dart';
@@ -31,6 +35,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _isLoading = false;
   bool _hasSubmitted = false;
   bool _hasValidationError = false;
+  String? _apiError;
 
   @override
   void initState() {
@@ -43,10 +48,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   void _onInputChanged() {
-    if (!mounted) {
-      return;
-    }
-    setState(() {});
+    if (!mounted) return;
+    setState(() {
+      if (_apiError != null) _apiError = null;
+    });
   }
 
   @override
@@ -89,24 +94,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _hasSubmitted = true);
     if (currentState == null) {
       setState(() => _hasValidationError = true);
-      HapticFeedback.selectionClick();
+      AppHaptics.tap();
       return;
     }
     final bool isValid = currentState.validate();
     if (!isValid) {
       setState(() => _hasValidationError = true);
-      HapticFeedback.selectionClick();
+      AppHaptics.tap();
       return;
     }
     setState(() => _hasValidationError = false);
 
     setState(() => _isLoading = true);
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    await Future<void>.delayed(AppMotion.slow);
     if (!mounted) {
       return;
     }
     setState(() => _isLoading = false);
 
+    AppHaptics.light();
     final String localDigits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
     final String formattedLocal = formatMacedonianLocalPhone(localDigits);
     final String displayNumber = localDigits.isEmpty ? '' : '+389 $formattedLocal';
@@ -125,13 +131,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
           header: const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              BrandLogo(),
-              SizedBox(height: 18),
+              BrandLogo(compact: true),
+              SizedBox(height: AppSpacing.sm),
               Text(
                 'Sign up',
                 style: AppTypography.authHeadline,
               ),
-              SizedBox(height: 10),
+              SizedBox(height: AppSpacing.xs),
               Text(
                 'Welcome! Please enter your details',
                 style: AppTypography.authSubtitle,
@@ -143,13 +149,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
               return SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
-                  20,
-                  22,
-                  20,
-                  24 + MediaQuery.viewInsetsOf(context).bottom,
+                  AppSpacing.lg,
+                  AppSpacing.xl,
+                  AppSpacing.lg,
+                  AppSpacing.lg + MediaQuery.viewInsetsOf(context).bottom,
                 ),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 18),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight - AppSpacing.radius18),
                   child: AutofillGroup(
                     child: Form(
                       key: _formKey,
@@ -159,6 +165,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          if (_apiError != null) ...[
+                            ApiErrorBanner(
+                              message: _apiError!,
+                              onDismiss: () => setState(() => _apiError = null),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                          ],
                           AuthTextField(
                             label: 'Full Name',
                             controller: _fullNameController,
@@ -170,7 +183,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             validator: (String? value) =>
                                 InputValidators.validateRequired(value, 'Full name'),
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: AppSpacing.sm),
                           AuthTextField(
                             label: 'Email',
                             controller: _emailController,
@@ -183,7 +196,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             enableSuggestions: false,
                             autocorrect: false,
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: AppSpacing.sm),
                           AuthTextField(
                             label: 'Phone Number',
                             hintText: '71 234 567',
@@ -197,7 +210,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             validator: _validateMacedonianPhone,
                             inputFormatters: const <TextInputFormatter>[MacedonianPhoneFormatter()],
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: AppSpacing.sm),
                           AuthTextField(
                             label: 'Password',
                             controller: _passwordController,
@@ -211,14 +224,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             autocorrect: false,
                             onFieldSubmitted: (_) => _handleSignUp(),
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppSpacing.md),
                           RichText(
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                             text: const TextSpan(
                               text: 'By signing up you agree to our ',
-                              style: TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 16,
-                              ),
+                              style: AppTypography.authSubtitle,
                               children: [
                                 TextSpan(
                                   text: 'terms and conditions',
@@ -230,34 +242,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 20),
-                          if (_hasValidationError) ...<Widget>[
-                            const Text(
-                              'Please check the highlighted fields above.',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
+                          const SizedBox(height: AppSpacing.xl),
+                          AnimatedSize(
+                            duration: AppMotion.fast,
+                            curve: AppMotion.emphasized,
+                            child: _hasValidationError
+                                ? Padding(
+                                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                                    child: Text(
+                                      'Please check the highlighted fields above.',
+                                      style: AppTypography.cardSubtitle.copyWith(color: AppColors.error),
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
+                          ),
                           PrimaryButton(
                             label: 'Sign Up',
                             enabled: _isSubmitReady && !_isLoading,
                             onPressed: _isLoading ? null : _handleSignUp,
                           ),
-                          const SizedBox(height: 28),
+                          const SizedBox(height: AppSpacing.xxl),
                           Center(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  Navigator.of(context).pushReplacementNamed(AppRoutes.signIn),
-                              child: RichText(
+                            child: Semantics(
+                              button: true,
+                              label: 'Sign in',
+                              child: GestureDetector(
+                                onTap: () =>
+                                    Navigator.of(context).pushReplacementNamed(AppRoutes.signIn),
+                                child: RichText(
                                 text: const TextSpan(
                                   text: 'Already have an account? ',
-                                  style: TextStyle(
-                                    color: AppColors.textPrimary,
-                                    fontSize: 16,
-                                  ),
+                                  style: AppTypography.authSubtitle,
                                   children: [
                                     TextSpan(
                                       text: 'Sign In',
@@ -269,6 +284,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ],
                                 ),
                               ),
+                            ),
                             ),
                           ),
                         ],

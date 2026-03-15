@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class AuthTopBar extends StatelessWidget {
   const AuthTopBar({super.key, required this.title});
@@ -8,12 +11,16 @@ class AuthTopBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.radius10,
+        AppSpacing.md,
+        0,
+      ),
       child: Text(
         title,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.85),
-          fontSize: 18,
+        style: AppTypography.sectionHeader.copyWith(
+          color: AppColors.textOnDark.withValues(alpha: 0.85),
           fontWeight: FontWeight.w500,
         ),
       ),

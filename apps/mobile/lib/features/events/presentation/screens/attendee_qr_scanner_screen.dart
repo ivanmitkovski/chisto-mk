@@ -45,7 +45,6 @@ class _ScanFramePainter extends CustomPainter {
     final double r = cornerRadius.clamp(0, cornerLength / 2);
     final double len = cornerLength;
 
-    // Top-left: horizontal right, vertical down, rounded at vertex
     final Path tl = Path()
       ..moveTo(len, 0)
       ..lineTo(r, 0)
@@ -53,7 +52,6 @@ class _ScanFramePainter extends CustomPainter {
       ..lineTo(0, len);
     canvas.drawPath(tl, paint);
 
-    // Top-right
     final Path tr = Path()
       ..moveTo(size.width - len, 0)
       ..lineTo(size.width - r, 0)
@@ -66,7 +64,6 @@ class _ScanFramePainter extends CustomPainter {
       ..lineTo(size.width, len);
     canvas.drawPath(tr, paint);
 
-    // Bottom-left
     final Path bl = Path()
       ..moveTo(0, size.height - len)
       ..lineTo(0, size.height - r)
@@ -79,7 +76,6 @@ class _ScanFramePainter extends CustomPainter {
       ..lineTo(len, size.height);
     canvas.drawPath(bl, paint);
 
-    // Bottom-right
     final Path br = Path()
       ..moveTo(size.width, size.height - len)
       ..lineTo(size.width, size.height - r)
@@ -119,7 +115,6 @@ class _CheckmarkPainter extends CustomPainter {
 
     final double w = size.width;
     final double h = size.height;
-    // Checkmark path: left-down stroke, then right-up stroke
     final Path path = Path()
       ..moveTo(w * 0.2, h * 0.5)
       ..lineTo(w * 0.42, h * 0.72)
@@ -303,7 +298,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     final bool? submit = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext context) {
         return Padding(
           padding: EdgeInsets.only(
@@ -339,11 +334,11 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                             filled: true,
                             fillColor: AppColors.inputFill,
                             border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                               borderSide: const BorderSide(color: AppColors.inputBorder),
                             ),
                             enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                               borderSide: const BorderSide(color: AppColors.inputBorder),
                             ),
                           ),
@@ -495,11 +490,11 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: AppColors.black,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: AppColors.black,
         leading: const Padding(
-          padding: EdgeInsets.only(left: 8),
+          padding: EdgeInsets.only(left: AppSpacing.sm),
           child: Center(child: AppBackButton()),
         ),
         title: Text(
@@ -524,10 +519,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: <Color>[
-                    Colors.black54,
-                    Colors.transparent,
-                    Colors.transparent,
-                    Colors.black54,
+                    AppColors.black.withValues(alpha: 0.54),
+                    AppColors.transparent,
+                    AppColors.transparent,
+                    AppColors.black.withValues(alpha: 0.54),
                   ],
                   stops: const <double>[0.0, 0.2, 0.8, 1.0],
                 ),
@@ -587,18 +582,18 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
               button: true,
               label: 'Toggle flashlight',
               child: Material(
-                color: Colors.black45,
-                borderRadius: BorderRadius.circular(28),
+                color: AppColors.black.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                 child: InkWell(
                   onTap: _toggleTorch,
-                  borderRadius: BorderRadius.circular(28),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                   child: Container(
                     width: 56,
                     height: 56,
                     alignment: Alignment.center,
                     child: Icon(
                       _torchEnabled ? CupertinoIcons.bolt_fill : CupertinoIcons.bolt_slash,
-                      color: Colors.white,
+                      color: AppColors.white,
                       size: 28,
                     ),
                   ),
@@ -615,7 +610,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 Text(
                   _feedback ?? 'Point your camera at the organizer\'s live QR code',
                   style: textTheme.bodyMedium?.copyWith(
-                    color: _feedback == null ? Colors.white70 : Colors.orange.shade200,
+                    color: _feedback == null ? AppColors.textOnDarkMuted : Colors.orange.shade200,
                     fontWeight: _feedback == null ? FontWeight.w400 : FontWeight.w600,
                   ),
                   textAlign: TextAlign.center,
@@ -632,7 +627,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       child: Text(
                         "Can't scan? Enter code manually",
                         style: textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.textOnDarkMuted,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -643,7 +638,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       child: Text(
                         'Retry camera',
                         style: textTheme.bodySmall?.copyWith(
-                          color: Colors.white70,
+                          color: AppColors.textOnDarkMuted,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -656,7 +651,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       ? 'If the organizer refreshes their QR, scan the newest one.'
                       : 'If camera access stays blocked, paste the code manually or enable camera access in Settings.',
                   style: textTheme.bodySmall?.copyWith(
-                    color: Colors.white54,
+                    color: AppColors.white.withValues(alpha: 0.54),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -665,10 +660,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
           ),
           if (_processing)
             Container(
-              color: Colors.black45,
+              color: AppColors.black.withValues(alpha: 0.45),
               child: const Center(
                 child: CupertinoActivityIndicator(
-                  color: Colors.white,
+                  color: AppColors.white,
                 ),
               ),
             ),

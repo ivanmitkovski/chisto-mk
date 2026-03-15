@@ -6,6 +6,7 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/cleanup_evidence/cleanup_evidence_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -14,7 +15,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'dart:ui' as ui;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -140,7 +140,7 @@ class _EventCleanupEvidenceScreenState
     AppHaptics.softTransition();
     Navigator.of(context).push(
       CupertinoPageRoute<void>(
-        builder: (BuildContext context) => _CleanupFullscreenGalleryPage(
+        builder: (BuildContext context) => CleanupFullscreenGalleryPage(
           imagePaths: _afterImages,
           initialIndex: initialIndex,
         ),
@@ -174,11 +174,11 @@ class _EventCleanupEvidenceScreenState
     AppHaptics.softTransition();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext context) => Container(
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
         ),
         child: SafeArea(
           top: false,
@@ -205,7 +205,10 @@ class _EventCleanupEvidenceScreenState
                 leading: Icon(CupertinoIcons.trash, color: AppColors.accentDanger),
                 title: Text(
                   'Remove',
-                  style: TextStyle(color: AppColors.accentDanger, fontWeight: FontWeight.w600),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.accentDanger,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onTap: () {
                   Navigator.pop(context);
@@ -320,15 +323,19 @@ class _EventCleanupEvidenceScreenState
                   width: double.infinity,
                   child: CupertinoSlidingSegmentedControl<String>(
                     groupValue: value,
-                    children: const <String, Widget>{
+                    children: <String, Widget>{
                       'before': Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.radiusXl,
+                          vertical: AppSpacing.radius10,
+                        ),
                         child: Text('Before'),
                       ),
                       'after': Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.radiusXl,
+                          vertical: AppSpacing.radius10,
+                        ),
                         child: Text('After'),
                       ),
                     },
@@ -347,17 +354,21 @@ class _EventCleanupEvidenceScreenState
                 return AnimatedSwitcher(
                   duration: AppMotion.fast,
                   child: value == 'before'
-                      ? _BeforeTab(
+                      ? BeforeTab(
                           key: const ValueKey<String>('before'),
                           event: event,
+                          heroHeight: _heroHeight,
                           buildImage: _buildImage,
                         )
-                      : _AfterTab(
+                      : AfterTab(
                           key: const ValueKey<String>('after'),
                           afterImages: _afterImages,
                           selectedIndex: _selectedIndex,
                           isPicking: _isPicking,
                           maxImages: _maxAfterImages,
+                          heroHeight: _heroHeight,
+                          thumbSize: _thumbSize,
+                          thumbStripHeight: _thumbStripHeight,
                           onPick: _pickAfterImages,
                           onRemove: _removeAfterImage,
                           onSelect: (int i) =>
@@ -385,7 +396,7 @@ class _EventCleanupEvidenceScreenState
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: AppColors.primary.withValues(alpha: 0.42),
-                        borderRadius: BorderRadius.circular(28),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -397,8 +408,7 @@ class _EventCleanupEvidenceScreenState
                           const SizedBox(width: AppSpacing.sm),
                           Text(
                             'Saving...',
-                            style: const TextStyle(
-                              fontSize: 19,
+                            style: Theme.of(context).textTheme.labelLarge?.copyWith(
                               fontWeight: FontWeight.w600,
                               letterSpacing: 0.1,
                               color: AppColors.textPrimary,
@@ -445,538 +455,4 @@ class _EventCleanupEvidenceScreenState
       },
     );
   }
-}
-
-class _BeforeTab extends StatelessWidget {
-  const _BeforeTab({
-    super.key,
-    required this.event,
-    required this.buildImage,
-  });
-
-  final EcoEvent event;
-  final Widget Function(String path, {double? height, BoxFit fit}) buildImage;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: buildImage(
-              event.siteImageUrl,
-              height: _EventCleanupEvidenceScreenState._heroHeight,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'Site reference photo',
-            style:
-                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'Reference taken before cleanup. Use the After tab to add photos of the cleaned site.',
-            style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AfterTab extends StatelessWidget {
-  const _AfterTab({
-    super.key,
-    required this.afterImages,
-    required this.selectedIndex,
-    required this.isPicking,
-    required this.maxImages,
-    required this.onPick,
-    required this.onRemove,
-    required this.onSelect,
-    required this.onImageTap,
-    required this.onThumbnailLongPress,
-    required this.buildImage,
-  });
-
-  final List<String> afterImages;
-  final int selectedIndex;
-  final bool isPicking;
-  final int maxImages;
-  final VoidCallback onPick;
-  final ValueChanged<int> onRemove;
-  final ValueChanged<int> onSelect;
-  final ValueChanged<int> onImageTap;
-  final ValueChanged<int> onThumbnailLongPress;
-  final Widget Function(String path, {double? height, BoxFit fit}) buildImage;
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-
-    if (isPicking) {
-      return const Center(child: CupertinoActivityIndicator(radius: 16));
-    }
-
-    if (afterImages.isEmpty) {
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Semantics(
-          button: true,
-          label: 'Upload after photos',
-          child: _AddPhotosEmptyState(
-            maxImages: maxImages,
-            onTap: onPick,
-            textTheme: textTheme,
-          ),
-        ),
-      );
-    }
-
-    final String selectedPath = afterImages[selectedIndex.clamp(0, afterImages.length - 1)];
-    final int remaining = maxImages - afterImages.length;
-
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Stack(
-            children: <Widget>[
-              Semantics(
-                button: true,
-                label: 'View photo fullscreen',
-                child: GestureDetector(
-                  onTap: () => onImageTap(selectedIndex.clamp(0, afterImages.length - 1)),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: buildImage(
-                      selectedPath,
-                      height: _EventCleanupEvidenceScreenState._heroHeight,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: AppSpacing.sm,
-                right: AppSpacing.sm,
-                child: CupertinoButton(
-                  padding: EdgeInsets.zero,
-                  minimumSize: const Size(36, 36),
-                  onPressed: () => onRemove(
-                    selectedIndex.clamp(0, afterImages.length - 1),
-                  ),
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: AppColors.panelBackground.withValues(alpha: 0.9),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      CupertinoIcons.trash,
-                      size: 18,
-                      color: AppColors.accentDanger,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: <Widget>[
-              Expanded(
-                child: Text(
-                  'Upload more photos',
-                  style: textTheme.bodyLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-              Text(
-                '${afterImages.length} uploaded',
-                style: textTheme.bodySmall
-                    ?.copyWith(color: AppColors.textMuted),
-              ),
-            ],
-          ),
-          if (remaining > 0)
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: Text(
-                '$remaining more slot${remaining == 1 ? '' : 's'} available',
-                style: textTheme.bodySmall
-                    ?.copyWith(color: AppColors.textMuted),
-              ),
-            ),
-          const SizedBox(height: AppSpacing.md),
-          SizedBox(
-            height: _EventCleanupEvidenceScreenState._thumbStripHeight,
-            child: ListView.separated(
-              scrollDirection: Axis.horizontal,
-              itemCount: afterImages.length + (remaining > 0 ? 1 : 0),
-              separatorBuilder: (BuildContext context, int index) =>
-                  const SizedBox(width: AppSpacing.sm),
-              itemBuilder: (BuildContext context, int index) {
-                if (index == 0 && remaining > 0) {
-                  return Semantics(
-                    button: true,
-                    label: 'Add more photos',
-                    child: GestureDetector(
-                      onTap: onPick,
-                      child: Container(
-                        width: _EventCleanupEvidenceScreenState._thumbSize,
-                        height: _EventCleanupEvidenceScreenState._thumbSize,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.primary.withValues(alpha: 0.8),
-                          ),
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.plus,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                    ),
-                  );
-                }
-                final int imageIndex = remaining > 0 ? index - 1 : index;
-                final String path = afterImages[imageIndex];
-                final bool isSelected = imageIndex == selectedIndex;
-                return GestureDetector(
-                  onTap: () => onSelect(imageIndex),
-                  onLongPress: () => onThumbnailLongPress(imageIndex),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: <Widget>[
-                      Container(
-                        width: _EventCleanupEvidenceScreenState._thumbSize,
-                        height: _EventCleanupEvidenceScreenState._thumbSize,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isSelected
-                                ? AppColors.primaryDark
-                                : Colors.transparent,
-                            width: 2,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image(
-                            image: path.startsWith('assets/')
-                                ? AssetImage(path) as ImageProvider
-                                : FileImage(File(path)),
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) {
-                              return Container(
-                                color: AppColors.inputFill,
-                                child: const Icon(
-                                  CupertinoIcons.photo,
-                                  size: 18,
-                                  color: AppColors.textMuted,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: -4,
-                        top: -4,
-                        child: Semantics(
-                          button: true,
-                          label: 'Remove photo',
-                          child: CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            minimumSize: const Size(24, 24),
-                            onPressed: () => onRemove(imageIndex),
-                            child: Container(
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: AppColors.panelBackground,
-                                shape: BoxShape.circle,
-                                boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                    color: Colors.black
-                                        .withValues(alpha: 0.12),
-                                    blurRadius: 4,
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                CupertinoIcons.minus_circle_fill,
-                                size: 20,
-                                color: AppColors.accentDanger,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AddPhotosEmptyState extends StatefulWidget {
-  const _AddPhotosEmptyState({
-    required this.maxImages,
-    required this.onTap,
-    required this.textTheme,
-  });
-
-  final int maxImages;
-  final VoidCallback onTap;
-  final TextTheme textTheme;
-
-  @override
-  State<_AddPhotosEmptyState> createState() => _AddPhotosEmptyStateState();
-}
-
-class _AddPhotosEmptyStateState extends State<_AddPhotosEmptyState>
-    with SingleTickerProviderStateMixin {
-  bool _pressed = false;
-  late final AnimationController _pulseController;
-  late final Animation<double> _pulseAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _pulseController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _pulseController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final TextTheme textTheme = widget.textTheme;
-
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: widget.onTap,
-      child: FadeTransition(
-        opacity: _pulseAnimation,
-        child: AnimatedContainer(
-        duration: AppMotion.xFast,
-        curve: AppMotion.emphasized,
-        transform: Matrix4.diagonal3Values(
-          _pressed ? 0.98 : 1.0,
-          _pressed ? 0.98 : 1.0,
-          1.0,
-        ),
-        child: CustomPaint(
-          painter: _DashedBorderPainter(
-            color: AppColors.primary.withValues(alpha: 0.45),
-            borderRadius: 20,
-          ),
-          child: Container(
-            width: double.infinity,
-            constraints: const BoxConstraints(minHeight: 220),
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.xl,
-              vertical: AppSpacing.xl,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      CupertinoIcons.photo_on_rectangle,
-                      size: 32,
-                      color: AppColors.primaryDark,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Text(
-                    'Add photos of the cleaned site',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    'Up to ${widget.maxImages} photos',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Icon(
-                        Icons.touch_app_rounded,
-                        size: 14,
-                        color: AppColors.primaryDark.withValues(alpha: 0.8),
-                      ),
-                      const SizedBox(width: 6),
-                      Text(
-                        'Tap to select from gallery',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: AppColors.primaryDark,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-        ),
-      ),
-      ),
-    );
-  }
-}
-
-class _CleanupFullscreenGalleryPage extends StatelessWidget {
-  const _CleanupFullscreenGalleryPage({
-    required this.imagePaths,
-    required this.initialIndex,
-  });
-
-  final List<String> imagePaths;
-  final int initialIndex;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: Stack(
-        children: <Widget>[
-          PageView.builder(
-            controller: PageController(initialPage: initialIndex.clamp(0, imagePaths.length - 1)),
-            itemCount: imagePaths.length,
-            itemBuilder: (BuildContext context, int index) {
-              final String path = imagePaths[index];
-              final ImageProvider provider = path.startsWith('assets/')
-                  ? AssetImage(path)
-                  : FileImage(File(path)) as ImageProvider;
-              return InteractiveViewer(
-                child: Center(
-                  child: Image(
-                    image: provider,
-                    fit: BoxFit.contain,
-                    errorBuilder: (BuildContext context, Object error, StackTrace? stack) {
-                      return const Icon(
-                        CupertinoIcons.photo,
-                        size: 48,
-                        color: Colors.white54,
-                      );
-                    },
-                  ),
-                ),
-              );
-            },
-          ),
-          SafeArea(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(CupertinoIcons.xmark_circle_fill),
-                  color: Colors.white,
-                  iconSize: 28,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _DashedBorderPainter extends CustomPainter {
-  _DashedBorderPainter({
-    required this.color,
-    required this.borderRadius,
-  });
-
-  final Color color;
-  final double borderRadius;
-  static const double _dashWidth = 6.0;
-  static const double _dashGap = 4.0;
-  static const double _strokeWidth = 1.5;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Paint paint = Paint()
-      ..color = color
-      ..strokeWidth = _strokeWidth
-      ..style = PaintingStyle.stroke;
-
-    final RRect rRect = RRect.fromRectAndRadius(
-      Offset.zero & size,
-      Radius.circular(borderRadius),
-    );
-
-    final Path path = Path()..addRRect(rRect);
-    final List<ui.PathMetric> metrics = path.computeMetrics().toList();
-    for (final ui.PathMetric metric in metrics) {
-      double distance = 0;
-      while (distance < metric.length) {
-        final double end =
-            (distance + _dashWidth).clamp(0, metric.length).toDouble();
-        canvas.drawPath(
-          metric.extractPath(distance, end),
-          paint,
-        );
-        distance += _dashWidth + _dashGap;
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(_DashedBorderPainter oldDelegate) =>
-      color != oldDelegate.color ||
-      borderRadius != oldDelegate.borderRadius;
 }

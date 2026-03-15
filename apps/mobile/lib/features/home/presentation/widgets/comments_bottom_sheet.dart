@@ -119,8 +119,6 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
 
-    // The bottom sheet route (useSafeArea: true) already handles the notch.
-    // Here we just lay out the content.
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: <Widget>[
@@ -160,10 +158,10 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     AppSpacing.lg,
                     0,
                     AppSpacing.lg,
-                    AppSpacing.sm, // small gap above the input bar
+                    AppSpacing.sm,
                   ),
                   itemCount: _comments.length,
-                  separatorBuilder: (_, __) =>
+                  separatorBuilder: (_, _) =>
                       const SizedBox(height: AppSpacing.xs),
                   itemBuilder: (BuildContext context, int index) {
                     final Comment comment = _comments[index];
@@ -180,7 +178,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
   }
 
   Widget _buildHeader(BuildContext context) {
-    void _maybeClose() {
+    void maybeClose() {
       Navigator.of(context).maybePop();
     }
 
@@ -192,13 +190,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         children: <Widget>[
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: _maybeClose,
+            onTap: maybeClose,
             onVerticalDragEnd: (DragEndDetails details) {
               // If the user flicks the header downward with enough velocity,
               // dismiss the sheet (Instagram / Apple-style).
               if (details.primaryVelocity != null &&
                   details.primaryVelocity! > 200) {
-                _maybeClose();
+                maybeClose();
               }
             },
             child: Center(
@@ -245,7 +243,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     // When the keyboard is closed we add comfortable padding above the home indicator.
     final double bottomPadding =
         keyboardOpen
-            ? mediaQuery.viewInsets.bottom + 8
+            ? mediaQuery.viewInsets.bottom + AppSpacing.xs
             : AppSpacing.md + mediaQuery.padding.bottom;
 
     return Padding(
@@ -288,12 +286,12 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
               onSubmitted: (String value) => _submitComment(value),
             ),
           ),
-          const SizedBox(width: 6),
+          const SizedBox(width: AppSpacing.xs),
           AnimatedOpacity(
             duration: const Duration(milliseconds: 180),
             opacity: _canPost ? 1 : 0.45,
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 borderRadius: BorderRadius.circular(999),
                 onTap: _canPost ? () => _submitComment() : null,
@@ -309,7 +307,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                   child: Icon(
                     Icons.arrow_upward_rounded,
                     size: 18,
-                    color: _canPost ? Colors.white : AppColors.textMuted,
+                    color: _canPost ? AppColors.textOnDark : AppColors.textMuted,
                   ),
                 ),
               ),

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
+import 'package:chisto_mobile/features/profile/presentation/navigation/profile_actions_handler.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_general_info_screen.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_password_screen.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/weekly_rankings_screen.dart';
@@ -22,14 +27,48 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
+  bool _isLoadingProfile = true;
+  AppError? _profileLoadError;
+  ProfileUser? _profileUser;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 550),
-    )..forward();
+      duration: AppMotion.emphasizedDuration,
+    );
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    setState(() {
+      _profileLoadError = null;
+      _isLoadingProfile = true;
+    });
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 350));
+      if (!mounted) return;
+      setState(() {
+        _profileUser = ProfileMockData.currentUser;
+        _isLoadingProfile = false;
+        _profileLoadError = null;
+      });
+      _controller.forward();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _profileLoadError = AppError.network(cause: e);
+        _isLoadingProfile = false;
+      });
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'No connection',
+          type: AppSnackType.warning,
+        );
+      }
+    }
   }
 
   @override
@@ -38,13 +77,46 @@ class _ProfileScreenState extends State<ProfileScreen>
     super.dispose();
   }
 
+  Future<void> _handleRefresh() async {
+    await _loadProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ProfileUser user = ProfileMockData.currentUser;
+    if (_profileLoadError != null) {
+      return Scaffold(
+        backgroundColor: AppColors.appBackground,
+        body: SafeArea(
+          child: AppErrorView(
+            error: _profileLoadError!,
+            onRetry: _loadProfile,
+          ),
+        ),
+      );
+    }
+    final ProfileUser? loaded = _profileUser;
+    if (loaded == null || _isLoadingProfile) {
+      return Scaffold(
+        backgroundColor: AppColors.appBackground,
+        body: SafeArea(
+          child: Center(
+            child: SizedBox(
+              width: 32,
+              height: 32,
+              child: CircularProgressIndicator(
+                color: AppColors.primaryDark,
+                strokeWidth: 2.5,
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+    final ProfileUser user = loaded;
 
     final Animation<double> primaryOpacity = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.emphasized,
     );
     final Animation<Offset> levelSlide = Tween<Offset>(
       begin: const Offset(0, 0.06),
@@ -52,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: Curves.easeOutCubic),
+        curve: const Interval(0.0, 0.6, curve: AppMotion.emphasized),
       ),
     );
     final Animation<Offset> weeklySlide = Tween<Offset>(
@@ -61,7 +133,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.2, 1.0, curve: Curves.easeOutCubic),
+        curve: const Interval(0.2, 1.0, curve: AppMotion.emphasized),
       ),
     );
 
@@ -72,14 +144,21 @@ class _ProfileScreenState extends State<ProfileScreen>
           children: <Widget>[
             _ProfileHeader(user: user),
             Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.lg,
-                  AppSpacing.xl,
-                ),
-                child: Column(
+              child: RefreshIndicator(
+                color: AppColors.primary,
+                backgroundColor: AppColors.panelBackground,
+                onRefresh: _handleRefresh,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics(),
+                  ),
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.lg,
+                    AppSpacing.xl,
+                  ),
+                  child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     FadeTransition(
@@ -120,10 +199,10 @@ class _ProfileScreenState extends State<ProfileScreen>
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
+                            color: AppColors.shadowLight,
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -163,9 +242,88 @@ class _ProfileScreenState extends State<ProfileScreen>
                         ],
                       ),
                     ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      'Support',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.1,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.panelBackground,
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: AppColors.shadowLight,
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: AppColors.divider.withValues(alpha: 0.9),
+                        ),
+                      ),
+                      child: SettingsListTile(
+                        leadingIcon: Icons.help_outline_rounded,
+                        title: 'Help center',
+                        onTap: () => ProfileActionsHandler.handleHelp(context),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    Text(
+                      'Account',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.1,
+                          ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.panelBackground,
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: AppColors.shadowLight,
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: AppColors.divider.withValues(alpha: 0.9),
+                        ),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          SettingsListTile(
+                            leadingIcon: Icons.logout_rounded,
+                            title: 'Sign out',
+                            onTap: () =>
+                                ProfileActionsHandler.handleLogout(context),
+                            showTrailingChevron: false,
+                            showDividerBelow: true,
+                          ),
+                          SettingsListTile(
+                            leadingIcon: Icons.person_remove_rounded,
+                            title: 'Delete account',
+                            onTap: () => ProfileActionsHandler.handleDeleteAccount(
+                              context,
+                            ),
+                            isDestructive: true,
+                            showTrailingChevron: false,
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
+            ),
             ),
           ],
         ),
@@ -193,7 +351,7 @@ class _ProfileHeader extends StatelessWidget {
           ],
         ),
         borderRadius: const BorderRadius.vertical(
-          bottom: Radius.circular(24),
+          bottom: Radius.circular(AppSpacing.radiusCard),
         ),
       ),
       child: Padding(
@@ -230,26 +388,25 @@ class _ProfileHeader extends StatelessWidget {
                     animation: profileAvatarState,
                     builder: (BuildContext context, Widget? child) {
                       return Container(
-                        width: 72,
-                        height: 72,
+                        width: AppSpacing.avatarLg,
+                        height: AppSpacing.avatarLg,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.white.withValues(alpha: 0.16),
+                          color: AppColors.white.withValues(alpha: 0.16),
                           border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: AppColors.white.withValues(alpha: 0.7),
                             width: 2,
                           ),
                         ),
                         child: CircleAvatar(
-                          backgroundColor: Colors.white.withValues(alpha: 0.9),
+                          backgroundColor: AppColors.white.withValues(alpha: 0.9),
                           foregroundImage: profileAvatarState.localFile != null
                               ? FileImage(profileAvatarState.localFile!)
                               : null,
                           child: profileAvatarState.localFile == null
                               ? Text(
                                   user.name.isNotEmpty ? user.name[0] : '?',
-                                  style: const TextStyle(
-                                    fontSize: 26,
+                                  style: AppTypography.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     color: AppColors.primaryDark,
                                   ),
@@ -270,18 +427,18 @@ class _ProfileHeader extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: AppTypography.textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
+                          color: AppColors.textOnDark,
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.3,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         user.phoneNumber,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: Colors.white.withValues(alpha: 0.9),
+                              color: AppColors.textOnDarkMuted,
                             ),
                       ),
                     ],
@@ -316,10 +473,10 @@ class _LevelAndPointsCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: AppColors.shadowMedium,
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -331,16 +488,16 @@ class _LevelAndPointsCard extends StatelessWidget {
           Row(
             children: <Widget>[
               Container(
-                width: 40,
-                height: 40,
+                width: AppSpacing.xxl,
+                height: AppSpacing.xxl,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(14),
+                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
                 ),
                 child: const Icon(
                   Icons.person_outline_rounded,
                   color: AppColors.primaryDark,
-                  size: 22,
+                  size: AppSpacing.iconLg,
                 ),
               ),
               const SizedBox(width: AppSpacing.md),
@@ -369,12 +526,12 @@ class _LevelAndPointsCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           ClipRRect(
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
             child: Container(
-              height: 18,
+              height: AppSpacing.radius18,
               decoration: BoxDecoration(
                 color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
               ),
               child: Stack(
                 fit: StackFit.expand,
@@ -384,7 +541,7 @@ class _LevelAndPointsCard extends StatelessWidget {
                     widthFactor: progress.clamp(0.0, 1.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(999),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
                         gradient: LinearGradient(
                           colors: <Color>[
                             AppColors.primaryDark,
@@ -397,11 +554,9 @@ class _LevelAndPointsCard extends StatelessWidget {
                   Center(
                     child: Text(
                       '${user.points} pts',
-                      style: const TextStyle(
+                      style: AppTypography.badgeLabel.copyWith(
+                        color: AppColors.textOnDark,
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                        letterSpacing: -0.1,
                       ),
                     ),
                   ),
@@ -431,10 +586,10 @@ class _WeeklyRankCard extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: AppColors.shadowMedium,
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -443,16 +598,16 @@ class _WeeklyRankCard extends StatelessWidget {
       child: Row(
         children: <Widget>[
           Container(
-            width: 40,
-            height: 40,
+            width: AppSpacing.xxl,
+            height: AppSpacing.xxl,
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.18),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
             ),
             child: const Icon(
               Icons.emoji_events_rounded,
               color: AppColors.primaryDark,
-              size: 22,
+              size: AppSpacing.iconLg,
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -479,83 +634,14 @@ class _WeeklyRankCard extends StatelessWidget {
           ),
           TextButton(
             onPressed: onViewRankings,
-            child: const Text(
+            child: Text(
               'View rankings',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
+              style: AppTypography.chipLabel.copyWith(
                 color: AppColors.primaryDark,
               ),
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ProfileListTile extends StatelessWidget {
-  const _ProfileListTile({
-    required this.leadingIcon,
-    required this.title,
-    required this.onTap,
-  });
-
-  final IconData leadingIcon;
-  final String title;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Ink(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.md,
-            vertical: AppSpacing.sm,
-          ),
-          decoration: BoxDecoration(
-            color: AppColors.panelBackground,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: AppColors.divider.withValues(alpha: 0.9),
-            ),
-          ),
-          child: Row(
-            children: <Widget>[
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(
-                  leadingIcon,
-                  size: 18,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Text(
-                  title,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
-              ),
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.textMuted,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

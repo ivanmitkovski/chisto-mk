@@ -45,7 +45,7 @@ class _EvidenceCarouselState extends State<EvidenceCarousel> {
         height: 200,
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.06),
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppSpacing.radius22),
         ),
       );
     }
@@ -56,7 +56,7 @@ class _EvidenceCarouselState extends State<EvidenceCarousel> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         ClipRRect(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(AppSpacing.radius22),
           child: AspectRatio(
             aspectRatio: 16 / 9,
             child: PageView.builder(
@@ -88,14 +88,14 @@ class _EvidenceCarouselState extends State<EvidenceCarousel> {
               final bool isActive = index == _currentIndex;
               return AnimatedContainer(
                 duration: AppMotion.fast,
-                margin: const EdgeInsets.symmetric(horizontal: 3),
+                margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                 width: isActive ? 18 : 6,
                 height: 6,
                 decoration: BoxDecoration(
                   color: isActive
                       ? AppColors.primary
                       : AppColors.divider.withValues(alpha: 0.9),
-                  borderRadius: BorderRadius.circular(999),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
                 ),
               );
             }),

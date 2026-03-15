@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 
 List<PollutionSite> buildMockPollutionSites() {
   const ImageProvider image1 =
@@ -67,6 +68,25 @@ List<PollutionSite> buildMockPollutionSites() {
     ),
   ];
 
+  final SiteReport report1 = SiteReport(
+    id: 'r1',
+    reporterName: 'eco_maria',
+    reportedAt: now.subtract(const Duration(days: 2)),
+    description:
+        'Spotted a large pile of mixed waste near the riverside. Plastic, cardboard and household items. Water level is high, risk of contamination.',
+    images: <ImageProvider>[image1, image2],
+  );
+
+  SiteReport reportForSite(int id, String reporter, String desc, List<ImageProvider> imgs) {
+    return SiteReport(
+      id: 'r$id',
+      reporterName: reporter,
+      reportedAt: now.subtract(Duration(days: (id % 7) + 1)),
+      description: desc,
+      images: imgs,
+    );
+  }
+
   return <PollutionSite>[
     PollutionSite(
       id: '1',
@@ -84,6 +104,8 @@ List<PollutionSite> buildMockPollutionSites() {
       comments: comments1,
       urgencyLabel: 'Urgent',
       cleaningEvents: eventsForSite1,
+      firstReport: report1,
+      coReporterNames: <String>['green_skopje', 'nature_lover'],
     ),
     PollutionSite(
       id: '2',
@@ -99,6 +121,15 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       images: <ImageProvider>[image2, image1],
       comments: comments2,
+      firstReport: SiteReport(
+        id: 'r2',
+        reporterName: 'park_volunteer',
+        reportedAt: now.subtract(const Duration(hours: 18)),
+        description:
+            'Bottles and wrappers around the playground. Kids could get hurt. Would appreciate a cleanup soon.',
+        images: <ImageProvider>[image2],
+      ),
+      coReporterNames: <String>[],
     ),
     PollutionSite(
       id: '3',
@@ -114,6 +145,15 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image1,
       images: <ImageProvider>[image1, image2, image1],
       comments: comments3,
+      firstReport: SiteReport(
+        id: 'r3',
+        reporterName: 'local_resident',
+        reportedAt: now.subtract(const Duration(days: 5)),
+        description:
+            'Rubble and concrete blocks dumped overnight. Dust and noise. Reported to local authorities too.',
+        images: <ImageProvider>[image1, image2],
+      ),
+      coReporterNames: <String>['clean_crew', 'eco_jana'],
     ),
     PollutionSite(
       id: '4',
@@ -128,6 +168,13 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       images: <ImageProvider>[image2, image1],
       comments: comments1,
+      firstReport: reportForSite(
+        4,
+        'eco_jana',
+        'Bins overflowing after the weekend. Smell and flies. Needs urgent pickup.',
+        <ImageProvider>[image2],
+      ),
+      coReporterNames: <String>['green_skopje'],
     ),
     PollutionSite(
       id: '5',
@@ -142,12 +189,26 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image1,
       images: <ImageProvider>[image1],
       comments: comments2,
+      firstReport: reportForSite(
+        5,
+        'park_volunteer',
+        'Glass everywhere near the river. Dangerous for kids and pets.',
+        <ImageProvider>[image1],
+      ),
+      coReporterNames: <String>[],
     ),
     PollutionSite(
       id: '6',
       title: 'Illegal tire dump',
       pollutionType: 'Industrial waste',
       description: 'Piles of used tires stacking up behind an industrial area fence.',
+      firstReport: reportForSite(
+        6,
+        'nature_lover',
+        'Large tire pile growing. Fire risk and mosquito breeding.',
+        <ImageProvider>[image2, image1],
+      ),
+      coReporterNames: <String>['eco_jana', 'local_resident'],
       statusLabel: 'High',
       statusColor: AppColors.accentDanger,
       distanceKm: 12,
@@ -170,6 +231,8 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image1,
       images: <ImageProvider>[image1],
       comments: comments1,
+      firstReport: reportForSite(7, 'eco_jana', 'Plastic bags stuck in trees after storm.', <ImageProvider>[image1]),
+      coReporterNames: <String>['nature_lover'],
     ),
     PollutionSite(
       id: '8',
@@ -184,6 +247,8 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       images: <ImageProvider>[image2],
       comments: comments2,
+      firstReport: reportForSite(8, 'local_resident', 'Dust clouds from construction affecting health.', <ImageProvider>[image2]),
+      coReporterNames: <String>['park_volunteer'],
     ),
     PollutionSite(
       id: '9',
@@ -198,6 +263,8 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image1,
       images: <ImageProvider>[image1],
       comments: comments3,
+      firstReport: reportForSite(9, 'local_resident', 'Furniture dumped on sidewalk. Blocking pedestrians.', <ImageProvider>[image1]),
+      coReporterNames: <String>[],
     ),
     PollutionSite(
       id: '10',
@@ -213,8 +280,9 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       images: <ImageProvider>[image2, image1],
       comments: comments1,
+      firstReport: reportForSite(10, 'green_skopje', 'Alley used as dumping ground. Rats and smell.', <ImageProvider>[image2]),
+      coReporterNames: <String>['eco_jana', 'nature_lover'],
     ),
-    // Ohrid region (southwest)
     PollutionSite(
       id: '11',
       title: 'Beach debris near lakeshore',
@@ -227,12 +295,16 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 5,
       imageProvider: image1,
       comments: comments2,
+      firstReport: reportForSite(11, 'park_volunteer', 'Debris washing up on Ohrid beach. Tourism impact.', <ImageProvider>[image1]),
+      coReporterNames: <String>['clean_crew'],
     ),
     PollutionSite(
       id: '12',
       title: 'Old town dumping spot',
       pollutionType: 'Illegal landfill',
       description: 'Tourist waste accumulating in historic district alley.',
+      firstReport: reportForSite(12, 'nature_lover', 'Waste piling in old town. Heritage site at risk.', <ImageProvider>[image2]),
+      coReporterNames: <String>[],
       statusLabel: 'Low',
       statusColor: AppColors.primary,
       distanceKm: 178,
@@ -241,7 +313,6 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       comments: comments1,
     ),
-    // Bitola (south)
     PollutionSite(
       id: '13',
       title: 'Industrial scrap near Bitola',
@@ -254,6 +325,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 8,
       imageProvider: image1,
       comments: comments3,
+      firstReport: reportForSite(13, 'clean_crew', 'Metal scrap and waste near industrial zone.', <ImageProvider>[image1]),
+      coReporterNames: <String>['local_resident', 'eco_jana'],
     ),
     PollutionSite(
       id: '14',
@@ -267,8 +340,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 1,
       imageProvider: image2,
       comments: comments2,
+      firstReport: reportForSite(14, 'park_volunteer', 'Cups and wrappers on main street. Daily cleanup needed.', <ImageProvider>[image2]),
+      coReporterNames: <String>[],
     ),
-    // Tetovo (northwest)
     PollutionSite(
       id: '15',
       title: 'Riverside landfill',
@@ -281,6 +355,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 11,
       imageProvider: image1,
       comments: comments1,
+      firstReport: reportForSite(15, 'eco_maria', 'Dumping along Pena River. Water contamination risk.', <ImageProvider>[image1, image2]),
+      coReporterNames: <String>['green_skopje', 'nature_lover', 'clean_crew'],
     ),
     PollutionSite(
       id: '16',
@@ -294,8 +370,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 3,
       imageProvider: image2,
       comments: comments3,
+      firstReport: reportForSite(16, 'local_resident', 'Market bins overflow every weekend.', <ImageProvider>[image2]),
+      coReporterNames: <String>['eco_jana'],
     ),
-    // Kumanovo (north)
     PollutionSite(
       id: '17',
       title: 'Abandoned lot waste',
@@ -308,6 +385,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 4,
       imageProvider: image1,
       comments: comments2,
+      firstReport: reportForSite(17, 'green_skopje', 'Lot used for illegal dumping. Growing pile.', <ImageProvider>[image1]),
+      coReporterNames: <String>['park_volunteer'],
     ),
     PollutionSite(
       id: '18',
@@ -321,8 +400,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 6,
       imageProvider: image2,
       comments: comments1,
+      firstReport: reportForSite(18, 'nature_lover', 'Tires piled behind garage. Fire hazard.', <ImageProvider>[image2]),
+      coReporterNames: <String>['eco_jana', 'local_resident'],
     ),
-    // Štip (east)
     PollutionSite(
       id: '19',
       title: 'Mining waste near Bregalnica',
@@ -335,6 +415,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 9,
       imageProvider: image1,
       comments: comments3,
+      firstReport: reportForSite(19, 'clean_crew', 'Mining debris near Bregalnica. River at risk.', <ImageProvider>[image1]),
+      coReporterNames: <String>['eco_maria', 'green_skopje'],
     ),
     PollutionSite(
       id: '20',
@@ -347,9 +429,10 @@ List<PollutionSite> buildMockPollutionSites() {
       score: 7,
       participantCount: 2,
       imageProvider: image2,
+      firstReport: reportForSite(20, 'eco_jana', 'Plastics around campus. Student area needs cleanup.', <ImageProvider>[image2]),
+      coReporterNames: <String>[],
       comments: comments2,
     ),
-    // Strumica (southeast)
     PollutionSite(
       id: '21',
       title: 'Orchard dumping',
@@ -362,6 +445,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 5,
       imageProvider: image1,
       comments: comments1,
+      firstReport: reportForSite(21, 'nature_lover', 'Orchard used for dumping. Soil contamination.', <ImageProvider>[image1]),
+      coReporterNames: <String>['eco_jana'],
     ),
     PollutionSite(
       id: '22',
@@ -375,8 +460,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 1,
       imageProvider: image2,
       comments: comments2,
+      firstReport: reportForSite(22, 'park_volunteer', 'Glass on vineyard road. Tire hazard.', <ImageProvider>[image2]),
+      coReporterNames: <String>[],
     ),
-    // Prilep (center-south)
     PollutionSite(
       id: '23',
       title: 'Tobacco factory debris',
@@ -389,6 +475,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 7,
       imageProvider: image1,
       comments: comments3,
+      firstReport: reportForSite(23, 'local_resident', 'Industrial debris at old factory. Asbestos concern.', <ImageProvider>[image1]),
+      coReporterNames: <String>['clean_crew', 'eco_jana'],
     ),
     PollutionSite(
       id: '24',
@@ -402,8 +490,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 3,
       imageProvider: image2,
       comments: comments1,
+      firstReport: reportForSite(24, 'green_skopje', 'Furniture dumped near monument. Tourist area.', <ImageProvider>[image2]),
+      coReporterNames: <String>['nature_lover'],
     ),
-    // Veles (center)
     PollutionSite(
       id: '25',
       title: 'Vardar riverbank waste',
@@ -416,8 +505,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 8,
       imageProvider: image1,
       comments: comments2,
+      firstReport: reportForSite(25, 'eco_maria', 'Waste along Vardar. Major river pollution.', <ImageProvider>[image1, image2]),
+      coReporterNames: <String>['green_skopje', 'clean_crew', 'nature_lover'],
     ),
-    // Gevgelija (south, border)
     PollutionSite(
       id: '26',
       title: 'Highway rest stop litter',
@@ -430,8 +520,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 4,
       imageProvider: image2,
       comments: comments1,
+      firstReport: reportForSite(26, 'eco_jana', 'Rest stop litter. International route image.', <ImageProvider>[image2]),
+      coReporterNames: <String>['park_volunteer'],
     ),
-    // Resen (southwest, near Ohrid)
     PollutionSite(
       id: '27',
       title: 'Apple orchard plastic',
@@ -444,8 +535,9 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 3,
       imageProvider: image1,
       comments: comments3,
+      firstReport: reportForSite(27, 'nature_lover', 'Plastic sheeting in orchard. Wildlife risk.', <ImageProvider>[image1]),
+      coReporterNames: <String>['eco_jana', 'local_resident'],
     ),
-    // Struga (southwest, lakeside)
     PollutionSite(
       id: '28',
       title: 'Bridge area waste',
@@ -458,22 +550,24 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 2,
       imageProvider: image2,
       comments: comments2,
+      firstReport: reportForSite(28, 'park_volunteer', 'Waste near historic bridge. Scenic spot ruined.', <ImageProvider>[image2]),
+      coReporterNames: <String>[],
     ),
-    // Kavadarci (center)
     PollutionSite(
       id: '29',
       title: 'Vineyard chemical containers',
       pollutionType: 'Industrial waste',
       description: 'Discarded agricultural chemical containers near Tikveš.',
+      firstReport: reportForSite(29, 'nature_lover', 'Chemical containers near Tikveš. Toxic leak risk.', <ImageProvider>[image1]),
+      coReporterNames: <String>['eco_maria'],
       statusLabel: 'High',
       statusColor: AppColors.accentDanger,
       distanceKm: 95,
       score: 16,
       participantCount: 5,
       imageProvider: image1,
-      comments: comments1,
+      comments: comments3,
     ),
-    // Negotino (east)
     PollutionSite(
       id: '30',
       title: 'Riverside construction waste',
@@ -486,6 +580,8 @@ List<PollutionSite> buildMockPollutionSites() {
       participantCount: 4,
       imageProvider: image2,
       comments: comments2,
+      firstReport: reportForSite(30, 'local_resident', 'Construction debris near Vardar bridge.', <ImageProvider>[image2]),
+      coReporterNames: <String>['green_skopje'],
     ),
   ];
 }

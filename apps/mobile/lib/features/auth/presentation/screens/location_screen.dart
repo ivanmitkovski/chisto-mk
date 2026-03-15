@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
@@ -84,7 +86,7 @@ class _LocationScreenState extends State<LocationScreen> {
     if (_resolvingLocation) {
       return;
     }
-    HapticFeedback.lightImpact();
+    AppHaptics.light();
     setState(() => _resolvingLocation = true);
 
     try {
@@ -142,6 +144,7 @@ class _LocationScreenState extends State<LocationScreen> {
       // Zoom in closer when auto-detecting location so the user can better
       // verify the exact spot.
       _mapController.move(_selectedPosition!, 17);
+      AppHaptics.success();
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.home,
         (Route<dynamic> route) => false,
@@ -173,28 +176,33 @@ class _LocationScreenState extends State<LocationScreen> {
           behavior: HitTestBehavior.translucent,
           child: SafeArea(
             child: AnimatedPadding(
-              duration: const Duration(milliseconds: 220),
-              curve: Curves.easeOutCubic,
+              duration: AppMotion.medium,
+              curve: AppMotion.emphasized,
               padding: EdgeInsets.only(bottom: keyboardInset),
               child: SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                padding: const EdgeInsets.fromLTRB(22, 12, 22, 24),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  AppSpacing.lg,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.radiusSm),
                     const Text(
                       'Choose your location',
                       style: AppTypography.authHeadline,
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: AppSpacing.radius10),
                     const Text(
                       'We use your location to show cleanups and reports near you.',
                       style: AppTypography.authSubtitle,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.lg),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(22),
+                      borderRadius: BorderRadius.circular(AppSpacing.radius22),
                       child: SizedBox(
                         height: 260,
                         width: double.infinity,
@@ -232,7 +240,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                 .withValues(alpha: 0.82),
                                             shape: BoxShape.circle,
                                             border: Border.all(
-                                              color: Colors.white,
+                                              color: AppColors.white,
                                               width: 2,
                                             ),
                                           ),
@@ -249,17 +257,17 @@ class _LocationScreenState extends State<LocationScreen> {
                                 ),
                               ),
                             Positioned(
-                              left: 16,
-                              right: 16,
-                              top: 16,
+                              left: AppSpacing.md,
+                              right: AppSpacing.md,
+                              top: AppSpacing.md,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 8,
+                                  horizontal: AppSpacing.sm,
+                                  vertical: AppSpacing.radiusSm,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.92),
-                                  borderRadius: BorderRadius.circular(16),
+                                  color: AppColors.white.withValues(alpha: 0.92),
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                                 ),
                                 child: Text(
                                   _currentAddress ??
@@ -274,22 +282,18 @@ class _LocationScreenState extends State<LocationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 28),
+                    const SizedBox(height: AppSpacing.radiusPill),
                     PrimaryButton(
                       label: _resolvingLocation ? 'Detecting location…' : 'Use current location',
                       enabled: !_resolvingLocation,
                       onPressed: _resolvingLocation ? null : _useCurrentLocation,
                     ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      'We only use your location to show nearby cleanups. We don’t track you in the background.',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.textSecondary,
-                        height: 1.35,
-                      ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(
+                      "We only use your location to show nearby cleanups. We don't track you in the background.",
+                      style: AppTypography.cardSubtitle.copyWith(height: 1.35),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.md),
                   ],
                 ),
               ),
@@ -312,8 +316,8 @@ class _MapTilesFallback extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: <Color>[
-            Color(0xFFEFF3F6),
-            Color(0xFFE3E8ED),
+            AppColors.inputFill,
+            AppColors.inputBorder,
           ],
         ),
       ),
@@ -327,9 +331,9 @@ class _MapTilesFallback extends StatelessWidget {
 class _GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    const double tileSize = 32;
+    const double tileSize = AppSpacing.xl;
     final Paint linePaint = Paint()
-      ..color = const Color(0xFFE0E5EB)
+      ..color = AppColors.divider
       ..strokeWidth = 0.7;
 
     for (double x = 0; x <= size.width; x += tileSize) {

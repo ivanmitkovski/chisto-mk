@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
@@ -45,10 +46,10 @@ class ReportSheetScaffold extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusCard)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: AppColors.black.withValues(alpha: 0.08),
             blurRadius: 28,
             offset: const Offset(0, -8),
           ),
@@ -66,9 +67,9 @@ class ReportSheetScaffold extends StatelessWidget {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    const SizedBox(height: 6),
+                    const SizedBox(height: AppSpacing.xs),
                     const Center(child: _ReportSheetHandle()),
-                    SizedBox(height: topPadding > 0 ? 10 : 14),
+                    SizedBox(height: topPadding > 0 ? AppSpacing.xs : AppSpacing.radius14),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
@@ -164,7 +165,7 @@ class ReportStatePill extends StatelessWidget {
       ),
       decoration: BoxDecoration(
         color: palette.background,
-        borderRadius: BorderRadius.circular(999),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
         border: Border.all(color: palette.border),
       ),
       child: Row(
@@ -172,17 +173,14 @@ class ReportStatePill extends StatelessWidget {
         children: <Widget>[
           if (icon != null) ...<Widget>[
             Icon(icon, size: 13, color: palette.foreground),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppSpacing.xs),
           ],
           Text(
             label,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
+            style: AppTypography.badgeLabel.copyWith(
               color: palette.foreground,
-              letterSpacing: -0.1,
             ),
           ),
         ],
@@ -214,7 +212,7 @@ class ReportInfoBanner extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.sm),
       decoration: BoxDecoration(
         color: palette.background,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(color: palette.border.withValues(alpha: 0.9)),
       ),
       child: Row(
@@ -283,21 +281,21 @@ class ReportActionTile extends StatelessWidget {
     final _ReportSurfacePalette palette = _ReportSurfacePalette.fromTone(tone);
 
     return Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
         child: Ink(
           padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
             color: tone == ReportSurfaceTone.neutral
                 ? AppColors.inputFill
                 : palette.background,
-            borderRadius: BorderRadius.circular(18),
+            borderRadius: BorderRadius.circular(AppSpacing.radius18),
             border: Border.all(color: palette.border.withValues(alpha: 0.85)),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.018),
+                color: AppColors.black.withValues(alpha: 0.018),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -313,7 +311,7 @@ class ReportActionTile extends StatelessWidget {
                 height: 40,
                 decoration: BoxDecoration(
                   color: palette.iconBackground,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 ),
                 child: Icon(icon, size: 20, color: palette.foreground),
               ),
@@ -372,7 +370,7 @@ class ReportCircleIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Widget child = Material(
-      color: Colors.transparent,
+      color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -384,8 +382,8 @@ class ReportCircleIconButton extends StatelessWidget {
             shape: BoxShape.circle,
             border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
             boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+            BoxShadow(
+              color: AppColors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -409,11 +407,11 @@ class _ReportSheetHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 36,
-      height: 4,
+      width: AppSpacing.sheetHandle,
+      height: AppSpacing.sheetHandleHeight,
       decoration: BoxDecoration(
         color: AppColors.divider,
-        borderRadius: BorderRadius.circular(2),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
       ),
     );
   }
@@ -442,25 +440,25 @@ class _ReportSurfacePalette {
           background: emphasized
               ? AppColors.primaryDark
               : AppColors.primary.withValues(alpha: 0.1),
-          foreground: emphasized ? Colors.white : AppColors.primaryDark,
+          foreground: emphasized ? AppColors.white : AppColors.primaryDark,
           border: emphasized
               ? AppColors.primaryDark
               : AppColors.primaryDark.withValues(alpha: 0.18),
           iconBackground: emphasized
-              ? Colors.white.withValues(alpha: 0.16)
+              ? AppColors.white.withValues(alpha: 0.16)
               : AppColors.primary.withValues(alpha: 0.16),
         );
       case ReportSurfaceTone.success:
         return const _ReportSurfacePalette(
           background: Color(0xFFEDFFF6),
-          foreground: Color(0xFF158A52),
+          foreground: AppColors.primaryDark,
           border: Color(0xFFD0F0DF),
           iconBackground: Color(0xFFDDF7E9),
         );
       case ReportSurfaceTone.warning:
         return const _ReportSurfacePalette(
           background: Color(0xFFFFF6E8),
-          foreground: Color(0xFFA66700),
+          foreground: AppColors.accentWarningDark,
           border: Color(0xFFFFE1B3),
           iconBackground: Color(0xFFFFEDC8),
         );

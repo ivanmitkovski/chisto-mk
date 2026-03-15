@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class PrimaryButton extends StatefulWidget {
   const PrimaryButton({
@@ -24,8 +27,8 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   Widget build(BuildContext context) {
     return AnimatedScale(
       scale: _pressed ? 0.985 : 1,
-      duration: const Duration(milliseconds: 110),
-      curve: Curves.easeOutCubic,
+      duration: AppMotion.xFast,
+      curve: AppMotion.emphasized,
       child: SizedBox(
         width: double.infinity,
         height: 56,
@@ -41,16 +44,12 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                   widget.enabled ? AppColors.primary : AppColors.primary.withValues(alpha: 0.42),
               foregroundColor: AppColors.textPrimary,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(28),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               ),
             ),
             child: Text(
               widget.label,
-              style: const TextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.1,
-              ),
+              style: AppTypography.buttonLabel,
             ),
           ),
         ),

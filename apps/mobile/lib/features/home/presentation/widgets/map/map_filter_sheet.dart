@@ -74,14 +74,14 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusSheet)),
       ),
       child: SafeArea(
         top: false,
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
             AppSpacing.lg,
-            10,
+            AppSpacing.sm,
             AppSpacing.lg,
             AppSpacing.xl,
           ),
@@ -127,14 +127,14 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                   children: <Widget>[
                     StatusChip(
                       label: 'High',
-                      color: Colors.redAccent,
+                      color: AppColors.accentDanger,
                       isActive: _activeStatuses.contains('High'),
                       onTap: () => _toggleStatus('High'),
                     ),
                     const SizedBox(width: AppSpacing.sm),
                     StatusChip(
                       label: 'Medium',
-                      color: Colors.orangeAccent,
+                      color: AppColors.accentWarning,
                       isActive: _activeStatuses.contains('Medium'),
                       onTap: () => _toggleStatus('Medium'),
                     ),
@@ -237,12 +237,12 @@ class TypeChip extends StatelessWidget {
         child: AnimatedContainer(
           duration: AppMotion.fast,
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius14, vertical: AppSpacing.radius10),
           decoration: BoxDecoration(
             color: isActive
                 ? AppColors.primary.withValues(alpha: 0.12)
                 : AppColors.inputFill,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             border: Border.all(
               color: isActive
                   ? AppColors.primary.withValues(alpha: 0.35)
@@ -287,7 +287,7 @@ class StatusChip extends StatelessWidget {
         : AppColors.textMuted.withValues(alpha: 0.85);
     final Color background = isActive
         ? color.withValues(alpha: 0.12)
-        : Colors.white.withValues(alpha: 0.35);
+        : AppColors.white.withValues(alpha: 0.35);
 
     return Semantics(
       button: true,
@@ -297,12 +297,12 @@ class StatusChip extends StatelessWidget {
         child: AnimatedContainer(
           duration: AppMotion.fast,
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
             color: background,
-            borderRadius: BorderRadius.circular(999),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             border: Border.all(
-              color: isActive ? color.withValues(alpha: 0.5) : Colors.transparent,
+              color: isActive ? color.withValues(alpha: 0.5) : AppColors.transparent,
               width: 1,
             ),
           ),
@@ -317,7 +317,7 @@ class StatusChip extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 5),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(

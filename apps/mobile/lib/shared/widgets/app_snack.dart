@@ -1,6 +1,5 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -31,9 +30,9 @@ class AppSnack {
 
       showGeneralDialog<void>(
         context: navigatorContext,
-        barrierDismissible: false,
+        barrierDismissible: true,
         barrierLabel: 'app_snack',
-        barrierColor: Colors.transparent,
+        barrierColor: AppColors.transparent,
         transitionDuration: const Duration(milliseconds: 220),
         pageBuilder: (
           BuildContext dialogContext,
@@ -80,7 +79,7 @@ class AppSnack {
     return messenger.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         duration: duration,
         margin: const EdgeInsets.fromLTRB(
@@ -128,13 +127,13 @@ class _AppSnackCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         border: Border.all(color: palette.borderColor, width: 1),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
+            color: AppColors.shadowLight,
             blurRadius: 18,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, AppSpacing.radiusSm),
           ),
         ],
       ),
@@ -156,7 +155,7 @@ class _AppSnackCard extends StatelessWidget {
               ),
               child: Icon(
                 palette.icon,
-                size: 16,
+                size: AppSpacing.iconSm,
                 color: palette.iconColor,
               ),
             ),
@@ -207,6 +206,12 @@ class _AppSnackOverlayState extends State<_AppSnackOverlay> {
     });
   }
 
+  void _dismiss() {
+    if (mounted && Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -219,9 +224,18 @@ class _AppSnackOverlayState extends State<_AppSnackOverlay> {
             AppSpacing.lg,
             0,
           ),
-          child: _AppSnackCard(
-            message: widget.message,
-            type: widget.type,
+          child: Dismissible(
+            key: const ValueKey<String>('app_snack'),
+            direction: DismissDirection.up,
+            onDismissed: (_) => _dismiss(),
+            child: GestureDetector(
+              onTap: _dismiss,
+              behavior: HitTestBehavior.opaque,
+              child: _AppSnackCard(
+                message: widget.message,
+                type: widget.type,
+              ),
+            ),
           ),
         ),
       ),
@@ -261,16 +275,16 @@ class _SnackPalette {
       case AppSnackType.warning:
         return _SnackPalette(
           icon: Icons.warning_amber_rounded,
-          iconColor: const Color(0xFFA66700),
-          iconBackground: const Color(0xFFFFF4DB),
-          borderColor: const Color(0xFFFFDDA3),
+          iconColor: AppColors.accentWarningDark,
+          iconBackground: AppColors.accentWarning.withValues(alpha: 0.15),
+          borderColor: AppColors.accentWarning.withValues(alpha: 0.5),
         );
       case AppSnackType.error:
         return _SnackPalette(
           icon: Icons.error_outline_rounded,
           iconColor: AppColors.error,
-          iconBackground: const Color(0xFFFDECEC),
-          borderColor: const Color(0xFFF8C3C3),
+          iconBackground: AppColors.accentDanger.withValues(alpha: 0.08),
+          borderColor: AppColors.accentDanger.withValues(alpha: 0.5),
         );
     }
   }

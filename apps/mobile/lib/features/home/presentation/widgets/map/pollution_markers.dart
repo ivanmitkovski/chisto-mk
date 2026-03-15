@@ -63,7 +63,7 @@ class PollutionMarker extends StatelessWidget {
                       spreadRadius: 4,
                     ),
                   BoxShadow(
-                    color: Colors.black
+                    color: AppColors.black
                         .withValues(alpha: isSelected ? 0.28 : 0.18),
                     blurRadius: isSelected ? 16 : 8,
                     offset: Offset(0, isSelected ? 8 : 4),
@@ -208,7 +208,7 @@ class _ClusterMarkerState extends State<ClusterMarker>
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.5),
+                  color: AppColors.white.withValues(alpha: 0.5),
                   width: 2,
                 ),
                 boxShadow: <BoxShadow>[
@@ -218,7 +218,7 @@ class _ClusterMarkerState extends State<ClusterMarker>
                     spreadRadius: 1,
                   ),
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.12),
+                    color: AppColors.shadowLight,
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -228,7 +228,7 @@ class _ClusterMarkerState extends State<ClusterMarker>
                 child: Text(
                   count >= 100 ? '99+' : '$count',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textOnDark,
                     fontWeight: FontWeight.w700,
                     fontSize: count >= 10 ? 12 : 14,
                     height: 1,
@@ -340,7 +340,7 @@ class _UserLocationDotState extends State<UserLocationDot>
               decoration: BoxDecoration(
                 color: AppColors.primaryDark,
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 3),
+                border: Border.all(color: AppColors.white, width: 3),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
                     color: AppColors.primaryDark.withValues(alpha: 0.4),

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -265,7 +266,6 @@ class _LocationPickerState extends State<LocationPicker> {
     }
     _wasAtFenceLastMove = atFence;
 
-    // Light haptic when the user first hits the maximum zoom level.
     const double kMaxZoom = 19;
     final bool atMaxZoom = newZoom >= kMaxZoom;
     if (atMaxZoom && !_wasAtMaxZoomLastMove) {
@@ -455,7 +455,7 @@ class _LocationPickerState extends State<LocationPicker> {
           sortKey: OrdinalSortKey(0),
           label: 'Map. Drag to move the pin. Pin cannot leave Macedonia.',
           child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
             child: SizedBox(
               height: 240,
               width: double.infinity,
@@ -492,7 +492,7 @@ class _LocationPickerState extends State<LocationPicker> {
                   ),
                 Center(
                   child: Padding(
-                    padding: const EdgeInsets.only(bottom: 24),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.lg),
                     child: AnimatedScale(
                       scale: hasConfirmedLocation ? 1.08 : 1.0,
                       duration: AppMotion.medium,
@@ -506,7 +506,7 @@ class _LocationPickerState extends State<LocationPicker> {
                             AppColors.primaryDark.withValues(alpha: 0.84),
                         shadows: <Shadow>[
                           Shadow(
-                            color: Colors.black.withValues(alpha: 0.2),
+                            color: AppColors.black.withValues(alpha: 0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 2),
                           ),
@@ -699,28 +699,28 @@ class _LocationPickerState extends State<LocationPicker> {
                           },
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.textOnDark,
+                      disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.42),
+                      disabledForegroundColor: AppColors.textOnDark,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       ),
                     ),
                     icon: _geocodingInProgress
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 18,
                             height: 18,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: AppColors.textOnDark,
                             ),
                           )
-                        : const Icon(Icons.check_rounded, size: 18),
+                        : Icon(Icons.check_rounded, size: 18, color: AppColors.textOnDark),
                     label: Text(
                       _geocodingInProgress ? 'Checking…' : 'Confirm location',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.15,
+                      style: AppTypography.buttonLabel.copyWith(
+                        color: AppColors.textOnDark,
                       ),
                     ),
                   ),
@@ -756,7 +756,7 @@ class _LocationPickerState extends State<LocationPicker> {
         ),
         decoration: BoxDecoration(
           color: AppColors.inputFill,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           border: Border.all(color: AppColors.divider.withValues(alpha: 0.8)),
         ),
         child: Row(
@@ -768,7 +768,7 @@ class _LocationPickerState extends State<LocationPicker> {
                   ? AppColors.textMuted
                   : AppColors.primaryDark,
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(
                 displayText,
@@ -807,19 +807,19 @@ class _LocationPickerState extends State<LocationPicker> {
             height: 40,
             decoration: BoxDecoration(
               color: AppColors.panelBackground.withValues(alpha: 0.94),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: AppColors.black.withValues(alpha: 0.1),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 onTap: () {
                   AppHaptics.light();
                   _detectCurrentLocation();
@@ -860,26 +860,25 @@ class _MapTilesFallback extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[Color(0xFFEFF3F6), Color(0xFFE3E8ED)],
+          colors: <Color>[AppColors.inputFill, AppColors.divider],
         ),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             SizedBox(
-              width: 24,
-              height: 24,
+              width: AppSpacing.iconLg,
+              height: AppSpacing.iconLg,
               child: CircularProgressIndicator(
                 strokeWidth: 2.5,
                 color: AppColors.primaryDark,
               ),
             ),
-            SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               'Detecting location…',
-              style: TextStyle(
-                fontSize: 13,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 fontWeight: FontWeight.w500,
                 color: AppColors.textMuted,
               ),

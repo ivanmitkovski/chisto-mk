@@ -1,23 +1,14 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
-import 'package:flutter/material.dart';
+import 'package:chisto_mobile/shared/widgets/photo_gallery/photo_gallery_widgets.dart';
 
-class GalleryImageItem {
-  const GalleryImageItem({
-    required this.image,
-    required this.heroTag,
-    this.semanticLabel,
-  });
-
-  final ImageProvider image;
-  final String heroTag;
-  final String? semanticLabel;
-}
+export 'package:chisto_mobile/shared/widgets/photo_gallery/photo_gallery_widgets.dart';
 
 typedef GalleryOverlayBuilder =
     Widget Function(BuildContext context, int currentIndex, int totalCount);
@@ -27,7 +18,7 @@ class ImmersivePhotoGallery extends StatefulWidget {
     super.key,
     required this.items,
     this.aspectRatio = 16 / 9,
-    this.borderRadius = 20,
+    this.borderRadius = AppSpacing.radiusXl,
     this.selectedIndex,
     this.onPageChanged,
     this.topLeftBuilder,
@@ -112,7 +103,7 @@ class _ImmersivePhotoGalleryState extends State<ImmersivePhotoGallery> {
     Navigator.of(context).push(
       PageRouteBuilder<void>(
         opaque: false,
-        barrierColor: Colors.transparent,
+        barrierColor: AppColors.transparent,
         pageBuilder:
             (
               BuildContext context,
@@ -142,7 +133,7 @@ class _ImmersivePhotoGalleryState extends State<ImmersivePhotoGallery> {
                   animation: curved,
                   child: child,
                   builder: (BuildContext context, Widget? child) {
-                    final double lift = (1 - curved.value) * 18;
+                    final double lift = (1 - curved.value) * AppSpacing.radius18;
                     return Transform.translate(
                       offset: Offset(0, lift),
                       child: ScaleTransition(
@@ -211,9 +202,9 @@ class _ImmersivePhotoGalleryState extends State<ImmersivePhotoGallery> {
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: <Color>[
-                            Colors.black.withValues(alpha: 0.34),
-                            Colors.transparent,
-                            Colors.black.withValues(alpha: 0.24),
+                            AppColors.black.withValues(alpha: 0.34),
+                            AppColors.transparent,
+                            AppColors.black.withValues(alpha: 0.24),
                           ],
                           stops: const <double>[0, 0.42, 1],
                         ),
@@ -238,11 +229,9 @@ class _ImmersivePhotoGalleryState extends State<ImmersivePhotoGallery> {
                     child: GalleryGlassPill(
                       child: Text(
                         '${_currentIndex + 1}/$totalCount',
-                        style: const TextStyle(
+                        style: AppTypography.badgeLabel.copyWith(
                           fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white,
-                          letterSpacing: -0.1,
+                          color: AppColors.textOnDark,
                         ),
                       ),
                     ),
@@ -425,13 +414,13 @@ class _FullscreenPhotoGalleryScreenState
     final double bottomInset = MediaQuery.of(context).padding.bottom;
     final double chromeOpacity = _isCurrentImageZoomed ? 0 : 1;
     final Color backgroundColor = Color.lerp(
-      Colors.black,
+      AppColors.black,
       AppColors.primaryDark,
       0.16,
     )!.withValues(alpha: _backgroundOpacity);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       body: GestureDetector(
         onVerticalDragUpdate: _handleVerticalDragUpdate,
         onVerticalDragEnd: _handleVerticalDragEnd,
@@ -459,7 +448,7 @@ class _FullscreenPhotoGalleryScreenState
                       },
                       itemBuilder: (BuildContext context, int index) {
                         final GalleryImageItem item = widget.items[index];
-                        return _ZoomableGalleryImage(
+                        return ZoomableGalleryImage(
                           item: item,
                           controller: _zoomControllers[index],
                           onDoubleTap: (TapDownDetails details) =>
@@ -505,11 +494,9 @@ class _FullscreenPhotoGalleryScreenState
                                   emphasis: GalleryGlassPillEmphasis.strong,
                                   child: Text(
                                     '${_currentIndex + 1} / ${widget.items.length}',
-                                    style: const TextStyle(
+                                    style: AppTypography.chipLabel.copyWith(
                                       fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                      letterSpacing: -0.2,
+                                      color: AppColors.textOnDark,
                                     ),
                                   ),
                                 ),
@@ -524,7 +511,7 @@ class _FullscreenPhotoGalleryScreenState
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
-                                _GalleryThumbnailRail(
+                                GalleryThumbnailRail(
                                   items: widget.items,
                                   currentIndex: _currentIndex,
                                   onSelect: (int index) {
@@ -556,15 +543,13 @@ class _FullscreenPhotoGalleryScreenState
                             duration: AppMotion.fast,
                             child: IgnorePointer(
                               ignoring: chromeOpacity == 0,
-                              child: const Center(
+                              child: Center(
                                 child: GalleryGlassPill(
                                   child: Text(
                                     'Pinch or double-tap to zoom',
-                                    style: TextStyle(
-                                      fontSize: 12,
+                                    style: AppTypography.badgeLabel.copyWith(
                                       fontWeight: FontWeight.w500,
-                                      color: Colors.white,
-                                      letterSpacing: -0.1,
+                                      color: AppColors.textOnDark,
                                     ),
                                   ),
                                 ),
@@ -584,11 +569,11 @@ class _FullscreenPhotoGalleryScreenState
                           begin: Alignment.topCenter,
                           end: Alignment.bottomCenter,
                           colors: <Color>[
-                            Colors.black.withValues(
+                            AppColors.black.withValues(
                               alpha: 0.28 * chromeOpacity,
                             ),
-                            Colors.transparent,
-                            Colors.black.withValues(
+                            AppColors.transparent,
+                            AppColors.black.withValues(
                               alpha: 0.24 * chromeOpacity,
                             ),
                           ],
@@ -606,14 +591,12 @@ class _FullscreenPhotoGalleryScreenState
                     duration: AppMotion.fast,
                     child: IgnorePointer(
                       ignoring: chromeOpacity == 0,
-                      child: const Center(
+                      child: Center(
                         child: Text(
                           'Drag down to close',
-                          style: TextStyle(
-                            fontSize: 12,
+                          style: AppTypography.badgeLabel.copyWith(
                             fontWeight: FontWeight.w500,
-                            color: Colors.white70,
-                            letterSpacing: -0.1,
+                            color: AppColors.textOnDarkMuted,
                           ),
                         ),
                       ),
@@ -637,301 +620,5 @@ class _FullscreenPhotoGalleryScreenState
     if (next >= 0 && next < widget.items.length) {
       precacheImage(widget.items[next].image, context);
     }
-  }
-}
-
-class _ZoomableGalleryImage extends StatefulWidget {
-  const _ZoomableGalleryImage({
-    required this.item,
-    required this.controller,
-    required this.onDoubleTap,
-  });
-
-  final GalleryImageItem item;
-  final TransformationController controller;
-  final ValueChanged<TapDownDetails> onDoubleTap;
-
-  @override
-  State<_ZoomableGalleryImage> createState() => _ZoomableGalleryImageState();
-}
-
-class _ZoomableGalleryImageState extends State<_ZoomableGalleryImage> {
-  TapDownDetails? _doubleTapDetails;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onDoubleTapDown: (TapDownDetails details) {
-        _doubleTapDetails = details;
-      },
-      onDoubleTap: () {
-        final TapDownDetails? details = _doubleTapDetails;
-        if (details == null) return;
-        widget.onDoubleTap(details);
-      },
-      child: InteractiveViewer(
-        transformationController: widget.controller,
-        minScale: 1,
-        maxScale: 4.5,
-        panEnabled: true,
-        scaleEnabled: true,
-        clipBehavior: Clip.none,
-        boundaryMargin: const EdgeInsets.all(AppSpacing.xl),
-        child: Center(
-          child: AppSmartImage(
-            image: widget.item.image,
-            fit: BoxFit.contain,
-            semanticLabel: widget.item.semanticLabel,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class GalleryGlassPill extends StatelessWidget {
-  const GalleryGlassPill({
-    super.key,
-    required this.child,
-    this.padding,
-    this.emphasis = GalleryGlassPillEmphasis.regular,
-  });
-
-  final Widget child;
-  final EdgeInsetsGeometry? padding;
-  final GalleryGlassPillEmphasis emphasis;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool strong = emphasis == GalleryGlassPillEmphasis.strong;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(999),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: strong ? 16 : 12,
-          sigmaY: strong ? 16 : 12,
-        ),
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: strong ? 0.3 : 0.22),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: strong ? 0.16 : 0.1),
-              width: 0.8,
-            ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.12),
-                blurRadius: strong ? 14 : 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Padding(
-            padding:
-                padding ??
-                const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: AppSpacing.xs,
-                ),
-            child: child,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-enum GalleryGlassPillEmphasis { regular, strong }
-
-class GalleryPageIndicators extends StatelessWidget {
-  const GalleryPageIndicators({
-    super.key,
-    required this.currentIndex,
-    required this.totalCount,
-    this.activeColor = Colors.white,
-    this.inactiveOpacity = 0.34,
-    this.maxVisible = 5,
-  });
-
-  final int currentIndex;
-  final int totalCount;
-  final Color activeColor;
-  final double inactiveOpacity;
-  final int maxVisible;
-
-  @override
-  Widget build(BuildContext context) {
-    final int visibleCount = totalCount <= maxVisible ? totalCount : maxVisible;
-    final int halfWindow = visibleCount ~/ 2;
-    int start = 0;
-    if (totalCount > visibleCount) {
-      start = currentIndex - halfWindow;
-      if (start < 0) {
-        start = 0;
-      }
-      if (start > totalCount - visibleCount) {
-        start = totalCount - visibleCount;
-      }
-    }
-    final int end = start + visibleCount;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: List<Widget>.generate(visibleCount, (int localIndex) {
-        final int index = start + localIndex;
-        final bool isActive = index == currentIndex;
-        final bool isEdgeDot =
-            totalCount > visibleCount && (index == start || index == end - 1);
-        return AnimatedContainer(
-          duration: AppMotion.fast,
-          curve: AppMotion.emphasized,
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: isActive ? 18 : (isEdgeDot ? 4 : 6),
-          height: 4,
-          decoration: BoxDecoration(
-            color: activeColor.withValues(
-              alpha: isActive ? 0.96 : inactiveOpacity,
-            ),
-            borderRadius: BorderRadius.circular(999),
-          ),
-        );
-      }),
-    );
-  }
-}
-
-class GalleryGlassIconButton extends StatelessWidget {
-  const GalleryGlassIconButton({super.key, required this.icon});
-
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-        child: Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.3),
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.14),
-              width: 0.8,
-            ),
-            boxShadow: <BoxShadow>[
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.18),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Icon(icon, size: 22, color: Colors.white),
-        ),
-      ),
-    );
-  }
-}
-
-class _GalleryThumbnailRail extends StatelessWidget {
-  const _GalleryThumbnailRail({
-    required this.items,
-    required this.currentIndex,
-    required this.onSelect,
-  });
-
-  final List<GalleryImageItem> items;
-  final int currentIndex;
-  final ValueChanged<int> onSelect;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(
-            AppSpacing.sm,
-            AppSpacing.sm,
-            AppSpacing.sm,
-            AppSpacing.xs,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.26),
-            borderRadius: BorderRadius.circular(22),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.1),
-              width: 0.8,
-            ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                child: Text(
-                  'Photos',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white70,
-                    letterSpacing: -0.1,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 6),
-              SizedBox(
-                height: 52,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: items.length,
-                  separatorBuilder: (BuildContext context, int index) =>
-                      const SizedBox(width: AppSpacing.xs),
-                  itemBuilder: (BuildContext context, int index) {
-                    final bool isActive = index == currentIndex;
-                    return GestureDetector(
-                      onTap: () => onSelect(index),
-                      child: AnimatedContainer(
-                        duration: AppMotion.fast,
-                        curve: AppMotion.emphasized,
-                        width: isActive ? 54 : 46,
-                        padding: const EdgeInsets.all(2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isActive
-                                ? Colors.white.withValues(alpha: 0.9)
-                                : Colors.white.withValues(alpha: 0.16),
-                            width: isActive ? 1.4 : 0.9,
-                          ),
-                          boxShadow: isActive
-                              ? <BoxShadow>[
-                                  BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.18),
-                                    blurRadius: 14,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ]
-                              : const <BoxShadow>[],
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(13),
-                          child: AppSmartImage(image: items[index].image),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

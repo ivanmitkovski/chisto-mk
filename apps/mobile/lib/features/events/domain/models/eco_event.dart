@@ -1,10 +1,6 @@
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:flutter/foundation.dart';
 
-// ---------------------------------------------------------------------------
-// Event time – plain domain type replacing Flutter's TimeOfDay
-// ---------------------------------------------------------------------------
-
 class EventTime {
   const EventTime({required this.hour, required this.minute});
 
@@ -27,10 +23,6 @@ class EventTime {
   @override
   String toString() => 'EventTime($formatted)';
 }
-
-// ---------------------------------------------------------------------------
-// Event-specific categories (action type, not pollution type)
-// ---------------------------------------------------------------------------
 
 enum EcoEventCategory {
   generalCleanup(
@@ -75,10 +67,6 @@ enum EcoEventCategory {
   final int iconCodePoint;
 }
 
-// ---------------------------------------------------------------------------
-// Gear items (multi-select)
-// ---------------------------------------------------------------------------
-
 enum EventGear {
   trashBags('Trash bags', 0xf37d),
   gloves('Gloves', 0xf05c0),
@@ -94,10 +82,6 @@ enum EventGear {
   final int iconCodePoint;
 }
 
-// ---------------------------------------------------------------------------
-// Cleanup scale (single-select)
-// ---------------------------------------------------------------------------
-
 enum CleanupScale {
   small('Small (1–5 people)', 'Quick spot cleanup, one bag or two.'),
   medium('Medium (6–15 people)', 'Half-day effort, several areas covered.'),
@@ -109,10 +93,6 @@ enum CleanupScale {
   final String description;
 }
 
-// ---------------------------------------------------------------------------
-// Difficulty level (single-select)
-// ---------------------------------------------------------------------------
-
 enum EventDifficulty {
   easy('Easy', 'Flat terrain, light waste, family-friendly.', 0xFF2FD788),
   moderate('Moderate', 'Mixed terrain or bulky items, some effort.', 0xFFF5A623),
@@ -123,10 +103,6 @@ enum EventDifficulty {
   final String description;
   final int colorValue;
 }
-
-// ---------------------------------------------------------------------------
-// Event status
-// ---------------------------------------------------------------------------
 
 enum EcoEventStatus {
   upcoming('Upcoming', 0xFF2FD788),
@@ -143,10 +119,6 @@ enum AttendeeCheckInStatus {
   notCheckedIn,
   checkedIn,
 }
-
-// ---------------------------------------------------------------------------
-// EcoEvent model
-// ---------------------------------------------------------------------------
 
 class EcoEvent {
   const EcoEvent({

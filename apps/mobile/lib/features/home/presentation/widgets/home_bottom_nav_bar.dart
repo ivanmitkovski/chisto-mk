@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class HomeBottomNavBar extends StatelessWidget {
   const HomeBottomNavBar({
@@ -37,7 +39,7 @@ class HomeBottomNavBar extends StatelessWidget {
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(
-        top: Radius.circular(24),
+        top: Radius.circular(AppSpacing.radiusCard),
       ),
       child: Container(
         height: 64,
@@ -54,14 +56,14 @@ class HomeBottomNavBar extends StatelessWidget {
           ),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
+              color: AppColors.shadowLight,
               offset: const Offset(0, -2),
               blurRadius: 8,
             ),
           ],
         ),
         child: Material(
-          color: Colors.transparent,
+          color: AppColors.transparent,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
@@ -77,7 +79,7 @@ class HomeBottomNavBar extends StatelessWidget {
                 currentIndex: currentIndex,
                 onTap: onTabSelected,
               ),
-              const SizedBox(width: 64), // Visual space under central button.
+              const SizedBox(width: 64),
               _BottomNavItem(
                 config: items[2],
                 index: 2,
@@ -147,13 +149,11 @@ class _BottomNavItemState extends State<_BottomNavItem> {
               height: 26,
               colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xxs),
             Text(
               widget.config.label,
-              style: TextStyle(
-                fontSize: 11,
+              style: AppTypography.badgeLabel.copyWith(
                 height: 1.1,
-                letterSpacing: -0.2,
                 fontWeight: _isSelected ? FontWeight.w600 : FontWeight.w500,
                 color: color,
               ),

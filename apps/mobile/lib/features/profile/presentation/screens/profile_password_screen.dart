@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
@@ -63,7 +64,7 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
       _isSubmitting = true;
     });
     AppHaptics.medium();
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    await Future<void>.delayed(AppMotion.slow);
     if (!mounted) return;
 
     setState(() => _isSubmitting = false);
@@ -162,7 +163,7 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
                         padding: const EdgeInsets.all(AppSpacing.sm),
                         decoration: BoxDecoration(
                           color: AppColors.inputFill,
-                          borderRadius: BorderRadius.circular(14),
+                          borderRadius: BorderRadius.circular(AppSpacing.radius14),
                           border: Border.all(
                             color: AppColors.divider.withValues(alpha: 0.9),
                           ),
@@ -242,15 +243,15 @@ class _PasswordField extends StatelessWidget {
               vertical: AppSpacing.sm,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
               borderSide: BorderSide(color: borderColor, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
               borderSide: BorderSide(color: focusedBorderColor, width: 1.5),
             ),
             suffixIcon: IconButton(
@@ -263,7 +264,7 @@ class _PasswordField extends StatelessWidget {
           ),
         ),
         if (helperText != null) ...<Widget>[
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xxs),
           Text(
             helperText!,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(

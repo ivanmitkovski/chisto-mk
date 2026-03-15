@@ -1,16 +1,19 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/report_draft_storage.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_grid.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source_modal.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_category_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
@@ -43,10 +46,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
   bool _submitting = false;
   bool _isProcessingPhotoFlow = false;
   bool _evidenceTipDismissed = false;
-  final Set<_ReportStage> _attemptedStages = <_ReportStage>{};
-  _ReportStage _currentStage = _ReportStage.evidence;
-  _ReportStage? _highlightedStage;
+  final Set<ReportStage> _attemptedStages = <ReportStage>{};
+  ReportStage _currentStage = ReportStage.evidence;
+  ReportStage? _highlightedStage;
   bool _didAnnounceLocationStep = false;
+  String? _apiError;
 
   @override
   void initState() {
@@ -65,9 +69,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
     final ({ReportDraft draft, int stageIndex})? saved =
         await loadReportDraft();
     if (!mounted || saved == null) return;
-    final BuildContext dialogContext = context;
     final bool? resume = await showDialog<bool>(
-      context: dialogContext,
+      context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Resume draft?'),
@@ -86,7 +89,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
               },
               style: FilledButton.styleFrom(
                 backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+                foregroundColor: AppColors.white,
               ),
               child: const Text('Resume'),
             ),
@@ -95,11 +98,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
       },
     );
     if (!mounted) return;
-    if (resume == true && saved != null) {
+    if (resume == true) {
       setState(() {
         _draft = saved.draft;
         _currentStage =
-            _ReportStage.values[saved.stageIndex.clamp(0, _ReportStage.values.length - 1)];
+            ReportStage.values[saved.stageIndex.clamp(0, ReportStage.values.length - 1)];
         _descriptionController.text = _draft.description;
       });
     }
@@ -117,7 +120,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     if (!_submitting) {
       saveReportDraft(
         draft: _draft,
-        stageIndex: _ReportStage.values.indexOf(_currentStage),
+        stageIndex: ReportStage.values.indexOf(_currentStage),
       );
     }
     _descriptionController.dispose();
@@ -133,7 +136,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   bool get _canSubmit => _draft.isValid && _hasValidLocation;
 
-  int get _currentStageIndex => _ReportStage.values.indexOf(_currentStage);
+  int get _currentStageIndex => ReportStage.values.indexOf(_currentStage);
 
   Future<void> _addPhoto() async {
     if (_draft.photos.length >= 5 || _isProcessingPhotoFlow) return;
@@ -179,8 +182,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
               context: context,
               isScrollControlled: true,
               backgroundColor: AppColors.panelBackground,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
               ),
               builder: (_) => PhotoReviewSheet(file: selectedFile),
             );
@@ -277,15 +280,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 selected: selected,
                 onSelected: (_) => _setCleanupEffort(effort),
                 selectedColor: AppColors.primary.withValues(alpha: 0.14),
-                labelStyle: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600,
+                labelStyle: AppTypography.badgeLabel.copyWith(
                   color: selected ? AppColors.primaryDark : AppColors.textSecondary,
-                  letterSpacing: -0.1,
                 ),
                 backgroundColor: AppColors.inputFill,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                   side: BorderSide(
                     color: selected
                         ? AppColors.primaryDark.withValues(alpha: 0.5)
@@ -319,34 +319,34 @@ class _NewReportScreenState extends State<NewReportScreen> {
     );
   }
 
-  bool _isStageComplete(_ReportStage stage) {
+  bool _isStageComplete(ReportStage stage) {
     switch (stage) {
-      case _ReportStage.evidence:
+      case ReportStage.evidence:
         return _draft.hasPhotos;
-      case _ReportStage.details:
+      case ReportStage.details:
         return _draft.hasCategory;
-      case _ReportStage.location:
+      case ReportStage.location:
         return _hasValidLocation;
-      case _ReportStage.review:
+      case ReportStage.review:
         return _canSubmit;
     }
   }
 
-  bool _canNavigateToStage(_ReportStage stage) {
-    final int targetIndex = _ReportStage.values.indexOf(stage);
+  bool _canNavigateToStage(ReportStage stage) {
+    final int targetIndex = ReportStage.values.indexOf(stage);
     if (targetIndex <= _currentStageIndex) {
       return true;
     }
-    if (stage == _ReportStage.details) {
+    if (stage == ReportStage.details) {
       return _draft.hasPhotos;
     }
-    if (stage == _ReportStage.location) {
+    if (stage == ReportStage.location) {
       return _draft.hasPhotos && _draft.hasCategory;
     }
     return _canSubmit;
   }
 
-  void _highlightStage(_ReportStage stage) {
+  void _highlightStage(ReportStage stage) {
     setState(() => _highlightedStage = stage);
     Future<void>.delayed(const Duration(milliseconds: 1200), () {
       if (!mounted || _highlightedStage != stage) return;
@@ -354,7 +354,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     });
   }
 
-  void _goToStage(_ReportStage stage, {bool withHaptic = true}) {
+  void _goToStage(ReportStage stage, {bool withHaptic = true}) {
     if (!_canNavigateToStage(stage)) return;
     FocusManager.instance.primaryFocus?.unfocus();
     if (withHaptic) {
@@ -363,7 +363,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     setState(() {
       _currentStage = stage;
       _highlightedStage = null;
-      if (stage != _ReportStage.location) {
+      if (stage != ReportStage.location) {
         _didAnnounceLocationStep = false;
       }
     });
@@ -371,50 +371,50 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   void _goToFirstInvalidStage() {
     if (!_draft.hasPhotos) {
-      _goToStage(_ReportStage.evidence, withHaptic: false);
-      _highlightStage(_ReportStage.evidence);
+      _goToStage(ReportStage.evidence, withHaptic: false);
+      _highlightStage(ReportStage.evidence);
       return;
     }
     if (!_draft.hasCategory) {
-      _goToStage(_ReportStage.details, withHaptic: false);
-      _highlightStage(_ReportStage.details);
+      _goToStage(ReportStage.details, withHaptic: false);
+      _highlightStage(ReportStage.details);
       return;
     }
     if (!_hasValidLocation) {
-      _goToStage(_ReportStage.location, withHaptic: false);
-      _highlightStage(_ReportStage.location);
+      _goToStage(ReportStage.location, withHaptic: false);
+      _highlightStage(ReportStage.location);
       return;
     }
   }
 
   bool _canAdvanceFromCurrentStage() {
     switch (_currentStage) {
-      case _ReportStage.evidence:
+      case ReportStage.evidence:
         return _draft.hasPhotos;
-      case _ReportStage.details:
+      case ReportStage.details:
         return _draft.hasCategory;
-      case _ReportStage.location:
+      case ReportStage.location:
         return _hasValidLocation;
-      case _ReportStage.review:
+      case ReportStage.review:
         return _canSubmit;
     }
   }
 
-  String _stageBlockingMessage(_ReportStage stage) {
+  String _stageBlockingMessage(ReportStage stage) {
     switch (stage) {
-      case _ReportStage.evidence:
+      case ReportStage.evidence:
         return 'Add at least one photo before continuing.';
-      case _ReportStage.details:
+      case ReportStage.details:
         return 'Choose a category before continuing.';
-      case _ReportStage.location:
+      case ReportStage.location:
         return 'Confirm a location inside Macedonia before continuing.';
-      case _ReportStage.review:
+      case ReportStage.review:
         return 'Finish the missing steps before submitting.';
     }
   }
 
   void _handlePrimaryAction() {
-    if (_currentStage == _ReportStage.review) {
+    if (_currentStage == ReportStage.review) {
       _submit();
       return;
     }
@@ -432,13 +432,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
       return;
     }
 
-    _goToStage(_ReportStage.values[_currentStageIndex + 1]);
+    _goToStage(ReportStage.values[_currentStageIndex + 1]);
   }
 
   Future<void> _submit() async {
     if (_submitting) return;
     setState(() {
-      _attemptedStages.addAll(_ReportStage.values);
+      _attemptedStages.addAll(ReportStage.values);
     });
 
     if (!_canSubmit) {
@@ -460,13 +460,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
     await clearReportDraft();
     if (!mounted) return;
     setState(() => _submitting = false);
-    final BuildContext submitContext = context;
-
-    final _SubmittedDialogResult? result = await showDialog<_SubmittedDialogResult>(
-      context: submitContext,
+    final SubmittedDialogResult? result = await showDialog<SubmittedDialogResult>(
+      context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return _ReportSubmittedDialog(
+        return ReportSubmittedDialog(
           categoryLabel: _draft.category?.label ?? 'Report',
           address: _draft.address,
         );
@@ -474,17 +472,17 @@ class _NewReportScreenState extends State<NewReportScreen> {
     );
 
     if (!mounted) return;
-    if (result == _SubmittedDialogResult.reportAnother) {
+    if (result == SubmittedDialogResult.reportAnother) {
       _resetDraftAndStartOver();
     } else {
-      Navigator.of(submitContext).pop(true);
+      Navigator.of(context).pop(true);
     }
   }
 
   void _resetDraftAndStartOver() {
     setState(() {
       _draft = ReportDraft();
-      _currentStage = _ReportStage.evidence;
+      _currentStage = ReportStage.evidence;
       _highlightedStage = null;
       _attemptedStages.clear();
       _submitting = false;
@@ -538,7 +536,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                         );
                       },
                   child: KeyedSubtree(
-                    key: ValueKey<_ReportStage>(_currentStage),
+                    key: ValueKey<ReportStage>(_currentStage),
                     child: _buildCurrentStage(context),
                   ),
                 ),
@@ -556,15 +554,15 @@ class _NewReportScreenState extends State<NewReportScreen> {
       children: <Widget>[
         ReportCircleIconButton(
           icon: Icons.chevron_left_rounded,
-          semanticLabel: _currentStage == _ReportStage.evidence
+          semanticLabel: _currentStage == ReportStage.evidence
               ? 'Back'
               : 'Previous step',
           onTap: () {
-            if (_currentStage == _ReportStage.evidence) {
+            if (_currentStage == ReportStage.evidence) {
               Navigator.of(context).maybePop();
               return;
             }
-            _goToStage(_ReportStage.values[_currentStageIndex - 1]);
+            _goToStage(ReportStage.values[_currentStageIndex - 1]);
           },
         ),
         const SizedBox(width: AppSpacing.md),
@@ -581,8 +579,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
           ),
         ),
         ReportStatePill(
-          label: '${_currentStageIndex + 1}/${_ReportStage.values.length}',
-          tone: _currentStage == _ReportStage.review
+          label: '${_currentStageIndex + 1}/${ReportStage.values.length}',
+          tone: _currentStage == ReportStage.review
               ? ReportSurfaceTone.success
               : ReportSurfaceTone.neutral,
         ),
@@ -594,17 +592,17 @@ class _NewReportScreenState extends State<NewReportScreen> {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(AppSpacing.xxs),
         child: Row(
-          children: _ReportStage.values.asMap().entries.map((
-            MapEntry<int, _ReportStage> entry,
+          children: ReportStage.values.asMap().entries.map((
+            MapEntry<int, ReportStage> entry,
           ) {
-            final _ReportStage stage = entry.value;
+            final ReportStage stage = entry.value;
             return Expanded(
-              child: _StageChip(
+              child: StageChip(
                 label: stage.shortLabel,
                 isCurrent: stage == _currentStage,
                 isComplete: _isStageComplete(stage),
@@ -620,12 +618,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   Widget _buildCurrentStage(BuildContext context) {
     switch (_currentStage) {
-      case _ReportStage.evidence:
+      case ReportStage.evidence:
         return _buildStageScrollView(
           context,
           child: _buildStageSurface(
             context,
-            stage: _ReportStage.evidence,
+            stage: ReportStage.evidence,
             title: 'Evidence',
             message:
                 'Start with one clear photo of the site. Add another only if it helps explain the issue.',
@@ -635,7 +633,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 if (_draft.photos.isEmpty && !_evidenceTipDismissed)
-                  _EvidenceTipCard(
+                  EvidenceTipCard(
                     onDismiss: () {
                       AppHaptics.light();
                       setState(() => _evidenceTipDismissed = true);
@@ -652,12 +650,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
             ),
           ),
         );
-      case _ReportStage.details:
+      case ReportStage.details:
         return _buildStageScrollView(
           context,
           child: _buildStageSurface(
             context,
-            stage: _ReportStage.details,
+            stage: ReportStage.details,
             title: 'Details',
             message:
                 'Pick the closest category, then add short context only if it helps moderation.',
@@ -676,12 +674,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
             ),
           ),
         );
-      case _ReportStage.location:
+      case ReportStage.location:
         if (!_hasValidLocation && !_didAnnounceLocationStep) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
             if (MediaQuery.supportsAnnounceOf(context)) {
-              SemanticsService.announce(
+              SemanticsService.sendAnnouncement(
+                View.of(context),
                 'Location. Place the pin on the site, then confirm.',
                 Directionality.of(context),
               );
@@ -693,7 +692,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
           context,
           child: _buildStageSurface(
             context,
-            stage: _ReportStage.location,
+            stage: ReportStage.location,
             title: 'Location',
             message: 'Place the pin on the site, then confirm. Stays inside Macedonia.',
             contextHint:
@@ -705,12 +704,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
             ),
           ),
         );
-      case _ReportStage.review:
+      case ReportStage.review:
         return _buildStageScrollView(
           context,
           child: _buildStageSurface(
             context,
-            stage: _ReportStage.review,
+            stage: ReportStage.review,
             title: 'Review',
             message:
                 'Check the essentials once, then send the report when it feels right.',
@@ -718,53 +717,53 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 'Give everything one last look. You can still go back and adjust before you submit.',
             child: Column(
               children: <Widget>[
-                _ReviewSummaryTile(
+                ReviewSummaryTile(
                   icon: Icons.photo_library_outlined,
                   title: 'Evidence',
                   subtitle: _draft.hasPhotos
                       ? '${_draft.photos.length} photo${_draft.photos.length == 1 ? '' : 's'} attached'
                       : 'Add at least one photo',
                   isComplete: _draft.hasPhotos,
-                  onTap: () => _goToStage(_ReportStage.evidence),
+                  onTap: () => _goToStage(ReportStage.evidence),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                _ReviewSummaryTile(
+                ReviewSummaryTile(
                   icon: _draft.category?.icon ?? Icons.category_outlined,
                   title: 'Category',
                   subtitle: _draft.category?.label ?? 'Choose the issue type',
                   isComplete: _draft.hasCategory,
-                  onTap: () => _goToStage(_ReportStage.details),
+                  onTap: () => _goToStage(ReportStage.details),
                 ),
                 const SizedBox(height: AppSpacing.sm),
-                _ReviewSummaryTile(
+                ReviewSummaryTile(
                   icon: Icons.location_on_outlined,
                   title: 'Location',
                   subtitle: _hasValidLocation
                       ? (_draft.address ?? 'Pinned location confirmed')
                       : 'Confirm the location in Macedonia',
                   isComplete: _hasValidLocation,
-                  onTap: () => _goToStage(_ReportStage.location),
+                  onTap: () => _goToStage(ReportStage.location),
                 ),
                 if (_draft.hasDescription) ...<Widget>[
                   const SizedBox(height: AppSpacing.sm),
-                  _ReviewSummaryTile(
+                  ReviewSummaryTile(
                     icon: Icons.notes_outlined,
                     title: 'Extra context',
                     subtitle: _draft.description.trim(),
                     isComplete: true,
                     isOptional: true,
-                    onTap: () => _goToStage(_ReportStage.details),
+                    onTap: () => _goToStage(ReportStage.details),
                   ),
                 ],
                 if (_draft.cleanupEffort != null) ...<Widget>[
                   const SizedBox(height: AppSpacing.sm),
-                  _ReviewSummaryTile(
+                  ReviewSummaryTile(
                     icon: Icons.group_outlined,
                     title: 'Cleanup effort',
                     subtitle: _draft.cleanupEffort!.label,
                     isComplete: true,
                     isOptional: true,
-                    onTap: () => _goToStage(_ReportStage.details),
+                    onTap: () => _goToStage(ReportStage.details),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.md),
@@ -795,7 +794,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   Widget _buildStageScrollView(BuildContext context, {required Widget child}) {
     return SingleChildScrollView(
-      key: PageStorageKey<_ReportStage>(_currentStage),
+      key: PageStorageKey<ReportStage>(_currentStage),
       padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         0,
@@ -803,13 +802,26 @@ class _NewReportScreenState extends State<NewReportScreen> {
         AppSpacing.xl,
       ),
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      child: child,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          if (_apiError != null) ...[
+            ApiErrorBanner(
+              message: _apiError!,
+              onDismiss: () => setState(() => _apiError = null),
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
+          child,
+        ],
+      ),
     );
   }
 
   Widget _buildStageSurface(
     BuildContext context, {
-    required _ReportStage stage,
+    required ReportStage stage,
     required String title,
     required String message,
     required Widget child,
@@ -823,7 +835,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
         border: Border.all(
           color: isHighlighted
               ? AppColors.accentDanger.withValues(alpha: 0.32)
@@ -831,7 +843,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
         ),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.025),
+            color: AppColors.black.withValues(alpha: 0.025),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -850,7 +862,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   letterSpacing: -0.3,
                 ),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 message,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -906,7 +918,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   Widget _buildCategoryField(BuildContext context) {
     final bool hasCategoryError =
-        _attemptedStages.contains(_ReportStage.details) && !_draft.hasCategory;
+        _attemptedStages.contains(ReportStage.details) && !_draft.hasCategory;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -990,17 +1002,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
             });
           },
           textInputAction: TextInputAction.done,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w400,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: AppColors.textPrimary,
             letterSpacing: -0.2,
           ),
           decoration: InputDecoration(
             hintText: 'Describe the pollution site…',
-            hintStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.textMuted,
               letterSpacing: -0.2,
             ),
@@ -1009,15 +1017,15 @@ class _NewReportScreenState extends State<NewReportScreen> {
             counterText: '',
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide.none,
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: const BorderSide(color: AppColors.divider, width: 1),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: const BorderSide(
                 color: AppColors.primaryDark,
                 width: 1.5,
@@ -1038,8 +1046,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
   }
 
   Widget _buildBottomBar(BuildContext context) {
-    final bool showBack = _currentStage != _ReportStage.evidence;
-    final bool isReviewStage = _currentStage == _ReportStage.review;
+    final bool showBack = _currentStage != ReportStage.evidence;
+    final bool isReviewStage = _currentStage == ReportStage.review;
 
     return Container(
       padding: EdgeInsets.fromLTRB(
@@ -1072,7 +1080,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                       onPressed: _submitting
                           ? null
                           : () => _goToStage(
-                              _ReportStage.values[_currentStageIndex - 1],
+                              ReportStage.values[_currentStageIndex - 1],
                             ),
                       style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textPrimary,
@@ -1080,15 +1088,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
                         color: AppColors.divider.withValues(alpha: 0.8),
                       ),
                       backgroundColor: AppColors.panelBackground,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
                       ),
                     ),
-                      child: const Text(
+                      child: Text(
                         'Back',
-                        style: TextStyle(
-                          fontSize: 15,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
                         ),
@@ -1110,13 +1117,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
                       onPressed: _submitting ? null : _handlePrimaryAction,
                     style: FilledButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.white,
                       disabledBackgroundColor: AppColors.primary.withValues(
                         alpha: 0.42,
                       ),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
                       ),
                     ),
                       child: Text(
@@ -1125,8 +1132,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                             : isReviewStage
                             ? 'Submit report'
                             : _currentStage.primaryActionLabel,
-                        style: const TextStyle(
-                          fontSize: 15,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
                         ),
@@ -1155,367 +1161,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-enum _ReportStage {
-  evidence(
-    'Evidence',
-    'Report a pollution site',
-    'Start with a clear photo of the site.',
-    'Evidence',
-    'Next',
-    'Start with one clear overview photo.',
-    'Required: 1+ photo',
-    'Best with 1-2 strong shots',
-  ),
-  details(
-    'Details',
-    'Describe the issue',
-    'Choose the closest category and add short context if needed.',
-    'Details',
-    'Next',
-    'Keep the description brief and factual.',
-    'Required: category',
-    'Optional: short note',
-  ),
-  location(
-    'Location',
-    'Confirm the location',
-    'Place the pin on the exact site.',
-    'Location',
-    'Next',
-    'Confirm the pin on the exact spot.',
-    'Required: confirm pin',
-    'Inside Macedonia',
-  ),
-  review(
-    'Review',
-    'Final review',
-    'Check the essentials, then submit.',
-    'Review',
-    'Submit report',
-    'Give everything one last look, then submit.',
-    'Final check',
-    null,
-  );
-
-  const _ReportStage(
-    this.eyebrow,
-    this.title,
-    this.subtitle,
-    this.shortLabel,
-    this.primaryActionLabel,
-    this.footerHint,
-    this.primaryRequirementLabel,
-    this.secondaryRequirementLabel,
-  );
-
-  final String eyebrow;
-  final String title;
-  final String subtitle;
-  final String shortLabel;
-  final String primaryActionLabel;
-  final String footerHint;
-  final String primaryRequirementLabel;
-  final String? secondaryRequirementLabel;
-}
-
-class _EvidenceTipCard extends StatelessWidget {
-  const _EvidenceTipCard({required this.onDismiss});
-
-  final VoidCallback onDismiss;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.primaryDark.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(
-            Icons.lightbulb_outline_rounded,
-            size: 20,
-            color: AppColors.primaryDark.withValues(alpha: 0.9),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              'Best: full frame of the site, good light, avoid obstructions.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.35,
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: onDismiss,
-            behavior: HitTestBehavior.opaque,
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Icon(
-                Icons.close_rounded,
-                size: 18,
-                color: AppColors.textMuted,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StageChip extends StatelessWidget {
-  const _StageChip({
-    required this.label,
-    required this.isCurrent,
-    required this.isComplete,
-    required this.isEnabled,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool isCurrent;
-  final bool isComplete;
-  final bool isEnabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color background = isCurrent
-        ? AppColors.panelBackground
-        : Colors.transparent;
-    final Color foreground = isCurrent
-        ? AppColors.textPrimary
-        : isComplete
-        ? AppColors.primaryDark
-        : AppColors.textMuted;
-
-    final String statusText = isComplete ? 'Complete' : isCurrent ? 'Current' : 'Incomplete';
-    final String hint = isEnabled ? 'Double-tap to go to $label' : 'Complete previous steps first.';
-    return Semantics(
-      button: true,
-      label: '$label step. $statusText.',
-      hint: hint,
-      child: Opacity(
-        opacity: isEnabled ? 1 : 0.55,
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: isEnabled ? onTap : null,
-            borderRadius: BorderRadius.circular(16),
-          child: AnimatedContainer(
-            duration: AppMotion.fast,
-            curve: AppMotion.emphasized,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: 10,
-            ),
-            decoration: BoxDecoration(
-              color: background,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: isCurrent
-                  ? <BoxShadow>[
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.04),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ]
-                  : const <BoxShadow>[],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (isComplete && !isCurrent) ...<Widget>[
-                  Icon(Icons.check_rounded, size: 14, color: foreground),
-                  const SizedBox(width: 4),
-                ],
-                Flexible(
-                  child: Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: foreground,
-                      letterSpacing: -0.15,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    ),
-    );
-  }
-}
-
-class _ReviewSummaryTile extends StatelessWidget {
-  const _ReviewSummaryTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.isComplete,
-    required this.onTap,
-    this.isOptional = false,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final bool isComplete;
-  final VoidCallback onTap;
-  final bool isOptional;
-
-  @override
-  Widget build(BuildContext context) {
-    final ReportSurfaceTone tone = isOptional
-        ? ReportSurfaceTone.neutral
-        : isComplete
-        ? ReportSurfaceTone.neutral
-        : ReportSurfaceTone.warning;
-
-    return ReportActionTile(
-      icon: icon,
-      title: title,
-      subtitle: subtitle,
-      tone: tone,
-      trailing: Icon(
-        isOptional
-            ? Icons.chevron_right_rounded
-            : isComplete
-            ? Icons.check_circle_outline_rounded
-            : Icons.error_outline_rounded,
-        color: isOptional
-            ? AppColors.textMuted
-            : isComplete
-            ? AppColors.primaryDark
-            : const Color(0xFFA66700),
-        size: 22,
-      ),
-      onTap: onTap,
-    );
-  }
-}
-
-enum _SubmittedDialogResult { viewReports, reportAnother }
-
-class _ReportSubmittedDialog extends StatelessWidget {
-  const _ReportSubmittedDialog({required this.categoryLabel, this.address});
-
-  final String categoryLabel;
-  final String? address;
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(28),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.14),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.check_rounded,
-                size: 28,
-                color: AppColors.primaryDark,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              'Report submitted',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.3,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              address != null && address!.trim().isNotEmpty
-                  ? '$categoryLabel has been added to your reports and is now waiting for review near $address.'
-                  : '$categoryLabel has been added to your reports and is now waiting for review.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.4,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () {
-                  AppHaptics.light();
-                  Navigator.of(context).pop(_SubmittedDialogResult.viewReports);
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
-                  ),
-                ),
-                child: const Text(
-                  'View my reports',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            TextButton(
-              onPressed: () {
-                AppHaptics.light();
-                Navigator.of(context).pop(_SubmittedDialogResult.reportAnother);
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: AppColors.textSecondary,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              child: const Text(
-                'Report another',
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

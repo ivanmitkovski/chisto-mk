@@ -8,8 +8,12 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
@@ -23,10 +27,6 @@ import 'package:chisto_mobile/features/home/presentation/widgets/map/site_previe
 import 'package:chisto_mobile/features/home/presentation/widgets/map/pollution_markers.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_overlays.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
-
-// ---------------------------------------------------------------------------
-// PollutionMapScreen
-// ---------------------------------------------------------------------------
 
 class PollutionMapScreen extends StatefulWidget {
   const PollutionMapScreen({super.key});
@@ -44,8 +44,9 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     curve: Curves.easeOutCubic,
   );
 
-  late final List<PollutionSite> _allSites;
-  late final Set<String> _activeStatuses;
+  List<PollutionSite> _allSites = <PollutionSite>[];
+  Set<String> _activeStatuses = <String>{};
+  AppError? _loadError;
   Set<String> _activePollutionTypes = <String>{};
   PollutionSite? _selectedSite;
   LatLng? _userLocation;
@@ -58,7 +59,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
 
-  // Chrome entrance animations — initialized inline so they're ready before build().
   late final AnimationController _entranceController = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 700),
@@ -100,14 +100,40 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   @override
   void initState() {
     super.initState();
-    _allSites = buildMockPollutionSites();
-    _activeStatuses =
-        _allSites.map((PollutionSite s) => s.statusLabel).toSet();
     _activePollutionTypes = _canonicalPollutionTypes.toSet();
     WidgetsBinding.instance.addPostFrameCallback((_) => _tryInitialLocate());
+    _loadSites();
     Future<void>.delayed(const Duration(milliseconds: 900), () {
       if (mounted) setState(() => _showTileLoadingOverlay = false);
     });
+  }
+
+  Future<void> _loadSites() async {
+    setState(() => _loadError = null);
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+      if (!mounted) return;
+      final List<PollutionSite> sites = buildMockPollutionSites();
+      setState(() {
+        _allSites = sites;
+        _activeStatuses = sites.map((PollutionSite s) => s.statusLabel).toSet();
+        _loadError = null;
+        _filteredSitesCache = null;
+        _filteredSitesCacheHash = 0;
+        _displayedSitesCache = null;
+        _displayedSitesFilterHashCache = -1;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loadError = AppError.network(cause: e));
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'No connection',
+          type: AppSnackType.warning,
+        );
+      }
+    }
   }
 
   /// Best practice: try to start at user's city when possible; otherwise show whole country.
@@ -250,7 +276,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     AppHaptics.light();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (BuildContext context) => MapSearchModal(
         allSites: _filteredSites,
@@ -267,7 +293,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     AppHaptics.light();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (BuildContext context) => MapFilterSheet(
         activeStatuses: Set<String>.from(_activeStatuses),
@@ -292,10 +318,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     AppHaptics.light();
   }
 
-  // -----------------------------------------------------------------------
-  // Build
-  // -----------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
@@ -310,8 +332,20 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         const BottomVignette(),
         if (_showTileLoadingOverlay)
           TileLoadingOverlay(showLoading: _showTileLoadingOverlay),
-
-        // Map actions menu — bottom-right
+        if (_loadError != null)
+          Positioned.fill(
+            child: Container(
+              color: AppColors.panelBackground,
+              alignment: Alignment.center,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                child: AppErrorView(
+                  error: _loadError!,
+                  onRetry: _loadSites,
+                ),
+              ),
+            ),
+          ),
         Positioned(
           right: AppSpacing.lg,
           bottom: AppSpacing.lg,
@@ -332,10 +366,10 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
             onZoomToFit: _handleZoomToFitAll,
             onToggleRotationLock: _toggleRotationLock,
             onLocateMe: _handleLocateMe,
+            onRefresh: _loadSites,
           ),
         ),
 
-        // Top chrome — filter (left) + search icon + compass (right)
         Positioned(
           left: AppSpacing.md,
           right: AppSpacing.md,
@@ -384,7 +418,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
           ),
         ),
 
-        // Preview sheet — compact, Apple-like, ~200px tall
         Positioned(
           left: AppSpacing.md,
           right: AppSpacing.md,
@@ -465,10 +498,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Map
-  // -----------------------------------------------------------------------
-
   Widget _buildMap() {
     return FlutterMap(
       mapController: _animatedMapController.mapController,
@@ -504,10 +533,9 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       ),
       children: <Widget>[
         TileLayer(
-          urlTemplate:
-              _useDarkTiles
-                  ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
-                  : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+          urlTemplate: _useDarkTiles
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png'
+              : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
           subdomains: const <String>['a', 'b', 'c', 'd'],
           maxNativeZoom: 20,
           userAgentPackageName: 'chisto_mobile',
@@ -527,7 +555,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
             ],
           ),
         if (_showHeatmap) _buildHeatmapLayer(),
-        if (_displayedSites.isEmpty)
+        if (_allSites.isNotEmpty && _displayedSites.isEmpty)
           EmptyFilterOverlay(
             onResetFilters: () {
               setState(() {
@@ -583,10 +611,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     );
   }
 
-  // -----------------------------------------------------------------------
-  // Clustering
-  // -----------------------------------------------------------------------
-
   int _entranceDelayMsForPoint(LatLng point, MapCamera camera) {
     final LatLng center = camera.center;
     final double dLat = (point.latitude - center.latitude).abs();
@@ -631,7 +655,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     _animatedMapController.animatedFitCamera(
       cameraFit: CameraFit.bounds(
         bounds: bounds,
-        padding: const EdgeInsets.all(64),
+        padding: const EdgeInsets.all(AppSpacing.xxl + AppSpacing.lg),
         maxZoom: 18,
         minZoom: isTightCluster ? _minZoomClusterExpand : 6,
       ),
@@ -741,10 +765,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     return markers;
   }
 
-  // -----------------------------------------------------------------------
-  // Actions
-  // -----------------------------------------------------------------------
-
   Future<void> _openSiteDetail(PollutionSite site) async {
     AppHaptics.softTransition();
     await Navigator.of(context).push<void>(
@@ -799,7 +819,6 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         zoom: 16.5.clamp(3, 18).toDouble(),
       );
 
-      // Reset the success flash after a short delay
       await Future<void>.delayed(const Duration(milliseconds: 1200));
       if (mounted) setState(() => _locationJustFound = false);
     } catch (_) {
@@ -824,7 +843,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     AppHaptics.light();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (BuildContext context) {
         return DirectionsSheet(
@@ -884,7 +903,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     _animatedMapController.animatedFitCamera(
       cameraFit: CameraFit.bounds(
         bounds: _macedoniaBounds,
-        padding: const EdgeInsets.all(48),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         maxZoom: 8,
         minZoom: 6,
       ),

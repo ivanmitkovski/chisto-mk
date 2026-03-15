@@ -81,10 +81,10 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
             ),
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(28),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.15),
+                  color: AppColors.black.withValues(alpha: 0.15),
                   blurRadius: 40,
                   offset: const Offset(0, 16),
                 ),
@@ -157,15 +157,14 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                     style: ElevatedButton.styleFrom(
                       elevation: 0,
                       backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
+                      foregroundColor: AppColors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(27),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                       ),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Open event',
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -190,7 +189,7 @@ class _CheckPainter extends CustomPainter {
     if (progress <= 0) return;
 
     final Paint paint = Paint()
-      ..color = Colors.white
+      ..color = AppColors.white
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3.5
       ..strokeCap = StrokeCap.round;

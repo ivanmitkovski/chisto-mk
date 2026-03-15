@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class AuthTextField extends StatefulWidget {
   const AuthTextField({
@@ -96,16 +99,14 @@ class _AuthTextFieldState extends State<AuthTextField> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AnimatedDefaultTextStyle(
-          duration: const Duration(milliseconds: 160),
-          curve: Curves.easeOutCubic,
-          style: TextStyle(
-            fontSize: 14.5,
-            fontWeight: FontWeight.w600,
+          duration: AppMotion.fast,
+          curve: AppMotion.emphasized,
+          style: AppTypography.pillLabel.copyWith(
             color: _isFocused ? AppColors.primaryDark : AppColors.textPrimary,
           ),
           child: Text(widget.label),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: AppSpacing.radiusSm),
         TextFormField(
           controller: widget.controller,
           focusNode: widget.focusNode,
@@ -124,20 +125,50 @@ class _AuthTextFieldState extends State<AuthTextField> {
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
           scrollPadding: const EdgeInsets.only(bottom: 120),
           cursorColor: AppColors.primaryDark,
-          style: const TextStyle(fontSize: 17, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.textPrimary,
+              ),
           decoration: InputDecoration(
             hintText: widget.hintText,
-            fillColor: _isFocused ? Colors.white : AppColors.inputFill,
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.textMuted,
+            ),
+            fillColor: _isFocused ? AppColors.panelBackground : AppColors.inputFill,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: 14,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: const BorderSide(color: AppColors.divider),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 1.5,
+              ),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: const BorderSide(color: AppColors.accentDanger),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: const BorderSide(color: AppColors.accentDanger),
+            ),
             prefixIcon: widget.prefixFixedText != null
                 ? Padding(
-                    padding: const EdgeInsets.only(left: 18, right: 8),
+                    padding: const EdgeInsets.only(
+                      left: AppSpacing.md,
+                      right: AppSpacing.sm,
+                    ),
                     child: Text(
                       widget.prefixFixedText!,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textPrimary,
+                          ),
                     ),
                   )
                 : widget.prefixIcon,
@@ -147,10 +178,10 @@ class _AuthTextFieldState extends State<AuthTextField> {
             suffixIcon: widget.obscureText
                 ? IconButton(
                     onPressed: () => setState(() => _obscured = !_obscured),
-                    splashRadius: 20,
+                    splashRadius: AppSpacing.iconMd,
                     icon: Icon(
                       _obscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                      size: 20,
+                      size: AppSpacing.iconMd,
                       color: AppColors.textMuted,
                     ),
                     tooltip: _obscured ? 'Show password' : 'Hide password',

@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source_modal.dart';
@@ -46,7 +48,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     setState(() => _isSaving = true);
     AppHaptics.light();
 
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    await Future<void>.delayed(AppMotion.slow);
     if (!mounted) return;
 
     setState(() => _isSaving = false);
@@ -126,8 +128,8 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                               onTap: _handleChangeAvatar,
                               behavior: HitTestBehavior.opaque,
                               child: Container(
-                                width: 90,
-                                height: 90,
+                                width: AppSpacing.avatarLg + AppSpacing.lg,
+                                height: AppSpacing.avatarLg + AppSpacing.lg,
                                 decoration: const BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: AppColors.inputFill,
@@ -141,7 +143,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                       )
                                     : const Icon(
                                         Icons.person_outline_rounded,
-                                        size: 42,
+                                        size: AppSpacing.iconLg + AppSpacing.md,
                                         color: AppColors.textMuted,
                                       ),
                               ),
@@ -149,10 +151,9 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                             const SizedBox(height: AppSpacing.sm),
                             TextButton(
                               onPressed: _handleChangeAvatar,
-                              child: const Text(
+                              child: Text(
                                 'Upload new image',
-                                style: TextStyle(
-                                  fontSize: 14,
+                                style: AppTypography.cardSubtitle.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.primaryDark,
                                 ),
@@ -165,10 +166,10 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                       Container(
                         decoration: BoxDecoration(
                           color: AppColors.panelBackground,
-                          borderRadius: BorderRadius.circular(18),
+                          borderRadius: BorderRadius.circular(AppSpacing.radius18),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: AppColors.shadowLight,
                               blurRadius: 10,
                               offset: const Offset(0, 4),
                             ),
@@ -226,7 +227,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                 padding: const EdgeInsets.all(AppSpacing.sm),
                                 decoration: BoxDecoration(
                                   color: AppColors.inputFill,
-                                  borderRadius: BorderRadius.circular(14),
+                                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
                                   border: Border.all(
                                     color: AppColors.divider
                                         .withValues(alpha: 0.9),
@@ -237,7 +238,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                   children: <Widget>[
                                     const Icon(
                                       Icons.info_outline_rounded,
-                                      size: 18,
+                                      size: AppSpacing.iconMd,
                                       color: AppColors.textMuted,
                                     ),
                                     const SizedBox(width: AppSpacing.xs),
@@ -278,9 +279,8 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: const TextStyle(
+      hintStyle: AppTypography.cardSubtitle.copyWith(
         fontSize: 15,
-        color: AppColors.textMuted,
       ),
       filled: true,
       fillColor: AppColors.inputFill,
@@ -289,15 +289,15 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
         vertical: AppSpacing.sm,
       ),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSpacing.radius18),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSpacing.radius18),
         borderSide: const BorderSide(color: AppColors.inputBorder, width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppSpacing.radius18),
         borderSide: const BorderSide(color: AppColors.primaryDark, width: 1.5),
       ),
     );

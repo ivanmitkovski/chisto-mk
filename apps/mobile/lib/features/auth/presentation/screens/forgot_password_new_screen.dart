@@ -1,0 +1,192 @@
+import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
+import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
+import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
+import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+
+class ForgotPasswordNewScreen extends StatefulWidget {
+  const ForgotPasswordNewScreen({super.key, required this.phoneNumber});
+
+  final String phoneNumber;
+
+  @override
+  State<ForgotPasswordNewScreen> createState() => _ForgotPasswordNewScreenState();
+}
+
+class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmController = TextEditingController();
+  final FocusNode _passwordFocus = FocusNode();
+  final FocusNode _confirmFocus = FocusNode();
+  bool _isLoading = false;
+  bool _hasSubmitted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _passwordController.addListener(_onInputChanged);
+    _confirmController.addListener(_onInputChanged);
+  }
+
+  @override
+  void dispose() {
+    _passwordController.removeListener(_onInputChanged);
+    _confirmController.removeListener(_onInputChanged);
+    _passwordFocus.dispose();
+    _confirmFocus.dispose();
+    _passwordController.dispose();
+    _confirmController.dispose();
+    super.dispose();
+  }
+
+  void _onInputChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+
+  bool get _canSubmit {
+    return _passwordController.text.trim().isNotEmpty &&
+        _confirmController.text.trim().isNotEmpty;
+  }
+
+  Future<void> _handleReset() async {
+    if (_isLoading) return;
+    final FormState? formState = _formKey.currentState;
+    setState(() => _hasSubmitted = true);
+    if (formState == null || !formState.validate()) {
+      AppHaptics.tap();
+      return;
+    }
+
+    AppHaptics.light();
+    setState(() => _isLoading = true);
+    await Future<void>.delayed(AppMotion.slow);
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+    AppHaptics.success();
+
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.forgotPasswordSuccess,
+      (Route<dynamic> route) => route.settings.name == AppRoutes.signIn,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        AuthShell(
+          header: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Tooltip(
+                message: 'Go back',
+                child: AppBackButton(),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Create new password',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Enter a new password for your account',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+          body: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final double keyboardInset =
+                  MediaQuery.viewInsetsOf(context).bottom;
+
+              return SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.xl,
+                  AppSpacing.lg,
+                  AppSpacing.lg + keyboardInset,
+                ),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - AppSpacing.xl,
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    autovalidateMode: _hasSubmitted
+                        ? AutovalidateMode.onUserInteraction
+                        : AutovalidateMode.disabled,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        AuthTextField(
+                          label: 'New password',
+                          controller: _passwordController,
+                          focusNode: _passwordFocus,
+                          hintText: 'At least 8 characters',
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          textInputAction: TextInputAction.next,
+                          validator: InputValidators.validatePassword,
+                          autofillHints: const <String>[
+                            AutofillHints.newPassword,
+                          ],
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onFieldSubmitted: (_) =>
+                              _confirmFocus.requestFocus(),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        AuthTextField(
+                          label: 'Confirm password',
+                          controller: _confirmController,
+                          focusNode: _confirmFocus,
+                          hintText: 'Re-enter your password',
+                          obscureText: true,
+                          keyboardType: TextInputType.visiblePassword,
+                          textInputAction: TextInputAction.done,
+                          validator: InputValidators.validateConfirmPassword(
+                            _passwordController.text.trim(),
+                          ),
+                          autofillHints: const <String>[
+                            AutofillHints.newPassword,
+                          ],
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onFieldSubmitted: (_) => _handleReset(),
+                        ),
+                        const SizedBox(height: AppSpacing.radius22),
+                        PrimaryButton(
+                          label: 'Reset password',
+                          enabled: _canSubmit && !_isLoading,
+                          onPressed: _isLoading ? null : _handleReset,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        LoadingOverlay(visible: _isLoading),
+      ],
+    );
+  }
+}

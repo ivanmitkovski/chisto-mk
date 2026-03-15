@@ -183,7 +183,7 @@ class _EventCalendarState extends State<EventCalendar> {
 
   Widget _buildWeekRow(BuildContext context, List<DateTime?> week) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs / 2),
       child: Row(
         children: week.map((DateTime? date) {
           if (date == null) {
@@ -213,11 +213,11 @@ class _EventCalendarState extends State<EventCalendar> {
                   duration: AppMotion.fast,
                   curve: AppMotion.emphasized,
                   height: 40,
-                  margin: const EdgeInsets.all(2),
+                  margin: const EdgeInsets.all(AppSpacing.xxs / 2),
                   decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.primary
-                        : Colors.transparent,
+                        : AppColors.transparent,
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
@@ -250,7 +250,7 @@ class _EventCalendarState extends State<EventCalendar> {
     required bool isToday,
     required bool isPast,
   }) {
-    if (isSelected) return Colors.white;
+    if (isSelected) return AppColors.white;
     if (!inMonth) return AppColors.textMuted.withValues(alpha: 0.35);
     if (isToday) return AppColors.primaryDark;
     if (isPast) return AppColors.textMuted.withValues(alpha: 0.5);

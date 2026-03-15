@@ -30,9 +30,9 @@ class TopVignette extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: <Color>[
-                Colors.black.withValues(alpha: 0.18),
-                Colors.black.withValues(alpha: 0.06),
-                Colors.transparent,
+                AppColors.black.withValues(alpha: 0.18),
+                AppColors.black.withValues(alpha: 0.06),
+                AppColors.transparent,
               ],
               stops: const <double>[0, 0.5, 1],
             ),
@@ -66,8 +66,8 @@ class BottomVignette extends StatelessWidget {
               begin: Alignment.bottomCenter,
               end: Alignment.topCenter,
               colors: <Color>[
-                Colors.black.withValues(alpha: 0.10),
-                Colors.transparent,
+                AppColors.black.withValues(alpha: 0.10),
+                AppColors.transparent,
               ],
             ),
           ),
@@ -139,17 +139,17 @@ class EmptyFilterOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
             margin: const EdgeInsets.all(AppSpacing.lg),
             padding: const EdgeInsets.all(AppSpacing.xl),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(16),
+              color: AppColors.white.withValues(alpha: 0.9),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.7),
+                color: AppColors.white.withValues(alpha: 0.7),
               ),
             ),
             child: Column(

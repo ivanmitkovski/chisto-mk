@@ -22,7 +22,7 @@ class FeedHeader extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(
           AppSpacing.lg,
           AppSpacing.lg,
-          AppSpacing.lg - 4,
+          AppSpacing.lg - AppSpacing.xxs,
           AppSpacing.md,
         ),
         child: Row(
@@ -68,7 +68,7 @@ class FeedHeader extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 3),
+                  const SizedBox(height: AppSpacing.xxs),
                   Text(
                     'Explore pollution sites near you',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(

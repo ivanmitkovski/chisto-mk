@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
@@ -52,8 +54,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     HapticFeedback.lightImpact();
     if (_activePage < _slides.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 360),
-        curve: Curves.easeOutCubic,
+        duration: AppMotion.standard,
+        curve: AppMotion.emphasized,
       );
       return;
     }
@@ -87,8 +89,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: <Color>[
-                          Colors.transparent,
-                          Colors.white.withValues(alpha: 0.14),
+                          AppColors.transparent,
+                          AppColors.white.withValues(alpha: 0.14),
                         ],
                       ),
                     ),
@@ -104,24 +106,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   color: AppColors.panelBackground,
                   border: Border(
                     top: BorderSide(
-                      color: Color(0xFFE9EBF1),
+                      color: AppColors.divider,
                       width: 1,
                     ),
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(24, 8, 24, (systemPadding.bottom + 10).clamp(14, 26)),
+                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.radiusSm, AppSpacing.lg, (systemPadding.bottom + AppSpacing.radius10).clamp(AppSpacing.radius14, AppSpacing.radius22)),
                   child: Column(
                     children: [
                       Container(
-                        width: 38,
-                        height: 4,
+                        width: AppSpacing.sheetHandle,
+                        height: AppSpacing.sheetHandleHeight,
                         decoration: BoxDecoration(
                           color: AppColors.divider,
-                          borderRadius: BorderRadius.circular(99),
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.radiusSm),
                       Expanded(
                         child: PageView.builder(
                           controller: _pageController,
@@ -143,25 +145,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 6),
+                      const SizedBox(height: AppSpacing.xs),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List<Widget>.generate(
                           _slides.length,
                           (int index) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 220),
-                            curve: Curves.easeOutCubic,
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: _activePage == index ? 18 : 6,
-                            height: 6,
+                            duration: AppMotion.medium,
+                            curve: AppMotion.emphasized,
+                            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                            width: _activePage == index ? AppSpacing.radius18 : AppSpacing.xs,
+                            height: AppSpacing.xs,
                             decoration: BoxDecoration(
                               color: _activePage == index ? AppColors.primary : AppColors.divider,
-                              borderRadius: BorderRadius.circular(99),
+                              borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
                             ),
                           ),
                         ),
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: AppSpacing.radius14),
                       PrimaryButton(
                         label: _activePage == _slides.length - 1 ? 'Get Started' : 'Continue',
                         onPressed: _onContinueTap,
@@ -197,7 +199,7 @@ class _OnboardingSlide extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         final bool compact = constraints.maxHeight < 96;
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -208,27 +210,21 @@ class _OnboardingSlide extends StatelessWidget {
                     children: [
                       Text(
                         'Welcome to',
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
+                        style: AppTypography.authHeadline.copyWith(
                           fontSize: compact ? 20 : 22,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.radiusSm),
                       SvgPicture.asset(
                         AppAssets.brandLogoGreenBlack,
                         width: compact ? 84 : 90,
                         height: compact ? 24 : 26,
                         fit: BoxFit.contain,
                       ),
-                      const Text(
+                      Text(
                         ' Chisto.mk',
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
+                        style: AppTypography.authHeadline.copyWith(
                           fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.2,
                         ),
                       ),
                     ],
@@ -238,6 +234,8 @@ class _OnboardingSlide extends StatelessWidget {
                 Text(
                   title,
                   textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: AppTypography.authHeadline.copyWith(
                     fontSize: compact ? 24 : 26,
                   ),
@@ -253,15 +251,13 @@ class _OnboardingSlide extends StatelessWidget {
                 ),
               ),
               if (!compact) ...<Widget>[
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xxs),
                 Text(
                   supporting,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppColors.textMuted,
+                  style: AppTypography.cardSubtitle.copyWith(
                     height: 1.35,
                   ),
                 ),

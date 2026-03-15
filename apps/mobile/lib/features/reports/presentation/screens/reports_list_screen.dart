@@ -1,138 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/evidence_carousel.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
 import 'package:flutter/material.dart';
-
-enum _ReportStatus {
-  underReview('Under review', Color(0xFFF5A623), Color(0xFFFFF8EC)),
-  approved('Approved', Color(0xFF2FD788), Color(0xFFEDFFF6)),
-  declined('Declined', Color(0xFFE6513D), Color(0xFFFFF0EE)),
-  alreadyReported('Already reported', Color(0xFF5B8DEF), Color(0xFFEDF3FF));
-
-  const _ReportStatus(this.label, this.color, this.background);
-  final String label;
-  final Color color;
-  final Color background;
-}
-
-class _MockReport {
-  const _MockReport({
-    required this.title,
-    required this.description,
-    required this.status,
-    required this.score,
-    required this.category,
-    this.address,
-    this.declineReason,
-    this.evidenceImagePaths,
-    this.cleanupEffort,
-    required this.createdAt,
-  });
-
-  final String title;
-  final String description;
-  final _ReportStatus status;
-  final int score;
-  final ReportCategory category;
-  final String? address;
-  final String? declineReason;
-  final List<String>? evidenceImagePaths;
-  final CleanupEffort? cleanupEffort;
-  final DateTime createdAt;
-}
-
-final List<_MockReport> _seedReportsCatalog = <_MockReport>[
-  _MockReport(
-    title: 'Illegal dump near river',
-    description:
-        'Large pile of mixed waste accumulating near the Vardar riverbank.',
-    status: _ReportStatus.underReview,
-    score: 0,
-    category: ReportCategory.illegalLandfill,
-    address: 'Vardar riverbank, Skopje',
-    createdAt: DateTime.now().subtract(const Duration(days: 2)),
-  ),
-  _MockReport(
-    title: 'Construction debris on road',
-    description:
-        'Broken bricks and concrete blocking the sidewalk on main street.',
-    status: _ReportStatus.approved,
-    score: 50,
-    category: ReportCategory.industrialWaste,
-    address: 'Main St. 15, Skopje',
-    createdAt: DateTime.now().subtract(const Duration(days: 5)),
-  ),
-  _MockReport(
-    title: 'Tire dump behind factory',
-    description:
-        'Dozens of old tires piled up behind the abandoned textile factory.',
-    status: _ReportStatus.declined,
-    score: 0,
-    category: ReportCategory.illegalLandfill,
-    address: 'Industrial zone, Kumanovo',
-    declineReason: 'Duplicate report — already tracked under site #42.',
-    createdAt: DateTime.now().subtract(const Duration(days: 8)),
-  ),
-  _MockReport(
-    title: 'Plastic waste in park',
-    description:
-        'Scattered plastic bags and bottles around the central park benches.',
-    status: _ReportStatus.alreadyReported,
-    score: 0,
-    category: ReportCategory.other,
-    address: 'City Park, Bitola',
-    createdAt: DateTime.now().subtract(const Duration(days: 12)),
-  ),
-];
-
-class ReportsListMockStore {
-  const ReportsListMockStore._();
-
-  static final ValueNotifier<int> changes = ValueNotifier<int>(0);
-  static final List<_MockReport> _submittedReports = <_MockReport>[];
-
-  static List<_MockReport> get _reports => <_MockReport>[
-    ..._submittedReports,
-    ..._seedReportsCatalog,
-  ];
-
-  static void addSubmittedDraft(ReportDraft draft) {
-    final ReportCategory category = draft.category ?? ReportCategory.other;
-    final String trimmedDescription = draft.description.trim();
-    final String? trimmedAddress = draft.address?.trim();
-
-    _submittedReports.insert(
-      0,
-      _MockReport(
-        title: '${category.label} report',
-        description: trimmedDescription.isNotEmpty
-            ? trimmedDescription
-            : 'Citizen report awaiting moderation and site review.',
-        status: _ReportStatus.underReview,
-        score: 0,
-        category: category,
-        address: trimmedAddress != null && trimmedAddress.isNotEmpty
-            ? trimmedAddress
-            : 'Pinned location in Macedonia',
-        evidenceImagePaths:
-            draft.photos.map((XFile file) => file.path).toList(),
-        cleanupEffort: draft.cleanupEffort,
-        createdAt: DateTime.now(),
-      ),
-    );
-    changes.value++;
-  }
-}
 
 class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({super.key});
@@ -146,7 +24,8 @@ class _ReportsListScreenState extends State<ReportsListScreen>
   static const Duration _searchDebounceDuration = Duration(milliseconds: 220);
 
   bool _isLoading = true;
-  _ReportStatus? _statusFilter;
+  AppError? _loadError;
+  ReportStatus? _statusFilter;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
@@ -160,7 +39,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return normalized.split(' ').where((String s) => s.isNotEmpty).toList();
   }
 
-  bool _reportMatchesQuery(_MockReport r, List<String> tokens) {
+  bool _reportMatchesQuery(MockReport r, List<String> tokens) {
     final String title = r.title.toLowerCase();
     final String desc = r.description.toLowerCase();
     final String address = (r.address ?? '').toLowerCase();
@@ -179,7 +58,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return true;
   }
 
-  int _reportSearchScore(_MockReport r, List<String> tokens) {
+  int _reportSearchScore(MockReport r, List<String> tokens) {
     final String title = r.title.toLowerCase();
     final String address = (r.address ?? '').toLowerCase();
     final String category = r.category.label.toLowerCase();
@@ -194,16 +73,16 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return score;
   }
 
-  List<_MockReport> get _filteredReports {
-    List<_MockReport> list = _reports;
+  List<MockReport> get _filteredReports {
+    List<MockReport> list = _reports;
     if (_statusFilter != null) {
-      list = list.where((_MockReport r) => r.status == _statusFilter!).toList();
+      list = list.where((MockReport r) => r.status == _statusFilter!).toList();
     }
     final List<String> tokens = _searchTokens(_searchQuery);
     if (tokens.isEmpty) return list;
-    list = list.where((_MockReport r) => _reportMatchesQuery(r, tokens)).toList();
-    list = List<_MockReport>.from(list)
-      ..sort((_MockReport a, _MockReport b) {
+    list = list.where((MockReport r) => _reportMatchesQuery(r, tokens)).toList();
+    list = List<MockReport>.from(list)
+      ..sort((MockReport a, MockReport b) {
         final int scoreA = _reportSearchScore(a, tokens);
         final int scoreB = _reportSearchScore(b, tokens);
         return scoreB.compareTo(scoreA);
@@ -211,7 +90,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return list;
   }
 
-  List<_MockReport> get _reports => ReportsListMockStore._reports;
+  List<MockReport> get _reports => ReportsListMockStore.reports;
 
   @override
   void initState() {
@@ -223,11 +102,36 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     );
     _searchController.addListener(_onSearchChanged);
     _searchQuery = _searchController.text.trim();
-    Future<void>.delayed(const Duration(milliseconds: 400), () {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      _entranceController?.forward();
+    _loadReports();
+  }
+
+  Future<void> _loadReports() async {
+    setState(() {
+      _loadError = null;
+      _isLoading = true;
     });
+    try {
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _loadError = null;
+      });
+      _entranceController?.forward();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = AppError.network(cause: e);
+        _isLoading = false;
+      });
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'No connection',
+          type: AppSnackType.warning,
+        );
+      }
+    }
   }
 
   void _onSearchChanged() {
@@ -260,19 +164,16 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
-    await Future<void>.delayed(const Duration(milliseconds: 600));
-    if (mounted) {
-      setState(() {});
-    }
+    await _loadReports();
   }
 
-  void _openReportDetail(_MockReport report) {
+  void _openReportDetail(MockReport report) {
     AppHaptics.softTransition();
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) => _ReportDetailSheet(report: report),
+      backgroundColor: AppColors.transparent,
+      builder: (BuildContext context) => ReportDetailSheet(report: report),
     );
   }
 
@@ -287,7 +188,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final List<_MockReport> filteredReports = _filteredReports;
+    final List<MockReport> filteredReports = _filteredReports;
     return SafeArea(
       bottom: false,
       child: RefreshIndicator(
@@ -302,9 +203,17 @@ class _ReportsListScreenState extends State<ReportsListScreen>
           slivers: <Widget>[
             SliverToBoxAdapter(child: _buildHeader(context)),
             SliverToBoxAdapter(child: _buildSearchBar(context)),
-            if (!_isLoading && _reports.isNotEmpty)
+            if (!_isLoading && _loadError == null && _reports.isNotEmpty)
               SliverToBoxAdapter(child: _buildStatusFilter(context)),
-            if (_isLoading)
+            if (_loadError != null)
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: AppErrorView(
+                  error: _loadError!,
+                  onRetry: _loadReports,
+                ),
+              )
+            else if (_isLoading)
               const SliverFillRemaining(
                 hasScrollBody: false,
                 child: Center(
@@ -333,9 +242,9 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                     if (index >= filteredReports.length) {
                       return const SizedBox.shrink();
                     }
-                    final _MockReport report = filteredReports[index];
+                    final MockReport report = filteredReports[index];
                     final AnimationController? controller = _entranceController;
-                    final Widget card = _ReportCard(
+                    final Widget card = ReportCard(
                       report: report,
                       onTap: () => _openReportDetail(report),
                       formatDate: _formatDate,
@@ -403,7 +312,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     final int totalReports = _reports.length;
     final int underReviewCount = _reports
         .where(
-          (_MockReport report) => report.status == _ReportStatus.underReview,
+          (MockReport report) => report.status == ReportStatus.underReview,
         )
         .length;
 
@@ -464,7 +373,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   Widget _buildSearchBar(BuildContext context) {
     final bool hasSearchText = _searchController.text.isNotEmpty;
-    final List<_MockReport> filtered = _filteredReports;
+    final List<MockReport> filtered = _filteredReports;
     final String resultLabel = _searchQuery.isEmpty
         ? ''
         : filtered.isEmpty
@@ -485,8 +394,8 @@ class _ReportsListScreenState extends State<ReportsListScreen>
         hint: 'Search by title, location, category, or status. $resultLabel'.trim(),
         child: Container(
           height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          decoration: const BoxDecoration(), // transparent, no border
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius14),
+          decoration: const BoxDecoration(),
           child: Row(
             children: <Widget>[
               Icon(
@@ -494,26 +403,22 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                 size: 20,
                 color: AppColors.textMuted.withValues(alpha: 0.8),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: TextField(
                   controller: _searchController,
                   focusNode: _searchFocusNode,
                   decoration: InputDecoration(
                     hintText: 'Search your reports',
-                    hintStyle: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
+                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted.withValues(alpha: 0.9),
                       letterSpacing: -0.3,
                     ),
                     border: InputBorder.none,
-                    contentPadding: const EdgeInsets.fromLTRB(8, 12, 8, 12),
+                    contentPadding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
                     isDense: true,
                   ),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.textPrimary,
                     letterSpacing: -0.3,
                   ),
@@ -537,7 +442,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                   },
                   behavior: HitTestBehavior.opaque,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 6),
+                    padding: const EdgeInsets.only(left: AppSpacing.xs),
                     child: Icon(
                       Icons.close_rounded,
                       size: 18,
@@ -578,7 +483,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Row(
           children: <Widget>[
-            _FilterChip(
+            ReportFilterChip(
               label: 'All',
               selected: _statusFilter == null,
               onTap: () {
@@ -593,11 +498,11 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                 }
               },
             ),
-            const SizedBox(width: 8),
-            ..._ReportStatus.values.map(
-              (_ReportStatus status) => Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _FilterChip(
+            const SizedBox(width: AppSpacing.sm),
+            ...ReportStatus.values.map(
+              (ReportStatus status) => Padding(
+                padding: const EdgeInsets.only(right: AppSpacing.sm),
+                child: ReportFilterChip(
                   label: status.label,
                   selected: _statusFilter == status,
                   onTap: () {
@@ -662,7 +567,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
           if (hasSearch) ...[
             const SizedBox(height: AppSpacing.lg),
             Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
                   AppHaptics.tap();
@@ -671,11 +576,11 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                   _searchFocusNode.unfocus();
                   setState(() => _searchQuery = '');
                 },
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
-                    vertical: 10,
+                    vertical: AppSpacing.xs,
                   ),
                   child: Text(
                     'Clear search',
@@ -705,7 +610,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
             height: 64,
             decoration: BoxDecoration(
               color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
             ),
             child: const Icon(
               Icons.description_outlined,
@@ -730,541 +635,6 @@ class _ReportsListScreenState extends State<ReportsListScreen>
               height: 1.4,
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  const _FilterChip({
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
-
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '$label filter${selected ? ' selected' : ''}',
-      hint: 'Double-tap to filter reports by $label.',
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(20),
-          child: AnimatedContainer(
-            duration: AppMotion.medium,
-            curve: AppMotion.emphasized,
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(
-              color: selected ? AppColors.primary : AppColors.inputFill,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: selected ? AppColors.primary : AppColors.divider,
-                width: 0.5,
-              ),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: selected ? Colors.white : AppColors.textSecondary,
-                letterSpacing: -0.2,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ReportCard extends StatelessWidget {
-  const _ReportCard({
-    required this.report,
-    required this.onTap,
-    required this.formatDate,
-  });
-
-  final _MockReport report;
-  final VoidCallback onTap;
-  final String Function(DateTime) formatDate;
-
-  @override
-  Widget build(BuildContext context) {
-    final List<String> evidencePaths = report.evidenceImagePaths ?? const <String>[];
-    final bool hasEvidenceImage =
-        evidencePaths.isNotEmpty && File(evidencePaths.first).existsSync();
-
-    return Semantics(
-      button: true,
-      label: '${report.title}. ${report.status.label}. Tap to view details.',
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            child: Ink(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              decoration: BoxDecoration(
-                color: AppColors.panelBackground,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.divider, width: 0.5),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: SizedBox(
-                          width: 72,
-                          height: 72,
-                          child: hasEvidenceImage
-                              ? Stack(
-                                  fit: StackFit.expand,
-                                  children: <Widget>[
-                                    AppSmartImage(
-                                      image: FileImage(
-                                        File(evidencePaths.first),
-                                      ),
-                                    ),
-                                    DecoratedBox(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: <Color>[
-                                            Colors.black.withValues(
-                                              alpha: 0.05,
-                                            ),
-                                            Colors.black.withValues(
-                                              alpha: 0.24,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : Container(
-                                  color: AppColors.primary.withValues(
-                                    alpha: 0.08,
-                                  ),
-                                  child: Icon(
-                                    report.category.icon,
-                                    size: 28,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Expanded(
-                                  child: Wrap(
-                                    spacing: 6,
-                                    runSpacing: 6,
-                                    crossAxisAlignment:
-                                        WrapCrossAlignment.center,
-                                    children: <Widget>[
-                                      _StatusBadge(status: report.status),
-                                      Text(
-                                        formatDate(report.createdAt),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: AppColors.textMuted,
-                                              fontSize: 12,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.xs),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    if (report.score > 0)
-                                      Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          Icon(
-                                            Icons.emoji_events_rounded,
-                                            size: 18,
-                                            color: const Color(0xFFF5A623),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          Text(
-                                            '+${report.score}',
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w700,
-                                              color: Color(0xFFF5A623),
-                                              letterSpacing: -0.2,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    Icon(
-                                      Icons.chevron_right_rounded,
-                                      size: 22,
-                                      color: AppColors.textMuted,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            if (hasEvidenceImage)
-                              const ReportStatePill(
-                                label: 'Photo attached',
-                                icon: Icons.image_outlined,
-                                tone: ReportSurfaceTone.neutral,
-                              ),
-                            if (hasEvidenceImage) const SizedBox(height: 6),
-                            Text(
-                              report.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodyMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: -0.2,
-                                  ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              report.description,
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    height: 1.3,
-                                  ),
-                            ),
-                            if (report.address != null &&
-                                report.address!.isNotEmpty) ...[
-                              const SizedBox(height: 4),
-                              Row(
-                                children: <Widget>[
-                                  Icon(
-                                    Icons.location_on_outlined,
-                                    size: 14,
-                                    color: AppColors.textMuted,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      report.address!,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppColors.textMuted,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (report.declineReason != null) ...<Widget>[
-                    const SizedBox(height: AppSpacing.sm),
-                    ReportInfoBanner(
-                      title: 'Review note',
-                      message: report.declineReason!,
-                      icon: Icons.info_outline_rounded,
-                      tone: ReportSurfaceTone.warning,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatusBadge extends StatelessWidget {
-  const _StatusBadge({required this.status});
-
-  final _ReportStatus status;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: status.background,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: 7,
-            height: 7,
-            decoration: BoxDecoration(
-              color: status.color,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            status.label,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: status.color,
-              letterSpacing: -0.1,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ReportDetailSheet extends StatelessWidget {
-  const _ReportDetailSheet({required this.report});
-
-  final _MockReport report;
-
-  static String _formatDateFull(DateTime d) {
-    const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final List<String> evidencePaths = report.evidenceImagePaths ?? const <String>[];
-    final bool hasEvidenceImage =
-        evidencePaths.isNotEmpty && File(evidencePaths.first).existsSync();
-
-    return ReportSheetScaffold(
-      title: 'Report details',
-      subtitle: 'See what you submitted and how moderators handled this report.',
-      trailing: ReportCircleIconButton(
-        icon: Icons.close_rounded,
-        semanticLabel: 'Close',
-        onTap: () {
-          AppHaptics.tap();
-          Navigator.of(context).pop();
-        },
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            if (hasEvidenceImage) ...<Widget>[
-              EvidenceCarousel(photoPaths: evidencePaths),
-              const SizedBox(height: AppSpacing.md),
-            ],
-            Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.xs,
-              children: <Widget>[
-                _StatusBadge(status: report.status),
-                ReportStatePill(
-                  label: _formatDateFull(report.createdAt),
-                  icon: Icons.schedule_rounded,
-                  tone: ReportSurfaceTone.neutral,
-                ),
-                if (hasEvidenceImage)
-                  const ReportStatePill(
-                    label: 'Photo attached',
-                    icon: Icons.image_outlined,
-                    tone: ReportSurfaceTone.accent,
-                  ),
-              ],
-            ),
-            const SizedBox(height: AppSpacing.md),
-            _DetailRow(
-              icon: report.category.icon,
-              label: 'Category',
-              child: Text(
-                report.category.label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.2,
-                    ),
-              ),
-            ),
-            if (report.cleanupEffort != null)
-              _DetailRow(
-                icon: Icons.groups_2_outlined,
-                label: 'Cleanup effort',
-                child: Text(
-                  report.cleanupEffort!.label,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.2,
-                      ),
-                ),
-              ),
-            if (report.score > 0)
-              _DetailRow(
-                icon: Icons.emoji_events_rounded,
-                label: 'Points',
-                child: Text(
-                  '+${report.score}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFFF5A623),
-                  ),
-                ),
-              ),
-            if (report.address != null && report.address!.isNotEmpty)
-              _DetailRow(
-                icon: Icons.location_on_outlined,
-                label: 'Location',
-                child: Text(
-                  report.address!,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        letterSpacing: -0.2,
-                      ),
-                ),
-              ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              report.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.25,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              report.description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Divider(color: AppColors.divider.withValues(alpha: 0.7), height: 1),
-            const SizedBox(height: AppSpacing.lg),
-            ReportInfoBanner(
-              title: report.status == _ReportStatus.underReview
-                  ? 'Under review by moderators'
-                  : report.status == _ReportStatus.approved
-                      ? 'Approved and linked to a site'
-                      : report.status == _ReportStatus.alreadyReported
-                          ? 'Already tracked as an existing site'
-                          : 'Review outcome',
-              icon: report.status == _ReportStatus.approved
-                  ? Icons.verified_outlined
-                  : report.status == _ReportStatus.declined
-                      ? Icons.info_outline_rounded
-                      : Icons.schedule_rounded,
-              tone: report.status == _ReportStatus.approved
-                  ? ReportSurfaceTone.success
-                  : report.status == _ReportStatus.declined
-                      ? ReportSurfaceTone.danger
-                      : report.status == _ReportStatus.alreadyReported
-                          ? ReportSurfaceTone.warning
-                          : ReportSurfaceTone.neutral,
-              message: report.status == _ReportStatus.underReview
-                  ? 'Moderators are checking your evidence and location before they decide how to handle this report.'
-                  : report.status == _ReportStatus.approved
-                      ? 'This report helped confirm a public pollution site and may contribute to cleanup actions.'
-                      : report.status == _ReportStatus.alreadyReported
-                          ? 'Your report matched an existing site. The evidence is still useful for understanding the problem.'
-                          : report.declineReason ??
-                              'This report could not be approved in its current form.',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({
-    required this.icon,
-    required this.label,
-    required this.child,
-  });
-
-  final IconData icon;
-  final String label;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(icon, size: 20, color: AppColors.textMuted),
-          const SizedBox(width: AppSpacing.sm),
-          SizedBox(
-            width: 96,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textMuted,
-                  ),
-            ),
-          ),
-          Expanded(child: child),
         ],
       ),
     );

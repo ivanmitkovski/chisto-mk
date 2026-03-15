@@ -36,7 +36,7 @@ class EventsFilterChips extends StatelessWidget {
             selected: isActive,
             label: '${filter.label} events filter',
             child: Material(
-              color: Colors.transparent,
+              color: AppColors.transparent,
               child: InkWell(
                 onTap: () {
                   if (filter != active) {
@@ -44,17 +44,20 @@ class EventsFilterChips extends StatelessWidget {
                     onSelected(filter);
                   }
                 },
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 child: AnimatedContainer(
                   duration: AppMotion.fast,
                   curve: AppMotion.emphasized,
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.radiusSm,
+                      ),
                   decoration: BoxDecoration(
                     color: isActive
                         ? AppColors.primary.withValues(alpha: 0.12)
                         : AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                     border: Border.all(
                       color: isActive ? AppColors.primary : AppColors.divider,
                       width: 1.2,

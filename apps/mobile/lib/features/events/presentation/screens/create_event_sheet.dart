@@ -16,6 +16,7 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_widgets.dart';
 
 class CreateEventSheet extends StatefulWidget {
   const CreateEventSheet({
@@ -157,10 +158,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Modal pickers
-  // ---------------------------------------------------------------------------
-
   void _showSitePicker() {
     AppHaptics.tap();
     final List<EventSiteSummary> allSites = EventSiteResolver.allSites()
@@ -169,7 +166,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     showCupertinoModalPopup<void>(
       context: context,
       builder: (BuildContext ctx) {
-        return _SitePickerSheet(
+        return SitePickerSheet(
           allSites: allSites,
           selectedSiteId: _selectedSite?.id,
           onSelect: (EventSiteSummary site) {
@@ -265,7 +262,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.textPrimary,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(26),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
                     ),
                   ),
                   child: Text(
@@ -441,10 +438,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
@@ -470,7 +463,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(2),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                     child: LinearProgressIndicator(
                       value: steps / 5,
                       minHeight: 4,
@@ -507,10 +500,10 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   Center(
                     child: Container(
                       width: 40,
-                      height: 4,
+                      height: AppSpacing.sheetHandleHeight,
                       decoration: BoxDecoration(
                         color: AppColors.textPrimary,
-                        borderRadius: BorderRadius.circular(2),
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
                       ),
                     ),
                   ),
@@ -584,10 +577,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // App bar
-  // ---------------------------------------------------------------------------
-
   Widget _buildAppBar(BuildContext context, double topPadding) {
     return Container(
       color: AppColors.appBackground,
@@ -637,10 +626,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Site card
-  // ---------------------------------------------------------------------------
-
   Widget _buildSiteCard(BuildContext context) {
     final EventSiteSummary? site = _selectedSite;
     final bool hasError = _showValidationErrors && site == null;
@@ -667,7 +652,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               color: hasError
                   ? AppColors.accentDanger.withValues(alpha: 0.04)
                   : AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(18),
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
               border: Border.all(
                 color: hasError
                     ? AppColors.accentDanger
@@ -681,10 +666,10 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               children: <Widget>[
                 Container(
                   width: 44,
-                  height: 44,
+                  height: AppSpacing.avatarMd,
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(14),
+                    borderRadius: BorderRadius.circular(AppSpacing.radius14),
                   ),
                   child: const Icon(
                     CupertinoIcons.location_solid,
@@ -705,7 +690,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                                   : AppColors.textPrimary,
                             ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         site == null
                             ? 'Every event should be anchored to one cleanup location.'
@@ -746,10 +731,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Title field
-  // ---------------------------------------------------------------------------
-
   Widget _buildTitleField(BuildContext context) {
     final bool titleError =
         _showValidationErrors && _titleController.text.trim().isEmpty;
@@ -783,10 +764,14 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   fontSize: 12,
                 ),
           ),
-          style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText: 'e.g. Weekend river cleanup',
-            hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 16),
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.textMuted,
+            ),
             filled: true,
             fillColor: titleError
                 ? AppColors.accentDanger.withValues(alpha: 0.04)
@@ -796,7 +781,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               vertical: 14,
             ),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
                 color: titleError
                     ? AppColors.accentDanger
@@ -804,11 +789,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               ),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: const BorderSide(color: AppColors.accentDanger),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
                 color: titleError
                     ? AppColors.accentDanger
@@ -816,7 +801,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: BorderSide(
                 color: titleError
                     ? AppColors.accentDanger
@@ -840,10 +825,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       ],
     );
   }
-
-  // ---------------------------------------------------------------------------
-  // Reusable picker tile
-  // ---------------------------------------------------------------------------
 
   Widget _buildPickerTile(
     BuildContext context, {
@@ -883,7 +864,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               color: hasError
                   ? AppColors.accentDanger.withValues(alpha: 0.04)
                   : AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               border: Border.all(
                 color: hasError
                     ? AppColors.accentDanger
@@ -945,10 +926,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Gear tile (multi-select summary)
-  // ---------------------------------------------------------------------------
-
   Widget _buildGearTile(BuildContext context) {
     final bool hasGear = _selectedGear.isNotEmpty;
     final String summary = hasGear
@@ -979,7 +956,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
             ),
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               border: Border.all(
                 color: hasGear ? AppColors.primary.withValues(alpha: 0.3) : AppColors.divider,
               ),
@@ -1015,7 +992,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(AppSpacing.radius10),
                     ),
                     child: Text(
                       '${_selectedGear.length}',
@@ -1042,10 +1019,6 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Description field
-  // ---------------------------------------------------------------------------
-
   Widget _buildDescriptionField(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1057,7 +1030,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               .bodyLarge
               ?.copyWith(fontWeight: FontWeight.w600),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xxs),
         Text(
           'Optional — give volunteers more context.',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -1070,163 +1043,38 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
           maxLines: 3,
           maxLength: 300,
           onChanged: (_) => setState(() {}),
-          style: const TextStyle(fontSize: 16, color: AppColors.textPrimary),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.textPrimary,
+          ),
           decoration: InputDecoration(
             hintText: 'Describe what to expect, meeting point, etc.',
             hintStyle:
-                const TextStyle(color: AppColors.textMuted, fontSize: 16),
+                Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textMuted,
+                ),
             filled: true,
             fillColor: AppColors.panelBackground,
             counterStyle:
-                const TextStyle(color: AppColors.textMuted, fontSize: 12),
+                Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                ),
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: const BorderSide(color: AppColors.divider),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide: const BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
               borderSide:
                   const BorderSide(color: AppColors.primary, width: 1.5),
             ),
           ),
         ),
       ],
-    );
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Site picker with search
-// ---------------------------------------------------------------------------
-
-class _SitePickerSheet extends StatefulWidget {
-  const _SitePickerSheet({
-    required this.allSites,
-    required this.selectedSiteId,
-    required this.onSelect,
-    required this.onClose,
-  });
-
-  final List<EventSiteSummary> allSites;
-  final String? selectedSiteId;
-  final ValueChanged<EventSiteSummary> onSelect;
-  final VoidCallback onClose;
-
-  @override
-  State<_SitePickerSheet> createState() => _SitePickerSheetState();
-}
-
-class _SitePickerSheetState extends State<_SitePickerSheet> {
-  final TextEditingController _searchController = TextEditingController();
-  String _query = '';
-
-  List<EventSiteSummary> get _filteredSites {
-    if (_query.isEmpty) return widget.allSites;
-    final String q = _query.toLowerCase();
-    return widget.allSites
-        .where((EventSiteSummary s) =>
-            s.title.toLowerCase().contains(q) ||
-            s.description.toLowerCase().contains(q))
-        .toList();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final List<EventSiteSummary> filtered = _filteredSites;
-
-    return ReportSheetScaffold(
-      title: 'Choose site',
-      subtitle: 'Anchor this event to one cleanup location.',
-      trailing: ReportCircleIconButton(
-        icon: CupertinoIcons.xmark,
-        semanticLabel: 'Close',
-        onTap: widget.onClose,
-      ),
-      maxHeightFactor: 0.85,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          CupertinoSearchTextField(
-            controller: _searchController,
-            placeholder: 'Search by name or description',
-            style: const TextStyle(fontSize: 15, color: AppColors.textPrimary),
-            placeholderStyle: const TextStyle(color: AppColors.textMuted, fontSize: 15),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-            backgroundColor: AppColors.inputFill,
-            borderRadius: BorderRadius.circular(12),
-            onChanged: (String value) => setState(() => _query = value),
-            onSuffixTap: () {
-              _searchController.clear();
-              setState(() => _query = '');
-            },
-          ),
-          const SizedBox(height: AppSpacing.md),
-          if (filtered.isEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-              child: Column(
-                children: <Widget>[
-                  Icon(
-                    CupertinoIcons.search,
-                    size: 32,
-                    color: AppColors.textMuted.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'No sites match "$_query"',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                  ),
-                ],
-              ),
-            )
-          else
-            Flexible(
-              child: ListView.separated(
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                itemCount: filtered.length,
-                separatorBuilder: (_, __) =>
-                    const SizedBox(height: AppSpacing.sm),
-                itemBuilder: (BuildContext context, int index) {
-                  final EventSiteSummary site = filtered[index];
-                  final bool isActive = site.id == widget.selectedSiteId;
-                  return ReportActionTile(
-                    icon: CupertinoIcons.location_solid,
-                    title: site.title,
-                    subtitle:
-                        '${site.distanceKm.toStringAsFixed(1)} km away · ${site.description}',
-                    tone: isActive
-                        ? ReportSurfaceTone.accent
-                        : ReportSurfaceTone.neutral,
-                    trailing: Icon(
-                      isActive
-                          ? CupertinoIcons.checkmark_circle_fill
-                          : CupertinoIcons.circle,
-                      size: 22,
-                      color: isActive
-                          ? AppColors.primaryDark
-                          : AppColors.divider,
-                    ),
-                    onTap: () => widget.onSelect(site),
-                  );
-                },
-              ),
-            ),
-        ],
-      ),
     );
   }
 }

@@ -59,7 +59,7 @@ class ReportStepChips extends StatelessWidget {
                 color: isComplete
                     ? AppColors.primary.withValues(alpha: 0.12)
                     : AppColors.inputFill,
-                borderRadius: BorderRadius.circular(999),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
               ),
               child: Text(
                 isComplete ? 'Complete' : 'In progress',
@@ -184,7 +184,7 @@ class _StepChip extends StatelessWidget {
             width: 16,
             height: 16,
             decoration: BoxDecoration(
-              color: isDone ? AppColors.primary : Colors.transparent,
+              color: isDone ? AppColors.primary : AppColors.transparent,
               shape: BoxShape.circle,
               border: Border.all(color: fg, width: 1.1),
             ),
@@ -193,7 +193,7 @@ class _StepChip extends StatelessWidget {
                   ? const Icon(
                       Icons.check_rounded,
                       size: 10,
-                      color: Colors.white,
+                      color: AppColors.white,
                     )
                   : Text(
                       '$index',
@@ -206,7 +206,7 @@ class _StepChip extends StatelessWidget {
                     ),
             ),
           ),
-          const SizedBox(width: 4),
+          const SizedBox(width: AppSpacing.xxs),
           Flexible(
             child: Text(
               label,
