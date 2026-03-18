@@ -52,11 +52,11 @@ async function bootstrap() {
   }
 
   const port = process.env.PORT ?? 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`Chisto API running at http://localhost:${port}`);
+  console.log(`Chisto API running at http://0.0.0.0:${port}`);
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`OpenAPI docs at http://localhost:${port}/api/docs`);
+    console.log(`OpenAPI docs at http://0.0.0.0:${port}/api/docs`);
   }
 }
 
