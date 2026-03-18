@@ -14,7 +14,10 @@ class ApiErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Semantics(
+      liveRegion: true,
+      label: message,
+      child: Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -66,6 +69,7 @@ class ApiErrorBanner extends StatelessWidget {
             ),
           ],
         ],
+        ),
       ),
     );
   }

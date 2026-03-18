@@ -1,56 +1,50 @@
-import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('ServiceLocator', () {
     late ServiceLocator locator;
 
     setUp(() {
       locator = ServiceLocator.instance;
+      locator.reset();
+      SharedPreferences.setMockInitialValues(<String, Object>{});
     });
 
-    test('initialize sets isInitialized to true', () {
-      if (!locator.isInitialized) {
-        locator.initialize(config: AppConfig.dev);
-      }
+    test('starts as not initialized', () {
+      expect(locator.isInitialized, isFalse);
+    });
+
+    test('initialize sets isInitialized to true', () async {
+      await locator.initialize();
       expect(locator.isInitialized, isTrue);
     });
 
-    test('double initialization is idempotent', () {
-      if (!locator.isInitialized) {
-        locator.initialize(config: AppConfig.dev);
-      }
+    test('double initialization is idempotent', () async {
+      await locator.initialize();
       final authState = locator.authState;
 
-      locator.initialize(config: AppConfig.dev);
-
-      expect(locator.isInitialized, isTrue);
+      await locator.initialize();
       expect(locator.authState, same(authState));
-      expect(locator.authState.displayName, equals('You'));
     });
 
-    test('after init, eventsRepository and checkInRepository are non-null', () {
-      if (!locator.isInitialized) {
-        locator.initialize(config: AppConfig.dev);
-      }
+    test('after init, repositories are available', () async {
+      await locator.initialize();
+      expect(locator.authRepository, isNotNull);
       expect(locator.eventsRepository, isNotNull);
       expect(locator.checkInRepository, isNotNull);
     });
 
-    test('after init, authState is authenticated with default user', () {
-      if (!locator.isInitialized) {
-        locator.initialize(config: AppConfig.dev);
-      }
-      expect(locator.authState.isAuthenticated, isTrue);
-      expect(locator.authState.userId, equals('current_user'));
-      expect(locator.authState.displayName, equals('You'));
+    test('after init, authState starts unauthenticated (no hardcoded user)', () async {
+      await locator.initialize();
+      expect(locator.authState.isAuthenticated, isFalse);
     });
 
-    test('reset sets isInitialized to false', () {
-      if (!locator.isInitialized) {
-        locator.initialize(config: AppConfig.dev);
-      }
+    test('reset sets isInitialized to false', () async {
+      await locator.initialize();
       expect(locator.isInitialized, isTrue);
 
       locator.reset();

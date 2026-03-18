@@ -5,11 +5,14 @@ import 'package:chisto_mobile/features/home/presentation/widgets/feed_notificati
 class FeedHeader extends StatelessWidget {
   const FeedHeader({
     super.key,
+    required this.displayName,
     required this.unreadCount,
     required this.onProfileTap,
     required this.onNotificationTap,
   });
 
+  /// Current user's display name (e.g. "John Doe"). Shown as "Hi, {first name}".
+  final String displayName;
   final int unreadCount;
   final VoidCallback onProfileTap;
   final VoidCallback onNotificationTap;
@@ -60,11 +63,14 @@ class FeedHeader extends StatelessWidget {
                               fontWeight: FontWeight.w400,
                             ),
                       ),
-                      Text(
-                        'John',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w700,
-                            ),
+                      Flexible(
+                        child: Text(
+                          _firstWord(displayName),
+                          overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -87,5 +93,12 @@ class FeedHeader extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static String _firstWord(String displayName) {
+    final String trimmed = displayName.trim();
+    if (trimmed.isEmpty) return 'there';
+    final int space = trimmed.indexOf(' ');
+    return space < 0 ? trimmed : trimmed.substring(0, space);
   }
 }

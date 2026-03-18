@@ -1,20 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_mobile/core/validation/password_strength.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/password_strength_indicator.dart';
+import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
 import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
-import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class ForgotPasswordNewScreen extends StatefulWidget {
-  const ForgotPasswordNewScreen({super.key, required this.phoneNumber});
+  const ForgotPasswordNewScreen({
+    super.key,
+    required this.phoneNumberE164,
+    required this.code,
+  });
 
-  final String phoneNumber;
+  final String phoneNumberE164;
+  final String code;
 
   @override
   State<ForgotPasswordNewScreen> createState() => _ForgotPasswordNewScreenState();
@@ -28,6 +38,8 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
   final FocusNode _confirmFocus = FocusNode();
   bool _isLoading = false;
   bool _hasSubmitted = false;
+  String? _apiError;
+  PasswordStrength _passwordStrength = PasswordStrength.none;
 
   @override
   void initState() {
@@ -49,7 +61,10 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
 
   void _onInputChanged() {
     if (!mounted) return;
-    setState(() {});
+    setState(() {
+      _passwordStrength = computePasswordStrength(_passwordController.text);
+      if (_apiError != null) _apiError = null;
+    });
   }
 
   bool get _canSubmit {
@@ -68,16 +83,27 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
 
     AppHaptics.light();
     setState(() => _isLoading = true);
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) return;
+    setState(() => _apiError = null);
 
-    setState(() => _isLoading = false);
-    AppHaptics.success();
-
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.forgotPasswordSuccess,
-      (Route<dynamic> route) => route.settings.name == AppRoutes.signIn,
-    );
+    try {
+      await ServiceLocator.instance.authRepository.confirmPasswordReset(
+        phoneNumberE164: widget.phoneNumberE164,
+        code: widget.code,
+        newPassword: _passwordController.text.trim(),
+      );
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      AppHaptics.success();
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.forgotPasswordSuccess,
+        (Route<dynamic> route) => route.settings.name == AppRoutes.signIn,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      setState(() => _apiError = messageForAuthError(e));
+      AppHaptics.warning();
+    }
   }
 
   @override
@@ -135,6 +161,13 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (_apiError != null) ...[
+                          ApiErrorBanner(
+                            message: _apiError!,
+                            onDismiss: () => setState(() => _apiError = null),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ],
                         AuthTextField(
                           label: 'New password',
                           controller: _passwordController,
@@ -144,14 +177,12 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
                           keyboardType: TextInputType.visiblePassword,
                           textInputAction: TextInputAction.next,
                           validator: InputValidators.validatePassword,
-                          autofillHints: const <String>[
-                            AutofillHints.newPassword,
-                          ],
                           enableSuggestions: false,
                           autocorrect: false,
                           onFieldSubmitted: (_) =>
                               _confirmFocus.requestFocus(),
                         ),
+                        PasswordStrengthIndicator(strength: _passwordStrength),
                         const SizedBox(height: AppSpacing.sm),
                         AuthTextField(
                           label: 'Confirm password',
@@ -164,18 +195,19 @@ class _ForgotPasswordNewScreenState extends State<ForgotPasswordNewScreen> {
                           validator: InputValidators.validateConfirmPassword(
                             _passwordController.text.trim(),
                           ),
-                          autofillHints: const <String>[
-                            AutofillHints.newPassword,
-                          ],
                           enableSuggestions: false,
                           autocorrect: false,
                           onFieldSubmitted: (_) => _handleReset(),
                         ),
                         const SizedBox(height: AppSpacing.radius22),
-                        PrimaryButton(
+                        Semantics(
+                          button: true,
                           label: 'Reset password',
-                          enabled: _canSubmit && !_isLoading,
-                          onPressed: _isLoading ? null : _handleReset,
+                          child: PrimaryButton(
+                            label: 'Reset password',
+                            enabled: _canSubmit && !_isLoading,
+                            onPressed: _isLoading ? null : _handleReset,
+                          ),
                         ),
                       ],
                     ),

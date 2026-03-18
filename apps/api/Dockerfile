@@ -16,9 +16,11 @@ RUN pnpm --filter @chisto/api build
 
 FROM base AS runner
 ENV NODE_ENV=production
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
-COPY --from=builder /app/apps/api/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/apps/api/package.json ./
 COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 EXPOSE 3000
-CMD ["node", "dist/main.js"]
+ENTRYPOINT ["./docker-entrypoint.sh"]

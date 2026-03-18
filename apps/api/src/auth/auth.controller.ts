@@ -1,16 +1,24 @@
-import { Body, Controller, Get, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
-import { LoginDto } from './dto/login.dto';
+import { AdminLoginDto } from './dto/admin-login.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { CitizenLoginDto } from './dto/citizen-login.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
+import { SendOtpDto } from './dto/send-otp.dto';
+import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
@@ -19,13 +27,15 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 
 @ApiTags('auth')
 @Controller('auth')
+@UseGuards(ThrottlerGuard)
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Register a new user account' })
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Register a new citizen account' })
   @ApiCreatedResponse({
-    description: 'User registered and token issued',
+    description: 'User registered and tokens issued',
     type: AuthResponseDto,
   })
   register(@Body() dto: RegisterDto): Promise<AuthResponseDto> {
@@ -33,23 +43,94 @@ export class AuthController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Authenticate existing user' })
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Citizen login with phone number and password' })
   @ApiOkResponse({
-    description: 'User authenticated and token issued',
+    description: 'Citizen authenticated and tokens issued',
     type: AuthResponseDto,
   })
-  login(@Body() dto: LoginDto): Promise<AuthResponseDto> {
-    return this.authService.login(dto);
+  @HttpCode(HttpStatus.OK)
+  citizenLogin(@Body() dto: CitizenLoginDto): Promise<AuthResponseDto> {
+    return this.authService.citizenLogin(dto);
   }
 
   @Post('admin/login')
-  @ApiOperation({ summary: 'Authenticate admin user for admin console' })
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Admin login with email and password' })
   @ApiOkResponse({
-    description: 'Admin authenticated and token issued',
+    description: 'Admin authenticated and tokens issued',
     type: AuthResponseDto,
   })
-  adminLogin(@Body() dto: LoginDto): Promise<AuthResponseDto> {
+  @HttpCode(HttpStatus.OK)
+  adminLogin(@Body() dto: AdminLoginDto): Promise<AuthResponseDto> {
     return this.authService.adminLogin(dto);
+  }
+
+  @Post('refresh')
+  @Throttle({ default: { ttl: 60_000, limit: 15 } })
+  @ApiOperation({ summary: 'Rotate access and refresh tokens using a valid refresh token' })
+  @ApiOkResponse({
+    description: 'New token pair issued, old refresh token revoked',
+    type: AuthResponseDto,
+  })
+  @HttpCode(HttpStatus.OK)
+  refresh(@Body() dto: RefreshTokenDto): Promise<AuthResponseDto> {
+    return this.authService.refresh(dto.refreshToken);
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'Revoke refresh token session' })
+  @ApiNoContentResponse({ description: 'Session revoked' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@Body() dto: RefreshTokenDto): Promise<void> {
+    await this.authService.logout(dto.refreshToken);
+  }
+
+  @Post('otp/send')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Send OTP to registered phone for verification' })
+  @ApiOkResponse({ description: 'OTP sent; in development devCode is returned' })
+  @HttpCode(HttpStatus.OK)
+  sendOtp(@Body() dto: SendOtpDto) {
+    return this.authService.sendOtp(dto.phoneNumber);
+  }
+
+  @Post('otp/verify')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Verify OTP and mark phone as verified' })
+  @ApiNoContentResponse({ description: 'Phone verified' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async verifyOtp(@Body() dto: VerifyOtpDto): Promise<void> {
+    await this.authService.verifyOtp(dto.phoneNumber, dto.code);
+  }
+
+  @Post('password-reset/confirm')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Confirm password reset with OTP and new password' })
+  @ApiNoContentResponse({ description: 'Password reset successfully' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async confirmPasswordReset(@Body() dto: ResetPasswordConfirmDto): Promise<void> {
+    await this.authService.confirmPasswordReset(dto);
+  }
+
+  @Patch('me/password')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change password for authenticated user' })
+  @ApiNoContentResponse({ description: 'Password changed' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async changePassword(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: ChangePasswordDto,
+  ): Promise<void> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    await this.authService.changePassword(user.userId, dto);
   }
 
   @Get('me')

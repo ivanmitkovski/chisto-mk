@@ -32,11 +32,52 @@ model User {
   reports              Report[]             @relation("ReporterReports")
   moderatedReports     Report[]             @relation("ModeratorReports")
   adminNotifications   AdminNotification[]
-  pointTransactions PointTransaction[]
+  pointTransactions    PointTransaction[]
   coReportedReports    ReportCoReporter[]
+  sessions             UserSession[]
 
   @@index([role])
   @@index([status])
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenId          String   @unique
+  refreshTokenHash String
+  deviceInfo       String?
+  ipAddress        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model PhoneOtp {
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+
+  phoneNumber  String
+  code         String
+  expiresAt    DateTime
+  attemptCount Int      @default(0)
+
+  @@unique([phoneNumber])
+  @@index([expiresAt])
+}
+
+model LoginFailure {
+  id             String   @id @default(cuid())
+  phoneNumber    String   @unique
+  firstFailedAt  DateTime
+  attemptCount   Int
+
+  @@index([phoneNumber])
 }
 
 enum Role {

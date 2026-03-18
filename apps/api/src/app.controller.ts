@@ -9,9 +9,4 @@ export class AppController {
   getHello(): { message: string } {
     return this.appService.getHello();
   }
-
-  @Get('health')
-  async getHealth(): Promise<{ status: string }> {
-    return this.appService.getHealth();
-  }
 }

@@ -6,11 +6,13 @@ class AuthState extends ChangeNotifier {
   AuthStatus _status = AuthStatus.unknown;
   String? _userId;
   String? _displayName;
+  String? _phoneNumber;
   String? _accessToken;
 
   AuthStatus get status => _status;
   String? get userId => _userId;
   String? get displayName => _displayName;
+  String? get phoneNumber => _phoneNumber;
   String? get accessToken => _accessToken;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
 
@@ -18,10 +20,12 @@ class AuthState extends ChangeNotifier {
     required String userId,
     required String displayName,
     String? accessToken,
+    String? phoneNumber,
   }) {
     _status = AuthStatus.authenticated;
     _userId = userId;
     _displayName = displayName;
+    _phoneNumber = phoneNumber;
     _accessToken = accessToken;
     notifyListeners();
   }
@@ -30,6 +34,7 @@ class AuthState extends ChangeNotifier {
     _status = AuthStatus.unauthenticated;
     _userId = null;
     _displayName = null;
+    _phoneNumber = null;
     _accessToken = null;
     notifyListeners();
   }

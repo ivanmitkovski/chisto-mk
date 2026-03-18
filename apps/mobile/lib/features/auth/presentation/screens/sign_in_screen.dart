@@ -1,7 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
+import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -13,7 +18,10 @@ import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
 import 'package:chisto_mobile/shared/widgets/brand_logo.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/_macedonian_phone_formatter.dart';
+import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
+
+const String _keyRememberMe = 'chisto_remember_me';
+const String _keyLastSignInPhone = 'chisto_last_signin_phone';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -53,6 +61,33 @@ class _SignInScreenState extends State<SignInScreen>
       curve: AppMotion.emphasized,
     );
     _entranceController.forward();
+    _loadRememberMe();
+  }
+
+  Future<void> _loadRememberMe() async {
+    if (!ServiceLocator.instance.isInitialized) return;
+    final prefs = ServiceLocator.instance.preferences;
+    final bool rememberMe = prefs.getBool(_keyRememberMe) ?? false;
+    final String? lastPhone = prefs.getString(_keyLastSignInPhone);
+    if (!mounted) return;
+    setState(() {
+      _rememberMe = rememberMe;
+      if (rememberMe && lastPhone != null && lastPhone.isNotEmpty) {
+        // National part only: field has prefixFixedText '+389', so avoid "+389 +389 ...".
+        _phoneController.text = formatPhoneNationalPart(lastPhone);
+      }
+    });
+  }
+
+  Future<void> _saveRememberMe({required String phoneE164, required bool remember}) async {
+    if (!ServiceLocator.instance.isInitialized) return;
+    final prefs = ServiceLocator.instance.preferences;
+    await prefs.setBool(_keyRememberMe, remember);
+    if (remember) {
+      await prefs.setString(_keyLastSignInPhone, phoneE164);
+    } else {
+      await prefs.remove(_keyLastSignInPhone);
+    }
   }
 
   @override
@@ -98,15 +133,32 @@ class _SignInScreenState extends State<SignInScreen>
     }
     setState(() => _hasValidationError = false);
     AppHaptics.light();
-    setState(() => _isLoading = true);
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    AppHaptics.success();
-    Navigator.of(context).pushNamedAndRemoveUntil(
-      AppRoutes.home,
-      (Route<dynamic> route) => false,
-    );
+    setState(() {
+      _isLoading = true;
+      _apiError = null;
+    });
+
+    try {
+      final String phoneE164 = normalizeToE164(_phoneController.text);
+      await ServiceLocator.instance.authRepository.signIn(
+        phoneNumber: phoneE164,
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      await _saveRememberMe(phoneE164: phoneE164, remember: _rememberMe);
+      if (!mounted) return;
+      AppHaptics.success();
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        AppRoutes.home,
+        (Route<dynamic> route) => false,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() => _apiError = messageForAuthError(e));
+      AppHaptics.warning();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   void _handleForgotPassword() {
@@ -122,7 +174,6 @@ class _SignInScreenState extends State<SignInScreen>
   @override
   Widget build(BuildContext context) {
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-    final bool keyboardVisible = keyboardInset > 0;
 
     return Stack(
       children: <Widget>[
@@ -208,7 +259,7 @@ class _SignInScreenState extends State<SignInScreen>
                                 ],
                                 AuthTextField(
                                   label: 'Phone number',
-                                  hintText: '71 234 567',
+                                  hintText: '70 123 456',
                                   prefixFixedText: '+389',
                                   controller: _phoneController,
                                   focusNode: _phoneFocus,
@@ -302,16 +353,16 @@ class _SignInScreenState extends State<SignInScreen>
                                           key: ValueKey<bool>(false),
                                         ),
                                 ),
-                                PrimaryButton(
+                                Semantics(
+                                  button: true,
                                   label: 'Sign in',
-                                  enabled: _canSubmit && !_isLoading,
-                                  onPressed: _isLoading ? null : _handleSignIn,
+                                  child: PrimaryButton(
+                                    label: 'Sign in',
+                                    enabled: _canSubmit && !_isLoading,
+                                    onPressed: _isLoading ? null : _handleSignIn,
+                                  ),
                                 ),
-                                SizedBox(
-                                  height: keyboardVisible
-                                      ? AppSpacing.md
-                                      : AppSpacing.radius22,
-                                ),
+                                const SizedBox(height: AppSpacing.radius22),
                                 Center(
                                     child: Semantics(
                                       button: true,
@@ -432,18 +483,22 @@ class _RememberMeRow extends StatelessWidget {
               ),
             ),
             const SizedBox(width: AppSpacing.sm),
-            CupertinoButton(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.xs,
-              ),
-              minimumSize: Size.zero,
-              onPressed: onForgotPassword,
-              child: Text(
-                'Forgot password?',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.primaryDark,
-                  fontWeight: FontWeight.w500,
+            Semantics(
+              button: true,
+              label: 'Forgot password?',
+              child: CupertinoButton(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                minimumSize: Size.zero,
+                onPressed: onForgotPassword,
+                child: Text(
+                  'Forgot password?',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),

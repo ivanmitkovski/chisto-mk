@@ -11,6 +11,8 @@ type HttpExceptionPayload = {
   code?: unknown;
   message?: unknown;
   details?: unknown;
+  retryable?: boolean;
+  retryAfterSeconds?: number;
 };
 
 @Catch()
@@ -28,7 +30,6 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    // Log unexpected errors to aid debugging while keeping response generic
     console.error('Unhandled exception in request pipeline:', exception);
 
     const fallback: ErrorResponse = {
@@ -56,11 +57,15 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         code: candidate.code as string,
         message: candidate.message as string,
       };
-
       if (typeof candidate.details !== 'undefined') {
         error.details = candidate.details;
       }
-
+      if (typeof candidate.retryable === 'boolean') {
+        error.retryable = candidate.retryable;
+      }
+      if (typeof candidate.retryAfterSeconds === 'number') {
+        error.retryAfterSeconds = candidate.retryAfterSeconds;
+      }
       return error;
     }
 

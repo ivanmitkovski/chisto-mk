@@ -2,10 +2,13 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { validateEnv } from './config/env';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 
 async function bootstrap() {
+  validateEnv();
   const app = await NestFactory.create(AppModule);
+  app.enableShutdownHooks();
 
   const allowedOriginsEnv = process.env.CORS_ORIGINS;
   const allowedOrigins = allowedOriginsEnv
@@ -37,19 +40,24 @@ async function bootstrap() {
   );
   app.useGlobalFilters(new GlobalExceptionFilter());
 
-  const config = new DocumentBuilder()
-    .setTitle('Chisto.mk API')
-    .setDescription('Civic environmental platform — pollution reporting, site lifecycle, cleanup events')
-    .setVersion('0.1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  const nodeEnv = process.env.NODE_ENV ?? 'development';
+  if (nodeEnv !== 'production') {
+    const config = new DocumentBuilder()
+      .setTitle('Chisto.mk API')
+      .setDescription('Civic environmental platform — pollution reporting, site lifecycle, cleanup events')
+      .setVersion('0.1.0')
+      .build();
+    const document = SwaggerModule.createDocument(app, config);
+    SwaggerModule.setup('api/docs', app, document);
+  }
 
   const port = process.env.PORT ?? 3000;
   await app.listen(port);
 
   console.log(`Chisto API running at http://localhost:${port}`);
-  console.log(`OpenAPI docs at http://localhost:${port}/api/docs`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`OpenAPI docs at http://localhost:${port}/api/docs`);
+  }
 }
 
 bootstrap().catch((err) => {

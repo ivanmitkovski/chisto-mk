@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 class LoadingOverlay extends StatefulWidget {
@@ -55,7 +56,7 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
     return IgnorePointer(
       ignoring: !widget.visible,
       child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 180),
+        duration: AppMotion.fast,
         opacity: widget.visible ? 1 : 0,
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 4, sigmaY: 4),
@@ -63,8 +64,8 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
             color: AppColors.overlay,
             child: Center(
               child: AnimatedScale(
-                duration: const Duration(milliseconds: 220),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.medium,
+                curve: AppMotion.smooth,
                 scale: widget.visible ? 1 : 0.92,
                 child: Container(
                   width: 120,

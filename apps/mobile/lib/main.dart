@@ -6,7 +6,7 @@ import 'package:chisto_mobile/core/navigation/app_routes.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  ServiceLocator.instance.initialize();
+  await ServiceLocator.instance.initialize();
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
   ]);

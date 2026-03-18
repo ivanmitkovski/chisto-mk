@@ -22,6 +22,7 @@ class AppAssets {
   static const String cardComments = 'assets/icons/comment.svg';
   static const String cardShare = 'assets/icons/paper-plane-share.svg';
 
+  static const String splashLogoLottie = 'assets/animations/splash_logo.json';
   static const String splashReference = 'assets/images/references/splash_reference.png';
   static const String onboardingReference = 'assets/images/references/onboarding_reference.png';
   static const String signInReference = 'assets/images/references/sign_in_reference.png';

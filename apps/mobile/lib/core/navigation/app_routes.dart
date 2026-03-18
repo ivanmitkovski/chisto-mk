@@ -10,6 +10,8 @@ import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_success_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
+import 'package:chisto_mobile/features/auth/presentation/screens/initial_route_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_screen.dart';
@@ -25,6 +27,7 @@ class AppRoutes {
   const AppRoutes._();
 
   static const String splash = '/';
+  static const String initialRoute = '/initial';
   static const String onboarding = '/onboarding';
   static const String signIn = '/auth/sign-in';
   static const String signUp = '/auth/sign-up';
@@ -42,6 +45,16 @@ class AppRoutes {
   static const String eventsAttendeeCheckIn = '/events/attendee-check-in';
   static const String eventsOrganizerCheckIn = '/events/organizer-check-in';
   static const String eventsCleanupEvidence = '/events/cleanup-evidence';
+}
+
+class ForgotPasswordNewRouteArgs {
+  const ForgotPasswordNewRouteArgs({
+    required this.phoneNumberE164,
+    required this.code,
+  });
+
+  final String phoneNumberE164;
+  final String code;
 }
 
 class EventCreateRouteArguments {
@@ -74,6 +87,23 @@ class AppRouter {
           builder: (_) => const SplashScreen(),
           settings: settings,
         );
+      case AppRoutes.initialRoute:
+        return PageRouteBuilder<void>(
+          settings: settings,
+          opaque: true,
+          transitionDuration: SplashConstants.splashToInitialTransitionDuration,
+          reverseTransitionDuration: Duration.zero,
+          pageBuilder: (_, __, ___) => const InitialRouteScreen(),
+          transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+            return FadeTransition(
+              opacity: CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeOut,
+              ),
+              child: child,
+            );
+          },
+        );
       case AppRoutes.onboarding:
         return MaterialPageRoute<void>(
           builder: (_) => const OnboardingScreen(),
@@ -104,19 +134,26 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.forgotPasswordOtp:
-        final String fpPhoneNumber = settings.arguments is String
+        final String fpPhoneE164 = settings.arguments is String
             ? settings.arguments! as String
-            : '+389 70 123 456';
+            : '+38970123456';
         return MaterialPageRoute<void>(
-          builder: (_) => ForgotPasswordOtpScreen(phoneNumber: fpPhoneNumber),
+          builder: (_) => ForgotPasswordOtpScreen(phoneNumberE164: fpPhoneE164),
           settings: settings,
         );
       case AppRoutes.forgotPasswordNew:
-        final String fpNewPhone = settings.arguments is String
-            ? settings.arguments! as String
-            : '+389 70 123 456';
+        final ForgotPasswordNewRouteArgs fpArgs =
+            settings.arguments is ForgotPasswordNewRouteArgs
+                ? settings.arguments! as ForgotPasswordNewRouteArgs
+                : const ForgotPasswordNewRouteArgs(
+                    phoneNumberE164: '+38970123456',
+                    code: '',
+                  );
         return MaterialPageRoute<void>(
-          builder: (_) => ForgotPasswordNewScreen(phoneNumber: fpNewPhone),
+          builder: (_) => ForgotPasswordNewScreen(
+            phoneNumberE164: fpArgs.phoneNumberE164,
+            code: fpArgs.code,
+          ),
           settings: settings,
         );
       case AppRoutes.forgotPasswordSuccess:

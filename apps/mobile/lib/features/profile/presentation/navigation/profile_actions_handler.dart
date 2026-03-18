@@ -106,9 +106,10 @@ abstract final class ProfileActionsHandler {
     }
   }
 
-  static void _performLogout(BuildContext context) {
-    ServiceLocator.instance.authState.setUnauthenticated();
+  static Future<void> _performLogout(BuildContext context) async {
+    await ServiceLocator.instance.authRepository.signOut();
     AppHaptics.success();
+    if (!context.mounted) return;
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.signIn,
       (Route<dynamic> route) => false,

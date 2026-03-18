@@ -11,9 +11,10 @@ class AppMotion {
   static const Duration slow = Duration(milliseconds: 700);
 
   static const Curve emphasized = Curves.easeOutCubic;
+  static const Curve smooth = Cubic(0.33, 0.0, 0.2, 1.0);
   static const Curve spring = Curves.easeOutBack;
-  static const Curve standardCurve = Curves.easeOut;
-  static const Curve decelerate = Curves.easeInOut;
+  static const Curve standardCurve = Curves.easeOutCubic;
+  static const Curve decelerate = Curves.easeInOutCubic;
   static const Curve sharpDecelerate = Cubic(0.2, 0.0, 0.0, 1.0);
 
   static SpringDescription get snappySpring => const SpringDescription(

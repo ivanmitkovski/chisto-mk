@@ -42,7 +42,7 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField).first, '71234567');
+    await tester.enterText(find.byType(TextFormField).first, '70123456');
     await tester.enterText(find.byType(TextFormField).last, 'password123');
     await tester.pump();
 
@@ -61,7 +61,7 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    await tester.enterText(find.byType(TextFormField).first, '71234567');
+    await tester.enterText(find.byType(TextFormField).first, '70123456');
     await tester.enterText(find.byType(TextFormField).last, 'short');
     await tester.pump();
 

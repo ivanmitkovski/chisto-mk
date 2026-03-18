@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const String testPhoneNumber = '+389 71 234 567';
+  const String testPhoneNumber = '+389 70 123 456';
 
   Widget buildTestApp() {
     return MaterialApp(

@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -9,9 +10,13 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
+/// Shown only after OTP verification in the sign-up flow.
+/// User picks location, then taps "Confirm and continue" to go to the feed.
+/// Sign-in and returning users skip this and go straight to home.
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
 
@@ -25,6 +30,15 @@ class _LocationScreenState extends State<LocationScreen> {
   final LatLng _mapCenter = const LatLng(41.6086, 21.7453); // Approx center of Macedonia
   LatLng? _selectedPosition;
   final MapController _mapController = MapController();
+  bool _showTileLoadingOverlay = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(const Duration(milliseconds: 900), () {
+      if (mounted) setState(() => _showTileLoadingOverlay = false);
+    });
+  }
 
   @override
   void dispose() {
@@ -141,14 +155,13 @@ class _LocationScreenState extends State<LocationScreen> {
         _selectedPosition = LatLng(pos.latitude, pos.longitude);
         _resolvingLocation = false;
       });
-      // Zoom in closer when auto-detecting location so the user can better
-      // verify the exact spot.
-      _mapController.move(_selectedPosition!, 17);
+      // Move map after layout so tiles load correctly; zoom 15 = neighborhood view (avoids over-zoom).
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _selectedPosition != null) {
+          _mapController.move(_selectedPosition!, 15);
+        }
+      });
       AppHaptics.success();
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRoutes.home,
-        (Route<dynamic> route) => false,
-      );
     } catch (_) {
       if (!mounted) {
         return;
@@ -160,6 +173,15 @@ class _LocationScreenState extends State<LocationScreen> {
         type: AppSnackType.error,
       );
     }
+  }
+
+  void _confirmAndGoToFeed() {
+    if (_selectedPosition == null) return;
+    AppHaptics.light();
+    Navigator.of(context).pushNamedAndRemoveUntil(
+      AppRoutes.home,
+      (Route<dynamic> route) => false,
+    );
   }
 
   @override
@@ -202,28 +224,34 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     ClipRRect(
-                      borderRadius: BorderRadius.circular(AppSpacing.radius22),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
                       child: SizedBox(
                         height: 260,
                         width: double.infinity,
                         child: Stack(
                           children: [
                             FlutterMap(
+                              key: ValueKey<bool>(_selectedPosition != null),
                               mapController: _mapController,
                               options: MapOptions(
                                 initialCenter: _selectedPosition ?? _mapCenter,
-                                initialZoom: _selectedPosition != null ? 14 : 7,
+                                initialZoom: _selectedPosition != null ? 15 : 7,
+                                minZoom: 1.5,
+                                maxZoom: 18,
                                 interactionOptions: const InteractionOptions(
                                   flags: InteractiveFlag.none,
                                 ),
                               ),
                               children: [
                                 TileLayer(
-                                  // Lightweight OSM tiles for auth/onboarding flow.
                                   urlTemplate:
-                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  maxNativeZoom: 19,
+                                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                                  subdomains: const <String>['a', 'b', 'c', 'd'],
+                                  maxNativeZoom: 20,
                                   userAgentPackageName: 'chisto_mobile',
+                                  retinaMode: false,
+                                  tileProvider: createCachedTileProvider(maxStaleDays: 30),
+                                  tileDisplay: TileDisplay.instantaneous(),
                                 ),
                                 if (_selectedPosition != null)
                                   MarkerLayer(
@@ -250,11 +278,10 @@ class _LocationScreenState extends State<LocationScreen> {
                                   ),
                               ],
                             ),
-                            if (_resolvingLocation && _selectedPosition == null)
+                            if (_showTileLoadingOverlay ||
+                                (_resolvingLocation && _selectedPosition == null))
                               const Positioned.fill(
-                                child: IgnorePointer(
-                                  child: _MapTilesFallback(),
-                                ),
+                                child: IgnorePointer(child: _MapTileSkeleton()),
                               ),
                             Positioned(
                               left: AppSpacing.md,
@@ -266,8 +293,8 @@ class _LocationScreenState extends State<LocationScreen> {
                                   vertical: AppSpacing.radiusSm,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.white.withValues(alpha: 0.92),
-                                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                                  color: AppColors.white.withValues(alpha: 0.94),
+                                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                                 ),
                                 child: Text(
                                   _currentAddress ??
@@ -283,10 +310,60 @@ class _LocationScreenState extends State<LocationScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.radiusPill),
-                    PrimaryButton(
-                      label: _resolvingLocation ? 'Detecting location…' : 'Use current location',
-                      enabled: !_resolvingLocation,
-                      onPressed: _resolvingLocation ? null : _useCurrentLocation,
+                    Semantics(
+                      button: true,
+                      label: _resolvingLocation
+                          ? 'Detecting location…'
+                          : _selectedPosition != null
+                              ? 'Continue'
+                              : 'Use current location',
+                      child: PrimaryButton(
+                        label: _resolvingLocation
+                            ? 'Detecting location…'
+                            : _selectedPosition != null
+                                ? 'Continue'
+                                : 'Use current location',
+                        enabled: !_resolvingLocation,
+                        onPressed: _resolvingLocation
+                            ? null
+                            : _selectedPosition != null
+                                ? _confirmAndGoToFeed
+                                : _useCurrentLocation,
+                      ),
+                    ),
+                    AnimatedSize(
+                      duration: AppMotion.standard,
+                      curve: AppMotion.emphasized,
+                      alignment: Alignment.topCenter,
+                      child: _selectedPosition != null && !_resolvingLocation
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                const SizedBox(height: AppSpacing.sm),
+                                Center(
+                                  child: Semantics(
+                                    button: true,
+                                    label: 'Use a different location',
+                                    child: CupertinoButton(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: AppSpacing.sm,
+                                        vertical: AppSpacing.xs,
+                                      ),
+                                      minimumSize: Size.zero,
+                                      onPressed: _useCurrentLocation,
+                                      child: Text(
+                                        'Use a different location',
+                                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                        color: AppColors.primaryDark,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
@@ -305,45 +382,103 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 }
 
-class _MapTilesFallback extends StatelessWidget {
-  const _MapTilesFallback();
+/// Apple-style tile skeleton: grid of rounded tiles with a subtle left-to-right shimmer.
+class _MapTileSkeleton extends StatefulWidget {
+  const _MapTileSkeleton();
+
+  @override
+  State<_MapTileSkeleton> createState() => _MapTileSkeletonState();
+}
+
+class _MapTileSkeletonState extends State<_MapTileSkeleton>
+    with SingleTickerProviderStateMixin {
+  static const int _columns = 4;
+  static const double _gap = 6;
+  static const double _radius = 8;
+
+  late final AnimationController _shimmerController;
+
+  @override
+  void initState() {
+    super.initState();
+    _shimmerController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _shimmerController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: <Color>[
-            AppColors.inputFill,
-            AppColors.inputBorder,
-          ],
+    return AnimatedBuilder(
+      animation: _shimmerController,
+      builder: (BuildContext context, Widget? child) {
+        final double t = _shimmerController.value;
+        return ShaderMask(
+          shaderCallback: (Rect bounds) {
+            return LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: const <Color>[
+                AppColors.inputFill,
+                AppColors.panelBackground,
+                AppColors.inputFill,
+              ],
+              stops: <double>[
+                (t - 0.25).clamp(0.0, 1.0),
+                t,
+                (t + 0.25).clamp(0.0, 1.0),
+              ],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: child!,
+        );
+      },
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: AppColors.panelBackground,
+        padding: const EdgeInsets.all(_gap / 2),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double w = constraints.maxWidth;
+            final double h = constraints.maxHeight;
+            final double totalGapW = _gap * (_columns - 1);
+            final double tileW = (w - totalGapW - _gap) / _columns;
+            final int rows = ((h + _gap) / (tileW + _gap)).floor().clamp(2, 6);
+            final double totalGapH = _gap * (rows - 1);
+            final double tileH = (h - totalGapH - _gap) / rows;
+            return Column(
+              children: List<Widget>.generate(rows, (int row) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: row < rows - 1 ? _gap : 0),
+                  child: Row(
+                    children: List<Widget>.generate(_columns, (int col) {
+                      return Padding(
+                        padding: EdgeInsets.only(right: col < _columns - 1 ? _gap : 0),
+                        child: Container(
+                          width: tileW,
+                          height: tileH,
+                          decoration: BoxDecoration(
+                            color: AppColors.inputFill,
+                            borderRadius: BorderRadius.circular(_radius),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                );
+              }),
+            );
+          },
         ),
-      ),
-      child: CustomPaint(
-        painter: _GridPainter(),
       ),
     );
   }
-}
-
-class _GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    const double tileSize = AppSpacing.xl;
-    final Paint linePaint = Paint()
-      ..color = AppColors.divider
-      ..strokeWidth = 0.7;
-
-    for (double x = 0; x <= size.width; x += tileSize) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), linePaint);
-    }
-    for (double y = 0; y <= size.height; y += tileSize) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

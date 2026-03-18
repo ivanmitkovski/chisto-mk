@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -38,6 +40,10 @@ class _ProfileScreenState extends State<ProfileScreen>
       vsync: this,
       duration: AppMotion.emphasizedDuration,
     );
+    final authState = ServiceLocator.instance.authState;
+    if (authState.isAuthenticated && authState.userId != null) {
+      _profileUser = _profileUserFromAuthState();
+    }
     _loadProfile();
   }
 
@@ -47,14 +53,14 @@ class _ProfileScreenState extends State<ProfileScreen>
       _isLoadingProfile = true;
     });
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 350));
+      final ProfileUser? loaded = await _fetchProfileUser();
       if (!mounted) return;
       setState(() {
-        _profileUser = ProfileMockData.currentUser;
+        _profileUser = loaded;
         _isLoadingProfile = false;
-        _profileLoadError = null;
+        _profileLoadError = loaded == null ? AppError.unknown() : null;
       });
-      _controller.forward();
+      if (loaded != null) _controller.forward();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -69,6 +75,54 @@ class _ProfileScreenState extends State<ProfileScreen>
         );
       }
     }
+  }
+
+  /// Fetches current user from GET /auth/me or builds minimal from auth state.
+  Future<ProfileUser?> _fetchProfileUser() async {
+    final authState = ServiceLocator.instance.authState;
+    if (!authState.isAuthenticated || authState.userId == null) return null;
+
+    try {
+      final response = await ServiceLocator.instance.apiClient.get('/auth/me');
+      final Map<String, dynamic>? json = response.json;
+      if (json == null) return _profileUserFromAuthState();
+
+      final String id = json['id'] as String? ?? authState.userId!;
+      final String firstName = json['firstName'] as String? ?? '';
+      final String lastName = json['lastName'] as String? ?? '';
+      final String name = '$firstName $lastName'.trim();
+      final String phoneNumber = (json['phoneNumber'] as String?)?.trim().isNotEmpty == true
+          ? (json['phoneNumber'] as String)
+          : (authState.phoneNumber ?? '—');
+      final int pointsBalance = (json['pointsBalance'] as num?)?.toInt() ?? 0;
+      final int level = 1 + (pointsBalance / 100).floor();
+      const int pointsToNextLevel = 100;
+
+      return ProfileUser(
+        id: id,
+        name: name.isEmpty ? (authState.displayName ?? 'User') : name,
+        phoneNumber: phoneNumber,
+        points: pointsBalance,
+        level: level,
+        pointsToNextLevel: pointsToNextLevel,
+        avatarColor: AppColors.primary,
+      );
+    } catch (_) {
+      return _profileUserFromAuthState();
+    }
+  }
+
+  ProfileUser _profileUserFromAuthState() {
+    final authState = ServiceLocator.instance.authState;
+    return ProfileUser(
+      id: authState.userId!,
+      name: authState.displayName ?? 'User',
+      phoneNumber: authState.phoneNumber ?? '—',
+      points: 0,
+      level: 1,
+      pointsToNextLevel: 100,
+      avatarColor: AppColors.primary,
+    );
   }
 
   @override
@@ -95,7 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       );
     }
     final ProfileUser? loaded = _profileUser;
-    if (loaded == null || _isLoadingProfile) {
+    if (loaded == null) {
       return Scaffold(
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
@@ -220,8 +274,7 @@ class _ProfileScreenState extends State<ProfileScreen>
                               AppHaptics.tap();
                               Navigator.of(context).push(
                                 MaterialPageRoute<void>(
-                                  builder: (_) =>
-                                      const ProfileGeneralInfoScreen(),
+                                  builder: (_) => ProfileGeneralInfoScreen(user: user),
                                 ),
                               );
                             },
@@ -379,7 +432,7 @@ class _ProfileHeader extends StatelessWidget {
                     AppHaptics.tap();
                     Navigator.of(context).push(
                       MaterialPageRoute<void>(
-                        builder: (_) => const ProfileGeneralInfoScreen(),
+                        builder: (_) => ProfileGeneralInfoScreen(user: user),
                       ),
                     );
                   },
@@ -434,7 +487,7 @@ class _ProfileHeader extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
-                        user.phoneNumber,
+                        formatPhoneForDisplay(user.phoneNumber),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(

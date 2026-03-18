@@ -2,6 +2,7 @@ import { Role, UserStatus } from '@prisma/client';
 
 export type AuthResponse = {
   accessToken: string;
+  refreshToken: string;
   user: {
     id: string;
     firstName: string;

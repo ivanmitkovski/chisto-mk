@@ -2,19 +2,22 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class ForgotPasswordOtpScreen extends StatefulWidget {
-  const ForgotPasswordOtpScreen({super.key, required this.phoneNumber});
+  const ForgotPasswordOtpScreen({super.key, required this.phoneNumberE164});
 
-  final String phoneNumber;
+  final String phoneNumberE164;
 
   @override
   State<ForgotPasswordOtpScreen> createState() => _ForgotPasswordOtpScreenState();
@@ -85,16 +88,30 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
 
     Navigator.of(context).pushNamed(
       AppRoutes.forgotPasswordNew,
-      arguments: widget.phoneNumber,
+      arguments: ForgotPasswordNewRouteArgs(
+        phoneNumberE164: widget.phoneNumberE164,
+        code: _codeController.text.trim(),
+      ),
     );
   }
 
-  void _handleResend() {
+  Future<void> _handleResend() async {
     if (!_canResend) return;
     AppHaptics.light();
-    _codeController.clear();
-    _codeFocusNode.requestFocus();
-    _startResendCountdown();
+    setState(() => _isLoading = true);
+    try {
+      await ServiceLocator.instance.authRepository.requestPasswordReset(
+        widget.phoneNumberE164,
+      );
+      if (!mounted) return;
+      _codeController.clear();
+      _codeFocusNode.requestFocus();
+      _startResendCountdown();
+    } on AppError catch (_) {
+      if (mounted) _startResendCountdown();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -140,7 +157,7 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'We sent a 4‑digit code to ${widget.phoneNumber}',
+                        'We sent a 4‑digit code to ${formatPhoneForDisplay(widget.phoneNumberE164)}',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textMuted,
                         ),
@@ -189,10 +206,14 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
-                      PrimaryButton(
+                      Semantics(
+                        button: true,
                         label: 'Continue',
-                        enabled: _isComplete && !_isLoading,
-                        onPressed: _isLoading ? null : _onContinue,
+                        child: PrimaryButton(
+                          label: 'Continue',
+                          enabled: _isComplete && !_isLoading,
+                          onPressed: _isLoading ? null : _onContinue,
+                        ),
                       ),
                       const SizedBox(height: AppSpacing.lg),
                       Center(

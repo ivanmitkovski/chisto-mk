@@ -137,8 +137,8 @@ class _BottomNavItemState extends State<_BottomNavItem> {
       behavior: HitTestBehavior.opaque,
       child: AnimatedScale(
         scale: _pressed ? 0.94 : 1.0,
-        duration: const Duration(milliseconds: 100),
-        curve: Curves.easeOut,
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,

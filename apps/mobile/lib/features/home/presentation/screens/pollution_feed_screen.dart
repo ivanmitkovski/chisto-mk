@@ -14,6 +14,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_she
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_section_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_skeleton.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card.dart';
 import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
@@ -175,6 +176,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
             slivers: <Widget>[
               SliverToBoxAdapter(
                 child: FeedHeader(
+                  displayName: ServiceLocator.instance.authState.displayName ?? 'You',
                   unreadCount: _unreadNotificationsCount,
                   onProfileTap: () {
                     AppHaptics.softTransition();

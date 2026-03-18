@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
+import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
@@ -11,7 +15,6 @@ import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
 import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/_macedonian_phone_formatter.dart';
 
 class ForgotPasswordRequestScreen extends StatefulWidget {
   const ForgotPasswordRequestScreen({super.key});
@@ -71,20 +74,24 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
 
     AppHaptics.light();
     setState(() => _isLoading = true);
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) return;
+    setState(() => _apiError = null);
 
-    setState(() => _isLoading = false);
-    AppHaptics.success();
-
-    final String digits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
-    final String formattedLocal = formatMacedonianLocalPhone(digits);
-    final String displayNumber = '+389 $formattedLocal';
-
-    Navigator.of(context).pushNamed(
-      AppRoutes.forgotPasswordOtp,
-      arguments: displayNumber,
-    );
+    try {
+      final String phoneE164 = normalizeToE164(_phoneController.text);
+      await ServiceLocator.instance.authRepository.requestPasswordReset(phoneE164);
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      AppHaptics.success();
+      Navigator.of(context).pushNamed(
+        AppRoutes.forgotPasswordOtp,
+        arguments: phoneE164,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      setState(() => _apiError = messageForAuthError(e));
+      AppHaptics.warning();
+    }
   }
 
   @override
@@ -121,7 +128,6 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
               final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
-              final bool keyboardVisible = keyboardInset > 0;
 
               return SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -152,7 +158,7 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
                         ],
                         AuthTextField(
                           label: 'Phone Number',
-                          hintText: '71 234 567',
+                          hintText: '70 123 456',
                           prefixFixedText: '+389',
                           controller: _phoneController,
                           focusNode: _phoneFocus,
@@ -167,15 +173,15 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
                           ],
                           onFieldSubmitted: (_) => _handleSendCode(),
                         ),
-                        SizedBox(
-                          height: keyboardVisible
-                              ? AppSpacing.radius10
-                              : AppSpacing.radius22,
-                        ),
-                        PrimaryButton(
-                          label: 'Send reset code',
-                          enabled: _canSubmit && !_isLoading,
-                          onPressed: _isLoading ? null : _handleSendCode,
+                        const SizedBox(height: AppSpacing.radius22),
+                        Semantics(
+                          button: true,
+                          label: 'Request code',
+                          child: PrimaryButton(
+                            label: 'Send reset code',
+                            enabled: _canSubmit && !_isLoading,
+                            onPressed: _isLoading ? null : _handleSendCode,
+                          ),
                         ),
                       ],
                     ),

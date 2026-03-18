@@ -32,11 +32,15 @@ export class AuthUserDto {
 
 export class AuthResponseDto {
   @ApiProperty({
-    description: 'JWT access token to authenticate subsequent requests',
+    description: 'Short-lived JWT access token for API authentication',
   })
   accessToken!: string;
+
+  @ApiProperty({
+    description: 'Long-lived opaque refresh token for session renewal',
+  })
+  refreshToken!: string;
 
   @ApiProperty({ type: AuthUserDto })
   user!: AuthUserDto;
 }
-

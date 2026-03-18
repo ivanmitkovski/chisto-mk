@@ -492,8 +492,8 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                 if (_scrollController.hasClients) {
                   _scrollController.animateTo(
                     0,
-                    duration: AppMotion.fast,
-                    curve: AppMotion.emphasized,
+                    duration: AppMotion.medium,
+                    curve: AppMotion.smooth,
                   );
                 }
               },
@@ -511,8 +511,8 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                     if (_scrollController.hasClients) {
                       _scrollController.animateTo(
                         0,
-                        duration: AppMotion.fast,
-                        curve: AppMotion.emphasized,
+                        duration: AppMotion.medium,
+                        curve: AppMotion.smooth,
                       );
                     }
                   },

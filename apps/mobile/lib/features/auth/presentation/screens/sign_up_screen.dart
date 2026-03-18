@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_mobile/core/validation/password_strength.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/password_strength_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
 import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
 import 'package:chisto_mobile/shared/widgets/brand_logo.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/features/auth/presentation/screens/_macedonian_phone_formatter.dart';
+import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,6 +30,8 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _phoneFieldKey = GlobalKey();
+  final GlobalKey _passwordFieldKey = GlobalKey();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
@@ -36,6 +44,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _hasSubmitted = false;
   bool _hasValidationError = false;
   String? _apiError;
+  PasswordStrength _passwordStrength = PasswordStrength.none;
 
   @override
   void initState() {
@@ -45,11 +54,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.addListener(_onInputChanged);
     _phoneController.addListener(_onInputChanged);
     _passwordController.addListener(_onInputChanged);
+    _phoneFocus.addListener(_scrollToFocusedField);
+    _passwordFocus.addListener(_scrollToFocusedField);
+  }
+
+  void _scrollToFocusedField() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final BuildContext? ctx = _phoneFocus.hasFocus
+            ? _phoneFieldKey.currentContext
+            : _passwordFocus.hasFocus
+                ? _passwordFieldKey.currentContext
+                : null;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            alignment: 0.2,
+            duration: AppMotion.standard,
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
   }
 
   void _onInputChanged() {
     if (!mounted) return;
     setState(() {
+      _passwordStrength = computePasswordStrength(_passwordController.text);
       if (_apiError != null) _apiError = null;
     });
   }
@@ -60,6 +93,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailFocus.dispose();
     _phoneFocus.dispose();
     _passwordFocus.dispose();
+    _phoneFocus.removeListener(_scrollToFocusedField);
+    _passwordFocus.removeListener(_scrollToFocusedField);
     _fullNameController.removeListener(_onInputChanged);
     _emailController.removeListener(_onInputChanged);
     _phoneController.removeListener(_onInputChanged);
@@ -103,24 +138,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
       AppHaptics.tap();
       return;
     }
-    setState(() => _hasValidationError = false);
+    setState(() {
+      _hasValidationError = false;
+      _isLoading = true;
+      _apiError = null;
+    });
 
-    setState(() => _isLoading = true);
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) {
-      return;
+    try {
+      final String fullName = _fullNameController.text.trim();
+      final List<String> parts = fullName.split(RegExp(r'\s+'));
+      final String firstName = parts.first;
+      final String lastName = parts.length > 1 ? parts.sublist(1).join(' ') : '';
+      final String phoneE164 = normalizeToE164(_phoneController.text);
+
+      await ServiceLocator.instance.authRepository.signUp(
+        firstName: firstName,
+        lastName: lastName,
+        email: _emailController.text.trim(),
+        phoneNumber: phoneE164,
+        password: _passwordController.text,
+      );
+      if (!mounted) return;
+      AppHaptics.success();
+      Navigator.of(context).pushNamed(
+        AppRoutes.otp,
+        arguments: phoneE164,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() => _apiError = messageForAuthError(e));
+      AppHaptics.warning();
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    setState(() => _isLoading = false);
-
-    AppHaptics.light();
-    final String localDigits = _phoneController.text.replaceAll(RegExp(r'\D'), '');
-    final String formattedLocal = formatMacedonianLocalPhone(localDigits);
-    final String displayNumber = localDigits.isEmpty ? '' : '+389 $formattedLocal';
-
-    Navigator.of(context).pushNamed(
-      AppRoutes.otp,
-      arguments: displayNumber,
-    );
   }
 
   @override
@@ -146,13 +196,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
+              final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
               return SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
                   AppSpacing.lg,
                   AppSpacing.xl,
                   AppSpacing.lg,
-                  AppSpacing.lg + MediaQuery.viewInsetsOf(context).bottom,
+                  AppSpacing.lg + keyboardInset,
                 ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: constraints.maxHeight - AppSpacing.radius18),
@@ -198,8 +249,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           AuthTextField(
+                            key: _phoneFieldKey,
                             label: 'Phone Number',
-                            hintText: '71 234 567',
+                            hintText: '70 123 456',
                             prefixFixedText: '+389',
                             controller: _phoneController,
                             focusNode: _phoneFocus,
@@ -212,6 +264,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                           const SizedBox(height: AppSpacing.sm),
                           AuthTextField(
+                            key: _passwordFieldKey,
                             label: 'Password',
                             controller: _passwordController,
                             focusNode: _passwordFocus,
@@ -219,10 +272,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             obscureText: true,
                             textInputAction: TextInputAction.done,
                             validator: InputValidators.validatePassword,
-                            autofillHints: const <String>[AutofillHints.newPassword],
                             enableSuggestions: false,
                             autocorrect: false,
+                            scrollPadding: EdgeInsets.only(
+                              bottom: keyboardInset + 100,
+                            ),
                             onFieldSubmitted: (_) => _handleSignUp(),
+                          ),
+                          PasswordStrengthIndicator(strength: _passwordStrength),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'At least 8 characters, with letters and numbers',
+                            style: AppTypography.cardSubtitle,
                           ),
                           const SizedBox(height: AppSpacing.md),
                           RichText(
@@ -256,10 +317,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   )
                                 : const SizedBox.shrink(),
                           ),
-                          PrimaryButton(
-                            label: 'Sign Up',
-                            enabled: _isSubmitReady && !_isLoading,
-                            onPressed: _isLoading ? null : _handleSignUp,
+                          Semantics(
+                            button: true,
+                            label: 'Sign up',
+                            child: PrimaryButton(
+                              label: 'Sign Up',
+                              enabled: _isSubmitReady && !_isLoading,
+                              onPressed: _isLoading ? null : _handleSignUp,
+                            ),
                           ),
                           const SizedBox(height: AppSpacing.xxl),
                           Center(

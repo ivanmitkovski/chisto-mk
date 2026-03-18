@@ -26,6 +26,7 @@ class AuthTextField extends StatefulWidget {
     this.autocorrect = true,
     this.inputFormatters,
     this.maxLength,
+    this.scrollPadding,
   });
 
   final String label;
@@ -46,6 +47,7 @@ class AuthTextField extends StatefulWidget {
   final bool autocorrect;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLength;
+  final EdgeInsets? scrollPadding;
 
   @override
   State<AuthTextField> createState() => _AuthTextFieldState();
@@ -95,10 +97,14 @@ class _AuthTextFieldState extends State<AuthTextField> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AnimatedDefaultTextStyle(
+    return Semantics(
+      label: widget.label,
+      hint: widget.hintText,
+      value: widget.obscureText ? null : widget.controller.text,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AnimatedDefaultTextStyle(
           duration: AppMotion.fast,
           curve: AppMotion.emphasized,
           style: AppTypography.pillLabel.copyWith(
@@ -123,7 +129,7 @@ class _AuthTextFieldState extends State<AuthTextField> {
           inputFormatters: widget.inputFormatters,
           maxLength: widget.maxLength,
           onTapOutside: (_) => FocusManager.instance.primaryFocus?.unfocus(),
-          scrollPadding: const EdgeInsets.only(bottom: 120),
+          scrollPadding: widget.scrollPadding ?? const EdgeInsets.only(bottom: 120),
           cursorColor: AppColors.primaryDark,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                 color: AppColors.textPrimary,
@@ -189,7 +195,8 @@ class _AuthTextFieldState extends State<AuthTextField> {
                 : null,
           ),
         ),
-      ],
+        ],
+      ),
     );
   }
 }
