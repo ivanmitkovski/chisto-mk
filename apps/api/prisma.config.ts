@@ -1,4 +1,8 @@
-import 'dotenv/config';
+try {
+  require('dotenv/config');
+} catch {
+  // dotenv not in image; DATABASE_URL from env (e.g. ECS task definition)
+}
 import { defineConfig, env } from 'prisma/config';
 
 export default defineConfig({
