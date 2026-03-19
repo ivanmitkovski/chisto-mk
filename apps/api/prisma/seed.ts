@@ -1,7 +1,12 @@
-import { PrismaClient, Role, SiteStatus, ReportStatus } from '@prisma/client';
+import 'dotenv/config';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient, Role, SiteStatus, ReportStatus } from '../src/generated/prisma/client';
 import * as bcrypt from 'bcrypt';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+const prisma = new PrismaClient({ adapter });
 const SALT_ROUNDS = 12;
 
 async function main() {

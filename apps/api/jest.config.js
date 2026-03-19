@@ -8,4 +8,8 @@ module.exports = {
   collectCoverageFrom: ['src/**/*.ts'],
   coverageDirectory: './coverage',
   verbose: true,
+  moduleNameMapper: {
+    '^@prisma/client$': '<rootDir>/src/generated/prisma',
+    '^@prisma/client/(.*)$': '<rootDir>/src/generated/prisma/$1',
+  },
 };

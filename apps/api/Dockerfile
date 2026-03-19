@@ -18,8 +18,10 @@ FROM base AS runner
 ENV NODE_ENV=production
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
+COPY --from=builder /app/apps/api/src/generated ./dist/generated
 COPY --from=builder /app/apps/api/package.json ./
 COPY --from=builder /app/apps/api/prisma ./prisma
+COPY --from=builder /app/apps/api/prisma.config.ts ./
 COPY --from=builder /app/apps/api/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 EXPOSE 3000

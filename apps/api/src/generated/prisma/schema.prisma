@@ -1,0 +1,245 @@
+// Chisto.mk — Prisma schema
+// Civic environmental platform: pollution reporting, site lifecycle, cleanup events
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  firstName       String
+  lastName        String
+  email           String     @unique
+  phoneNumber     String     @unique
+  passwordHash    String
+  role            Role       @default(USER)
+  status          UserStatus @default(ACTIVE)
+  isPhoneVerified Boolean    @default(false)
+
+  pointsBalance     Int       @default(0)
+  totalPointsEarned Int       @default(0)
+  totalPointsSpent  Int       @default(0)
+  lastActiveAt      DateTime?
+
+  reports            Report[]            @relation("ReporterReports")
+  moderatedReports   Report[]            @relation("ModeratorReports")
+  adminNotifications AdminNotification[]
+  pointTransactions  PointTransaction[]
+  coReportedReports  ReportCoReporter[]
+  sessions           UserSession[]
+
+  @@index([role])
+  @@index([status])
+}
+
+model UserSession {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  tokenId          String    @unique
+  refreshTokenHash String
+  deviceInfo       String?
+  ipAddress        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+}
+
+model PhoneOtp {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  phoneNumber  String
+  code         String
+  expiresAt    DateTime
+  attemptCount Int      @default(0)
+
+  @@unique([phoneNumber])
+  @@index([expiresAt])
+}
+
+model LoginFailure {
+  id            String   @id @default(cuid())
+  phoneNumber   String   @unique
+  firstFailedAt DateTime
+  attemptCount  Int
+
+  @@index([phoneNumber])
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+// Admin notifications for console activity
+model AdminNotification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  title     String
+  message   String
+  timeLabel String
+  tone      AdminNotificationTone
+  category  AdminNotificationCategory
+  isUnread  Boolean                   @default(true)
+  href      String?
+
+  @@index([userId, createdAt])
+  @@index([category, createdAt])
+}
+
+enum AdminNotificationTone {
+  success
+  warning
+  info
+  neutral
+}
+
+enum AdminNotificationCategory {
+  reports
+  system
+  analytics
+}
+
+model PointTransaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  delta         Int
+  balanceAfter  Int
+  reasonCode    String
+  referenceType String?
+  referenceId   String?
+  metadata      Json?
+
+  @@index([userId, createdAt])
+  @@index([reasonCode])
+}
+
+// Canonical pollution/report site
+model Site {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  latitude    Float
+  longitude   Float
+  description String?
+  status      SiteStatus @default(REPORTED)
+
+  reports Report[]
+  events  CleanupEvent[]
+
+  @@index([status])
+  @@index([latitude, longitude])
+}
+
+enum SiteStatus {
+  REPORTED
+  VERIFIED
+  CLEANUP_SCHEDULED
+  IN_PROGRESS
+  CLEANED
+  DISPUTED
+}
+
+// User-submitted pollution report
+model Report {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  reporterId String?
+  reporter   User?   @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: SetNull)
+
+  description String?
+  mediaUrls   String[] @default([])
+
+  status           ReportStatus @default(NEW)
+  moderatedAt      DateTime?
+  moderationReason String?
+  moderatedById    String?
+  moderatedBy      User?        @relation("ModeratorReports", fields: [moderatedById], references: [id], onDelete: SetNull)
+
+  // Optional link to a primary report this one is considered a potential duplicate of
+  potentialDuplicateOfId String?
+  potentialDuplicateOf   Report?  @relation("ReportPotentialDuplicate", fields: [potentialDuplicateOfId], references: [id])
+  potentialDuplicates    Report[] @relation("ReportPotentialDuplicate")
+
+  coReporters ReportCoReporter[]
+
+  @@index([siteId])
+  @@index([reporterId])
+  @@index([status])
+  @@index([potentialDuplicateOfId])
+}
+
+enum ReportStatus {
+  NEW
+  IN_REVIEW
+  APPROVED
+  DELETED
+}
+
+// Additional reporters attached to an existing report
+model ReportCoReporter {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([reportId, userId])
+  @@index([userId])
+}
+
+// Cleanup event at a site
+model CleanupEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  scheduledAt DateTime
+  completedAt DateTime?
+
+  organizerId      String?
+  participantCount Int     @default(0)
+
+  @@index([siteId])
+  @@index([scheduledAt])
+}
