@@ -52,6 +52,17 @@ class AppConfig {
     );
   }
 
+  /// AWS dev API. Pass URL via --dart-define=API_URL=https://your-alb-url.eu-central-1.elb.amazonaws.com
+  static AppConfig get awsDev {
+    const String url =
+        String.fromEnvironment('API_URL', defaultValue: 'https://api-dev.chisto.mk');
+    return AppConfig._(
+      apiBaseUrl: url,
+      helpCenterUrl: 'https://chisto.mk/help',
+      environment: AppEnvironment.dev,
+    );
+  }
+
   static AppConfig fromEnvironment() {
     const String env = String.fromEnvironment('ENV', defaultValue: 'dev');
     switch (env) {
@@ -65,6 +76,8 @@ class AppConfig {
         return localAndroid;
       case 'localDevice':
         return localDevice;
+      case 'awsDev':
+        return awsDev;
       default:
         return dev;
     }

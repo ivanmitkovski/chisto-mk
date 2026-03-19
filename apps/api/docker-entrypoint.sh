@@ -1,4 +1,6 @@
 #!/bin/sh
 set -e
-npx prisma migrate deploy
+cd /app
+prisma generate
+prisma migrate deploy
 exec node dist/main.js

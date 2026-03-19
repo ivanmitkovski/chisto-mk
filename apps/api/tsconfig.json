@@ -8,9 +8,7 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"],
-      "@prisma/client": ["src/generated/prisma/client"],
-      "@prisma/client/*": ["src/generated/prisma/*"]
+      "@/*": ["src/*"]
     },
     "types": ["node", "jest"]
   },
