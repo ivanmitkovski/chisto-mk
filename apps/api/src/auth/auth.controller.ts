@@ -104,13 +104,22 @@ export class AuthController {
     await this.authService.verifyOtp(dto.phoneNumber, dto.code);
   }
 
+  @Post('password-reset/request')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiOperation({ summary: 'Request password reset; sends OTP to registered phone' })
+  @ApiOkResponse({ description: 'OTP sent; in development devCode is returned when SMS_PROVIDER is not Twilio' })
+  @HttpCode(HttpStatus.OK)
+  requestPasswordReset(@Body() dto: SendOtpDto) {
+    return this.authService.sendOtp(dto.phoneNumber);
+  }
+
   @Post('password-reset/confirm')
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Confirm password reset with OTP and new password' })
-  @ApiNoContentResponse({ description: 'Password reset successfully' })
-  @HttpCode(HttpStatus.NO_CONTENT)
-  async confirmPasswordReset(@Body() dto: ResetPasswordConfirmDto): Promise<void> {
-    await this.authService.confirmPasswordReset(dto);
+  @ApiOkResponse({ description: 'Password reset successful; all sessions invalidated' })
+  @HttpCode(HttpStatus.OK)
+  confirmPasswordReset(@Body() dto: ResetPasswordConfirmDto): Promise<{ message: string }> {
+    return this.authService.confirmPasswordReset(dto);
   }
 
   @Patch('me/password')

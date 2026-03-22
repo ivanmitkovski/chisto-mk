@@ -11,6 +11,7 @@ import { Role, User, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { OTP_SENDER, OtpSender } from '../otp/otp-sender.interface';
+import { OtpService } from '../otp/otp.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
@@ -21,18 +22,9 @@ import { AuthResponse } from './types/auth-response.type';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 
 const OTP_EXPIRES_SECONDS = 600;
-const OTP_MAX_VERIFY_ATTEMPTS = 5;
 const LOGIN_MAX_ATTEMPTS = 5;
 const LOGIN_LOCKOUT_WINDOW_MINUTES = 15;
-
-type PhoneOtpWithAttempts = {
-  id: string;
-  phoneNumber: string;
-  code: string;
-  expiresAt: Date;
-  createdAt: Date;
-  attemptCount: number;
-};
+const REMEMBER_ME_SHORT_DAYS = 1;
 
 type PrismaWithLoginFailure = PrismaService & {
   loginFailure: {
@@ -49,19 +41,22 @@ export class AuthService {
   private readonly accessTokenTtl: number;
   private readonly refreshTokenTtlDays: number;
   private readonly maxSessionsPerUser: number;
-  private readonly isDev: boolean;
+  private readonly shouldReturnDevCode: boolean;
 
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    private readonly otpService: OtpService,
     configService: ConfigService,
     @Inject(OTP_SENDER) private readonly otpSender: OtpSender,
   ) {
-    this.isDev = configService.get<string>('NODE_ENV') !== 'production';
+    const isProduction = configService.get<string>('NODE_ENV') === 'production';
+    const smsProvider = configService.get<string>('SMS_PROVIDER')?.toLowerCase() ?? 'none';
+    this.shouldReturnDevCode = !isProduction && smsProvider !== 'twilio';
     const accessRaw = configService.get<string>('JWT_ACCESS_EXPIRES_IN');
     this.accessTokenTtl = accessRaw ? Number(accessRaw) : 900;
     const refreshRaw = configService.get<string>('JWT_REFRESH_EXPIRES_DAYS');
-    this.refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 30;
+    this.refreshTokenTtlDays = refreshRaw ? Number(refreshRaw) : 7;
     const maxSessionsRaw = configService.get<string>('MAX_SESSIONS_PER_USER');
     this.maxSessionsPerUser = maxSessionsRaw ? Number(maxSessionsRaw) : 5;
   }
@@ -104,7 +99,7 @@ export class AuthService {
       },
     });
 
-    return this.buildAuthResponse(user);
+    return this.buildAuthResponse(user, true);
   }
 
   async citizenLogin(dto: CitizenLoginDto): Promise<AuthResponse> {
@@ -160,7 +155,7 @@ export class AuthService {
 
     await db.loginFailure.deleteMany({ where: { phoneNumber } }).catch(() => {});
 
-    return this.buildAuthResponse(user);
+    return this.buildAuthResponse(user, dto.rememberMe ?? true);
   }
 
   private async recordLoginFailure(phoneNumber: string): Promise<void> {
@@ -215,7 +210,7 @@ export class AuthService {
       });
     }
 
-    return this.buildAuthResponse(user);
+    return this.buildAuthResponse(user, true);
   }
 
   async refresh(rawRefreshToken: string): Promise<AuthResponse> {
@@ -257,7 +252,7 @@ export class AuthService {
       });
     }
 
-    return this.buildAuthResponse(user);
+    return this.buildAuthResponse(user, true);
   }
 
   private parseTokenIdFromRefreshToken(fullToken: string): string | null {
@@ -352,7 +347,7 @@ export class AuthService {
     const payload: { expiresIn: number; devCode?: string } = {
       expiresIn: OTP_EXPIRES_SECONDS,
     };
-    if (this.isDev) {
+    if (this.shouldReturnDevCode) {
       payload.devCode = code;
     }
     return payload;
@@ -360,95 +355,43 @@ export class AuthService {
 
   async verifyOtp(phoneNumber: string, code: string): Promise<void> {
     const normalized = phoneNumber.trim();
-    const record = (await this.prisma.phoneOtp.findUnique({
+    await this.otpService.verifyAndConsumeOtp(normalized, code);
+    await this.prisma.user.update({
       where: { phoneNumber: normalized },
-    })) as PhoneOtpWithAttempts | null;
-
-    if (!record) {
-      throw new UnauthorizedException({
-        code: 'OTP_NOT_FOUND',
-        message: 'No code was sent to this number. Request a new code.',
-      });
-    }
-    if (record.expiresAt < new Date()) {
-      await this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }).catch(() => {});
-      throw new UnauthorizedException({
-        code: 'OTP_EXPIRED',
-        message: 'This code has expired. Request a new code.',
-      });
-    }
-    if (record.attemptCount >= OTP_MAX_VERIFY_ATTEMPTS) {
-      await this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }).catch(() => {});
-      throw new UnauthorizedException({
-        code: 'OTP_MAX_ATTEMPTS',
-        message: 'Too many wrong codes. Request a new code.',
-      });
-    }
-    if (record.code !== code) {
-      await this.prisma.phoneOtp.update({
-        where: { phoneNumber: normalized },
-        data: { attemptCount: record.attemptCount + 1 } as Record<string, unknown>,
-      });
-      throw new UnauthorizedException({
-        code: 'OTP_INVALID',
-        message: 'Invalid code. Please try again.',
-      });
-    }
-
-    await this.prisma.$transaction([
-      this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }),
-      this.prisma.user.update({
-        where: { phoneNumber: normalized },
-        data: { isPhoneVerified: true },
-      }),
-    ]);
+      data: { isPhoneVerified: true },
+    });
   }
 
-  async confirmPasswordReset(dto: ResetPasswordConfirmDto): Promise<void> {
+  async confirmPasswordReset(dto: ResetPasswordConfirmDto): Promise<{ message: string }> {
     const normalized = dto.phoneNumber.trim();
-    const record = (await this.prisma.phoneOtp.findUnique({
-      where: { phoneNumber: normalized },
-    })) as PhoneOtpWithAttempts | null;
+    await this.otpService.verifyAndConsumeOtp(normalized, dto.code);
 
-    if (!record) {
+    const user = await this.prisma.user.findUnique({
+      where: { phoneNumber: normalized },
+      select: { id: true },
+    });
+    if (!user) {
       throw new UnauthorizedException({
-        code: 'OTP_NOT_FOUND',
-        message: 'No code was sent to this number. Request a new code.',
-      });
-    }
-    if (record.expiresAt < new Date()) {
-      await this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }).catch(() => {});
-      throw new UnauthorizedException({
-        code: 'OTP_EXPIRED',
-        message: 'This code has expired. Request a new code.',
-      });
-    }
-    if (record.attemptCount >= OTP_MAX_VERIFY_ATTEMPTS) {
-      await this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }).catch(() => {});
-      throw new UnauthorizedException({
-        code: 'OTP_MAX_ATTEMPTS',
-        message: 'Too many wrong codes. Request a new code.',
-      });
-    }
-    if (record.code !== dto.code) {
-      await this.prisma.phoneOtp.update({
-        where: { phoneNumber: normalized },
-        data: { attemptCount: record.attemptCount + 1 } as Record<string, unknown>,
-      });
-      throw new UnauthorizedException({
-        code: 'OTP_INVALID',
-        message: 'Invalid code. Please try again.',
+        code: 'USER_NOT_FOUND',
+        message: 'User not found for this phone number',
       });
     }
 
     const passwordHash = await bcrypt.hash(dto.newPassword, this.saltRounds);
+    const now = new Date();
+
     await this.prisma.$transaction([
-      this.prisma.phoneOtp.delete({ where: { phoneNumber: normalized } }),
       this.prisma.user.update({
         where: { phoneNumber: normalized },
         data: { passwordHash },
       }),
+      this.prisma.userSession.updateMany({
+        where: { userId: user.id, revokedAt: null },
+        data: { revokedAt: now },
+      }),
     ]);
+
+    return { message: 'Password reset successful' };
   }
 
   async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
@@ -476,7 +419,7 @@ export class AuthService {
     });
   }
 
-  private async buildAuthResponse(user: User): Promise<AuthResponse> {
+  private async buildAuthResponse(user: User, rememberMe = true): Promise<AuthResponse> {
     const accessToken = this.jwtService.sign(
       {
         sub: user.id,
@@ -495,17 +438,9 @@ export class AuthService {
       this.saltRounds,
     );
 
+    const refreshDays = rememberMe ? this.refreshTokenTtlDays : REMEMBER_ME_SHORT_DAYS;
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + this.refreshTokenTtlDays);
-
-    await this.prisma.userSession.create({
-      data: {
-        userId: user.id,
-        tokenId,
-        refreshTokenHash,
-        expiresAt,
-      },
-    });
+    expiresAt.setDate(expiresAt.getDate() + refreshDays);
 
     const activeCount = await this.prisma.userSession.count({
       where: {
@@ -514,7 +449,8 @@ export class AuthService {
         expiresAt: { gt: new Date() },
       },
     });
-    if (activeCount > this.maxSessionsPerUser) {
+    if (activeCount >= this.maxSessionsPerUser) {
+      const toRevokeCount = activeCount - this.maxSessionsPerUser + 1;
       const toRevoke = await this.prisma.userSession.findMany({
         where: {
           userId: user.id,
@@ -522,7 +458,7 @@ export class AuthService {
           expiresAt: { gt: new Date() },
         },
         orderBy: { createdAt: 'asc' },
-        take: activeCount - this.maxSessionsPerUser,
+        take: toRevokeCount,
         select: { id: true },
       });
       const now = new Date();
@@ -535,6 +471,15 @@ export class AuthService {
         ),
       );
     }
+
+    await this.prisma.userSession.create({
+      data: {
+        userId: user.id,
+        tokenId,
+        refreshTokenHash,
+        expiresAt,
+      },
+    });
 
     return {
       accessToken,

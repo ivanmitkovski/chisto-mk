@@ -25,7 +25,7 @@ export function validateEnv(): void {
   }
   optionalEnv('PORT', '3000');
   optionalEnv('JWT_ACCESS_EXPIRES_IN', '900');
-  optionalEnv('JWT_REFRESH_EXPIRES_DAYS', '30');
+  optionalEnv('JWT_REFRESH_EXPIRES_DAYS', '7');
   optionalEnv('MAX_SESSIONS_PER_USER', '5');
   const smsProvider = (process.env.SMS_PROVIDER ?? 'none').toLowerCase();
   if (smsProvider === 'twilio') {

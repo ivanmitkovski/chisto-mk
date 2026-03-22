@@ -1,9 +1,8 @@
-import { Injectable, ServiceUnavailableException } from '@nestjs/common';
+import { ServiceUnavailableException } from '@nestjs/common';
 import Twilio from 'twilio';
-import { OtpSender } from './otp-sender.interface';
+import { OtpSender } from '../otp-sender.interface';
 
-@Injectable()
-export class TwilioOtpSenderService implements OtpSender {
+export class TwilioOtpSender implements OtpSender {
   private readonly client: Twilio.Twilio;
   private readonly messagingServiceSid: string | undefined;
   private readonly fromNumber: string | undefined;

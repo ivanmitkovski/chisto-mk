@@ -40,7 +40,6 @@ class _OtpScreenState extends State<OtpScreen> {
   Timer? _resendTimer;
   bool _hasResentOnce = false;
   String? _apiError;
-  String? _devCode;
   int _verifyAttempts = 0;
   bool _otpLocked = false;
 
@@ -86,10 +85,7 @@ class _OtpScreenState extends State<OtpScreen> {
       final SendOtpResult result = await ServiceLocator.instance.authRepository
           .requestOtp(widget.phoneNumber);
       if (!mounted) return;
-      setState(() {
-        _devCode = result.devCode;
-        _sendingOtp = false;
-      });
+      setState(() => _sendingOtp = false);
     } on AppError catch (e) {
       if (!mounted) return;
       setState(() {
@@ -221,28 +217,6 @@ class _OtpScreenState extends State<OtpScreen> {
                           onDismiss: () => setState(() => _apiError = null),
                         ),
                         const SizedBox(height: AppSpacing.md),
-                      ],
-                      if (_devCode != null) ...[
-                        Center(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.md,
-                              vertical: AppSpacing.sm,
-                            ),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                            ),
-                            child: Text(
-                              'Your code: $_devCode',
-                              style: AppTypography.authSubtitle.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDark,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
                       ],
                       const SizedBox(height: AppSpacing.xxl),
                       Center(

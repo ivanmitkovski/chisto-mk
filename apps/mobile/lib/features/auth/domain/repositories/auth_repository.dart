@@ -43,8 +43,7 @@ abstract class AuthRepository {
 }
 
 class SendOtpResult {
-  const SendOtpResult({required this.expiresInSeconds, this.devCode});
+  const SendOtpResult({required this.expiresInSeconds});
 
   final int expiresInSeconds;
-  final String? devCode;
 }

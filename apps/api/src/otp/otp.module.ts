@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { OTP_SENDER, OtpSender } from './otp-sender.interface';
 import { NoopOtpSenderService } from './noop-otp-sender.service';
-import { TwilioOtpSenderService } from './twilio-otp-sender.service';
+import { TwilioOtpSender } from './senders/twilio.sender';
+import { OtpService } from './otp.service';
 
 @Module({
   imports: [ConfigModule],
@@ -23,7 +24,7 @@ import { TwilioOtpSenderService } from './twilio-otp-sender.service';
           if (!messagingServiceSid && !fromNumber) {
             throw new Error('TWILIO_MESSAGING_SERVICE_SID or TWILIO_PHONE_NUMBER is required when SMS_PROVIDER=twilio');
           }
-          return new TwilioOtpSenderService(
+          return new TwilioOtpSender(
             accountSid,
             authToken,
             messagingServiceSid?.trim() || undefined,
@@ -33,7 +34,8 @@ import { TwilioOtpSenderService } from './twilio-otp-sender.service';
         return new NoopOtpSenderService();
       },
     },
+    OtpService,
   ],
-  exports: [OTP_SENDER],
+  exports: [OTP_SENDER, OtpService],
 })
 export class OtpModule {}

@@ -107,8 +107,7 @@ class ApiAuthRepository implements AuthRepository {
     final int expiresIn = json['expiresIn'] is int
         ? json['expiresIn'] as int
         : 600;
-    final String? devCode = json['devCode'] as String?;
-    return SendOtpResult(expiresInSeconds: expiresIn, devCode: devCode);
+    return SendOtpResult(expiresInSeconds: expiresIn);
   }
 
   @override

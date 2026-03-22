@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, Matches, MaxLength, MinLength } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsBoolean, IsOptional, IsString, Matches, MaxLength, MinLength } from 'class-validator';
 
 export class CitizenLoginDto {
   @ApiProperty({
@@ -17,4 +17,12 @@ export class CitizenLoginDto {
   @MinLength(8)
   @MaxLength(72)
   password!: string;
+
+  @ApiPropertyOptional({
+    description: 'If true, refresh token lasts longer (e.g. 30 days). If false, short-lived (e.g. 1 day).',
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean()
+  rememberMe?: boolean;
 }
