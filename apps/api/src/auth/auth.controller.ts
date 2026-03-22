@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -18,6 +18,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
 import { SendOtpDto } from './dto/send-otp.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Roles } from './roles.decorator';
@@ -156,6 +157,42 @@ export class AuthController {
     }
 
     return this.authService.me(user);
+  }
+
+  @Patch('me')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update authenticated user profile (name only)' })
+  @ApiOkResponse({ description: 'Profile updated' })
+  updateProfile(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: UpdateProfileDto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.authService.updateProfile(user.userId, dto);
+  }
+
+  @Delete('me')
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 3 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Delete account (soft delete)' })
+  @ApiNoContentResponse({ description: 'Account deleted' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteAccount(@CurrentUser() user?: AuthenticatedUser): Promise<void> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    await this.authService.deleteAccount(user.userId);
   }
 
   @Get('admin/ping')

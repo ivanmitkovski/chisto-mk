@@ -157,6 +157,25 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   @override
+  Future<void> deleteAccount() async {
+    try {
+      await _client.delete('/auth/me');
+      await _performLocalLogout();
+    } on AppError catch (e) {
+      if (e.code == 'UNAUTHORIZED' || e.code == 'INVALID_TOKEN_USER' || e.code == 'FORBIDDEN') {
+        await _performLocalLogout();
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _performLocalLogout() async {
+    _cancelProactiveRefresh();
+    _authState.setUnauthenticated();
+    await _tokenStorage.clearTokens();
+  }
+
+  @override
   Future<void> signOut() async {
     final String? storedRefresh = await _tokenStorage.refreshToken;
     if (storedRefresh != null && storedRefresh.isNotEmpty) {
@@ -169,9 +188,7 @@ class ApiAuthRepository implements AuthRepository {
         // Best-effort server-side revocation; local cleanup happens regardless.
       }
     }
-    _cancelProactiveRefresh();
-    _authState.setUnauthenticated();
-    await _tokenStorage.clearTokens();
+    await _performLocalLogout();
   }
 
   void _cancelProactiveRefresh() {

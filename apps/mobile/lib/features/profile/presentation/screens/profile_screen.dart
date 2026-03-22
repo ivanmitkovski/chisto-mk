@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -29,7 +30,6 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  bool _isLoadingProfile = true;
   AppError? _profileLoadError;
   ProfileUser? _profileUser;
 
@@ -48,25 +48,28 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   Future<void> _loadProfile() async {
-    setState(() {
-      _profileLoadError = null;
-      _isLoadingProfile = true;
-    });
+    setState(() => _profileLoadError = null);
     try {
       final ProfileUser? loaded = await _fetchProfileUser();
       if (!mounted) return;
       setState(() {
         _profileUser = loaded;
-        _isLoadingProfile = false;
         _profileLoadError = loaded == null ? AppError.unknown() : null;
       });
       if (loaded != null) _controller.forward();
+    } on AppError catch (e) {
+      if (!mounted) return;
+      if (_isAuthError(e.code)) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      setState(() => _profileLoadError = e);
     } catch (e) {
       if (!mounted) return;
-      setState(() {
-        _profileLoadError = AppError.network(cause: e);
-        _isLoadingProfile = false;
-      });
+      setState(() => _profileLoadError = AppError.network(cause: e));
       if (mounted) {
         AppSnack.show(
           context,
@@ -77,48 +80,33 @@ class _ProfileScreenState extends State<ProfileScreen>
     }
   }
 
-  /// Fetches current user from GET /auth/me or builds minimal from auth state.
   Future<ProfileUser?> _fetchProfileUser() async {
     final authState = ServiceLocator.instance.authState;
     if (!authState.isAuthenticated || authState.userId == null) return null;
 
     try {
-      final response = await ServiceLocator.instance.apiClient.get('/auth/me');
-      final Map<String, dynamic>? json = response.json;
-      if (json == null) return _profileUserFromAuthState();
-
-      final String id = json['id'] as String? ?? authState.userId!;
-      final String firstName = json['firstName'] as String? ?? '';
-      final String lastName = json['lastName'] as String? ?? '';
-      final String name = '$firstName $lastName'.trim();
-      final String phoneNumber = (json['phoneNumber'] as String?)?.trim().isNotEmpty == true
-          ? (json['phoneNumber'] as String)
-          : (authState.phoneNumber ?? '—');
-      final int pointsBalance = (json['pointsBalance'] as num?)?.toInt() ?? 0;
-      final int level = 1 + (pointsBalance / 100).floor();
-      const int pointsToNextLevel = 100;
-
-      return ProfileUser(
-        id: id,
-        name: name.isEmpty ? (authState.displayName ?? 'User') : name,
-        phoneNumber: phoneNumber,
-        points: pointsBalance,
-        level: level,
-        pointsToNextLevel: pointsToNextLevel,
-        avatarColor: AppColors.primary,
-      );
+      return await ServiceLocator.instance.profileRepository.getMe();
+    } on AppError catch (e) {
+      if (_isAuthError(e.code)) rethrow;
+      return _profileUserFromAuthState();
     } catch (_) {
       return _profileUserFromAuthState();
     }
   }
+
+  static bool _isAuthError(String code) =>
+      code == 'UNAUTHORIZED' || code == 'INVALID_TOKEN_USER' || code == 'ACCOUNT_NOT_ACTIVE';
 
   ProfileUser _profileUserFromAuthState() {
     final authState = ServiceLocator.instance.authState;
     return ProfileUser(
       id: authState.userId!,
       name: authState.displayName ?? 'User',
+      firstName: '',
+      lastName: '',
       phoneNumber: authState.phoneNumber ?? '—',
       points: 0,
+      totalPointsEarned: 0,
       level: 1,
       pointsToNextLevel: 100,
       avatarColor: AppColors.primary,
@@ -196,7 +184,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       body: SafeArea(
         child: Column(
           children: <Widget>[
-            _ProfileHeader(user: user),
+            _ProfileHeader(
+              user: user,
+              onProfileUpdated: (ProfileUser u) =>
+                  setState(() => _profileUser = u),
+            ),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.primary,
@@ -270,13 +262,15 @@ class _ProfileScreenState extends State<ProfileScreen>
                           SettingsListTile(
                             leadingIcon: Icons.person_outline_rounded,
                             title: 'General info',
-                            onTap: () {
+                            onTap: () async {
                               AppHaptics.tap();
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
+                              final ProfileUser? updated = await Navigator.of(context).push<ProfileUser>(
+                                MaterialPageRoute<ProfileUser>(
                                   builder: (_) => ProfileGeneralInfoScreen(user: user),
                                 ),
                               );
+                              if (!mounted || updated == null) return;
+                              setState(() => _profileUser = updated);
                             },
                             showDividerBelow: true,
                           ),
@@ -386,9 +380,13 @@ class _ProfileScreenState extends State<ProfileScreen>
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({required this.user});
+  const _ProfileHeader({
+    required this.user,
+    this.onProfileUpdated,
+  });
 
   final ProfileUser user;
+  final void Function(ProfileUser)? onProfileUpdated;
 
   @override
   Widget build(BuildContext context) {
@@ -428,13 +426,14 @@ class _ProfileHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     AppHaptics.tap();
-                    Navigator.of(context).push(
-                      MaterialPageRoute<void>(
+                    final ProfileUser? updated = await Navigator.of(context).push<ProfileUser>(
+                      MaterialPageRoute<ProfileUser>(
                         builder: (_) => ProfileGeneralInfoScreen(user: user),
                       ),
                     );
+                    if (updated != null) onProfileUpdated?.call(updated);
                   },
                   behavior: HitTestBehavior.opaque,
                   child: AnimatedBuilder(
@@ -515,11 +514,7 @@ class _LevelAndPointsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final int level = user.level;
     final int pointsToNext = user.pointsToNextLevel;
-    final int currentLevelMin = (level - 1) * 100;
-    final int currentLevelMax = level * 100;
-    final int clampedPoints = user.points.clamp(currentLevelMin, currentLevelMax);
-    final double progress =
-        (clampedPoints - currentLevelMin) / (currentLevelMax - currentLevelMin);
+    final double progress = (user.totalPointsEarned % 100) / 100;
 
     return Container(
       width: double.infinity,
@@ -677,7 +672,7 @@ class _WeeklyRankCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '$points pts this week',
+                  '$points pts',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textMuted,
                       ),

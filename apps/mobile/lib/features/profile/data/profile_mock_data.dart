@@ -6,8 +6,11 @@ class ProfileUser {
   const ProfileUser({
     required this.id,
     required this.name,
+    required this.firstName,
+    required this.lastName,
     required this.phoneNumber,
     required this.points,
+    required this.totalPointsEarned,
     required this.level,
     required this.pointsToNextLevel,
     required this.avatarColor,
@@ -15,8 +18,11 @@ class ProfileUser {
 
   final String id;
   final String name;
+  final String firstName;
+  final String lastName;
   final String phoneNumber;
   final int points;
+  final int totalPointsEarned;
   final int level;
   final int pointsToNextLevel;
   final Color avatarColor;
@@ -43,8 +49,11 @@ class ProfileMockData {
   static const ProfileUser currentUser = ProfileUser(
     id: 'user-1',
     name: 'John Doe',
+    firstName: 'John',
+    lastName: 'Doe',
     phoneNumber: '+389 70 123 456',
     points: 1500,
+    totalPointsEarned: 150,
     level: 2,
     pointsToNextLevel: 50,
     avatarColor: AppColors.primary,

@@ -8,6 +8,8 @@ import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
+import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
+import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ServiceLocator {
@@ -23,6 +25,7 @@ class ServiceLocator {
   AuthRepository? _authRepository;
   EventsRepository? _eventsRepository;
   CheckInRepository? _checkInRepository;
+  ProfileRepository? _profileRepository;
 
   AppConfig get config => _config!;
   AuthState get authState => _authState!;
@@ -32,6 +35,7 @@ class ServiceLocator {
   AuthRepository get authRepository => _authRepository!;
   EventsRepository get eventsRepository => _eventsRepository!;
   CheckInRepository get checkInRepository => _checkInRepository!;
+  ProfileRepository get profileRepository => _profileRepository!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -72,6 +76,7 @@ class ServiceLocator {
 
     _eventsRepository = InMemoryEventsStore.instance;
     _checkInRepository = InMemoryCheckInRepository.instance;
+    _profileRepository = ApiProfileRepository(client: _apiClient!);
 
     _initialized = true;
   }
@@ -85,6 +90,7 @@ class ServiceLocator {
     _authRepository = null;
     _eventsRepository = null;
     _checkInRepository = null;
+    _profileRepository = null;
     _initialized = false;
   }
 }
