@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -94,12 +95,20 @@ abstract final class ProfileActionsHandler {
         ),
       );
       if (doubleConfirm == true && context.mounted) {
-        _performLogout(context);
-        if (context.mounted) {
+        try {
+          await ServiceLocator.instance.authRepository.deleteAccount();
+          if (!context.mounted) return;
+          AppHaptics.success();
+          Navigator.of(context).pushNamedAndRemoveUntil(
+            AppRoutes.signIn,
+            (Route<dynamic> route) => false,
+          );
+        } on AppError catch (e) {
+          if (!context.mounted) return;
           AppSnack.show(
             context,
-            message: 'Account deletion requested',
-            type: AppSnackType.info,
+            message: e.message,
+            type: AppSnackType.error,
           );
         }
       }

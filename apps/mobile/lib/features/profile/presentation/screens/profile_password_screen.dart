@@ -124,13 +124,22 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
         newPassword: newPassword,
       );
       if (!mounted) return;
-      setState(() => _isSubmitting = false);
+      setState(() {
+        _isSubmitting = false;
+        _oldPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+        _hasConfirmError = false;
+      });
       AppSnack.show(
         context,
         message: 'Password updated',
         type: AppSnackType.success,
       );
-      Navigator.of(context).maybePop();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        Navigator.of(context).maybePop();
+      });
     } on AppError catch (e) {
       if (!mounted) return;
       setState(() => _isSubmitting = false);

@@ -47,6 +47,10 @@ class ApiClient {
     return _requestWithRetry('PATCH', path, headers: headers, body: body);
   }
 
+  Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
+    return _requestWithRetry('DELETE', path, headers: headers);
+  }
+
   /// Auth-related paths that should never trigger a transparent refresh
   /// (they manage tokens themselves).
   static const Set<String> _authPaths = <String>{
@@ -137,6 +141,9 @@ class ApiClient {
             body: bodyStr,
           );
           break;
+        case 'DELETE':
+          request = http.delete(url, headers: requestHeaders);
+          break;
         default:
           request = http.post(
             url,
@@ -197,11 +204,14 @@ class ApiClient {
 
     if (statusCode == 401) {
       final String authCode = code;
-      if (authCode != 'UNAUTHORIZED' && authCode != 'INVALID_TOKEN_USER') {
+      // ACCOUNT_NOT_ACTIVE = soft-deleted/suspended; sign out like other auth failures
+      if (authCode == 'UNAUTHORIZED' ||
+          authCode == 'INVALID_TOKEN_USER' ||
+          authCode == 'ACCOUNT_NOT_ACTIVE') {
+        _onUnauthorized();
         return AppError(code: authCode, message: message);
       }
-      _onUnauthorized();
-      return AppError.unauthorized(message: message);
+      return AppError(code: authCode, message: message);
     }
     if (statusCode == 403) return AppError.forbidden(message: message);
     if (statusCode == 404) return AppError.notFound(message: message);

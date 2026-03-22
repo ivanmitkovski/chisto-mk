@@ -1,20 +1,18 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source_modal.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/keyboard_aware_form_scroll.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
@@ -37,15 +35,59 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   final GlobalKey _phoneFieldKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   bool _isSaving = false;
-  final ImagePicker _picker = ImagePicker();
   String? _localAvatarPath;
+
+  void _initFromUser(ProfileUser user) {
+    _nameController = TextEditingController(
+      text: user.firstName.isNotEmpty || user.lastName.isNotEmpty
+          ? '${user.firstName} ${user.lastName}'.trim()
+          : user.name,
+    );
+    _phoneController = TextEditingController(text: formatPhoneForDisplay(user.phoneNumber));
+  }
+
+  Future<void> _fetchAndInitUser() async {
+    try {
+      final ProfileUser user = await ServiceLocator.instance.profileRepository.getMe();
+      if (!mounted) return;
+      setState(() {
+        _nameController.text = user.firstName.isNotEmpty || user.lastName.isNotEmpty
+            ? '${user.firstName} ${user.lastName}'.trim()
+            : user.name;
+        _phoneController.text = formatPhoneForDisplay(user.phoneNumber);
+      });
+    } on AppError catch (e) {
+      if (!mounted) return;
+      if (_isAuthError(e.code)) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+    } catch (_) {
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: 'Could not load profile',
+        type: AppSnackType.warning,
+      );
+    }
+  }
+
+  static bool _isAuthError(String code) =>
+      code == 'UNAUTHORIZED' || code == 'INVALID_TOKEN_USER' || code == 'ACCOUNT_NOT_ACTIVE';
 
   @override
   void initState() {
     super.initState();
-    final ProfileUser user = widget.user ?? _profileUserFromAuthState();
-    _nameController = TextEditingController(text: user.name);
-    _phoneController = TextEditingController(text: formatPhoneForDisplay(user.phoneNumber));
+    if (widget.user != null) {
+      _initFromUser(widget.user!);
+    } else {
+      _initFromUser(_profileUserFromAuthState());
+      WidgetsBinding.instance.addPostFrameCallback((_) => _fetchAndInitUser());
+    }
     _localAvatarPath = profileAvatarState.localPath;
     _nameFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
@@ -123,8 +165,11 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     return ProfileUser(
       id: authState.userId ?? 'unknown',
       name: authState.displayName ?? 'User',
+      firstName: '',
+      lastName: '',
       phoneNumber: '—',
       points: 0,
+      totalPointsEarned: 0,
       level: 1,
       pointsToNextLevel: 100,
       avatarColor: AppColors.primary,
@@ -147,40 +192,55 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
 
   Future<void> _handleSave() async {
     if (_isSaving) return;
+    final String nameTrimmed = _nameController.text.trim();
+    if (nameTrimmed.isEmpty) {
+      AppSnack.show(context, message: 'Name is required', type: AppSnackType.warning);
+      return;
+    }
+    if (nameTrimmed.length > 100) {
+      AppSnack.show(
+        context,
+        message: 'Name is too long',
+        type: AppSnackType.warning,
+      );
+      return;
+    }
+    final int spaceIndex = nameTrimmed.indexOf(' ');
+    final String firstName = spaceIndex >= 0 ? nameTrimmed.substring(0, spaceIndex) : nameTrimmed;
+    final String lastName = spaceIndex >= 0 ? nameTrimmed.substring(spaceIndex + 1).trim() : '';
+
     setState(() => _isSaving = true);
     AppHaptics.light();
 
-    await Future<void>.delayed(AppMotion.slow);
-    if (!mounted) return;
-
-    setState(() => _isSaving = false);
-    AppSnack.show(
-      context,
-      message: 'Profile updated',
-      type: AppSnackType.success,
-    );
+    try {
+      final ProfileUser? updated = await ServiceLocator.instance.profileRepository.updateProfile(
+        firstName: firstName,
+        lastName: lastName,
+      );
+      if (!mounted) return;
+      AppSnack.show(context, message: 'Profile updated', type: AppSnackType.success);
+      if (updated != null) {
+        Navigator.of(context).pop(updated);
+      }
+    } on AppError catch (e) {
+      if (!mounted) return;
+      if (_isAuthError(e.code)) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   Future<void> _handleChangeAvatar() async {
     AppHaptics.tap();
-    final ImageSource? source = await showPhotoSourceModal(context);
-    if (source == null || !mounted) return;
-
-    final XFile? file = await _picker.pickImage(
-      source: source,
-      preferredCameraDevice: CameraDevice.front,
-      imageQuality: 92,
-      maxWidth: 1024,
-    );
-    if (file == null || !mounted) return;
-
-    setState(() => _localAvatarPath = file.path);
-    profileAvatarState.setLocalPath(file.path);
-    AppSnack.show(
-      context,
-      message: 'Profile photo updated',
-      type: AppSnackType.success,
-    );
+    if (!mounted) return;
+    AppSnack.show(context, message: 'Coming soon', type: AppSnackType.info);
   }
 
   @override
@@ -335,11 +395,9 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                               child: TextField(
                                 controller: _phoneController,
                                 focusNode: _phoneFocus,
+                                readOnly: true,
                                 keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.done,
-                                inputFormatters: const <TextInputFormatter>[
-                                  MacedonianPhoneFormatter(),
-                                ],
                                 decoration: _inputDecoration('70 123 456'),
                               ),
                             ),
@@ -366,7 +424,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                   const SizedBox(width: AppSpacing.xs),
                                   Expanded(
                                     child: Text(
-                                      'You can only change your name and number a limited number of times.',
+                                      'Name changes are limited. Phone number changes require verification.',
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall

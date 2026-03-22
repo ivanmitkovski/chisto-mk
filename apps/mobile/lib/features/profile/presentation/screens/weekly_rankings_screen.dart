@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// TODO: Wire to GET /rankings or GET /users/rankings when endpoint is available
+
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';

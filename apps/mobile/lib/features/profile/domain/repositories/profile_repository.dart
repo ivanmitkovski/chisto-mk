@@ -1,13 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
 
-abstract class ProfileRepository implements Listenable {
-  String get displayName;
-  String get email;
-  String? get avatarUrl;
-  int get totalPoints;
-  int get rank;
+abstract class ProfileRepository {
+  Future<ProfileUser> getMe();
 
-  Future<void> loadProfile();
-  Future<void> updateDisplayName(String name);
-  Future<void> updateAvatar(String path);
+  /// Updates profile and returns the updated user, or null if no changes were sent.
+  Future<ProfileUser?> updateProfile({
+    String? firstName,
+    String? lastName,
+  });
 }

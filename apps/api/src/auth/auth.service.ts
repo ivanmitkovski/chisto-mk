@@ -18,6 +18,7 @@ import { ChangePasswordDto } from './dto/change-password.dto';
 import { CitizenLoginDto } from './dto/citizen-login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordConfirmDto } from './dto/reset-password-confirm.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { AuthResponse } from './types/auth-response.type';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 
@@ -320,6 +321,72 @@ export class AuthService {
     }
 
     return user;
+  }
+
+  async updateProfile(
+    userId: string,
+    dto: UpdateProfileDto,
+  ): Promise<{ id: string; firstName: string; lastName: string; email: string; phoneNumber: string }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, status: true },
+    });
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN_USER',
+        message: 'User not found',
+      });
+    }
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_NOT_ACTIVE',
+        message: 'Account is not active',
+      });
+    }
+    const data: { firstName?: string; lastName?: string } = {};
+    if (dto.firstName != null && dto.firstName.trim().length > 0) {
+      data.firstName = dto.firstName.trim();
+    }
+    if (dto.lastName != null && dto.lastName.trim().length > 0) {
+      data.lastName = dto.lastName.trim();
+    }
+    if (Object.keys(data).length === 0) {
+      const updated = await this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true },
+      });
+      if (!updated) throw new UnauthorizedException({ code: 'INVALID_TOKEN_USER', message: 'User not found' });
+      return updated;
+    }
+    return this.prisma.user.update({
+      where: { id: userId },
+      data,
+      select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true },
+    });
+  }
+
+  async deleteAccount(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true },
+    });
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN_USER',
+        message: 'User not found',
+      });
+    }
+    const now = new Date();
+    await this.prisma.$transaction([
+      this.prisma.userSession.updateMany({
+        where: { userId: user.id },
+        data: { revokedAt: now },
+      }),
+      this.prisma.user.update({
+        where: { id: userId },
+        data: { status: UserStatus.DELETED },
+      }),
+    ]);
   }
 
   async sendOtp(phoneNumber: string): Promise<{ expiresIn: number; devCode?: string }> {

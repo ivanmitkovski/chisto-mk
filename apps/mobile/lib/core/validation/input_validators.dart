@@ -42,6 +42,12 @@ class InputValidators {
     if (trimmed.length < 8) {
       return 'Password must be at least 8 characters';
     }
+    if (!RegExp(r'\d').hasMatch(trimmed)) {
+      return 'Password must contain at least one number';
+    }
+    if (!RegExp(r'[A-Za-z]').hasMatch(trimmed)) {
+      return 'Password must contain at least one letter';
+    }
     return null;
   }
 
