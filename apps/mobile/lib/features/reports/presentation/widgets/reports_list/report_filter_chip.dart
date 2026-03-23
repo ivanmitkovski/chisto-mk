@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class ReportFilterChip extends StatelessWidget {
   const ReportFilterChip({
@@ -30,7 +31,11 @@ class ReportFilterChip extends StatelessWidget {
           child: AnimatedContainer(
             duration: AppMotion.medium,
             curve: AppMotion.emphasized,
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius14, vertical: AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.radius14,
+              vertical: AppSpacing.sm,
+            ),
+            constraints: const BoxConstraints(minHeight: 44),
             decoration: BoxDecoration(
               color: selected ? AppColors.primary : AppColors.inputFill,
               borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
@@ -39,13 +44,11 @@ class ReportFilterChip extends StatelessWidget {
                 width: 0.5,
               ),
             ),
+            alignment: Alignment.center,
             child: Text(
               label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
+              style: AppTypography.chipLabel.copyWith(
                 color: selected ? AppColors.white : AppColors.textSecondary,
-                letterSpacing: -0.2,
               ),
             ),
           ),

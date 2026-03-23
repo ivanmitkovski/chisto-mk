@@ -1,4 +1,4 @@
-import { Role, UserStatus } from '@prisma/client';
+import { Role, UserStatus } from '../../prisma-client';
 
 export type AuthResponse = {
   accessToken: string;

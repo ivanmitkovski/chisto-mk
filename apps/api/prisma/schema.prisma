@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -171,8 +172,9 @@ enum SiteStatus {
 
 // User-submitted pollution report
 model Report {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  reportNumber String?  @unique // Human-friendly ID: CH-000001, set by DB trigger on insert
 
   siteId    String
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
@@ -182,6 +184,8 @@ model Report {
 
   description String?
   mediaUrls   String[] @default([])
+  category    String?
+  severity    Int?
 
   status          ReportStatus @default(NEW)
   moderatedAt     DateTime?

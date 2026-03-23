@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UnauthorizedException,
+  UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -6,15 +20,12 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '../prisma-client';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { Roles } from '../auth/roles.decorator';
-import {
-  AdminReportDetailDto,
-  AdminReportListResponseDto,
-} from './dto/admin-report.dto';
+import { AdminReportListResponseDto } from './dto/admin-report.dto';
 import {
   AdminDuplicateReportGroupDto,
   AdminDuplicateReportGroupsResponseDto,
@@ -22,35 +33,115 @@ import {
   MergeDuplicateReportsResponseDto,
 } from './dto/admin-duplicate-report.dto';
 import { RolesGuard } from '../auth/roles.guard';
-import { CreateReportDto } from './dto/create-report.dto';
+import { CreateReportWithLocationDto } from './dto/create-report-with-location.dto';
+import { ReportSubmitResponseDto } from './dto/report-submit-response.dto';
+import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportsService } from './reports.service';
-import { UserReportListItemDto } from './dto/user-report.dto';
+import { ReportsUploadService } from './reports-upload.service';
 
 @ApiTags('reports')
 @Controller('reports')
 export class ReportsController {
-  constructor(private readonly reportsService: ReportsService) {}
+  constructor(
+    private readonly reportsService: ReportsService,
+    private readonly reportsUploadService: ReportsUploadService,
+  ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a report for a site' })
-  @ApiCreatedResponse({ description: 'Report created successfully' })
-  create(@Body() dto: CreateReportDto) {
-    return this.reportsService.create(dto);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create a report by location (finds or creates site, awards points)' })
+  @ApiCreatedResponse({
+    description: 'Report created successfully',
+    type: ReportSubmitResponseDto,
+  })
+  createWithLocation(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: CreateReportWithLocationDto,
+  ): Promise<ReportSubmitResponseDto> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.reportsService.createWithLocation(user, dto);
+  }
+
+  @Post('upload')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(
+    FilesInterceptor('files', 5, {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  @ApiOperation({ summary: 'Upload report photos (max 5, jpeg/png/webp, 10MB each)' })
+  @ApiOkResponse({ description: 'Uploaded file URLs' })
+  async upload(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<{ urls: string[] }> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(
+      user.userId,
+      files || [],
+    );
+    return { urls };
+  }
+
+  @Post(':id/media')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseInterceptors(
+    FilesInterceptor('files', 5, {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 10 * 1024 * 1024 },
+    }),
+  )
+  @ApiOperation({
+    summary: 'Append photos to an existing report (reporter or co-reporter only)',
+  })
+  @ApiOkResponse({ description: 'Media appended successfully' })
+  async appendMedia(
+    @Param('id') reportId: string,
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<{ urls: string[] }> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(
+      user.userId,
+      files || [],
+    );
+    await this.reportsService.appendMedia(reportId, user.userId, urls);
+    return { urls };
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'List reports created by the authenticated user' })
+  @ApiOperation({ summary: 'List reports created by the authenticated user (paginated)' })
   @ApiOkResponse({
     description: 'Reports for the current user fetched successfully',
-    type: UserReportListItemDto,
-    isArray: true,
   })
-  findForCurrentUser(@CurrentUser() user: AuthenticatedUser): Promise<UserReportListItemDto[]> {
-    return this.reportsService.findForCurrentUser(user);
+  findForCurrentUser(
+    @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListMyReportsQueryDto,
+  ) {
+    return this.reportsService.findForCurrentUser(user, query);
   }
 
   @Get()
@@ -90,13 +181,23 @@ export class ReportsController {
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get detailed report view for moderation' })
-  @ApiOkResponse({ description: 'Report fetched successfully', type: AdminReportDetailDto })
-  findOneForModeration(@Param('id') id: string): Promise<AdminReportDetailDto> {
-    return this.reportsService.findOneForModeration(id);
+  @ApiOperation({
+    summary: 'Get report details (admin: full moderation view, citizen: own reports only)',
+  })
+  @ApiOkResponse({ description: 'Report fetched successfully' })
+  findOne(
+    @Param('id') id: string,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.reportsService.findOne(id, user);
   }
 
   @Patch(':id/status')

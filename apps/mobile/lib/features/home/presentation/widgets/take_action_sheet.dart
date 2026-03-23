@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class TakeActionSheet extends StatelessWidget {
-  const TakeActionSheet({super.key});
+  const TakeActionSheet({
+    super.key,
+    this.canCreateEcoAction = true,
+  });
 
-  static Future<TakeActionType?> show(BuildContext context) {
+  final bool canCreateEcoAction;
+
+  static Future<TakeActionType?> show(
+    BuildContext context, {
+    bool canCreateEcoAction = true,
+  }) {
     AppHaptics.medium();
     return showModalBottomSheet<TakeActionType>(
       context: context,
@@ -16,7 +25,9 @@ class TakeActionSheet extends StatelessWidget {
       useSafeArea: true,
       backgroundColor: AppColors.transparent,
       barrierColor: AppColors.overlay,
-      builder: (BuildContext context) => const TakeActionSheet(),
+      builder: (BuildContext context) => TakeActionSheet(
+        canCreateEcoAction: canCreateEcoAction,
+      ),
     );
   }
 
@@ -58,25 +69,27 @@ class TakeActionSheet extends StatelessWidget {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'Take action',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                  style: (AppTypography.textTheme.titleMedium ?? const TextStyle()).copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Choose how you want to help',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: (AppTypography.textTheme.bodySmall ?? const TextStyle()).copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
-                _TakeActionTile(
-                  icon: Icons.add_circle_outline_rounded,
-                  title: 'Create eco action',
-                  subtitle: 'Schedule a cleanup event at this site',
-                  onTap: () => _popWith(context, TakeActionType.createEcoAction),
-                ),
+                if (canCreateEcoAction)
+                  _TakeActionTile(
+                    icon: Icons.add_circle_outline_rounded,
+                    title: 'Create eco action',
+                    subtitle: 'Schedule a cleanup event at this site',
+                    onTap: () =>
+                        _popWith(context, TakeActionType.createEcoAction),
+                  ),
                 _TakeActionTile(
                   icon: Icons.groups_rounded,
                   title: 'Join action',

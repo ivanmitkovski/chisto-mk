@@ -36,6 +36,7 @@ Future<void> saveReportDraft({
     'longitude': draft.longitude,
     'address': draft.address,
     'photoPaths': photoPaths,
+    'severity': draft.severity.clamp(1, 5),
   };
 
   final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -72,6 +73,8 @@ Future<({ReportDraft draft, int stageIndex})?> loadReportDraft() async {
         ? ReportCategory.values[categoryIndex]
         : null;
 
+    final int severity = (map['severity'] as num?)?.toInt() ?? 3;
+
     final ReportDraft draft = ReportDraft(
       photos: photos,
       category: category,
@@ -79,6 +82,7 @@ Future<({ReportDraft draft, int stageIndex})?> loadReportDraft() async {
       latitude: lat,
       longitude: lng,
       address: address,
+      severity: severity.clamp(1, 5),
     );
 
     return (draft: draft, stageIndex: stageIndex.clamp(0, 3));

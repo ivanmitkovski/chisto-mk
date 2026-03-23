@@ -1,0 +1,12 @@
+node_modules
+.git
+.env
+.env.*
+*.log
+dist
+.next
+coverage
+.nyc_output
+apps/mobile
+# Prisma generates into src/generated; always regenerate in Docker
+apps/api/src/generated

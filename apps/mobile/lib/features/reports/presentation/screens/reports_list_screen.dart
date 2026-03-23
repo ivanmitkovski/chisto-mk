@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -8,20 +10,33 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
+import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card_skeleton.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
 import 'package:flutter/material.dart';
 
 class ReportsListScreen extends StatefulWidget {
-  const ReportsListScreen({super.key});
+  const ReportsListScreen({
+    super.key,
+    this.initialReportIdToOpen,
+    this.onReportOpened,
+    this.refreshTrigger,
+  });
+
+  final String? initialReportIdToOpen;
+  final VoidCallback? onReportOpened;
+  final int? refreshTrigger;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
 }
 
-class _ReportsListScreenState extends State<ReportsListScreen>
-    with SingleTickerProviderStateMixin {
+class _ReportsListScreenState extends State<ReportsListScreen> {
   static const Duration _searchDebounceDuration = Duration(milliseconds: 220);
+  static const Duration _minSkeletonDuration = Duration(milliseconds: 400);
 
   bool _isLoading = true;
   AppError? _loadError;
@@ -29,9 +44,9 @@ class _ReportsListScreenState extends State<ReportsListScreen>
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
-  AnimationController? _entranceController;
   Timer? _searchDebounce;
   String _searchQuery = '';
+  bool _isOpeningReportDetail = false;
 
   List<String> _searchTokens(String raw) {
     final String normalized = raw.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
@@ -39,50 +54,58 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return normalized.split(' ').where((String s) => s.isNotEmpty).toList();
   }
 
-  bool _reportMatchesQuery(MockReport r, List<String> tokens) {
+  bool _reportMatchesQuery(ReportListItem r, List<String> tokens) {
     final String title = r.title.toLowerCase();
-    final String desc = r.description.toLowerCase();
-    final String address = (r.address ?? '').toLowerCase();
-    final String category = r.category.label.toLowerCase();
+    final String address = r.location.toLowerCase();
+    final String category = (r.category?.label ?? 'other').toLowerCase();
     final String statusLabel = r.status.label.toLowerCase();
-    final String decline = (r.declineReason ?? '').toLowerCase();
     for (final String token in tokens) {
       final bool matches = title.contains(token) ||
-          desc.contains(token) ||
           address.contains(token) ||
           category.contains(token) ||
-          statusLabel.contains(token) ||
-          decline.contains(token);
+          statusLabel.contains(token);
       if (!matches) return false;
     }
     return true;
   }
 
-  int _reportSearchScore(MockReport r, List<String> tokens) {
+  int _reportSearchScore(ReportListItem r, List<String> tokens) {
     final String title = r.title.toLowerCase();
-    final String address = (r.address ?? '').toLowerCase();
-    final String category = r.category.label.toLowerCase();
-    final String desc = r.description.toLowerCase();
+    final String address = r.location.toLowerCase();
+    final String category = (r.category?.label ?? 'other').toLowerCase();
     int score = 0;
     for (final String token in tokens) {
       if (title.contains(token)) score += 10;
       if (address.contains(token)) score += 8;
       if (category.contains(token)) score += 6;
-      if (desc.contains(token)) score += 2;
     }
     return score;
   }
 
-  List<MockReport> get _filteredReports {
-    List<MockReport> list = _reports;
+  ReportStatus? _apiStatusToDisplay(ApiReportStatus s) {
+    switch (s) {
+      case ApiReportStatus.new_:
+      case ApiReportStatus.inReview:
+        return ReportStatus.underReview;
+      case ApiReportStatus.approved:
+        return ReportStatus.approved;
+      case ApiReportStatus.deleted:
+        return ReportStatus.declined;
+    }
+  }
+
+  List<ReportListItem> get _filteredReports {
+    List<ReportListItem> list = _reports;
     if (_statusFilter != null) {
-      list = list.where((MockReport r) => r.status == _statusFilter!).toList();
+      list = list
+          .where((ReportListItem r) => _apiStatusToDisplay(r.status) == _statusFilter!)
+          .toList();
     }
     final List<String> tokens = _searchTokens(_searchQuery);
     if (tokens.isEmpty) return list;
-    list = list.where((MockReport r) => _reportMatchesQuery(r, tokens)).toList();
-    list = List<MockReport>.from(list)
-      ..sort((MockReport a, MockReport b) {
+    list = list.where((ReportListItem r) => _reportMatchesQuery(r, tokens)).toList();
+    list = List<ReportListItem>.from(list)
+      ..sort((ReportListItem a, ReportListItem b) {
         final int scoreA = _reportSearchScore(a, tokens);
         final int scoreB = _reportSearchScore(b, tokens);
         return scoreB.compareTo(scoreA);
@@ -90,19 +113,39 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     return list;
   }
 
-  List<MockReport> get _reports => ReportsListMockStore.reports;
+  List<ReportListItem> _reports = <ReportListItem>[];
 
   @override
   void initState() {
     super.initState();
-    ReportsListMockStore.changes.addListener(_onStoreChanged);
-    _entranceController = AnimationController(
-      vsync: this,
-      duration: AppMotion.slow,
-    );
     _searchController.addListener(_onSearchChanged);
     _searchQuery = _searchController.text.trim();
     _loadReports();
+    if (widget.initialReportIdToOpen != null &&
+        widget.initialReportIdToOpen!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openReportDetailById(widget.initialReportIdToOpen!);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(ReportsListScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.refreshTrigger != null &&
+        widget.refreshTrigger != oldWidget.refreshTrigger) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _loadReports();
+      });
+    }
+    final String? id = widget.initialReportIdToOpen;
+    if (id != null &&
+        id.isNotEmpty &&
+        id != oldWidget.initialReportIdToOpen) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _openReportDetailById(id);
+      });
+    }
   }
 
   Future<void> _loadReports() async {
@@ -110,14 +153,43 @@ class _ReportsListScreenState extends State<ReportsListScreen>
       _loadError = null;
       _isLoading = true;
     });
+    final Stopwatch stopwatch = Stopwatch()..start();
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 400));
+      final response = await ServiceLocator.instance.reportsApiRepository
+          .getMyReports(page: 1, limit: 50);
+      if (!mounted) return;
+      final int elapsed = stopwatch.elapsedMilliseconds;
+      if (elapsed < _minSkeletonDuration.inMilliseconds) {
+        await Future<void>.delayed(
+          Duration(
+            milliseconds: _minSkeletonDuration.inMilliseconds - elapsed,
+          ),
+        );
+      }
       if (!mounted) return;
       setState(() {
+        _reports = response.data;
         _isLoading = false;
         _loadError = null;
       });
-      _entranceController?.forward();
+    } on AppError catch (e) {
+      if (!mounted) return;
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'ACCOUNT_NOT_ACTIVE') {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      setState(() {
+        _loadError = e;
+        _isLoading = false;
+      });
+      if (mounted) {
+        AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -144,21 +216,13 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     });
   }
 
-  void _onStoreChanged() {
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   void dispose() {
     _searchDebounce?.cancel();
-    ReportsListMockStore.changes.removeListener(_onStoreChanged);
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _searchFocusNode.dispose();
     _scrollController.dispose();
-    _entranceController?.dispose();
     super.dispose();
   }
 
@@ -167,14 +231,64 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     await _loadReports();
   }
 
-  void _openReportDetail(MockReport report) {
+  Future<void> _openReportDetailById(String id) async {
+    if (_isOpeningReportDetail) return;
+    _isOpeningReportDetail = true;
+    if (mounted) setState(() {});
     AppHaptics.softTransition();
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      builder: (BuildContext context) => ReportDetailSheet(report: report),
-    );
+    widget.onReportOpened?.call();
+    try {
+      final detail = await ServiceLocator.instance.reportsApiRepository
+          .getReportById(id);
+      if (!mounted) return;
+      final MockReport display = ReportsListMockStore.fromDetail(detail);
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.transparent,
+        builder: (BuildContext context) => ReportDetailSheet(report: display),
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+    } finally {
+      _isOpeningReportDetail = false;
+      if (mounted) setState(() {});
+    }
+  }
+
+  Future<void> _openReportDetail(ReportListItem report) async {
+    if (_isOpeningReportDetail) return;
+    _isOpeningReportDetail = true;
+    if (mounted) setState(() {});
+    AppHaptics.softTransition();
+    try {
+      final detail = await ServiceLocator.instance.reportsApiRepository
+          .getReportById(report.id);
+      if (!mounted) return;
+      final MockReport display = ReportsListMockStore.fromDetail(detail);
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.transparent,
+        builder: (BuildContext context) => ReportDetailSheet(report: display),
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+    } catch (_) {
+      if (!mounted) return;
+      final MockReport display = ReportsListMockStore.fromListItem(report);
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.transparent,
+        builder: (BuildContext context) => ReportDetailSheet(report: display),
+      );
+    } finally {
+      _isOpeningReportDetail = false;
+      if (mounted) setState(() {});
+    }
   }
 
   static String _formatDate(DateTime d) {
@@ -188,7 +302,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   @override
   Widget build(BuildContext context) {
-    final List<MockReport> filteredReports = _filteredReports;
+    final List<ReportListItem> filteredReports = _filteredReports;
     return SafeArea(
       bottom: false,
       child: RefreshIndicator(
@@ -214,13 +328,16 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                 ),
               )
             else if (_isLoading)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: AppColors.primaryDark,
-                    strokeWidth: 2.5,
-                  ),
+              SliverPadding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  0,
+                ),
+                sliver: SliverList.builder(
+                  itemCount: 5,
+                  itemBuilder: (_, __) => const ReportCardSkeleton(),
                 ),
               )
             else if (_reports.isEmpty)
@@ -235,49 +352,29 @@ class _ReportsListScreenState extends State<ReportsListScreen>
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                  AppSpacing.lg,
+                  0,
+                ),
                 sliver: SliverList.builder(
                   itemCount: filteredReports.length,
                   itemBuilder: (BuildContext context, int index) {
                     if (index >= filteredReports.length) {
                       return const SizedBox.shrink();
                     }
-                    final MockReport report = filteredReports[index];
-                    final AnimationController? controller = _entranceController;
-                    final Widget card = ReportCard(
-                      report: report,
-                      onTap: () => _openReportDetail(report),
-                      formatDate: _formatDate,
-                    );
-
-                    if (controller == null) return card;
-                    final double stagger = (index * 0.15).clamp(0.0, 0.6);
-                    final double staggerEnd = (stagger + 0.4).clamp(0.0, 1.0);
-                    final Animation<double> opacity = CurvedAnimation(
-                      parent: controller,
-                      curve: Interval(
-                        stagger,
-                        staggerEnd,
-                        curve: AppMotion.standardCurve,
+                    final ReportListItem report = filteredReports[index];
+                    final MockReport display =
+                        ReportsListMockStore.fromListItem(report);
+                    return AnimatedListItem(
+                      index: index,
+                      slideOffset: 14,
+                      child: ReportCard(
+                        report: display,
+                        onTap: () => _openReportDetail(report),
+                        formatDate: _formatDate,
                       ),
-                    );
-                    final Animation<Offset> slide =
-                        Tween<Offset>(
-                          begin: const Offset(0, 0.06),
-                          end: Offset.zero,
-                        ).animate(
-                          CurvedAnimation(
-                            parent: controller,
-                            curve: Interval(
-                              stagger,
-                              staggerEnd,
-                              curve: AppMotion.emphasized,
-                            ),
-                          ),
-                        );
-                    return FadeTransition(
-                      opacity: opacity,
-                      child: SlideTransition(position: slide, child: card),
                     );
                   },
                 ),
@@ -294,7 +391,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                       _statusFilter == null
                           ? 'All reports shown'
                           : '${_filteredReports.length} report${_filteredReports.length == 1 ? '' : 's'}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      style: AppTypography.textTheme.bodySmall!.copyWith(
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
                       ),
@@ -312,7 +409,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
     final int totalReports = _reports.length;
     final int underReviewCount = _reports
         .where(
-          (MockReport report) => report.status == ReportStatus.underReview,
+          (ReportListItem r) => _apiStatusToDisplay(r.status) == ReportStatus.underReview,
         )
         .length;
 
@@ -328,19 +425,15 @@ class _ReportsListScreenState extends State<ReportsListScreen>
         children: <Widget>[
           Text(
             'Your reports',
-            style: AppTypography.textTheme.titleLarge?.copyWith(
-              fontSize: 24,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.4,
-            ),
+            style: AppTypography.textTheme.titleLarge,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'See every pollution report you have sent and how it was handled.',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.35,
-                ),
+            style: AppTypography.textTheme.bodySmall!.copyWith(
+              color: AppColors.textMuted,
+              height: 1.35,
+            ),
           ),
           const SizedBox(height: AppSpacing.sm),
           Semantics(
@@ -373,7 +466,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   Widget _buildSearchBar(BuildContext context) {
     final bool hasSearchText = _searchController.text.isNotEmpty;
-    final List<MockReport> filtered = _filteredReports;
+    final List<ReportListItem> filtered = _filteredReports;
     final String resultLabel = _searchQuery.isEmpty
         ? ''
         : filtered.isEmpty
@@ -392,84 +485,116 @@ class _ReportsListScreenState extends State<ReportsListScreen>
       child: Semantics(
         label: 'Search reports',
         hint: 'Search by title, location, category, or status. $resultLabel'.trim(),
-        child: Container(
-          height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius14),
-          decoration: const BoxDecoration(),
-          child: Row(
-            children: <Widget>[
-              Icon(
-                Icons.search_rounded,
-                size: 20,
-                color: AppColors.textMuted.withValues(alpha: 0.8),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: TextField(
-                  controller: _searchController,
-                  focusNode: _searchFocusNode,
-                  decoration: InputDecoration(
-                    hintText: 'Search your reports',
-                    hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted.withValues(alpha: 0.9),
-                      letterSpacing: -0.3,
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.fromLTRB(AppSpacing.sm, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-                    isDense: true,
-                  ),
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                    letterSpacing: -0.3,
-                  ),
-                  textInputAction: TextInputAction.search,
-                  onSubmitted: (_) {
-                    _searchFocusNode.unfocus();
-                    _searchDebounce?.cancel();
-                    setState(
-                      () => _searchQuery = _searchController.text.trim(),
-                    );
-                  },
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              Icons.search_rounded,
+              size: AppSpacing.iconMd,
+              color: AppColors.textMuted.withValues(alpha: 0.8),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Container(
+                height: 44,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
                 ),
-              ),
-              if (hasSearchText)
-                GestureDetector(
-                  onTap: () {
-                    AppHaptics.tap();
-                    _searchDebounce?.cancel();
-                    _searchController.clear();
-                    setState(() => _searchQuery = '');
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: AppSpacing.xs),
-                    child: Icon(
-                      Icons.close_rounded,
-                      size: 18,
-                      color: AppColors.textMuted.withValues(alpha: 0.85),
-                    ),
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius:
+                      BorderRadius.circular(AppSpacing.radiusPill),
+                  border: Border.all(
+                    color: AppColors.divider.withValues(alpha: 0.8),
+                    width: 0.5,
                   ),
-                )
-              else if (_searchQuery.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(left: 6),
-                  child: Text(
-                    _filteredReports.isEmpty
-                        ? 'No matches'
-                        : _filteredReports.length == 1
-                            ? '1 report'
-                            : '${_filteredReports.length} reports',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontSize: 14,
-                          color: _filteredReports.isEmpty
-                              ? AppColors.textMuted.withValues(alpha: 0.9)
-                              : AppColors.textSecondary.withValues(alpha: 0.95),
-                          fontWeight: FontWeight.w500,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        focusNode: _searchFocusNode,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          hintText: 'Search your reports',
+                          hintStyle: AppTypography.textTheme.bodyMedium!
+                              .copyWith(
+                            color: AppColors.textMuted.withValues(alpha: 0.9),
+                            letterSpacing: -0.3,
+                            height: 1.25,
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          filled: false,
+                          contentPadding: const EdgeInsets.only(
+                            left: 0,
+                            right: 0,
+                            top: 12,
+                            bottom: 12,
+                          ),
+                          isDense: true,
                         ),
-                  ),
+                        style: AppTypography.textTheme.bodyMedium!.copyWith(
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.3,
+                          height: 1.25,
+                        ),
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) {
+                          _searchFocusNode.unfocus();
+                          _searchDebounce?.cancel();
+                          setState(
+                            () =>
+                                _searchQuery =
+                                    _searchController.text.trim(),
+                          );
+                        },
+                      ),
+                    ),
+                    if (hasSearchText)
+                      GestureDetector(
+                        onTap: () {
+                          AppHaptics.tap();
+                          _searchDebounce?.cancel();
+                          _searchController.clear();
+                          setState(() => _searchQuery = '');
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: AppSpacing.xs),
+                          child: Icon(
+                            Icons.close_rounded,
+                            size: 18,
+                            color: AppColors.textMuted.withValues(alpha: 0.85),
+                          ),
+                        ),
+                      )
+                    else if (_searchQuery.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(left: AppSpacing.xs),
+                        child: Text(
+                          _filteredReports.isEmpty
+                              ? 'No matches'
+                              : _filteredReports.length == 1
+                                  ? '1 report'
+                                  : '${_filteredReports.length} reports',
+                          style: AppTypography.chipLabel.copyWith(
+                            color: _filteredReports.isEmpty
+                                ? AppColors.textMuted.withValues(alpha: 0.9)
+                                : AppColors.textSecondary
+                                    .withValues(alpha: 0.95),
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-            ],
-          ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -477,7 +602,7 @@ class _ReportsListScreenState extends State<ReportsListScreen>
 
   Widget _buildStatusFilter(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -550,19 +675,13 @@ class _ReportsListScreenState extends State<ReportsListScreen>
           const SizedBox(height: AppSpacing.md),
           Text(
             message,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
-            ),
+            style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             hint,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              height: 1.4,
-            ),
+            style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
           ),
           if (hasSearch) ...[
             const SizedBox(height: AppSpacing.lg),
@@ -584,9 +703,9 @@ class _ReportsListScreenState extends State<ReportsListScreen>
                   ),
                   child: Text(
                     'Clear search',
-                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: AppTypography.buttonLabel.copyWith(
                       color: AppColors.primary,
+                      fontSize: 16,
                     ),
                   ),
                 ),
@@ -596,6 +715,20 @@ class _ReportsListScreenState extends State<ReportsListScreen>
         ],
       ),
     );
+  }
+
+  Future<void> _startNewReport() async {
+    AppHaptics.medium();
+    final Object? result = await Navigator.of(context).push<Object>(
+      MaterialPageRoute<Object>(
+        builder: (_) => const NewReportScreen(
+          entryLabel: 'New report',
+        ),
+      ),
+    );
+    if (result != null && mounted) {
+      await _loadReports();
+    }
   }
 
   Widget _buildEmptyState(BuildContext context) {
@@ -621,18 +754,33 @@ class _ReportsListScreenState extends State<ReportsListScreen>
           const SizedBox(height: AppSpacing.md),
           Text(
             'No reports yet',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
-            ),
+            style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             'Your future reports will appear here after you submit them.',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              height: 1.4,
+            style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          Semantics(
+            button: true,
+            label: 'Report pollution',
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.icon(
+                onPressed: _startNewReport,
+                icon: const Icon(Icons.add_rounded, size: 20),
+                label: const Text('Report pollution'),
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: AppColors.white,
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                  ),
+                ),
+              ),
             ),
           ),
         ],

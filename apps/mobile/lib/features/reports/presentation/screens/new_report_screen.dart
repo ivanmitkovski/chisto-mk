@@ -1,10 +1,15 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/report_draft_storage.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_grid.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
@@ -15,6 +20,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/n
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -44,13 +50,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   ReportDraft _draft = ReportDraft();
   bool _submitting = false;
+  String? _submitPhase;
   bool _isProcessingPhotoFlow = false;
   bool _evidenceTipDismissed = false;
   final Set<ReportStage> _attemptedStages = <ReportStage>{};
   ReportStage _currentStage = ReportStage.evidence;
   ReportStage? _highlightedStage;
   bool _didAnnounceLocationStep = false;
-  String? _apiError;
+  AppError? _apiError;
 
   @override
   void initState() {
@@ -69,33 +76,28 @@ class _NewReportScreenState extends State<NewReportScreen> {
     final ({ReportDraft draft, int stageIndex})? saved =
         await loadReportDraft();
     if (!mounted || saved == null) return;
-    final bool? resume = await showDialog<bool>(
+    final bool? resume = await showCupertinoDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Resume draft?'),
-          content: const Text(
-            'You have an unsaved report. Resume where you left off or start fresh.',
+      builder: (BuildContext context) => CupertinoAlertDialog(
+        title: const Text('Resume draft?'),
+        content: const Text(
+          'You have an unsaved report. Resume where you left off or start fresh.',
+        ),
+        actions: <CupertinoDialogAction>[
+          CupertinoDialogAction(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Start fresh'),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Start fresh'),
-            ),
-            FilledButton(
-              onPressed: () {
-                AppHaptics.light();
-                Navigator.of(context).pop(true);
-              },
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
-              ),
-              child: const Text('Resume'),
-            ),
-          ],
-        );
-      },
+          CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              AppHaptics.light();
+              Navigator.of(context).pop(true);
+            },
+            child: const Text('Resume'),
+          ),
+        ],
+      ),
     );
     if (!mounted) return;
     if (resume == true) {
@@ -439,6 +441,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     if (_submitting) return;
     setState(() {
       _attemptedStages.addAll(ReportStage.values);
+      _apiError = null;
     });
 
     if (!_canSubmit) {
@@ -452,30 +455,130 @@ class _NewReportScreenState extends State<NewReportScreen> {
     }
 
     AppHaptics.medium();
-    setState(() => _submitting = true);
-    await Future<void>.delayed(const Duration(milliseconds: 900));
+    setState(() {
+      _submitting = true;
+      _submitPhase = 'creating';
+    });
 
-    if (!mounted) return;
-    ReportsListMockStore.addSubmittedDraft(_draft);
-    await clearReportDraft();
-    if (!mounted) return;
-    setState(() => _submitting = false);
-    final SubmittedDialogResult? result = await showDialog<SubmittedDialogResult>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return ReportSubmittedDialog(
-          categoryLabel: _draft.category?.label ?? 'Report',
-          address: _draft.address,
+    try {
+      final reportsApi = ServiceLocator.instance.reportsApiRepository;
+      String description = _draft.description.trim();
+      if (_draft.category != null) {
+        description =
+            '${_draft.category!.label}: ${description.isEmpty ? "No additional details" : description}'
+                .trim();
+      }
+      final result = await reportsApi.submitReport(
+        latitude: _draft.latitude!,
+        longitude: _draft.longitude!,
+        description: description.isEmpty ? null : description,
+        mediaUrls: null,
+        category: _draft.category?.apiString,
+        severity: _draft.severity,
+      );
+      if (!mounted) return;
+      if (_draft.photos.isNotEmpty) {
+        setState(() => _submitPhase = 'uploading');
+        if (!mounted) return;
+        final List<String> paths =
+            _draft.photos.map<String>((XFile x) => x.path).toList();
+        bool uploadSuccess = false;
+        try {
+          await reportsApi.uploadReportMedia(result.reportId, paths);
+          uploadSuccess = true;
+        } catch (e) {
+          if (!mounted) return;
+          final bool? retry = await showCupertinoDialog<bool>(
+            context: context,
+            builder: (BuildContext ctx) => CupertinoAlertDialog(
+              title: const Text('Photo upload failed'),
+              content: const Text(
+                'Report was submitted. Tap Retry to upload your photos, or Skip to continue.',
+              ),
+              actions: <CupertinoDialogAction>[
+                CupertinoDialogAction(
+                  onPressed: () => Navigator.of(ctx).pop(false),
+                  child: const Text('Skip'),
+                ),
+                CupertinoDialogAction(
+                  isDefaultAction: true,
+                  onPressed: () => Navigator.of(ctx).pop(true),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+          if (!mounted) return;
+          if (retry == true) {
+            try {
+              await reportsApi.uploadReportMedia(result.reportId, paths);
+              uploadSuccess = true;
+            } catch (_) {}
+          }
+        }
+        if (!uploadSuccess && mounted) {
+          AppSnack.show(
+            context,
+            message: 'Report submitted. Photos could not be uploaded.',
+            type: AppSnackType.warning,
+          );
+        }
+      }
+      if (!mounted) return;
+      await clearReportDraft();
+      if (!mounted) return;
+      ServiceLocator.instance.profileNeedsRefresh.value++;
+      setState(() {
+        _submitting = false;
+        _submitPhase = null;
+      });
+      final Object? dialogResult = await showDialog<Object>(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return ReportSubmittedDialog(
+            categoryLabel: _draft.category?.label ?? 'Report',
+            reportNumber: result.reportNumber,
+            reportId: result.reportId,
+            address: _draft.address,
+            pointsAwarded: result.pointsAwarded,
+            isNewSite: result.isNewSite,
+          );
+        },
+      );
+      if (!mounted) return;
+      if (dialogResult == SubmittedDialogResult.reportAnother) {
+        _resetDraftAndStartOver();
+      } else {
+        Navigator.of(context).pop(dialogResult is String ? dialogResult : true);
+      }
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _submitPhase = null;
+      });
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'ACCOUNT_NOT_ACTIVE') {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
         );
-      },
-    );
-
-    if (!mounted) return;
-    if (result == SubmittedDialogResult.reportAnother) {
-      _resetDraftAndStartOver();
-    } else {
-      Navigator.of(context).pop(true);
+        return;
+      }
+      setState(() => _apiError = e);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _submitting = false;
+        _submitPhase = null;
+        _apiError = e is TimeoutException
+            ? AppError.timeout()
+            : e is SocketException
+                ? AppError.network(message: e.message, cause: e)
+                : AppError.unknown(cause: e);
+      });
     }
   }
 
@@ -486,6 +589,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       _highlightedStage = null;
       _attemptedStages.clear();
       _submitting = false;
+      _submitPhase = null;
       _evidenceTipDismissed = false;
     });
     _descriptionController.text = '';
@@ -608,6 +712,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 isComplete: _isStageComplete(stage),
                 isEnabled: _canNavigateToStage(stage),
                 onTap: () => _goToStage(stage),
+                stepIndex: entry.key,
+                totalSteps: ReportStage.values.length,
               ),
             );
           }).toList(),
@@ -666,6 +772,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
                 _buildCategoryField(context),
+                const SizedBox(height: AppSpacing.md),
+                _buildSeverityField(context),
                 const SizedBox(height: AppSpacing.md),
                 _buildDescriptionField(context),
                 const SizedBox(height: AppSpacing.md),
@@ -736,6 +844,15 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
+                  icon: Icons.signal_cellular_alt,
+                  title: 'Severity',
+                  subtitle: _severityLabel(_draft.severity),
+                  isComplete: true,
+                  isOptional: true,
+                  onTap: () => _goToStage(ReportStage.details),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                ReviewSummaryTile(
                   icon: Icons.location_on_outlined,
                   title: 'Location',
                   subtitle: _hasValidLocation
@@ -780,7 +897,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'Moderators will review within a few days. You\'ll see the status in My reports.',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  style: AppTypography.textTheme.bodySmall!.copyWith(
                     color: AppColors.textMuted,
                     height: 1.35,
                   ),
@@ -808,8 +925,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
         children: <Widget>[
           if (_apiError != null) ...[
             ApiErrorBanner(
-              message: _apiError!,
+              message: _apiError!.message,
               onDismiss: () => setState(() => _apiError = null),
+              onRetry: _apiError!.retryable
+                  ? () {
+                      setState(() => _apiError = null);
+                      _submit();
+                    }
+                  : null,
             ),
             const SizedBox(height: AppSpacing.md),
           ],
@@ -857,15 +980,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
             children: <Widget>[
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
+                style: AppTypography.sectionHeader,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 message,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                style: AppTypography.textTheme.bodySmall!.copyWith(
                   color: AppColors.textMuted,
                   height: 1.35,
                 ),
@@ -889,7 +1009,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             const SizedBox(height: AppSpacing.sm),
             Text(
               contextHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              style: AppTypography.textTheme.bodySmall!.copyWith(
                 color: AppColors.textMuted,
                 height: 1.35,
               ),
@@ -913,6 +1033,96 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child,
         ],
       ),
+    );
+  }
+
+  static const List<String> _severityLabels = <String>[
+    'Low',
+    'Moderate',
+    'Significant',
+    'High',
+    'Critical',
+  ];
+
+  String _severityLabel(int value) =>
+      '${value.clamp(1, 5)} – ${_severityLabels[(value.clamp(1, 5) - 1)]}';
+
+  Widget _buildSeverityField(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Text(
+          'Severity',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+            letterSpacing: -0.1,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: AppSpacing.sm,
+          ),
+          decoration: BoxDecoration(
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+            border: Border.all(
+              color: AppColors.inputBorder.withValues(alpha: 0.8),
+              width: 0.5,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                _severityLabel(_draft.severity),
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              CupertinoSlider(
+                value: _draft.severity.toDouble(),
+                min: 1,
+                max: 5,
+                divisions: 4,
+                activeColor: AppColors.primary,
+                onChanged: (double value) {
+                  AppHaptics.light();
+                  setState(
+                    () => _draft = _draft.copyWith(
+                      severity: value.round().clamp(1, 5),
+                    ),
+                  );
+                },
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text(
+                    'Low',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    'Critical',
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1126,15 +1336,24 @@ class _NewReportScreenState extends State<NewReportScreen> {
                         borderRadius: BorderRadius.circular(AppSpacing.radius18),
                       ),
                     ),
-                      child: Text(
-                        _submitting
-                            ? 'Submitting…'
-                            : isReviewStage
-                            ? 'Submit report'
-                            : _currentStage.primaryActionLabel,
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          _submitting
+                              ? (_submitPhase == 'creating'
+                                  ? 'Creating report…'
+                                  : _submitPhase == 'uploading'
+                                      ? 'Uploading photos…'
+                                      : 'Submitting…')
+                              : isReviewStage
+                              ? 'Submit report'
+                              : _currentStage.primaryActionLabel,
+                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: -0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),

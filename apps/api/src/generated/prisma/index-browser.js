@@ -205,10 +205,13 @@ exports.Prisma.SiteScalarFieldEnum = {
 exports.Prisma.ReportScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  reportNumber: 'reportNumber',
   siteId: 'siteId',
   reporterId: 'reporterId',
   description: 'description',
   mediaUrls: 'mediaUrls',
+  category: 'category',
+  severity: 'severity',
   status: 'status',
   moderatedAt: 'moderatedAt',
   moderationReason: 'moderationReason',

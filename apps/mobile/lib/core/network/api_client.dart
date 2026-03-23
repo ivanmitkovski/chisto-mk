@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:http/http.dart' as http;
 
@@ -49,6 +51,96 @@ class ApiClient {
 
   Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
     return _requestWithRetry('DELETE', path, headers: headers);
+  }
+
+  /// Multipart file upload. [filePaths] are local paths to files.
+  /// Field name is 'files' to match backend FilesInterceptor.
+  Future<ApiResponse> postMultipart(
+    String path,
+    List<String> filePaths,
+  ) async {
+    return _postMultipartWithRetry(path, filePaths);
+  }
+
+  Future<ApiResponse> _postMultipartWithRetry(
+    String path,
+    List<String> filePaths,
+  ) async {
+    try {
+      return await _postMultipart(path, filePaths);
+    } on AppError catch (e) {
+      if (e.code != 'UNAUTHORIZED' ||
+          _authPaths.contains(path) ||
+          refreshSession == null ||
+          _refreshing) {
+        rethrow;
+      }
+      _refreshing = true;
+      try {
+        final bool refreshed = await refreshSession!();
+        if (!refreshed) rethrow;
+      } on Exception catch (_) {
+        rethrow;
+      } finally {
+        _refreshing = false;
+      }
+      return _postMultipart(path, filePaths);
+    }
+  }
+
+  Future<ApiResponse> _postMultipart(
+    String path,
+    List<String> filePaths,
+  ) async {
+    final Uri url = Uri.parse('$_baseUrl$path');
+    final http.MultipartRequest request =
+        http.MultipartRequest('POST', url);
+
+    final String? token = _accessToken();
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.headers['Accept'] = 'application/json';
+
+    for (final String filePath in filePaths) {
+      final MediaType? contentType = _contentTypeForPath(filePath);
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'files',
+          filePath,
+          contentType: contentType,
+        ),
+      );
+    }
+
+    try {
+      final http.StreamedResponse streamed =
+          await request.send().timeout(_timeout);
+      final http.Response response = await http.Response.fromStream(streamed);
+      return _handleResponse(response);
+    } on TimeoutException catch (e) {
+      throw AppError.timeout(
+          message: e.message?.isEmpty ?? true ? null : e.message);
+    } on SocketException catch (e) {
+      throw AppError.network(message: e.message, cause: e);
+    } on AppError {
+      rethrow;
+    } on Exception catch (e) {
+      if (e is http.ClientException) {
+        throw AppError.network(message: e.message, cause: e);
+      }
+      rethrow;
+    }
+  }
+
+  static MediaType? _contentTypeForPath(String path) {
+    final String name = path.split(RegExp(r'[/\\]')).last.toLowerCase();
+    if (name.endsWith('.jpg') || name.endsWith('.jpeg')) {
+      return MediaType('image', 'jpeg');
+    }
+    if (name.endsWith('.png')) return MediaType('image', 'png');
+    if (name.endsWith('.webp')) return MediaType('image', 'webp');
+    return MediaType('image', 'jpeg');
   }
 
   /// Auth-related paths that should never trigger a transparent refresh
@@ -215,7 +307,7 @@ class ApiClient {
     }
     if (statusCode == 403) return AppError.forbidden(message: message);
     if (statusCode == 404) return AppError.notFound(message: message);
-    if (statusCode == 422 || code == 'VALIDATION_ERROR') {
+    if (statusCode == 422 || statusCode == 400 && code == 'VALIDATION_ERROR') {
       return AppError.validation(message: message, details: details);
     }
     if (statusCode >= 500) {

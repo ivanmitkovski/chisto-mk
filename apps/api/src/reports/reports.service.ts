@@ -1,9 +1,23 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Report, ReportStatus } from '@prisma/client';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  AdminNotificationCategory,
+  AdminNotificationTone,
+  Prisma,
+  Report,
+  ReportStatus,
+  Role,
+} from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../common/utils/distance';
 import { CreateReportDto } from './dto/create-report.dto';
+import { CreateReportWithLocationDto } from './dto/create-report-with-location.dto';
+import { ReportSubmitResponseDto } from './dto/report-submit-response.dto';
 import {
   AdminReportDetailDto,
   AdminReportListItemDto,
@@ -16,9 +30,12 @@ import {
   MergeDuplicateReportsDto,
   MergeDuplicateReportsResponseDto,
 } from './dto/admin-duplicate-report.dto';
+import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
+import { CitizenReportDetailDto } from './dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from './dto/user-report.dto';
+import { ReportsUploadService } from './reports-upload.service';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -28,15 +45,26 @@ const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = 
 };
 
 const DUPLICATE_RADIUS_METERS = 30;
+const SITE_NEARBY_RADIUS_METERS = 50;
+const POINTS_FIRST_REPORT = 100;
+const POINTS_CO_REPORT = 50;
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reportsUploadService: ReportsUploadService,
+  ) {}
 
-  private buildReportNumber(report: { id: string; createdAt: Date }): string {
+  /** Fallback for reports created before reportNumber column (e.g. during migration). */
+  private getReportNumberFallback(report: { id: string; createdAt: Date }): string {
     const shortId = report.id.slice(0, 4).toUpperCase();
     const yearSuffix = report.createdAt.getFullYear().toString().slice(-2);
     return `R-${yearSuffix}-${shortId}`;
+  }
+
+  private getReportNumber(report: { id: string; createdAt: Date; reportNumber?: string | null }): string {
+    return report.reportNumber ?? this.getReportNumberFallback(report);
   }
 
   private buildLocationLabel(site: {
@@ -80,7 +108,7 @@ export class ReportsService {
   }): AdminDuplicateReportItemDto {
     return {
       id: report.id,
-      reportNumber: this.buildReportNumber(report),
+      reportNumber: this.getReportNumber(report),
       title: report.site.description ?? report.description ?? 'Reported site',
       location: this.buildLocationLabel(report.site),
       submittedAt: report.createdAt.toISOString(),
@@ -229,50 +257,270 @@ export class ReportsService {
     });
   }
 
-  async findForCurrentUser(user: AuthenticatedUser): Promise<UserReportListItemDto[]> {
-    const reports = await this.prisma.report.findMany({
+  async createWithLocation(
+    user: AuthenticatedUser,
+    dto: CreateReportWithLocationDto,
+  ): Promise<ReportSubmitResponseDto> {
+    const { latitude, longitude, description, mediaUrls, category, severity } = dto;
+    const metersPerDegreeLat = 111_320;
+    const deltaLat = SITE_NEARBY_RADIUS_METERS / metersPerDegreeLat;
+    const metersPerDegreeLng =
+      Math.cos((latitude * Math.PI) / 180) * metersPerDegreeLat || metersPerDegreeLat;
+    const deltaLng = SITE_NEARBY_RADIUS_METERS / metersPerDegreeLng;
+
+    const candidateSites = await this.prisma.site.findMany({
       where: {
-        reporterId: user.userId,
-      },
-      orderBy: {
-        createdAt: 'desc',
+        latitude: { gte: latitude - deltaLat, lte: latitude + deltaLat },
+        longitude: { gte: longitude - deltaLng, lte: longitude + deltaLng },
       },
       include: {
-        site: {
-          select: {
-            latitude: true,
-            longitude: true,
-            description: true,
-          },
-        },
-        coReporters: true,
-        potentialDuplicateOf: {
-          select: {
-            id: true,
-            createdAt: true,
-          },
-        },
-        potentialDuplicates: {
-          select: {
-            id: true,
-          },
+        reports: {
+          orderBy: { createdAt: 'asc' },
+          take: 1,
+          select: { id: true, createdAt: true, reporterId: true },
         },
       },
     });
 
-    return reports.map((report) => ({
-      id: report.id,
-      reportNumber: this.buildReportNumber(report),
-      title: report.site.description ?? 'Reported site',
-      location: this.buildLocationLabel(report.site),
-      submittedAt: report.createdAt.toISOString(),
-      status: report.status,
-      isPotentialDuplicate:
-        report.potentialDuplicateOfId !== null ||
-        report.potentialDuplicates.length > 0 ||
-        report.coReporters.length > 0,
-      coReporterCount: report.coReporters.length,
-    }));
+    const nearbySites = candidateSites.filter((site) => {
+      const dist = distanceInMeters(latitude, longitude, site.latitude, site.longitude);
+      return dist <= SITE_NEARBY_RADIUS_METERS;
+    });
+
+    type EarliestReport = { id: string; createdAt: Date; reporterId: string | null; siteId: string };
+    let primaryReport: EarliestReport | null = null;
+    for (const site of nearbySites) {
+      const firstReport = site.reports[0];
+      if (firstReport && (!primaryReport || firstReport.createdAt < primaryReport.createdAt)) {
+        primaryReport = {
+          id: firstReport.id,
+          createdAt: firstReport.createdAt,
+          reporterId: firstReport.reporterId,
+          siteId: site.id,
+        };
+      }
+    }
+
+    const targetSiteId = primaryReport?.siteId ?? null;
+
+    return this.prisma.$transaction(async (tx) => {
+      let siteId: string;
+      let isNewSite: boolean;
+
+      if (targetSiteId) {
+        siteId = targetSiteId;
+        isNewSite = false;
+      } else {
+        const newSite = await tx.site.create({
+          data: {
+            latitude,
+            longitude,
+            description: description?.trim() || null,
+          },
+        });
+        siteId = newSite.id;
+        isNewSite = true;
+      }
+
+      const newReport = await tx.report.create({
+        data: {
+          siteId,
+          description: description?.trim() || null,
+          mediaUrls: mediaUrls ?? [],
+          reporterId: user.userId,
+          potentialDuplicateOfId: primaryReport?.id ?? null,
+          category: category ?? null,
+          severity: severity ?? null,
+        },
+      });
+
+      if (
+        primaryReport &&
+        primaryReport.reporterId &&
+        primaryReport.reporterId !== user.userId
+      ) {
+        await tx.reportCoReporter.upsert({
+          where: {
+            reportId_userId: {
+              reportId: primaryReport.id,
+              userId: user.userId,
+            },
+          },
+          update: {},
+          create: {
+            reportId: primaryReport.id,
+            userId: user.userId,
+          },
+        });
+      }
+
+      const reportNumber = this.getReportNumber(newReport);
+
+      await tx.adminNotification.create({
+        data: {
+          title: isNewSite ? 'New pollution site reported' : 'Co-report added to existing site',
+          message: `Report ${reportNumber} submitted${isNewSite ? ' at a new location' : ' near an existing site'}.`,
+          timeLabel: 'Just now',
+          tone: AdminNotificationTone.info,
+          category: AdminNotificationCategory.reports,
+          href: `/dashboard/reports?reportId=${newReport.id}`,
+        },
+      });
+
+      return {
+        reportId: newReport.id,
+        reportNumber: this.getReportNumber(newReport),
+        siteId,
+        isNewSite,
+        pointsAwarded: 0, // Points awarded when admin approves, not at submit
+      };
+    });
+  }
+
+  /**
+   * Appends media URLs to an existing report. Only the report's reporter or co-reporters may add media.
+   * Used by the two-phase submit flow: create report first, then upload photos to avoid S3 orphans.
+   */
+  async appendMedia(
+    reportId: string,
+    userId: string,
+    urls: string[],
+  ): Promise<void> {
+    if (!urls || urls.length === 0) {
+      return;
+    }
+
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      select: {
+        id: true,
+        reporterId: true,
+        mediaUrls: true,
+        coReporters: { select: { userId: true } },
+      },
+    });
+
+    if (!report) {
+      throw new NotFoundException({
+        code: 'REPORT_NOT_FOUND',
+        message: `Report with id '${reportId}' was not found`,
+      });
+    }
+
+    const isReporter = report.reporterId === userId;
+    const isCoReporter = report.coReporters.some((c) => c.userId === userId);
+    if (!isReporter && !isCoReporter) {
+      throw new ForbiddenException({
+        code: 'FORBIDDEN',
+        message: 'Only the report creator or co-reporters may add media',
+      });
+    }
+
+    const existingUrls = report.mediaUrls ?? [];
+    const newUrls = [...existingUrls, ...urls];
+    if (newUrls.length > 10) {
+      throw new BadRequestException({
+        code: 'TOO_MANY_MEDIA',
+        message: 'Maximum 10 media files per report',
+      });
+    }
+
+    await this.prisma.report.update({
+      where: { id: reportId },
+      data: { mediaUrls: newUrls },
+    });
+  }
+
+  async findForCurrentUser(
+    user: AuthenticatedUser,
+    query: ListMyReportsQueryDto,
+  ): Promise<{
+    data: UserReportListItemDto[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const where = { reporterId: user.userId };
+    const skip = (query.page - 1) * query.limit;
+
+    const [reports, total] = await this.prisma.$transaction([
+      this.prisma.report.findMany({
+        where,
+        skip,
+        take: query.limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          site: {
+            select: {
+              latitude: true,
+              longitude: true,
+              description: true,
+            },
+          },
+          coReporters: true,
+          potentialDuplicateOf: {
+            select: {
+              id: true,
+              createdAt: true,
+            },
+          },
+          potentialDuplicates: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      }),
+      this.prisma.report.count({ where }),
+    ]);
+
+    const reportIds = reports.map((r) => r.id);
+    const pointTxns = await this.prisma.pointTransaction.findMany({
+      where: {
+        referenceType: 'Report',
+        referenceId: { in: reportIds },
+      },
+      select: { referenceId: true, delta: true },
+    });
+    const pointsByReport = new Map<string, number>();
+    for (const t of pointTxns) {
+      if (t.referenceId) {
+        pointsByReport.set(t.referenceId, (pointsByReport.get(t.referenceId) ?? 0) + t.delta);
+      }
+    }
+
+    const data = await Promise.all(
+      reports.map(async (report) => {
+        const signedUrls =
+          report.mediaUrls?.length > 0
+            ? await this.reportsUploadService.signUrls(report.mediaUrls)
+            : [];
+        return {
+          id: report.id,
+          reportNumber: this.getReportNumber(report),
+          title: report.site.description ?? report.description ?? 'Reported site',
+          location: this.buildLocationLabel(report.site),
+          submittedAt: report.createdAt.toISOString(),
+          status: report.status,
+          isPotentialDuplicate:
+            report.potentialDuplicateOfId !== null ||
+            report.potentialDuplicates.length > 0 ||
+            report.coReporters.length > 0,
+          coReporterCount: report.coReporters.length,
+          mediaUrls: signedUrls,
+          pointsAwarded: pointsByReport.get(report.id) ?? 0,
+          category: report.category ?? null,
+          severity: report.severity ?? null,
+        };
+      }),
+    );
+
+    return {
+      data,
+      total,
+      page: query.page,
+      limit: query.limit,
+    };
   }
 
   async findAllForModeration(query: ListReportsQueryDto): Promise<AdminReportListResponseDto> {
@@ -314,7 +562,7 @@ export class ReportsService {
 
     const items: AdminReportListItemDto[] = data.map((report) => ({
       id: report.id,
-      reportNumber: this.buildReportNumber(report),
+      reportNumber: this.getReportNumber(report),
       name: report.site.description ?? 'Reported site',
       location: report.site ? this.buildLocationLabel(report.site) : 'Unknown location',
       dateReportedAt: report.createdAt.toISOString(),
@@ -616,15 +864,66 @@ export class ReportsService {
 
     const now = new Date();
 
-    return this.prisma.report.update({
-      where: { id: reportId },
-      data: {
-        status: dto.status,
-        moderatedAt: now,
-        moderationReason: dto.reason ?? null,
-        moderatedById: moderator.userId,
-      },
+    const updated = await this.prisma.$transaction(async (tx) => {
+      const updatedReport = await tx.report.update({
+        where: { id: reportId },
+        data: {
+          status: dto.status,
+          moderatedAt: now,
+          moderationReason: dto.reason ?? null,
+          moderatedById: moderator.userId,
+        },
+      });
+
+      if (dto.status === 'APPROVED' && updatedReport.reporterId) {
+        const existingAward = await tx.pointTransaction.findFirst({
+          where: {
+            referenceType: 'Report',
+            referenceId: reportId,
+          },
+        });
+        if (!existingAward) {
+          const otherApprovedCount = await tx.report.count({
+            where: {
+              siteId: updatedReport.siteId,
+              status: 'APPROVED',
+              id: { not: reportId },
+            },
+          });
+          const isFirstApproved = otherApprovedCount === 0;
+          const points = isFirstApproved ? POINTS_FIRST_REPORT : POINTS_CO_REPORT;
+          const user = await tx.user.findUnique({
+            where: { id: updatedReport.reporterId },
+            select: { pointsBalance: true, totalPointsEarned: true },
+          });
+          if (user) {
+            const balanceAfter = user.pointsBalance + points;
+            const totalEarnedAfter = user.totalPointsEarned + points;
+            await tx.pointTransaction.create({
+              data: {
+                userId: updatedReport.reporterId,
+                delta: points,
+                balanceAfter,
+                reasonCode: isFirstApproved ? 'FIRST_REPORT' : 'CO_REPORT',
+                referenceType: 'Report',
+                referenceId: reportId,
+              },
+            });
+            await tx.user.update({
+              where: { id: updatedReport.reporterId },
+              data: {
+                pointsBalance: balanceAfter,
+                totalPointsEarned: totalEarnedAfter,
+              },
+            });
+          }
+        }
+      }
+
+      return updatedReport;
     });
+
+    return updated;
   }
 
   async findOneForModeration(reportId: string): Promise<AdminReportDetailDto> {
@@ -677,7 +976,7 @@ export class ReportsService {
       });
     }
 
-    const reportNumber = this.buildReportNumber(report);
+    const reportNumber = this.getReportNumber(report);
     const locationLabel = this.buildLocationLabel(report.site);
 
     const reporterAlias = report.reporter
@@ -750,7 +1049,7 @@ export class ReportsService {
       report.potentialDuplicateOfId !== null || report.potentialDuplicates.length > 0 || coReporters.length > 0;
 
     const potentialDuplicateOfReportNumber = report.potentialDuplicateOf
-      ? this.buildReportNumber(report.potentialDuplicateOf)
+      ? this.getReportNumber(report.potentialDuplicateOf)
       : null;
 
     return {
@@ -779,6 +1078,104 @@ export class ReportsService {
       isPotentialDuplicate,
       coReporters,
       potentialDuplicateOfReportNumber,
+    };
+  }
+
+  async findOne(
+    reportId: string,
+    user: AuthenticatedUser,
+  ): Promise<AdminReportDetailDto | CitizenReportDetailDto> {
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      select: { id: true, reporterId: true },
+    });
+    if (!report) {
+      throw new NotFoundException({
+        code: 'REPORT_NOT_FOUND',
+        message: `Report with id '${reportId}' was not found`,
+      });
+    }
+    if (user.role === Role.ADMIN) {
+      return this.findOneForModeration(reportId);
+    }
+    if (report.reporterId === user.userId) {
+      return this.findOneForCitizen(reportId, user);
+    }
+    throw new NotFoundException({
+      code: 'REPORT_NOT_FOUND',
+      message: `Report with id '${reportId}' was not found`,
+    });
+  }
+
+  async findOneForCitizen(
+    reportId: string,
+    user: AuthenticatedUser,
+  ): Promise<CitizenReportDetailDto> {
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      include: {
+        site: true,
+        reporter: {
+          select: { firstName: true, lastName: true },
+        },
+        coReporters: {
+          include: {
+            user: {
+              select: { firstName: true, lastName: true },
+            },
+          },
+        },
+      },
+    });
+
+    if (!report) {
+      throw new NotFoundException({
+        code: 'REPORT_NOT_FOUND',
+        message: `Report with id '${reportId}' was not found`,
+      });
+    }
+
+    if (report.reporterId !== user.userId) {
+      throw new NotFoundException({
+        code: 'REPORT_NOT_FOUND',
+        message: `Report with id '${reportId}' was not found`,
+      });
+    }
+
+    const reporterName = report.reporter
+      ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
+      : null;
+    const coReporterNames = report.coReporters
+      .map((cr) =>
+        cr.user ? `${cr.user.firstName} ${cr.user.lastName}`.trim() : null,
+      )
+      .filter((n): n is string => !!n);
+
+    const mediaUrls = await this.reportsUploadService.signUrls(report.mediaUrls);
+    const pointTxns = await this.prisma.pointTransaction.findMany({
+      where: { referenceType: 'Report', referenceId: reportId },
+      select: { delta: true },
+    });
+    const pointsAwarded = pointTxns.reduce((sum, t) => sum + t.delta, 0);
+    return {
+      id: report.id,
+      reportNumber: this.getReportNumber(report),
+      status: report.status,
+      description: report.description,
+      mediaUrls,
+      submittedAt: report.createdAt.toISOString(),
+      site: {
+        id: report.site.id,
+        latitude: report.site.latitude,
+        longitude: report.site.longitude,
+        description: report.site.description,
+      },
+      reporterName,
+      coReporterNames,
+      location: this.buildLocationLabel(report.site),
+      pointsAwarded,
+      category: report.category ?? null,
+      severity: report.severity ?? null,
     };
   }
 }

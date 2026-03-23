@@ -4,24 +4,33 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 
-/// Bottom sheet for choosing Apple Maps or Google Maps to get directions.
+enum DirectionsSheetMode {
+  directions,
+  viewLocation,
+}
+
 class DirectionsSheet extends StatelessWidget {
   const DirectionsSheet({
     super.key,
+    this.mode = DirectionsSheetMode.directions,
     required this.onAppleMapsTap,
     required this.onGoogleMapsTap,
     required this.onDismiss,
   });
 
+  final DirectionsSheetMode mode;
   final VoidCallback onAppleMapsTap;
   final VoidCallback onGoogleMapsTap;
   final VoidCallback onDismiss;
 
   @override
   Widget build(BuildContext context) {
+    final bool isViewLocation = mode == DirectionsSheetMode.viewLocation;
     return ReportSheetScaffold(
-      title: 'Open in Maps',
-      subtitle: 'Choose which app to get directions.',
+      title: isViewLocation ? 'View location' : 'Open in Maps',
+      subtitle: isViewLocation
+          ? 'Choose which app to view this location on a map.'
+          : 'Choose which app to get directions.',
       trailing: ReportCircleIconButton(
         icon: Icons.close,
         semanticLabel: 'Close',

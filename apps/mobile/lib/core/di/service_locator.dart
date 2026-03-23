@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
@@ -8,8 +10,12 @@ import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
+import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
+import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ServiceLocator {
@@ -26,6 +32,11 @@ class ServiceLocator {
   EventsRepository? _eventsRepository;
   CheckInRepository? _checkInRepository;
   ProfileRepository? _profileRepository;
+  ReportsApiRepository? _reportsApiRepository;
+  SitesRepository? _sitesRepository;
+
+  /// Increment to trigger profile refresh (e.g. after report submit).
+  final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
 
   AppConfig get config => _config!;
   AuthState get authState => _authState!;
@@ -36,6 +47,8 @@ class ServiceLocator {
   EventsRepository get eventsRepository => _eventsRepository!;
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
+  ReportsApiRepository get reportsApiRepository => _reportsApiRepository!;
+  SitesRepository get sitesRepository => _sitesRepository!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -77,6 +90,8 @@ class ServiceLocator {
     _eventsRepository = InMemoryEventsStore.instance;
     _checkInRepository = InMemoryCheckInRepository.instance;
     _profileRepository = ApiProfileRepository(client: _apiClient!);
+    _reportsApiRepository = ApiReportsRepository(client: _apiClient!);
+    _sitesRepository = ApiSitesRepository(client: _apiClient!);
 
     _initialized = true;
   }
@@ -91,6 +106,8 @@ class ServiceLocator {
     _eventsRepository = null;
     _checkInRepository = null;
     _profileRepository = null;
+    _reportsApiRepository = null;
+    _sitesRepository = null;
     _initialized = false;
   }
 }

@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Role, User, UserStatus } from '@prisma/client';
+import { Role, User, UserStatus } from '../prisma-client';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { OTP_SENDER, OtpSender } from '../otp/otp-sender.interface';

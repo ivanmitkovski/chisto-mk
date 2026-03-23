@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient, Role, SiteStatus, ReportStatus } from '@prisma/client';
+import { PrismaClient, Role, SiteStatus, ReportStatus } from '../src/prisma-client';
 import * as bcrypt from 'bcrypt';
 
 function connectionStringWithNoVerify(url: string): string {

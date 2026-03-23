@@ -9979,16 +9979,29 @@ export namespace Prisma {
 
   export type AggregateReport = {
     _count: ReportCountAggregateOutputType | null
+    _avg: ReportAvgAggregateOutputType | null
+    _sum: ReportSumAggregateOutputType | null
     _min: ReportMinAggregateOutputType | null
     _max: ReportMaxAggregateOutputType | null
+  }
+
+  export type ReportAvgAggregateOutputType = {
+    severity: number | null
+  }
+
+  export type ReportSumAggregateOutputType = {
+    severity: number | null
   }
 
   export type ReportMinAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    reportNumber: string | null
     siteId: string | null
     reporterId: string | null
     description: string | null
+    category: string | null
+    severity: number | null
     status: $Enums.ReportStatus | null
     moderatedAt: Date | null
     moderationReason: string | null
@@ -9999,9 +10012,12 @@ export namespace Prisma {
   export type ReportMaxAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    reportNumber: string | null
     siteId: string | null
     reporterId: string | null
     description: string | null
+    category: string | null
+    severity: number | null
     status: $Enums.ReportStatus | null
     moderatedAt: Date | null
     moderationReason: string | null
@@ -10012,10 +10028,13 @@ export namespace Prisma {
   export type ReportCountAggregateOutputType = {
     id: number
     createdAt: number
+    reportNumber: number
     siteId: number
     reporterId: number
     description: number
     mediaUrls: number
+    category: number
+    severity: number
     status: number
     moderatedAt: number
     moderationReason: number
@@ -10025,12 +10044,23 @@ export namespace Prisma {
   }
 
 
+  export type ReportAvgAggregateInputType = {
+    severity?: true
+  }
+
+  export type ReportSumAggregateInputType = {
+    severity?: true
+  }
+
   export type ReportMinAggregateInputType = {
     id?: true
     createdAt?: true
+    reportNumber?: true
     siteId?: true
     reporterId?: true
     description?: true
+    category?: true
+    severity?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -10041,9 +10071,12 @@ export namespace Prisma {
   export type ReportMaxAggregateInputType = {
     id?: true
     createdAt?: true
+    reportNumber?: true
     siteId?: true
     reporterId?: true
     description?: true
+    category?: true
+    severity?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -10054,10 +10087,13 @@ export namespace Prisma {
   export type ReportCountAggregateInputType = {
     id?: true
     createdAt?: true
+    reportNumber?: true
     siteId?: true
     reporterId?: true
     description?: true
     mediaUrls?: true
+    category?: true
+    severity?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -10104,6 +10140,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ReportAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ReportSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ReportMinAggregateInputType
@@ -10134,6 +10182,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ReportCountAggregateInputType | true
+    _avg?: ReportAvgAggregateInputType
+    _sum?: ReportSumAggregateInputType
     _min?: ReportMinAggregateInputType
     _max?: ReportMaxAggregateInputType
   }
@@ -10141,16 +10191,21 @@ export namespace Prisma {
   export type ReportGroupByOutputType = {
     id: string
     createdAt: Date
+    reportNumber: string | null
     siteId: string
     reporterId: string | null
     description: string | null
     mediaUrls: string[]
+    category: string | null
+    severity: number | null
     status: $Enums.ReportStatus
     moderatedAt: Date | null
     moderationReason: string | null
     moderatedById: string | null
     potentialDuplicateOfId: string | null
     _count: ReportCountAggregateOutputType | null
+    _avg: ReportAvgAggregateOutputType | null
+    _sum: ReportSumAggregateOutputType | null
     _min: ReportMinAggregateOutputType | null
     _max: ReportMaxAggregateOutputType | null
   }
@@ -10172,10 +10227,13 @@ export namespace Prisma {
   export type ReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
     description?: boolean
     mediaUrls?: boolean
+    category?: boolean
+    severity?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -10193,10 +10251,13 @@ export namespace Prisma {
   export type ReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
     description?: boolean
     mediaUrls?: boolean
+    category?: boolean
+    severity?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -10211,10 +10272,13 @@ export namespace Prisma {
   export type ReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
     description?: boolean
     mediaUrls?: boolean
+    category?: boolean
+    severity?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -10229,10 +10293,13 @@ export namespace Prisma {
   export type ReportSelectScalar = {
     id?: boolean
     createdAt?: boolean
+    reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
     description?: boolean
     mediaUrls?: boolean
+    category?: boolean
+    severity?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -10240,7 +10307,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: boolean
   }
 
-  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "siteId" | "reporterId" | "description" | "mediaUrls" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
+  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "description" | "mediaUrls" | "category" | "severity" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
   export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
@@ -10276,10 +10343,13 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       createdAt: Date
+      reportNumber: string | null
       siteId: string
       reporterId: string | null
       description: string | null
       mediaUrls: string[]
+      category: string | null
+      severity: number | null
       status: $Enums.ReportStatus
       moderatedAt: Date | null
       moderationReason: string | null
@@ -10716,10 +10786,13 @@ export namespace Prisma {
   interface ReportFieldRefs {
     readonly id: FieldRef<"Report", 'String'>
     readonly createdAt: FieldRef<"Report", 'DateTime'>
+    readonly reportNumber: FieldRef<"Report", 'String'>
     readonly siteId: FieldRef<"Report", 'String'>
     readonly reporterId: FieldRef<"Report", 'String'>
     readonly description: FieldRef<"Report", 'String'>
     readonly mediaUrls: FieldRef<"Report", 'String[]'>
+    readonly category: FieldRef<"Report", 'String'>
+    readonly severity: FieldRef<"Report", 'Int'>
     readonly status: FieldRef<"Report", 'ReportStatus'>
     readonly moderatedAt: FieldRef<"Report", 'DateTime'>
     readonly moderationReason: FieldRef<"Report", 'String'>
@@ -13563,10 +13636,13 @@ export namespace Prisma {
   export const ReportScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
+    reportNumber: 'reportNumber',
     siteId: 'siteId',
     reporterId: 'reporterId',
     description: 'description',
     mediaUrls: 'mediaUrls',
+    category: 'category',
+    severity: 'severity',
     status: 'status',
     moderatedAt: 'moderatedAt',
     moderationReason: 'moderationReason',
@@ -14354,10 +14430,13 @@ export namespace Prisma {
     NOT?: ReportWhereInput | ReportWhereInput[]
     id?: StringFilter<"Report"> | string
     createdAt?: DateTimeFilter<"Report"> | Date | string
+    reportNumber?: StringNullableFilter<"Report"> | string | null
     siteId?: StringFilter<"Report"> | string
     reporterId?: StringNullableFilter<"Report"> | string | null
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
+    category?: StringNullableFilter<"Report"> | string | null
+    severity?: IntNullableFilter<"Report"> | number | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -14374,10 +14453,13 @@ export namespace Prisma {
   export type ReportOrderByWithRelationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportNumber?: SortOrderInput | SortOrder
     siteId?: SortOrder
     reporterId?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     mediaUrls?: SortOrder
+    category?: SortOrderInput | SortOrder
+    severity?: SortOrderInput | SortOrder
     status?: SortOrder
     moderatedAt?: SortOrderInput | SortOrder
     moderationReason?: SortOrderInput | SortOrder
@@ -14393,6 +14475,7 @@ export namespace Prisma {
 
   export type ReportWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    reportNumber?: string
     AND?: ReportWhereInput | ReportWhereInput[]
     OR?: ReportWhereInput[]
     NOT?: ReportWhereInput | ReportWhereInput[]
@@ -14401,6 +14484,8 @@ export namespace Prisma {
     reporterId?: StringNullableFilter<"Report"> | string | null
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
+    category?: StringNullableFilter<"Report"> | string | null
+    severity?: IntNullableFilter<"Report"> | number | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -14412,23 +14497,28 @@ export namespace Prisma {
     potentialDuplicateOf?: XOR<ReportNullableScalarRelationFilter, ReportWhereInput> | null
     potentialDuplicates?: ReportListRelationFilter
     coReporters?: ReportCoReporterListRelationFilter
-  }, "id">
+  }, "id" | "reportNumber">
 
   export type ReportOrderByWithAggregationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportNumber?: SortOrderInput | SortOrder
     siteId?: SortOrder
     reporterId?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     mediaUrls?: SortOrder
+    category?: SortOrderInput | SortOrder
+    severity?: SortOrderInput | SortOrder
     status?: SortOrder
     moderatedAt?: SortOrderInput | SortOrder
     moderationReason?: SortOrderInput | SortOrder
     moderatedById?: SortOrderInput | SortOrder
     potentialDuplicateOfId?: SortOrderInput | SortOrder
     _count?: ReportCountOrderByAggregateInput
+    _avg?: ReportAvgOrderByAggregateInput
     _max?: ReportMaxOrderByAggregateInput
     _min?: ReportMinOrderByAggregateInput
+    _sum?: ReportSumOrderByAggregateInput
   }
 
   export type ReportScalarWhereWithAggregatesInput = {
@@ -14437,10 +14527,13 @@ export namespace Prisma {
     NOT?: ReportScalarWhereWithAggregatesInput | ReportScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Report"> | string
     createdAt?: DateTimeWithAggregatesFilter<"Report"> | Date | string
+    reportNumber?: StringNullableWithAggregatesFilter<"Report"> | string | null
     siteId?: StringWithAggregatesFilter<"Report"> | string
     reporterId?: StringNullableWithAggregatesFilter<"Report"> | string | null
     description?: StringNullableWithAggregatesFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
+    category?: StringNullableWithAggregatesFilter<"Report"> | string | null
+    severity?: IntNullableWithAggregatesFilter<"Report"> | number | null
     status?: EnumReportStatusWithAggregatesFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableWithAggregatesFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableWithAggregatesFilter<"Report"> | string | null
@@ -15180,8 +15273,11 @@ export namespace Prisma {
   export type ReportCreateInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -15196,10 +15292,13 @@ export namespace Prisma {
   export type ReportUncheckedCreateInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -15212,8 +15311,11 @@ export namespace Prisma {
   export type ReportUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15228,10 +15330,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15244,10 +15349,13 @@ export namespace Prisma {
   export type ReportCreateManyInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -15258,8 +15366,11 @@ export namespace Prisma {
   export type ReportUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -15268,10 +15379,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -16094,6 +16208,17 @@ export namespace Prisma {
     isEmpty?: boolean
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type EnumReportStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ReportStatus | EnumReportStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReportStatus[] | ListEnumReportStatusFieldRefInput<$PrismaModel>
@@ -16114,10 +16239,13 @@ export namespace Prisma {
   export type ReportCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
     description?: SortOrder
     mediaUrls?: SortOrder
+    category?: SortOrder
+    severity?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
@@ -16125,12 +16253,19 @@ export namespace Prisma {
     potentialDuplicateOfId?: SortOrder
   }
 
+  export type ReportAvgOrderByAggregateInput = {
+    severity?: SortOrder
+  }
+
   export type ReportMaxOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
     description?: SortOrder
+    category?: SortOrder
+    severity?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
@@ -16141,14 +16276,37 @@ export namespace Prisma {
   export type ReportMinOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
     description?: SortOrder
+    category?: SortOrder
+    severity?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
     moderatedById?: SortOrder
     potentialDuplicateOfId?: SortOrder
+  }
+
+  export type ReportSumOrderByAggregateInput = {
+    severity?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumReportStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -16730,6 +16888,14 @@ export namespace Prisma {
     push?: string | string[]
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type EnumReportStatusFieldUpdateOperationsInput = {
     set?: $Enums.ReportStatus
   }
@@ -17175,6 +17341,33 @@ export namespace Prisma {
     not?: NestedEnumReportStatusFilter<$PrismaModel> | $Enums.ReportStatus
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type NestedEnumReportStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ReportStatus | EnumReportStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReportStatus[] | ListEnumReportStatusFieldRefInput<$PrismaModel>
@@ -17188,8 +17381,11 @@ export namespace Prisma {
   export type ReportCreateWithoutReporterInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -17203,9 +17399,12 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutReporterInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -17228,8 +17427,11 @@ export namespace Prisma {
   export type ReportCreateWithoutModeratedByInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -17243,10 +17445,13 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutModeratedByInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -17409,10 +17614,13 @@ export namespace Prisma {
     NOT?: ReportScalarWhereInput | ReportScalarWhereInput[]
     id?: StringFilter<"Report"> | string
     createdAt?: DateTimeFilter<"Report"> | Date | string
+    reportNumber?: StringNullableFilter<"Report"> | string | null
     siteId?: StringFilter<"Report"> | string
     reporterId?: StringNullableFilter<"Report"> | string | null
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
+    category?: StringNullableFilter<"Report"> | string | null
+    severity?: IntNullableFilter<"Report"> | number | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -17884,8 +18092,11 @@ export namespace Prisma {
   export type ReportCreateWithoutSiteInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -17899,9 +18110,12 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutSiteInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18129,8 +18343,11 @@ export namespace Prisma {
   export type ReportCreateWithoutPotentialDuplicatesInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18144,10 +18361,13 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutPotentialDuplicatesInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18164,8 +18384,11 @@ export namespace Prisma {
   export type ReportCreateWithoutPotentialDuplicateOfInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18179,10 +18402,13 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutPotentialDuplicateOfInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18384,8 +18610,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutPotentialDuplicatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18399,10 +18628,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutPotentialDuplicatesInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18446,8 +18678,11 @@ export namespace Prisma {
   export type ReportCreateWithoutCoReportersInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18461,10 +18696,13 @@ export namespace Prisma {
   export type ReportUncheckedCreateWithoutCoReportersInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18543,8 +18781,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutCoReportersInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18558,10 +18799,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutCoReportersInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18690,9 +18934,12 @@ export namespace Prisma {
   export type ReportCreateManyReporterInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18703,10 +18950,13 @@ export namespace Prisma {
   export type ReportCreateManyModeratedByInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18757,8 +19007,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutReporterInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18772,9 +19025,12 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutReporterInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18787,9 +19043,12 @@ export namespace Prisma {
   export type ReportUncheckedUpdateManyWithoutReporterInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18800,8 +19059,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutModeratedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18815,10 +19077,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutModeratedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18830,10 +19095,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateManyWithoutModeratedByInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -18966,9 +19234,12 @@ export namespace Prisma {
   export type ReportCreateManySiteInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -18989,8 +19260,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19004,9 +19278,12 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19019,9 +19296,12 @@ export namespace Prisma {
   export type ReportUncheckedUpdateManyWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19062,10 +19342,13 @@ export namespace Prisma {
   export type ReportCreateManyPotentialDuplicateOfInput = {
     id?: string
     createdAt?: Date | string
+    reportNumber?: string | null
     siteId: string
     reporterId?: string | null
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -19081,8 +19364,11 @@ export namespace Prisma {
   export type ReportUpdateWithoutPotentialDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19096,10 +19382,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateWithoutPotentialDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -19111,10 +19400,13 @@ export namespace Prisma {
   export type ReportUncheckedUpdateManyWithoutPotentialDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null

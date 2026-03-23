@@ -13,6 +13,8 @@ class StageChip extends StatelessWidget {
     required this.isComplete,
     required this.isEnabled,
     required this.onTap,
+    this.stepIndex,
+    this.totalSteps,
   });
 
   final String label;
@@ -20,6 +22,8 @@ class StageChip extends StatelessWidget {
   final bool isComplete;
   final bool isEnabled;
   final VoidCallback onTap;
+  final int? stepIndex;
+  final int? totalSteps;
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +36,16 @@ class StageChip extends StatelessWidget {
         ? AppColors.primaryDark
         : AppColors.textMuted;
 
-    final String statusText = isComplete ? 'Complete' : isCurrent ? 'Current' : 'Incomplete';
-    final String hint = isEnabled ? 'Double-tap to go to $label' : 'Complete previous steps first.';
+    final String statusText =
+        isComplete ? 'Complete' : isCurrent ? 'Current' : 'Incomplete';
+    final String stepLabel = stepIndex != null && totalSteps != null
+        ? 'Step ${stepIndex! + 1} of $totalSteps, $label'
+        : '$label step';
+    final String hint =
+        isEnabled ? 'Double-tap to go to $label' : 'Complete previous steps first.';
     return Semantics(
       button: true,
-      label: '$label step. $statusText.',
+      label: '$stepLabel. $statusText.',
       hint: hint,
       child: Opacity(
         opacity: isEnabled ? 1 : 0.55,

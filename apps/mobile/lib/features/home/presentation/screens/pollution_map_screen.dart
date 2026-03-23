@@ -8,10 +8,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -87,7 +87,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   /// At z=15, pixel-radius threshold ≈ 0.0022°, separating Skopje's closest pair (~0.003°).
   static const double _minZoomClusterExpand = 15.0;
 
-  late final Map<String, LatLng> _siteCoordinates = getMockSiteCoordinates();
+  Map<String, LatLng> _siteCoordinates = <String, LatLng>{};
 
   /// Whether we've already tried to zoom to user location on startup.
   bool _hasAttemptedInitialLocate = false;
@@ -111,18 +111,38 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   Future<void> _loadSites() async {
     setState(() => _loadError = null);
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 300));
+      final double lat = _userLocation?.latitude ?? ReportGeoFence.centerLat;
+      final double lng = _userLocation?.longitude ?? ReportGeoFence.centerLng;
+      final result = await ServiceLocator.instance.sitesRepository.getSites(
+        latitude: lat,
+        longitude: lng,
+        radiusKm: 50,
+        page: 1,
+        limit: 100,
+      );
       if (!mounted) return;
-      final List<PollutionSite> sites = buildMockPollutionSites();
+      final Map<String, LatLng> coords = <String, LatLng>{};
+      for (final PollutionSite s in result.sites) {
+        if (s.latitude != null && s.longitude != null) {
+          coords[s.id] = LatLng(s.latitude!, s.longitude!);
+        }
+      }
       setState(() {
-        _allSites = sites;
-        _activeStatuses = sites.map((PollutionSite s) => s.statusLabel).toSet();
+        _allSites = result.sites;
+        _siteCoordinates = coords;
+        _activeStatuses = result.sites.map((PollutionSite s) => s.statusLabel).toSet();
         _loadError = null;
         _filteredSitesCache = null;
         _filteredSitesCacheHash = 0;
         _displayedSitesCache = null;
         _displayedSitesFilterHashCache = -1;
       });
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() => _loadError = e);
+      if (mounted) {
+        AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() => _loadError = AppError.network(cause: e));

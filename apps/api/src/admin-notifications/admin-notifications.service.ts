@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { AdminNotification, Prisma } from '@prisma/client';
+import { AdminNotification, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.dto';

@@ -7,7 +7,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '@prisma/client';
+import { Role } from '../prisma-client';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';

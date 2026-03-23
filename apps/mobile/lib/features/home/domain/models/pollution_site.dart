@@ -22,6 +22,8 @@ class PollutionSite {
     this.pollutionType,
     this.firstReport,
     List<String>? coReporterNames,
+    this.latitude,
+    this.longitude,
   }) : coReporterNames = coReporterNames ?? const [];
 
   final String id;
@@ -53,5 +55,7 @@ class PollutionSite {
   final String? pollutionType;
   final SiteReport? firstReport;
   final List<String> coReporterNames;
+  final double? latitude;
+  final double? longitude;
 }
 

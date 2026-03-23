@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
 
 enum ReportStatus {
   underReview('Under review', AppColors.accentWarning, Color(0xFFFFF8EC)),
@@ -22,15 +24,21 @@ class MockReport {
     required this.status,
     required this.score,
     required this.category,
+    this.reportNumber,
     this.address,
     this.declineReason,
     this.evidenceImagePaths,
     this.cleanupEffort,
+    this.severity,
     required this.createdAt,
+    this.latitude,
+    this.longitude,
+    this.siteId,
   });
 
   final String title;
   final String description;
+  final String? reportNumber;
   final ReportStatus status;
   final int score;
   final ReportCategory category;
@@ -38,7 +46,11 @@ class MockReport {
   final String? declineReason;
   final List<String>? evidenceImagePaths;
   final CleanupEffort? cleanupEffort;
+  final int? severity;
   final DateTime createdAt;
+  final double? latitude;
+  final double? longitude;
+  final String? siteId;
 }
 
 final List<MockReport> seedReportsCatalog = <MockReport>[
@@ -96,6 +108,75 @@ class ReportsListMockStore {
     ...seedReportsCatalog,
   ];
 
+  static ReportStatus _statusFromApi(ApiReportStatus s) {
+    switch (s) {
+      case ApiReportStatus.new_:
+      case ApiReportStatus.inReview:
+        return ReportStatus.underReview;
+      case ApiReportStatus.approved:
+        return ReportStatus.approved;
+      case ApiReportStatus.deleted:
+        return ReportStatus.declined;
+    }
+  }
+
+  static MockReport fromListItem(ReportListItem r) {
+    final String title = r.title.trim().isNotEmpty ? r.title : 'Report';
+    final String loc = r.location.trim();
+    final bool locationIsDistinct = loc.isNotEmpty &&
+        title.isNotEmpty &&
+        loc.toLowerCase() != title.toLowerCase();
+    return MockReport(
+      title: title,
+      description: r.title,
+      status: _statusFromApi(r.status),
+      score: r.pointsAwarded,
+      category: r.category ?? ReportCategory.other,
+      reportNumber: r.reportNumber.isNotEmpty ? r.reportNumber : null,
+      address: locationIsDistinct ? r.location : null,
+      evidenceImagePaths: r.mediaUrls.isNotEmpty ? r.mediaUrls : null,
+      cleanupEffort: null,
+      severity: r.severity,
+      createdAt: r.submittedAt,
+    );
+  }
+
+  static MockReport fromDetail(ReportDetail r) {
+    final String desc = (r.description ?? '').trim().isNotEmpty
+        ? r.description!
+        : r.location;
+    final String title = desc.isNotEmpty ? desc : (r.site.description ?? 'Report');
+    final String loc = (r.location).trim();
+    final bool locationIsDistinct =
+        loc.isNotEmpty &&
+        desc.isNotEmpty &&
+        loc.toLowerCase() != desc.trim().toLowerCase();
+    final bool hasValidCoords = ReportGeoFence.contains(
+      r.site.latitude,
+      r.site.longitude,
+    );
+    final double? lat = hasValidCoords ? r.site.latitude : null;
+    final double? lng = hasValidCoords ? r.site.longitude : null;
+    final String? siteId =
+        (r.site.id).trim().isNotEmpty ? r.site.id : null;
+    return MockReport(
+      title: title,
+      description: desc.isNotEmpty ? desc : 'Report details',
+      status: _statusFromApi(r.status),
+      score: r.pointsAwarded,
+      category: r.category ?? ReportCategory.other,
+      reportNumber: r.reportNumber.isNotEmpty ? r.reportNumber : null,
+      address: locationIsDistinct ? r.location : null,
+      evidenceImagePaths: r.mediaUrls.isNotEmpty ? r.mediaUrls : null,
+      cleanupEffort: null,
+      severity: r.severity,
+      createdAt: r.submittedAt,
+      latitude: lat,
+      longitude: lng,
+      siteId: siteId,
+    );
+  }
+
   static void addSubmittedDraft(ReportDraft draft) {
     final ReportCategory category = draft.category ?? ReportCategory.other;
     final String trimmedDescription = draft.description.trim();
@@ -117,6 +198,7 @@ class ReportsListMockStore {
         evidenceImagePaths:
             draft.photos.map((XFile file) => file.path).toList(),
         cleanupEffort: draft.cleanupEffort,
+        severity: draft.severity,
         createdAt: DateTime.now(),
       ),
     );

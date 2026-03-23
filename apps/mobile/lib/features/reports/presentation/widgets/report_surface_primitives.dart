@@ -23,6 +23,7 @@ class ReportSheetScaffold extends StatelessWidget {
       AppSpacing.lg,
     ),
     this.showHeaderDivider = true,
+    this.addBottomInset = true,
   });
 
   final String title;
@@ -34,6 +35,7 @@ class ReportSheetScaffold extends StatelessWidget {
   final double maxHeightFactor;
   final EdgeInsets padding;
   final bool showHeaderDivider;
+  final bool addBottomInset;
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +51,9 @@ class ReportSheetScaffold extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusCard)),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.08),
-            blurRadius: 28,
-            offset: const Offset(0, -8),
+            color: AppColors.black.withValues(alpha: 0.06),
+            blurRadius: 36,
+            offset: const Offset(0, -4),
           ),
         ],
       ),
@@ -83,21 +85,16 @@ class ReportSheetScaffold extends StatelessWidget {
                             children: <Widget>[
                               Text(
                                 title,
-                                style: Theme.of(context).textTheme.titleLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: -0.3,
-                                    ),
+                                style: AppTypography.sheetTitle,
                               ),
                               if (subtitle != null) ...<Widget>[
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   subtitle!,
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: AppColors.textMuted,
-                                        height: 1.35,
-                                      ),
+                                  style: AppTypography.textTheme.bodySmall!.copyWith(
+                                    color: AppColors.textMuted,
+                                    height: 1.35,
+                                  ),
                                 ),
                               ],
                             ],
@@ -123,7 +120,7 @@ class ReportSheetScaffold extends StatelessWidget {
                       const SizedBox(height: AppSpacing.lg),
                       footer!,
                     ],
-                    SizedBox(height: bottomPadding),
+                    if (addBottomInset) SizedBox(height: bottomPadding),
                   ],
                 ),
               ),
@@ -161,7 +158,7 @@ class ReportStatePill extends StatelessWidget {
       curve: AppMotion.emphasized,
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
-        vertical: 7,
+        vertical: AppSpacing.xxs,
       ),
       decoration: BoxDecoration(
         color: palette.background,
@@ -235,12 +232,9 @@ class ReportInfoBanner extends StatelessWidget {
                 if (title != null) ...<Widget>[
                   Text(
                     title!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.cardTitle,
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(height: AppSpacing.xxs),
                 ],
                 Text(
                   message,
@@ -328,7 +322,7 @@ class ReportActionTile extends StatelessWidget {
                       ),
                     ),
                     if (subtitle != null) ...<Widget>[
-                      const SizedBox(height: 2),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         subtitle!,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -375,8 +369,8 @@ class ReportCircleIconButton extends StatelessWidget {
         onTap: onTap,
         customBorder: const CircleBorder(),
         child: Ink(
-          width: 42,
-          height: 42,
+          width: 44,
+          height: 44,
           decoration: BoxDecoration(
             color: AppColors.inputFill,
             shape: BoxShape.circle,

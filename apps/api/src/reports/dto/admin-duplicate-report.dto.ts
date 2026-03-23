@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { ReportStatus } from '@prisma/client';
+import { ReportStatus } from '../../prisma-client';
 import { ArrayNotEmpty, ArrayUnique, IsArray, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class AdminDuplicateReportItemDto {

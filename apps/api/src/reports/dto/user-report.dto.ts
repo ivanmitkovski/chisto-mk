@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ReportStatus } from '@prisma/client';
+import { ReportStatus } from '../../prisma-client';
 
 export class UserReportListItemDto {
   @ApiProperty()
@@ -37,5 +37,22 @@ export class UserReportListItemDto {
     description: 'How many other reporters are attached as co-reporters',
   })
   coReporterCount!: number;
+
+  @ApiProperty({
+    description: 'Presigned URLs for evidence photos (first image for list thumbnail)',
+    type: [String],
+  })
+  mediaUrls!: string[];
+
+  @ApiProperty({
+    description: 'Points awarded when admin approved this report (0 if pending or denied)',
+  })
+  pointsAwarded!: number;
+
+  @ApiProperty({ nullable: true, description: 'Report category' })
+  category!: string | null;
+
+  @ApiProperty({ nullable: true, description: 'Severity 1-5' })
+  severity!: number | null;
 }
 

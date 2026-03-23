@@ -1,12 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, Site, SiteStatus } from '@prisma/client';
+import { Prisma, ReportStatus, Site, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { distanceInMeters } from '../common/utils/distance';
+import { ReportsUploadService } from '../reports/reports-upload.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 
-type SiteWithReports = Prisma.SiteGetPayload<{
-  include: { reports: true };
+type SiteWithReportsAndEvents = Prisma.SiteGetPayload<{
+  include: { reports: true; events: true };
 }>;
 
 const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
@@ -20,7 +22,10 @@ const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
 
 @Injectable()
 export class SitesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly reportsUploadService: ReportsUploadService,
+  ) {}
 
   async create(dto: CreateSiteDto): Promise<Site> {
     return this.prisma.site.create({
@@ -33,23 +38,98 @@ export class SitesService {
   }
 
   async findAll(query: ListSitesQueryDto): Promise<{
-    data: Site[];
+    data: Array<
+      Site & {
+        reportCount: number;
+        latestReportDescription: string | null;
+        distanceKm?: number;
+      }
+    >;
     meta: { page: number; limit: number; total: number };
   }> {
     const where: Prisma.SiteWhereInput = query.status
       ? { status: query.status }
       : {};
 
+    const hasGeo = query.lat != null && query.lng != null;
+    if (hasGeo) {
+      const radiusMeters = (query.radiusKm ?? 10) * 1000;
+      const metersPerDegreeLat = 111_320;
+      const deltaLat = radiusMeters / metersPerDegreeLat;
+      const metersPerDegreeLng =
+        Math.cos((query.lat! * Math.PI) / 180) * metersPerDegreeLat ||
+        metersPerDegreeLat;
+      const deltaLng = radiusMeters / metersPerDegreeLng;
+
+      where.latitude = {
+        gte: query.lat! - deltaLat,
+        lte: query.lat! + deltaLat,
+      };
+      where.longitude = {
+        gte: query.lng! - deltaLng,
+        lte: query.lng! + deltaLng,
+      };
+    }
+
+    const sites = await this.prisma.site.findMany({
+      where,
+      include: {
+        reports: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+          select: { description: true, mediaUrls: true },
+        },
+        _count: { select: { reports: true } },
+      },
+    });
+
+    type SiteEnriched = Site & {
+      reportCount: number;
+      latestReportDescription: string | null;
+      latestReportMediaUrls?: string[];
+      distanceKm?: number;
+    };
+
+    const enrichedPromises = sites.map(async (site) => {
+      const { reports, _count, ...siteBase } = site;
+      const firstReport = reports[0];
+      const mediaUrls = firstReport?.mediaUrls?.length
+        ? await this.reportsUploadService.signUrls(firstReport.mediaUrls)
+        : undefined;
+      return {
+        ...siteBase,
+        reportCount: _count.reports,
+        latestReportDescription: firstReport?.description ?? null,
+        latestReportMediaUrls: mediaUrls,
+        distanceKm:
+          hasGeo && query.lat != null && query.lng != null
+            ? distanceInMeters(
+                query.lat,
+                query.lng,
+                site.latitude,
+                site.longitude,
+              ) / 1000
+            : undefined,
+      } as SiteEnriched;
+    });
+
+    let enriched = await Promise.all(enrichedPromises);
+
+    if (hasGeo && query.lat != null && query.lng != null) {
+      const radiusMeters = (query.radiusKm ?? 10) * 1000;
+      enriched = enriched
+        .filter((s) => (s.distanceKm ?? 0) * 1000 <= radiusMeters)
+        .sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
+    } else {
+      enriched = enriched.sort(
+        (a, b) =>
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      );
+    }
+
+    const total = enriched.length;
     const skip = (query.page - 1) * query.limit;
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.site.findMany({
-        where,
-        skip,
-        take: query.limit,
-        orderBy: { createdAt: 'desc' },
-      }),
-      this.prisma.site.count({ where }),
-    ]);
+    const data = enriched.slice(skip, skip + query.limit);
 
     return {
       data,
@@ -61,12 +141,15 @@ export class SitesService {
     };
   }
 
-  async findOne(siteId: string): Promise<SiteWithReports> {
+  async findOne(siteId: string): Promise<SiteWithReportsAndEvents> {
     const site = await this.prisma.site.findUnique({
       where: { id: siteId },
       include: {
         reports: {
           orderBy: { createdAt: 'desc' },
+        },
+        events: {
+          orderBy: { scheduledAt: 'asc' },
         },
       },
     });
@@ -78,7 +161,14 @@ export class SitesService {
       });
     }
 
-    return site;
+    const reportsWithSignedUrls = await Promise.all(
+      site.reports.map(async (r) => ({
+        ...r,
+        mediaUrls: await this.reportsUploadService.signUrls(r.mediaUrls),
+      })),
+    );
+
+    return { ...site, reports: reportsWithSignedUrls };
   }
 
   async updateStatus(siteId: string, dto: UpdateSiteStatusDto): Promise<Site> {
@@ -117,5 +207,20 @@ export class SitesService {
       where: { id: siteId },
       data: { status: dto.status },
     });
+  }
+
+  async assertSiteEligibleForEcoAction(siteId: string): Promise<void> {
+    const approvedCount = await this.prisma.report.count({
+      where: {
+        siteId,
+        status: ReportStatus.APPROVED,
+      },
+    });
+    if (approvedCount === 0) {
+      throw new BadRequestException({
+        code: 'SITE_NOT_APPROVED_FOR_ECO_ACTIONS',
+        message: 'Site must have at least one approved report to create eco actions.',
+      });
+    }
   }
 }

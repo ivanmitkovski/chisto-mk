@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/cache/report_image_provider.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -35,11 +36,22 @@ class _EvidenceCarouselState extends State<EvidenceCarousel> {
     super.dispose();
   }
 
+  bool _isNetworkUrl(String s) =>
+      s.startsWith('http://') || s.startsWith('https://');
+
+  List<String> get _validPaths {
+    return widget.photoPaths.where((String path) {
+      if (_isNetworkUrl(path)) return true;
+      return File(path).existsSync();
+    }).toList();
+  }
+
+  ImageProvider _imageForPath(String path) =>
+      imageProviderForReportEvidence(path);
+
   @override
   Widget build(BuildContext context) {
-    final List<String> existingPhotos = widget.photoPaths
-        .where((String path) => File(path).existsSync())
-        .toList();
+    final List<String> existingPhotos = _validPaths;
     if (existingPhotos.isEmpty) {
       return Container(
         height: 200,
@@ -73,7 +85,7 @@ class _EvidenceCarouselState extends State<EvidenceCarousel> {
                   label: 'Evidence photo ${index + 1} of $count',
                   image: true,
                   child: AppSmartImage(
-                    image: FileImage(File(existingPhotos[index])),
+                    image: _imageForPath(existingPhotos[index]),
                   ),
                 );
               },

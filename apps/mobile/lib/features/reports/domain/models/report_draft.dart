@@ -69,6 +69,26 @@ enum ReportCategory {
   final String label;
   final String description;
   final IconData icon;
+
+  static ReportCategory? fromApiString(String? s) {
+    if (s == null || s.isEmpty) return null;
+    return switch (s.toUpperCase()) {
+      'ILLEGAL_LANDFILL' => ReportCategory.illegalLandfill,
+      'WATER_POLLUTION' => ReportCategory.waterPollution,
+      'AIR_POLLUTION' => ReportCategory.airPollution,
+      'INDUSTRIAL_WASTE' => ReportCategory.industrialWaste,
+      'OTHER' => ReportCategory.other,
+      _ => null,
+    };
+  }
+
+  String get apiString => switch (this) {
+        ReportCategory.illegalLandfill => 'ILLEGAL_LANDFILL',
+        ReportCategory.waterPollution => 'WATER_POLLUTION',
+        ReportCategory.airPollution => 'AIR_POLLUTION',
+        ReportCategory.industrialWaste => 'INDUSTRIAL_WASTE',
+        ReportCategory.other => 'OTHER',
+      };
 }
 
 /// Canonical pollution types for filtering and reporting (aligned with ReportCategory).
@@ -104,6 +124,7 @@ class ReportDraft {
     this.longitude,
     this.address,
     this.cleanupEffort,
+    this.severity = 3,
   }) : photos = photos ?? <XFile>[];
 
   final List<XFile> photos;
@@ -113,6 +134,7 @@ class ReportDraft {
   final double? longitude;
   final String? address;
   final CleanupEffort? cleanupEffort;
+  final int severity;
 
   bool get hasPhotos => photos.isNotEmpty;
   bool get hasCategory => category != null;
@@ -147,6 +169,7 @@ class ReportDraft {
     double? longitude,
     String? address,
     CleanupEffort? cleanupEffort,
+    int? severity,
     bool clearLocation = false,
   }) {
     if (clearLocation) {
@@ -158,6 +181,7 @@ class ReportDraft {
         longitude: null,
         address: null,
         cleanupEffort: this.cleanupEffort,
+        severity: severity ?? this.severity,
       );
     }
     return ReportDraft(
@@ -168,6 +192,7 @@ class ReportDraft {
       longitude: longitude ?? this.longitude,
       address: address ?? this.address,
       cleanupEffort: cleanupEffort ?? this.cleanupEffort,
+      severity: severity ?? this.severity,
     );
   }
 }

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -9,7 +7,6 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
-import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/data/site_issue_report_repository.dart';
@@ -20,6 +17,7 @@ import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart'
 import 'package:chisto_mobile/features/home/presentation/navigation/take_action_coordinator.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action_sheet.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/utils/device_platform.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
@@ -46,7 +44,11 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _siteCoordinates = getMockSiteCoordinates();
+    _siteCoordinates = <String, LatLng>{};
+    if (widget.site.latitude != null && widget.site.longitude != null) {
+      _siteCoordinates[widget.site.id] =
+          LatLng(widget.site.latitude!, widget.site.longitude!);
+    }
     _siteIssueRepo = SiteIssueReportRepository();
     _loadReportedState();
   }
@@ -344,7 +346,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
 
   Future<void> _launchMaps({required LatLng dest, required bool useAppleMaps}) async {
     final String destStr = '${dest.latitude},${dest.longitude}';
-    final Uri url = useAppleMaps && Platform.isIOS
+    final Uri url = useAppleMaps && DevicePlatform.isIOS
         ? Uri.parse('https://maps.apple.com/?daddr=$destStr&dirflg=d')
         : Uri.parse(
             'https://www.google.com/maps/dir/?api=1&destination=$destStr',

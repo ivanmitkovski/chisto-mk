@@ -16,7 +16,6 @@ import 'package:chisto_mobile/features/home/presentation/widgets/feed_section_he
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_skeleton.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card.dart';
-import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -44,12 +43,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     return _notifications;
   }
 
-  List<PollutionSite> _ensureSitesSeeded() {
-    if (_allSites.isEmpty) {
-      _allSites = _buildMockSites();
-    }
-    return _allSites;
-  }
+  List<PollutionSite> _ensureSitesSeeded() => _allSites;
 
   int get _unreadNotificationsCount =>
       _ensureNotificationsSeeded()
@@ -90,17 +84,32 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       _isLoading = true;
     });
     try {
-      await Future<void>.delayed(const Duration(milliseconds: 600));
+      final result = await ServiceLocator.instance.sitesRepository.getSites(
+        latitude: 41.6086,
+        longitude: 21.7453,
+        radiusKm: 100,
+        status: 'VERIFIED',
+        page: 1,
+        limit: 50,
+      );
       if (!mounted) return;
-      final List<PollutionSite> sites = _buildMockSites();
       final List<FeedNotification> notifications = _buildMockNotifications();
       setState(() {
-        _allSites = sites;
+        _allSites = result.sites;
         _notifications = notifications;
         _isLoading = false;
         _loadError = null;
       });
       _entranceController?.forward();
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = e;
+        _isLoading = false;
+      });
+      if (mounted) {
+        AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -527,7 +536,4 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     ];
   }
 
-  List<PollutionSite> _buildMockSites() {
-    return buildMockPollutionSites();
-  }
 }

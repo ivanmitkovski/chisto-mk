@@ -1,18 +1,47 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:chisto_mobile/core/cache/report_image_provider.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/evidence_carousel.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/utils/device_platform.dart';
+import 'package:chisto_mobile/shared/utils/file_exists.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
-class ReportDetailSheet extends StatelessWidget {
+const List<String> _severityLabels = <String>[
+  'Low',
+  'Moderate',
+  'Significant',
+  'High',
+  'Critical',
+];
+
+String _severityLabel(int value) =>
+    '${value.clamp(1, 5)} – ${_severityLabels[(value.clamp(1, 5) - 1)]}';
+
+class ReportDetailSheet extends StatefulWidget {
   const ReportDetailSheet({super.key, required this.report});
 
   final MockReport report;
+
+  @override
+  State<ReportDetailSheet> createState() => _ReportDetailSheetState();
+}
+
+class _ReportDetailSheetState extends State<ReportDetailSheet> {
+  bool _isOpeningMap = false;
+
+  MockReport get report => widget.report;
 
   static String _formatDateFull(DateTime d) {
     const List<String> months = <String>[
@@ -32,15 +61,156 @@ class ReportDetailSheet extends StatelessWidget {
     return '${d.day} ${months[d.month - 1]} ${d.year}';
   }
 
+  static bool _isNetworkUrl(String s) =>
+      s.startsWith('http://') || s.startsWith('https://');
+
+  bool get _hasValidCoordinates =>
+      report.latitude != null &&
+      report.longitude != null;
+
+  bool get _hasLocationData =>
+      (report.address != null && report.address!.trim().isNotEmpty) ||
+      _hasValidCoordinates;
+
+  bool get _canOpenExternalMaps =>
+      report.status != ReportStatus.approved && _hasValidCoordinates;
+
+  bool get _canOpenInAppMap {
+    if (report.siteId == null || report.siteId!.trim().isEmpty) return false;
+    return report.status == ReportStatus.approved ||
+        report.status == ReportStatus.alreadyReported;
+  }
+
+  bool get _canTapLocation => _canOpenExternalMaps || _canOpenInAppMap;
+
+  String get _locationDisplayText {
+    final bool hasDistinctAddress = report.address != null &&
+        report.address!.trim().isNotEmpty &&
+        report.address!.trim() != report.title.trim();
+    if (hasDistinctAddress) return report.address!;
+    if (_hasValidCoordinates) return 'View on map';
+    return report.address ?? '';
+  }
+
+  void _onLocationTap() {
+    if (!_canTapLocation || _isOpeningMap) return;
+    if (_canOpenInAppMap) {
+      _openInAppSite();
+    } else if (_canOpenExternalMaps) {
+      _showExternalMapsSheet();
+    }
+  }
+
+  void _showExternalMapsSheet() {
+    AppHaptics.light();
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: AppColors.transparent,
+      builder: (BuildContext sheetContext) {
+        return DirectionsSheet(
+          mode: DirectionsSheetMode.viewLocation,
+          onAppleMapsTap: () {
+            Navigator.of(sheetContext).pop();
+            _launchExternalMap(useAppleMaps: true);
+          },
+          onGoogleMapsTap: () {
+            Navigator.of(sheetContext).pop();
+            _launchExternalMap(useAppleMaps: false);
+          },
+          onDismiss: () => Navigator.of(sheetContext).pop(),
+        );
+      },
+    );
+  }
+
+  Future<void> _launchExternalMap({required bool useAppleMaps}) async {
+    if (report.latitude == null || report.longitude == null) return;
+    final String destStr = '${report.latitude},${report.longitude}';
+    final Uri url = useAppleMaps && DevicePlatform.isIOS
+        ? Uri.parse('https://maps.apple.com/?ll=$destStr')
+        : Uri.parse(
+            'https://www.google.com/maps/search/?api=1&query=$destStr',
+          );
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      } else if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'Could not open Maps',
+          type: AppSnackType.warning,
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'Could not open Maps',
+          type: AppSnackType.warning,
+        );
+      }
+    }
+  }
+
+  Future<void> _openInAppSite() async {
+    if (report.siteId == null || report.siteId!.trim().isEmpty) return;
+    setState(() => _isOpeningMap = true);
+    try {
+      final PollutionSite? site = await ServiceLocator.instance.sitesRepository
+          .getSiteById(report.siteId!);
+      if (!mounted) return;
+      setState(() => _isOpeningMap = false);
+      if (site == null) {
+        if (_hasValidCoordinates) {
+          AppSnack.show(
+            context,
+            message: 'Site not found. Opening in maps.',
+            type: AppSnackType.warning,
+          );
+          _showExternalMapsSheet();
+        } else {
+          AppSnack.show(
+            context,
+            message: 'Site not available.',
+            type: AppSnackType.warning,
+          );
+        }
+        return;
+      }
+      final NavigatorState navigator = Navigator.of(context);
+      navigator.pop();
+      await navigator.push<void>(
+        MaterialPageRoute<void>(
+          builder: (_) => PollutionSiteDetailScreen(site: site),
+        ),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _isOpeningMap = false);
+      AppSnack.show(
+        context,
+        message: 'Could not load site.',
+        type: AppSnackType.warning,
+      );
+      if (_hasValidCoordinates) {
+        _showExternalMapsSheet();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<String> evidencePaths = report.evidenceImagePaths ?? const <String>[];
-    final bool hasEvidenceImage =
-        evidencePaths.isNotEmpty && File(evidencePaths.first).existsSync();
+    final bool hasEvidenceImage = evidencePaths.isNotEmpty &&
+        (_isNetworkUrl(evidencePaths.first) ||
+            fileExistsSync(evidencePaths.first));
 
     return ReportSheetScaffold(
+      addBottomInset: false,
       title: 'Report details',
-      subtitle: 'See what you submitted and how moderators handled this report.',
+      subtitle: report.reportNumber != null
+          ? '${report.reportNumber} · See what you submitted and how moderators handled this report.'
+          : 'See what you submitted and how moderators handled this report.',
       trailing: ReportCircleIconButton(
         icon: Icons.close_rounded,
         semanticLabel: 'Close',
@@ -50,17 +220,29 @@ class ReportDetailSheet extends StatelessWidget {
         },
       ),
       child: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).padding.bottom + AppSpacing.lg,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             if (hasEvidenceImage) ...<Widget>[
-              EvidenceCarousel(photoPaths: evidencePaths),
+              _ReportEvidenceGallery(
+                evidencePaths: evidencePaths,
+                reportTag: report.reportNumber ?? 'report',
+              ),
               const SizedBox(height: AppSpacing.md),
             ],
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.xs,
               children: <Widget>[
+                if (report.reportNumber != null)
+                  ReportStatePill(
+                    label: report.reportNumber!,
+                    icon: Icons.tag_rounded,
+                    tone: ReportSurfaceTone.neutral,
+                  ),
                 ReportStatusBadge(status: report.status),
                 ReportStatePill(
                   label: _formatDateFull(report.createdAt),
@@ -79,66 +261,98 @@ class ReportDetailSheet extends StatelessWidget {
             _DetailRow(
               icon: report.category.icon,
               label: 'Category',
+              isLast: report.severity == null &&
+                  report.cleanupEffort == null &&
+                  report.score <= 0 &&
+                  !_hasLocationData,
               child: Text(
                 report.category.label,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: -0.2,
-                    ),
+                style: AppTypography.cardTitle,
               ),
             ),
+            if (report.severity != null)
+              _DetailRow(
+                icon: Icons.signal_cellular_alt,
+                label: 'Severity',
+                isLast: report.cleanupEffort == null &&
+                    report.score <= 0 &&
+                    !_hasLocationData,
+                child: Text(
+                  _severityLabel(report.severity!),
+                  style: AppTypography.cardTitle,
+                ),
+              ),
             if (report.cleanupEffort != null)
               _DetailRow(
                 icon: Icons.groups_2_outlined,
                 label: 'Cleanup effort',
+                isLast: report.score <= 0 && !_hasLocationData,
                 child: Text(
                   report.cleanupEffort!.label,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: -0.2,
-                      ),
+                  style: AppTypography.cardTitle,
                 ),
               ),
             if (report.score > 0)
               _DetailRow(
                 icon: Icons.emoji_events_rounded,
                 label: 'Points',
+                isLast: !_hasLocationData,
                 child: Text(
                   '+${report.score}',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  style: AppTypography.cardTitle.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.accentWarning,
                   ),
                 ),
               ),
-            if (report.address != null && report.address!.isNotEmpty)
+            if (_hasLocationData)
               _DetailRow(
                 icon: Icons.location_on_outlined,
                 label: 'Location',
-                child: Text(
-                  report.address!,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        letterSpacing: -0.2,
+                isLast: true,
+                onTap: _canTapLocation ? _onLocationTap : null,
+                child: _isOpeningMap
+                    ? Row(
+                        children: <Widget>[
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                          const SizedBox(width: AppSpacing.sm),
+                          Text(
+                            'Opening…',
+                            style: AppTypography.textTheme.bodyMedium!.copyWith(
+                              color: AppColors.textMuted,
+                            ),
+                          ),
+                        ],
+                      )
+                    : Text(
+                        _locationDisplayText,
+                        style: AppTypography.textTheme.bodyMedium!.copyWith(
+                          color: AppColors.textPrimary,
+                        ),
                       ),
-                ),
               ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.lg),
             Text(
               report.title,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.25,
-                  ),
+              style: AppTypography.sectionHeader,
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              report.description,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-                height: 1.45,
+            if (report.description.trim() != report.title.trim()) ...[
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                report.description,
+                style: AppTypography.textTheme.bodyMedium!.copyWith(
+                  color: AppColors.textSecondary,
+                  height: 1.45,
+                ),
               ),
-            ),
+            ],
             const SizedBox(height: AppSpacing.md),
             Divider(color: AppColors.divider.withValues(alpha: 0.7), height: 1),
             const SizedBox(height: AppSpacing.lg),
@@ -178,39 +392,166 @@ class ReportDetailSheet extends StatelessWidget {
   }
 }
 
+class _ReportEvidenceGallery extends StatelessWidget {
+  const _ReportEvidenceGallery({
+    required this.evidencePaths,
+    required this.reportTag,
+  });
+
+  final List<String> evidencePaths;
+  final String reportTag;
+
+  static bool _isNetworkUrl(String s) =>
+      s.startsWith('http://') || s.startsWith('https://');
+
+  static List<String> _validPaths(List<String> paths) {
+    return paths.where((String path) {
+      if (_isNetworkUrl(path)) return true;
+      return fileExistsSync(path);
+    }).toList();
+  }
+
+  ImageProvider _imageForPath(String path) =>
+      imageProviderForReportEvidence(path);
+
+  @override
+  Widget build(BuildContext context) {
+    final List<String> validPaths = _validPaths(evidencePaths);
+    if (validPaths.isEmpty) {
+      return AspectRatio(
+        aspectRatio: 16 / 9,
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.inputFill,
+            borderRadius: BorderRadius.circular(AppSpacing.radius22),
+          ),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Icon(
+                  Icons.image_not_supported_outlined,
+                  size: 32,
+                  color: AppColors.textMuted,
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  'No photos',
+                  style: AppTypography.textTheme.bodySmall!.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    final List<GalleryImageItem> items = List<GalleryImageItem>.generate(
+      validPaths.length,
+      (int index) => GalleryImageItem(
+        image: _imageForPath(validPaths[index]),
+        heroTag: 'report-evidence-$reportTag-$index',
+        semanticLabel: 'Evidence photo ${index + 1}',
+      ),
+    );
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(AppSpacing.radius22),
+      child: ImmersivePhotoGallery(
+        items: items,
+        aspectRatio: 16 / 9,
+        borderRadius: 0,
+        openLabel: 'Open report evidence photos',
+        bottomCenterBuilder:
+            (BuildContext context, int currentIndex, int totalCount) {
+          return GalleryGlassPill(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(
+                  Icons.photo_library_outlined,
+                  size: 13,
+                  color: AppColors.textOnDark,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  totalCount > 1 ? 'Tap to expand' : 'Open photo',
+                  style: AppTypography.chipLabel.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textOnDark,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
 class _DetailRow extends StatelessWidget {
   const _DetailRow({
     required this.icon,
     required this.label,
     required this.child,
+    this.isLast = false,
+    this.onTap,
   });
 
   final IconData icon;
   final String label;
   final Widget child;
+  final bool isLast;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Icon(icon, size: 20, color: AppColors.textMuted),
-          const SizedBox(width: AppSpacing.sm),
-          SizedBox(
-            width: 96,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textMuted,
-                  ),
+    final Widget row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Icon(icon, size: AppSpacing.iconMd, color: AppColors.textMuted),
+        const SizedBox(width: AppSpacing.sm),
+        SizedBox(
+          width: 96,
+          child: Text(
+            label,
+            style: AppTypography.cardSubtitle,
+          ),
+        ),
+        Expanded(child: child),
+        if (onTap != null)
+          Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.xs),
+            child: Icon(
+              Icons.chevron_right_rounded,
+              size: AppSpacing.iconMd,
+              color: AppColors.textMuted,
             ),
           ),
-          Expanded(child: child),
-        ],
-      ),
+      ],
+    );
+    if (onTap != null) {
+      return Padding(
+        padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.md),
+        child: Material(
+          color: AppColors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxs),
+              child: row,
+            ),
+          ),
+        ),
+      );
+    }
+    return Padding(
+      padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.md),
+      child: row,
     );
   }
 }

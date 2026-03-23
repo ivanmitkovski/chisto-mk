@@ -45,6 +45,11 @@ class _ProfileScreenState extends State<ProfileScreen>
       _profileUser = _profileUserFromAuthState();
     }
     _loadProfile();
+    ServiceLocator.instance.profileNeedsRefresh.addListener(_onProfileNeedsRefresh);
+  }
+
+  void _onProfileNeedsRefresh() {
+    if (mounted) _loadProfile();
   }
 
   Future<void> _loadProfile() async {
@@ -115,6 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   @override
   void dispose() {
+    ServiceLocator.instance.profileNeedsRefresh.removeListener(_onProfileNeedsRefresh);
     _controller.dispose();
     super.dispose();
   }

@@ -267,6 +267,17 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                   _cachedDescKey = site.description;
                                   _cachedTruncationWidth = maxWidth;
                                 }
+                                final String titleNorm =
+                                    site.title.trim().toLowerCase();
+                                final String descNorm =
+                                    site.description.trim().toLowerCase();
+                                final bool redundant =
+                                    titleNorm.isEmpty ||
+                                    descNorm.isEmpty ||
+                                    titleNorm == descNorm ||
+                                    descNorm.startsWith(titleNorm) ||
+                                    titleNorm.startsWith(descNorm);
+
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
@@ -280,16 +291,18 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(height: AppSpacing.xs),
-                                    SizedBox(
-                                      width: maxWidth,
-                                      child: Text(
-                                        descDisplay,
-                                        style: descStyle,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                                    if (!redundant) ...[
+                                      const SizedBox(height: AppSpacing.xs),
+                                      SizedBox(
+                                        width: maxWidth,
+                                        child: Text(
+                                          descDisplay,
+                                          style: descStyle,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ],
                                 );
                               },

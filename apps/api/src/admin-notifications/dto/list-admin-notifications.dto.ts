@@ -1,7 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsInt, IsOptional, Max, Min } from 'class-validator';
-import { AdminNotificationCategory } from '@prisma/client';
+import { AdminNotificationCategory } from '../../prisma-client';
 
 export class ListAdminNotificationsQueryDto {
   @ApiPropertyOptional({ default: false })

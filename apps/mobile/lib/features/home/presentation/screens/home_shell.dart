@@ -26,12 +26,13 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
+  String? _reportIdToOpen;
+  int _reportsRefreshTrigger = 0;
   final ImagePicker _imagePicker = ImagePicker();
   final GlobalKey _feedKey = GlobalKey();
   final GlobalKey _eventsFeedKey = GlobalKey();
   bool _isLaunchingReportFlow = false;
 
-  /// Map loads only after the user opens the map tab, avoiding tile fetch on app start.
   bool _hasVisitedMap = false;
 
   @override
@@ -50,7 +51,11 @@ class _HomeShellState extends State<HomeShell> {
         index: _currentIndex,
         children: <Widget>[
           PollutionFeedScreen(key: _feedKey),
-          const ReportsListScreen(),
+          ReportsListScreen(
+            initialReportIdToOpen: _reportIdToOpen,
+            onReportOpened: () => setState(() => _reportIdToOpen = null),
+            refreshTrigger: _reportsRefreshTrigger,
+          ),
           _hasVisitedMap
               ? const PollutionMapScreen()
               : _MapTabPlaceholder(),
@@ -187,8 +192,8 @@ class _HomeShellState extends State<HomeShell> {
       await _captureAndReview();
     } else if (result == PhotoReviewResult.use) {
       AppHaptics.softTransition();
-      final bool? submitted = await Navigator.of(context).push<bool>(
-        MaterialPageRoute<bool>(
+      final Object? result = await Navigator.of(context).push<Object>(
+        MaterialPageRoute<Object>(
           builder: (_) => NewReportScreen(
             initialPhoto: selectedFile,
             entryLabel: 'Camera report',
@@ -197,8 +202,12 @@ class _HomeShellState extends State<HomeShell> {
           ),
         ),
       );
-      if (submitted == true && mounted) {
-        setState(() => _currentIndex = 1);
+      if (result != null && mounted) {
+        setState(() {
+          _currentIndex = 1;
+          _reportsRefreshTrigger++;
+          if (result is String) _reportIdToOpen = result;
+        });
       }
     }
   }

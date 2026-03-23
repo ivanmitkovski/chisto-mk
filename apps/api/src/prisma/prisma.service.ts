@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../prisma-client';
 
 function connectionStringWithNoVerify(url: string): string {
   const noVerify = 'sslmode=no-verify';
