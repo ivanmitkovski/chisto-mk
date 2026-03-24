@@ -7,7 +7,9 @@
 .shell {
   --sidebar-width: 16.25rem;
   --sidebar-width-collapsed: 5.25rem;
-  min-height: 100vh;
+  --topbar-height: 4.875rem;
+  min-height: 100dvh;
+  height: 100dvh;
   display: grid;
   grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
   backdrop-filter: blur(6px);
@@ -31,13 +33,34 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .content {
-  padding: var(--space-6) var(--space-6) var(--space-7);
+  flex: 1;
+  padding: var(--space-4) var(--space-5) var(--space-6);
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
   align-content: start;
+  min-height: 0;
+  overflow: auto;
+}
+
+.contentImmersive {
+  padding: var(--space-4) var(--space-5) var(--space-6);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  align-content: unset;
+  /* Flex + min-height:0 on child lets map fill remaining area; padding frames the map */
+}
+
+.contentImmersive > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
 }
 
 .sidebarBackdrop {
@@ -53,7 +76,11 @@
 
 @media (max-width: 64rem) {
   .content {
-    padding: var(--space-5);
+    padding: var(--space-4) var(--space-5) var(--space-5);
+  }
+
+  .contentImmersive {
+    padding: var(--space-4) var(--space-5) var(--space-5);
   }
 }
 
@@ -65,5 +92,9 @@
   .content {
     padding: var(--space-4);
     gap: var(--space-4);
+  }
+
+  .contentImmersive {
+    padding: var(--space-4);
   }
 }

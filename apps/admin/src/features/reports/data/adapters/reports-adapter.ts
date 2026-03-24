@@ -31,10 +31,15 @@ type DuplicateReportGroupsResponse = {
   };
 };
 
-export async function getReports(): Promise<ReportRow[]> {
+export async function getReports(params?: { siteId?: string }): Promise<ReportRow[]> {
   const token = await getAdminAuthTokenFromCookies();
+  const search = new URLSearchParams();
+  if (params?.siteId) {
+    search.set('siteId', params.siteId);
+  }
+  const suffix = search.size > 0 ? `?${search.toString()}` : '';
 
-  const response = await apiFetch<AdminReportListResponse>('/reports', {
+  const response = await apiFetch<AdminReportListResponse>(`/reports${suffix}`, {
     method: 'GET',
     authToken: token,
   });

@@ -1,5 +1,6 @@
 export type AuthResponse = {
   accessToken: string;
+  refreshToken?: string;
   user: {
     id: string;
     firstName: string;
@@ -12,4 +13,16 @@ export type AuthResponse = {
     pointsBalance: number;
   };
 };
+
+export type AdminLogin2FAResponse = {
+  requiresTotp: true;
+  tempToken: string;
+  expiresIn: number;
+};
+
+export type AdminLoginResponse = AuthResponse | AdminLogin2FAResponse;
+
+export function is2FAResponse(r: AdminLoginResponse): r is AdminLogin2FAResponse {
+  return 'requiresTotp' in r && r.requiresTotp === true;
+}
 

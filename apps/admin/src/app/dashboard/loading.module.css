@@ -1,0 +1,115 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.statsSkeleton {
+  width: 8rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.actionsSkeleton {
+  width: 12rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.reportsSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.reportsHeaderSkeleton {
+  width: 6rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.insightsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.insightsHeadingSkeleton {
+  grid-column: 1 / -1;
+  width: 4rem;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (min-width: 64rem) {
+  .insightsRow {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+
+@media (max-width: 48rem) {
+  .insightsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+@media (max-width: 48rem) {
+  .statsSkeleton {
+    width: 6rem;
+  }
+}

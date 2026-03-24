@@ -11,8 +11,10 @@ import {
   Report,
   ReportStatus,
   Role,
+  SiteStatus,
 } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../common/utils/distance';
 import { CreateReportDto } from './dto/create-report.dto';
@@ -36,6 +38,9 @@ import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { CitizenReportDetailDto } from './dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from './dto/user-report.dto';
 import { ReportsUploadService } from './reports-upload.service';
+import { NotificationEventsService } from '../admin-events/notification-events.service';
+import { ReportEventsService } from '../admin-events/report-events.service';
+import { SiteEventsService } from '../admin-events/site-events.service';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -53,7 +58,11 @@ const POINTS_CO_REPORT = 50;
 export class ReportsService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly reportEventsService: ReportEventsService,
+    private readonly notificationEventsService: NotificationEventsService,
+    private readonly siteEventsService: SiteEventsService,
   ) {}
 
   /** Fallback for reports created before reportNumber column (e.g. during migration). */
@@ -134,9 +143,33 @@ export class ReportsService {
 
     return {
       potentialDuplicateOfId: null,
+      status: { not: 'DELETED' },
       potentialDuplicates: { some: {} },
       ...(statusOrSiteFilters.length > 0 ? { AND: statusOrSiteFilters } : {}),
     };
+  }
+
+  /**
+   * When the first report for a site is approved, transition site from REPORTED → VERIFIED.
+   * Only updates when site is REPORTED; does not overwrite DISPUTED or other statuses.
+   */
+  private async transitionSiteToVerifiedIfFirstApproved(
+    tx: Pick<PrismaService, 'site'>,
+    siteId: string,
+  ): Promise<void> {
+    const site = await tx.site.findUnique({
+      where: { id: siteId },
+      select: { id: true, status: true },
+    });
+    if (!site || site.status !== SiteStatus.REPORTED) {
+      return;
+    }
+
+    await tx.site.update({
+      where: { id: siteId },
+      data: { status: SiteStatus.VERIFIED },
+    });
+    this.siteEventsService.emitSiteUpdated(siteId);
   }
 
   private async findPrimaryReportId(reportId: string): Promise<string> {
@@ -303,7 +336,7 @@ export class ReportsService {
 
     const targetSiteId = primaryReport?.siteId ?? null;
 
-    return this.prisma.$transaction(async (tx) => {
+    const result = await this.prisma.$transaction(async (tx) => {
       let siteId: string;
       let isNewSite: boolean;
 
@@ -356,7 +389,7 @@ export class ReportsService {
 
       const reportNumber = this.getReportNumber(newReport);
 
-      await tx.adminNotification.create({
+      const notification = await tx.adminNotification.create({
         data: {
           title: isNewSite ? 'New pollution site reported' : 'Co-report added to existing site',
           message: `Report ${reportNumber} submitted${isNewSite ? ' at a new location' : ' near an existing site'}.`,
@@ -373,8 +406,23 @@ export class ReportsService {
         siteId,
         isNewSite,
         pointsAwarded: 0, // Points awarded when admin approves, not at submit
+        notificationId: notification.id,
+        notificationTitle: notification.title,
       };
     });
+
+    this.reportEventsService.emitReportCreated(result.reportId);
+    this.notificationEventsService.emitNotificationCreated(
+      result.notificationId,
+      result.notificationTitle,
+    );
+    return {
+      reportId: result.reportId,
+      reportNumber: result.reportNumber,
+      siteId: result.siteId,
+      isNewSite: result.isNewSite,
+      pointsAwarded: result.pointsAwarded,
+    };
   }
 
   /**
@@ -805,6 +853,16 @@ export class ReportsService {
         },
       });
 
+      const approvedCountForSite = await tx.report.count({
+        where: {
+          siteId: primaryReport.siteId,
+          status: 'APPROVED',
+        },
+      });
+      if (approvedCountForSite === 1) {
+        await this.transitionSiteToVerifiedIfFirstApproved(tx, primaryReport.siteId);
+      }
+
       await tx.report.updateMany({
         where: { id: { in: selectedChildIds } },
         data: {
@@ -815,6 +873,17 @@ export class ReportsService {
           moderationReason: dto.reason ?? 'Merged duplicate',
         },
       });
+    });
+
+    await this.audit.log({
+      actorId: moderator.userId,
+      action: 'REPORT_MERGE',
+      resourceType: 'Report',
+      resourceId: primaryReport.id,
+      metadata: {
+        mergedChildCount: selectedChildren.length,
+        childReportIds: selectedChildIds,
+      },
     });
 
     return {
@@ -920,9 +989,31 @@ export class ReportsService {
         }
       }
 
+      if (dto.status === 'APPROVED') {
+        const otherApprovedCount = await tx.report.count({
+          where: {
+            siteId: updatedReport.siteId,
+            status: 'APPROVED',
+            id: { not: reportId },
+          },
+        });
+        if (otherApprovedCount === 0) {
+          await this.transitionSiteToVerifiedIfFirstApproved(tx, updatedReport.siteId);
+        }
+      }
+
       return updatedReport;
     });
 
+    await this.audit.log({
+      actorId: moderator.userId,
+      action: 'REPORT_STATUS_UPDATED',
+      resourceType: 'Report',
+      resourceId: reportId,
+      metadata: { from: report.status, to: dto.status },
+    });
+
+    this.reportEventsService.emitReportStatusUpdated(reportId);
     return updated;
   }
 

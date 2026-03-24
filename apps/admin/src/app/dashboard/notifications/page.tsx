@@ -14,21 +14,21 @@ export default async function NotificationsPage() {
 
     if (items.length === 0) {
       return (
-        <AdminShell title="Notifications" activeItem="dashboard" initialSidebarCollapsed={initialSidebarCollapsed}>
+        <AdminShell title="Notifications" activeItem="notifications" initialSidebarCollapsed={initialSidebarCollapsed}>
           <SectionState variant="empty" message="No notifications are available yet." />
         </AdminShell>
       );
     }
 
     return (
-      <AdminShell title="Notifications" activeItem="dashboard" initialSidebarCollapsed={initialSidebarCollapsed}>
+      <AdminShell title="Notifications" activeItem="notifications" initialSidebarCollapsed={initialSidebarCollapsed}>
         <NotificationsCenter initialItems={items} />
       </AdminShell>
     );
   } catch (error) {
     if (error instanceof ApiError) {
       return (
-        <AdminShell title="Notifications" activeItem="dashboard" initialSidebarCollapsed={initialSidebarCollapsed}>
+        <AdminShell title="Notifications" activeItem="notifications" initialSidebarCollapsed={initialSidebarCollapsed}>
           <SectionState variant="error" message="Unable to load notifications right now." />
         </AdminShell>
       );

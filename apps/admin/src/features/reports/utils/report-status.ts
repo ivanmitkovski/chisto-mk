@@ -1,6 +1,13 @@
 import { IconName } from '@/components/ui';
 import { ReportStatus } from '../types';
 
+/** Report statuses that represent a final decision (no further approve/reject actions). */
+const FINAL_STATUSES: ReportStatus[] = ['APPROVED', 'DELETED'];
+
+export function isReportFinalStatus(status: ReportStatus): boolean {
+  return FINAL_STATUSES.includes(status);
+}
+
 export function formatReportDate(value: string) {
   return new Intl.DateTimeFormat('en-GB').format(new Date(value));
 }

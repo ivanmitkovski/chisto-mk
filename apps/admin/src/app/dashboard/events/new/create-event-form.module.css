@@ -1,0 +1,127 @@
+.layout {
+  max-width: 36rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.7);
+  text-decoration: none;
+  margin-bottom: var(--space-4);
+  transition: color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.backLink:hover {
+  color: var(--color-green-700);
+}
+
+.sectionCard {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.hint {
+  font-size: 0.9375rem;
+  color: rgba(8, 54, 39, 0.75);
+  margin: 0 0 var(--space-5);
+}
+
+.siteId {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  padding: 0 var(--space-1);
+  background: rgba(8, 54, 39, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+.siteLink {
+  margin-left: var(--space-2);
+  font-weight: 600;
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.siteLink:hover {
+  text-decoration: underline;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldCheck {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  color: rgba(8, 54, 39, 0.8);
+  cursor: pointer;
+}
+
+.fieldCheck input {
+  accent-color: var(--color-green-700);
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: rgba(8, 54, 39, 0.85);
+}
+
+.input {
+  max-width: 16rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.14);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.9375rem;
+  color: rgba(8, 54, 39, 0.95);
+}
+
+.input:hover,
+.input:focus {
+  border-color: rgba(37, 219, 134, 0.4);
+  outline: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.cancelLink {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.65);
+  text-decoration: none;
+}
+
+.cancelLink:hover {
+  color: var(--color-green-700);
+}

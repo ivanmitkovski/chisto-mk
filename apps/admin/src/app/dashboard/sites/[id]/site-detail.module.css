@@ -1,0 +1,219 @@
+/* Apple-inspired site detail layout */
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  max-width: 48rem;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.7);
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+  transition: color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.backLink:hover {
+  color: var(--color-green-700);
+}
+
+.sectionCard {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+}
+
+.sectionLabel {
+  display: block;
+  margin-bottom: var(--space-3);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.coordsValue {
+  font-size: 1.125rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgba(8, 54, 39, 0.95);
+  margin: 0 0 var(--space-3);
+}
+
+.description {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(8, 54, 39, 0.75);
+  margin: 0 0 var(--space-4);
+}
+
+.mapLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.mapBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.14);
+  background: rgba(255, 255, 255, 0.9);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.9);
+  text-decoration: none;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.mapBtn:hover {
+  border-color: rgba(37, 219, 134, 0.4);
+  background: rgba(37, 219, 134, 0.06);
+}
+
+.createEventLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-green-700);
+  text-decoration: none;
+  margin-bottom: var(--space-2);
+}
+
+.createEventLink:hover {
+  text-decoration: underline;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.metaItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.metaLabel {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.metaValue {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.9);
+}
+
+.reportsLink {
+  color: var(--color-green-700);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.reportsLink:hover {
+  text-decoration: underline;
+}
+
+/* Status form */
+.statusForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.statusForm label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statusForm select {
+  max-width: 16rem;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.14);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.95);
+  cursor: pointer;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.statusForm select:hover,
+.statusForm select:focus {
+  border-color: rgba(37, 219, 134, 0.4);
+  outline: none;
+}
+
+.statusPill {
+  display: inline-flex;
+  padding: 4px var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  align-self: flex-start;
+}
+
+.statusReported {
+  background: rgba(248, 187, 0, 0.2);
+  color: #8b6914;
+}
+
+.statusVerified {
+  background: rgba(36, 172, 249, 0.16);
+  color: #1a6e98;
+}
+
+.statusScheduled {
+  background: rgba(139, 92, 246, 0.16);
+  color: #5b21b6;
+}
+
+.statusInProgress {
+  background: rgba(36, 172, 249, 0.2);
+  color: #0369a1;
+}
+
+.statusCleaned {
+  background: rgba(37, 219, 134, 0.18);
+  color: var(--color-green-900);
+}
+
+.statusDisputed {
+  background: var(--color-red-050);
+  color: var(--color-error);
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.formActions .saving {
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.55);
+}

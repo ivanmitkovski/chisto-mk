@@ -11,6 +11,7 @@ type JwtPayload = {
   email: string;
   phoneNumber: string;
   role: Role;
+  sid?: string;
 };
 
 @Injectable()
@@ -33,23 +34,27 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<AuthenticatedUser> {
-    const user = await this.prisma.user.findUnique({
+    const dbUser = await this.prisma.user.findUnique({
       where: { id: payload.sub },
       select: { status: true },
     });
 
-    if (!user || user.status !== UserStatus.ACTIVE) {
+    if (!dbUser || dbUser.status !== UserStatus.ACTIVE) {
       throw new UnauthorizedException({
         code: 'ACCOUNT_NOT_ACTIVE',
         message: 'Account is not active or has been deleted',
       });
     }
 
-    return {
+    const authUser: AuthenticatedUser = {
       userId: payload.sub,
       email: payload.email,
       phoneNumber: payload.phoneNumber,
       role: payload.role,
     };
+    if (payload.sid) {
+      authUser.sessionId = payload.sid;
+    }
+    return authUser;
   }
 }

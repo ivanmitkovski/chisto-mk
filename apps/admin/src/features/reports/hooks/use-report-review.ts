@@ -47,7 +47,12 @@ function createTimelineEntry(status: ReportStatus, reason?: string): ReportTimel
   };
 }
 
-export function useReportReview(initialReport: ReportDetail) {
+type UseReportReviewOptions = {
+  onReportUpdated?: () => void;
+};
+
+export function useReportReview(initialReport: ReportDetail, options?: UseReportReviewOptions) {
+  const onReportUpdated = options?.onReportUpdated;
   const [report, setReport] = useState<ReportDetail>(initialReport);
   const [isUpdating, setIsUpdating] = useState(false);
   const [snack, setSnack] = useState<SnackState | null>(null);
@@ -83,6 +88,8 @@ export function useReportReview(initialReport: ReportDetail) {
       status: nextStatus,
       timeline: [timelineEntry, ...prev.timeline],
     }));
+
+    onReportUpdated?.();
 
     if (action === 'approve') {
       setSnack({

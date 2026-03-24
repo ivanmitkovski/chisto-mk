@@ -20,7 +20,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '../prisma-client';
+import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
@@ -146,7 +146,7 @@ export class ReportsController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List reports for admin moderation queue' })
   @ApiOkResponse({ description: 'Reports fetched successfully', type: AdminReportListResponseDto })
@@ -156,7 +156,7 @@ export class ReportsController {
 
   @Get('duplicates')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List duplicate report groups for moderation' })
   @ApiOkResponse({
@@ -169,7 +169,7 @@ export class ReportsController {
 
   @Get(':id/duplicates')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get duplicate group details for a report' })
   @ApiOkResponse({
@@ -202,7 +202,7 @@ export class ReportsController {
 
   @Patch(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update report moderation status' })
   @ApiOkResponse({ description: 'Report status updated successfully' })
@@ -216,7 +216,7 @@ export class ReportsController {
 
   @Post(':id/merge')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Approve and merge child duplicate reports into a primary report' })
   @ApiOkResponse({

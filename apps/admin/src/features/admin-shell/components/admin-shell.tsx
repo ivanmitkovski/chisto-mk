@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode, useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { adminNavigation } from '../config/navigation';
 import { DESKTOP_SIDEBAR_COOKIE_KEY, DESKTOP_SIDEBAR_STORAGE_KEY } from '../constants';
@@ -15,6 +16,7 @@ type AdminShellProps = {
   children: ReactNode;
   initialSidebarCollapsed?: boolean;
   initialTopBarNotifications?: import('../types/top-bar').TopBarNotification[];
+  contentMode?: 'default' | 'immersive';
 };
 
 const SIDEBAR_PREFERENCE_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
@@ -31,7 +33,9 @@ export function AdminShell({
   children,
   initialSidebarCollapsed = false,
   initialTopBarNotifications,
+  contentMode = 'default',
 }: AdminShellProps) {
+  const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(initialSidebarCollapsed);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
@@ -167,8 +171,25 @@ export function AdminShell({
             isMobileSidebarOpen={isMobileSidebarOpen}
             onMenuToggle={toggleSidebar}
             initialNotifications={initialTopBarNotifications ?? []}
+            searchPlaceholder={
+              pathname === '/dashboard/reports'
+                ? 'Commands'
+                : pathname?.startsWith('/dashboard/users')
+                  ? 'Search users'
+                  : pathname?.startsWith('/dashboard/sites')
+                    ? 'Search sites'
+                    : pathname?.startsWith('/dashboard/events')
+                      ? 'Search events'
+                      : pathname?.startsWith('/dashboard/audit')
+                        ? 'Search logs'
+                        : pathname?.startsWith('/dashboard/settings')
+                          ? 'Search settings'
+                          : 'Search reports'
+            }
           />
-          <div className={styles.content}>{children}</div>
+          <div className={`${styles.content} ${contentMode === 'immersive' ? styles.contentImmersive : ''}`}>
+            {children}
+          </div>
         </main>
       </div>
     </div>

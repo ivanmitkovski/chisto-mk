@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { Role, UserStatus } from '../../src/prisma-client';
 import * as bcrypt from 'bcrypt';
 import { AuthService } from '../../src/auth/auth.service';
+import { is2FAResponse } from '../../src/auth/types/auth-response.type';
 
 const mockUser = {
   id: 'user-1',
@@ -69,8 +70,23 @@ function makeConfig() {
   };
 }
 
+function makeOtpService() {
+  return {
+    createAndSend: jest.fn().mockResolvedValue(undefined),
+    verify: jest.fn().mockResolvedValue(true),
+  };
+}
+
 function makeOtpSender() {
   return { sendOtp: jest.fn().mockResolvedValue(undefined) };
+}
+
+function makeAudit() {
+  return { log: jest.fn().mockResolvedValue(undefined) };
+}
+
+function makeEventEmitter() {
+  return { emit: jest.fn(), on: jest.fn() };
 }
 
 describe('AuthService', () => {
@@ -86,11 +102,17 @@ describe('AuthService', () => {
     mockUser.passwordHash = await bcrypt.hash('StrongPass123!', 4);
     mockAdmin.passwordHash = mockUser.passwordHash;
 
+    const otpService = makeOtpService();
+    const audit = makeAudit();
+    const eventEmitter = makeEventEmitter();
     service = new AuthService(
       prisma as any,
       jwt as unknown as JwtService,
+      otpService as any,
       config as unknown as ConfigService,
       otpSender as any,
+      audit as any,
+      eventEmitter as any,
     );
   });
 
@@ -185,7 +207,7 @@ describe('AuthService', () => {
 
   describe('adminLogin', () => {
     it('authenticates admin by email', async () => {
-      prisma.user.findUnique.mockResolvedValue(mockAdmin);
+      prisma.user.findUnique.mockResolvedValue({ ...mockAdmin, totpSecret: null });
       prisma.userSession.create.mockResolvedValue({});
 
       const result = await service.adminLogin({
@@ -193,6 +215,7 @@ describe('AuthService', () => {
         password: 'StrongPass123!',
       });
 
+      if (is2FAResponse(result)) throw new Error('Expected direct auth, not 2FA');
       expect(result.user.role).toBe(Role.ADMIN);
     });
 

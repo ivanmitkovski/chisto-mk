@@ -1,7 +1,10 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Card, Icon, SectionState } from '@/components/ui';
+import { adminBrowserFetch } from '@/lib/admin-browser-api';
+import { useNotifications } from '../context/notifications-context';
 import { AdminNotification } from '../types';
 import styles from './notifications-center.module.css';
 
@@ -32,6 +35,8 @@ type NotificationsCenterProps = {
 };
 
 export function NotificationsCenter({ initialItems }: NotificationsCenterProps) {
+  const router = useRouter();
+  const notificationsCtx = useNotifications();
   const [filter, setFilter] = useState<FilterKey>('all');
   const [items, setItems] = useState<AdminNotification[]>(() => initialItems.map((item) => ({ ...item })));
 
@@ -47,9 +52,40 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
     return { filtered: filteredItems, unreadCount: unread };
   }, [filter, items]);
 
-  function markAllRead() {
-    setItems((previous) => previous.map((item) => ({ ...item, isUnread: false })));
-  }
+  const markAllRead = useCallback(async () => {
+    const previous = items;
+    setItems((prev) => prev.map((item) => ({ ...item, isUnread: false })));
+    try {
+      if (notificationsCtx) {
+        await notificationsCtx.markAllRead();
+      } else {
+        await adminBrowserFetch('/admin/notifications/read-all', { method: 'PATCH' });
+      }
+    } catch {
+      setItems(previous);
+    }
+  }, [items, notificationsCtx]);
+
+  const markOneRead = useCallback(
+    async (id: string) => {
+      const previous = items;
+      const wasUnread = items.some((item) => item.id === id && item.isUnread);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id && item.isUnread ? { ...item, isUnread: false } : item,
+        ),
+      );
+      try {
+        await adminBrowserFetch(`/admin/notifications/${encodeURIComponent(id)}/read`, {
+          method: 'PATCH',
+        });
+        notificationsCtx?.applyNotificationRead(id, wasUnread);
+      } catch {
+        setItems(previous);
+      }
+    },
+    [items, notificationsCtx],
+  );
 
   return (
     <div className={styles.root}>
@@ -97,22 +133,31 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
           <ul className={styles.items}>
             {filtered.map((notification) => (
               <li key={notification.id} className={styles.item}>
-                <span className={`${styles.iconWrap} ${toneClassName(notification.tone)}`} aria-hidden>
-                  <Icon name={notification.icon} size={16} />
-                </span>
-                <div className={styles.textWrap}>
-                  <p className={styles.itemTitle}>{notification.title}</p>
-                  <p className={styles.itemMessage}>{notification.message}</p>
-                  {notification.href ? (
-                    <a className={styles.link} href={notification.href}>
-                      View details
-                    </a>
-                  ) : null}
-                </div>
-                <div className={styles.meta}>
-                  {notification.isUnread ? <span className={styles.unreadDot} aria-label="Unread" /> : null}
-                  <span>{notification.timeLabel}</span>
-                </div>
+                <button
+                  type="button"
+                  className={styles.itemButton}
+                  onClick={() => {
+                    void markOneRead(notification.id);
+                    if (notification.href) {
+                      router.push(notification.href);
+                    }
+                  }}
+                >
+                  <span className={`${styles.iconWrap} ${toneClassName(notification.tone)}`} aria-hidden>
+                    <Icon name={notification.icon} size={16} />
+                  </span>
+                  <div className={styles.textWrap}>
+                    <p className={styles.itemTitle}>{notification.title}</p>
+                    <p className={styles.itemMessage}>{notification.message}</p>
+                    {notification.href ? (
+                      <span className={styles.link}>View details</span>
+                    ) : null}
+                  </div>
+                  <div className={styles.meta}>
+                    {notification.isUnread ? <span className={styles.unreadDot} aria-label="Unread" /> : null}
+                    <span>{notification.timeLabel}</span>
+                  </div>
+                </button>
               </li>
             ))}
           </ul>

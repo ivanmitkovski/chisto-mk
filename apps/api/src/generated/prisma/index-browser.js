@@ -135,7 +135,9 @@ exports.Prisma.UserScalarFieldEnum = {
   pointsBalance: 'pointsBalance',
   totalPointsEarned: 'totalPointsEarned',
   totalPointsSpent: 'totalPointsSpent',
-  lastActiveAt: 'lastActiveAt'
+  lastActiveAt: 'lastActiveAt',
+  totpSecret: 'totpSecret',
+  mfaBackupCodes: 'mfaBackupCodes'
 };
 
 exports.Prisma.UserSessionScalarFieldEnum = {
@@ -164,6 +166,30 @@ exports.Prisma.LoginFailureScalarFieldEnum = {
   phoneNumber: 'phoneNumber',
   firstFailedAt: 'firstFailedAt',
   attemptCount: 'attemptCount'
+};
+
+exports.Prisma.AdminLoginFailureScalarFieldEnum = {
+  id: 'id',
+  email: 'email',
+  firstFailedAt: 'firstFailedAt',
+  attemptCount: 'attemptCount'
+};
+
+exports.Prisma.AdminTempTokenScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  tokenHash: 'tokenHash',
+  userId: 'userId',
+  email: 'email',
+  expiresAt: 'expiresAt'
+};
+
+exports.Prisma.AdminPendingMfaScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  secret: 'secret',
+  expiresAt: 'expiresAt'
 };
 
 exports.Prisma.AdminNotificationScalarFieldEnum = {
@@ -226,6 +252,34 @@ exports.Prisma.ReportCoReporterScalarFieldEnum = {
   userId: 'userId'
 };
 
+exports.Prisma.SystemConfigScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  key: 'key',
+  value: 'value'
+};
+
+exports.Prisma.FeatureFlagScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  key: 'key',
+  enabled: 'enabled',
+  metadata: 'metadata'
+};
+
+exports.Prisma.AuditLogScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  actorId: 'actorId',
+  action: 'action',
+  resourceType: 'resourceType',
+  resourceId: 'resourceId',
+  metadata: 'metadata',
+  ipAddress: 'ipAddress'
+};
+
 exports.Prisma.CleanupEventScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -233,6 +287,7 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   siteId: 'siteId',
   scheduledAt: 'scheduledAt',
   completedAt: 'completedAt',
+  status: 'status',
   organizerId: 'organizerId',
   participantCount: 'participantCount'
 };
@@ -264,7 +319,9 @@ exports.Prisma.JsonNullValueFilter = {
 };
 exports.Role = exports.$Enums.Role = {
   USER: 'USER',
-  ADMIN: 'ADMIN'
+  SUPPORT: 'SUPPORT',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN'
 };
 
 exports.UserStatus = exports.$Enums.UserStatus = {
@@ -302,16 +359,28 @@ exports.ReportStatus = exports.$Enums.ReportStatus = {
   DELETED: 'DELETED'
 };
 
+exports.CleanupEventStatus = exports.$Enums.CleanupEventStatus = {
+  PENDING: 'PENDING',
+  APPROVED: 'APPROVED',
+  DECLINED: 'DECLINED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserSession: 'UserSession',
   PhoneOtp: 'PhoneOtp',
   LoginFailure: 'LoginFailure',
+  AdminLoginFailure: 'AdminLoginFailure',
+  AdminTempToken: 'AdminTempToken',
+  AdminPendingMfa: 'AdminPendingMfa',
   AdminNotification: 'AdminNotification',
   PointTransaction: 'PointTransaction',
   Site: 'Site',
   Report: 'Report',
   ReportCoReporter: 'ReportCoReporter',
+  SystemConfig: 'SystemConfig',
+  FeatureFlag: 'FeatureFlag',
+  AuditLog: 'AuditLog',
   CleanupEvent: 'CleanupEvent'
 };
 

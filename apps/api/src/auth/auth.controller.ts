@@ -7,12 +7,15 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '../prisma-client';
+import { ADMIN_PANEL_ROLES } from './admin-roles';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { Complete2FALoginDto } from './dto/complete-2fa-login.dto';
+import { Disable2FADto } from './dto/disable-2fa.dto';
+import { Enable2FADto } from './dto/enable-2fa.dto';
 import { CitizenLoginDto } from './dto/citizen-login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -59,12 +62,23 @@ export class AuthController {
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Admin login with email and password' })
   @ApiOkResponse({
+    description: 'Admin authenticated and tokens issued, or requiresTotp + tempToken when 2FA enabled',
+  })
+  @HttpCode(HttpStatus.OK)
+  adminLogin(@Body() dto: AdminLoginDto) {
+    return this.authService.adminLogin(dto);
+  }
+
+  @Post('admin/2fa/complete-login')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Complete admin login with TOTP or backup code' })
+  @ApiOkResponse({
     description: 'Admin authenticated and tokens issued',
     type: AuthResponseDto,
   })
   @HttpCode(HttpStatus.OK)
-  adminLogin(@Body() dto: AdminLoginDto): Promise<AuthResponseDto> {
-    return this.authService.adminLogin(dto);
+  completeAdmin2FALogin(@Body() dto: Complete2FALoginDto) {
+    return this.authService.completeAdmin2FALogin(dto.tempToken, dto.code);
   }
 
   @Post('refresh')
@@ -143,6 +157,66 @@ export class AuthController {
     await this.authService.changePassword(user.userId, dto);
   }
 
+  @Post('me/2fa/setup')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Start 2FA setup; returns QR URI and secret' })
+  @ApiOkResponse({ description: 'Setup data for QR code' })
+  @HttpCode(HttpStatus.OK)
+  async setupMfa(@CurrentUser() user?: AuthenticatedUser) {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.authService.setupMfa(user.userId);
+  }
+
+  @Post('me/2fa/enable')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Enable 2FA after verifying TOTP code' })
+  @ApiOkResponse({ description: '2FA enabled; backup codes returned' })
+  @HttpCode(HttpStatus.OK)
+  async enableMfa(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: Enable2FADto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.authService.enableMfa(user.userId, dto);
+  }
+
+  @Post('me/2fa/disable')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Disable 2FA; requires current password' })
+  @ApiNoContentResponse({ description: '2FA disabled' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async disableMfa(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() dto: Disable2FADto,
+  ): Promise<void> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    await this.authService.disableMfa(user.userId, dto);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -197,7 +271,7 @@ export class AuthController {
 
   @Get('admin/ping')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Admin-only authorization check endpoint' })
   @ApiOkResponse({ description: 'Admin role validated' })

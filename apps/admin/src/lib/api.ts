@@ -1,6 +1,6 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
 
-type HttpMethod = 'GET' | 'POST' | 'PATCH';
+type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
 
 type FetchOptions = {
   method?: HttpMethod;
@@ -73,6 +73,7 @@ export async function apiFetch<TResponse>(path: string, options: FetchOptions = 
         code?: unknown;
         message?: unknown;
         details?: unknown;
+        retryAfterSeconds?: number;
       }
     | null;
 
@@ -81,7 +82,8 @@ export async function apiFetch<TResponse>(path: string, options: FetchOptions = 
     payload && typeof payload.message === 'string'
       ? payload.message
       : `Request to ${path} failed with status ${response.status}`;
+  const details = payload?.details ?? (payload?.retryAfterSeconds != null ? { retryAfterSeconds: payload.retryAfterSeconds } : undefined);
 
-  throw new ApiError(response.status, code, message, payload?.details);
+  throw new ApiError(response.status, code, message, details);
 }
 

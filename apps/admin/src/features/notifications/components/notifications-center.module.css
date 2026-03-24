@@ -110,15 +110,26 @@
 }
 
 .item {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.96);
+  transition: border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease;
+  overflow: hidden;
+}
+
+.itemButton {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: flex-start;
+  width: 100%;
   padding: var(--space-3);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(148, 163, 184, 0.35);
-  background: rgba(255, 255, 255, 0.96);
-  transition: background-color 140ms ease, border-color 140ms ease, box-shadow 140ms ease, transform 120ms ease;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
 }
 
 .item:hover {
@@ -127,9 +138,9 @@
   transform: translateY(-1px);
 }
 
-.item:focus-within {
-  border-color: rgba(37, 219, 134, 0.3);
-  box-shadow: 0 0 0 1px rgba(37, 219, 134, 0.28);
+.itemButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
 }
 
 .iconWrap {

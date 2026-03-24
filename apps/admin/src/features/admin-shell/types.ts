@@ -1,6 +1,16 @@
 import { IconName } from '@/components/ui';
 
-export type NavItemKey = 'dashboard' | 'reports' | 'duplicates' | 'settings';
+export type NavItemKey =
+  | 'dashboard'
+  | 'reports'
+  | 'duplicates'
+  | 'users'
+  | 'sites'
+  | 'map'
+  | 'events'
+  | 'audit'
+  | 'notifications'
+  | 'settings';
 
 export type NavItem = {
   key: NavItemKey;

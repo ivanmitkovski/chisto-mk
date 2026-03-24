@@ -5,4 +5,5 @@ export type AuthenticatedUser = {
   email: string;
   phoneNumber: string;
   role: Role;
+  sessionId?: string;
 };
