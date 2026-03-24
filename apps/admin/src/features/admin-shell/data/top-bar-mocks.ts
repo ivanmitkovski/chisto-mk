@@ -24,6 +24,72 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
     },
   },
   {
+    id: 'go-duplicates',
+    label: 'Go to Duplicate Reports',
+    description: 'Merge duplicate report groups',
+    icon: 'document-forward',
+    keywords: ['merge', 'duplicates', 'groups'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/reports/duplicates',
+    },
+  },
+  {
+    id: 'go-users',
+    label: 'Go to Users',
+    description: 'Browse and manage admin users',
+    icon: 'users',
+    keywords: ['accounts', 'moderators', 'people'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/users',
+    },
+  },
+  {
+    id: 'go-sites',
+    label: 'Go to Sites',
+    description: 'Pollution sites and lifecycle status',
+    icon: 'location',
+    keywords: ['places', 'locations', 'canonical'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/sites',
+    },
+  },
+  {
+    id: 'go-map',
+    label: 'Go to Map',
+    description: 'Sites on the map',
+    icon: 'map',
+    keywords: ['geo', 'markers', 'clusters'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/map',
+    },
+  },
+  {
+    id: 'go-events',
+    label: 'Go to Cleanup Events',
+    description: 'Schedule and review cleanup events',
+    icon: 'calendar',
+    keywords: ['cleanups', 'volunteers'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/events',
+    },
+  },
+  {
+    id: 'go-audit',
+    label: 'Go to Audit Log',
+    description: 'Admin activity and changes',
+    icon: 'scroll-text',
+    keywords: ['history', 'compliance', 'trail'],
+    action: {
+      type: 'navigate',
+      href: '/dashboard/audit',
+    },
+  },
+  {
     id: 'go-settings',
     label: 'Go to Settings',
     description: 'Manage profile and admin preferences',
@@ -58,11 +124,12 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
   {
     id: 'open-preferences',
     label: 'Open Preferences',
-    description: 'Preferences controls are planned next',
+    description: 'Display and notification preferences',
     icon: 'setting',
-    keywords: ['theme', 'controls', 'soon'],
+    keywords: ['theme', 'controls', 'locale', 'motion'],
     action: {
-      type: 'preferences-placeholder',
+      type: 'navigate',
+      href: '/dashboard/settings?section=preferences',
     },
   },
   {
@@ -72,8 +139,7 @@ export const topBarCommands: ReadonlyArray<TopBarCommand> = [
     icon: 'log-out',
     keywords: ['logout', 'exit'],
     action: {
-      type: 'navigate',
-      href: '/login',
+      type: 'sign-out',
     },
   },
 ];

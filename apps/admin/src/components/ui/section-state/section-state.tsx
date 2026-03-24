@@ -1,3 +1,4 @@
+import { Spinner } from '../spinner';
 import styles from './section-state.module.css';
 
 type SectionStateVariant = 'loading' | 'empty' | 'error';
@@ -16,5 +17,12 @@ export function SectionState({ variant, message }: SectionStateProps) {
     .join(' ')
     .trim();
 
-  return <p className={className}>{message}</p>;
+  return (
+    <div className={className} role={variant === 'loading' ? 'status' : undefined} aria-live="polite">
+      {variant === 'loading' && (
+        <Spinner size="md" className={styles.spinner} />
+      )}
+      <span className={styles.message}>{message}</span>
+    </div>
+  );
 }

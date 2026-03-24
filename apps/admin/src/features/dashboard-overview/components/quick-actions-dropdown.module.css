@@ -1,0 +1,109 @@
+.wrapper {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  min-height: 2.5rem;
+  font-size: var(--overview-body-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: color var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out),
+    border-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.trigger:hover {
+  color: var(--color-green-700);
+  background: var(--color-green-010);
+  border-color: rgba(37, 219, 134, 0.2);
+}
+
+.trigger[aria-expanded="true"] {
+  border-color: rgba(37, 219, 134, 0.35);
+  box-shadow: 0 0 0 3px rgba(37, 219, 134, 0.12);
+}
+
+.trigger:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.triggerIcon {
+  color: var(--color-green-700);
+  opacity: 0.9;
+}
+
+.chevron {
+  opacity: 0.7;
+  transition: transform var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  min-width: 14rem;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(8, 54, 39, 0.1);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 12px 28px rgba(8, 54, 39, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-1);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--overview-body-size);
+  font-weight: var(--overview-body-weight);
+  color: var(--text-primary);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out),
+    color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.item:hover {
+  background: var(--color-green-010);
+  color: var(--color-green-700);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.itemIcon {
+  color: var(--color-green-700);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.itemChevron {
+  margin-left: auto;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}

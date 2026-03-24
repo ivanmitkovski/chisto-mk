@@ -1,0 +1,336 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.statsBar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
+
+.statCard {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 4px 16px rgba(8, 54, 39, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  transition: box-shadow var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.statCard:hover {
+  box-shadow: 0 6px 20px rgba(8, 54, 39, 0.08);
+}
+
+.statIcon,
+.statIconPage {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.statIcon {
+  background: rgba(37, 219, 134, 0.12);
+  color: var(--color-green-700);
+}
+
+.statIconPage {
+  background: rgba(139, 92, 246, 0.12);
+  color: #5b21b6;
+}
+
+.statValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: rgba(8, 54, 39, 0.92);
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: rgba(8, 54, 39, 0.55);
+}
+
+.filtersCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+}
+
+.filtersLabel {
+  display: block;
+  margin-bottom: var(--space-4);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.filtersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(8, 54, 39, 0.7);
+  margin-bottom: var(--space-1);
+}
+
+.input {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.14);
+  background: rgba(255, 255, 255, 0.95);
+  font-size: 0.875rem;
+  color: rgba(8, 54, 39, 0.95);
+}
+
+.input:hover,
+.input:focus {
+  border-color: rgba(37, 219, 134, 0.4);
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(8, 54, 39, 0.45);
+}
+
+.filterActions {
+  display: flex;
+  gap: var(--space-3);
+}
+
+.tableCard {
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.toolbarHint {
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.55);
+}
+
+.tableWrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  text-align: left;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.06);
+}
+
+.table th {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(8, 54, 39, 0.5);
+}
+
+.row {
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.row:hover {
+  background: rgba(37, 219, 134, 0.04);
+}
+
+.cellTime {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Action pills */
+.pillAuth,
+.pillCreate,
+.pillUpdate,
+.pillDelete,
+.pillMerge,
+.pillWarning,
+.pillDefault {
+  display: inline-flex;
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.pillAuth {
+  background: rgba(36, 172, 249, 0.16);
+  color: #1a6e98;
+}
+
+.pillCreate {
+  background: rgba(37, 219, 134, 0.18);
+  color: var(--color-green-900);
+}
+
+.pillUpdate {
+  background: rgba(139, 92, 246, 0.14);
+  color: #5b21b6;
+}
+
+.pillDelete {
+  background: var(--color-red-050);
+  color: var(--color-error);
+}
+
+.pillMerge {
+  background: rgba(139, 92, 246, 0.18);
+  color: #5b21b6;
+}
+
+.pillWarning {
+  background: rgba(248, 187, 0, 0.2);
+  color: #8b6914;
+}
+
+.pillDefault {
+  background: rgba(8, 54, 39, 0.1);
+  color: rgba(8, 54, 39, 0.7);
+}
+
+.resourceCell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.resourceType {
+  font-weight: 500;
+  color: rgba(8, 54, 39, 0.9);
+}
+
+.resourceSep {
+  color: rgba(8, 54, 39, 0.4);
+}
+
+.resourceLink {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  color: var(--color-green-700);
+  text-decoration: none;
+}
+
+.resourceLink:hover {
+  text-decoration: underline;
+}
+
+.resourceIdBtn {
+  font-family: ui-monospace, monospace;
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.75);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.resourceIdBtn:hover {
+  color: var(--color-green-700);
+  text-decoration: underline;
+}
+
+.actor {
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.85);
+}
+
+.thDetails,
+.tdDetails {
+  width: 5rem;
+  text-align: right;
+}
+
+.detailsBtn {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: rgba(8, 54, 39, 0.6);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--space-1) 0;
+}
+
+.detailsBtn:hover {
+  color: var(--color-green-700);
+}
+
+.metaRow td {
+  background: rgba(8, 54, 39, 0.03);
+  border-bottom: 1px solid rgba(8, 54, 39, 0.06);
+  padding: var(--space-4);
+}
+
+.metaPre {
+  margin: 0;
+  font-size: 0.75rem;
+  font-family: ui-monospace, monospace;
+  color: rgba(8, 54, 39, 0.8);
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 12rem;
+  overflow-y: auto;
+}
+
+.empty {
+  padding: var(--space-10);
+  text-align: center;
+  color: rgba(8, 54, 39, 0.55);
+  font-size: 0.875rem;
+}
+
+.footer {
+  margin-top: var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: rgba(8, 54, 39, 0.55);
+  font-weight: 500;
+}

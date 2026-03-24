@@ -42,7 +42,9 @@
   padding: 0 var(--space-3);
   color: var(--text-primary);
   font-size: var(--font-size-md);
-  transition: border-color 130ms ease, box-shadow 130ms ease, background-color 130ms ease;
+  transition: border-color var(--motion-duration-fast) var(--motion-ease-out),
+    box-shadow var(--motion-duration-fast) var(--motion-ease-out),
+    background-color var(--motion-duration-fast) var(--motion-ease-out);
 }
 
 .input:hover {
@@ -50,8 +52,13 @@
 }
 
 .input:focus {
-  border-color: rgba(37, 219, 134, 0.72);
-  background: #fbfffd;
+  border-color: var(--border-focus);
+  background: var(--surface-subtle);
+  outline: none;
+}
+
+.input:focus-visible {
+  box-shadow: var(--focus-ring);
 }
 
 .withLeftSlot {

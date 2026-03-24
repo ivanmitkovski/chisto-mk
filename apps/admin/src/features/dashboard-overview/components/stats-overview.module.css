@@ -1,75 +1,138 @@
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.card {
-  display: grid;
-  gap: var(--space-2);
-  border: 1px solid rgba(37, 219, 134, 0.08);
-  transition: box-shadow 150ms ease;
-}
-
-.card:hover {
-  box-shadow: var(--shadow-md);
-}
-
-.header {
+.root {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-3);
+  min-width: 0;
 }
 
-.dot {
-  width: 1.75rem;
-  height: 1.75rem;
-  border-radius: 50%;
+.group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.groupLabel {
+  font-size: var(--overview-label-size);
+  font-weight: var(--overview-label-weight);
+  letter-spacing: var(--overview-label-tracking);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
+.groupStats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.groupDivider {
+  width: 1px;
+  height: 1.25rem;
+  background: var(--border-default);
+  flex-shrink: 0;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  min-height: 2.75rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  font-size: var(--overview-body-size);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out),
+    border-color var(--motion-duration-fast) var(--motion-ease-out),
+    transform var(--motion-duration-micro) var(--motion-ease-out);
+}
+
+.statLink:hover {
+  background: var(--color-green-010);
+  border-color: rgba(37, 219, 134, 0.2);
+}
+
+.statLink:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
+.iconWrap {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-}
-
-.dotGreen {
-  background: var(--color-green-100);
-}
-
-.dotYellow {
-  background: var(--color-yellow-100);
-}
-
-.dotRed {
-  background: var(--color-red-100);
-}
-
-.dotMint {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-sm);
   background: var(--color-green-010);
+  flex-shrink: 0;
 }
 
 .icon {
-  opacity: 0.88;
-}
-
-.label {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--font-size-base);
+  color: var(--color-green-700);
+  opacity: 0.9;
 }
 
 .value {
-  margin: 0;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
+  font-size: var(--overview-stat-value-size);
+  font-weight: var(--overview-stat-value-weight);
+  letter-spacing: var(--overview-title-tracking);
+  color: var(--text-primary);
 }
 
-@media (max-width: 64rem) {
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.label {
+  font-size: var(--overview-stat-label-size);
+  font-weight: var(--overview-stat-label-weight);
+  color: var(--text-secondary);
 }
 
-@media (max-width: 36rem) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+.trendUp {
+  font-size: var(--overview-caption-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--color-success);
+}
+
+.trendDown {
+  font-size: var(--overview-caption-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--color-error);
+}
+
+.trendNeutral {
+  font-size: var(--overview-caption-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--text-secondary);
+}
+
+.toggleButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--overview-body-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--color-green-700);
+  background: var(--surface-subtle);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background-color var(--motion-duration-fast) var(--motion-ease-out),
+    border-color var(--motion-duration-fast) var(--motion-ease-out);
+}
+
+.toggleButton:hover {
+  background: var(--color-green-010);
+  border-color: rgba(37, 219, 134, 0.2);
+}
+
+.toggleButton:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 2px;
 }

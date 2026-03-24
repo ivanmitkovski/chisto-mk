@@ -1,5 +1,7 @@
 export { ReportReviewCard } from './components/report-review-card';
-export { ReportsTable } from './components/reports-table';
+export { ReportListCard } from './components/report-list-card';
+export { ReportsList } from './components/reports-list';
+export { ReportsPageClient } from './components/reports-page-client';
 export { DuplicateReportsWorkspace } from './components/duplicate-reports-workspace';
 export {
   getDuplicateReportGroup,

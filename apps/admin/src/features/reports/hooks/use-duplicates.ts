@@ -58,10 +58,17 @@ export function useDuplicates({ initialGroups, initialSelectedGroupId = null }: 
       return;
     }
 
-    setSelectedChildIdsByGroup((prev) => ({
-      ...prev,
-      [selectedGroup.primaryReport.id]: selectedGroup.duplicateReports.map((duplicate) => duplicate.id),
-    }));
+    const groupId = selectedGroup.primaryReport.id;
+    const allIds = selectedGroup.duplicateReports.map((d) => d.id);
+
+    setSelectedChildIdsByGroup((prev) => {
+      const current = prev[groupId] ?? [];
+      const allSelected = allIds.length > 0 && current.length === allIds.length;
+      return {
+        ...prev,
+        [groupId]: allSelected ? [] : allIds,
+      };
+    });
   }
 
   async function mergeSelected(reason?: string): Promise<boolean> {

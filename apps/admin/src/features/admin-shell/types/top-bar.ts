@@ -9,7 +9,7 @@ export type TopBarCommandAction =
       type: 'open-profile';
     }
   | {
-      type: 'preferences-placeholder';
+      type: 'sign-out';
     };
 
 export type TopBarCommand = {
@@ -27,6 +27,7 @@ export type TopBarNotification = {
   message: string;
   timeLabel: string;
   isUnread: boolean;
+  href?: string;
 };
 
 export type ProfileMenuAction = {

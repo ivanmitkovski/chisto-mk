@@ -1,14 +1,17 @@
 'use client';
 
-import { KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'framer-motion';
-import { Button, Icon, Input } from '@/components/ui';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { Button } from '@/components/ui/button/button';
+import { Icon } from '@/components/ui/icon/icon';
+import { Input } from '@/components/ui/input/input';
+import { useNotifications } from '@/features/notifications/context/notifications-context';
 import { profileMenuActions, topBarCommands } from '../data/top-bar-mocks';
 import { useCommandPalette } from '../hooks/use-command-palette';
 import { useOverlayDismiss } from '../hooks/use-overlay-dismiss';
 import { TopBarCommand, TopBarNotification } from '../types/top-bar';
+import { logoutAdmin } from '@/features/auth/lib/admin-auth';
 import styles from './top-bar.module.css';
 
 type TopBarProps = {
@@ -18,6 +21,7 @@ type TopBarProps = {
   isMobileSidebarOpen: boolean;
   onMenuToggle: () => void;
   initialNotifications?: TopBarNotification[];
+  searchPlaceholder?: string;
 };
 
 export function TopBar({
@@ -27,8 +31,10 @@ export function TopBar({
   isMobileSidebarOpen,
   onMenuToggle,
   initialNotifications = [],
+  searchPlaceholder = 'Search reports',
 }: TopBarProps) {
   const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const searchTriggerRef = useRef<HTMLInputElement>(null);
   const notifyButtonRef = useRef<HTMLButtonElement>(null);
   const profileButtonRef = useRef<HTMLButtonElement>(null);
@@ -38,14 +44,18 @@ export function TopBar({
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const paletteFocusReturnRef = useRef<HTMLElement | null>(null);
 
+  const notificationsContext = useNotifications();
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [shortcutLabel, setShortcutLabel] = useState('Ctrl+K');
-  const [preferencesMessage, setPreferencesMessage] = useState<string | null>(null);
-  const [notifications, setNotifications] = useState<TopBarNotification[]>(() =>
-    initialNotifications.map((notification) => ({ ...notification })),
+  const [localNotifications, setLocalNotifications] = useState<TopBarNotification[]>(() =>
+    initialNotifications.map((n) => ({ ...n })),
   );
+
+  const notifications = notificationsContext?.items ?? localNotifications;
+  const unreadNotificationsCount =
+    notificationsContext?.unreadCount ?? notifications.filter((n) => n.isUnread).length;
 
   const {
     query,
@@ -60,11 +70,6 @@ export function TopBar({
     isOpen: isPaletteOpen,
     commands: topBarCommands,
   });
-
-  const unreadNotificationsCount = useMemo(
-    () => notifications.filter((notification) => notification.isUnread).length,
-    [notifications],
-  );
 
   const menuIcon = isMobile ? (isMobileSidebarOpen ? 'x' : 'menu') : isSidebarCollapsed ? 'panel-left-open' : 'panel-left-close';
   const menuLabel = isMobile
@@ -124,8 +129,12 @@ export function TopBar({
         return;
       }
 
-      setPreferencesMessage('Preferences controls will be introduced in the next admin iteration.');
-      closePalette();
+      if (command.action.type === 'sign-out') {
+        closePalette();
+        logoutAdmin();
+        router.push('/login');
+        return;
+      }
     },
     [closePalette, router],
   );
@@ -219,19 +228,25 @@ export function TopBar({
   }
 
   function markAllNotificationsRead() {
-    setNotifications((previousNotifications) =>
-      previousNotifications.map((notification) =>
-        notification.isUnread ? { ...notification, isUnread: false } : notification,
-      ),
-    );
+    if (notificationsContext) {
+      void notificationsContext.markAllRead();
+    } else {
+      setLocalNotifications((prev) =>
+        prev.map((n) => (n.isUnread ? { ...n, isUnread: false } : n)),
+      );
+    }
   }
 
   function markNotificationRead(id: string) {
-    setNotifications((previousNotifications) =>
-      previousNotifications.map((notification) =>
-        notification.id === id && notification.isUnread ? { ...notification, isUnread: false } : notification,
-      ),
-    );
+    if (notificationsContext) {
+      void notificationsContext.markOneRead(id);
+    } else {
+      setLocalNotifications((prev) =>
+        prev.map((n) =>
+          n.id === id && n.isUnread ? { ...n, isUnread: false } : n,
+        ),
+      );
+    }
   }
 
   function handleProfileAction(action: (typeof profileMenuActions)[number]['action']) {
@@ -241,14 +256,18 @@ export function TopBar({
       return;
     }
 
-    if (action === 'sign-out') {
+    if (action === 'open-preferences') {
       setIsProfileOpen(false);
-      router.push('/login');
+      router.push('/dashboard/settings?section=preferences');
       return;
     }
 
-    setPreferencesMessage('Preferences controls will be introduced in the next admin iteration.');
-    setIsProfileOpen(false);
+    if (action === 'sign-out') {
+      setIsProfileOpen(false);
+      logoutAdmin();
+      router.push('/login');
+      return;
+    }
   }
 
   useOverlayDismiss({
@@ -294,15 +313,6 @@ export function TopBar({
   }, [togglePalette]);
 
   useEffect(() => {
-    if (!preferencesMessage) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => setPreferencesMessage(null), 2400);
-    return () => window.clearTimeout(timeoutId);
-  }, [preferencesMessage]);
-
-  useEffect(() => {
     if (!isPaletteOpen) {
       return;
     }
@@ -318,9 +328,9 @@ export function TopBar({
     <>
       <motion.header
         className={styles.topbar}
-        initial={{ opacity: 0, y: -8 }}
+        initial={reduceMotion ? false : { opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.22, ease: 'easeOut' }}
+        transition={{ duration: reduceMotion ? 0 : 0.22, ease: 'easeOut' }}
       >
         <div className={styles.titleWrap}>
           <Button
@@ -338,7 +348,7 @@ export function TopBar({
           <Input
             inputRef={searchTriggerRef}
             aria-label="Open command palette"
-            placeholder="Search reports"
+            placeholder={searchPlaceholder}
             className={styles.searchInput}
             readOnly
             value=""
@@ -354,15 +364,22 @@ export function TopBar({
           />
           <motion.div
             className={styles.iconCluster}
-            initial={{ opacity: 0 }}
+            initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.05, duration: 0.2, ease: 'easeOut' }}
+            transition={{ delay: reduceMotion ? 0 : 0.05, duration: reduceMotion ? 0 : 0.2, ease: 'easeOut' }}
           >
-            <motion.span className={styles.notifyWrap} whileHover={{ y: -1 }}>
+            <motion.span
+              className={styles.notifyWrap}
+              {...(!reduceMotion ? { whileHover: { y: -1 } } : {})}
+            >
               <Button
                 ref={notifyButtonRef}
                 variant="icon"
-                aria-label="Notifications"
+                aria-label={
+                  unreadNotificationsCount > 0
+                    ? `Notifications, ${unreadNotificationsCount} unread`
+                    : 'Notifications'
+                }
                 aria-expanded={isNotificationsOpen}
                 aria-haspopup="dialog"
                 className={`${styles.iconButton} ${isNotificationsOpen ? styles.iconButtonOpen : ''}`}
@@ -379,10 +396,10 @@ export function TopBar({
                     className={styles.dropdownPanel}
                     role="dialog"
                     aria-label="Notifications panel"
-                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                    initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                    transition={{ duration: 0.16 }}
+                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.16 }}
                   >
                     <header className={styles.panelHeader}>
                       <div>
@@ -404,7 +421,13 @@ export function TopBar({
                           <button
                             type="button"
                             className={`${styles.notificationItem} ${notification.isUnread ? styles.notificationUnread : ''}`}
-                            onClick={() => markNotificationRead(notification.id)}
+                            onClick={() => {
+                              void markNotificationRead(notification.id);
+                              if (notification.href) {
+                                setIsNotificationsOpen(false);
+                                router.push(notification.href);
+                              }
+                            }}
                           >
                             <span className={styles.notificationHeading}>
                               {notification.title}
@@ -432,7 +455,10 @@ export function TopBar({
                 ) : null}
               </AnimatePresence>
             </motion.span>
-            <motion.span whileHover={{ y: -1 }} className={styles.profileWrap}>
+            <motion.span
+              className={styles.profileWrap}
+              {...(!reduceMotion ? { whileHover: { y: -1 } } : {})}
+            >
               <Button
                 ref={profileButtonRef}
                 variant="icon"
@@ -451,10 +477,10 @@ export function TopBar({
                     className={`${styles.dropdownPanel} ${styles.profileMenu}`}
                     role="menu"
                     aria-label="Profile actions"
-                    initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                    initial={reduceMotion ? false : { opacity: 0, y: -6, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -6, scale: 0.98 }}
-                    transition={{ duration: 0.16 }}
+                    exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: -6, scale: 0.98 }}
+                    transition={{ duration: reduceMotion ? 0 : 0.16 }}
                   >
                     <ul className={styles.profileActions}>
                       {profileMenuActions.map((item) => (
@@ -477,21 +503,16 @@ export function TopBar({
             </motion.span>
           </motion.div>
         </div>
-        {preferencesMessage ? (
-          <p className={styles.preferencesHint} role="status">
-            {preferencesMessage}
-          </p>
-        ) : null}
       </motion.header>
 
       <AnimatePresence>
         {isPaletteOpen ? (
           <motion.div
             className={styles.paletteBackdrop}
-            initial={{ opacity: 0 }}
+            initial={reduceMotion ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.16 }}
+            transition={{ duration: reduceMotion ? 0 : 0.16 }}
           >
             <motion.section
               ref={palettePanelRef}
@@ -499,10 +520,10 @@ export function TopBar({
               role="dialog"
               aria-modal="true"
               aria-label="Command palette"
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 6, scale: 0.98 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
+              exit={reduceMotion ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
+              transition={{ duration: reduceMotion ? 0 : 0.18, ease: 'easeOut' }}
               onKeyDown={onPaletteTrapKeyDown}
             >
               <div className={styles.paletteSearchWrap}>

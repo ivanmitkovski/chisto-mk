@@ -63,7 +63,10 @@ export function ActionConfirmModal({
   const notesId = useId();
 
   useEffect(() => {
-    setIsMounted(true);
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => setIsMounted(true));
+    });
+    return () => cancelAnimationFrame(id);
   }, []);
 
   useEffect(() => {
@@ -107,12 +110,12 @@ export function ActionConfirmModal({
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [isOpen, onCancel]);
 
-  if (!isMounted) {
+  if (!isMounted || typeof document === 'undefined' || !document.body) {
     return null;
   }
 
   return createPortal(
-    <AnimatePresence>
+    <AnimatePresence mode="sync">
       {isOpen ? (
         <motion.div
           className={styles.backdrop}

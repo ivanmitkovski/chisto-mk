@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
+import { Spinner } from '../spinner';
 import styles from './button.module.css';
 
 type ButtonVariant = 'solid' | 'outline' | 'ghost' | 'icon';
@@ -49,8 +50,19 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     .trim();
 
   return (
-    <button {...rest} ref={ref} type={type ?? 'button'} className={resolvedClassName} disabled={disabled || isLoading}>
-      {isLoading ? 'Working...' : children}
+    <button
+      {...rest}
+      ref={ref}
+      type={type ?? 'button'}
+      className={resolvedClassName}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading}
+    >
+      {isLoading ? (
+        <Spinner size="sm" />
+      ) : (
+        children
+      )}
     </button>
   );
 });

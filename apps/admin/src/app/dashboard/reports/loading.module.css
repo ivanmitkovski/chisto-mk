@@ -1,96 +1,118 @@
-.card {
-  border: 1px solid rgba(37, 219, 134, 0.11);
-  background: rgba(255, 255, 255, 0.92);
-  display: grid;
+.section {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-4);
+  min-width: 0;
+  width: 100%;
+}
+
+.sectionLabel {
+  display: block;
+  font-size: var(--overview-label-size);
+  font-weight: var(--overview-label-weight);
+  letter-spacing: var(--overview-label-tracking);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  opacity: 0.9;
 }
 
 .header {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.line,
-.chip,
-.panelBody,
-.actionBar {
-  border-radius: var(--radius-lg);
-  background: linear-gradient(90deg, rgba(8, 54, 39, 0.07), rgba(8, 54, 39, 0.12), rgba(8, 54, 39, 0.07));
-  background-size: 200% 100%;
-  animation: pulse 1.2s linear infinite;
-}
-
-.line {
-  height: 1rem;
-}
-
-.lineShort {
-  width: 45%;
-}
-
-.lineLong {
-  width: 70%;
-}
-
-.chips {
-  display: inline-flex;
-  gap: var(--space-2);
-}
-
-.chip {
-  width: 6rem;
-  height: 1.5rem;
-  border-radius: var(--radius-full);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 0.85fr);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--space-4);
 }
 
-.column {
+.headerLeft {
   display: grid;
+  gap: var(--space-1);
+}
+
+.titleSkeleton {
+  width: 8rem;
+  height: 1.25rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: reportsShimmer 1.5s ease-in-out infinite;
+}
+
+.subtitleSkeleton {
+  width: 6rem;
+  height: 1rem;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: reportsShimmer 1.5s ease-in-out infinite;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
   gap: var(--space-3);
 }
 
-.panel {
-  border: 1px solid rgba(8, 54, 39, 0.1);
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 6px 16px rgba(8, 54, 39, 0.06);
+.filterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.panelBody {
-  min-height: 11rem;
-}
-
-.panelBodyTall {
-  min-height: 14rem;
-}
-
-.rail {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.actionBar {
-  height: 2.15rem;
+.filterChipSkeleton {
+  width: 4.5rem;
+  height: 1.75rem;
   border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.12) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: reportsShimmer 1.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  from {
-    background-position: 0 50%;
-  }
-  to {
-    background-position: 200% 50%;
-  }
+.card {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-@media (max-width: 76rem) {
-  .grid {
-    grid-template-columns: 1fr;
+.tableSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.rowSkeleton {
+  height: 3.25rem;
+  border-bottom: 1px solid var(--border-default);
+  background: linear-gradient(
+    90deg,
+    var(--color-green-010) 25%,
+    rgba(37, 219, 134, 0.08) 50%,
+    var(--color-green-010) 75%
+  );
+  background-size: 200% 100%;
+  animation: reportsShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes reportsShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

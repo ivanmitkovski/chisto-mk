@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Brand, Button, Icon } from '@/components/ui';
 import { NavItem } from '../types';
 import styles from './sidebar-nav.module.css';
@@ -25,6 +26,8 @@ export function SidebarNav({
   onRequestClose,
   onToggleCollapse,
 }: SidebarNavProps) {
+  const router = useRouter();
+  const reduceMotion = useReducedMotion();
   const asideClassName = [
     styles.sidebar,
     isCollapsed ? styles.sidebarCollapsed : '',
@@ -50,11 +53,17 @@ export function SidebarNav({
 
       <nav className={styles.nav}>
         {items.map((item) => (
-          <motion.div key={item.key} whileHover={{ x: 2 }} transition={{ duration: 0.15 }}>
+          <motion.div
+            key={item.key}
+            transition={{ duration: reduceMotion ? 0 : 0.15 }}
+            {...(!reduceMotion ? { whileHover: { x: 2 } } : {})}
+          >
             <Link
               href={item.href}
               className={`${styles.navLink} ${item.key === activeItem ? styles.navLinkActive : ''}`}
               aria-current={item.key === activeItem ? 'page' : undefined}
+              onPointerEnter={() => router.prefetch(item.href)}
+              {...(isCollapsed ? { 'aria-label': item.label } : {})}
               {...(isMobile ? { onClick: onRequestClose } : {})}
             >
               <span className={styles.navIconWrap}>

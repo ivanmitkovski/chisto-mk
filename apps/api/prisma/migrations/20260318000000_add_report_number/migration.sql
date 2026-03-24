@@ -14,12 +14,15 @@ SET "reportNumber" = 'CH-' || LPAD(n.rn::text, 6, '0')
 FROM numbered n
 WHERE "Report".id = n.id AND "Report"."reportNumber" IS NULL;
 
--- Set sequence to continue after highest assigned number
+-- Set sequence to continue after highest assigned number (min 1: setval(0) is invalid)
 SELECT setval(
   'report_number_seq',
-  COALESCE(
-    (SELECT MAX(CAST(SUBSTRING("reportNumber" FROM 4) AS INTEGER)) FROM "Report"),
-    0
+  GREATEST(
+    COALESCE(
+      (SELECT MAX(CAST(SUBSTRING("reportNumber" FROM 4) AS INTEGER)) FROM "Report"),
+      0
+    ),
+    1
   )
 );
 

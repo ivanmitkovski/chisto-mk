@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { Prisma } from '../../prisma-client';
 import { ErrorResponse } from '../errors/error-response.type';
 
 type HttpExceptionPayload = {
@@ -30,6 +31,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
+    const prismaMapped = this.tryMapPrismaError(exception);
+    if (prismaMapped) {
+      response.status(prismaMapped.status).json(prismaMapped.body);
+      return;
+    }
+
     console.error('Unhandled exception in request pipeline:', exception);
 
     const fallback: ErrorResponse = {
@@ -38,6 +45,57 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     };
 
     response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(fallback);
+  }
+
+  private tryMapPrismaError(exception: unknown): { status: number; body: ErrorResponse } | null {
+    const code =
+      exception && typeof exception === 'object' && 'code' in exception
+        ? (exception as { code: string }).code
+        : null;
+    if (code && (code === 'P1008' || code === 'P1001' || code === 'P1017')) {
+      return this.mapPrismaErrorByCode(code);
+    }
+    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      return this.mapPrismaErrorByCode(exception.code);
+    }
+    return null;
+  }
+
+  private mapPrismaErrorByCode(code: string): { status: number; body: ErrorResponse } | null {
+    switch (code) {
+      case 'P1008':
+        return {
+          status: HttpStatus.SERVICE_UNAVAILABLE,
+          body: {
+            code: 'DATABASE_TIMEOUT',
+            message: 'Database connection timed out. Please try again.',
+            retryable: true,
+            retryAfterSeconds: 3,
+          },
+        };
+      case 'P1001':
+        return {
+          status: HttpStatus.SERVICE_UNAVAILABLE,
+          body: {
+            code: 'DATABASE_UNAVAILABLE',
+            message: 'Cannot reach the database. Please try again later.',
+            retryable: true,
+            retryAfterSeconds: 5,
+          },
+        };
+      case 'P1017':
+        return {
+          status: HttpStatus.SERVICE_UNAVAILABLE,
+          body: {
+            code: 'DATABASE_DISCONNECTED',
+            message: 'Database connection was closed. Please try again.',
+            retryable: true,
+            retryAfterSeconds: 3,
+          },
+        };
+      default:
+        return null;
+    }
   }
 
   private normalizeHttpPayload(status: number, payload: string | object): ErrorResponse {

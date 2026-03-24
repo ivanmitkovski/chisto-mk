@@ -12,10 +12,18 @@ function optionalEnv(name: string, defaultValue: string): string {
   return (value === undefined || value.trim() === '') ? defaultValue : value.trim();
 }
 
+const MIN_JWT_SECRET_LENGTH = 32;
+
 export function validateEnv(): void {
   requireEnv('DATABASE_URL');
-  requireEnv('JWT_SECRET');
+  const jwtSecret = requireEnv('JWT_SECRET');
   const nodeEnv = optionalEnv('NODE_ENV', 'development');
+  if ((nodeEnv === 'production' || nodeEnv === 'staging') && jwtSecret.length < MIN_JWT_SECRET_LENGTH) {
+    console.error(
+      `JWT_SECRET must be at least ${MIN_JWT_SECRET_LENGTH} characters in production/staging (current: ${jwtSecret.length})`,
+    );
+    process.exit(1);
+  }
   if (nodeEnv === 'production' || nodeEnv === 'staging') {
     const cors = process.env.CORS_ORIGINS;
     if (!cors || cors.trim() === '') {

@@ -5,7 +5,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '../prisma-client';
+import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { Roles } from '../auth/roles.decorator';
@@ -21,7 +21,7 @@ export class AdminNotificationsController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List admin notifications for the current console user' })
   @ApiOkResponse({ description: 'Notifications fetched successfully' })
@@ -34,7 +34,7 @@ export class AdminNotificationsController {
 
   @Patch(':id/read')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark a single notification as read' })
   @ApiOkResponse({ description: 'Notification marked as read' })
@@ -45,7 +45,7 @@ export class AdminNotificationsController {
 
   @Patch('read-all')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Mark all notifications as read for the current admin' })
   @ApiOkResponse({ description: 'Notifications marked as read' })

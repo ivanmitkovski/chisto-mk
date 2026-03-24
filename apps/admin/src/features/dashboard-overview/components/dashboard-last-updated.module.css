@@ -1,0 +1,5 @@
+.root {
+  font-size: var(--overview-caption-size);
+  font-weight: var(--overview-caption-weight);
+  color: var(--text-secondary);
+}

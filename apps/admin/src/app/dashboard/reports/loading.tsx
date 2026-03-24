@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
-import { Card } from '@/components/ui';
 import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import styles from './loading.module.css';
+import pageStyles from './reports-page.module.css';
 
 export default async function ReportsLoading() {
   const cookieStore = await cookies();
@@ -10,45 +10,31 @@ export default async function ReportsLoading() {
 
   return (
     <AdminShell title="Reports" activeItem="reports" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <Card className={styles.card} aria-busy="true" aria-live="polite">
-        <div className={styles.header}>
-          <span className={`${styles.line} ${styles.lineLong}`} />
-          <span className={`${styles.line} ${styles.lineShort}`} />
-          <div className={styles.chips}>
-            <span className={styles.chip} />
-            <span className={styles.chip} />
+      <div className={pageStyles.page}>
+        <section className={styles.section} aria-busy="true">
+          <span className={styles.sectionLabel}>Queue</span>
+          <div className={styles.header}>
+            <div className={styles.headerLeft}>
+              <div className={styles.titleSkeleton} />
+              <div className={styles.subtitleSkeleton} />
+            </div>
           </div>
-        </div>
-
-        <div className={styles.grid}>
-          <section className={styles.column}>
-            <div className={styles.panel}>
-              <div className={`${styles.panelBody} ${styles.panelBodyTall}`} />
+          <div className={styles.filterRow}>
+            <div className={styles.filterChips}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <span key={i} className={styles.filterChipSkeleton} />
+              ))}
             </div>
-            <div className={styles.panel}>
-              <div className={styles.panelBody} />
+          </div>
+          <div className={styles.card}>
+            <div className={styles.tableSkeleton}>
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className={styles.rowSkeleton} />
+              ))}
             </div>
-            <div className={styles.panel}>
-              <div className={styles.panelBody} />
-            </div>
-          </section>
-
-          <aside className={styles.rail}>
-            <div className={styles.panel}>
-              <div className={styles.panelBody}>
-                <div className={styles.column}>
-                  <span className={styles.actionBar} />
-                  <span className={styles.actionBar} />
-                  <span className={styles.actionBar} />
-                </div>
-              </div>
-            </div>
-            <div className={styles.panel}>
-              <div className={styles.panelBody} />
-            </div>
-          </aside>
-        </div>
-      </Card>
+          </div>
+        </section>
+      </div>
     </AdminShell>
   );
 }

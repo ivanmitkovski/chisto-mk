@@ -1,9 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ReportStatus, Site, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { SiteEventsService } from '../admin-events/site-events.service';
+import { AuditService } from '../audit/audit.service';
+import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../common/utils/distance';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import { CreateSiteDto } from './dto/create-site.dto';
+import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 
@@ -24,17 +28,21 @@ const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
 export class SitesService {
   constructor(
     private readonly prisma: PrismaService,
+    private readonly audit: AuditService,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly siteEventsService: SiteEventsService,
   ) {}
 
   async create(dto: CreateSiteDto): Promise<Site> {
-    return this.prisma.site.create({
+    const site = await this.prisma.site.create({
       data: {
         latitude: dto.latitude,
         longitude: dto.longitude,
         description: dto.description ?? null,
       },
     });
+    this.siteEventsService.emitSiteCreated(site.id);
+    return site;
   }
 
   async findAll(query: ListSitesQueryDto): Promise<{
@@ -42,6 +50,10 @@ export class SitesService {
       Site & {
         reportCount: number;
         latestReportDescription: string | null;
+        latestReportCategory: string | null;
+        latestReportCreatedAt: string | null;
+        latestReportNumber: string | null;
+        latestReportMediaUrls?: string[];
         distanceKm?: number;
       }
     >;
@@ -77,7 +89,13 @@ export class SitesService {
         reports: {
           orderBy: { createdAt: 'desc' },
           take: 1,
-          select: { description: true, mediaUrls: true },
+          select: {
+            description: true,
+            mediaUrls: true,
+            category: true,
+            createdAt: true,
+            reportNumber: true,
+          },
         },
         _count: { select: { reports: true } },
       },
@@ -86,6 +104,9 @@ export class SitesService {
     type SiteEnriched = Site & {
       reportCount: number;
       latestReportDescription: string | null;
+      latestReportCategory: string | null;
+      latestReportCreatedAt: string | null;
+      latestReportNumber: string | null;
       latestReportMediaUrls?: string[];
       distanceKm?: number;
     };
@@ -100,6 +121,9 @@ export class SitesService {
         ...siteBase,
         reportCount: _count.reports,
         latestReportDescription: firstReport?.description ?? null,
+        latestReportCategory: firstReport?.category ?? null,
+        latestReportCreatedAt: firstReport?.createdAt?.toISOString() ?? null,
+        latestReportNumber: firstReport?.reportNumber ?? null,
         latestReportMediaUrls: mediaUrls,
         distanceKm:
           hasGeo && query.lat != null && query.lng != null
@@ -141,6 +165,19 @@ export class SitesService {
     };
   }
 
+  async findAllForMap(query: ListSitesMapQueryDto) {
+    const listQuery = {
+      lat: query.lat,
+      lng: query.lng,
+      radiusKm: query.radiusKm,
+      page: 1,
+      limit: query.limit,
+      ...(query.status != null ? { status: query.status } : {}),
+    } satisfies ListSitesQueryDto;
+    const result = await this.findAll(listQuery);
+    return { data: result.data };
+  }
+
   async findOne(siteId: string): Promise<SiteWithReportsAndEvents> {
     const site = await this.prisma.site.findUnique({
       where: { id: siteId },
@@ -171,7 +208,11 @@ export class SitesService {
     return { ...site, reports: reportsWithSignedUrls };
   }
 
-  async updateStatus(siteId: string, dto: UpdateSiteStatusDto): Promise<Site> {
+  async updateStatus(
+    siteId: string,
+    dto: UpdateSiteStatusDto,
+    admin: AuthenticatedUser,
+  ): Promise<Site> {
     const site = await this.prisma.site.findUnique({
       where: { id: siteId },
       select: { id: true, status: true },
@@ -203,10 +244,22 @@ export class SitesService {
       });
     }
 
-    return this.prisma.site.update({
+    const updated = await this.prisma.site.update({
       where: { id: siteId },
       data: { status: dto.status },
     });
+
+    this.siteEventsService.emitSiteUpdated(siteId);
+
+    await this.audit.log({
+      actorId: admin.userId,
+      action: 'SITE_STATUS_UPDATED',
+      resourceType: 'Site',
+      resourceId: siteId,
+      metadata: { from: site.status, to: dto.status },
+    });
+
+    return updated;
   }
 
   async assertSiteEligibleForEcoAction(siteId: string): Promise<void> {

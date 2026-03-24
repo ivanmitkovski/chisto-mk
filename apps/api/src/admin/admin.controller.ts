@@ -5,7 +5,7 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { Role } from '../prisma-client';
+import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
@@ -20,7 +20,7 @@ export class AdminController {
 
   @Get('overview')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get high-level admin overview metrics' })
   @ApiOkResponse({ description: 'Overview metrics fetched successfully' })
@@ -30,7 +30,7 @@ export class AdminController {
 
   @Get('security/overview')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.ADMIN)
+  @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get admin security overview (sessions and recent activity)' })
   @ApiOkResponse({ description: 'Security overview fetched successfully' })

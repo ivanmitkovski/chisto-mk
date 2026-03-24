@@ -9,7 +9,7 @@ export default async function NotificationsLoading() {
   const initialSidebarCollapsed = cookieStore.get(DESKTOP_SIDEBAR_COOKIE_KEY)?.value === '1';
 
   return (
-    <AdminShell title="Notifications" activeItem="dashboard" initialSidebarCollapsed={initialSidebarCollapsed}>
+    <AdminShell title="Notifications" activeItem="notifications" initialSidebarCollapsed={initialSidebarCollapsed}>
       <div className={styles.root} aria-busy="true" aria-live="polite">
         <header className={styles.header}>
           <div>
