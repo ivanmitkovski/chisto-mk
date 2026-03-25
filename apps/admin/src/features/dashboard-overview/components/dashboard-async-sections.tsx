@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { cache } from 'react';
 import { SkeletonCard, SkeletonTable } from '@/components/ui';
-import { ApiError } from '@/lib/api';
+import {
+  ApiConnectionError,
+  ApiError,
+  getApiBaseUrlMisconfigurationHint,
+} from '@/lib/api';
 import { DashboardErrorBoundary } from './dashboard-error-boundary';
 import { DashboardSectionWrapper } from './dashboard-section-wrapper';
 import { DashboardLastUpdated } from './dashboard-last-updated';
@@ -21,15 +25,20 @@ const getOverviewCached = cache(getDashboardOverview);
 const getReportsCached = cache(getReports);
 
 const CONNECTION_ERROR_MESSAGE =
-  'Cannot reach API. Ensure the API is running and NEXT_PUBLIC_API_BASE_URL is correct.';
+  'Cannot reach API. Check that the API is reachable from the internet and that NEXT_PUBLIC_API_BASE_URL is set for production builds (Vercel → Environment Variables → redeploy).';
 
-function isConnectionError(error: unknown): boolean {
+function isLikelyNetworkFailure(error: unknown): boolean {
+  if (error instanceof ApiConnectionError) return true;
   if (!(error instanceof Error)) return false;
-  const msg = error.message?.toLowerCase() ?? '';
-  const causeStr = error.cause?.toString() ?? '';
-  return (
-    msg.includes('fetch') || msg.includes('network') || causeStr.includes('ECONNREFUSED')
-  );
+  const msg = error.message.toLowerCase();
+  const cause = error.cause;
+  const causeMsg = cause instanceof Error ? cause.message : String(cause ?? '');
+  const combined = `${msg} ${causeMsg}`.toLowerCase();
+  if (msg === 'failed to fetch' || msg.includes('fetch failed')) return true;
+  if (combined.includes('econnrefused') || combined.includes('enotfound') || combined.includes('etimedout'))
+    return true;
+  if (combined.includes('network') && combined.includes('error')) return true;
+  return false;
 }
 
 function getErrorDetails(error: unknown, fallback: string): {
@@ -38,6 +47,10 @@ function getErrorDetails(error: unknown, fallback: string): {
 } {
   if (process.env.NODE_ENV === 'development' && error instanceof Error) {
     console.error('[Dashboard]', fallback, error);
+  }
+  if (error instanceof ApiConnectionError) {
+    const hint = getApiBaseUrlMisconfigurationHint() ?? '';
+    return { message: CONNECTION_ERROR_MESSAGE + hint, showSignInLink: false };
   }
   if (error instanceof ApiError) {
     if (error.status === 401 || error.status === 403) {
@@ -50,8 +63,9 @@ function getErrorDetails(error: unknown, fallback: string): {
       return { message: 'API server error. Please try again later.', showSignInLink: false };
     }
   }
-  if (isConnectionError(error)) {
-    return { message: CONNECTION_ERROR_MESSAGE, showSignInLink: false };
+  if (isLikelyNetworkFailure(error)) {
+    const hint = getApiBaseUrlMisconfigurationHint() ?? '';
+    return { message: CONNECTION_ERROR_MESSAGE + hint, showSignInLink: false };
   }
   return { message: fallback, showSignInLink: false };
 }
