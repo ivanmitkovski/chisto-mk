@@ -7,12 +7,15 @@ import { Button } from '@/components/ui/button/button';
 import { Icon } from '@/components/ui/icon/icon';
 import { Input } from '@/components/ui/input/input';
 import { useNotifications } from '@/features/notifications/context/notifications-context';
+import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 import { profileMenuActions, topBarCommands } from '../data/top-bar-mocks';
 import { useCommandPalette } from '../hooks/use-command-palette';
 import { useOverlayDismiss } from '../hooks/use-overlay-dismiss';
 import { TopBarCommand, TopBarNotification } from '../types/top-bar';
 import { logoutAdmin } from '@/features/auth/lib/admin-auth';
 import styles from './top-bar.module.css';
+
+const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
 type TopBarProps = {
   title: string;
@@ -48,6 +51,7 @@ export function TopBar({
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isBellJingling, setIsBellJingling] = useState(false);
   const [shortcutLabel, setShortcutLabel] = useState('Ctrl+K');
   const [localNotifications, setLocalNotifications] = useState<TopBarNotification[]>(() =>
     initialNotifications.map((n) => ({ ...n })),
@@ -56,6 +60,13 @@ export function TopBar({
   const notifications = notificationsContext?.items ?? localNotifications;
   const unreadNotificationsCount =
     notificationsContext?.unreadCount ?? notifications.filter((n) => n.isUnread).length;
+  const bellJiggleTimeoutRef = useRef<number | null>(null);
+  const lastBellJiggleRef = useRef(0);
+
+  const isRealtimeDebugEnabled = useCallback(() => {
+    if (typeof window === 'undefined') return false;
+    return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
+  }, []);
 
   const {
     query,
@@ -297,6 +308,34 @@ export function TopBar({
   }, []);
 
   useEffect(() => {
+    return subscribeNewReportSignal((payload) => {
+      if (reduceMotion) return;
+      const now = Date.now();
+      if (now - lastBellJiggleRef.current < 3000) return;
+      lastBellJiggleRef.current = now;
+      setIsBellJingling(true);
+      if (isRealtimeDebugEnabled()) {
+        console.debug('[realtime] bell-jiggle', { reportId: payload.reportId, atMs: now });
+      }
+      if (bellJiggleTimeoutRef.current != null) {
+        window.clearTimeout(bellJiggleTimeoutRef.current);
+      }
+      bellJiggleTimeoutRef.current = window.setTimeout(() => {
+        setIsBellJingling(false);
+        bellJiggleTimeoutRef.current = null;
+      }, 650);
+    });
+  }, [isRealtimeDebugEnabled, reduceMotion]);
+
+  useEffect(() => {
+    return () => {
+      if (bellJiggleTimeoutRef.current != null) {
+        window.clearTimeout(bellJiggleTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const isShortcut = (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k';
 
@@ -382,7 +421,7 @@ export function TopBar({
                 }
                 aria-expanded={isNotificationsOpen}
                 aria-haspopup="dialog"
-                className={`${styles.iconButton} ${isNotificationsOpen ? styles.iconButtonOpen : ''}`}
+                className={`${styles.iconButton} ${isNotificationsOpen ? styles.iconButtonOpen : ''} ${isBellJingling ? styles.iconButtonJiggle : ''}`}
                 onClick={toggleNotifications}
               >
                 <Icon name="notification-bing" size={16} />

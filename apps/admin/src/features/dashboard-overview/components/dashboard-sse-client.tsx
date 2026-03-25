@@ -6,16 +6,23 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { adminQueryKeys } from '@/lib/admin-api-client';
 import { getApiBaseUrl } from '@/lib/api-base-url';
+import { emitNewReportSignal } from '@/lib/realtime-signals';
 import { getAdminTokenFromBrowserCookie } from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
 const SSE_URL = `${getApiBaseUrl()}/admin/events`;
 const MAX_RETRIES = 10;
 const MAX_RETRY_DELAY_MS = 30_000;
+const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
 function getRetryDelayMs(retryCount: number): number {
   const delay = Math.min(1000 * 2 ** retryCount, MAX_RETRY_DELAY_MS);
   return delay;
+}
+
+function isRealtimeDebugEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
 }
 
 type ReportEventPayload = {
@@ -114,6 +121,9 @@ export function DashboardSSEClient() {
         if (response.ok) {
           retryCountRef.current = 0;
           sseCtxRef.current?.setConnected(true);
+          if (isRealtimeDebugEnabled()) {
+            console.debug('[realtime] sse-connected', { url: SSE_URL });
+          }
           return;
         }
         if (response.status === 401 || response.status === 403) {
@@ -124,9 +134,13 @@ export function DashboardSSEClient() {
       onmessage(ev) {
         try {
           const data = JSON.parse(ev.data) as unknown;
+          if (isRealtimeDebugEnabled()) {
+            console.debug('[realtime] sse-event', data);
+          }
           const qc = queryClientRef.current;
           if (isReportEvent(data)) {
             if (data.type === 'report_created') {
+              emitNewReportSignal(data.reportId);
               sseCtxRef.current?.showRefreshToast('New report received');
             }
             void qc.invalidateQueries({ queryKey: adminQueryKeys.reportsAll });
