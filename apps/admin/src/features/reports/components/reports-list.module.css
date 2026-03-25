@@ -200,7 +200,7 @@
 /* Balanced columns: Report# min 7rem; Status ~13rem for aligned badge + meta + tags */
 .table {
   display: grid;
-  grid-template-columns: minmax(7rem, 7.5rem) 2fr 1fr 7rem minmax(13rem, 14rem) 9rem;
+  grid-template-columns: minmax(7rem, 7.5rem) minmax(0, 2fr) minmax(0, 1fr) 7rem minmax(13rem, 14rem) 9rem;
   gap: 0 var(--space-4);
   min-width: 40rem;
 }
@@ -208,7 +208,7 @@
 .tableHeader {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: minmax(7rem, 7.5rem) 2fr 1fr 7rem minmax(13rem, 14rem) 9rem;
+  grid-template-columns: minmax(7rem, 7.5rem) minmax(0, 2fr) minmax(0, 1fr) 7rem minmax(13rem, 14rem) 9rem;
   gap: 0 var(--space-4);
   background: var(--color-green-010);
   border-bottom: 1px solid rgba(8, 54, 39, 0.08);

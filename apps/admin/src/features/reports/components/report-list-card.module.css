@@ -59,16 +59,27 @@
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
   min-width: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cellLocation {
   font-weight: var(--overview-body-weight);
   color: var(--text-secondary);
   gap: var(--space-1);
+  min-width: 0;
+}
+
+.cellLocationIcon {
+  flex-shrink: 0;
+}
+
+.cellLocationText {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cellLocationMuted {
@@ -280,10 +291,10 @@
   font-size: var(--overview-body-size);
   font-weight: var(--font-weight-semibold);
   color: var(--text-primary);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  min-width: 0;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .mobileLocation {
@@ -291,13 +302,10 @@
   font-size: var(--overview-body-size);
   font-weight: var(--overview-body-weight);
   color: var(--text-secondary);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-1);
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .mobileStatusRow {

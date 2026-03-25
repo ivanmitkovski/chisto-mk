@@ -47,6 +47,7 @@ import { ReportEventsService } from '../admin-events/report-events.service';
 import { SiteEventsService } from '../admin-events/site-events.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
 import { parseReportCleanupEffort, reportCleanupEffortLabel } from './report-cleanup-effort';
+import { stripCategoryLabelPrefix } from './report-category-narrative';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -85,20 +86,27 @@ export class ReportsService {
     return report.reportNumber ?? this.getReportNumberFallback(report);
   }
 
-  private buildLocationLabel(site: {
-    latitude: number;
-    longitude: number;
-    description: string | null;
-    address: string | null;
-  }): string {
+  private formatLatLngLabel(latitude: number, longitude: number): string {
+    return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+  }
+
+  /**
+   * Location for queues and lists: never duplicate the report narrative when legacy `Site.description`
+   * was copied from `Report.description` (pre-address migration); show coordinates instead.
+   */
+  private listLocationLabel(
+    site: { latitude: number; longitude: number; description: string | null; address: string | null },
+    reportDescription: string | null,
+  ): string {
     const address = site.address?.trim();
     if (address) return address;
     const legacy = site.description?.trim();
+    const narrative = reportDescription?.trim();
+    if (legacy && narrative && legacy === narrative) {
+      return this.formatLatLngLabel(site.latitude, site.longitude);
+    }
     if (legacy) return legacy;
-
-    const lat = site.latitude.toFixed(4);
-    const lng = site.longitude.toFixed(4);
-    return `${lat}, ${lng}`;
+    return this.formatLatLngLabel(site.latitude, site.longitude);
   }
 
   /** Report narrative for titles; falls back to legacy site.description when report text is empty. */
@@ -111,6 +119,28 @@ export class ReportsService {
     const legacy = legacySiteDescription?.trim();
     if (legacy) return legacy;
     return 'Reported site';
+  }
+
+  /** Title / name for moderation and citizen lists (strips mobile "Category: …" prefix). */
+  private listReportTitle(
+    reportDescription: string | null,
+    legacySiteDescription: string | null,
+    category: string | null,
+  ): string {
+    const raw = this.reportNarrativeTitle(reportDescription, legacySiteDescription);
+    const stripped = stripCategoryLabelPrefix(raw, category);
+    if (stripped.length > 0) return stripped;
+    if (raw.trim().length > 0) return 'No additional details';
+    return raw.trim() || 'Reported site';
+  }
+
+  private moderationDetailBody(description: string | null, category: string | null): string {
+    if (description == null || description.trim() === '') {
+      return 'No description was provided for this report.';
+    }
+    const stripped = stripCategoryLabelPrefix(description, category);
+    if (stripped.length > 0) return stripped;
+    return 'No additional details';
   }
 
   private derivePriority(status: ReportStatus): AdminReportDetailDto['priority'] {
@@ -134,6 +164,7 @@ export class ReportsService {
     createdAt: Date;
     status: ReportStatus;
     description: string | null;
+    category: string | null;
     mediaUrls: string[];
     site: {
       latitude: number;
@@ -146,8 +177,8 @@ export class ReportsService {
     return {
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      title: this.reportNarrativeTitle(report.description, report.site.description),
-      location: this.buildLocationLabel(report.site),
+      title: this.listReportTitle(report.description, report.site.description, report.category),
+      location: this.listLocationLabel(report.site, report.description),
       submittedAt: report.createdAt.toISOString(),
       status: report.status,
       coReporterCount: report.coReporters.length,
@@ -709,8 +740,8 @@ export class ReportsService {
         return {
           id: report.id,
           reportNumber: this.getReportNumber(report),
-          title: this.reportNarrativeTitle(report.description, report.site.description),
-          location: this.buildLocationLabel(report.site),
+          title: this.listReportTitle(report.description, report.site.description, report.category),
+          location: this.listLocationLabel(report.site, report.description),
           submittedAt: report.createdAt.toISOString(),
           status: report.status,
           isPotentialDuplicate:
@@ -796,8 +827,10 @@ export class ReportsService {
     const items: AdminReportListItemDto[] = data.map((report) => ({
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      name: this.reportNarrativeTitle(report.description, report.site.description),
-      location: report.site ? this.buildLocationLabel(report.site) : 'Unknown location',
+      name: this.listReportTitle(report.description, report.site.description, report.category),
+      location: report.site
+        ? this.listLocationLabel(report.site, report.description)
+        : 'Unknown location',
       dateReportedAt: report.createdAt.toISOString(),
       status: report.status,
       isPotentialDuplicate:
@@ -1292,7 +1325,7 @@ export class ReportsService {
     }
 
     const reportNumber = this.getReportNumber(report);
-    const locationLabel = this.buildLocationLabel(report.site);
+    const locationLabel = this.listLocationLabel(report.site, report.description);
 
     const reporterAlias = report.reporter
       ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
@@ -1372,8 +1405,8 @@ export class ReportsService {
       reportNumber,
       status: report.status,
       priority: this.derivePriority(report.status),
-      title: this.reportNarrativeTitle(report.description, report.site.description),
-      description: report.description ?? 'No description was provided for this report.',
+      title: this.listReportTitle(report.description, report.site.description, report.category),
+      description: this.moderationDetailBody(report.description, report.category),
       location: locationLabel,
       submittedAt: report.createdAt.toISOString(),
       reporterAlias,
@@ -1473,11 +1506,19 @@ export class ReportsService {
       select: { delta: true },
     });
     const pointsAwarded = pointTxns.reduce((sum, t) => sum + t.delta, 0);
+    const citizenDescription =
+      report.description == null
+        ? null
+        : (() => {
+            const stripped = stripCategoryLabelPrefix(report.description, report.category);
+            return stripped.length > 0 ? stripped : 'No additional details';
+          })();
+
     return {
       id: report.id,
       reportNumber: this.getReportNumber(report),
       status: report.status,
-      description: report.description,
+      description: citizenDescription,
       mediaUrls,
       submittedAt: report.createdAt.toISOString(),
       site: {
@@ -1489,7 +1530,7 @@ export class ReportsService {
       },
       reporterName,
       coReporterNames,
-      location: this.buildLocationLabel(report.site),
+      location: this.listLocationLabel(report.site, report.description),
       pointsAwarded,
       category: report.category ?? null,
       severity: report.severity ?? null,

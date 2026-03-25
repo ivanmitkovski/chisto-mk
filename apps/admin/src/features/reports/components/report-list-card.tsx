@@ -57,8 +57,10 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
       <span className={styles.cellReport}>{report.reportNumber}</span>
       <span className={styles.cellTitle}>{report.name}</span>
       <span className={styles.cellLocation}>
-        <Icon name="location" size={12} />
-        {report.location.trim() ? report.location : '—'}
+        <Icon name="location" size={12} className={styles.cellLocationIcon} aria-hidden />
+        <span className={styles.cellLocationText}>
+          {report.location.trim() ? report.location : '—'}
+        </span>
       </span>
       <span className={styles.cellDate}>{formatReportDate(report.dateReportedAt)}</span>
       <span className={styles.cellStatus}>
@@ -171,8 +173,10 @@ export function ReportListMobileCard({
           </div>
           <h3 className={styles.mobileTitle}>{report.name}</h3>
           <p className={styles.mobileLocation}>
-            <Icon name="location" size={14} aria-hidden />
-            {report.location.trim() ? report.location : '—'}
+            <Icon name="location" size={14} className={styles.cellLocationIcon} aria-hidden />
+            <span className={styles.cellLocationText}>
+              {report.location.trim() ? report.location : '—'}
+            </span>
           </p>
         <div className={styles.mobileStatusRow}>
           <span className={statusClassName(report.status)}>
