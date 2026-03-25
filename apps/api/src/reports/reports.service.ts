@@ -41,6 +41,7 @@ import { ReportsUploadService } from './reports-upload.service';
 import { NotificationEventsService } from '../admin-events/notification-events.service';
 import { ReportEventsService } from '../admin-events/report-events.service';
 import { SiteEventsService } from '../admin-events/site-events.service';
+import { ReportsOwnerEventsService } from './reports-owner-events.service';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -63,6 +64,7 @@ export class ReportsService {
     private readonly reportEventsService: ReportEventsService,
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
+    private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
   ) {}
 
   /** Fallback for reports created before reportNumber column (e.g. during migration). */
@@ -412,6 +414,12 @@ export class ReportsService {
     });
 
     this.reportEventsService.emitReportCreated(result.reportId);
+    this.reportsOwnerEventsService.emit(
+      user.userId,
+      result.reportId,
+      'report_created',
+      { kind: 'created' },
+    );
     this.notificationEventsService.emitNotificationCreated(
       result.notificationId,
       result.notificationTitle,
@@ -477,6 +485,15 @@ export class ReportsService {
       where: { id: reportId },
       data: { mediaUrls: newUrls },
     });
+
+    if (report.reporterId) {
+      this.reportsOwnerEventsService.emit(
+        report.reporterId,
+        reportId,
+        'report_updated',
+        { kind: 'media_appended' },
+      );
+    }
   }
 
   async findForCurrentUser(
@@ -886,6 +903,32 @@ export class ReportsService {
       },
     });
 
+    // Admin dashboard invalidation
+    this.reportEventsService.emitReportStatusUpdated(primaryReport.id);
+    for (const childId of selectedChildIds) {
+      this.reportEventsService.emitReportStatusUpdated(childId);
+    }
+
+    // Owner-facing events (each affected report owner receives an update hint)
+    if (primaryReport.reporterId) {
+      this.reportsOwnerEventsService.emit(
+        primaryReport.reporterId,
+        primaryReport.id,
+        'report_updated',
+        { kind: 'merged', status: 'APPROVED' },
+      );
+    }
+    for (const child of selectedChildren) {
+      if (child.reporterId) {
+        this.reportsOwnerEventsService.emit(
+          child.reporterId,
+          child.id,
+          'report_updated',
+          { kind: 'merged', status: 'DELETED' },
+        );
+      }
+    }
+
     return {
       primaryReportId: primaryReport.id,
       mergedChildCount: selectedChildren.length,
@@ -902,7 +945,7 @@ export class ReportsService {
   ): Promise<Report> {
     const report = await this.prisma.report.findUnique({
       where: { id: reportId },
-      select: { id: true, status: true },
+      select: { id: true, status: true, reporterId: true },
     });
 
     if (!report) {
@@ -1014,6 +1057,14 @@ export class ReportsService {
     });
 
     this.reportEventsService.emitReportStatusUpdated(reportId);
+    if (report.reporterId) {
+      this.reportsOwnerEventsService.emit(
+        report.reporterId,
+        reportId,
+        'report_updated',
+        { kind: 'status_changed', status: dto.status },
+      );
+    }
     return updated;
   }
 

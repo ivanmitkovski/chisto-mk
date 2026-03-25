@@ -19,6 +19,7 @@ enum ReportStatus {
 
 class MockReport {
   const MockReport({
+    this.reportId,
     required this.title,
     required this.description,
     required this.status,
@@ -36,6 +37,7 @@ class MockReport {
     this.siteId,
   });
 
+  final String? reportId;
   final String title;
   final String description;
   final String? reportNumber;
@@ -127,6 +129,7 @@ class ReportsListMockStore {
         title.isNotEmpty &&
         loc.toLowerCase() != title.toLowerCase();
     return MockReport(
+      reportId: r.id,
       title: title,
       description: r.title,
       status: _statusFromApi(r.status),
@@ -160,6 +163,7 @@ class ReportsListMockStore {
     final String? siteId =
         (r.site.id).trim().isNotEmpty ? r.site.id : null;
     return MockReport(
+      reportId: r.id,
       title: title,
       description: desc.isNotEmpty ? desc : 'Report details',
       status: _statusFromApi(r.status),
