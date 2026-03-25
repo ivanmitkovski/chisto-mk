@@ -3,6 +3,9 @@ import {
   DashboardSSEProvider,
   DashboardPollingFallback,
 } from '@/features/dashboard-overview';
+
+/** Ensure RSC reads request cookies (auth token for API calls, notifications). */
+export const dynamic = 'force-dynamic';
 import { AdminPreferencesInit } from '@/features/settings/components/admin-preferences-init';
 import { NotificationsProvider } from '@/features/notifications/context/notifications-context';
 import { NotificationsQuerySync } from '@/features/notifications/components/notifications-query-sync';

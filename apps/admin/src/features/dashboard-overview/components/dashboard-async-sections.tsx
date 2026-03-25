@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { cache } from 'react';
 import { SkeletonCard, SkeletonTable } from '@/components/ui';
 import {
@@ -24,8 +25,25 @@ import styles from './dashboard-async-sections.module.css';
 const getOverviewCached = cache(getDashboardOverview);
 const getReportsCached = cache(getReports);
 
+function getErrorHttpStatus(error: unknown): number | null {
+  if (error instanceof ApiError) return error.status;
+  if (typeof error === 'object' && error !== null && 'status' in error) {
+    const s = (error as { status: unknown }).status;
+    return typeof s === 'number' ? s : null;
+  }
+  return null;
+}
+
+/** 401/403 from admin API → send user to login (expired JWT still passes middleware until refresh window). */
+function redirectToLoginIfUnauthorized(error: unknown): void {
+  const s = getErrorHttpStatus(error);
+  if (s === 401 || s === 403) {
+    redirect('/login');
+  }
+}
+
 const CONNECTION_ERROR_MESSAGE =
-  'Cannot reach API. Check that the API is reachable from the internet and that NEXT_PUBLIC_API_BASE_URL is set for production builds (Vercel → Environment Variables → redeploy).';
+  'Cannot reach API from the server. Confirm https://api.chisto.mk is reachable (ALB security group allows 443 from the internet). In Vercel, set NEXT_PUBLIC_API_BASE_URL and redeploy; if the build still lacks it, add SERVER_API_BASE_URL=https://api.chisto.mk (server runtime, same origin).';
 
 function isLikelyNetworkFailure(error: unknown): boolean {
   if (error instanceof ApiConnectionError) return true;
@@ -48,20 +66,19 @@ function getErrorDetails(error: unknown, fallback: string): {
   if (process.env.NODE_ENV === 'development' && error instanceof Error) {
     console.error('[Dashboard]', fallback, error);
   }
+  const httpStatus = getErrorHttpStatus(error);
+  if (httpStatus === 401 || httpStatus === 403) {
+    return {
+      message: 'Session expired or access denied. The access token may have expired (default 15 min). Sign in again.',
+      showSignInLink: true,
+    };
+  }
   if (error instanceof ApiConnectionError) {
     const hint = getApiBaseUrlMisconfigurationHint() ?? '';
     return { message: CONNECTION_ERROR_MESSAGE + hint, showSignInLink: false };
   }
-  if (error instanceof ApiError) {
-    if (error.status === 401 || error.status === 403) {
-      return {
-        message: 'Session expired or access denied. The access token may have expired (default 15 min). Sign in again.',
-        showSignInLink: true,
-      };
-    }
-    if (error.status >= 500) {
-      return { message: 'API server error. Please try again later.', showSignInLink: false };
-    }
+  if (error instanceof ApiError && error.status >= 500) {
+    return { message: 'API server error. Please try again later.', showSignInLink: false };
   }
   if (isLikelyNetworkFailure(error)) {
     const hint = getApiBaseUrlMisconfigurationHint() ?? '';
@@ -81,6 +98,7 @@ export async function StatsSection() {
       </DashboardSectionWrapper>
     );
   } catch (err) {
+    redirectToLoginIfUnauthorized(err);
     return <DashboardSectionError {...getErrorDetails(err, 'Statistics failed to load.')} />;
   }
 }
@@ -145,6 +163,7 @@ export async function ReportsSection() {
       </DashboardSectionWrapper>
     );
   } catch (err) {
+    redirectToLoginIfUnauthorized(err);
     return (
       <section id="reports-section" className={styles.reportsSection} aria-labelledby="reports-heading">
         <span className={styles.sectionLabel}>Queue</span>
@@ -163,9 +182,7 @@ export async function ReportsSection() {
             </Link>
           </div>
         </div>
-        <DashboardSectionError
-          {...getErrorDetails(err, 'Reports table failed to load.')}
-        />
+        <DashboardSectionError {...getErrorDetails(err, 'Reports table failed to load.')} />
       </section>
     );
   }
@@ -218,6 +235,7 @@ export async function InsightsSection() {
       </DashboardSectionWrapper>
     );
   } catch (err) {
+    redirectToLoginIfUnauthorized(err);
     return (
       <section
         id="insights-section"
@@ -258,6 +276,7 @@ export async function DashboardDataOrError({
     await Promise.all([getOverviewCached(), getReportsCached()]);
     return <>{children}</>;
   } catch (err) {
+    redirectToLoginIfUnauthorized(err);
     return (
       <div className={styles.dataErrorWrap}>
         <DashboardSectionError {...getErrorDetails(err, 'Dashboard failed to load.')} />

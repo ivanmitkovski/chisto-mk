@@ -5,11 +5,11 @@ import { fetchEventSource } from '@microsoft/fetch-event-source';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { adminQueryKeys } from '@/lib/admin-api-client';
+import { getApiBaseUrl } from '@/lib/api-base-url';
 import { getAdminTokenFromBrowserCookie } from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
-const SSE_URL = `${API_BASE_URL}/admin/events`;
+const SSE_URL = `${getApiBaseUrl()}/admin/events`;
 const MAX_RETRIES = 10;
 const MAX_RETRY_DELAY_MS = 30_000;
 
