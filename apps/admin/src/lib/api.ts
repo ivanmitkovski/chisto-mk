@@ -1,6 +1,31 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
-
 type HttpMethod = 'GET' | 'POST' | 'PATCH' | 'DELETE';
+
+/** Resolve at call time so server components see env correctly; trim trailing slash. */
+export function getApiBaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_API_BASE_URL?.trim();
+  if (!raw) return 'http://localhost:3000';
+  return raw.endsWith('/') ? raw.slice(0, -1) : raw;
+}
+
+export class ApiConnectionError extends Error {
+  readonly code = 'API_CONNECTION_FAILED';
+
+  constructor(message: string, options?: { cause?: unknown }) {
+    super(message, options);
+    this.name = 'ApiConnectionError';
+  }
+}
+
+/** Extra hint when production build still points at localhost (misconfigured deploy). */
+export function getApiBaseUrlMisconfigurationHint(): string | null {
+  const base = getApiBaseUrl();
+  const looksLocal = base.includes('localhost') || base.includes('127.0.0.1');
+  if (!looksLocal) return null;
+  if (process.env.VERCEL === '1' || process.env.NODE_ENV === 'production') {
+    return ' The deployed app is still using a localhost API URL — set NEXT_PUBLIC_API_BASE_URL to https://api.chisto.mk (or your API URL) in Vercel Environment Variables and redeploy.';
+  }
+  return null;
+}
 
 type FetchOptions = {
   method?: HttpMethod;
@@ -38,7 +63,8 @@ export class ApiError extends Error {
 }
 
 export async function apiFetch<TResponse>(path: string, options: FetchOptions = {}): Promise<TResponse> {
-  const url = `${API_BASE_URL}${path}`;
+  const base = getApiBaseUrl();
+  const url = `${base}${path}`;
 
   const headers: Record<string, string> = {
     Accept: 'application/json',
@@ -53,15 +79,17 @@ export async function apiFetch<TResponse>(path: string, options: FetchOptions = 
     headers.Authorization = `Bearer ${options.authToken}`;
   }
 
-  const response = await fetch(
-    url,
-    {
+  let response: Response;
+  try {
+    response = await fetch(url, {
       method: options.method ?? 'GET',
       headers,
       body: options.body !== undefined ? JSON.stringify(options.body) : null,
       cache: options.cache ?? 'no-store',
-    },
-  );
+    });
+  } catch (cause) {
+    throw new ApiConnectionError(`Network request to API failed (${path})`, { cause });
+  }
 
   if (response.ok) {
     const payload = await parseJsonSafe(response);
