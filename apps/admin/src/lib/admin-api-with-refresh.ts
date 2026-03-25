@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY } from '@/features/auth/lib/auth-constants';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
+import { getApiBaseUrl } from '@/lib/api-base-url';
 
 type RequestInitWithBody = RequestInit & { body?: unknown };
 
 async function doRefresh(refreshToken: string): Promise<{ accessToken: string; refreshToken?: string } | null> {
   try {
-    const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
+    const res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ refreshToken }),
@@ -50,7 +49,7 @@ export async function fetchBackendWithRefresh(
   const accessToken = request.cookies.get(ADMIN_AUTH_COOKIE_KEY)?.value ?? null;
   const refreshToken = request.cookies.get(ADMIN_REFRESH_COOKIE_KEY)?.value ?? null;
 
-  const url = `${API_BASE_URL}${path}`;
+  const url = `${getApiBaseUrl()}${path}`;
   const headers: Record<string, string> = {
     Accept: 'application/json',
     ...((init.headers as Record<string, string>) ?? {}),

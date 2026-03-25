@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
-
-const ADMIN_AUTH_COOKIE_KEY = 'chisto_admin_token';
+import { ADMIN_AUTH_COOKIE_KEY } from '@/features/auth/lib/auth-constants';
 
 export async function getAdminAuthTokenFromCookies(): Promise<string | null> {
   const cookieStore = await cookies();

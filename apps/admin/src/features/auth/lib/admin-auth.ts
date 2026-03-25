@@ -1,4 +1,5 @@
 import { apiFetch } from '@/lib/api';
+import { getApiBaseUrl } from '@/lib/api-base-url';
 import type { AdminLoginResponse, AuthResponse } from './types';
 import { is2FAResponse } from './types';
 
@@ -74,8 +75,7 @@ export function logoutAdmin(): void {
   if (typeof document !== 'undefined') {
     const refreshToken = getAdminRefreshFromBrowserCookie();
     if (refreshToken) {
-      const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
-      fetch(`${apiBase}/auth/logout`, {
+      fetch(`${getApiBaseUrl()}/auth/logout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refreshToken }),
