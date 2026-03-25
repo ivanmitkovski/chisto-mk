@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Roboto } from 'next/font/google';
+import '@/lib/server-dns-init';
 import { QueryProvider } from '@/components/providers/query-provider';
 import './globals.css';
 
