@@ -6,10 +6,10 @@ import {
   fetchNotifications,
   type AdminNotificationItem,
 } from '@/lib/admin-api-client';
-import { NotificationsCenter } from '@/features/notifications';
+import { NotificationsCenter } from '@/features/notifications/components/notifications-center';
+import type { AdminNotification } from '@/features/notifications/types';
 import { SectionState } from '@/components/ui';
 import { ApiConnectionError, ApiError } from '@/lib/api';
-import type { AdminNotification } from '@/features/notifications/types';
 
 function mapToAdminNotifications(items: AdminNotificationItem[]): AdminNotification[] {
   return items.map((item) => ({
