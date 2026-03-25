@@ -42,5 +42,8 @@ class AppTheme {
           ),
         ),
         useMaterial3: true,
+        bottomSheetTheme: const BottomSheetThemeData(
+          surfaceTintColor: Colors.transparent,
+        ),
       );
 }

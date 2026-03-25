@@ -136,6 +136,17 @@ export const AdminNotificationCategory: {
 export type AdminNotificationCategory = (typeof AdminNotificationCategory)[keyof typeof AdminNotificationCategory]
 
 
+export const ReportCleanupEffort: {
+  ONE_TO_TWO: 'ONE_TO_TWO',
+  THREE_TO_FIVE: 'THREE_TO_FIVE',
+  SIX_TO_TEN: 'SIX_TO_TEN',
+  TEN_PLUS: 'TEN_PLUS',
+  NOT_SURE: 'NOT_SURE'
+};
+
+export type ReportCleanupEffort = (typeof ReportCleanupEffort)[keyof typeof ReportCleanupEffort]
+
+
 export const SiteStatus: {
   REPORTED: 'REPORTED',
   VERIFIED: 'VERIFIED',
@@ -183,6 +194,10 @@ export const AdminNotificationTone: typeof $Enums.AdminNotificationTone
 export type AdminNotificationCategory = $Enums.AdminNotificationCategory
 
 export const AdminNotificationCategory: typeof $Enums.AdminNotificationCategory
+
+export type ReportCleanupEffort = $Enums.ReportCleanupEffort
+
+export const ReportCleanupEffort: typeof $Enums.ReportCleanupEffort
 
 export type SiteStatus = $Enums.SiteStatus
 
@@ -2522,12 +2537,18 @@ export namespace Prisma {
     pointsBalance: number | null
     totalPointsEarned: number | null
     totalPointsSpent: number | null
+    reportCreditsAvailable: number | null
+    reportCreditsSpentTotal: number | null
+    reportEmergencyWindowDays: number | null
   }
 
   export type UserSumAggregateOutputType = {
     pointsBalance: number | null
     totalPointsEarned: number | null
     totalPointsSpent: number | null
+    reportCreditsAvailable: number | null
+    reportCreditsSpentTotal: number | null
+    reportEmergencyWindowDays: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -2545,6 +2566,10 @@ export namespace Prisma {
     pointsBalance: number | null
     totalPointsEarned: number | null
     totalPointsSpent: number | null
+    reportCreditsAvailable: number | null
+    reportCreditsSpentTotal: number | null
+    reportEmergencyWindowDays: number | null
+    reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
     totpSecret: string | null
   }
@@ -2564,6 +2589,10 @@ export namespace Prisma {
     pointsBalance: number | null
     totalPointsEarned: number | null
     totalPointsSpent: number | null
+    reportCreditsAvailable: number | null
+    reportCreditsSpentTotal: number | null
+    reportEmergencyWindowDays: number | null
+    reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
     totpSecret: string | null
   }
@@ -2583,6 +2612,10 @@ export namespace Prisma {
     pointsBalance: number
     totalPointsEarned: number
     totalPointsSpent: number
+    reportCreditsAvailable: number
+    reportCreditsSpentTotal: number
+    reportEmergencyWindowDays: number
+    reportEmergencyUsedAt: number
     lastActiveAt: number
     totpSecret: number
     mfaBackupCodes: number
@@ -2594,12 +2627,18 @@ export namespace Prisma {
     pointsBalance?: true
     totalPointsEarned?: true
     totalPointsSpent?: true
+    reportCreditsAvailable?: true
+    reportCreditsSpentTotal?: true
+    reportEmergencyWindowDays?: true
   }
 
   export type UserSumAggregateInputType = {
     pointsBalance?: true
     totalPointsEarned?: true
     totalPointsSpent?: true
+    reportCreditsAvailable?: true
+    reportCreditsSpentTotal?: true
+    reportEmergencyWindowDays?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -2617,6 +2656,10 @@ export namespace Prisma {
     pointsBalance?: true
     totalPointsEarned?: true
     totalPointsSpent?: true
+    reportCreditsAvailable?: true
+    reportCreditsSpentTotal?: true
+    reportEmergencyWindowDays?: true
+    reportEmergencyUsedAt?: true
     lastActiveAt?: true
     totpSecret?: true
   }
@@ -2636,6 +2679,10 @@ export namespace Prisma {
     pointsBalance?: true
     totalPointsEarned?: true
     totalPointsSpent?: true
+    reportCreditsAvailable?: true
+    reportCreditsSpentTotal?: true
+    reportEmergencyWindowDays?: true
+    reportEmergencyUsedAt?: true
     lastActiveAt?: true
     totpSecret?: true
   }
@@ -2655,6 +2702,10 @@ export namespace Prisma {
     pointsBalance?: true
     totalPointsEarned?: true
     totalPointsSpent?: true
+    reportCreditsAvailable?: true
+    reportCreditsSpentTotal?: true
+    reportEmergencyWindowDays?: true
+    reportEmergencyUsedAt?: true
     lastActiveAt?: true
     totpSecret?: true
     mfaBackupCodes?: true
@@ -2762,6 +2813,10 @@ export namespace Prisma {
     pointsBalance: number
     totalPointsEarned: number
     totalPointsSpent: number
+    reportCreditsAvailable: number
+    reportCreditsSpentTotal: number
+    reportEmergencyWindowDays: number
+    reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
     totpSecret: string | null
     mfaBackupCodes: string[]
@@ -2801,6 +2856,10 @@ export namespace Prisma {
     pointsBalance?: boolean
     totalPointsEarned?: boolean
     totalPointsSpent?: boolean
+    reportCreditsAvailable?: boolean
+    reportCreditsSpentTotal?: boolean
+    reportEmergencyWindowDays?: boolean
+    reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
@@ -2831,6 +2890,10 @@ export namespace Prisma {
     pointsBalance?: boolean
     totalPointsEarned?: boolean
     totalPointsSpent?: boolean
+    reportCreditsAvailable?: boolean
+    reportCreditsSpentTotal?: boolean
+    reportEmergencyWindowDays?: boolean
+    reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
@@ -2851,6 +2914,10 @@ export namespace Prisma {
     pointsBalance?: boolean
     totalPointsEarned?: boolean
     totalPointsSpent?: boolean
+    reportCreditsAvailable?: boolean
+    reportCreditsSpentTotal?: boolean
+    reportEmergencyWindowDays?: boolean
+    reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
@@ -2871,12 +2938,16 @@ export namespace Prisma {
     pointsBalance?: boolean
     totalPointsEarned?: boolean
     totalPointsSpent?: boolean
+    reportCreditsAvailable?: boolean
+    reportCreditsSpentTotal?: boolean
+    reportEmergencyWindowDays?: boolean
+    reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "lastActiveAt" | "totpSecret" | "mfaBackupCodes", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "reportCreditsAvailable" | "reportCreditsSpentTotal" | "reportEmergencyWindowDays" | "reportEmergencyUsedAt" | "lastActiveAt" | "totpSecret" | "mfaBackupCodes", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | User$reportsArgs<ExtArgs>
     moderatedReports?: boolean | User$moderatedReportsArgs<ExtArgs>
@@ -2920,6 +2991,10 @@ export namespace Prisma {
       pointsBalance: number
       totalPointsEarned: number
       totalPointsSpent: number
+      reportCreditsAvailable: number
+      reportCreditsSpentTotal: number
+      reportEmergencyWindowDays: number
+      reportEmergencyUsedAt: Date | null
       lastActiveAt: Date | null
       totpSecret: string | null
       mfaBackupCodes: string[]
@@ -3369,6 +3444,10 @@ export namespace Prisma {
     readonly pointsBalance: FieldRef<"User", 'Int'>
     readonly totalPointsEarned: FieldRef<"User", 'Int'>
     readonly totalPointsSpent: FieldRef<"User", 'Int'>
+    readonly reportCreditsAvailable: FieldRef<"User", 'Int'>
+    readonly reportCreditsSpentTotal: FieldRef<"User", 'Int'>
+    readonly reportEmergencyWindowDays: FieldRef<"User", 'Int'>
+    readonly reportEmergencyUsedAt: FieldRef<"User", 'DateTime'>
     readonly lastActiveAt: FieldRef<"User", 'DateTime'>
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly mfaBackupCodes: FieldRef<"User", 'String[]'>
@@ -12674,6 +12753,7 @@ export namespace Prisma {
     updatedAt: Date | null
     latitude: number | null
     longitude: number | null
+    address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
   }
@@ -12684,6 +12764,7 @@ export namespace Prisma {
     updatedAt: Date | null
     latitude: number | null
     longitude: number | null
+    address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
   }
@@ -12694,6 +12775,7 @@ export namespace Prisma {
     updatedAt: number
     latitude: number
     longitude: number
+    address: number
     description: number
     status: number
     _all: number
@@ -12716,6 +12798,7 @@ export namespace Prisma {
     updatedAt?: true
     latitude?: true
     longitude?: true
+    address?: true
     description?: true
     status?: true
   }
@@ -12726,6 +12809,7 @@ export namespace Prisma {
     updatedAt?: true
     latitude?: true
     longitude?: true
+    address?: true
     description?: true
     status?: true
   }
@@ -12736,6 +12820,7 @@ export namespace Prisma {
     updatedAt?: true
     latitude?: true
     longitude?: true
+    address?: true
     description?: true
     status?: true
     _all?: true
@@ -12833,6 +12918,7 @@ export namespace Prisma {
     updatedAt: Date
     latitude: number
     longitude: number
+    address: string | null
     description: string | null
     status: $Enums.SiteStatus
     _count: SiteCountAggregateOutputType | null
@@ -12862,6 +12948,7 @@ export namespace Prisma {
     updatedAt?: boolean
     latitude?: boolean
     longitude?: boolean
+    address?: boolean
     description?: boolean
     status?: boolean
     reports?: boolean | Site$reportsArgs<ExtArgs>
@@ -12875,6 +12962,7 @@ export namespace Prisma {
     updatedAt?: boolean
     latitude?: boolean
     longitude?: boolean
+    address?: boolean
     description?: boolean
     status?: boolean
   }, ExtArgs["result"]["site"]>
@@ -12885,6 +12973,7 @@ export namespace Prisma {
     updatedAt?: boolean
     latitude?: boolean
     longitude?: boolean
+    address?: boolean
     description?: boolean
     status?: boolean
   }, ExtArgs["result"]["site"]>
@@ -12895,11 +12984,12 @@ export namespace Prisma {
     updatedAt?: boolean
     latitude?: boolean
     longitude?: boolean
+    address?: boolean
     description?: boolean
     status?: boolean
   }
 
-  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "description" | "status", ExtArgs["result"]["site"]>
+  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "address" | "description" | "status", ExtArgs["result"]["site"]>
   export type SiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | Site$reportsArgs<ExtArgs>
     events?: boolean | Site$eventsArgs<ExtArgs>
@@ -12920,6 +13010,10 @@ export namespace Prisma {
       updatedAt: Date
       latitude: number
       longitude: number
+      /**
+       * Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
+       */
+      address: string | null
       description: string | null
       status: $Enums.SiteStatus
     }, ExtArgs["result"]["site"]>
@@ -13352,6 +13446,7 @@ export namespace Prisma {
     readonly updatedAt: FieldRef<"Site", 'DateTime'>
     readonly latitude: FieldRef<"Site", 'Float'>
     readonly longitude: FieldRef<"Site", 'Float'>
+    readonly address: FieldRef<"Site", 'String'>
     readonly description: FieldRef<"Site", 'String'>
     readonly status: FieldRef<"Site", 'SiteStatus'>
   }
@@ -13842,6 +13937,7 @@ export namespace Prisma {
     description: string | null
     category: string | null
     severity: number | null
+    cleanupEffort: $Enums.ReportCleanupEffort | null
     status: $Enums.ReportStatus | null
     moderatedAt: Date | null
     moderationReason: string | null
@@ -13858,6 +13954,7 @@ export namespace Prisma {
     description: string | null
     category: string | null
     severity: number | null
+    cleanupEffort: $Enums.ReportCleanupEffort | null
     status: $Enums.ReportStatus | null
     moderatedAt: Date | null
     moderationReason: string | null
@@ -13875,6 +13972,7 @@ export namespace Prisma {
     mediaUrls: number
     category: number
     severity: number
+    cleanupEffort: number
     status: number
     moderatedAt: number
     moderationReason: number
@@ -13901,6 +13999,7 @@ export namespace Prisma {
     description?: true
     category?: true
     severity?: true
+    cleanupEffort?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -13917,6 +14016,7 @@ export namespace Prisma {
     description?: true
     category?: true
     severity?: true
+    cleanupEffort?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -13934,6 +14034,7 @@ export namespace Prisma {
     mediaUrls?: true
     category?: true
     severity?: true
+    cleanupEffort?: true
     status?: true
     moderatedAt?: true
     moderationReason?: true
@@ -14038,6 +14139,7 @@ export namespace Prisma {
     mediaUrls: string[]
     category: string | null
     severity: number | null
+    cleanupEffort: $Enums.ReportCleanupEffort | null
     status: $Enums.ReportStatus
     moderatedAt: Date | null
     moderationReason: string | null
@@ -14074,6 +14176,7 @@ export namespace Prisma {
     mediaUrls?: boolean
     category?: boolean
     severity?: boolean
+    cleanupEffort?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -14098,6 +14201,7 @@ export namespace Prisma {
     mediaUrls?: boolean
     category?: boolean
     severity?: boolean
+    cleanupEffort?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -14119,6 +14223,7 @@ export namespace Prisma {
     mediaUrls?: boolean
     category?: boolean
     severity?: boolean
+    cleanupEffort?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -14140,6 +14245,7 @@ export namespace Prisma {
     mediaUrls?: boolean
     category?: boolean
     severity?: boolean
+    cleanupEffort?: boolean
     status?: boolean
     moderatedAt?: boolean
     moderationReason?: boolean
@@ -14147,7 +14253,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: boolean
   }
 
-  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "description" | "mediaUrls" | "category" | "severity" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
+  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "description" | "mediaUrls" | "category" | "severity" | "cleanupEffort" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
   export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
@@ -14190,6 +14296,7 @@ export namespace Prisma {
       mediaUrls: string[]
       category: string | null
       severity: number | null
+      cleanupEffort: $Enums.ReportCleanupEffort | null
       status: $Enums.ReportStatus
       moderatedAt: Date | null
       moderationReason: string | null
@@ -14633,6 +14740,7 @@ export namespace Prisma {
     readonly mediaUrls: FieldRef<"Report", 'String[]'>
     readonly category: FieldRef<"Report", 'String'>
     readonly severity: FieldRef<"Report", 'Int'>
+    readonly cleanupEffort: FieldRef<"Report", 'ReportCleanupEffort'>
     readonly status: FieldRef<"Report", 'ReportStatus'>
     readonly moderatedAt: FieldRef<"Report", 'DateTime'>
     readonly moderationReason: FieldRef<"Report", 'String'>
@@ -20524,6 +20632,10 @@ export namespace Prisma {
     pointsBalance: 'pointsBalance',
     totalPointsEarned: 'totalPointsEarned',
     totalPointsSpent: 'totalPointsSpent',
+    reportCreditsAvailable: 'reportCreditsAvailable',
+    reportCreditsSpentTotal: 'reportCreditsSpentTotal',
+    reportEmergencyWindowDays: 'reportEmergencyWindowDays',
+    reportEmergencyUsedAt: 'reportEmergencyUsedAt',
     lastActiveAt: 'lastActiveAt',
     totpSecret: 'totpSecret',
     mfaBackupCodes: 'mfaBackupCodes'
@@ -20640,6 +20752,7 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     latitude: 'latitude',
     longitude: 'longitude',
+    address: 'address',
     description: 'description',
     status: 'status'
   };
@@ -20657,6 +20770,7 @@ export namespace Prisma {
     mediaUrls: 'mediaUrls',
     category: 'category',
     severity: 'severity',
+    cleanupEffort: 'cleanupEffort',
     status: 'status',
     moderatedAt: 'moderatedAt',
     moderationReason: 'moderationReason',
@@ -20923,6 +21037,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'ReportCleanupEffort'
+   */
+  export type EnumReportCleanupEffortFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportCleanupEffort'>
+    
+
+
+  /**
+   * Reference to a field of type 'ReportCleanupEffort[]'
+   */
+  export type ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportCleanupEffort[]'>
+    
+
+
+  /**
    * Reference to a field of type 'ReportStatus'
    */
   export type EnumReportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportStatus'>
@@ -20971,6 +21099,10 @@ export namespace Prisma {
     pointsBalance?: IntFilter<"User"> | number
     totalPointsEarned?: IntFilter<"User"> | number
     totalPointsSpent?: IntFilter<"User"> | number
+    reportCreditsAvailable?: IntFilter<"User"> | number
+    reportCreditsSpentTotal?: IntFilter<"User"> | number
+    reportEmergencyWindowDays?: IntFilter<"User"> | number
+    reportEmergencyUsedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
@@ -21000,6 +21132,10 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
+    reportEmergencyUsedAt?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
@@ -21032,6 +21168,10 @@ export namespace Prisma {
     pointsBalance?: IntFilter<"User"> | number
     totalPointsEarned?: IntFilter<"User"> | number
     totalPointsSpent?: IntFilter<"User"> | number
+    reportCreditsAvailable?: IntFilter<"User"> | number
+    reportCreditsSpentTotal?: IntFilter<"User"> | number
+    reportEmergencyWindowDays?: IntFilter<"User"> | number
+    reportEmergencyUsedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
@@ -21061,6 +21201,10 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
+    reportEmergencyUsedAt?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
@@ -21089,6 +21233,10 @@ export namespace Prisma {
     pointsBalance?: IntWithAggregatesFilter<"User"> | number
     totalPointsEarned?: IntWithAggregatesFilter<"User"> | number
     totalPointsSpent?: IntWithAggregatesFilter<"User"> | number
+    reportCreditsAvailable?: IntWithAggregatesFilter<"User"> | number
+    reportCreditsSpentTotal?: IntWithAggregatesFilter<"User"> | number
+    reportEmergencyWindowDays?: IntWithAggregatesFilter<"User"> | number
+    reportEmergencyUsedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
@@ -21612,6 +21760,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Site"> | Date | string
     latitude?: FloatFilter<"Site"> | number
     longitude?: FloatFilter<"Site"> | number
+    address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
     reports?: ReportListRelationFilter
@@ -21624,6 +21773,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
     reports?: ReportOrderByRelationAggregateInput
@@ -21639,6 +21789,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Site"> | Date | string
     latitude?: FloatFilter<"Site"> | number
     longitude?: FloatFilter<"Site"> | number
+    address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
     reports?: ReportListRelationFilter
@@ -21651,6 +21802,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
     _count?: SiteCountOrderByAggregateInput
@@ -21669,6 +21821,7 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"Site"> | Date | string
     latitude?: FloatWithAggregatesFilter<"Site"> | number
     longitude?: FloatWithAggregatesFilter<"Site"> | number
+    address?: StringNullableWithAggregatesFilter<"Site"> | string | null
     description?: StringNullableWithAggregatesFilter<"Site"> | string | null
     status?: EnumSiteStatusWithAggregatesFilter<"Site"> | $Enums.SiteStatus
   }
@@ -21686,6 +21839,7 @@ export namespace Prisma {
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
     severity?: IntNullableFilter<"Report"> | number | null
+    cleanupEffort?: EnumReportCleanupEffortNullableFilter<"Report"> | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -21709,6 +21863,7 @@ export namespace Prisma {
     mediaUrls?: SortOrder
     category?: SortOrderInput | SortOrder
     severity?: SortOrderInput | SortOrder
+    cleanupEffort?: SortOrderInput | SortOrder
     status?: SortOrder
     moderatedAt?: SortOrderInput | SortOrder
     moderationReason?: SortOrderInput | SortOrder
@@ -21735,6 +21890,7 @@ export namespace Prisma {
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
     severity?: IntNullableFilter<"Report"> | number | null
+    cleanupEffort?: EnumReportCleanupEffortNullableFilter<"Report"> | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -21758,6 +21914,7 @@ export namespace Prisma {
     mediaUrls?: SortOrder
     category?: SortOrderInput | SortOrder
     severity?: SortOrderInput | SortOrder
+    cleanupEffort?: SortOrderInput | SortOrder
     status?: SortOrder
     moderatedAt?: SortOrderInput | SortOrder
     moderationReason?: SortOrderInput | SortOrder
@@ -21783,6 +21940,7 @@ export namespace Prisma {
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableWithAggregatesFilter<"Report"> | string | null
     severity?: IntNullableWithAggregatesFilter<"Report"> | number | null
+    cleanupEffort?: EnumReportCleanupEffortNullableWithAggregatesFilter<"Report"> | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusWithAggregatesFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableWithAggregatesFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableWithAggregatesFilter<"Report"> | string | null
@@ -22115,6 +22273,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -22144,6 +22306,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -22173,6 +22339,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -22202,6 +22372,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -22231,6 +22405,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -22251,6 +22429,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -22271,6 +22453,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -22823,6 +23009,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     reports?: ReportCreateNestedManyWithoutSiteInput
@@ -22835,6 +23022,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
@@ -22847,6 +23035,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     reports?: ReportUpdateManyWithoutSiteNestedInput
@@ -22859,6 +23048,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
@@ -22871,6 +23061,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
   }
@@ -22881,6 +23072,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
   }
@@ -22891,6 +23083,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
   }
@@ -22903,6 +23096,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -22924,6 +23118,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -22941,6 +23136,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22962,6 +23158,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22981,6 +23178,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -22996,6 +23194,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23011,6 +23210,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23528,6 +23728,10 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
+    reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
     totpSecret?: SortOrder
     mfaBackupCodes?: SortOrder
@@ -23537,6 +23741,9 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -23554,6 +23761,10 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
+    reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
     totpSecret?: SortOrder
   }
@@ -23573,6 +23784,10 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
+    reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
     totpSecret?: SortOrder
   }
@@ -23581,6 +23796,9 @@ export namespace Prisma {
     pointsBalance?: SortOrder
     totalPointsEarned?: SortOrder
     totalPointsSpent?: SortOrder
+    reportCreditsAvailable?: SortOrder
+    reportCreditsSpentTotal?: SortOrder
+    reportEmergencyWindowDays?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -24084,6 +24302,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    address?: SortOrder
     description?: SortOrder
     status?: SortOrder
   }
@@ -24099,6 +24318,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    address?: SortOrder
     description?: SortOrder
     status?: SortOrder
   }
@@ -24109,6 +24329,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     latitude?: SortOrder
     longitude?: SortOrder
+    address?: SortOrder
     description?: SortOrder
     status?: SortOrder
   }
@@ -24155,6 +24376,13 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
+  export type EnumReportCleanupEffortNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportCleanupEffort | EnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel> | $Enums.ReportCleanupEffort | null
+  }
+
   export type EnumReportStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ReportStatus | EnumReportStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReportStatus[] | ListEnumReportStatusFieldRefInput<$PrismaModel>
@@ -24182,6 +24410,7 @@ export namespace Prisma {
     mediaUrls?: SortOrder
     category?: SortOrder
     severity?: SortOrder
+    cleanupEffort?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
@@ -24202,6 +24431,7 @@ export namespace Prisma {
     description?: SortOrder
     category?: SortOrder
     severity?: SortOrder
+    cleanupEffort?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
@@ -24218,6 +24448,7 @@ export namespace Prisma {
     description?: SortOrder
     category?: SortOrder
     severity?: SortOrder
+    cleanupEffort?: SortOrder
     status?: SortOrder
     moderatedAt?: SortOrder
     moderationReason?: SortOrder
@@ -24243,6 +24474,16 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EnumReportCleanupEffortNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportCleanupEffort | EnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumReportCleanupEffortNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReportCleanupEffort | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel>
+    _max?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel>
   }
 
   export type EnumReportStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -25085,6 +25326,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type NullableEnumReportCleanupEffortFieldUpdateOperationsInput = {
+    set?: $Enums.ReportCleanupEffort | null
+  }
+
   export type EnumReportStatusFieldUpdateOperationsInput = {
     set?: $Enums.ReportStatus
   }
@@ -25543,6 +25788,13 @@ export namespace Prisma {
     _max?: NestedEnumSiteStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumReportCleanupEffortNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportCleanupEffort | EnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel> | $Enums.ReportCleanupEffort | null
+  }
+
   export type NestedEnumReportStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ReportStatus | EnumReportStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ReportStatus[] | ListEnumReportStatusFieldRefInput<$PrismaModel>
@@ -25575,6 +25827,16 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumReportCleanupEffortNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportCleanupEffort | EnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ReportCleanupEffort[] | ListEnumReportCleanupEffortFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumReportCleanupEffortNullableWithAggregatesFilter<$PrismaModel> | $Enums.ReportCleanupEffort | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel>
+    _max?: NestedEnumReportCleanupEffortNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumReportStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -25612,6 +25874,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -25631,6 +25894,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -25658,6 +25922,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -25678,6 +25943,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -25922,6 +26188,7 @@ export namespace Prisma {
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
     severity?: IntNullableFilter<"Report"> | number | null
+    cleanupEffort?: EnumReportCleanupEffortNullableFilter<"Report"> | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFilter<"Report"> | $Enums.ReportStatus
     moderatedAt?: DateTimeNullableFilter<"Report"> | Date | string | null
     moderationReason?: StringNullableFilter<"Report"> | string | null
@@ -26164,6 +26431,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26192,6 +26463,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26236,6 +26511,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26264,6 +26543,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26292,6 +26575,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26320,6 +26607,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26364,6 +26655,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26392,6 +26687,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26420,6 +26719,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26448,6 +26751,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26492,6 +26799,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26520,6 +26831,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26548,6 +26863,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26576,6 +26895,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26620,6 +26943,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26648,6 +26975,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26676,6 +27007,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26704,6 +27039,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26748,6 +27087,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26776,6 +27119,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -26797,6 +27144,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -26816,6 +27164,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -26920,6 +27269,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     events?: CleanupEventCreateNestedManyWithoutSiteInput
@@ -26931,6 +27281,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
@@ -26956,6 +27307,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -26984,6 +27339,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27017,6 +27376,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27045,6 +27408,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27071,6 +27438,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27091,6 +27459,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27112,6 +27481,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27132,6 +27502,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27189,6 +27560,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
@@ -27200,6 +27572,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
@@ -27231,6 +27604,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27259,6 +27636,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27298,6 +27679,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27326,6 +27711,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27358,6 +27747,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27378,6 +27768,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27426,6 +27817,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27446,6 +27838,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27474,6 +27867,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27502,6 +27899,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27539,6 +27940,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27559,6 +27961,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27593,6 +27996,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27621,6 +28028,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27649,6 +28060,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27677,6 +28092,10 @@ export namespace Prisma {
     pointsBalance?: number
     totalPointsEarned?: number
     totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
@@ -27721,6 +28140,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27749,6 +28172,10 @@ export namespace Prisma {
     pointsBalance?: IntFieldUpdateOperationsInput | number
     totalPointsEarned?: IntFieldUpdateOperationsInput | number
     totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
@@ -27768,6 +28195,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     reports?: ReportCreateNestedManyWithoutSiteInput
@@ -27779,6 +28207,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     latitude: number
     longitude: number
+    address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
     reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
@@ -27806,6 +28235,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     reports?: ReportUpdateManyWithoutSiteNestedInput
@@ -27817,6 +28247,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     latitude?: FloatFieldUpdateOperationsInput | number
     longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
     reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
@@ -27831,6 +28262,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27848,6 +28280,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -27921,6 +28354,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27940,6 +28374,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27958,6 +28393,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27973,6 +28409,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27993,6 +28430,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28011,6 +28449,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28203,6 +28642,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -28229,6 +28669,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28248,6 +28689,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28266,6 +28708,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28316,6 +28759,7 @@ export namespace Prisma {
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
     severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
@@ -28336,6 +28780,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28356,6 +28801,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28374,6 +28820,7 @@ export namespace Prisma {
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
     severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null

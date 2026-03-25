@@ -27,6 +27,10 @@ model User {
   pointsBalance     Int @default(0)
   totalPointsEarned Int @default(0)
   totalPointsSpent  Int @default(0)
+  reportCreditsAvailable Int @default(10)
+  reportCreditsSpentTotal Int @default(0)
+  reportEmergencyWindowDays Int @default(7)
+  reportEmergencyUsedAt DateTime?
   lastActiveAt      DateTime?
 
   totpSecret       String?   // Base32-encoded TOTP secret when 2FA enabled
@@ -187,6 +191,14 @@ model PointTransaction {
   @@index([reasonCode])
 }
 
+enum ReportCleanupEffort {
+  ONE_TO_TWO
+  THREE_TO_FIVE
+  SIX_TO_TEN
+  TEN_PLUS
+  NOT_SURE
+}
+
 // Canonical pollution/report site
 model Site {
   id          String   @id @default(cuid())
@@ -195,6 +207,8 @@ model Site {
 
   latitude    Float
   longitude   Float
+  /// Reverse-geocoded or user-confirmed place line from mobile (not the report narrative).
+  address     String?
   description String?
   status      SiteStatus @default(REPORTED)
 
@@ -230,6 +244,7 @@ model Report {
   mediaUrls   String[] @default([])
   category    String?
   severity    Int?
+  cleanupEffort ReportCleanupEffort?
 
   status          ReportStatus @default(NEW)
   moderatedAt     DateTime?

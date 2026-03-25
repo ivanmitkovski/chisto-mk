@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
 import 'package:chisto_mobile/features/reports/domain/models/reports_list_response.dart';
 
@@ -18,6 +19,8 @@ abstract class ReportsApiRepository {
     List<String>? mediaUrls,
     String? category,
     int? severity,
+    String? address,
+    String? cleanupEffort,
   });
 
   /// Paginated list of current user's reports.
@@ -28,4 +31,7 @@ abstract class ReportsApiRepository {
 
   /// Full report detail for citizen (own report).
   Future<ReportDetail> getReportById(String id);
+
+  /// Current reporting capacity policy state for preflight checks and UX hints.
+  Future<ReportCapacity> getReportingCapacity();
 }

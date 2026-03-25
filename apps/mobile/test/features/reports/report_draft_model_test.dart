@@ -67,6 +67,15 @@ void main() {
       expect(CleanupEffort.tenPlus.label, '10+ people');
       expect(CleanupEffort.notSure.label, 'Not sure');
     });
+
+    test('apiKey round-trips with fromApiString', () {
+      for (final CleanupEffort e in CleanupEffort.values) {
+        expect(CleanupEffort.fromApiString(e.apiKey), e);
+      }
+      expect(CleanupEffort.fromApiString(null), isNull);
+      expect(CleanupEffort.fromApiString(''), isNull);
+      expect(CleanupEffort.fromApiString('INVALID'), isNull);
+    });
   });
 
   group('ReportDraft', () {

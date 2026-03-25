@@ -13,6 +13,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
+import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
 
 export class CreateReportWithLocationDto {
   @ApiProperty({ description: 'Latitude of the report location', example: 41.6086 })
@@ -62,4 +63,23 @@ export class CreateReportWithLocationDto {
   @Min(1)
   @Max(5)
   severity?: number;
+
+  @ApiPropertyOptional({
+    description: 'Reverse-geocoded or user-confirmed place line (not the report narrative)',
+    example: 'Skopje, Municipality of Centar',
+    maxLength: 500,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  address?: string;
+
+  @ApiPropertyOptional({
+    description: 'Estimated cleanup team size for organizers',
+    enum: REPORT_CLEANUP_EFFORT_KEYS,
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn([...REPORT_CLEANUP_EFFORT_KEYS])
+  cleanupEffort?: string;
 }

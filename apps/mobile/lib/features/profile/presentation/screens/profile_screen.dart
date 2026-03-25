@@ -9,6 +9,9 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
@@ -32,6 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen>
   late final AnimationController _controller;
   AppError? _profileLoadError;
   ProfileUser? _profileUser;
+  ReportCapacity? _reportCapacity;
 
   @override
   void initState() {
@@ -61,6 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         _profileUser = loaded;
         _profileLoadError = loaded == null ? AppError.unknown() : null;
       });
+      await _loadReportCapacity();
       if (loaded != null) _controller.forward();
     } on AppError catch (e) {
       if (!mounted) return;
@@ -82,6 +87,18 @@ class _ProfileScreenState extends State<ProfileScreen>
           type: AppSnackType.warning,
         );
       }
+    }
+  }
+
+  Future<void> _loadReportCapacity() async {
+    try {
+      final ReportCapacity capacity =
+          await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      if (!mounted) return;
+      setState(() => _reportCapacity = capacity);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _reportCapacity = null);
     }
   }
 
@@ -220,6 +237,13 @@ class _ProfileScreenState extends State<ProfileScreen>
                         child: _LevelAndPointsCard(user: user),
                       ),
                     ),
+                    if (_reportCapacity != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.md),
+                      FadeTransition(
+                        opacity: primaryOpacity,
+                        child: ProfileReportCapacityCard(capacity: _reportCapacity!),
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.md),
                     FadeTransition(
                       opacity: primaryOpacity,
@@ -694,6 +718,63 @@ class _WeeklyRankCard extends StatelessWidget {
                 color: AppColors.primaryDark,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileReportCapacityCard extends StatelessWidget {
+  const ProfileReportCapacityCard({required this.capacity, super.key});
+
+  final ReportCapacity capacity;
+
+  @override
+  Widget build(BuildContext context) {
+    final ReportCapacityUiState ui = mapReportCapacityToUiState(capacity);
+    final String subtitle = ui.kind == ReportCapacityUiKind.cooldown &&
+            capacity.retryAfterSeconds != null &&
+            capacity.retryAfterSeconds! > 0
+        ? '${ui.bannerMessage} (${capacity.retryAfterSeconds}s remaining)'
+        : ui.bannerMessage;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.panelBackground,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+            color: AppColors.shadowMedium,
+            blurRadius: 14,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            'Report credits',
+            style: AppTypography.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ReportStatePill(
+            label: ui.pillLabel,
+            tone: ui.pillTone,
+            icon: ui.pillIcon,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ReportInfoBanner(
+            title: ui.bannerTitle,
+            message: subtitle,
+            icon: ui.bannerIcon,
+            tone: ui.bannerTone,
           ),
         ],
       ),

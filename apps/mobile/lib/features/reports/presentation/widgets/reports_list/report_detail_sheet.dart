@@ -32,9 +32,14 @@ String _severityLabel(int value) =>
     '${value.clamp(1, 5)} – ${_severityLabels[(value.clamp(1, 5) - 1)]}';
 
 class ReportDetailSheet extends StatefulWidget {
-  const ReportDetailSheet({super.key, required this.report});
+  const ReportDetailSheet({
+    super.key,
+    required this.report,
+    this.onShowSiteOnMap,
+  });
 
   final MockReport report;
+  final void Function(String siteId)? onShowSiteOnMap;
 
   @override
   State<ReportDetailSheet> createState() => _ReportDetailSheetState();
@@ -159,10 +164,16 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
 
   Future<void> _openInAppSite() async {
     if (report.siteId == null || report.siteId!.trim().isEmpty) return;
+    final String siteId = report.siteId!.trim();
+    if (widget.onShowSiteOnMap != null) {
+      Navigator.of(context).pop();
+      widget.onShowSiteOnMap!(siteId);
+      return;
+    }
     setState(() => _isOpeningMap = true);
     try {
       final PollutionSite? site = await ServiceLocator.instance.sitesRepository
-          .getSiteById(report.siteId!);
+          .getSiteById(siteId);
       if (!mounted) return;
       setState(() => _isOpeningMap = false);
       if (site == null) {
@@ -263,7 +274,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
       ),
       child: SingleChildScrollView(
         padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).padding.bottom + AppSpacing.lg,
+          bottom: MediaQuery.viewPaddingOf(context).bottom + AppSpacing.lg,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

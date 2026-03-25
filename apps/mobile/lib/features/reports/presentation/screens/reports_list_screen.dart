@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -11,11 +12,15 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/report_surfa
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card_skeleton.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
+import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
 import 'package:flutter/material.dart';
 
 class ReportsListScreen extends StatefulWidget {
@@ -24,11 +29,13 @@ class ReportsListScreen extends StatefulWidget {
     this.initialReportIdToOpen,
     this.onReportOpened,
     this.refreshTrigger,
+    this.onShowSiteOnMap,
   });
 
   final String? initialReportIdToOpen;
   final VoidCallback? onReportOpened;
   final int? refreshTrigger;
+  final void Function(String siteId)? onShowSiteOnMap;
 
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
@@ -50,6 +57,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   StreamSubscription? _realtimeSub;
   String _searchQuery = '';
   bool _isOpeningReportDetail = false;
+  ReportCapacity? _reportCapacity;
 
   List<String> _searchTokens(String raw) {
     final String normalized = raw.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
@@ -183,6 +191,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         _isLoading = false;
         _loadError = null;
       });
+      _loadReportCapacityHint();
     } on AppError catch (e) {
       if (!mounted) return;
       if (e.code == 'UNAUTHORIZED' ||
@@ -214,6 +223,18 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           type: AppSnackType.warning,
         );
       }
+    }
+  }
+
+  Future<void> _loadReportCapacityHint() async {
+    try {
+      final ReportCapacity capacity =
+          await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      if (!mounted) return;
+      setState(() => _reportCapacity = capacity);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _reportCapacity = null);
     }
   }
 
@@ -258,8 +279,18 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
+        useSafeArea: false,
         backgroundColor: AppColors.transparent,
-        builder: (BuildContext context) => ReportDetailSheet(report: display),
+        elevation: 0,
+        builder: (BuildContext sheetContext) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: ReportDetailSheet(
+            report: display,
+            onShowSiteOnMap: widget.onShowSiteOnMap,
+          ),
+        ),
       );
     } on AppError catch (e) {
       if (!mounted) return;
@@ -283,8 +314,18 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
+        useSafeArea: false,
         backgroundColor: AppColors.transparent,
-        builder: (BuildContext context) => ReportDetailSheet(report: display),
+        elevation: 0,
+        builder: (BuildContext sheetContext) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: ReportDetailSheet(
+            report: display,
+            onShowSiteOnMap: widget.onShowSiteOnMap,
+          ),
+        ),
       );
     } on AppError catch (e) {
       if (!mounted) return;
@@ -295,8 +336,18 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
+        useSafeArea: false,
         backgroundColor: AppColors.transparent,
-        builder: (BuildContext context) => ReportDetailSheet(report: display),
+        elevation: 0,
+        builder: (BuildContext sheetContext) => Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: ReportDetailSheet(
+            report: display,
+            onShowSiteOnMap: widget.onShowSiteOnMap,
+          ),
+        ),
       );
     } finally {
       _isOpeningReportDetail = false;
@@ -330,7 +381,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           slivers: <Widget>[
             SliverToBoxAdapter(child: _buildHeader(context)),
             SliverToBoxAdapter(child: _buildSearchBar(context)),
-            if (!_isLoading && _loadError == null && _reports.isNotEmpty)
+            if (!_isLoading && _loadError == null)
               SliverToBoxAdapter(child: _buildStatusFilter(context)),
             if (_loadError != null)
               SliverFillRemaining(
@@ -438,14 +489,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         children: <Widget>[
           Text(
             'Your reports',
-            style: AppTypography.textTheme.titleLarge,
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            'See every pollution report you have sent and how it was handled.',
-            style: AppTypography.textTheme.bodySmall!.copyWith(
-              color: AppColors.textMuted,
-              height: 1.35,
+            style: AppTypography.textTheme.headlineLarge?.copyWith(
+              letterSpacing: -0.5,
             ),
           ),
           const SizedBox(height: AppSpacing.sm),
@@ -469,6 +514,18 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                       ? ReportSurfaceTone.warning
                       : ReportSurfaceTone.neutral,
                 ),
+                if (_reportCapacity != null)
+                  Builder(
+                    builder: (BuildContext context) {
+                      final ReportCapacityUiState ui =
+                          mapReportCapacityToUiState(_reportCapacity!);
+                      return ReportStatePill(
+                        label: ui.pillLabel,
+                        icon: ui.pillIcon,
+                        tone: ui.pillTone,
+                      );
+                    },
+                  ),
               ],
             ),
           ),
@@ -478,7 +535,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildSearchBar(BuildContext context) {
-    final bool hasSearchText = _searchController.text.isNotEmpty;
     final List<ReportListItem> filtered = _filteredReports;
     final String resultLabel = _searchQuery.isEmpty
         ? ''
@@ -498,167 +554,67 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       child: Semantics(
         label: 'Search reports',
         hint: 'Search by title, location, category, or status. $resultLabel'.trim(),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              Icons.search_rounded,
-              size: AppSpacing.iconMd,
-              color: AppColors.textMuted.withValues(alpha: 0.8),
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Container(
-                height: 44,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius:
-                      BorderRadius.circular(AppSpacing.radiusPill),
-                  border: Border.all(
-                    color: AppColors.divider.withValues(alpha: 0.8),
-                    width: 0.5,
-                  ),
-                ),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        focusNode: _searchFocusNode,
-                        textAlignVertical: TextAlignVertical.center,
-                        decoration: InputDecoration(
-                          hintText: 'Search your reports',
-                          hintStyle: AppTypography.textTheme.bodyMedium!
-                              .copyWith(
-                            color: AppColors.textMuted.withValues(alpha: 0.9),
-                            letterSpacing: -0.3,
-                            height: 1.25,
-                          ),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          filled: false,
-                          contentPadding: const EdgeInsets.only(
-                            left: 0,
-                            right: 0,
-                            top: 12,
-                            bottom: 12,
-                          ),
-                          isDense: true,
-                        ),
-                        style: AppTypography.textTheme.bodyMedium!.copyWith(
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.3,
-                          height: 1.25,
-                        ),
-                        textInputAction: TextInputAction.search,
-                        onSubmitted: (_) {
-                          _searchFocusNode.unfocus();
-                          _searchDebounce?.cancel();
-                          setState(
-                            () =>
-                                _searchQuery =
-                                    _searchController.text.trim(),
-                          );
-                        },
-                      ),
-                    ),
-                    if (hasSearchText)
-                      GestureDetector(
-                        onTap: () {
-                          AppHaptics.tap();
-                          _searchDebounce?.cancel();
-                          _searchController.clear();
-                          setState(() => _searchQuery = '');
-                        },
-                        behavior: HitTestBehavior.opaque,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: AppSpacing.xs),
-                          child: Icon(
-                            Icons.close_rounded,
-                            size: 18,
-                            color: AppColors.textMuted.withValues(alpha: 0.85),
-                          ),
-                        ),
-                      )
-                    else if (_searchQuery.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(left: AppSpacing.xs),
-                        child: Text(
-                          _filteredReports.isEmpty
-                              ? 'No matches'
-                              : _filteredReports.length == 1
-                                  ? '1 report'
-                                  : '${_filteredReports.length} reports',
-                          style: AppTypography.chipLabel.copyWith(
-                            color: _filteredReports.isEmpty
-                                ? AppColors.textMuted.withValues(alpha: 0.9)
-                                : AppColors.textSecondary
-                                    .withValues(alpha: 0.95),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+        child: CupertinoSearchTextField(
+          controller: _searchController,
+          focusNode: _searchFocusNode,
+          placeholder: 'Search your reports',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
               ),
-            ),
-          ],
+          placeholderStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textMuted,
+              ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.radius10,
+          ),
+          backgroundColor: AppColors.panelBackground,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          onSubmitted: (_) {
+            _searchFocusNode.unfocus();
+            _searchDebounce?.cancel();
+            setState(() => _searchQuery = _searchController.text.trim());
+          },
+          onSuffixTap: () {
+            AppHaptics.tap();
+            _searchDebounce?.cancel();
+            _searchController.clear();
+            setState(() => _searchQuery = '');
+          },
         ),
       ),
     );
   }
 
   Widget _buildStatusFilter(BuildContext context) {
+    final List<String> labels = <String>[
+      'All',
+      ...ReportStatus.values.map((ReportStatus s) => s.label),
+    ];
+    final int selectedIndex = _statusFilter == null
+        ? 0
+        : ReportStatus.values.indexOf(_statusFilter!) + 1;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Row(
-          children: <Widget>[
-            ReportFilterChip(
-              label: 'All',
-              selected: _statusFilter == null,
-              onTap: () {
-                AppHaptics.tap();
-                setState(() => _statusFilter = null);
-                if (_scrollController.hasClients) {
-                  _scrollController.animateTo(
-                    0,
-                    duration: AppMotion.medium,
-                    curve: AppMotion.smooth,
-                  );
-                }
-              },
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            ...ReportStatus.values.map(
-              (ReportStatus status) => Padding(
-                padding: const EdgeInsets.only(right: AppSpacing.sm),
-                child: ReportFilterChip(
-                  label: status.label,
-                  selected: _statusFilter == status,
-                  onTap: () {
-                    AppHaptics.tap();
-                    setState(() => _statusFilter = status);
-                    if (_scrollController.hasClients) {
-                      _scrollController.animateTo(
-                        0,
-                        duration: AppMotion.medium,
-                        curve: AppMotion.smooth,
-                      );
-                    }
-                  },
-                ),
-              ),
-            ),
-          ],
-        ),
+      child: AppPillFilterChips(
+        labels: labels,
+        selectedIndex: selectedIndex,
+        semanticLabelPrefix: 'Reports',
+        onSelected: (int index) {
+          AppHaptics.tap();
+          setState(() {
+            _statusFilter =
+                index == 0 ? null : ReportStatus.values[index - 1];
+          });
+          if (_scrollController.hasClients) {
+            _scrollController.animateTo(
+              0,
+              duration: AppMotion.medium,
+              curve: AppMotion.smooth,
+            );
+          }
+        },
       ),
     );
   }
@@ -732,6 +688,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
 
   Future<void> _startNewReport() async {
     AppHaptics.medium();
+    final bool canProceed = await _ensureCanStartReportFlow();
+    if (!canProceed) return;
     final Object? result = await Navigator.of(context).push<Object>(
       MaterialPageRoute<Object>(
         builder: (_) => const NewReportScreen(
@@ -744,7 +702,44 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
   }
 
+  Future<bool> _ensureCanStartReportFlow() async {
+    try {
+      final capacity = await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      if (capacity.creditsAvailable > 0 || capacity.emergencyAvailable) {
+        return true;
+      }
+      if (!mounted) return false;
+      return showReportingCooldownDialog(context, capacity);
+    } on AppError catch (e) {
+      if (!mounted) return false;
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'ACCOUNT_NOT_ACTIVE') {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return false;
+      }
+      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
+      return false;
+    } catch (_) {
+      if (!mounted) return false;
+      AppSnack.show(
+        context,
+        message: 'Could not check reporting availability right now.',
+        type: AppSnackType.warning,
+      );
+      return false;
+    }
+  }
+
   Widget _buildEmptyState(BuildContext context) {
+    final ReportCapacity? capacity = _reportCapacity;
+    final ui = capacity != null ? mapReportCapacityToUiState(capacity) : null;
+    final bool showCapacityBanner = ui != null &&
+        (ui.kind == ReportCapacityUiKind.emergency ||
+            ui.kind == ReportCapacityUiKind.cooldown);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Column(
@@ -775,6 +770,15 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
             textAlign: TextAlign.center,
             style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
           ),
+          if (showCapacityBanner) ...<Widget>[
+            const SizedBox(height: AppSpacing.md),
+            ReportInfoBanner(
+              title: ui!.bannerTitle,
+              message: ui.bannerMessage,
+              icon: ui.bannerIcon,
+              tone: ui.bannerTone,
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
           Semantics(
             button: true,

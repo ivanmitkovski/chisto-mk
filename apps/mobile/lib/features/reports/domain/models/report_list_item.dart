@@ -26,6 +26,7 @@ class ReportListItem {
     this.pointsAwarded = 0,
     this.category,
     this.severity,
+    this.cleanupEffort,
   });
 
   final String id;
@@ -40,4 +41,5 @@ class ReportListItem {
   final int pointsAwarded;
   final ReportCategory? category;
   final int? severity;
+  final CleanupEffort? cleanupEffort;
 }

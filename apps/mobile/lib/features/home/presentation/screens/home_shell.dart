@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -8,6 +11,7 @@ import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
@@ -34,12 +38,29 @@ class _HomeShellState extends State<HomeShell> {
   bool _isLaunchingReportFlow = false;
 
   bool _hasVisitedMap = false;
+  final ValueNotifier<String?> _mapPendingSiteFocus = ValueNotifier<String?>(null);
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialTabIndex.clamp(0, 3);
     _hasVisitedMap = _currentIndex == 2;
+  }
+
+  @override
+  void dispose() {
+    _mapPendingSiteFocus.dispose();
+    super.dispose();
+  }
+
+  void _requestShowSiteOnMap(String siteId) {
+    setState(() {
+      _currentIndex = 2;
+      _hasVisitedMap = true;
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _mapPendingSiteFocus.value = siteId;
+    });
   }
 
   @override
@@ -55,9 +76,12 @@ class _HomeShellState extends State<HomeShell> {
             initialReportIdToOpen: _reportIdToOpen,
             onReportOpened: () => setState(() => _reportIdToOpen = null),
             refreshTrigger: _reportsRefreshTrigger,
+            onShowSiteOnMap: _requestShowSiteOnMap,
           ),
           _hasVisitedMap
-              ? const PollutionMapScreen()
+              ? PollutionMapScreen(
+                  pendingSiteFocus: _mapPendingSiteFocus,
+                )
               : _MapTabPlaceholder(),
           EventsFeedScreen(
             key: _eventsFeedKey,
@@ -141,6 +165,8 @@ class _HomeShellState extends State<HomeShell> {
     });
 
     try {
+      final bool canProceed = await _ensureCanStartReportFlow();
+      if (!canProceed) return;
       await _captureAndReview();
     } finally {
       if (mounted) {
@@ -148,6 +174,42 @@ class _HomeShellState extends State<HomeShell> {
           _isLaunchingReportFlow = false;
         });
       }
+    }
+  }
+
+  Future<bool> _ensureCanStartReportFlow() async {
+    try {
+      final capacity = await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      if (capacity.creditsAvailable > 0 || capacity.emergencyAvailable) {
+        return true;
+      }
+      if (!mounted) return false;
+      return showReportingCooldownDialog(context, capacity);
+    } on AppError catch (e) {
+      if (!mounted) return false;
+      if (e.code == 'UNAUTHORIZED' ||
+          e.code == 'INVALID_TOKEN_USER' ||
+          e.code == 'ACCOUNT_NOT_ACTIVE') {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return false;
+      }
+      AppSnack.show(
+        context,
+        message: e.message,
+        type: AppSnackType.warning,
+      );
+      return false;
+    } catch (_) {
+      if (!mounted) return false;
+      AppSnack.show(
+        context,
+        message: 'Could not check reporting availability right now.',
+        type: AppSnackType.warning,
+      );
+      return false;
     }
   }
 

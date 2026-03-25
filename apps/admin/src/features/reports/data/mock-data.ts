@@ -10,6 +10,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'NEW',
     isPotentialDuplicate: true,
     coReporterCount: 2,
+    cleanupEffortLabel: '3–5 people',
   },
   {
     id: 'r-2',
@@ -20,6 +21,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'IN_REVIEW',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-3',
@@ -30,6 +32,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'APPROVED',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-4',
@@ -40,6 +43,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'NEW',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-5',
@@ -50,6 +54,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'DELETED',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-6',
@@ -60,6 +65,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'IN_REVIEW',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-7',
@@ -70,6 +76,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'NEW',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
   {
     id: 'r-8',
@@ -80,6 +87,7 @@ export const reports: ReadonlyArray<ReportRow> = [
     status: 'APPROVED',
     isPotentialDuplicate: false,
     coReporterCount: 0,
+    cleanupEffortLabel: null,
   },
 ];
 
@@ -168,4 +176,5 @@ export const reportDetail: ReportDetail = {
   isPotentialDuplicate: true,
   coReporters: ['Citizen #5930', 'Citizen #6112'],
   potentialDuplicateOfReportNumber: '00.',
+  cleanupEffortLabel: '3–5 people',
 };

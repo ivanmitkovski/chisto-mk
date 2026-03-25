@@ -1,6 +1,8 @@
 import {
   BadRequestException,
   ForbiddenException,
+  HttpException,
+  HttpStatus,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -9,6 +11,7 @@ import {
   AdminNotificationTone,
   Prisma,
   Report,
+  ReportCleanupEffort,
   ReportStatus,
   Role,
   SiteStatus,
@@ -34,6 +37,7 @@ import {
 } from './dto/admin-duplicate-report.dto';
 import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
+import { ReportCapacityDto } from './dto/report-capacity.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { CitizenReportDetailDto } from './dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from './dto/user-report.dto';
@@ -42,6 +46,7 @@ import { NotificationEventsService } from '../admin-events/notification-events.s
 import { ReportEventsService } from '../admin-events/report-events.service';
 import { SiteEventsService } from '../admin-events/site-events.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
+import { parseReportCleanupEffort, reportCleanupEffortLabel } from './report-cleanup-effort';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -54,6 +59,8 @@ const DUPLICATE_RADIUS_METERS = 30;
 const SITE_NEARBY_RADIUS_METERS = 50;
 const POINTS_FIRST_REPORT = 100;
 const POINTS_CO_REPORT = 50;
+const INITIAL_REPORT_CREDITS = 10;
+const DEFAULT_EMERGENCY_WINDOW_DAYS = 7;
 
 @Injectable()
 export class ReportsService {
@@ -82,14 +89,28 @@ export class ReportsService {
     latitude: number;
     longitude: number;
     description: string | null;
+    address: string | null;
   }): string {
-    if (site.description && site.description.trim().length > 0) {
-      return site.description;
-    }
+    const address = site.address?.trim();
+    if (address) return address;
+    const legacy = site.description?.trim();
+    if (legacy) return legacy;
 
     const lat = site.latitude.toFixed(4);
     const lng = site.longitude.toFixed(4);
     return `${lat}, ${lng}`;
+  }
+
+  /** Report narrative for titles; falls back to legacy site.description when report text is empty. */
+  private reportNarrativeTitle(
+    reportDescription: string | null,
+    legacySiteDescription: string | null,
+  ): string {
+    const narrative = reportDescription?.trim();
+    if (narrative) return narrative;
+    const legacy = legacySiteDescription?.trim();
+    if (legacy) return legacy;
+    return 'Reported site';
   }
 
   private derivePriority(status: ReportStatus): AdminReportDetailDto['priority'] {
@@ -114,13 +135,18 @@ export class ReportsService {
     status: ReportStatus;
     description: string | null;
     mediaUrls: string[];
-    site: { latitude: number; longitude: number; description: string | null };
+    site: {
+      latitude: number;
+      longitude: number;
+      description: string | null;
+      address: string | null;
+    };
     coReporters: { id: string }[];
   }): AdminDuplicateReportItemDto {
     return {
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      title: report.site.description ?? report.description ?? 'Reported site',
+      title: this.reportNarrativeTitle(report.description, report.site.description),
       location: this.buildLocationLabel(report.site),
       submittedAt: report.createdAt.toISOString(),
       status: report.status,
@@ -188,6 +214,111 @@ export class ReportsService {
     }
 
     return report.potentialDuplicateOfId ?? report.id;
+  }
+
+  private emergencyRetryAfterSeconds(lastUsedAt: Date, windowDays: number, now: Date): number {
+    const windowMs = windowDays * 24 * 60 * 60 * 1000;
+    const unlockAtMs = lastUsedAt.getTime() + windowMs;
+    return Math.max(1, Math.ceil((unlockAtMs - now.getTime()) / 1000));
+  }
+
+  private buildCapacityDto(
+    user: {
+      reportCreditsAvailable: number;
+      reportEmergencyWindowDays: number;
+      reportEmergencyUsedAt: Date | null;
+    },
+    now: Date,
+  ): ReportCapacityDto {
+    const windowDays = user.reportEmergencyWindowDays || DEFAULT_EMERGENCY_WINDOW_DAYS;
+    const creditsAvailable = user.reportCreditsAvailable ?? INITIAL_REPORT_CREDITS;
+
+    let emergencyAvailable = true;
+    let retryAfterSeconds: number | null = null;
+    if (user.reportEmergencyUsedAt) {
+      const windowMs = windowDays * 24 * 60 * 60 * 1000;
+      const unlockAtMs = user.reportEmergencyUsedAt.getTime() + windowMs;
+      if (unlockAtMs > now.getTime()) {
+        emergencyAvailable = false;
+        retryAfterSeconds = this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now);
+      }
+    }
+
+    return {
+      creditsAvailable,
+      emergencyAvailable,
+      emergencyWindowDays: windowDays,
+      retryAfterSeconds,
+      unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
+    };
+  }
+
+  private async spendReportCapacity(
+    tx: Pick<PrismaService, 'user'>,
+    userId: string,
+    now: Date,
+  ): Promise<void> {
+    const spentFromCredits = await tx.user.updateMany({
+      where: {
+        id: userId,
+        reportCreditsAvailable: { gt: 0 },
+      },
+      data: {
+        reportCreditsAvailable: { decrement: 1 },
+        reportCreditsSpentTotal: { increment: 1 },
+      },
+    });
+
+    if (spentFromCredits.count > 0) {
+      return;
+    }
+
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        reportCreditsAvailable: true,
+        reportEmergencyWindowDays: true,
+        reportEmergencyUsedAt: true,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: `User with id '${userId}' was not found`,
+      });
+    }
+
+    const windowDays = user.reportEmergencyWindowDays || DEFAULT_EMERGENCY_WINDOW_DAYS;
+    const emergencyAvailable =
+      !user.reportEmergencyUsedAt ||
+      user.reportEmergencyUsedAt.getTime() + windowDays * 24 * 60 * 60 * 1000 <= now.getTime();
+
+    if (emergencyAvailable) {
+      await tx.user.update({
+        where: { id: userId },
+        data: {
+          reportEmergencyUsedAt: now,
+          reportCreditsSpentTotal: { increment: 1 },
+        },
+      });
+      return;
+    }
+
+    throw new HttpException({
+      code: 'REPORTING_COOLDOWN',
+      message:
+        'You have used all report credits and emergency allowance. Join or create an eco action to unlock more reports.',
+      details: {
+        creditsAvailable: user.reportCreditsAvailable,
+        emergencyAvailable: false,
+        retryAfterSeconds: user.reportEmergencyUsedAt
+          ? this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now)
+          : null,
+        unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
+      },
+    }, HttpStatus.TOO_MANY_REQUESTS);
   }
 
   async create(dto: CreateReportDto): Promise<Report> {
@@ -296,7 +427,11 @@ export class ReportsService {
     user: AuthenticatedUser,
     dto: CreateReportWithLocationDto,
   ): Promise<ReportSubmitResponseDto> {
-    const { latitude, longitude, description, mediaUrls, category, severity } = dto;
+    const { latitude, longitude, description, mediaUrls, category, severity, address } = dto;
+    const trimmedAddress = address?.trim() || null;
+    const cleanupEffortParsed: ReportCleanupEffort | null = parseReportCleanupEffort(
+      dto.cleanupEffort,
+    );
     const metersPerDegreeLat = 111_320;
     const deltaLat = SITE_NEARBY_RADIUS_METERS / metersPerDegreeLat;
     const metersPerDegreeLng =
@@ -339,18 +474,27 @@ export class ReportsService {
     const targetSiteId = primaryReport?.siteId ?? null;
 
     const result = await this.prisma.$transaction(async (tx) => {
+      await this.spendReportCapacity(tx, user.userId, new Date());
+
       let siteId: string;
       let isNewSite: boolean;
 
       if (targetSiteId) {
         siteId = targetSiteId;
         isNewSite = false;
+        if (trimmedAddress) {
+          await tx.site.updateMany({
+            where: { id: targetSiteId, address: null },
+            data: { address: trimmedAddress },
+          });
+        }
       } else {
         const newSite = await tx.site.create({
           data: {
             latitude,
             longitude,
-            description: description?.trim() || null,
+            address: trimmedAddress,
+            description: null,
           },
         });
         siteId = newSite.id;
@@ -366,6 +510,7 @@ export class ReportsService {
           potentialDuplicateOfId: primaryReport?.id ?? null,
           category: category ?? null,
           severity: severity ?? null,
+          cleanupEffort: cleanupEffortParsed,
         },
       });
 
@@ -520,6 +665,7 @@ export class ReportsService {
               latitude: true,
               longitude: true,
               description: true,
+              address: true,
             },
           },
           coReporters: true,
@@ -563,7 +709,7 @@ export class ReportsService {
         return {
           id: report.id,
           reportNumber: this.getReportNumber(report),
-          title: report.site.description ?? report.description ?? 'Reported site',
+          title: this.reportNarrativeTitle(report.description, report.site.description),
           location: this.buildLocationLabel(report.site),
           submittedAt: report.createdAt.toISOString(),
           status: report.status,
@@ -576,6 +722,7 @@ export class ReportsService {
           pointsAwarded: pointsByReport.get(report.id) ?? 0,
           category: report.category ?? null,
           severity: report.severity ?? null,
+          cleanupEffort: report.cleanupEffort ?? null,
         };
       }),
     );
@@ -586,6 +733,26 @@ export class ReportsService {
       page: query.page,
       limit: query.limit,
     };
+  }
+
+  async getCapacityForCurrentUser(user: AuthenticatedUser): Promise<ReportCapacityDto> {
+    const current = await this.prisma.user.findUnique({
+      where: { id: user.userId },
+      select: {
+        reportCreditsAvailable: true,
+        reportEmergencyWindowDays: true,
+        reportEmergencyUsedAt: true,
+      },
+    });
+
+    if (!current) {
+      throw new NotFoundException({
+        code: 'USER_NOT_FOUND',
+        message: `User with id '${user.userId}' was not found`,
+      });
+    }
+
+    return this.buildCapacityDto(current, new Date());
   }
 
   async findAllForModeration(query: ListReportsQueryDto): Promise<AdminReportListResponseDto> {
@@ -614,6 +781,7 @@ export class ReportsService {
               latitude: true,
               longitude: true,
               description: true,
+              address: true,
             },
           },
           coReporters: true,
@@ -628,13 +796,14 @@ export class ReportsService {
     const items: AdminReportListItemDto[] = data.map((report) => ({
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      name: report.site.description ?? 'Reported site',
+      name: this.reportNarrativeTitle(report.description, report.site.description),
       location: report.site ? this.buildLocationLabel(report.site) : 'Unknown location',
       dateReportedAt: report.createdAt.toISOString(),
       status: report.status,
       isPotentialDuplicate:
         report.potentialDuplicateOfId !== null || report.potentialDuplicates.length > 0,
       coReporterCount: report.coReporters.length,
+      cleanupEffortLabel: reportCleanupEffortLabel(report.cleanupEffort),
     }));
 
     return {
@@ -663,6 +832,7 @@ export class ReportsService {
               latitude: true,
               longitude: true,
               description: true,
+              address: true,
             },
           },
           coReporters: {
@@ -678,6 +848,7 @@ export class ReportsService {
                   latitude: true,
                   longitude: true,
                   description: true,
+                  address: true,
                 },
               },
               coReporters: {
@@ -721,6 +892,7 @@ export class ReportsService {
             latitude: true,
             longitude: true,
             description: true,
+            address: true,
           },
         },
         coReporters: {
@@ -736,6 +908,7 @@ export class ReportsService {
                 latitude: true,
                 longitude: true,
                 description: true,
+                address: true,
               },
             },
             coReporters: {
@@ -1199,7 +1372,7 @@ export class ReportsService {
       reportNumber,
       status: report.status,
       priority: this.derivePriority(report.status),
-      title: report.site.description ?? 'Reported site',
+      title: this.reportNarrativeTitle(report.description, report.site.description),
       description: report.description ?? 'No description was provided for this report.',
       location: locationLabel,
       submittedAt: report.createdAt.toISOString(),
@@ -1220,6 +1393,7 @@ export class ReportsService {
       isPotentialDuplicate,
       coReporters,
       potentialDuplicateOfReportNumber,
+      cleanupEffortLabel: reportCleanupEffortLabel(report.cleanupEffort),
     };
   }
 
@@ -1311,6 +1485,7 @@ export class ReportsService {
         latitude: report.site.latitude,
         longitude: report.site.longitude,
         description: report.site.description,
+        address: report.site.address,
       },
       reporterName,
       coReporterNames,
@@ -1318,6 +1493,7 @@ export class ReportsService {
       pointsAwarded,
       category: report.category ?? null,
       severity: report.severity ?? null,
+      cleanupEffort: report.cleanupEffort ?? null,
     };
   }
 }

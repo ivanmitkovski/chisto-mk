@@ -8,12 +8,14 @@ class ReportDetailSite {
     required this.latitude,
     required this.longitude,
     this.description,
+    this.address,
   });
 
   final String id;
   final double latitude;
   final double longitude;
   final String? description;
+  final String? address;
 }
 
 /// Full report detail from GET /reports/:id (citizen view).
@@ -32,6 +34,7 @@ class ReportDetail {
     this.pointsAwarded = 0,
     this.category,
     this.severity,
+    this.cleanupEffort,
   });
 
   final String id;
@@ -47,4 +50,5 @@ class ReportDetail {
   final int pointsAwarded;
   final ReportCategory? category;
   final int? severity;
+  final CleanupEffort? cleanupEffort;
 }

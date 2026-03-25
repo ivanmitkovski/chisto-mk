@@ -29,7 +29,14 @@ import 'package:chisto_mobile/features/home/presentation/widgets/map/map_overlay
 import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
 
 class PollutionMapScreen extends StatefulWidget {
-  const PollutionMapScreen({super.key});
+  const PollutionMapScreen({
+    super.key,
+    this.pendingSiteFocus,
+    this.onPendingSiteFocusConsumed,
+  });
+
+  final ValueNotifier<String?>? pendingSiteFocus;
+  final VoidCallback? onPendingSiteFocusConsumed;
 
   @override
   State<PollutionMapScreen> createState() => _PollutionMapScreenState();
@@ -95,17 +102,108 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   /// Whether to show the tile loading skeleton overlay.
   bool _showTileLoadingOverlay = true;
 
+  bool _pendingFocusBusy = false;
+
   LatLng? _getSiteCoordinates(String id) => _siteCoordinates[id];
 
   @override
   void initState() {
     super.initState();
     _activePollutionTypes = _canonicalPollutionTypes.toSet();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _tryInitialLocate());
+    widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _tryInitialLocate();
+        _tryApplyPendingSiteFocus();
+      }
+    });
     _loadSites();
     Future<void>.delayed(const Duration(milliseconds: 900), () {
       if (mounted) setState(() => _showTileLoadingOverlay = false);
     });
+  }
+
+  void _onPendingSiteFocusChanged() {
+    if (widget.pendingSiteFocus?.value != null) {
+      _tryApplyPendingSiteFocus();
+    }
+  }
+
+  Future<void> _tryApplyPendingSiteFocus() async {
+    if (_pendingFocusBusy) return;
+    final ValueNotifier<String?>? notifier = widget.pendingSiteFocus;
+    if (notifier == null || notifier.value == null || !mounted) return;
+    _pendingFocusBusy = true;
+    final String id = notifier.value!;
+    try {
+      PollutionSite? local;
+      for (final PollutionSite s in _allSites) {
+        if (s.id == id) {
+          local = s;
+          break;
+        }
+      }
+      if (local != null) {
+        final LatLng? point = _getSiteCoordinates(local.id);
+        if (point != null) {
+          _handleSelectSite(local, point);
+          if (notifier.value == id) notifier.value = null;
+          widget.onPendingSiteFocusConsumed?.call();
+          return;
+        }
+      }
+
+      try {
+        final PollutionSite? fetched =
+            await ServiceLocator.instance.sitesRepository.getSiteById(id);
+        if (!mounted) return;
+        if (notifier.value != id) return;
+        if (fetched != null &&
+            fetched.latitude != null &&
+            fetched.longitude != null) {
+          final LatLng point =
+              LatLng(fetched.latitude!, fetched.longitude!);
+          if (!mounted) return;
+          setState(() {
+            final bool has =
+                _allSites.any((PollutionSite s) => s.id == fetched.id);
+            if (!has) {
+              _allSites = <PollutionSite>[..._allSites, fetched];
+              _siteCoordinates = Map<String, LatLng>.from(_siteCoordinates)
+                ..[fetched.id] = point;
+              _filteredSitesCache = null;
+              _filteredSitesCacheHash = 0;
+              _displayedSitesCache = null;
+              _displayedSitesFilterHashCache = -1;
+            }
+          });
+          final PollutionSite target =
+              _allSites.firstWhere((PollutionSite s) => s.id == id);
+          _handleSelectSite(target, point);
+        } else if (mounted) {
+          AppSnack.show(
+            context,
+            message: 'This site is not available on the map yet.',
+            type: AppSnackType.warning,
+          );
+        }
+      } catch (_) {
+        if (mounted) {
+          AppSnack.show(
+            context,
+            message: 'Could not open this location on the map.',
+            type: AppSnackType.warning,
+          );
+        }
+      }
+
+      if (notifier.value == id) {
+        notifier.value = null;
+      }
+      widget.onPendingSiteFocusConsumed?.call();
+    } finally {
+      _pendingFocusBusy = false;
+    }
   }
 
   Future<void> _loadSites() async {
@@ -137,6 +235,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         _displayedSitesCache = null;
         _displayedSitesFilterHashCache = -1;
       });
+      _tryApplyPendingSiteFocus();
     } on AppError catch (e) {
       if (!mounted) return;
       setState(() => _loadError = e);
@@ -206,7 +305,17 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   }
 
   @override
+  void didUpdateWidget(PollutionMapScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pendingSiteFocus != widget.pendingSiteFocus) {
+      oldWidget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
+      widget.pendingSiteFocus?.addListener(_onPendingSiteFocusChanged);
+    }
+  }
+
+  @override
   void dispose() {
+    widget.pendingSiteFocus?.removeListener(_onPendingSiteFocusChanged);
     _mapRotationNotifier.dispose();
     _searchController.dispose();
     _searchFocusNode.dispose();

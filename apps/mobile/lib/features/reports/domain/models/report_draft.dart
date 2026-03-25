@@ -113,6 +113,27 @@ enum CleanupEffort {
 
   const CleanupEffort(this.label);
   final String label;
+
+  /// API / Prisma enum key (POST /reports `cleanupEffort`).
+  String get apiKey => switch (this) {
+        CleanupEffort.oneToTwo => 'ONE_TO_TWO',
+        CleanupEffort.threeToFive => 'THREE_TO_FIVE',
+        CleanupEffort.sixToTen => 'SIX_TO_TEN',
+        CleanupEffort.tenPlus => 'TEN_PLUS',
+        CleanupEffort.notSure => 'NOT_SURE',
+      };
+
+  static CleanupEffort? fromApiString(String? s) {
+    if (s == null || s.isEmpty) return null;
+    return switch (s) {
+      'ONE_TO_TWO' => CleanupEffort.oneToTwo,
+      'THREE_TO_FIVE' => CleanupEffort.threeToFive,
+      'SIX_TO_TEN' => CleanupEffort.sixToTen,
+      'TEN_PLUS' => CleanupEffort.tenPlus,
+      'NOT_SURE' => CleanupEffort.notSure,
+      _ => null,
+    };
+  }
 }
 
 class ReportDraft {

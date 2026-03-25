@@ -11,6 +11,7 @@ type AdminReportListItem = {
   status: ReportRow['status'];
   isPotentialDuplicate: boolean;
   coReporterCount: number;
+  cleanupEffortLabel: string | null;
 };
 
 type AdminReportListResponse = {
@@ -53,6 +54,7 @@ export async function getReports(params?: { siteId?: string }): Promise<ReportRo
     status: item.status,
     isPotentialDuplicate: item.isPotentialDuplicate,
     coReporterCount: item.coReporterCount,
+    cleanupEffortLabel: item.cleanupEffortLabel,
   }));
 }
 

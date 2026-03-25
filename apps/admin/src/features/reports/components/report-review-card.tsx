@@ -416,6 +416,17 @@ export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, 
                       <span className={styles.metaValue}>{currentReport.reporterAlias}</span>
                     </div>
                   </button>
+                  {currentReport.cleanupEffortLabel ? (
+                    <div className={styles.metaGridItem} aria-label="Cleanup effort from citizen">
+                      <span className={styles.metaIcon} aria-hidden>
+                        <Icon name="users" size={14} />
+                      </span>
+                      <div>
+                        <span className={styles.metaLabel}>Cleanup effort</span>
+                        <span className={styles.metaValue}>{currentReport.cleanupEffortLabel}</span>
+                      </div>
+                    </div>
+                  ) : null}
                   {currentReport.coReporters.length > 0 && !currentReport.isPotentialDuplicate ? (
                     <button
                       type="button"

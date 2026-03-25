@@ -185,6 +185,7 @@ type ReportRow = {
   status: string;
   isPotentialDuplicate: boolean;
   coReporterCount: number;
+  cleanupEffortLabel?: string | null;
 };
 
 type ReportsListResponse = {

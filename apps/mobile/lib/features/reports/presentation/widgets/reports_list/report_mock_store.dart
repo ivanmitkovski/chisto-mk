@@ -102,6 +102,21 @@ final List<MockReport> seedReportsCatalog = <MockReport>[
 class ReportsListMockStore {
   const ReportsListMockStore._();
 
+  /// Legacy submissions stored description as `"${category.label}: …"`. Category
+  /// is shown separately, so strip a matching prefix for display.
+  static String _stripCategoryPrefixFromDescription(
+    String text,
+    ReportCategory category,
+  ) {
+    final String trimmed = text.trim();
+    final String prefix = '${category.label}:';
+    if (trimmed.length < prefix.length) return trimmed;
+    if (!trimmed.toLowerCase().startsWith(prefix.toLowerCase())) {
+      return trimmed;
+    }
+    return trimmed.substring(prefix.length).trimLeft().trim();
+  }
+
   static final ValueNotifier<int> changes = ValueNotifier<int>(0);
   static final List<MockReport> _submittedReports = <MockReport>[];
 
@@ -123,37 +138,66 @@ class ReportsListMockStore {
   }
 
   static MockReport fromListItem(ReportListItem r) {
-    final String title = r.title.trim().isNotEmpty ? r.title : 'Report';
+    final String rawTitle = r.title.trim().isNotEmpty ? r.title.trim() : 'Report';
+    final ReportCategory category = r.category ?? ReportCategory.other;
+    final String stripped =
+        _stripCategoryPrefixFromDescription(rawTitle, category);
+    final String title;
+    if (stripped.isNotEmpty) {
+      title = stripped;
+    } else if (rawTitle.toLowerCase().startsWith('${category.label.toLowerCase()}:')) {
+      title = 'No additional details';
+    } else {
+      title = rawTitle;
+    }
     final String loc = r.location.trim();
     final bool locationIsDistinct = loc.isNotEmpty &&
-        title.isNotEmpty &&
-        loc.toLowerCase() != title.toLowerCase();
+        rawTitle.isNotEmpty &&
+        loc.toLowerCase() != rawTitle.toLowerCase();
     return MockReport(
       reportId: r.id,
       title: title,
-      description: r.title,
+      description: title,
       status: _statusFromApi(r.status),
       score: r.pointsAwarded,
-      category: r.category ?? ReportCategory.other,
+      category: category,
       reportNumber: r.reportNumber.isNotEmpty ? r.reportNumber : null,
       address: locationIsDistinct ? r.location : null,
       evidenceImagePaths: r.mediaUrls.isNotEmpty ? r.mediaUrls : null,
-      cleanupEffort: null,
+      cleanupEffort: r.cleanupEffort,
       severity: r.severity,
       createdAt: r.submittedAt,
     );
   }
 
   static MockReport fromDetail(ReportDetail r) {
-    final String desc = (r.description ?? '').trim().isNotEmpty
-        ? r.description!
-        : r.location;
-    final String title = desc.isNotEmpty ? desc : (r.site.description ?? 'Report');
+    final ReportCategory category = r.category ?? ReportCategory.other;
+    final String apiDescriptionRaw = (r.description ?? '').trim();
+    final bool hasApiDescription = apiDescriptionRaw.isNotEmpty;
+
+    final String descForFields;
+    if (hasApiDescription) {
+      final String stripped =
+          _stripCategoryPrefixFromDescription(apiDescriptionRaw, category);
+      descForFields =
+          stripped.isEmpty ? 'No additional details' : stripped;
+    } else {
+      descForFields = r.location;
+    }
+
+    final String trimmedFields = descForFields.trim();
+    final String title = trimmedFields.isNotEmpty
+        ? trimmedFields
+        : (r.site.description ?? 'Report');
+    final String description = trimmedFields.isNotEmpty
+        ? trimmedFields
+        : (hasApiDescription ? 'No additional details' : 'Report details');
+
     final String loc = (r.location).trim();
-    final bool locationIsDistinct =
-        loc.isNotEmpty &&
-        desc.isNotEmpty &&
-        loc.toLowerCase() != desc.trim().toLowerCase();
+    final bool locationIsDistinct = loc.isNotEmpty &&
+        hasApiDescription &&
+        apiDescriptionRaw.isNotEmpty &&
+        loc.toLowerCase() != apiDescriptionRaw.toLowerCase();
     final bool hasValidCoords = ReportGeoFence.contains(
       r.site.latitude,
       r.site.longitude,
@@ -162,17 +206,20 @@ class ReportsListMockStore {
     final double? lng = hasValidCoords ? r.site.longitude : null;
     final String? siteId =
         (r.site.id).trim().isNotEmpty ? r.site.id : null;
+    final String? placeLabel = r.site.address?.trim().isNotEmpty == true
+        ? r.site.address!.trim()
+        : (locationIsDistinct ? r.location : null);
     return MockReport(
       reportId: r.id,
       title: title,
-      description: desc.isNotEmpty ? desc : 'Report details',
+      description: description,
       status: _statusFromApi(r.status),
       score: r.pointsAwarded,
-      category: r.category ?? ReportCategory.other,
+      category: category,
       reportNumber: r.reportNumber.isNotEmpty ? r.reportNumber : null,
-      address: locationIsDistinct ? r.location : null,
+      address: placeLabel,
       evidenceImagePaths: r.mediaUrls.isNotEmpty ? r.mediaUrls : null,
-      cleanupEffort: null,
+      cleanupEffort: r.cleanupEffort,
       severity: r.severity,
       createdAt: r.submittedAt,
       latitude: lat,

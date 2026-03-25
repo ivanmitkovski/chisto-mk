@@ -135,6 +135,10 @@ exports.Prisma.UserScalarFieldEnum = {
   pointsBalance: 'pointsBalance',
   totalPointsEarned: 'totalPointsEarned',
   totalPointsSpent: 'totalPointsSpent',
+  reportCreditsAvailable: 'reportCreditsAvailable',
+  reportCreditsSpentTotal: 'reportCreditsSpentTotal',
+  reportEmergencyWindowDays: 'reportEmergencyWindowDays',
+  reportEmergencyUsedAt: 'reportEmergencyUsedAt',
   lastActiveAt: 'lastActiveAt',
   totpSecret: 'totpSecret',
   mfaBackupCodes: 'mfaBackupCodes'
@@ -224,6 +228,7 @@ exports.Prisma.SiteScalarFieldEnum = {
   updatedAt: 'updatedAt',
   latitude: 'latitude',
   longitude: 'longitude',
+  address: 'address',
   description: 'description',
   status: 'status'
 };
@@ -238,6 +243,7 @@ exports.Prisma.ReportScalarFieldEnum = {
   mediaUrls: 'mediaUrls',
   category: 'category',
   severity: 'severity',
+  cleanupEffort: 'cleanupEffort',
   status: 'status',
   moderatedAt: 'moderatedAt',
   moderationReason: 'moderationReason',
@@ -350,6 +356,14 @@ exports.SiteStatus = exports.$Enums.SiteStatus = {
   IN_PROGRESS: 'IN_PROGRESS',
   CLEANED: 'CLEANED',
   DISPUTED: 'DISPUTED'
+};
+
+exports.ReportCleanupEffort = exports.$Enums.ReportCleanupEffort = {
+  ONE_TO_TWO: 'ONE_TO_TWO',
+  THREE_TO_FIVE: 'THREE_TO_FIVE',
+  SIX_TO_TEN: 'SIX_TO_TEN',
+  TEN_PLUS: 'TEN_PLUS',
+  NOT_SURE: 'NOT_SURE'
 };
 
 exports.ReportStatus = exports.$Enums.ReportStatus = {

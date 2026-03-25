@@ -44,7 +44,6 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
 
   const href = `/dashboard/reports/${report.id}`;
 
-  const showLocation = report.location && report.location.trim() !== report.name.trim();
   const showActions = Boolean(onApprove && onReject);
   const actionsDisabled = isReportFinalStatus(report.status);
 
@@ -57,15 +56,9 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
     >
       <span className={styles.cellReport}>{report.reportNumber}</span>
       <span className={styles.cellTitle}>{report.name}</span>
-      <span className={`${styles.cellLocation} ${!showLocation ? styles.cellLocationMuted : ''}`}>
-        {showLocation ? (
-          <>
-            <Icon name="location" size={12} />
-            {report.location}
-          </>
-        ) : (
-          '—'
-        )}
+      <span className={styles.cellLocation}>
+        <Icon name="location" size={12} />
+        {report.location.trim() ? report.location : '—'}
       </span>
       <span className={styles.cellDate}>{formatReportDate(report.dateReportedAt)}</span>
       <span className={styles.cellStatus}>
@@ -79,8 +72,15 @@ export function ReportListCard({ report, onApprove, onReject }: ReportListCardPr
               {queueMeta(report.status).priority} · {queueMeta(report.status).slaLabel}
             </span>
           )}
-          {(report.isPotentialDuplicate || report.coReporterCount > 0) && (
+          {(report.isPotentialDuplicate ||
+            report.coReporterCount > 0 ||
+            report.cleanupEffortLabel) && (
             <span className={styles.badges}>
+              {report.cleanupEffortLabel ? (
+                <span className={styles.badge} title="Estimated cleanup team size">
+                  {report.cleanupEffortLabel}
+                </span>
+              ) : null}
               {report.isPotentialDuplicate && <span className={styles.badge}>Dup</span>}
               {report.coReporterCount > 0 && (
                 <span className={styles.badge}>+{report.coReporterCount}</span>
@@ -149,7 +149,6 @@ export function ReportListMobileCard({
 
   const href = `/dashboard/reports/${report.id}`;
 
-  const showLocation = report.location && report.location.trim() !== report.name.trim();
   const showActions = Boolean(onApprove && onReject);
   const actionsDisabled = isReportFinalStatus(report.status);
 
@@ -173,7 +172,7 @@ export function ReportListMobileCard({
           <h3 className={styles.mobileTitle}>{report.name}</h3>
           <p className={styles.mobileLocation}>
             <Icon name="location" size={14} aria-hidden />
-            {showLocation ? report.location : '—'}
+            {report.location.trim() ? report.location : '—'}
           </p>
         <div className={styles.mobileStatusRow}>
           <span className={statusClassName(report.status)}>
@@ -185,8 +184,15 @@ export function ReportListMobileCard({
               {queueMeta(report.status).priority} · {queueMeta(report.status).slaLabel}
             </span>
           )}
-          {(report.isPotentialDuplicate || report.coReporterCount > 0) && (
+          {(report.isPotentialDuplicate ||
+            report.coReporterCount > 0 ||
+            report.cleanupEffortLabel) && (
               <span className={styles.badges}>
+                {report.cleanupEffortLabel ? (
+                  <span className={styles.badge} title="Estimated cleanup team size">
+                    {report.cleanupEffortLabel}
+                  </span>
+                ) : null}
                 {report.isPotentialDuplicate && <span className={styles.badge}>Dup</span>}
                 {report.coReporterCount > 0 && (
                   <span className={styles.badge}>+{report.coReporterCount}</span>

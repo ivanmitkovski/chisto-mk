@@ -41,6 +41,7 @@ export type ReportRow = {
   status: ReportStatus;
   isPotentialDuplicate: boolean;
   coReporterCount: number;
+  cleanupEffortLabel: string | null;
 };
 
 export type ReportDetail = {
@@ -61,6 +62,7 @@ export type ReportDetail = {
   isPotentialDuplicate: boolean;
   coReporters: string[];
   potentialDuplicateOfReportNumber?: string;
+  cleanupEffortLabel: string | null;
 };
 
 export type DuplicateReportItem = {

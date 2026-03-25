@@ -37,6 +37,7 @@ import {
 } from './dto/admin-duplicate-report.dto';
 import { RolesGuard } from '../auth/roles.guard';
 import { CreateReportWithLocationDto } from './dto/create-report-with-location.dto';
+import { ReportCapacityDto } from './dto/report-capacity.dto';
 import { ReportSubmitResponseDto } from './dto/report-submit-response.dto';
 import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
@@ -149,6 +150,23 @@ export class ReportsController {
     @Query() query: ListMyReportsQueryDto,
   ) {
     return this.reportsService.findForCurrentUser(user, query);
+  }
+
+  @Get('capacity')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current reporting capacity and emergency allowance status' })
+  @ApiOkResponse({ description: 'Reporting capacity fetched successfully', type: ReportCapacityDto })
+  getCapacityForCurrentUser(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+  ): Promise<ReportCapacityDto> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.reportsService.getCapacityForCurrentUser(user);
   }
 
   @Get('events')

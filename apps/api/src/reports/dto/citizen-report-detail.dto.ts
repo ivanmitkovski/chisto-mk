@@ -13,6 +13,12 @@ export class CitizenReportSiteDto {
 
   @ApiProperty({ nullable: true })
   description!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Structured place line when available (not the report narrative)',
+  })
+  address!: string | null;
 }
 
 export class CitizenReportDetailDto {
@@ -54,4 +60,10 @@ export class CitizenReportDetailDto {
 
   @ApiProperty({ nullable: true, description: 'Severity 1-5' })
   severity!: number | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Cleanup effort (ONE_TO_TWO, THREE_TO_FIVE, …) when citizen provided it',
+  })
+  cleanupEffort!: string | null;
 }

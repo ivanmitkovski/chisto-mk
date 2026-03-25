@@ -43,6 +43,13 @@ export class AdminReportListItemDto {
     default: 0,
   })
   coReporterCount!: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Citizen estimate of cleanup team size, when provided',
+    example: '3–5 people',
+  })
+  cleanupEffortLabel!: string | null;
 }
 
 export class AdminReportListMetaDto {
@@ -189,5 +196,12 @@ export class AdminReportDetailDto {
     description: 'Report number of the primary report this one is considered a potential duplicate of, if any',
   })
   potentialDuplicateOfReportNumber!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Citizen estimate of cleanup team size, when provided',
+    example: '3–5 people',
+  })
+  cleanupEffortLabel!: string | null;
 }
 

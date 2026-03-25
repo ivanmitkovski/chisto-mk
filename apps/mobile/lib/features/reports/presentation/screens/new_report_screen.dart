@@ -10,6 +10,7 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/report_draft_storage.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_grid.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
@@ -17,6 +18,8 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/photo_source
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_category_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -58,6 +61,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
   ReportStage? _highlightedStage;
   bool _didAnnounceLocationStep = false;
   AppError? _apiError;
+  ReportCapacity? _reportCapacity;
 
   @override
   void initState() {
@@ -69,6 +73,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       _descriptionController.text = _draft.description;
       WidgetsBinding.instance.addPostFrameCallback((_) => _offerRestoreDraft());
     }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadReportingCapacity());
   }
 
   Future<void> _offerRestoreDraft() async {
@@ -183,10 +188,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
             await showModalBottomSheet<PhotoReviewResult>(
               context: context,
               isScrollControlled: true,
-              backgroundColor: AppColors.panelBackground,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusXl)),
-              ),
+              backgroundColor: AppColors.transparent,
+              elevation: 0,
               builder: (_) => PhotoReviewSheet(file: selectedFile),
             );
 
@@ -437,6 +440,33 @@ class _NewReportScreenState extends State<NewReportScreen> {
     _goToStage(ReportStage.values[_currentStageIndex + 1]);
   }
 
+  Future<void> _loadReportingCapacity() async {
+    try {
+      final ReportCapacity capacity =
+          await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      if (!mounted) return;
+      setState(() => _reportCapacity = capacity);
+    } catch (_) {
+      // Non-blocking UI hint only; submit endpoint remains authoritative.
+    }
+  }
+
+  ReportCapacity? _capacityFromErrorDetails(dynamic details) {
+    if (details is! Map<String, dynamic>) return null;
+    final int creditsAvailable = (details['creditsAvailable'] as num?)?.toInt() ?? 0;
+    final bool emergencyAvailable = details['emergencyAvailable'] as bool? ?? false;
+    final int? retryAfterSeconds = (details['retryAfterSeconds'] as num?)?.toInt();
+    final String unlockHint = details['unlockHint'] as String? ??
+        'Join and verify attendance, or create an eco action to unlock more reports.';
+    return ReportCapacity(
+      creditsAvailable: creditsAvailable,
+      emergencyAvailable: emergencyAvailable,
+      emergencyWindowDays: 7,
+      retryAfterSeconds: retryAfterSeconds,
+      unlockHint: unlockHint,
+    );
+  }
+
   Future<void> _submit() async {
     if (_submitting) return;
     setState(() {
@@ -463,18 +493,18 @@ class _NewReportScreenState extends State<NewReportScreen> {
     try {
       final reportsApi = ServiceLocator.instance.reportsApiRepository;
       String description = _draft.description.trim();
-      if (_draft.category != null) {
-        description =
-            '${_draft.category!.label}: ${description.isEmpty ? "No additional details" : description}'
-                .trim();
+      if (description.isEmpty) {
+        description = 'No additional details';
       }
       final result = await reportsApi.submitReport(
         latitude: _draft.latitude!,
         longitude: _draft.longitude!,
-        description: description.isEmpty ? null : description,
+        description: description,
         mediaUrls: null,
         category: _draft.category?.apiString,
         severity: _draft.severity,
+        address: _draft.address?.trim().isNotEmpty == true ? _draft.address!.trim() : null,
+        cleanupEffort: _draft.cleanupEffort?.apiKey,
       );
       if (!mounted) return;
       if (_draft.photos.isNotEmpty) {
@@ -567,6 +597,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
         );
         return;
       }
+      if (e.code == 'REPORTING_COOLDOWN') {
+        final capacity = _capacityFromErrorDetails(e.details);
+        if (capacity != null) {
+          await showReportingCooldownDialog(context, capacity);
+          await _loadReportingCapacity();
+          return;
+        }
+      }
       setState(() => _apiError = e);
     } catch (e) {
       if (!mounted) return;
@@ -617,6 +655,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     _buildTopBar(context),
+                    if (_reportCapacity != null) ...<Widget>[
+                      const SizedBox(height: AppSpacing.sm),
+                      _buildCapacityPill(),
+                    ],
                     const SizedBox(height: AppSpacing.md),
                     _buildStageStepper(context),
                   ],
@@ -689,6 +731,19 @@ class _NewReportScreenState extends State<NewReportScreen> {
               : ReportSurfaceTone.neutral,
         ),
       ],
+    );
+  }
+
+  Widget _buildCapacityPill() {
+    final ReportCapacity capacity = _reportCapacity!;
+    final ReportCapacityUiState ui = mapReportCapacityToUiState(capacity);
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: ReportStatePill(
+        label: ui.pillLabel,
+        tone: ui.pillTone,
+        icon: ui.pillIcon,
+      ),
     );
   }
 
@@ -884,6 +939,21 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   ),
                 ],
                 const SizedBox(height: AppSpacing.md),
+                if (_reportCapacity != null) ...<Widget>[
+                  Builder(
+                    builder: (BuildContext context) {
+                      final ReportCapacityUiState ui =
+                          mapReportCapacityToUiState(_reportCapacity!);
+                      return ReportInfoBanner(
+                        title: 'Credit impact',
+                        icon: ui.pillIcon,
+                        tone: ui.pillTone,
+                        message: ui.reviewMessage,
+                      );
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                ],
                 ReportInfoBanner(
                   title: 'After you submit',
                   icon: Icons.verified_user_outlined,

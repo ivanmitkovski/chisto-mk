@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
@@ -40,6 +41,8 @@ class ApiReportsRepository implements ReportsApiRepository {
     List<String>? mediaUrls,
     String? category,
     int? severity,
+    String? address,
+    String? cleanupEffort,
   }) async {
     final Map<String, dynamic> body = <String, dynamic>{
       'latitude': latitude,
@@ -56,6 +59,13 @@ class ApiReportsRepository implements ReportsApiRepository {
     }
     if (severity != null && severity >= 1 && severity <= 5) {
       body['severity'] = severity;
+    }
+    final String? trimmedAddress = address?.trim();
+    if (trimmedAddress != null && trimmedAddress.isNotEmpty) {
+      body['address'] = trimmedAddress;
+    }
+    if (cleanupEffort != null && cleanupEffort.isNotEmpty) {
+      body['cleanupEffort'] = cleanupEffort;
     }
     final ApiResponse response = await _client.post('/reports', body: body);
     final Map<String, dynamic>? json = response.json;
@@ -100,6 +110,21 @@ class ApiReportsRepository implements ReportsApiRepository {
     return _reportDetailFromJson(json);
   }
 
+  @override
+  Future<ReportCapacity> getReportingCapacity() async {
+    final ApiResponse response = await _client.get('/reports/capacity');
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+
+    return ReportCapacity(
+      creditsAvailable: (json['creditsAvailable'] as num?)?.toInt() ?? 0,
+      emergencyAvailable: json['emergencyAvailable'] as bool? ?? false,
+      emergencyWindowDays: (json['emergencyWindowDays'] as num?)?.toInt() ?? 7,
+      retryAfterSeconds: (json['retryAfterSeconds'] as num?)?.toInt(),
+      unlockHint: json['unlockHint'] as String? ?? 'Join and verify attendance, or create an eco action to unlock more reports.',
+    );
+  }
+
   ReportListItem _reportListItemFromJson(Map<String, dynamic> json) {
     final String statusStr = json['status'] as String? ?? 'NEW';
     final ApiReportStatus status = _parseApiStatus(statusStr);
@@ -110,6 +135,7 @@ class ApiReportsRepository implements ReportsApiRepository {
         mediaList.whereType<String>().map<String>((String s) => s).toList();
     final String? categoryStr = json['category'] as String?;
     final num? severityNum = json['severity'] as num?;
+    final String? cleanupStr = json['cleanupEffort'] as String?;
     return ReportListItem(
       id: json['id'] as String? ?? '',
       reportNumber: json['reportNumber'] as String? ?? '',
@@ -123,6 +149,7 @@ class ApiReportsRepository implements ReportsApiRepository {
       pointsAwarded: (json['pointsAwarded'] as num?)?.toInt() ?? 0,
       category: ReportCategory.fromApiString(categoryStr),
       severity: severityNum != null ? severityNum.toInt() : null,
+      cleanupEffort: CleanupEffort.fromApiString(cleanupStr),
     );
   }
 
@@ -139,6 +166,7 @@ class ApiReportsRepository implements ReportsApiRepository {
             latitude: (siteJson['latitude'] as num?)?.toDouble() ?? 0,
             longitude: (siteJson['longitude'] as num?)?.toDouble() ?? 0,
             description: siteJson['description'] as String?,
+            address: siteJson['address'] as String?,
           )
         : ReportDetailSite(id: '', latitude: 0, longitude: 0);
     final List<dynamic> mediaList = json['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
@@ -149,6 +177,7 @@ class ApiReportsRepository implements ReportsApiRepository {
         coList.whereType<String>().map<String>((String s) => s).toList();
     final String? categoryStr = json['category'] as String?;
     final num? severityNum = json['severity'] as num?;
+    final String? cleanupStr = json['cleanupEffort'] as String?;
     return ReportDetail(
       id: json['id'] as String? ?? '',
       reportNumber: json['reportNumber'] as String? ?? '',
@@ -163,6 +192,7 @@ class ApiReportsRepository implements ReportsApiRepository {
       pointsAwarded: (json['pointsAwarded'] as num?)?.toInt() ?? 0,
       category: ReportCategory.fromApiString(categoryStr),
       severity: severityNum != null ? severityNum.toInt() : null,
+      cleanupEffort: CleanupEffort.fromApiString(cleanupStr),
     );
   }
 

@@ -54,5 +54,11 @@ export class UserReportListItemDto {
 
   @ApiProperty({ nullable: true, description: 'Severity 1-5' })
   severity!: number | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Cleanup effort enum key when provided (ONE_TO_TWO, THREE_TO_FIVE, …)',
+  })
+  cleanupEffort!: string | null;
 }
 

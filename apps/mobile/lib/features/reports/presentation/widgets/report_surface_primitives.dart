@@ -39,95 +39,121 @@ class ReportSheetScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double topPadding = MediaQuery.of(context).padding.top;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
+    final MediaQueryData media = MediaQuery.of(context);
+    final double topPadding = media.padding.top;
+    final double bottomPadding = media.padding.bottom;
+    final double heightCap = media.size.height * maxHeightFactor;
 
-    return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * maxHeightFactor,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusCard)),
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-            color: AppColors.black.withValues(alpha: 0.06),
-            blurRadius: 36,
-            offset: const Offset(0, -4),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final double parentMax = constraints.maxHeight;
+        final double sheetHeight = parentMax.isFinite
+            ? parentMax.clamp(1.0, heightCap)
+            : heightCap;
+
+        final BorderRadius sheetRadius = BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusCard),
+        );
+
+        // DecoratedBox paints the card; hard-edge clip avoids iOS anti-alias seams.
+        // Material(type: transparency) supplies a Material ancestor for Text/InkWell
+        // (avoids debug yellow underlines) without painting another opaque surface.
+        return DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: sheetRadius,
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppColors.black.withValues(alpha: 0.06),
+                blurRadius: 36,
+                offset: const Offset(0, -4),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: SafeArea(
-        top: false,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return SizedBox(
-              height: constraints.maxHeight,
-              child: Padding(
-                padding: padding,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(height: AppSpacing.xs),
-                    const Center(child: _ReportSheetHandle()),
-                    SizedBox(height: topPadding > 0 ? AppSpacing.xs : AppSpacing.radius14),
-                    Row(
+          child: ClipRRect(
+            borderRadius: sheetRadius,
+            clipBehavior: Clip.hardEdge,
+            child: SizedBox(
+              height: sheetHeight,
+              child: Material(
+                type: MaterialType.transparency,
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Padding(
+                    padding: padding,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        if (leading != null) ...<Widget>[
-                          leading!,
-                          const SizedBox(width: AppSpacing.sm),
-                        ],
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                title,
-                                style: AppTypography.sheetTitle,
-                              ),
-                              if (subtitle != null) ...<Widget>[
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  subtitle!,
-                                  style: AppTypography.textTheme.bodySmall!.copyWith(
-                                    color: AppColors.textMuted,
-                                    height: 1.35,
-                                  ),
-                                ),
-                              ],
+                        const SizedBox(height: AppSpacing.xs),
+                        const Center(child: _ReportSheetHandle()),
+                        SizedBox(
+                          height: topPadding > 0 ? AppSpacing.xs : AppSpacing.radius14,
+                        ),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            if (leading != null) ...<Widget>[
+                              leading!,
+                              const SizedBox(width: AppSpacing.sm),
                             ],
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    title,
+                                    style: AppTypography.sheetTitle,
+                                  ),
+                                  if (subtitle != null) ...<Widget>[
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      subtitle!,
+                                      style: AppTypography.textTheme.bodySmall!.copyWith(
+                                        color: AppColors.textMuted,
+                                        height: 1.35,
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            ),
+                            if (trailing != null) ...<Widget>[
+                              const SizedBox(width: AppSpacing.sm),
+                              trailing!,
+                            ],
+                          ],
+                        ),
+                        if (showHeaderDivider) ...<Widget>[
+                          const SizedBox(height: AppSpacing.md),
+                          Divider(
+                            color: AppColors.divider.withValues(alpha: 0.6),
+                            height: 1,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                        ] else
+                          const SizedBox(height: AppSpacing.sm),
+                        Expanded(
+                          child: ColoredBox(
+                            color: AppColors.panelBackground,
+                            child: child,
                           ),
                         ),
-                        if (trailing != null) ...<Widget>[
-                          const SizedBox(width: AppSpacing.sm),
-                          trailing!,
+                        if (footer != null) ...<Widget>[
+                          const SizedBox(height: AppSpacing.lg),
+                          footer!,
                         ],
+                        if (addBottomInset) SizedBox(height: bottomPadding),
                       ],
                     ),
-                    if (showHeaderDivider) ...<Widget>[
-                      const SizedBox(height: AppSpacing.md),
-                      Divider(
-                        color: AppColors.divider.withValues(alpha: 0.6),
-                        height: 1,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ] else
-                      const SizedBox(height: AppSpacing.sm),
-                    Expanded(child: child),
-                    if (footer != null) ...<Widget>[
-                      const SizedBox(height: AppSpacing.lg),
-                      footer!,
-                    ],
-                    if (addBottomInset) SizedBox(height: bottomPadding),
-                  ],
+                  ),
                 ),
               ),
-            );
-          },
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
