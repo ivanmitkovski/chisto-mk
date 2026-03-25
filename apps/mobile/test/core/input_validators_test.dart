@@ -105,8 +105,8 @@ void main() {
     group('validatePassword', () {
       test('returns null for valid password', () {
         expect(InputValidators.validatePassword('password1'), isNull);
-        expect(InputValidators.validatePassword('12345678'), isNull);
-        expect(InputValidators.validatePassword('longpassword'), isNull);
+        expect(InputValidators.validatePassword('abc12345'), isNull);
+        expect(InputValidators.validatePassword('longpassword1'), isNull);
       });
 
       test('returns error for empty', () {

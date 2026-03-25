@@ -15,6 +15,7 @@ import 'package:chisto_mobile/features/home/domain/repositories/sites_repository
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
+import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_realtime_service.dart';
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -33,6 +34,7 @@ class ServiceLocator {
   CheckInRepository? _checkInRepository;
   ProfileRepository? _profileRepository;
   ReportsApiRepository? _reportsApiRepository;
+  ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
 
   /// Increment to trigger profile refresh (e.g. after report submit).
@@ -48,6 +50,7 @@ class ServiceLocator {
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
   ReportsApiRepository get reportsApiRepository => _reportsApiRepository!;
+  ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
 
   bool _initialized = false;
@@ -91,6 +94,10 @@ class ServiceLocator {
     _checkInRepository = InMemoryCheckInRepository.instance;
     _profileRepository = ApiProfileRepository(client: _apiClient!);
     _reportsApiRepository = ApiReportsRepository(client: _apiClient!);
+    _reportsRealtimeService = ReportsRealtimeService(
+      config: _config!,
+      authState: _authState!,
+    );
     _sitesRepository = ApiSitesRepository(client: _apiClient!);
 
     _initialized = true;
@@ -107,6 +114,7 @@ class ServiceLocator {
     _checkInRepository = null;
     _profileRepository = null;
     _reportsApiRepository = null;
+    _reportsRealtimeService = null;
     _sitesRepository = null;
     _initialized = false;
   }

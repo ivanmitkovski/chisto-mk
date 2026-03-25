@@ -37,6 +37,7 @@ class ReportsListScreen extends StatefulWidget {
 class _ReportsListScreenState extends State<ReportsListScreen> {
   static const Duration _searchDebounceDuration = Duration(milliseconds: 220);
   static const Duration _minSkeletonDuration = Duration(milliseconds: 400);
+  static const Duration _realtimeRefreshDebounce = Duration(milliseconds: 450);
 
   bool _isLoading = true;
   AppError? _loadError;
@@ -45,6 +46,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
+  Timer? _realtimeDebounce;
+  StreamSubscription? _realtimeSub;
   String _searchQuery = '';
   bool _isOpeningReportDetail = false;
 
@@ -121,6 +124,14 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     _searchController.addListener(_onSearchChanged);
     _searchQuery = _searchController.text.trim();
     _loadReports();
+    ServiceLocator.instance.reportsRealtimeService.start();
+    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen((_) {
+      _realtimeDebounce?.cancel();
+      _realtimeDebounce = Timer(_realtimeRefreshDebounce, () {
+        if (!mounted) return;
+        _loadReports();
+      });
+    });
     if (widget.initialReportIdToOpen != null &&
         widget.initialReportIdToOpen!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -219,6 +230,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   @override
   void dispose() {
     _searchDebounce?.cancel();
+    _realtimeDebounce?.cancel();
+    _realtimeSub?.cancel();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _searchFocusNode.dispose();

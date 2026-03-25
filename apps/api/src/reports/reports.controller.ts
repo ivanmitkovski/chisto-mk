@@ -2,10 +2,12 @@ import {
   Body,
   Controller,
   Get,
+  MessageEvent as NestMessageEvent,
   Param,
   Patch,
   Post,
   Query,
+  Sse,
   UnauthorizedException,
   UseGuards,
   UseInterceptors,
@@ -26,6 +28,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { Roles } from '../auth/roles.decorator';
 import { AdminReportListResponseDto } from './dto/admin-report.dto';
+import { Observable, interval, map, merge } from 'rxjs';
 import {
   AdminDuplicateReportGroupDto,
   AdminDuplicateReportGroupsResponseDto,
@@ -40,6 +43,7 @@ import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportsService } from './reports.service';
 import { ReportsUploadService } from './reports-upload.service';
+import { ReportsOwnerEventsService } from './reports-owner-events.service';
 
 @ApiTags('reports')
 @Controller('reports')
@@ -47,7 +51,10 @@ export class ReportsController {
   constructor(
     private readonly reportsService: ReportsService,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
   ) {}
+
+  private static readonly HEARTBEAT_INTERVAL_MS = 30_000;
 
   @Post()
   @UseGuards(JwtAuthGuard)
@@ -142,6 +149,36 @@ export class ReportsController {
     @Query() query: ListMyReportsQueryDto,
   ) {
     return this.reportsService.findForCurrentUser(user, query);
+  }
+
+  @Get('events')
+  @Sse()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Server-Sent Events stream for real-time updates to your reports' })
+  streamMyReportEvents(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+  ): Observable<NestMessageEvent> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+
+    const ownerEvents = this.reportsOwnerEventsService.getEventsForOwner(user.userId).pipe(
+      map((event) => ({
+        data: event as object,
+        type: event.type,
+        id: event.eventId,
+      })),
+    );
+
+    const heartbeat = interval(ReportsController.HEARTBEAT_INTERVAL_MS).pipe(
+      map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
+    );
+
+    return merge(ownerEvents, heartbeat);
   }
 
   @Get()

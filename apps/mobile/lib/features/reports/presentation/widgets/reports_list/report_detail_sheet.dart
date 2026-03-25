@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,8 +42,11 @@ class ReportDetailSheet extends StatefulWidget {
 
 class _ReportDetailSheetState extends State<ReportDetailSheet> {
   bool _isOpeningMap = false;
+  bool _isRefreshing = false;
+  MockReport? _report;
+  StreamSubscription? _realtimeSub;
 
-  MockReport get report => widget.report;
+  MockReport get report => _report ?? widget.report;
 
   static String _formatDateFull(DateTime d) {
     const List<String> months = <String>[
@@ -199,6 +204,43 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _report = widget.report;
+    ServiceLocator.instance.reportsRealtimeService.start();
+    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen((event) {
+      final String? reportId = report.reportId;
+      if (reportId == null || reportId.isEmpty) return;
+      if (event.reportId != reportId) return;
+      _refreshFromBackend();
+    });
+  }
+
+  @override
+  void dispose() {
+    _realtimeSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _refreshFromBackend() async {
+    if (_isRefreshing) return;
+    setState(() => _isRefreshing = true);
+    try {
+      final String? reportId = report.reportId;
+      if (reportId == null || reportId.isEmpty) return;
+      final detail = await ServiceLocator.instance.reportsApiRepository.getReportById(reportId);
+      if (!mounted) return;
+      setState(() {
+        _report = ReportsListMockStore.fromDetail(detail);
+      });
+    } catch (_) {
+      // Best-effort: keep current UI, manual pull-to-refresh exists in list.
+    } finally {
+      if (mounted) setState(() => _isRefreshing = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final List<String> evidencePaths = report.evidenceImagePaths ?? const <String>[];
     final bool hasEvidenceImage = evidencePaths.isNotEmpty &&
@@ -212,7 +254,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
           ? '${report.reportNumber} · See what you submitted and how moderators handled this report.'
           : 'See what you submitted and how moderators handled this report.',
       trailing: ReportCircleIconButton(
-        icon: Icons.close_rounded,
+        icon: _isRefreshing ? Icons.sync_rounded : Icons.close_rounded,
         semanticLabel: 'Close',
         onTap: () {
           AppHaptics.tap();

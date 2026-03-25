@@ -1,9 +1,14 @@
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  setUpAll(() async {
+    await bootstrapWidgetTests();
+  });
+
   Widget buildTestApp() {
     return MaterialApp(
       onGenerateRoute: AppRouter.onGenerateRoute,

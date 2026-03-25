@@ -1,4 +1,10 @@
 /// <reference types="jest" />
+jest.mock('otplib', () => ({
+  generateSecret: jest.fn(() => 'test-secret'),
+  generateURI: jest.fn(() => 'otpauth://totp/test'),
+  verify: jest.fn(() => true),
+}));
+
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -46,6 +52,12 @@ function makePrisma() {
       findUnique: jest.fn(),
       update: jest.fn(),
       count: jest.fn().mockResolvedValue(0),
+    },
+    adminLoginFailure: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+      update: jest.fn(),
+      deleteMany: jest.fn().mockResolvedValue(undefined),
     },
     loginFailure: {
       findUnique: jest.fn(),
