@@ -39,6 +39,7 @@ function toTopBarNotification(item: {
   title: string;
   message: string;
   timeLabel: string;
+  createdAt?: string;
   isUnread: boolean;
   href?: string;
 }): TopBarNotification {
@@ -48,6 +49,7 @@ function toTopBarNotification(item: {
     message: item.message,
     timeLabel: item.timeLabel,
     isUnread: item.isUnread,
+    ...(item.createdAt && { createdAt: item.createdAt }),
   };
   return item.href ? { ...base, href: item.href } : base;
 }

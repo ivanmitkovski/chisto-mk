@@ -205,6 +205,7 @@ type AdminNotificationApiItem = {
   title: string;
   message: string;
   timeLabel: string;
+  createdAt?: string;
   tone: string;
   category: string;
   isUnread: boolean;
@@ -225,6 +226,7 @@ export type AdminNotificationItem = {
   title: string;
   message: string;
   timeLabel: string;
+  createdAt?: string;
   tone: string;
   isUnread: boolean;
   category: string;
@@ -246,6 +248,7 @@ export async function fetchNotifications(): Promise<{
       title: item.title,
       message: item.message,
       timeLabel: item.timeLabel,
+      ...(item.createdAt && { createdAt: item.createdAt }),
       tone: item.tone,
       isUnread: item.isUnread,
       category: item.category,

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button/button';
 import { Icon } from '@/components/ui/icon/icon';
 import { Input } from '@/components/ui/input/input';
 import { useNotifications } from '@/features/notifications/context/notifications-context';
+import { NotificationRelativeTime } from '@/features/notifications/components/notification-relative-time';
 import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 import { profileMenuActions, topBarCommands } from '../data/top-bar-mocks';
 import { useCommandPalette } from '../hooks/use-command-palette';
@@ -478,7 +479,13 @@ export function TopBar({
                                 {notification.isUnread ? <span className={styles.unreadPill}>New</span> : null}
                               </span>
                               <span className={styles.notificationMessage}>{notification.message}</span>
-                              <span className={styles.notificationTime}>{notification.timeLabel}</span>
+                              <NotificationRelativeTime
+                                fallbackLabel={notification.timeLabel}
+                                className={styles.notificationTime}
+                                {...(notification.createdAt != null && notification.createdAt !== ''
+                                  ? { createdAt: notification.createdAt }
+                                  : {})}
+                              />
                             </button>
                           </li>
                         ))}

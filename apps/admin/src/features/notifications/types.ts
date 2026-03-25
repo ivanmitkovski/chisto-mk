@@ -7,6 +7,7 @@ export type AdminNotification = {
   title: string;
   message: string;
   timeLabel: string;
+  createdAt?: string;
   tone: NotificationTone;
   isUnread: boolean;
   category: 'reports' | 'system' | 'analytics';

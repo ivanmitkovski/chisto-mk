@@ -8,7 +8,10 @@ import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.d
 type AdminNotificationListItem = Pick<
   AdminNotification,
   'id' | 'title' | 'message' | 'timeLabel' | 'tone' | 'category' | 'isUnread' | 'href'
->;
+> & {
+  /** ISO 8601 — clients should prefer this for display (browser locale, live updates). */
+  createdAt: string;
+};
 
 type AdminNotificationListResponse = {
   data: AdminNotificationListItem[];
@@ -62,6 +65,7 @@ export class AdminNotificationsService {
         title: notification.title,
         message: notification.message,
         timeLabel: formatRelativeTimeSince(notification.createdAt, now, effectiveLocale),
+        createdAt: notification.createdAt.toISOString(),
         tone: notification.tone,
         category: notification.category,
         isUnread: notification.isUnread,

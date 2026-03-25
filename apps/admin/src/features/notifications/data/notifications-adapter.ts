@@ -8,6 +8,7 @@ type AdminNotificationApiItem = {
   title: string;
   message: string;
   timeLabel: string;
+  createdAt?: string;
   tone: string;
   category: string;
   isUnread: boolean;
@@ -39,6 +40,7 @@ function mapApiItemToAdminNotification(item: AdminNotificationApiItem): AdminNot
     title: item.title,
     message: item.message,
     timeLabel: item.timeLabel,
+    ...(item.createdAt && { createdAt: item.createdAt }),
     tone: item.tone as NotificationTone,
     isUnread: item.isUnread,
     category: item.category as AdminNotification['category'],

@@ -4,27 +4,30 @@ const MS_PER_HOUR = 60 * MS_PER_MINUTE;
 const MS_PER_DAY = 24 * MS_PER_HOUR;
 
 /**
- * Parses the first language tag from an Accept-Language header (e.g. "mk-MK,en;q=0.9" → "mk-MK").
+ * Relative time for admin notification rows (mirrors API `formatRelativeTimeSince` logic).
+ * Prefer `createdAt` ISO from the API; `fallbackLabel` is used when missing (older APIs) or invalid date.
  */
-export function localeFromAcceptLanguage(acceptLanguage?: string): string {
-  if (!acceptLanguage?.trim()) {
-    return 'en';
-  }
-  const first = acceptLanguage.split(',')[0]?.trim().split(';')[0]?.trim();
-  return first && first.length > 0 ? first : 'en';
-}
-
-/**
- * Human-readable relative time since `createdAt` (for notification lists).
- * Uses Intl.RelativeTimeFormat; under ~10s and future skew → "Just now"; 10s–59s → seconds ago.
- */
-export function formatRelativeTimeSince(
-  createdAt: Date,
-  now: Date,
-  locale: string,
+export function formatNotificationRelativeTimeFromIso(
+  createdAtIso: string | undefined,
+  fallbackLabel: string,
+  locale?: string,
 ): string {
-  const diffMs = now.getTime() - createdAt.getTime();
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  if (!createdAtIso?.trim()) {
+    return fallbackLabel;
+  }
+  const created = new Date(createdAtIso);
+  if (Number.isNaN(created.getTime())) {
+    return fallbackLabel;
+  }
+
+  const nowMs = Date.now();
+  const diffMs = nowMs - created.getTime();
+  const effectiveLocale =
+    locale?.trim() ||
+    (typeof navigator !== 'undefined' ? navigator.language : undefined) ||
+    'en';
+
+  const rtf = new Intl.RelativeTimeFormat(effectiveLocale, { numeric: 'auto' });
 
   if (diffMs < 0) {
     return 'Just now';

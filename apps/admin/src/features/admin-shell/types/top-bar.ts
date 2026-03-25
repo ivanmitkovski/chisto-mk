@@ -26,6 +26,8 @@ export type TopBarNotification = {
   title: string;
   message: string;
   timeLabel: string;
+  /** ISO 8601 from API — preferred source for relative time in the UI */
+  createdAt?: string;
   isUnread: boolean;
   href?: string;
 };

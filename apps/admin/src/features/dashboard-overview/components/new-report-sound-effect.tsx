@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react';
 import {
   getReportSoundPreference,
-  getReducedMotionPreference,
 } from '@/lib/admin-preferences';
 import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 
@@ -78,18 +77,37 @@ export function NewReportSoundEffect() {
 
   useEffect(() => {
     return subscribeNewReportSignal(() => {
-      if (!hasInteractionRef.current) return;
-      if (!getReportSoundPreference()) return;
-      if (getReducedMotionPreference()) return;
+      if (!hasInteractionRef.current) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'no-user-interaction-yet' });
+        }
+        return;
+      }
+      if (!getReportSoundPreference()) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'sound-preference-disabled' });
+        }
+        return;
+      }
       const now = Date.now();
-      if (now - lastPlayedRef.current < MIN_SOUND_INTERVAL_MS) return;
+      if (now - lastPlayedRef.current < MIN_SOUND_INTERVAL_MS) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'rate-limited' });
+        }
+        return;
+      }
       lastPlayedRef.current = now;
       if (isRealtimeDebugEnabled()) {
         console.debug('[realtime] sound-chime', { atMs: now });
       }
 
       const Ctor = getAudioContextConstructor();
-      if (!Ctor) return;
+      if (!Ctor) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'audio-context-unsupported' });
+        }
+        return;
+      }
       if (!audioContextRef.current) {
         audioContextRef.current = new Ctor();
       }

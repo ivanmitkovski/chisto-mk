@@ -31,6 +31,7 @@ export function NotificationsQuerySync() {
         title: item.title,
         message: item.message,
         timeLabel: item.timeLabel,
+        ...(item.createdAt && { createdAt: item.createdAt }),
         isUnread: item.isUnread,
         ...(item.href && { href: item.href }),
       }));

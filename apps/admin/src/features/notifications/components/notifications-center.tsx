@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Card, Icon, SectionState } from '@/components/ui';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import { useNotifications } from '../context/notifications-context';
+import { NotificationRelativeTime } from './notification-relative-time';
 import { AdminNotification } from '../types';
 import styles from './notifications-center.module.css';
 
@@ -155,7 +156,12 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
                   </div>
                   <div className={styles.meta}>
                     {notification.isUnread ? <span className={styles.unreadDot} aria-label="Unread" /> : null}
-                    <span>{notification.timeLabel}</span>
+                    <NotificationRelativeTime
+                      fallbackLabel={notification.timeLabel}
+                      {...(notification.createdAt != null && notification.createdAt !== ''
+                        ? { createdAt: notification.createdAt }
+                        : {})}
+                    />
                   </div>
                 </button>
               </li>

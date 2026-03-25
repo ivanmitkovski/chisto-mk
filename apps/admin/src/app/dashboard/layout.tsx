@@ -17,7 +17,15 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let initialItems: { id: string; title: string; message: string; timeLabel: string; isUnread: boolean; href?: string }[] = [];
+  let initialItems: {
+    id: string;
+    title: string;
+    message: string;
+    timeLabel: string;
+    createdAt?: string;
+    isUnread: boolean;
+    href?: string;
+  }[] = [];
   let initialUnreadCount = 0;
 
   try {
@@ -29,6 +37,7 @@ export default async function DashboardLayout({
         message: item.message,
         timeLabel: item.timeLabel,
         isUnread: item.isUnread,
+        ...(item.createdAt && { createdAt: item.createdAt }),
       };
       return item.href ? { ...base, href: item.href } : base;
     });
