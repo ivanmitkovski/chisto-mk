@@ -13,6 +13,13 @@ if (process.env.VERCEL === '1' && !process.env.NEXT_PUBLIC_API_BASE_URL?.trim())
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3000';
 const S3_MEDIA_HOST = process.env.NEXT_PUBLIC_S3_MEDIA_HOST ?? 'chisto-dev-media.s3.eu-central-1.amazonaws.com';
+const S3_MEDIA_HOSTS = Array.from(
+  new Set([
+    S3_MEDIA_HOST,
+    'chisto-dev-media.s3.eu-central-1.amazonaws.com',
+    'chisto-prod-media.s3.eu-central-1.amazonaws.com',
+  ]),
+);
 const isProduction = process.env.NODE_ENV === 'production';
 
 /** Carto basemap tiles (Leaflet); explicit hosts avoid widening connect-src to untrusted origins. */
@@ -56,13 +63,11 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: S3_MEDIA_HOST,
-        pathname: '/**',
-      },
-    ],
+    remotePatterns: S3_MEDIA_HOSTS.map((hostname) => ({
+      protocol: 'https',
+      hostname,
+      pathname: '/**',
+    })),
   },
   async headers() {
     return [
