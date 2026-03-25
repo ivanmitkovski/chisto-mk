@@ -74,6 +74,14 @@ export async function apiFetch<TResponse>(path: string, options: FetchOptions = 
       cache: options.cache ?? 'no-store',
     });
   } catch (cause) {
+    if (typeof window === 'undefined') {
+      console.error('[apiFetch] network failure', {
+        path,
+        url,
+        base,
+        cause: cause instanceof Error ? { name: cause.name, message: cause.message, cause: cause.cause } : cause,
+      });
+    }
     throw new ApiConnectionError(`Network request to API failed (${path})`, { cause });
   }
 
