@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useCallback, useContext, useState, type ReactNode } from 'react';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import type { TopBarNotification } from '@/features/admin-shell/types/top-bar';
 
@@ -64,10 +57,9 @@ export function NotificationsProvider({
   );
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
 
-  useEffect(() => {
-    setItemsState(initialItems.map(toTopBarNotification));
-    setUnreadCount(initialUnreadCount);
-  }, [initialItems, initialUnreadCount]);
+  // Live list comes from NotificationsQuerySync + mutations. Do not reset from RSC props on
+  // router.refresh() — server getAdminNotifications often fails while client fetch succeeds,
+  // which would wipe the bell (see plan: notifications persistence).
 
   const setItems = useCallback((next: TopBarNotification[]) => {
     setItemsState(next);

@@ -1,103 +1,79 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { getReportSoundPreference } from '@/lib/admin-preferences';
 import {
-  getReportSoundPreference,
-} from '@/lib/admin-preferences';
+  isReportAudioUnlocked,
+  playReportChime,
+  teardownReportAudio,
+  unlockReportAudioFromUserGesture,
+} from '@/lib/admin-report-audio';
 import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 
 const MIN_SOUND_INTERVAL_MS = 4000;
 const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
+/** Dev: localStorage.setItem('chisto:debug-realtime','1') — see SSE + sound logs in console. */
 function isRealtimeDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
 }
 
-function getAudioContextConstructor(): (typeof AudioContext) | null {
-  const w = window as Window & { webkitAudioContext?: typeof AudioContext };
-  return window.AudioContext ?? w.webkitAudioContext ?? null;
-}
-
-function playChimeOnContext(ctx: AudioContext): void {
-  const now = ctx.currentTime;
-
-  const master = ctx.createGain();
-  master.gain.value = 0.0001;
-  master.connect(ctx.destination);
-  master.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
-  master.gain.exponentialRampToValueAtTime(0.0001, now + 0.62);
-
-  const first = ctx.createOscillator();
-  first.type = 'sine';
-  first.frequency.value = 1046.5;
-  first.connect(master);
-  first.start(now);
-  first.stop(now + 0.16);
-
-  const second = ctx.createOscillator();
-  second.type = 'triangle';
-  second.frequency.value = 1318.5;
-  second.connect(master);
-  second.start(now + 0.14);
-  second.stop(now + 0.35);
-}
-
 export function NewReportSoundEffect() {
   const lastPlayedRef = useRef(0);
-  const hasInteractionRef = useRef(false);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const triedGestureUnlockRef = useRef(false);
+  const hasQueuedBurstRef = useRef(false);
+  const trailingChimeTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
-    const unlock = () => {
-      if (triedGestureUnlockRef.current) {
-        return;
-      }
-      triedGestureUnlockRef.current = true;
-      const Ctor = getAudioContextConstructor();
-      if (!Ctor) {
-        if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-skip', { reason: 'audio-context-unsupported' });
-        }
-        return;
-      }
-      if (!audioContextRef.current) {
-        audioContextRef.current = new Ctor();
-      }
-      const ctx = audioContextRef.current;
-      if (!ctx) {
-        return;
-      }
-      void ctx.resume().then(() => {
-        hasInteractionRef.current = true;
-        if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-unlocked', { state: ctx.state });
-        }
-      }).catch(() => {
-        if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-skip', { reason: 'resume-failed' });
+    const onGesture = () => {
+      void unlockReportAudioFromUserGesture().then((ok) => {
+        if (ok) {
+          window.removeEventListener('pointerdown', onGesture, true);
+          window.removeEventListener('keydown', onGesture, true);
+          if (isRealtimeDebugEnabled()) {
+            console.debug('[realtime] sound-unlocked');
+          }
+        } else if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-unlock-retry', { message: 'will retry on next gesture' });
         }
       });
-      window.removeEventListener('pointerdown', unlock, true);
-      window.removeEventListener('keydown', unlock, true);
     };
-    window.addEventListener('pointerdown', unlock, true);
-    window.addEventListener('keydown', unlock, true);
+    window.addEventListener('pointerdown', onGesture, true);
+    window.addEventListener('keydown', onGesture, true);
     return () => {
-      window.removeEventListener('pointerdown', unlock, true);
-      window.removeEventListener('keydown', unlock, true);
-      const ctx = audioContextRef.current;
-      audioContextRef.current = null;
-      if (ctx) {
-        void ctx.close().catch(() => {});
+      window.removeEventListener('pointerdown', onGesture, true);
+      window.removeEventListener('keydown', onGesture, true);
+      if (trailingChimeTimeoutRef.current != null) {
+        window.clearTimeout(trailingChimeTimeoutRef.current);
+        trailingChimeTimeoutRef.current = null;
       }
+      teardownReportAudio();
     };
   }, []);
 
   useEffect(() => {
+    const maybePlayTrailingChime = () => {
+      trailingChimeTimeoutRef.current = null;
+      if (!hasQueuedBurstRef.current) {
+        return;
+      }
+      hasQueuedBurstRef.current = false;
+      if (!isReportAudioUnlocked() || !getReportSoundPreference()) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'trailing-chime-gated' });
+        }
+        return;
+      }
+      const now = Date.now();
+      lastPlayedRef.current = now;
+      if (isRealtimeDebugEnabled()) {
+        console.debug('[realtime] sound-chime', { atMs: now, mode: 'trailing' });
+      }
+      playReportChime();
+    };
+
     return subscribeNewReportSignal(() => {
-      if (!hasInteractionRef.current) {
+      if (!isReportAudioUnlocked()) {
         if (isRealtimeDebugEnabled()) {
           console.debug('[realtime] sound-skip', { reason: 'no-user-interaction-yet' });
         }
@@ -110,49 +86,28 @@ export function NewReportSoundEffect() {
         return;
       }
       const now = Date.now();
-      if (now - lastPlayedRef.current < MIN_SOUND_INTERVAL_MS) {
+      const msSinceLast = now - lastPlayedRef.current;
+      if (msSinceLast < MIN_SOUND_INTERVAL_MS) {
+        hasQueuedBurstRef.current = true;
+        const waitMs = MIN_SOUND_INTERVAL_MS - msSinceLast;
+        if (trailingChimeTimeoutRef.current == null) {
+          trailingChimeTimeoutRef.current = window.setTimeout(maybePlayTrailingChime, waitMs);
+        }
         if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-skip', { reason: 'rate-limited' });
+          console.debug('[realtime] sound-coalesced', { reason: 'rate-limited', waitMs });
         }
         return;
+      }
+      hasQueuedBurstRef.current = false;
+      if (trailingChimeTimeoutRef.current != null) {
+        window.clearTimeout(trailingChimeTimeoutRef.current);
+        trailingChimeTimeoutRef.current = null;
       }
       lastPlayedRef.current = now;
       if (isRealtimeDebugEnabled()) {
-        console.debug('[realtime] sound-chime', { atMs: now });
+        console.debug('[realtime] sound-chime', { atMs: now, mode: 'immediate' });
       }
-
-      const Ctor = getAudioContextConstructor();
-      if (!Ctor) {
-        if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-skip', { reason: 'audio-context-unsupported' });
-        }
-        return;
-      }
-      const ctx = audioContextRef.current;
-      if (!ctx) {
-        if (isRealtimeDebugEnabled()) {
-          console.debug('[realtime] sound-skip', { reason: 'not-unlocked-yet' });
-        }
-        return;
-      }
-
-      const play = () => {
-        try {
-          playChimeOnContext(ctx);
-        } catch {
-          // ignore
-        }
-      };
-
-      if (ctx.state === 'suspended') {
-        void ctx.resume().then(play).catch(() => {
-          if (isRealtimeDebugEnabled()) {
-            console.debug('[realtime] sound-skip', { reason: 'resume-before-play-failed' });
-          }
-        });
-      } else {
-        play();
-      }
+      playReportChime();
     });
   }, []);
 

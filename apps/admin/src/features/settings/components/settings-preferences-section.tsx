@@ -8,6 +8,10 @@ import {
   setReducedMotionPreference,
   setReportSoundPreference,
 } from '@/lib/admin-preferences';
+import {
+  playReportChimePreview,
+  unlockReportAudioFromUserGesture,
+} from '@/lib/admin-report-audio';
 import styles from './settings-console.module.css';
 
 type SettingsPreferencesSectionProps = {
@@ -38,6 +42,21 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
   const onToggleReportSound = useCallback((next: boolean) => {
     setReportSound(next);
     setReportSoundPreference(next);
+    if (next) {
+      void unlockReportAudioFromUserGesture().then((ok) => {
+        if (ok) {
+          playReportChimePreview();
+        }
+      });
+    }
+  }, []);
+
+  const onTestReportSound = useCallback(() => {
+    void unlockReportAudioFromUserGesture().then((ok) => {
+      if (ok) {
+        playReportChimePreview();
+      }
+    });
   }, []);
 
   return (
@@ -99,6 +118,16 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
             <span className={styles.toggleThumb} />
           </button>
         </div>
+        {reportSound ? (
+          <button
+            type="button"
+            className={styles.soundTestButton}
+            disabled={!hydrated}
+            onClick={onTestReportSound}
+          >
+            Play test sound
+          </button>
+        ) : null}
         <div className={styles.preferenceNote}>
           <Icon name="info" size={18} />
           <p>Server-managed alerts still appear in the top bar and Notifications page.</p>

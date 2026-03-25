@@ -19,7 +19,7 @@ export function NotificationsQuerySync() {
   const { data } = useQuery({
     queryKey: adminQueryKeys.notifications,
     queryFn: fetchNotifications,
-    staleTime: 30_000,
+    staleTime: 0,
     gcTime: 600_000,
     refetchOnWindowFocus: true,
   });
