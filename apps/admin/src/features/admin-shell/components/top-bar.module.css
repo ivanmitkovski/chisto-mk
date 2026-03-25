@@ -115,6 +115,20 @@
   box-shadow: 0 0 0 3px rgba(37, 219, 134, 0.18);
 }
 
+@keyframes bellJiggle {
+  0% { transform: rotate(0deg); }
+  20% { transform: rotate(11deg); }
+  40% { transform: rotate(-10deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-6deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.iconButtonJiggle {
+  transform-origin: 50% 10%;
+  animation: bellJiggle 620ms ease-out;
+}
+
 .dropdownPanel {
   position: absolute;
   top: calc(100% + 0.55rem);
@@ -444,6 +458,12 @@
 
   .searchInput {
     width: 11rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iconButtonJiggle {
+    animation: none;
   }
 }
 

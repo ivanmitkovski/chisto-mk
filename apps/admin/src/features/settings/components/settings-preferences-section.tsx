@@ -2,10 +2,13 @@
 
 import { useCallback, useEffect, useState, type RefObject } from 'react';
 import { Icon } from '@/components/ui';
-import { ADMIN_REDUCED_MOTION_CLASS } from './admin-preferences-init';
+import {
+  getReducedMotionPreference,
+  getReportSoundPreference,
+  setReducedMotionPreference,
+  setReportSoundPreference,
+} from '@/lib/admin-preferences';
 import styles from './settings-console.module.css';
-
-const STORAGE_KEY = 'chisto.admin.ui.reducedMotion';
 
 type SettingsPreferencesSectionProps = {
   panelTitleRef?: RefObject<HTMLHeadingElement | null>;
@@ -13,32 +16,28 @@ type SettingsPreferencesSectionProps = {
 
 export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreferencesSectionProps) {
   const [reduceMotion, setReduceMotion] = useState(false);
+  const [reportSound, setReportSound] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
-      const v = window.localStorage.getItem(STORAGE_KEY) === '1';
-      setReduceMotion(v);
-      document.documentElement.classList.toggle(ADMIN_REDUCED_MOTION_CLASS, v);
+      setReduceMotion(getReducedMotionPreference());
+      setReportSound(getReportSoundPreference());
     } catch {
       setReduceMotion(false);
+      setReportSound(false);
     }
     setHydrated(true);
   }, []);
 
   const onToggleReduceMotion = useCallback((next: boolean) => {
     setReduceMotion(next);
-    try {
-      if (next) {
-        window.localStorage.setItem(STORAGE_KEY, '1');
-        document.documentElement.classList.add(ADMIN_REDUCED_MOTION_CLASS);
-      } else {
-        window.localStorage.removeItem(STORAGE_KEY);
-        document.documentElement.classList.remove(ADMIN_REDUCED_MOTION_CLASS);
-      }
-    } catch {
-      /* ignore */
-    }
+    setReducedMotionPreference(next);
+  }, []);
+
+  const onToggleReportSound = useCallback((next: boolean) => {
+    setReportSound(next);
+    setReportSoundPreference(next);
   }, []);
 
   return (
@@ -80,8 +79,26 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
         <span className={styles.sectionLabel}>Notifications</span>
         <h3 className={styles.sectionTitle}>Delivery preferences</h3>
         <p className={styles.sectionHint}>
-          Per-channel notification settings will use your account once the API exposes them. There is no backend field yet.
+          Per-browser toggles for live report alerts. This does not change settings on other devices.
         </p>
+        <div className={styles.preferenceRow}>
+          <div className={styles.preferenceText}>
+            <span className={styles.preferenceTitle}>Sound on new reports</span>
+            <span className={styles.preferenceCaption}>
+              Plays a subtle chime when a new report arrives in real time
+            </span>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={reportSound}
+            disabled={!hydrated}
+            className={`${styles.toggle} ${reportSound ? styles.toggleOn : ''}`}
+            onClick={() => onToggleReportSound(!reportSound)}
+          >
+            <span className={styles.toggleThumb} />
+          </button>
+        </div>
         <div className={styles.preferenceNote}>
           <Icon name="info" size={18} />
           <p>Server-managed alerts still appear in the top bar and Notifications page.</p>

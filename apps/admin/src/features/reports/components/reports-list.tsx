@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button, Card, Icon, Input, Pagination, Snack } from '@/components/ui';
 import { ADMIN_SEARCH_DEBOUNCE_MS } from '@/lib/admin-ui-timing';
+import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 import type { ReportRow, SortKey, SortDirection } from '@/features/reports/types';
 import { rejectionReasonOptions } from '../constants/rejection-reasons';
 import { useReportsListActions } from '../hooks/use-reports-list-actions';
@@ -29,6 +30,7 @@ const STATUS_PRIORITY: Record<ReportRow['status'], number> = {
 };
 const VALID_SORT_KEYS: SortKey[] = ['reportNumber', 'name', 'location', 'dateReportedAt', 'status'];
 const REFRESH_DEBOUNCE_MS = 800;
+const HIGHLIGHT_MS = 7000;
 
 function buildReportsUrl(params: {
   status?: string | undefined;
@@ -163,13 +165,74 @@ function ReportsListInner({
   const reducedMotion = useReducedMotion();
   const SPRING = { type: 'spring' as const, stiffness: 400, damping: 30 };
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [highlightedReportIds, setHighlightedReportIds] = useState<Set<string>>(new Set());
   const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [rejectionNotes, setRejectionNotes] = useState('');
   const [rejectionReasonError, setRejectionReasonError] = useState<string | null>(null);
   const lastRefreshRef = useRef(0);
+  const seenReportIdsRef = useRef<Set<string>>(new Set());
+  const highlightTimeoutsRef = useRef<Map<string, number>>(new Map());
+  const signaledReportIdRef = useRef<string | null>(null);
 
   const { approveReport, rejectReport, snack, clearSnack } = useReportsListActions();
+
+  useEffect(() => {
+    return subscribeNewReportSignal(({ reportId }) => {
+      signaledReportIdRef.current = reportId;
+    });
+  }, []);
+
+  useEffect(() => {
+    const currentIds = new Set(reports.map((r) => r.id));
+
+    if (seenReportIdsRef.current.size === 0) {
+      seenReportIdsRef.current = currentIds;
+      return;
+    }
+
+    const newlySeenIds = reports
+      .map((r) => r.id)
+      .filter((id) => !seenReportIdsRef.current.has(id));
+
+    const signaledId = signaledReportIdRef.current;
+    if (signaledId && currentIds.has(signaledId) && !newlySeenIds.includes(signaledId)) {
+      newlySeenIds.unshift(signaledId);
+    }
+
+    if (newlySeenIds.length > 0) {
+      setHighlightedReportIds((prev) => {
+        const next = new Set(prev);
+        for (const id of newlySeenIds) {
+          next.add(id);
+          const existing = highlightTimeoutsRef.current.get(id);
+          if (existing != null) window.clearTimeout(existing);
+          const timeoutId = window.setTimeout(() => {
+            setHighlightedReportIds((current) => {
+              if (!current.has(id)) return current;
+              const updated = new Set(current);
+              updated.delete(id);
+              return updated;
+            });
+            highlightTimeoutsRef.current.delete(id);
+          }, HIGHLIGHT_MS);
+          highlightTimeoutsRef.current.set(id, timeoutId);
+        }
+        return next;
+      });
+    }
+
+    seenReportIdsRef.current = currentIds;
+  }, [reports]);
+
+  useEffect(() => {
+    return () => {
+      for (const timeoutId of highlightTimeoutsRef.current.values()) {
+        window.clearTimeout(timeoutId);
+      }
+      highlightTimeoutsRef.current.clear();
+    };
+  }, []);
 
   function openApproveModal(report: ReportRow) {
     setPendingAction({ kind: 'approve', report });
@@ -427,7 +490,7 @@ function ReportsListInner({
                   {paginatedReports.map((report, index) => (
                     <motion.div
                       key={report.id}
-                      className={styles.tableRow}
+                      className={`${styles.tableRow} ${highlightedReportIds.has(report.id) ? styles.tableRowNew : ''}`}
                       initial={reducedMotion ? false : { opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={
@@ -448,14 +511,19 @@ function ReportsListInner({
             </div>
             <div className={styles.mobileList} role="list">
               {paginatedReports.map((report, index) => (
-                <ReportListMobileCard
-                  key={`mobile-${report.id}`}
-                  report={report}
-                  index={index}
-                  reducedMotion={!!reducedMotion}
-                  onApprove={openApproveModal}
-                  onReject={openRejectModal}
-                />
+                <div
+                  key={`mobile-wrap-${report.id}`}
+                  className={highlightedReportIds.has(report.id) ? styles.mobileRowNew : undefined}
+                >
+                  <ReportListMobileCard
+                    key={`mobile-${report.id}`}
+                    report={report}
+                    index={index}
+                    reducedMotion={!!reducedMotion}
+                    onApprove={openApproveModal}
+                    onReject={openRejectModal}
+                  />
+                </div>
               ))}
             </div>
             {!isOverview && totalPages > 1 && (

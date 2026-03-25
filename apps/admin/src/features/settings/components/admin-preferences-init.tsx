@@ -1,16 +1,19 @@
 'use client';
 
 import { useEffect } from 'react';
+import {
+  ADMIN_REDUCED_MOTION_CLASS,
+  getReducedMotionPreference,
+} from '@/lib/admin-preferences';
 
-const STORAGE_KEY = 'chisto.admin.ui.reducedMotion';
-export const ADMIN_REDUCED_MOTION_CLASS = 'chisto-admin-reduced-motion';
+export { ADMIN_REDUCED_MOTION_CLASS } from '@/lib/admin-preferences';
 
 /** Apply saved UI preferences before paint where possible (dashboard shell). */
 export function AdminPreferencesInit() {
   useEffect(() => {
     try {
       if (typeof window === 'undefined') return;
-      if (window.localStorage.getItem(STORAGE_KEY) === '1') {
+      if (getReducedMotionPreference()) {
         document.documentElement.classList.add(ADMIN_REDUCED_MOTION_CLASS);
       }
     } catch {

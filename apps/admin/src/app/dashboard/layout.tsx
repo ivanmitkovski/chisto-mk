@@ -2,6 +2,7 @@ import {
   DashboardSSEClient,
   DashboardSSEProvider,
   DashboardPollingFallback,
+  NewReportSoundEffect,
 } from '@/features/dashboard-overview';
 
 /** Ensure RSC reads request cookies (auth token for API calls, notifications). */
@@ -45,6 +46,7 @@ export default async function DashboardLayout({
       <NotificationsQuerySync />
       <DashboardSSEProvider>
         <DashboardSSEClient />
+        <NewReportSoundEffect />
         <DashboardPollingFallback />
         {children}
       </DashboardSSEProvider>

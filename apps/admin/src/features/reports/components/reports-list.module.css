@@ -279,6 +279,26 @@
   transition: transform var(--motion-duration-fast) var(--motion-ease-out);
 }
 
+@keyframes newReportPulse {
+  0% {
+    box-shadow: inset 0 0 0 1px rgba(37, 219, 134, 0.58);
+    background: rgba(37, 219, 134, 0.16);
+  }
+  100% {
+    box-shadow: inset 0 0 0 1px rgba(37, 219, 134, 0);
+    background: transparent;
+  }
+}
+
+.tableRowNew {
+  animation: newReportPulse 1.1s ease-out;
+}
+
+.mobileRowNew {
+  border-radius: var(--radius-lg);
+  animation: newReportPulse 1.1s ease-out;
+}
+
 .tableRow:hover {
   transform: translateY(-1px);
 }
@@ -286,6 +306,13 @@
 @media (prefers-reduced-motion: reduce) {
   .tableRow:hover {
     transform: none;
+  }
+
+  .tableRowNew,
+  .mobileRowNew {
+    animation: none;
+    box-shadow: inset 0 0 0 1px rgba(37, 219, 134, 0.36);
+    background: rgba(37, 219, 134, 0.08);
   }
 }
 
