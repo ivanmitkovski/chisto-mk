@@ -15,10 +15,12 @@ function isRealtimeDebugEnabled(): boolean {
   return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
 }
 
-function playChime(): void {
-  const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-  if (!AudioCtx) return;
-  const ctx = new AudioCtx();
+function getAudioContextConstructor(): (typeof AudioContext) | null {
+  const w = window as Window & { webkitAudioContext?: typeof AudioContext };
+  return window.AudioContext ?? w.webkitAudioContext ?? null;
+}
+
+function playChimeOnContext(ctx: AudioContext): void {
   const now = ctx.currentTime;
 
   const master = ctx.createGain();
@@ -40,19 +42,24 @@ function playChime(): void {
   second.connect(master);
   second.start(now + 0.14);
   second.stop(now + 0.35);
-
-  window.setTimeout(() => {
-    void ctx.close().catch(() => {});
-  }, 1000);
 }
 
 export function NewReportSoundEffect() {
   const lastPlayedRef = useRef(0);
   const hasInteractionRef = useRef(false);
+  const audioContextRef = useRef<AudioContext | null>(null);
 
   useEffect(() => {
     const unlock = () => {
       hasInteractionRef.current = true;
+      const Ctor = getAudioContextConstructor();
+      if (Ctor && !audioContextRef.current) {
+        audioContextRef.current = new Ctor();
+      }
+      const ctx = audioContextRef.current;
+      if (ctx?.state === 'suspended') {
+        void ctx.resume().catch(() => {});
+      }
       window.removeEventListener('pointerdown', unlock, true);
       window.removeEventListener('keydown', unlock, true);
     };
@@ -61,6 +68,11 @@ export function NewReportSoundEffect() {
     return () => {
       window.removeEventListener('pointerdown', unlock, true);
       window.removeEventListener('keydown', unlock, true);
+      const ctx = audioContextRef.current;
+      audioContextRef.current = null;
+      if (ctx) {
+        void ctx.close().catch(() => {});
+      }
     };
   }, []);
 
@@ -75,7 +87,27 @@ export function NewReportSoundEffect() {
       if (isRealtimeDebugEnabled()) {
         console.debug('[realtime] sound-chime', { atMs: now });
       }
-      playChime();
+
+      const Ctor = getAudioContextConstructor();
+      if (!Ctor) return;
+      if (!audioContextRef.current) {
+        audioContextRef.current = new Ctor();
+      }
+      const ctx = audioContextRef.current;
+
+      const play = () => {
+        try {
+          playChimeOnContext(ctx);
+        } catch {
+          // ignore
+        }
+      };
+
+      if (ctx.state === 'suspended') {
+        void ctx.resume().then(play).catch(() => {});
+      } else {
+        play();
+      }
     });
   }, []);
 

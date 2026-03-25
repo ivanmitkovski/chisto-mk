@@ -173,6 +173,7 @@ async function main() {
     ],
   });
 
+  const seedNow = Date.now();
   await prisma.adminNotification.createMany({
     data: [
       {
@@ -184,6 +185,7 @@ async function main() {
         category: 'reports',
         isUnread: true,
         href: `/dashboard/reports?reportId=${primaryReport.id}`,
+        createdAt: new Date(seedNow - 45_000),
       },
       {
         userId: admin.id,
@@ -194,6 +196,7 @@ async function main() {
         category: 'reports',
         isUnread: true,
         href: `/dashboard/reports?reportId=${duplicateReport.id}`,
+        createdAt: new Date(seedNow - 8 * 60 * 60 * 1000),
       },
       {
         userId: admin.id,
@@ -204,6 +207,7 @@ async function main() {
         category: 'system',
         isUnread: false,
         href: `/dashboard/sites`,
+        createdAt: new Date(seedNow - 30 * 60 * 60 * 1000),
       },
     ],
   });

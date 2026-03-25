@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { AdminNotification, Prisma } from '../prisma-client';
+import { formatRelativeTimeSince } from '../common/utils/format-relative-time-since';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.dto';
@@ -26,6 +27,7 @@ export class AdminNotificationsService {
   async listForAdmin(
     admin: AuthenticatedUser,
     query: ListAdminNotificationsQueryDto,
+    locale = 'en',
   ): Promise<AdminNotificationListResponse> {
     const where: Prisma.AdminNotificationWhereInput = {
       OR: [{ userId: admin.userId }, { userId: null }],
@@ -51,12 +53,15 @@ export class AdminNotificationsService {
       }),
     ]);
 
+    const now = new Date();
+    const effectiveLocale = locale.trim() || 'en';
+
     const items: AdminNotificationListItem[] = notifications.map(
       (notification) => ({
         id: notification.id,
         title: notification.title,
         message: notification.message,
-        timeLabel: notification.timeLabel,
+        timeLabel: formatRelativeTimeSince(notification.createdAt, now, effectiveLocale),
         tone: notification.tone,
         category: notification.category,
         isUnread: notification.isUnread,

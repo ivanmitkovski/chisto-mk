@@ -134,6 +134,9 @@
   top: calc(100% + 0.55rem);
   right: 0;
   width: min(22rem, 90vw);
+  max-height: min(28rem, calc(100vh - 5rem));
+  display: flex;
+  flex-direction: column;
   border-radius: var(--radius-xl);
   border: 1px solid rgba(8, 54, 39, 0.1);
   background: rgba(255, 255, 255, 0.94);
@@ -146,6 +149,7 @@
 }
 
 .panelHeader {
+  flex-shrink: 0;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -194,6 +198,31 @@
   outline-offset: 2px;
 }
 
+.notificationListScroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.notificationListScroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.notificationListScroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.notificationListScroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(8, 54, 39, 0.18);
+}
+
+.notificationListScroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(8, 54, 39, 0.28);
+}
+
 .notificationList {
   list-style: none;
   margin: 0;
@@ -203,6 +232,7 @@
 }
 
 .notificationFooter {
+  flex-shrink: 0;
   padding: 0 var(--space-3) var(--space-3);
   display: flex;
   justify-content: flex-end;

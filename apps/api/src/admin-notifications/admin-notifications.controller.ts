@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Headers, Param, Patch, Query, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -13,6 +13,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AdminNotificationsService } from './admin-notifications.service';
 import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.dto';
+import { localeFromAcceptLanguage } from '../common/utils/format-relative-time-since';
 
 @ApiTags('admin-notifications')
 @Controller('admin/notifications')
@@ -28,8 +29,13 @@ export class AdminNotificationsController {
   listForAdmin(
     @CurrentUser() admin: AuthenticatedUser,
     @Query() query: ListAdminNotificationsQueryDto,
+    @Headers('accept-language') acceptLanguage?: string,
   ) {
-    return this.notificationsService.listForAdmin(admin, query);
+    return this.notificationsService.listForAdmin(
+      admin,
+      query,
+      localeFromAcceptLanguage(acceptLanguage),
+    );
   }
 
   @Patch(':id/read')

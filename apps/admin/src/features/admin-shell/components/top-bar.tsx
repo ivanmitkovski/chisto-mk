@@ -454,30 +454,36 @@ export function TopBar({
                         Mark all read
                       </button>
                     </header>
-                    <ul className={styles.notificationList}>
-                      {notifications.map((notification) => (
-                        <li key={notification.id}>
-                          <button
-                            type="button"
-                            className={`${styles.notificationItem} ${notification.isUnread ? styles.notificationUnread : ''}`}
-                            onClick={() => {
-                              void markNotificationRead(notification.id);
-                              if (notification.href) {
-                                setIsNotificationsOpen(false);
-                                router.push(notification.href);
-                              }
-                            }}
-                          >
-                            <span className={styles.notificationHeading}>
-                              {notification.title}
-                              {notification.isUnread ? <span className={styles.unreadPill}>New</span> : null}
-                            </span>
-                            <span className={styles.notificationMessage}>{notification.message}</span>
-                            <span className={styles.notificationTime}>{notification.timeLabel}</span>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
+                    <div
+                      className={styles.notificationListScroll}
+                      role="region"
+                      aria-label="Notification list"
+                    >
+                      <ul className={styles.notificationList}>
+                        {notifications.map((notification) => (
+                          <li key={notification.id}>
+                            <button
+                              type="button"
+                              className={`${styles.notificationItem} ${notification.isUnread ? styles.notificationUnread : ''}`}
+                              onClick={() => {
+                                void markNotificationRead(notification.id);
+                                if (notification.href) {
+                                  setIsNotificationsOpen(false);
+                                  router.push(notification.href);
+                                }
+                              }}
+                            >
+                              <span className={styles.notificationHeading}>
+                                {notification.title}
+                                {notification.isUnread ? <span className={styles.unreadPill}>New</span> : null}
+                              </span>
+                              <span className={styles.notificationMessage}>{notification.message}</span>
+                              <span className={styles.notificationTime}>{notification.timeLabel}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                     <div className={styles.notificationFooter}>
                       <button
                         type="button"
