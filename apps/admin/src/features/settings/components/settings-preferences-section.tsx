@@ -14,6 +14,13 @@ import {
 } from '@/lib/admin-report-audio';
 import styles from './settings-console.module.css';
 
+const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
+
+function isRealtimeDebugEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
+}
+
 type SettingsPreferencesSectionProps = {
   panelTitleRef?: RefObject<HTMLHeadingElement | null>;
 };
@@ -42,19 +49,37 @@ export function SettingsPreferencesSection({ panelTitleRef }: SettingsPreference
   const onToggleReportSound = useCallback((next: boolean) => {
     setReportSound(next);
     setReportSoundPreference(next);
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] settings-toggle-sound', { enabled: next });
+    }
     if (next) {
       void unlockReportAudioFromUserGesture().then((ok) => {
+        if (isRealtimeDebugEnabled()) {
+          console.info('[realtime] settings-unlock-result', { ok });
+        }
         if (ok) {
           playReportChimePreview();
+          if (isRealtimeDebugEnabled()) {
+            console.info('[realtime] settings-play-test', { source: 'toggle-on' });
+          }
         }
       });
     }
   }, []);
 
   const onTestReportSound = useCallback(() => {
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] settings-play-test-click');
+    }
     void unlockReportAudioFromUserGesture().then((ok) => {
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] settings-unlock-result', { ok });
+      }
       if (ok) {
         playReportChimePreview();
+        if (isRealtimeDebugEnabled()) {
+          console.info('[realtime] settings-play-test', { source: 'button' });
+        }
       }
     });
   }, []);

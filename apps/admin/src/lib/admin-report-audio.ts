@@ -5,9 +5,15 @@
  */
 
 const FALLBACK_MP3_SRC = '/sounds/new-report.mp3';
+const DEBUG_REALTIME_FLAG = 'chisto:debug-realtime';
 
 let sharedCtx: AudioContext | null = null;
 let unlocked = false;
+
+function isRealtimeDebugEnabled(): boolean {
+  if (typeof window === 'undefined') return false;
+  return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
+}
 
 function getAudioContextConstructor(): (typeof AudioContext) | null {
   if (typeof window === 'undefined') return null;
@@ -42,9 +48,40 @@ function playHtmlAudioFallback(): void {
   try {
     const a = new Audio(FALLBACK_MP3_SRC);
     a.volume = 0.32;
-    void a.play().catch(() => {});
+    void a.play().then(() => {
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] audio-fallback-played', { src: FALLBACK_MP3_SRC });
+      }
+    }).catch(() => {
+      if (isRealtimeDebugEnabled()) {
+        console.info('[realtime] audio-fallback-failed', { src: FALLBACK_MP3_SRC });
+      }
+    });
   } catch {
     // Missing asset or autoplay blocked
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-fallback-threw', { src: FALLBACK_MP3_SRC });
+    }
+  }
+}
+
+async function primeHtmlAudioFromUserGesture(): Promise<boolean> {
+  try {
+    const a = new Audio(FALLBACK_MP3_SRC);
+    a.muted = true;
+    a.volume = 0;
+    await a.play();
+    a.pause();
+    a.currentTime = 0;
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-fallback-primed', { src: FALLBACK_MP3_SRC });
+    }
+    return true;
+  } catch {
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-fallback-prime-failed', { src: FALLBACK_MP3_SRC });
+    }
+    return false;
   }
 }
 
@@ -55,10 +92,14 @@ export function isReportAudioUnlocked(): boolean {
 /** Call from pointer/tap/key handlers until it returns true (browser autoplay policy). */
 export async function unlockReportAudioFromUserGesture(): Promise<boolean> {
   if (typeof window === 'undefined') return false;
+  const htmlPrimed = await primeHtmlAudioFromUserGesture();
   const Ctor = getAudioContextConstructor();
   if (!Ctor) {
-    unlocked = true;
-    return true;
+    unlocked = htmlPrimed;
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-unlock-no-context-needed');
+    }
+    return htmlPrimed;
   }
   if (!sharedCtx) {
     sharedCtx = new Ctor();
@@ -66,13 +107,24 @@ export async function unlockReportAudioFromUserGesture(): Promise<boolean> {
   try {
     await sharedCtx.resume();
   } catch {
-    return false;
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-unlock-resume-failed');
+    }
+    unlocked = htmlPrimed;
+    return htmlPrimed;
   }
   if (sharedCtx.state === 'running') {
     unlocked = true;
+    if (isRealtimeDebugEnabled()) {
+      console.info('[realtime] audio-unlocked', { state: sharedCtx.state });
+    }
     return true;
   }
-  return false;
+  if (isRealtimeDebugEnabled()) {
+    console.info('[realtime] audio-unlock-not-running', { state: sharedCtx.state });
+  }
+  unlocked = htmlPrimed;
+  return htmlPrimed;
 }
 
 /** Web Audio chime; falls back to HTMLAudio if oscillators throw. */
