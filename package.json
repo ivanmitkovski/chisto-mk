@@ -9,7 +9,7 @@
     "dev:admin": "pnpm --filter @chisto/admin dev",
     "dev:landing": "pnpm --filter @chisto/landing dev",
     "dev:mobile": "pnpm --filter @chisto/mobile dev",
-    "build": "pnpm -r --filter '!@chisto/mobile' run build",
+    "build": "pnpm -r --workspace-concurrency=1 --filter '!@chisto/mobile' run build",
     "build:api": "pnpm --filter @chisto/api build",
     "build:admin": "pnpm --filter @chisto/admin build",
     "build:landing": "pnpm --filter @chisto/landing build",
