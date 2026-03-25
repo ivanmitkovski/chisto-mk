@@ -47,18 +47,38 @@ export function NewReportSoundEffect() {
   const lastPlayedRef = useRef(0);
   const hasInteractionRef = useRef(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const triedGestureUnlockRef = useRef(false);
 
   useEffect(() => {
     const unlock = () => {
-      hasInteractionRef.current = true;
+      if (triedGestureUnlockRef.current) {
+        return;
+      }
+      triedGestureUnlockRef.current = true;
       const Ctor = getAudioContextConstructor();
-      if (Ctor && !audioContextRef.current) {
+      if (!Ctor) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'audio-context-unsupported' });
+        }
+        return;
+      }
+      if (!audioContextRef.current) {
         audioContextRef.current = new Ctor();
       }
       const ctx = audioContextRef.current;
-      if (ctx?.state === 'suspended') {
-        void ctx.resume().catch(() => {});
+      if (!ctx) {
+        return;
       }
+      void ctx.resume().then(() => {
+        hasInteractionRef.current = true;
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-unlocked', { state: ctx.state });
+        }
+      }).catch(() => {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'resume-failed' });
+        }
+      });
       window.removeEventListener('pointerdown', unlock, true);
       window.removeEventListener('keydown', unlock, true);
     };
@@ -108,10 +128,13 @@ export function NewReportSoundEffect() {
         }
         return;
       }
-      if (!audioContextRef.current) {
-        audioContextRef.current = new Ctor();
-      }
       const ctx = audioContextRef.current;
+      if (!ctx) {
+        if (isRealtimeDebugEnabled()) {
+          console.debug('[realtime] sound-skip', { reason: 'not-unlocked-yet' });
+        }
+        return;
+      }
 
       const play = () => {
         try {
@@ -122,7 +145,11 @@ export function NewReportSoundEffect() {
       };
 
       if (ctx.state === 'suspended') {
-        void ctx.resume().then(play).catch(() => {});
+        void ctx.resume().then(play).catch(() => {
+          if (isRealtimeDebugEnabled()) {
+            console.debug('[realtime] sound-skip', { reason: 'resume-before-play-failed' });
+          }
+        });
       } else {
         play();
       }
