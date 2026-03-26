@@ -23,6 +23,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/r
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
+import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -794,60 +795,64 @@ class _NewReportScreenState extends State<NewReportScreen>
   }
 
   Widget _buildTopBar(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    final String title = widget.entryLabel ?? context.l10n.newReportTitle;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        ReportCircleIconButton(
-          icon: Icons.chevron_left_rounded,
-          semanticLabel: _currentStage == ReportStage.evidence
-              ? 'Back'
-              : 'Previous step',
-          onTap: () {
-            if (_currentStage == ReportStage.evidence) {
-              Navigator.of(context).maybePop();
-              return;
-            }
-            _goToStage(ReportStage.values[_currentStageIndex - 1]);
-          },
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                widget.entryLabel ?? context.l10n.newReportTitle,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Semantics(
+              button: true,
+              label: _currentStage == ReportStage.evidence
+                  ? 'Back'
+                  : 'Previous step',
+              child: AppBackButton(
+                backgroundColor: AppColors.inputFill,
+                onPressed: () {
+                  if (_currentStage == ReportStage.evidence) {
+                    Navigator.of(context).maybePop();
+                    return;
+                  }
+                  _goToStage(ReportStage.values[_currentStageIndex - 1]);
+                },
+              ),
+            ),
+            Expanded(
+              child: Text(
+                title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: -0.2,
-                ),
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                    ),
               ),
-              if (_showDraftSavedBanner) ...<Widget>[
-                const SizedBox(height: 2),
-                Text(
-                  context.l10n.reportDraftSaved,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            ),
+            ReportStatePill(
+              label: '${_currentStageIndex + 1}/${ReportStage.values.length}',
+              tone: _currentStage == ReportStage.review
+                  ? ReportSurfaceTone.success
+                  : ReportSurfaceTone.neutral,
+            ),
+          ],
+        ),
+        if (_showDraftSavedBanner) ...<Widget>[
+          const SizedBox(height: AppSpacing.xxs),
+          Center(
+            child: Text(
+              context.l10n.reportDraftSaved,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
                     color: AppColors.textMuted.withValues(alpha: 0.9),
                     fontWeight: FontWeight.w500,
                   ),
-                ),
-              ],
-            ],
+            ),
           ),
-        ),
-        ReportStatePill(
-          label: '${_currentStageIndex + 1}/${ReportStage.values.length}',
-          tone: _currentStage == ReportStage.review
-              ? ReportSurfaceTone.success
-              : ReportSurfaceTone.neutral,
-        ),
+        ],
       ],
     );
   }
