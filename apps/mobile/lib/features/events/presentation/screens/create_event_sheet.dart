@@ -1032,7 +1032,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
         ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
-          'Optional — give volunteers more context.',
+          'Optional: give volunteers more context.',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textMuted,
               ),

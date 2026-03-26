@@ -24,6 +24,7 @@ class ReportDetail {
     required this.id,
     required this.reportNumber,
     required this.status,
+    required this.title,
     required this.description,
     required this.mediaUrls,
     required this.submittedAt,
@@ -40,6 +41,7 @@ class ReportDetail {
   final String id;
   final String reportNumber;
   final ApiReportStatus status;
+  final String title;
   final String? description;
   final List<String> mediaUrls;
   final DateTime submittedAt;

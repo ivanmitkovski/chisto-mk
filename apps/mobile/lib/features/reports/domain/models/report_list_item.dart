@@ -27,11 +27,14 @@ class ReportListItem {
     this.category,
     this.severity,
     this.cleanupEffort,
+    this.description,
   });
 
   final String id;
   final String reportNumber;
   final String title;
+  /// Optional extra context (subtitle); may be null from API.
+  final String? description;
   final String location;
   final DateTime submittedAt;
   final ApiReportStatus status;

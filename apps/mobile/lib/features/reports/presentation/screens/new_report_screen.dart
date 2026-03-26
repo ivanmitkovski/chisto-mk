@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/reports/data/report_flow_preferences.dart';
 import 'package:chisto_mobile/features/reports/data/report_draft_storage.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
@@ -45,11 +46,15 @@ class NewReportScreen extends StatefulWidget {
   State<NewReportScreen> createState() => _NewReportScreenState();
 }
 
-class _NewReportScreenState extends State<NewReportScreen> {
+class _NewReportScreenState extends State<NewReportScreen>
+    with WidgetsBindingObserver {
   final ImagePicker _imagePicker = ImagePicker();
+  final TextEditingController _titleController = TextEditingController();
+  final FocusNode _titleFocus = FocusNode();
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _descriptionFocus = FocusNode();
-  final int _maxDescriptionLength = 200;
+  final int _maxTitleLength = 120;
+  final int _maxDescriptionLength = 500;
 
   ReportDraft _draft = ReportDraft();
   bool _submitting = false;
@@ -62,14 +67,32 @@ class _NewReportScreenState extends State<NewReportScreen> {
   bool _didAnnounceLocationStep = false;
   AppError? _apiError;
   ReportCapacity? _reportCapacity;
+  final ReportFlowPreferences _reportFlowPreferences = const ReportFlowPreferences();
+  bool _reportFlowPrefsLoaded = false;
+  bool _hasSeenReportHelpHint = true;
+
+  Timer? _draftSaveTimer;
+  Timer? _draftSavedHideTimer;
+  bool _showDraftSavedBanner = false;
+  DateTime? _lastDraftSavedBannerShown;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _reportFlowPreferences.hasSeenReportHelpHint.then((bool v) {
+      if (!mounted) return;
+      setState(() {
+        _reportFlowPrefsLoaded = true;
+        _hasSeenReportHelpHint = v;
+      });
+    });
     if (widget.initialPhoto != null) {
       _draft = _draft.copyWith(photos: <XFile>[widget.initialPhoto!]);
+      _titleController.text = _draft.title;
       _descriptionController.text = _draft.description;
     } else {
+      _titleController.text = _draft.title;
       _descriptionController.text = _draft.description;
       WidgetsBinding.instance.addPostFrameCallback((_) => _offerRestoreDraft());
     }
@@ -83,23 +106,21 @@ class _NewReportScreenState extends State<NewReportScreen> {
     if (!mounted || saved == null) return;
     final bool? resume = await showCupertinoDialog<bool>(
       context: context,
-      builder: (BuildContext context) => CupertinoAlertDialog(
-        title: const Text('Resume draft?'),
-        content: const Text(
-          'You have an unsaved report. Resume where you left off or start fresh.',
-        ),
+      builder: (BuildContext dialogContext) => CupertinoAlertDialog(
+        title: Text(dialogContext.l10n.resumeDraftTitle),
+        content: Text(dialogContext.l10n.resumeDraftBody),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Start fresh'),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: Text(dialogContext.l10n.resumeDraftStartFresh),
           ),
           CupertinoDialogAction(
             isDefaultAction: true,
             onPressed: () {
               AppHaptics.light();
-              Navigator.of(context).pop(true);
+              Navigator.of(dialogContext).pop(true);
             },
-            child: const Text('Resume'),
+            child: Text(dialogContext.l10n.resumeDraftResume),
           ),
         ],
       ),
@@ -110,10 +131,23 @@ class _NewReportScreenState extends State<NewReportScreen> {
         _draft = saved.draft;
         _currentStage =
             ReportStage.values[saved.stageIndex.clamp(0, ReportStage.values.length - 1)];
+        _titleController.text = _draft.title;
         _descriptionController.text = _draft.description;
       });
+      unawaited(_saveDraftImmediately());
     }
     await clearReportDraft();
+  }
+
+  Future<void> _dismissFlowHelpHint() async {
+    AppHaptics.light();
+    await _reportFlowPreferences.setSeenReportHelpHint();
+    if (mounted) setState(() => _hasSeenReportHelpHint = true);
+  }
+
+  Future<void> _onFlowHelpOpened() async {
+    await _reportFlowPreferences.setSeenReportHelpHint();
+    if (mounted) setState(() => _hasSeenReportHelpHint = true);
   }
 
   @override
@@ -123,16 +157,68 @@ class _NewReportScreenState extends State<NewReportScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      _draftSaveTimer?.cancel();
+      unawaited(_saveDraftImmediately());
+    }
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _draftSaveTimer?.cancel();
+    _draftSavedHideTimer?.cancel();
     if (!_submitting) {
       saveReportDraft(
         draft: _draft,
         stageIndex: ReportStage.values.indexOf(_currentStage),
       );
     }
+    _titleController.dispose();
+    _titleFocus.dispose();
     _descriptionController.dispose();
     _descriptionFocus.dispose();
     super.dispose();
+  }
+
+  void _scheduleDraftSave() {
+    if (_submitting) return;
+    _draftSaveTimer?.cancel();
+    _draftSaveTimer = Timer(const Duration(milliseconds: 1500), () {
+      if (!mounted || _submitting) return;
+      saveReportDraft(
+        draft: _draft,
+        stageIndex: ReportStage.values.indexOf(_currentStage),
+      ).then((_) {
+        if (!mounted) return;
+        _maybeShowDraftSavedBanner();
+      });
+    });
+  }
+
+  void _maybeShowDraftSavedBanner() {
+    final DateTime now = DateTime.now();
+    if (_lastDraftSavedBannerShown != null &&
+        now.difference(_lastDraftSavedBannerShown!) <
+            const Duration(seconds: 60)) {
+      return;
+    }
+    _lastDraftSavedBannerShown = now;
+    _draftSavedHideTimer?.cancel();
+    setState(() => _showDraftSavedBanner = true);
+    _draftSavedHideTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showDraftSavedBanner = false);
+    });
+  }
+
+  Future<void> _saveDraftImmediately() async {
+    _draftSaveTimer?.cancel();
+    if (_submitting) return;
+    await saveReportDraft(
+      draft: _draft,
+      stageIndex: ReportStage.values.indexOf(_currentStage),
+    );
   }
 
   bool get _hasValidLocation {
@@ -206,6 +292,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
               photos: <XFile>[..._draft.photos, selectedFile],
             );
           });
+          _scheduleDraftSave();
           if (wasEmpty) {
             AppHaptics.success();
           }
@@ -227,6 +314,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
         ..removeAt(index);
       _draft = _draft.copyWith(photos: updated);
     });
+    _scheduleDraftSave();
   }
 
   void _setCleanupEffort(CleanupEffort effort) {
@@ -234,6 +322,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     setState(() {
       _draft = _draft.copyWith(cleanupEffort: effort);
     });
+    _scheduleDraftSave();
   }
 
   void _onLocationChanged(LocationPickerResult result) {
@@ -255,6 +344,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
         address: result.address,
       );
     });
+    _scheduleDraftSave();
   }
 
   Widget _buildCleanupEffortField(BuildContext context) {
@@ -302,14 +392,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
             );
           }).toList(),
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'How many people do you think are needed to clean this up?',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
-                height: 1.35,
-              ),
-        ),
       ],
     );
   }
@@ -320,6 +402,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       selected: _draft.category,
       onSelected: (ReportCategory cat) {
         setState(() => _draft = _draft.copyWith(category: cat));
+        _scheduleDraftSave();
       },
     );
   }
@@ -329,7 +412,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       case ReportStage.evidence:
         return _draft.hasPhotos;
       case ReportStage.details:
-        return _draft.hasCategory;
+        return _draft.hasCategory && _draft.hasTitle;
       case ReportStage.location:
         return _hasValidLocation;
       case ReportStage.review:
@@ -346,7 +429,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       return _draft.hasPhotos;
     }
     if (stage == ReportStage.location) {
-      return _draft.hasPhotos && _draft.hasCategory;
+      return _draft.hasPhotos && _draft.hasCategory && _draft.hasTitle;
     }
     return _canSubmit;
   }
@@ -372,6 +455,16 @@ class _NewReportScreenState extends State<NewReportScreen> {
         _didAnnounceLocationStep = false;
       }
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (!MediaQuery.supportsAnnounceOf(context)) return;
+      final String label = stage.config(context.l10n).infoTitle;
+      SemanticsService.sendAnnouncement(
+        View.of(context),
+        context.l10n.semanticsCurrentReportStep(label),
+        Directionality.of(context),
+      );
+    });
   }
 
   void _goToFirstInvalidStage() {
@@ -381,6 +474,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
       return;
     }
     if (!_draft.hasCategory) {
+      _goToStage(ReportStage.details, withHaptic: false);
+      _highlightStage(ReportStage.details);
+      return;
+    }
+    if (!_draft.hasTitle) {
       _goToStage(ReportStage.details, withHaptic: false);
       _highlightStage(ReportStage.details);
       return;
@@ -397,24 +495,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
       case ReportStage.evidence:
         return _draft.hasPhotos;
       case ReportStage.details:
-        return _draft.hasCategory;
+        return _draft.hasCategory && _draft.hasTitle;
       case ReportStage.location:
         return _hasValidLocation;
       case ReportStage.review:
         return _canSubmit;
-    }
-  }
-
-  String _stageBlockingMessage(ReportStage stage) {
-    switch (stage) {
-      case ReportStage.evidence:
-        return 'Add at least one photo before continuing.';
-      case ReportStage.details:
-        return 'Choose a category before continuing.';
-      case ReportStage.location:
-        return 'Confirm a location inside Macedonia before continuing.';
-      case ReportStage.review:
-        return 'Finish the missing steps before submitting.';
     }
   }
 
@@ -428,16 +513,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
       setState(() {
         _attemptedStages.add(_currentStage);
       });
-      AppSnack.show(
-        context,
-        message: _stageBlockingMessage(_currentStage),
-        type: AppSnackType.warning,
-      );
       _highlightStage(_currentStage);
       return;
     }
 
-    _goToStage(ReportStage.values[_currentStageIndex + 1]);
+    _goToStage(ReportStage.values[_currentStageIndex + 1], withHaptic: false);
+    if (!MediaQuery.disableAnimationsOf(context)) {
+      AppHaptics.settle();
+    }
   }
 
   Future<void> _loadReportingCapacity() async {
@@ -492,14 +575,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
     try {
       final reportsApi = ServiceLocator.instance.reportsApiRepository;
-      String description = _draft.description.trim();
-      if (description.isEmpty) {
-        description = 'No additional details';
-      }
+      final String trimmedTitle = _draft.title.trim();
+      final String trimmedDescription = _draft.description.trim();
       final result = await reportsApi.submitReport(
         latitude: _draft.latitude!,
         longitude: _draft.longitude!,
-        description: description,
+        title: trimmedTitle,
+        description: trimmedDescription.isNotEmpty ? trimmedDescription : null,
         mediaUrls: null,
         category: _draft.category?.apiString,
         severity: _draft.severity,
@@ -630,13 +712,16 @@ class _NewReportScreenState extends State<NewReportScreen> {
       _submitPhase = null;
       _evidenceTipDismissed = false;
     });
+    _titleController.text = '';
     _descriptionController.text = '';
+    _scheduleDraftSave();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
+      resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
         behavior: HitTestBehavior.translucent,
@@ -655,10 +740,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     _buildTopBar(context),
-                    if (_reportCapacity != null) ...<Widget>[
-                      const SizedBox(height: AppSpacing.sm),
-                      _buildCapacityPill(),
-                    ],
                     const SizedBox(height: AppSpacing.md),
                     _buildStageStepper(context),
                   ],
@@ -669,7 +750,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 child: AnimatedSwitcher(
                   duration: AppMotion.medium,
                   switchInCurve: AppMotion.emphasized,
-                  switchOutCurve: Curves.easeOutCubic,
+                  switchOutCurve: AppMotion.emphasized,
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
                         final Animation<Offset> slide = Tween<Offset>(
@@ -687,6 +768,23 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   ),
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Material(
+        color: AppColors.panelBackground,
+        elevation: 0,
+        child: SafeArea(
+          top: false,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Divider(
+                height: 1,
+                thickness: 0.5,
+                color: AppColors.divider.withValues(alpha: 0.5),
+              ),
               _buildBottomBar(context),
             ],
           ),
@@ -697,6 +795,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   Widget _buildTopBar(BuildContext context) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         ReportCircleIconButton(
           icon: Icons.chevron_left_rounded,
@@ -713,15 +812,34 @@ class _NewReportScreenState extends State<NewReportScreen> {
         ),
         const SizedBox(width: AppSpacing.md),
         Expanded(
-          child: Text(
-            widget.entryLabel ?? 'New report',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
-            ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                widget.entryLabel ?? context.l10n.newReportTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.2,
+                ),
+              ),
+              if (_showDraftSavedBanner) ...<Widget>[
+                const SizedBox(height: 2),
+                Text(
+                  context.l10n.reportDraftSaved,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    color: AppColors.textMuted.withValues(alpha: 0.9),
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ],
           ),
         ),
         ReportStatePill(
@@ -731,19 +849,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
               : ReportSurfaceTone.neutral,
         ),
       ],
-    );
-  }
-
-  Widget _buildCapacityPill() {
-    final ReportCapacity capacity = _reportCapacity!;
-    final ReportCapacityUiState ui = mapReportCapacityToUiState(capacity);
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: ReportStatePill(
-        label: ui.pillLabel,
-        tone: ui.pillTone,
-        icon: ui.pillIcon,
-      ),
     );
   }
 
@@ -762,7 +867,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             final ReportStage stage = entry.value;
             return Expanded(
               child: StageChip(
-                label: stage.shortLabel,
+                label: stage.config(context.l10n).shortLabel,
                 isCurrent: stage == _currentStage,
                 isComplete: _isStageComplete(stage),
                 isEnabled: _canNavigateToStage(stage),
@@ -785,10 +890,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child: _buildStageSurface(
             context,
             stage: ReportStage.evidence,
-            title: 'Evidence',
-            message:
-                'Start with one clear photo of the site. Add another only if it helps explain the issue.',
-            contextHint: widget.entryHint,
+            infoExtra: widget.entryHint,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -807,6 +909,17 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   onAddPhoto: _addPhoto,
                   onRemovePhoto: _removePhoto,
                 ),
+                if (_attemptedStages.contains(ReportStage.evidence) &&
+                    !_draft.hasPhotos) ...<Widget>[
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    context.l10n.reportFlowEvidenceNeedsPhoto,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.accentDanger,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -817,11 +930,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child: _buildStageSurface(
             context,
             stage: ReportStage.details,
-            title: 'Details',
-            message:
-                'Pick the closest category, then add short context only if it helps moderation.',
-            contextHint:
-                'Keep this step short and factual. Moderators see this before the full report.',
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -829,6 +937,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 _buildCategoryField(context),
                 const SizedBox(height: AppSpacing.md),
                 _buildSeverityField(context),
+                const SizedBox(height: AppSpacing.md),
+                _buildTitleField(context),
                 const SizedBox(height: AppSpacing.md),
                 _buildDescriptionField(context),
                 const SizedBox(height: AppSpacing.md),
@@ -844,7 +954,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             if (MediaQuery.supportsAnnounceOf(context)) {
               SemanticsService.sendAnnouncement(
                 View.of(context),
-                'Location. Place the pin on the site, then confirm.',
+                'Location: pin, then confirm.',
                 Directionality.of(context),
               );
             }
@@ -856,14 +966,13 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child: _buildStageSurface(
             context,
             stage: ReportStage.location,
-            title: 'Location',
-            message: 'Place the pin on the site, then confirm. Stays inside Macedonia.',
-            contextHint:
-                'Moderators rely on this spot to find the site. Take a moment to get it right.',
             child: LocationPicker(
               initialLatitude: _draft.latitude,
               initialLongitude: _draft.longitude,
               onLocationChanged: _onLocationChanged,
+              showAdvanceBlockedHint:
+                  _attemptedStages.contains(ReportStage.location) &&
+                  !_hasValidLocation,
             ),
           ),
         );
@@ -873,28 +982,36 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child: _buildStageSurface(
             context,
             stage: ReportStage.review,
-            title: 'Review',
-            message:
-                'Check the essentials once, then send the report when it feels right.',
-            contextHint:
-                'Give everything one last look. You can still go back and adjust before you submit.',
             child: Column(
               children: <Widget>[
                 ReviewSummaryTile(
                   icon: Icons.photo_library_outlined,
                   title: 'Evidence',
                   subtitle: _draft.hasPhotos
-                      ? '${_draft.photos.length} photo${_draft.photos.length == 1 ? '' : 's'} attached'
-                      : 'Add at least one photo',
+                      ? '${_draft.photos.length} photo${_draft.photos.length == 1 ? '' : 's'}'
+                      : 'Add a photo',
                   isComplete: _draft.hasPhotos,
+                  semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.evidence),
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
                   icon: _draft.category?.icon ?? Icons.category_outlined,
                   title: 'Category',
-                  subtitle: _draft.category?.label ?? 'Choose the issue type',
+                  subtitle: _draft.category?.label ?? 'Choose category',
                   isComplete: _draft.hasCategory,
+                  semanticsHint: context.l10n.reviewTapToEdit,
+                  onTap: () => _goToStage(ReportStage.details),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                ReviewSummaryTile(
+                  icon: Icons.title_rounded,
+                  title: 'Title',
+                  subtitle: _draft.hasTitle
+                      ? _draft.title.trim()
+                      : 'Add title',
+                  isComplete: _draft.hasTitle,
+                  semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.details),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -904,6 +1021,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   subtitle: _severityLabel(_draft.severity),
                   isComplete: true,
                   isOptional: true,
+                  semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.details),
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -911,9 +1029,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   icon: Icons.location_on_outlined,
                   title: 'Location',
                   subtitle: _hasValidLocation
-                      ? (_draft.address ?? 'Pinned location confirmed')
-                      : 'Confirm the location in Macedonia',
+                      ? (_draft.address ?? 'Pinned')
+                      : 'Pin in Macedonia',
                   isComplete: _hasValidLocation,
+                  semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.location),
                 ),
                 if (_draft.hasDescription) ...<Widget>[
@@ -924,6 +1043,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                     subtitle: _draft.description.trim(),
                     isComplete: true,
                     isOptional: true,
+                    semanticsHint: context.l10n.reviewTapToEdit,
                     onTap: () => _goToStage(ReportStage.details),
                   ),
                 ],
@@ -935,43 +1055,37 @@ class _NewReportScreenState extends State<NewReportScreen> {
                     subtitle: _draft.cleanupEffort!.label,
                     isComplete: true,
                     isOptional: true,
+                    semanticsHint: context.l10n.reviewTapToEdit,
                     onTap: () => _goToStage(ReportStage.details),
                   ),
                 ],
                 const SizedBox(height: AppSpacing.md),
+                ReportInfoBanner(
+                  title: context.l10n.reportReviewBannerAfterSubmitTitle,
+                  icon: Icons.verified_user_outlined,
+                  tone: _canSubmit
+                      ? ReportSurfaceTone.neutral
+                      : ReportSurfaceTone.warning,
+                  message: _canSubmit
+                      ? context.l10n.reportReviewAfterSubmitReady
+                      : context.l10n.reportReviewAfterSubmitIncomplete,
+                ),
                 if (_reportCapacity != null) ...<Widget>[
+                  const SizedBox(height: AppSpacing.sm),
                   Builder(
                     builder: (BuildContext context) {
                       final ReportCapacityUiState ui =
                           mapReportCapacityToUiState(_reportCapacity!);
                       return ReportInfoBanner(
-                        title: 'Credit impact',
+                        title: context.l10n.reportReviewBannerCreditsTitle,
+                        emphasis: ReportInfoBannerEmphasis.secondary,
                         icon: ui.pillIcon,
                         tone: ui.pillTone,
                         message: ui.reviewMessage,
                       );
                     },
                   ),
-                  const SizedBox(height: AppSpacing.sm),
                 ],
-                ReportInfoBanner(
-                  title: 'After you submit',
-                  icon: Icons.verified_user_outlined,
-                  tone: _canSubmit
-                      ? ReportSurfaceTone.neutral
-                      : ReportSurfaceTone.warning,
-                  message: _canSubmit
-                      ? 'The report will go to moderation first before it appears publicly.'
-                      : 'Finish the missing essentials above before you submit.',
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  'Moderators will review within a few days. You\'ll see the status in My reports.',
-                  style: AppTypography.textTheme.bodySmall!.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.35,
-                  ),
-                ),
               ],
             ),
           ),
@@ -1003,6 +1117,9 @@ class _NewReportScreenState extends State<NewReportScreen> {
                       _submit();
                     }
                   : null,
+              detail: _apiError!.retryable
+                  ? context.l10n.errorBannerDraftSavedHint
+                  : null,
             ),
             const SizedBox(height: AppSpacing.md),
           ],
@@ -1012,15 +1129,71 @@ class _NewReportScreenState extends State<NewReportScreen> {
     );
   }
 
+  Future<void> _showStageHelpModal(
+    BuildContext context,
+    ReportStage stage, {
+    String? infoExtra,
+  }) async {
+    AppHaptics.light();
+    await _onFlowHelpOpened();
+    if (!context.mounted) return;
+    final String trimmed = infoExtra?.trim() ?? '';
+    final String barrierLabel =
+        MaterialLocalizations.of(context).modalBarrierDismissLabel;
+
+    await showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: false,
+      backgroundColor: AppColors.transparent,
+      elevation: 0,
+      barrierLabel: barrierLabel,
+      builder: (BuildContext sheetContext) {
+        final ReportStageConfig cfg = stage.config(sheetContext.l10n);
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
+          ),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: SizedBox(
+              width: MediaQuery.sizeOf(sheetContext).width,
+              child: ReportSheetScaffold(
+                fitToContent: true,
+                addBottomInset: true,
+                maxHeightFactor: 0.92,
+                headerDividerGap: AppSpacing.sm,
+                title: cfg.infoTitle,
+                subtitle: cfg.subtitle,
+                trailing: ReportCircleIconButton(
+                  icon: Icons.close_rounded,
+                  semanticLabel: sheetContext.l10n.semanticsClose,
+                  onTap: () {
+                    AppHaptics.tap();
+                    Navigator.of(sheetContext).pop();
+                  },
+                ),
+                child: StageHelpFormattedContent(
+                  sections: cfg.helpSections,
+                  contextSectionTitle: sheetContext.l10n.reportHelpContextTitle,
+                  extraParagraph: trimmed.isEmpty ? null : trimmed,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildStageSurface(
     BuildContext context, {
     required ReportStage stage,
-    required String title,
-    required String message,
     required Widget child,
-    String? contextHint,
+    String? infoExtra,
   }) {
     final bool isHighlighted = _highlightedStage == stage;
+    final ReportStageConfig cfg = stage.config(context.l10n);
 
     return AnimatedContainer(
       duration: AppMotion.medium,
@@ -1045,61 +1218,68 @@ class _NewReportScreenState extends State<NewReportScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              Text(
-                title,
-                style: AppTypography.sectionHeader,
+              Expanded(
+                child: Text(
+                  cfg.infoTitle,
+                  style: AppTypography.sectionHeader,
+                ),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                message,
-                style: AppTypography.textTheme.bodySmall!.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.35,
+              Semantics(
+                button: true,
+                label: context.l10n.semanticsAboutStep(cfg.infoTitle),
+                child: IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  icon: const Icon(Icons.info_outline_rounded),
+                  color: AppColors.textSecondary,
+                  tooltip: 'About this step',
+                  onPressed: () =>
+                      _showStageHelpModal(context, stage, infoExtra: infoExtra),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.sm),
-          Wrap(
-            spacing: AppSpacing.xs,
-            runSpacing: AppSpacing.xs,
-            children: <Widget>[
-              ReportStatePill(
-                label: stage.primaryRequirementLabel,
-                tone: ReportSurfaceTone.accent,
-              ),
-              if (stage.secondaryRequirementLabel != null)
-                ReportStatePill(label: stage.secondaryRequirementLabel!),
-            ],
-          ),
-          if (contextHint != null) ...<Widget>[
+          if (_reportFlowPrefsLoaded &&
+              !_hasSeenReportHelpHint &&
+              stage == ReportStage.evidence) ...<Widget>[
             const SizedBox(height: AppSpacing.sm),
-            Text(
-              contextHint,
-              style: AppTypography.textTheme.bodySmall!.copyWith(
-                color: AppColors.textMuted,
-                height: 1.35,
-              ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    context.l10n.reportFlowHelpHint,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textMuted,
+                          height: 1.35,
+                        ),
+                  ),
+                ),
+                IconButton(
+                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 40,
+                    minHeight: 40,
+                  ),
+                  icon: const Icon(Icons.close_rounded, size: 20),
+                  color: AppColors.textMuted,
+                  tooltip: 'Dismiss',
+                  onPressed: _dismissFlowHelpHint,
+                ),
+              ],
             ),
           ],
-          if (isHighlighted) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            Semantics(
-              liveRegion: true,
-              label: _stageBlockingMessage(stage),
-              child: const ReportInfoBanner(
-                icon: Icons.error_outline_rounded,
-                tone: ReportSurfaceTone.warning,
-                message: 'This step needs attention before you continue.',
-              ),
-            ),
-          ],
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.xs),
           Divider(color: AppColors.divider.withValues(alpha: 0.6), height: 1),
-          const SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.sm),
           child,
         ],
       ),
@@ -1116,6 +1296,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   String _severityLabel(int value) =>
       '${value.clamp(1, 5)} – ${_severityLabels[(value.clamp(1, 5) - 1)]}';
+
+  /// Keeps focused fields scrollable above the IME and bottom CTA bar.
+  EdgeInsets _detailsFieldScrollPadding(BuildContext context) {
+    final double safeBottom = MediaQuery.paddingOf(context).bottom;
+    return EdgeInsets.only(bottom: safeBottom + kBottomNavigationBarHeight + 20);
+  }
 
   Widget _buildSeverityField(BuildContext context) {
     return Column(
@@ -1168,6 +1354,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                       severity: value.round().clamp(1, 5),
                     ),
                   );
+                  _scheduleDraftSave();
                 },
               ),
               Row(
@@ -1190,6 +1377,93 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 ],
               ),
             ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTitleField(BuildContext context) {
+    final bool hasTitleError =
+        _attemptedStages.contains(ReportStage.details) && !_draft.hasTitle;
+    final int length = _titleController.text.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: <Widget>[
+            Text(
+              'Title',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: hasTitleError
+                    ? AppColors.accentDanger
+                    : AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.1,
+              ),
+            ),
+            Text(
+              '$length/$_maxTitleLength',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textMuted,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        TextField(
+          controller: _titleController,
+          focusNode: _titleFocus,
+          scrollPadding: _detailsFieldScrollPadding(context),
+          maxLength: _maxTitleLength,
+          maxLines: 1,
+          textCapitalization: TextCapitalization.sentences,
+          onChanged: (String value) {
+            setState(() {
+              _draft = _draft.copyWith(title: value);
+            });
+            _scheduleDraftSave();
+          },
+          textInputAction: TextInputAction.next,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.textPrimary,
+            letterSpacing: -0.2,
+          ),
+          decoration: InputDecoration(
+            hintText: 'Brief headline',
+            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.textMuted.withValues(alpha: 0.85),
+              fontWeight: FontWeight.w400,
+              letterSpacing: -0.15,
+            ),
+            filled: true,
+            fillColor: AppColors.inputFill,
+            counterText: '',
+            contentPadding: const EdgeInsets.all(AppSpacing.md),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: BorderSide(
+                color: hasTitleError ? AppColors.accentDanger : AppColors.divider,
+                width: 1,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSpacing.radius14),
+              borderSide: const BorderSide(
+                color: AppColors.primaryDark,
+                width: 1.5,
+              ),
+            ),
           ),
         ),
       ],
@@ -1220,9 +1494,9 @@ class _NewReportScreenState extends State<NewReportScreen> {
           value: _draft.category?.label,
           child: ReportActionTile(
             icon: _draft.category?.icon ?? Icons.category_outlined,
-            title: _draft.category?.label ?? 'Select category',
+            title: _draft.category?.label ?? 'Category',
             subtitle: _draft.category == null
-                ? 'Choose the closest match.'
+                ? 'Choose'
                 : _draft.category!.description,
             tone: hasCategoryError
                 ? ReportSurfaceTone.danger
@@ -1251,7 +1525,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
           textBaseline: TextBaseline.alphabetic,
           children: <Widget>[
             Text(
-              'Short description (optional)',
+              'Details',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -1272,6 +1546,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
         TextField(
           controller: _descriptionController,
           focusNode: _descriptionFocus,
+          scrollPadding: _detailsFieldScrollPadding(context),
           maxLength: _maxDescriptionLength,
           maxLines: 4,
           minLines: 3,
@@ -1280,6 +1555,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             setState(() {
               _draft = _draft.copyWith(description: value);
             });
+            _scheduleDraftSave();
           },
           textInputAction: TextInputAction.done,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1287,10 +1563,11 @@ class _NewReportScreenState extends State<NewReportScreen> {
             letterSpacing: -0.2,
           ),
           decoration: InputDecoration(
-            hintText: 'Describe the pollution site…',
+            hintText: 'Anything else',
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textMuted,
-              letterSpacing: -0.2,
+              color: AppColors.textMuted.withValues(alpha: 0.85),
+              fontWeight: FontWeight.w400,
+              letterSpacing: -0.15,
             ),
             filled: true,
             fillColor: AppColors.inputFill,
@@ -1313,14 +1590,6 @@ class _NewReportScreenState extends State<NewReportScreen> {
             ),
           ),
         ),
-        const SizedBox(height: AppSpacing.xs),
-        Text(
-          'Optional: add short context only if it helps explain the site.',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textMuted,
-            height: 1.35,
-          ),
-        ),
       ],
     );
   }
@@ -1329,124 +1598,95 @@ class _NewReportScreenState extends State<NewReportScreen> {
     final bool showBack = _currentStage != ReportStage.evidence;
     final bool isReviewStage = _currentStage == ReportStage.review;
 
-    return Container(
-      padding: EdgeInsets.fromLTRB(
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
         AppSpacing.lg,
         AppSpacing.sm,
         AppSpacing.lg,
-        MediaQuery.of(context).padding.bottom + AppSpacing.sm,
+        AppSpacing.sm,
       ),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-        border: Border(
-          top: BorderSide(
-            color: AppColors.divider.withValues(alpha: 0.5),
-            width: 0.5,
-          ),
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              if (showBack) ...<Widget>[
-                Expanded(
-                  child: Semantics(
-                    button: true,
-                    label: 'Back',
-                    hint: 'Double-tap to go to previous step.',
-                    child: OutlinedButton(
-                      onPressed: _submitting
-                          ? null
-                          : () => _goToStage(
-                              ReportStage.values[_currentStageIndex - 1],
-                            ),
-                      style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.textPrimary,
-                      side: BorderSide(
-                        color: AppColors.divider.withValues(alpha: 0.8),
-                      ),
-                      backgroundColor: AppColors.panelBackground,
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                      ),
+          if (showBack) ...<Widget>[
+            Expanded(
+              child: Semantics(
+                button: true,
+                label: 'Back',
+                hint: 'Double-tap to go to previous step.',
+                child: OutlinedButton(
+                  onPressed: _submitting
+                      ? null
+                      : () => _goToStage(
+                            ReportStage.values[_currentStageIndex - 1],
+                          ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
+                    side: BorderSide(
+                      color: AppColors.divider.withValues(alpha: 0.8),
                     ),
-                      child: Text(
-                        'Back',
-                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                    backgroundColor: AppColors.panelBackground,
+                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                    ),
+                  ),
+                  child: Text(
+                    'Back',
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,
                         ),
-                      ),
-                    ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-              ],
-              Expanded(
-                flex: showBack ? 2 : 1,
-                child: Semantics(
-                  button: true,
-                  label: isReviewStage ? 'Submit report' : 'Next: ${_currentStage.primaryActionLabel}',
-                  hint: isReviewStage ? 'Double-tap to submit' : 'Double-tap to go to next step.',
-                  child: SizedBox(
-                    height: 52,
-                    child: FilledButton(
-                      onPressed: _submitting ? null : _handlePrimaryAction,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.white,
-                      disabledBackgroundColor: AppColors.primary.withValues(
-                        alpha: 0.42,
-                      ),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                      ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+          ],
+          Expanded(
+            flex: showBack ? 2 : 1,
+            child: Semantics(
+              button: true,
+              label: isReviewStage
+                  ? 'Submit report'
+                  : context.l10n.semanticsNextStep(
+                      _currentStage.config(context.l10n).shortLabel,
                     ),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          _submitting
-                              ? (_submitPhase == 'creating'
-                                  ? 'Creating report…'
-                                  : _submitPhase == 'uploading'
-                                      ? 'Uploading photos…'
-                                      : 'Submitting…')
-                              : isReviewStage
-                              ? 'Submit report'
-                              : _currentStage.primaryActionLabel,
-                          style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              hint: isReviewStage ? 'Double-tap to submit' : 'Double-tap to go to next step.',
+              child: SizedBox(
+                height: 52,
+                child: FilledButton(
+                  onPressed: _submitting ? null : _handlePrimaryAction,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    disabledBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.42,
+                    ),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                    ),
+                  ),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      _submitting
+                          ? (_submitPhase == 'creating'
+                              ? 'Creating…'
+                              : _submitPhase == 'uploading'
+                                  ? 'Uploading…'
+                                  : 'Submitting…')
+                          : _currentStage.config(context.l10n).primaryActionLabel,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.2,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              isReviewStage
-                  ? (_canSubmit
-                      ? 'Ready to submit.'
-                      : 'Finish the essentials before submitting.')
-                  : _currentStage.footerHint,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.25,
-                  ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

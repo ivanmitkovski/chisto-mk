@@ -87,6 +87,7 @@ async function main() {
     data: {
       siteId: riversideSite.id,
       reporterId: reporterA.id,
+      title: 'Mixed waste by the riverbank',
       description: 'Large pile of mixed waste next to the riverbank.',
       mediaUrls: [],
       status: ReportStatus.NEW,
@@ -97,6 +98,7 @@ async function main() {
     data: {
       siteId: riversideSite.id,
       reporterId: reporterB.id,
+      title: 'Same trash spot — co-report',
       description: 'Same trash spot reported from different user.',
       mediaUrls: [],
       status: ReportStatus.NEW,
@@ -115,6 +117,7 @@ async function main() {
     data: {
       siteId: parkSite.id,
       reporterId: reporterA.id,
+      title: 'Overflowing bins after weekend',
       description: 'Bins overflowing after weekend event.',
       mediaUrls: [],
       status: ReportStatus.IN_REVIEW,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -36,11 +37,13 @@ class LocationPicker extends StatefulWidget {
     this.initialLatitude,
     this.initialLongitude,
     required this.onLocationChanged,
+    this.showAdvanceBlockedHint = false,
   });
 
   final double? initialLatitude;
   final double? initialLongitude;
   final void Function(LocationPickerResult result) onLocationChanged;
+  final bool showAdvanceBlockedHint;
 
   @override
   State<LocationPicker> createState() => _LocationPickerState();
@@ -60,7 +63,6 @@ class _LocationPickerState extends State<LocationPicker> {
   bool _gpsNeedsReview = false;
   bool _needsConfirmation = false;
   int _geocodeRequestId = 0;
-  double? _gpsAccuracyMeters;
   LatLng? _lastGeocodedCenter;
   bool _lastGeocodeWasMacedonia = false;
   bool _geocodingInProgress = false;
@@ -204,7 +206,6 @@ class _LocationPickerState extends State<LocationPicker> {
           _resolvingGps = false;
           _gpsOutsideCoverage = true;
           _gpsNeedsReview = false;
-          _gpsAccuracyMeters = pos.accuracy;
           _needsConfirmation = false;
         });
         return;
@@ -222,7 +223,6 @@ class _LocationPickerState extends State<LocationPicker> {
           _permissionUnavailable = false;
           _gpsOutsideCoverage = false;
           _gpsNeedsReview = needsReview;
-          _gpsAccuracyMeters = pos.accuracy;
         });
       }
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -531,6 +531,7 @@ class _LocationPickerState extends State<LocationPicker> {
         _buildStatusSection(
           stateLabel: stateLabel,
           hasConfirmedLocation: hasConfirmedLocation,
+          showAdvanceBlockedHint: widget.showAdvanceBlockedHint,
         ),
       ],
     ),
@@ -540,6 +541,7 @@ class _LocationPickerState extends State<LocationPicker> {
   Widget _buildStatusSection({
     required String stateLabel,
     required bool hasConfirmedLocation,
+    required bool showAdvanceBlockedHint,
   }) {
     final bool showConfirmAction =
         _currentCenter != null &&
@@ -552,6 +554,14 @@ class _LocationPickerState extends State<LocationPicker> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
+          if (showAdvanceBlockedHint) ...<Widget>[
+            ReportInfoBanner(
+              icon: Icons.place_outlined,
+              tone: ReportSurfaceTone.warning,
+              message: context.l10n.reportLocationAdvanceBlockedBanner,
+            ),
+            const SizedBox(height: AppSpacing.md),
+          ],
           Semantics(
             liveRegion: true,
             label: stateLabel,
@@ -589,7 +599,7 @@ class _LocationPickerState extends State<LocationPicker> {
                     _currentCenter != null &&
                     _samePoint(_currentCenter, _lastGeocodedCenter) &&
                     !_lastGeocodeWasMacedonia
-              ? 'This location is outside Macedonia. Move the pin inside the country.'
+              ? context.l10n.reportFlowLocationOutsideMacedoniaHelper
               : hasConfirmedLocation
               ? 'The pinned location is ready to submit.'
               : 'Move the pin to the exact spot, then tap Confirm. The map stays inside Macedonia.',
@@ -637,21 +647,6 @@ class _LocationPickerState extends State<LocationPicker> {
                 ],
               ),
             ),
-          if (_needsConfirmation) ...<Widget>[
-            ReportInfoBanner(
-            title: _gpsNeedsReview
-                ? 'Confirm current location'
-                : 'Confirm location',
-            message: _gpsNeedsReview
-                ? _gpsAccuracyMeters != null
-                      ? 'About ${_gpsAccuracyMeters!.round()} m accuracy. Adjust the pin if needed, then confirm.'
-                      : 'Review the detected spot, adjust if needed, then confirm.'
-                : 'Place the pin on the exact site, then tap Confirm.',
-            icon: Icons.touch_app_outlined,
-              tone: ReportSurfaceTone.warning,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-          ],
           if (_permissionUnavailable) ...<Widget>[
             const ReportInfoBanner(
             icon: Icons.location_disabled_outlined,
@@ -669,6 +664,7 @@ class _LocationPickerState extends State<LocationPicker> {
             ),
             const SizedBox(height: AppSpacing.xs),
           ],
+          if (showConfirmAction) const SizedBox(height: AppSpacing.md),
           if (showConfirmAction)
             Semantics(
             button: true,

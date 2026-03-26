@@ -239,6 +239,7 @@ exports.Prisma.ReportScalarFieldEnum = {
   reportNumber: 'reportNumber',
   siteId: 'siteId',
   reporterId: 'reporterId',
+  title: 'title',
   description: 'description',
   mediaUrls: 'mediaUrls',
   category: 'category',

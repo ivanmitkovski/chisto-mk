@@ -6,6 +6,7 @@ import {
   IsString,
   IsUrl,
   MaxLength,
+  MinLength,
 } from 'class-validator';
 
 export class CreateReportDto {
@@ -16,9 +17,19 @@ export class CreateReportDto {
   @IsString()
   siteId!: string;
 
-  @ApiPropertyOptional({
-    description: 'Free-text report description',
+  @ApiProperty({
+    description: 'Short headline for lists and moderation',
     example: 'Trash pile behind the bus station',
+    maxLength: 120,
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  title!: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional extra context',
+    example: 'Additional details for moderators.',
   })
   @IsOptional()
   @IsString()

@@ -98,6 +98,7 @@ List<String> get reportPollutionTypeLabels =>
 enum ReportRequirement {
   photos('Add at least one photo'),
   category('Choose a category'),
+  title('Add a short title'),
   location('Confirm a location in Macedonia');
 
   const ReportRequirement(this.message);
@@ -140,6 +141,7 @@ class ReportDraft {
   ReportDraft({
     List<XFile>? photos,
     this.category,
+    this.title = '',
     this.description = '',
     this.latitude,
     this.longitude,
@@ -150,6 +152,7 @@ class ReportDraft {
 
   final List<XFile> photos;
   final ReportCategory? category;
+  final String title;
   final String description;
   final double? latitude;
   final double? longitude;
@@ -159,18 +162,20 @@ class ReportDraft {
 
   bool get hasPhotos => photos.isNotEmpty;
   bool get hasCategory => category != null;
+  bool get hasTitle => title.trim().isNotEmpty;
   bool get hasLocation => latitude != null && longitude != null;
   bool get hasDescription => description.trim().isNotEmpty;
 
-  bool get isValid => hasPhotos && hasCategory && hasLocation;
+  bool get isValid => hasPhotos && hasCategory && hasTitle && hasLocation;
 
   int get completedRequiredSteps => <bool>[
     hasPhotos,
     hasCategory,
+    hasTitle,
     hasLocation,
   ].where((bool value) => value).length;
 
-  int get totalRequiredSteps => 3;
+  int get totalRequiredSteps => 4;
 
   List<ReportRequirement> missingRequirements({
     required bool hasLocationInMacedonia,
@@ -178,6 +183,7 @@ class ReportDraft {
     final List<ReportRequirement> missing = <ReportRequirement>[];
     if (!hasPhotos) missing.add(ReportRequirement.photos);
     if (!hasCategory) missing.add(ReportRequirement.category);
+    if (!hasTitle) missing.add(ReportRequirement.title);
     if (!hasLocationInMacedonia) missing.add(ReportRequirement.location);
     return missing;
   }
@@ -185,6 +191,7 @@ class ReportDraft {
   ReportDraft copyWith({
     List<XFile>? photos,
     ReportCategory? category,
+    String? title,
     String? description,
     double? latitude,
     double? longitude,
@@ -197,6 +204,7 @@ class ReportDraft {
       return ReportDraft(
         photos: photos ?? this.photos,
         category: category ?? this.category,
+        title: title ?? this.title,
         description: description ?? this.description,
         latitude: null,
         longitude: null,
@@ -208,6 +216,7 @@ class ReportDraft {
     return ReportDraft(
       photos: photos ?? this.photos,
       category: category ?? this.category,
+      title: title ?? this.title,
       description: description ?? this.description,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,

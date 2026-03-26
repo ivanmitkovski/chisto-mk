@@ -15,6 +15,7 @@ abstract class ReportsApiRepository {
   Future<ReportSubmitResult> submitReport({
     required double latitude,
     required double longitude,
+    required String title,
     String? description,
     List<String>? mediaUrls,
     String? category,

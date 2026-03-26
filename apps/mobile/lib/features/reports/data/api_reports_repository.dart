@@ -37,6 +37,7 @@ class ApiReportsRepository implements ReportsApiRepository {
   Future<ReportSubmitResult> submitReport({
     required double latitude,
     required double longitude,
+    required String title,
     String? description,
     List<String>? mediaUrls,
     String? category,
@@ -47,6 +48,7 @@ class ApiReportsRepository implements ReportsApiRepository {
     final Map<String, dynamic> body = <String, dynamic>{
       'latitude': latitude,
       'longitude': longitude,
+      'title': title,
     };
     if (description != null && description.isNotEmpty) {
       body['description'] = description;
@@ -140,6 +142,7 @@ class ApiReportsRepository implements ReportsApiRepository {
       id: json['id'] as String? ?? '',
       reportNumber: json['reportNumber'] as String? ?? '',
       title: json['title'] as String? ?? '',
+      description: json['description'] as String?,
       location: json['location'] as String? ?? '',
       submittedAt: submittedAt,
       status: status,
@@ -182,6 +185,7 @@ class ApiReportsRepository implements ReportsApiRepository {
       id: json['id'] as String? ?? '',
       reportNumber: json['reportNumber'] as String? ?? '',
       status: status,
+      title: json['title'] as String? ?? '',
       description: json['description'] as String?,
       mediaUrls: mediaUrls,
       submittedAt: submittedAt,

@@ -1,0 +1,145 @@
+{
+  "@@locale": "sq",
+  "reportFlowHelpHint": "Tap the info button for tips on this step.",
+  "reportHelpContextTitle": "Context",
+  "resumeDraftTitle": "Resume draft?",
+  "resumeDraftBody": "You have an unsaved report. Resume where you left off or start fresh.",
+  "resumeDraftStartFresh": "Start fresh",
+  "resumeDraftResume": "Resume",
+  "reportStageEvidenceEyebrow": "Report a pollution site",
+  "reportStageEvidenceTitle": "Evidence",
+  "reportStageEvidenceSubtitle": "Photos and framing",
+  "reportStageEvidenceShortLabel": "Evidence",
+  "reportStageEvidencePrimaryAction": "Next",
+  "reportStageEvidencePrimaryRequirement": "Photo",
+  "reportStageEvidenceSecondaryRequirement": "Up to 5",
+  "reportStageEvidenceInfoTitle": "Evidence",
+  "reportHelpEvidenceS0Title": "What to capture",
+  "reportHelpEvidenceS0Body": "Add up to five photos that show the polluted area clearly. Use a wide shot for context, then closer frames of what matters: waste piles, pipes, stains, debris, or anything that shows the problem.",
+  "reportHelpEvidenceS1Title": "Why it helps",
+  "reportHelpEvidenceS1Body": "Moderators rely on your images to confirm the report and prioritize follow-up. Daylight, a steady hand, and showing the whole site make verification much easier.",
+  "reportStageDetailsEyebrow": "Describe the issue",
+  "reportStageDetailsTitle": "Details",
+  "reportStageDetailsSubtitle": "Category, headline, and context",
+  "reportStageDetailsShortLabel": "Details",
+  "reportStageDetailsPrimaryAction": "Next",
+  "reportStageDetailsPrimaryRequirement": "Category & title",
+  "reportStageDetailsSecondaryRequirement": "Details optional",
+  "reportStageDetailsInfoTitle": "Details",
+  "reportHelpDetailsS0Title": "What to fill in",
+  "reportHelpDetailsS0Body": "Choose the category that best matches what you saw. Write a short headline anyone could understand at a glance, like a news title, not an essay.\n\nThen add severity if you’re unsure; use the description for anything that helps someone find or assess the site on the ground: access, timing, smell, color of water, or landmarks. Cleanup effort is optional and only useful if you have a rough sense of scale.",
+  "reportHelpDetailsS1Title": "Optional fields",
+  "reportHelpDetailsS1Body": "Nothing here blocks submission except category and title. Extra detail is for nuance. Use it when it genuinely helps.",
+  "reportStageLocationEyebrow": "Confirm the location",
+  "reportStageLocationTitle": "Location",
+  "reportStageLocationSubtitle": "Map pin",
+  "reportStageLocationShortLabel": "Location",
+  "reportStageLocationPrimaryAction": "Next",
+  "reportStageLocationPrimaryRequirement": "Pin",
+  "reportStageLocationSecondaryRequirement": "In Macedonia",
+  "reportStageLocationInfoTitle": "Location",
+  "reportHelpLocationS0Title": "How to place the pin",
+  "reportHelpLocationS0Body": "Drag the map to the exact spot where the pollution is, not the nearest town unless you’re reporting a whole area. Zoom in until the pin sits on the real site.",
+  "reportHelpLocationS1Title": "Coverage area",
+  "reportHelpLocationS1Body": "The pin must be inside Macedonia so your report can be routed and verified correctly. If you’re unsure, place it as accurately as you can.",
+  "reportHelpLocationS2Title": "Why it matters",
+  "reportHelpLocationS2Body": "Coordinates tie your photos and description to a real place for field teams and moderators.",
+  "reportStageReviewEyebrow": "Final review",
+  "reportStageReviewTitle": "Review",
+  "reportStageReviewSubtitle": "Before you send",
+  "reportStageReviewShortLabel": "Review",
+  "reportStageReviewPrimaryAction": "Submit",
+  "reportStageReviewPrimaryRequirement": "Ready",
+  "reportStageReviewInfoTitle": "Review",
+  "reportHelpReviewS0Title": "Double-check each section",
+  "reportHelpReviewS0Body": "Tap any row to jump back and edit. When photos, details, and location all match what you saw, you’re ready.",
+  "reportHelpReviewS1Title": "What happens next",
+  "reportHelpReviewS1Body": "Your report is reviewed before it appears publicly. In My reports, you can track status; updates appear there as the site moves through moderation.",
+  "newReportTitle": "New report",
+  "reportReviewBannerCreditsTitle": "Credits",
+  "reportReviewBannerAfterSubmitTitle": "After submit",
+  "reportReviewAfterSubmitReady": "Moderated before public. Status in My reports.",
+  "reportReviewAfterSubmitIncomplete": "Finish steps above.",
+  "semanticsClose": "Close",
+  "semanticsAboutStep": "About {title}",
+  "@semanticsAboutStep": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticsNextStep": "Next: {label}",
+  "@semanticsNextStep": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "reportFlowJourneySeparator": " → ",
+  "reportDraftSaved": "Drafti u ruajt",
+  "reportFlowEvidenceNeedsPhoto": "Shtoni të paktën një foto për të vazhduar.",
+  "reportFlowLocationOutsideMacedoniaHelper": "Ky vend është jashtë Maqedonisë. Tërhiqni kunjin brenda vendit, pastaj prekni Konfirmo vendndodhjen.",
+  "reportLocationAdvanceBlockedBanner": "Vendosni kunjin në Maqedoni dhe prekni Konfirmo vendndodhjen.",
+  "reviewTapToEdit": "Prek për të përpunuar",
+  "semanticsCurrentReportStep": "Hapi aktual: {label}",
+  "@semanticsCurrentReportStep": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "errorBannerDraftSavedHint": "Drafti juaj është ruajtur — mund të provoni përsëri kur të jeni gati.",
+  "reportSubmittedTitle": "Raporti u dërgua",
+  "reportSubmittedSavedAs": "U ruajt si raport {number}",
+  "@reportSubmittedSavedAs": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "reportSubmittedBodyWithAddress": "{category} near {address} është në radhë për shqyrtim.",
+  "@reportSubmittedBodyWithAddress": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "address": {
+        "type": "String"
+      }
+    }
+  },
+  "reportSubmittedBodyNoAddress": "{category} është në radhë për shqyrtim.",
+  "@reportSubmittedBodyNoAddress": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "reportSubmittedNewSiteBadge": "Vend i ri u shtua në hartë",
+  "reportSubmittedPointsEarned": "+{points} pikë",
+  "@reportSubmittedPointsEarned": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSubmittedPointsPending": "Deri në {max} pikë kur të miratohet",
+  "@reportSubmittedPointsPending": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportSubmittedViewThisReport": "Shiko këtë raport",
+  "reportSubmittedViewAllReports": "Shiko të gjitha raportet",
+  "reportSubmittedViewInMyReports": "Shiko te Raportet e mia",
+  "reportSubmittedReportAnother": "Raport tjetër",
+  "reportSubmittedSemanticsSuccess": "Raporti u dërgua me sukses"
+}

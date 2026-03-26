@@ -72,6 +72,7 @@ List<PollutionSite> buildMockPollutionSites() {
     id: 'r1',
     reporterName: 'eco_maria',
     reportedAt: now.subtract(const Duration(days: 2)),
+    title: 'Mixed waste near the riverside',
     description:
         'Spotted a large pile of mixed waste near the riverside. Plastic, cardboard and household items. Water level is high, risk of contamination.',
     images: <ImageProvider>[image1, image2],
@@ -82,7 +83,8 @@ List<PollutionSite> buildMockPollutionSites() {
       id: 'r$id',
       reporterName: reporter,
       reportedAt: now.subtract(Duration(days: (id % 7) + 1)),
-      description: desc,
+      title: desc,
+      description: null,
       images: imgs,
     );
   }
@@ -125,6 +127,7 @@ List<PollutionSite> buildMockPollutionSites() {
         id: 'r2',
         reporterName: 'park_volunteer',
         reportedAt: now.subtract(const Duration(hours: 18)),
+        title: 'Plastic waste around playground',
         description:
             'Bottles and wrappers around the playground. Kids could get hurt. Would appreciate a cleanup soon.',
         images: <ImageProvider>[image2],
@@ -149,6 +152,7 @@ List<PollutionSite> buildMockPollutionSites() {
         id: 'r3',
         reporterName: 'local_resident',
         reportedAt: now.subtract(const Duration(days: 5)),
+        title: 'Construction rubble dumped overnight',
         description:
             'Rubble and concrete blocks dumped overnight. Dust and noise. Reported to local authorities too.',
         images: <ImageProvider>[image1, image2],

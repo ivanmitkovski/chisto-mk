@@ -13934,6 +13934,7 @@ export namespace Prisma {
     reportNumber: string | null
     siteId: string | null
     reporterId: string | null
+    title: string | null
     description: string | null
     category: string | null
     severity: number | null
@@ -13951,6 +13952,7 @@ export namespace Prisma {
     reportNumber: string | null
     siteId: string | null
     reporterId: string | null
+    title: string | null
     description: string | null
     category: string | null
     severity: number | null
@@ -13968,6 +13970,7 @@ export namespace Prisma {
     reportNumber: number
     siteId: number
     reporterId: number
+    title: number
     description: number
     mediaUrls: number
     category: number
@@ -13996,6 +13999,7 @@ export namespace Prisma {
     reportNumber?: true
     siteId?: true
     reporterId?: true
+    title?: true
     description?: true
     category?: true
     severity?: true
@@ -14013,6 +14017,7 @@ export namespace Prisma {
     reportNumber?: true
     siteId?: true
     reporterId?: true
+    title?: true
     description?: true
     category?: true
     severity?: true
@@ -14030,6 +14035,7 @@ export namespace Prisma {
     reportNumber?: true
     siteId?: true
     reporterId?: true
+    title?: true
     description?: true
     mediaUrls?: true
     category?: true
@@ -14135,6 +14141,7 @@ export namespace Prisma {
     reportNumber: string | null
     siteId: string
     reporterId: string | null
+    title: string
     description: string | null
     mediaUrls: string[]
     category: string | null
@@ -14172,6 +14179,7 @@ export namespace Prisma {
     reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
+    title?: boolean
     description?: boolean
     mediaUrls?: boolean
     category?: boolean
@@ -14197,6 +14205,7 @@ export namespace Prisma {
     reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
+    title?: boolean
     description?: boolean
     mediaUrls?: boolean
     category?: boolean
@@ -14219,6 +14228,7 @@ export namespace Prisma {
     reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
+    title?: boolean
     description?: boolean
     mediaUrls?: boolean
     category?: boolean
@@ -14241,6 +14251,7 @@ export namespace Prisma {
     reportNumber?: boolean
     siteId?: boolean
     reporterId?: boolean
+    title?: boolean
     description?: boolean
     mediaUrls?: boolean
     category?: boolean
@@ -14253,7 +14264,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: boolean
   }
 
-  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "description" | "mediaUrls" | "category" | "severity" | "cleanupEffort" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
+  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "title" | "description" | "mediaUrls" | "category" | "severity" | "cleanupEffort" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
   export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
@@ -14292,6 +14303,10 @@ export namespace Prisma {
       reportNumber: string | null
       siteId: string
       reporterId: string | null
+      /**
+       * Short headline shown in lists and moderation (required on new submissions).
+       */
+      title: string
       description: string | null
       mediaUrls: string[]
       category: string | null
@@ -14736,6 +14751,7 @@ export namespace Prisma {
     readonly reportNumber: FieldRef<"Report", 'String'>
     readonly siteId: FieldRef<"Report", 'String'>
     readonly reporterId: FieldRef<"Report", 'String'>
+    readonly title: FieldRef<"Report", 'String'>
     readonly description: FieldRef<"Report", 'String'>
     readonly mediaUrls: FieldRef<"Report", 'String[]'>
     readonly category: FieldRef<"Report", 'String'>
@@ -20766,6 +20782,7 @@ export namespace Prisma {
     reportNumber: 'reportNumber',
     siteId: 'siteId',
     reporterId: 'reporterId',
+    title: 'title',
     description: 'description',
     mediaUrls: 'mediaUrls',
     category: 'category',
@@ -21835,6 +21852,7 @@ export namespace Prisma {
     reportNumber?: StringNullableFilter<"Report"> | string | null
     siteId?: StringFilter<"Report"> | string
     reporterId?: StringNullableFilter<"Report"> | string | null
+    title?: StringFilter<"Report"> | string
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
@@ -21859,6 +21877,7 @@ export namespace Prisma {
     reportNumber?: SortOrderInput | SortOrder
     siteId?: SortOrder
     reporterId?: SortOrderInput | SortOrder
+    title?: SortOrder
     description?: SortOrderInput | SortOrder
     mediaUrls?: SortOrder
     category?: SortOrderInput | SortOrder
@@ -21886,6 +21905,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Report"> | Date | string
     siteId?: StringFilter<"Report"> | string
     reporterId?: StringNullableFilter<"Report"> | string | null
+    title?: StringFilter<"Report"> | string
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
@@ -21910,6 +21930,7 @@ export namespace Prisma {
     reportNumber?: SortOrderInput | SortOrder
     siteId?: SortOrder
     reporterId?: SortOrderInput | SortOrder
+    title?: SortOrder
     description?: SortOrderInput | SortOrder
     mediaUrls?: SortOrder
     category?: SortOrderInput | SortOrder
@@ -21936,6 +21957,7 @@ export namespace Prisma {
     reportNumber?: StringNullableWithAggregatesFilter<"Report"> | string | null
     siteId?: StringWithAggregatesFilter<"Report"> | string
     reporterId?: StringNullableWithAggregatesFilter<"Report"> | string | null
+    title?: StringWithAggregatesFilter<"Report"> | string
     description?: StringNullableWithAggregatesFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableWithAggregatesFilter<"Report"> | string | null
@@ -23092,6 +23114,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -23114,6 +23137,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -23132,6 +23156,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23154,6 +23179,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23174,6 +23200,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -23190,6 +23217,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -23206,6 +23234,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -24406,6 +24435,7 @@ export namespace Prisma {
     reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
+    title?: SortOrder
     description?: SortOrder
     mediaUrls?: SortOrder
     category?: SortOrder
@@ -24428,6 +24458,7 @@ export namespace Prisma {
     reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
+    title?: SortOrder
     description?: SortOrder
     category?: SortOrder
     severity?: SortOrder
@@ -24445,6 +24476,7 @@ export namespace Prisma {
     reportNumber?: SortOrder
     siteId?: SortOrder
     reporterId?: SortOrder
+    title?: SortOrder
     description?: SortOrder
     category?: SortOrder
     severity?: SortOrder
@@ -25870,6 +25902,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -25890,6 +25923,7 @@ export namespace Prisma {
     createdAt?: Date | string
     reportNumber?: string | null
     siteId: string
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -25918,6 +25952,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -25939,6 +25974,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -26184,6 +26220,7 @@ export namespace Prisma {
     reportNumber?: StringNullableFilter<"Report"> | string | null
     siteId?: StringFilter<"Report"> | string
     reporterId?: StringNullableFilter<"Report"> | string | null
+    title?: StringFilter<"Report"> | string
     description?: StringNullableFilter<"Report"> | string | null
     mediaUrls?: StringNullableListFilter<"Report">
     category?: StringNullableFilter<"Report"> | string | null
@@ -27140,6 +27177,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27160,6 +27198,7 @@ export namespace Prisma {
     createdAt?: Date | string
     reportNumber?: string | null
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27434,6 +27473,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27455,6 +27495,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27477,6 +27518,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27498,6 +27540,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27743,6 +27786,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27764,6 +27808,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27813,6 +27858,7 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     reportNumber?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27834,6 +27880,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -27936,6 +27983,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27957,6 +28005,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28258,6 +28307,7 @@ export namespace Prisma {
     createdAt?: Date | string
     reportNumber?: string | null
     siteId: string
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -28276,6 +28326,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -28350,6 +28401,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28370,6 +28422,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28389,6 +28442,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28405,6 +28459,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28426,6 +28481,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28445,6 +28501,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28638,6 +28695,7 @@ export namespace Prisma {
     createdAt?: Date | string
     reportNumber?: string | null
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -28665,6 +28723,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28685,6 +28744,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28704,6 +28764,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28755,6 +28816,7 @@ export namespace Prisma {
     reportNumber?: string | null
     siteId: string
     reporterId?: string | null
+    title: string
     description?: string | null
     mediaUrls?: ReportCreatemediaUrlsInput | string[]
     category?: string | null
@@ -28776,6 +28838,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28797,6 +28860,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28816,6 +28880,7 @@ export namespace Prisma {
     reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     mediaUrls?: ReportUpdatemediaUrlsInput | string[]
     category?: NullableStringFieldUpdateOperationsInput | string | null

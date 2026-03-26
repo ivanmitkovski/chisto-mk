@@ -55,6 +55,7 @@ void main() {
     test('has expected values and messages', () {
       expect(ReportRequirement.photos.message, 'Add at least one photo');
       expect(ReportRequirement.category.message, 'Choose a category');
+      expect(ReportRequirement.title.message, 'Add a short title');
       expect(ReportRequirement.location.message, 'Confirm a location in Macedonia');
     });
   });
@@ -84,6 +85,7 @@ void main() {
 
       expect(draft.photos, isEmpty);
       expect(draft.category, isNull);
+      expect(draft.title, '');
       expect(draft.description, '');
       expect(draft.latitude, isNull);
       expect(draft.longitude, isNull);
@@ -96,6 +98,7 @@ void main() {
       final ReportDraft draft = ReportDraft(
         photos: photos,
         category: ReportCategory.illegalLandfill,
+        title: 'Dump site',
         description: 'Test description',
         latitude: 41.6,
         longitude: 21.7,
@@ -105,6 +108,7 @@ void main() {
 
       expect(draft.photos, photos);
       expect(draft.category, ReportCategory.illegalLandfill);
+      expect(draft.title, 'Dump site');
       expect(draft.description, 'Test description');
       expect(draft.latitude, 41.6);
       expect(draft.longitude, 21.7);
@@ -130,6 +134,12 @@ void main() {
       expect(withCat.hasCategory, isTrue);
     });
 
+    test('hasTitle returns true when non-empty trimmed', () {
+      expect(ReportDraft().hasTitle, isFalse);
+      expect(ReportDraft(title: '   ').hasTitle, isFalse);
+      expect(ReportDraft(title: ' Issue ').hasTitle, isTrue);
+    });
+
     test('hasLocation returns true when lat/lng set', () {
       final ReportDraft without = ReportDraft();
       final ReportDraft withLoc = ReportDraft(latitude: 41.6, longitude: 21.7);
@@ -148,7 +158,7 @@ void main() {
       expect(withDesc.hasDescription, isTrue);
     });
 
-    test('isValid requires photos, category, and location', () {
+    test('isValid requires photos, category, title, and location', () {
       final ReportDraft incomplete = ReportDraft(
         photos: <XFile>[XFile('/tmp/p.jpg')],
         category: ReportCategory.other,
@@ -158,6 +168,7 @@ void main() {
       final ReportDraft valid = ReportDraft(
         photos: <XFile>[XFile('/tmp/p.jpg')],
         category: ReportCategory.other,
+        title: 'Issue title',
         latitude: 41.6,
         longitude: 21.7,
       );
@@ -167,14 +178,14 @@ void main() {
     test('completedRequiredSteps and totalRequiredSteps', () {
       final ReportDraft empty = ReportDraft();
       expect(empty.completedRequiredSteps, 0);
-      expect(empty.totalRequiredSteps, 3);
+      expect(empty.totalRequiredSteps, 4);
 
-      final ReportDraft twoOfThree = ReportDraft(
+      final ReportDraft twoOfFour = ReportDraft(
         photos: <XFile>[XFile('/tmp/p.jpg')],
         category: ReportCategory.other,
       );
-      expect(twoOfThree.completedRequiredSteps, 2);
-      expect(twoOfThree.totalRequiredSteps, 3);
+      expect(twoOfFour.completedRequiredSteps, 2);
+      expect(twoOfFour.totalRequiredSteps, 4);
     });
 
     test('missingRequirements returns correct list', () {
@@ -185,11 +196,12 @@ void main() {
 
       expect(missing, contains(ReportRequirement.photos));
       expect(missing, contains(ReportRequirement.category));
+      expect(missing, contains(ReportRequirement.title));
       expect(missing, contains(ReportRequirement.location));
-      expect(missing.length, 3);
+      expect(missing.length, 4);
     });
 
-    test('missingRequirements excludes location when in Macedonia', () {
+    test('missingRequirements only title when geo done', () {
       final ReportDraft withLoc = ReportDraft(
         photos: <XFile>[XFile('/tmp/p.jpg')],
         category: ReportCategory.other,
@@ -200,7 +212,7 @@ void main() {
         hasLocationInMacedonia: true,
       );
 
-      expect(missing, isEmpty);
+      expect(missing, <ReportRequirement>[ReportRequirement.title]);
     });
 
     test('copyWith updates fields', () {
@@ -238,6 +250,7 @@ void main() {
       final ReportDraft original = ReportDraft(
         photos: <XFile>[XFile('/tmp/p.jpg')],
         category: ReportCategory.waterPollution,
+        title: 'T',
         description: 'Desc',
         latitude: 41.6,
         longitude: 21.7,
@@ -248,6 +261,7 @@ void main() {
 
       expect(cleared.photos.length, 1);
       expect(cleared.category, ReportCategory.waterPollution);
+      expect(cleared.title, 'T');
       expect(cleared.description, 'Desc');
       expect(cleared.cleanupEffort, CleanupEffort.sixToTen);
     });

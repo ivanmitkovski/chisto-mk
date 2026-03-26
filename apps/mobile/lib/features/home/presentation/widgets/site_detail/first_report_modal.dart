@@ -121,12 +121,24 @@ class FirstReportModal extends StatelessWidget {
                       const SizedBox(height: AppSpacing.md),
                     ],
                     Text(
-                      report.description,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            height: 1.45,
-                            color: AppColors.textSecondary,
+                      report.title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            height: 1.35,
+                            color: AppColors.textPrimary,
                           ),
                     ),
+                    if (report.description != null &&
+                        report.description!.trim().isNotEmpty) ...<Widget>[
+                      const SizedBox(height: AppSpacing.sm),
+                      Text(
+                        report.description!,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              height: 1.45,
+                              color: AppColors.textSecondary,
+                            ),
+                      ),
+                    ],
                   ],
                 ),
               ),

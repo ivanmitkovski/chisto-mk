@@ -240,6 +240,8 @@ model Report {
   reporterId String?
   reporter   User?   @relation("ReporterReports", fields: [reporterId], references: [id], onDelete: SetNull)
 
+  /// Short headline shown in lists and moderation (required on new submissions).
+  title         String
   description   String?
   mediaUrls     String[]             @default([])
   category      String?

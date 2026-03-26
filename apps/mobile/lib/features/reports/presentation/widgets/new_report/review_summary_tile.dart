@@ -12,6 +12,7 @@ class ReviewSummaryTile extends StatelessWidget {
     required this.isComplete,
     required this.onTap,
     this.isOptional = false,
+    this.semanticsHint,
   });
 
   final IconData icon;
@@ -20,6 +21,7 @@ class ReviewSummaryTile extends StatelessWidget {
   final bool isComplete;
   final VoidCallback onTap;
   final bool isOptional;
+  final String? semanticsHint;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class ReviewSummaryTile extends StatelessWidget {
       title: title,
       subtitle: subtitle,
       tone: tone,
+      semanticsHint: semanticsHint,
       trailing: Icon(
         isOptional
             ? Icons.chevron_right_rounded

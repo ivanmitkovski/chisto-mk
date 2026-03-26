@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
@@ -25,6 +26,8 @@ class ChistoApp extends StatelessWidget {
       title: 'Chisto.mk',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       initialRoute: AppRoutes.splash,
       onGenerateRoute: AppRouter.onGenerateRoute,
     );

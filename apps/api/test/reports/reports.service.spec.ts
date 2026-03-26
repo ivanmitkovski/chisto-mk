@@ -68,6 +68,7 @@ describe('ReportsService capacity guards', () => {
   const dto = {
     latitude: 41.9981,
     longitude: 21.4254,
+    title: 'Test title',
     description: 'Test',
     category: null,
     severity: null,
@@ -143,6 +144,7 @@ describe('ReportsService createWithLocation payload', () => {
     await service.createWithLocation(user as never, {
       latitude: 41.9981,
       longitude: 21.4254,
+      title: 'Headline at site',
       description: 'Narrative only on report',
       address: ' Skopje ',
       cleanupEffort: 'THREE_TO_FIVE',
@@ -162,6 +164,7 @@ describe('ReportsService createWithLocation payload', () => {
     expect(prisma.report.create).toHaveBeenCalledWith({
       data: {
         siteId: 'site-new',
+        title: 'Headline at site',
         description: 'Narrative only on report',
         mediaUrls: [],
         reporterId: 'user-1',

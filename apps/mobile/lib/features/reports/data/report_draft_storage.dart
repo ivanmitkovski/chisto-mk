@@ -14,6 +14,7 @@ Future<void> saveReportDraft({
 }) async {
   final bool hasContent = draft.photos.isNotEmpty ||
       draft.category != null ||
+      draft.title.trim().isNotEmpty ||
       draft.description.trim().isNotEmpty ||
       (draft.latitude != null && draft.longitude != null);
   if (!hasContent) {
@@ -31,6 +32,7 @@ Future<void> saveReportDraft({
     'categoryIndex': draft.category != null
         ? ReportCategory.values.indexOf(draft.category!)
         : null,
+    'title': draft.title,
     'description': draft.description,
     'latitude': draft.latitude,
     'longitude': draft.longitude,
@@ -54,6 +56,7 @@ Future<({ReportDraft draft, int stageIndex})?> loadReportDraft() async {
         jsonDecode(raw) as Map<String, dynamic>;
     final int stageIndex = (map['stageIndex'] as num?)?.toInt() ?? 0;
     final int? categoryIndex = (map['categoryIndex'] as num?)?.toInt();
+    final String title = map['title'] as String? ?? '';
     final String description = map['description'] as String? ?? '';
     final double? lat = (map['latitude'] as num?)?.toDouble();
     final double? lng = (map['longitude'] as num?)?.toDouble();
@@ -78,6 +81,7 @@ Future<({ReportDraft draft, int stageIndex})?> loadReportDraft() async {
     final ReportDraft draft = ReportDraft(
       photos: photos,
       category: category,
+      title: title,
       description: description,
       latitude: lat,
       longitude: lng,

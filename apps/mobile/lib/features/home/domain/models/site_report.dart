@@ -5,14 +5,16 @@ class SiteReport {
     required this.id,
     required this.reporterName,
     required this.reportedAt,
-    required this.description,
+    required this.title,
+    this.description,
     this.images = const [],
   });
 
   final String id;
   final String reporterName;
   final DateTime reportedAt;
-  final String description;
+  final String title;
+  final String? description;
   final List<ImageProvider> images;
 
   String get reportedAgo {

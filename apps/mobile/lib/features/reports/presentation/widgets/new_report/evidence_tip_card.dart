@@ -30,7 +30,7 @@ class EvidenceTipCard extends StatelessWidget {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'Best: full frame of the site, good light, avoid obstructions.',
+              'Frame the site, good light.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textSecondary,
                 height: 1.35,

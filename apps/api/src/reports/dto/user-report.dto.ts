@@ -11,9 +11,15 @@ export class UserReportListItemDto {
   reportNumber!: string;
 
   @ApiProperty({
-    description: 'Short title or description of the reported site',
+    description: 'Short headline for the report',
   })
   title!: string;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Optional extra context from the reporter (subtitle)',
+  })
+  description!: string | null;
 
   @ApiProperty({
     description: 'Location label derived from site description or coordinates',

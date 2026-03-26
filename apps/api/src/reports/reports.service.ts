@@ -134,13 +134,25 @@ export class ReportsService {
     return raw.trim() || 'Reported site';
   }
 
-  private moderationDetailBody(description: string | null, category: string | null): string {
+  /** Headline: stored title when present, else legacy derivation (pre-title migration rows). */
+  private displayReportTitle(report: {
+    title: string;
+    description: string | null;
+    site: { description: string | null };
+    category: string | null;
+  }): string {
+    const trimmed = report.title?.trim();
+    if (trimmed) return trimmed;
+    return this.listReportTitle(report.description, report.site.description, report.category);
+  }
+
+  /** Optional narrative body only (no headline); strips category prefix from legacy single-field text. */
+  private optionalReportNarrative(description: string | null, category: string | null): string | null {
     if (description == null || description.trim() === '') {
-      return 'No description was provided for this report.';
+      return null;
     }
     const stripped = stripCategoryLabelPrefix(description, category);
-    if (stripped.length > 0) return stripped;
-    return 'No additional details';
+    return stripped.length > 0 ? stripped : null;
   }
 
   private derivePriority(status: ReportStatus): AdminReportDetailDto['priority'] {
@@ -163,6 +175,7 @@ export class ReportsService {
     id: string;
     createdAt: Date;
     status: ReportStatus;
+    title: string;
     description: string | null;
     category: string | null;
     mediaUrls: string[];
@@ -177,7 +190,7 @@ export class ReportsService {
     return {
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      title: this.listReportTitle(report.description, report.site.description, report.category),
+      title: this.displayReportTitle(report),
       location: this.listLocationLabel(report.site, report.description),
       submittedAt: report.createdAt.toISOString(),
       status: report.status,
@@ -422,7 +435,8 @@ export class ReportsService {
       const newReport = await tx.report.create({
         data: {
           siteId: dto.siteId,
-          description: dto.description ?? null,
+          title: dto.title.trim(),
+          description: dto.description?.trim() || null,
           mediaUrls: dto.mediaUrls ?? [],
           reporterId: dto.reporterId ?? null,
           potentialDuplicateOfId,
@@ -458,7 +472,7 @@ export class ReportsService {
     user: AuthenticatedUser,
     dto: CreateReportWithLocationDto,
   ): Promise<ReportSubmitResponseDto> {
-    const { latitude, longitude, description, mediaUrls, category, severity, address } = dto;
+    const { latitude, longitude, title, description, mediaUrls, category, severity, address } = dto;
     const trimmedAddress = address?.trim() || null;
     const cleanupEffortParsed: ReportCleanupEffort | null = parseReportCleanupEffort(
       dto.cleanupEffort,
@@ -535,6 +549,7 @@ export class ReportsService {
       const newReport = await tx.report.create({
         data: {
           siteId,
+          title: title.trim(),
           description: description?.trim() || null,
           mediaUrls: mediaUrls ?? [],
           reporterId: user.userId,
@@ -740,7 +755,8 @@ export class ReportsService {
         return {
           id: report.id,
           reportNumber: this.getReportNumber(report),
-          title: this.listReportTitle(report.description, report.site.description, report.category),
+          title: this.displayReportTitle(report),
+          description: this.optionalReportNarrative(report.description, report.category),
           location: this.listLocationLabel(report.site, report.description),
           submittedAt: report.createdAt.toISOString(),
           status: report.status,
@@ -827,7 +843,7 @@ export class ReportsService {
     const items: AdminReportListItemDto[] = data.map((report) => ({
       id: report.id,
       reportNumber: this.getReportNumber(report),
-      name: this.listReportTitle(report.description, report.site.description, report.category),
+      name: this.displayReportTitle(report),
       location: report.site
         ? this.listLocationLabel(report.site, report.description)
         : 'Unknown location',
@@ -1405,8 +1421,8 @@ export class ReportsService {
       reportNumber,
       status: report.status,
       priority: this.derivePriority(report.status),
-      title: this.listReportTitle(report.description, report.site.description, report.category),
-      description: this.moderationDetailBody(report.description, report.category),
+      title: this.displayReportTitle(report),
+      description: this.optionalReportNarrative(report.description, report.category) ?? '',
       location: locationLabel,
       submittedAt: report.createdAt.toISOString(),
       reporterAlias,
@@ -1506,19 +1522,13 @@ export class ReportsService {
       select: { delta: true },
     });
     const pointsAwarded = pointTxns.reduce((sum, t) => sum + t.delta, 0);
-    const citizenDescription =
-      report.description == null
-        ? null
-        : (() => {
-            const stripped = stripCategoryLabelPrefix(report.description, report.category);
-            return stripped.length > 0 ? stripped : 'No additional details';
-          })();
 
     return {
       id: report.id,
       reportNumber: this.getReportNumber(report),
       status: report.status,
-      description: citizenDescription,
+      title: this.displayReportTitle(report),
+      description: this.optionalReportNarrative(report.description, report.category),
       mediaUrls,
       submittedAt: report.createdAt.toISOString(),
       site: {

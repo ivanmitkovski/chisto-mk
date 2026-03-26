@@ -49,6 +49,7 @@ export class SitesService {
     data: Array<
       Site & {
         reportCount: number;
+        latestReportTitle: string | null;
         latestReportDescription: string | null;
         latestReportCategory: string | null;
         latestReportCreatedAt: string | null;
@@ -90,6 +91,7 @@ export class SitesService {
           orderBy: { createdAt: 'desc' },
           take: 1,
           select: {
+            title: true,
             description: true,
             mediaUrls: true,
             category: true,
@@ -103,6 +105,7 @@ export class SitesService {
 
     type SiteEnriched = Site & {
       reportCount: number;
+      latestReportTitle: string | null;
       latestReportDescription: string | null;
       latestReportCategory: string | null;
       latestReportCreatedAt: string | null;
@@ -120,6 +123,7 @@ export class SitesService {
       return {
         ...siteBase,
         reportCount: _count.reports,
+        latestReportTitle: firstReport?.title ?? null,
         latestReportDescription: firstReport?.description ?? null,
         latestReportCategory: firstReport?.category ?? null,
         latestReportCreatedAt: firstReport?.createdAt?.toISOString() ?? null,

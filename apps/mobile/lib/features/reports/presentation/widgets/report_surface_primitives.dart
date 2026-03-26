@@ -6,6 +6,22 @@ import 'package:flutter/material.dart';
 
 enum ReportSurfaceTone { neutral, accent, success, warning, danger }
 
+enum ReportInfoBannerEmphasis { primary, secondary }
+
+TextStyle _reportSheetSubtitleStyle() {
+  final TextStyle? base = AppTypography.textTheme.bodySmall;
+  return (base ?? AppTypography.cardSubtitle).copyWith(
+    color: AppColors.textMuted,
+    height: 1.35,
+  );
+}
+
+ScrollPhysics _reportSheetListPhysics(BuildContext context) {
+  return Theme.of(context).platform == TargetPlatform.iOS
+      ? const BouncingScrollPhysics()
+      : const ClampingScrollPhysics();
+}
+
 class ReportSheetScaffold extends StatelessWidget {
   const ReportSheetScaffold({
     super.key,
@@ -24,6 +40,8 @@ class ReportSheetScaffold extends StatelessWidget {
     ),
     this.showHeaderDivider = true,
     this.addBottomInset = true,
+    this.headerDividerGap = AppSpacing.md,
+    this.fitToContent = false,
   });
 
   final String title;
@@ -36,6 +54,11 @@ class ReportSheetScaffold extends StatelessWidget {
   final EdgeInsets padding;
   final bool showHeaderDivider;
   final bool addBottomInset;
+  /// Vertical space above and below the header rule (smaller feels tighter).
+  final double headerDividerGap;
+
+  /// Sheet height follows content until [maxHeightFactor] of the screen, then scrolls.
+  final bool fitToContent;
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +77,93 @@ class ReportSheetScaffold extends StatelessWidget {
         final BorderRadius sheetRadius = BorderRadius.vertical(
           top: Radius.circular(AppSpacing.radiusCard),
         );
+
+        if (fitToContent) {
+          return DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.panelBackground,
+              borderRadius: sheetRadius,
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: AppColors.black.withValues(alpha: 0.06),
+                  blurRadius: 36,
+                  offset: const Offset(0, -4),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: sheetRadius,
+              clipBehavior: Clip.hardEdge,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(maxHeight: heightCap),
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: ListView(
+                    shrinkWrap: true,
+                    physics: _reportSheetListPhysics(context),
+                    padding: padding,
+                    children: <Widget>[
+                      const SizedBox(height: AppSpacing.xs),
+                      const Center(child: _ReportSheetHandle()),
+                      SizedBox(
+                        height: topPadding > 0 ? AppSpacing.xs : AppSpacing.radius14,
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          if (leading != null) ...<Widget>[
+                            leading!,
+                            const SizedBox(width: AppSpacing.sm),
+                          ],
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  title,
+                                  style: AppTypography.sheetTitle,
+                                ),
+                                if (subtitle != null) ...<Widget>[
+                                  const SizedBox(height: AppSpacing.xs),
+                                  Text(
+                                    subtitle!,
+                                    style: _reportSheetSubtitleStyle(),
+                                  ),
+                                ],
+                              ],
+                            ),
+                          ),
+                          if (trailing != null) ...<Widget>[
+                            const SizedBox(width: AppSpacing.sm),
+                            trailing!,
+                          ],
+                        ],
+                      ),
+                      if (showHeaderDivider) ...<Widget>[
+                        SizedBox(height: headerDividerGap),
+                        Divider(
+                          color: AppColors.divider.withValues(alpha: 0.6),
+                          height: 1,
+                        ),
+                        SizedBox(height: headerDividerGap),
+                      ] else
+                        const SizedBox(height: AppSpacing.sm),
+                      ColoredBox(
+                        color: AppColors.panelBackground,
+                        child: child,
+                      ),
+                      if (footer != null) ...<Widget>[
+                        const SizedBox(height: AppSpacing.lg),
+                        footer!,
+                      ],
+                      if (addBottomInset) SizedBox(height: bottomPadding),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
 
         // DecoratedBox paints the card; hard-edge clip avoids iOS anti-alias seams.
         // Material(type: transparency) supplies a Material ancestor for Text/InkWell
@@ -110,10 +220,7 @@ class ReportSheetScaffold extends StatelessWidget {
                                     const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       subtitle!,
-                                      style: AppTypography.textTheme.bodySmall!.copyWith(
-                                        color: AppColors.textMuted,
-                                        height: 1.35,
-                                      ),
+                                      style: _reportSheetSubtitleStyle(),
                                     ),
                                   ],
                                 ],
@@ -126,12 +233,12 @@ class ReportSheetScaffold extends StatelessWidget {
                           ],
                         ),
                         if (showHeaderDivider) ...<Widget>[
-                          const SizedBox(height: AppSpacing.md),
+                          SizedBox(height: headerDividerGap),
                           Divider(
                             color: AppColors.divider.withValues(alpha: 0.6),
                             height: 1,
                           ),
-                          const SizedBox(height: AppSpacing.md),
+                          SizedBox(height: headerDividerGap),
                         ] else
                           const SizedBox(height: AppSpacing.sm),
                         Expanded(
@@ -219,16 +326,29 @@ class ReportInfoBanner extends StatelessWidget {
     this.title,
     this.icon = Icons.info_outline_rounded,
     this.tone = ReportSurfaceTone.neutral,
+    this.emphasis = ReportInfoBannerEmphasis.primary,
   });
 
   final String? title;
   final String message;
   final IconData icon;
   final ReportSurfaceTone tone;
+  /// Primary: title scans as a heading. Secondary: supporting label (e.g. credits line).
+  final ReportInfoBannerEmphasis emphasis;
 
   @override
   Widget build(BuildContext context) {
     final _ReportSurfacePalette palette = _ReportSurfacePalette.fromTone(tone);
+
+    final TextStyle? titleStyle = title == null
+        ? null
+        : emphasis == ReportInfoBannerEmphasis.primary
+            ? AppTypography.cardTitle
+            : AppTypography.cardSubtitle.copyWith(
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                letterSpacing: -0.1,
+              );
 
     return Container(
       width: double.infinity,
@@ -255,10 +375,10 @@ class ReportInfoBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                if (title != null) ...<Widget>[
+                if (title != null && titleStyle != null) ...<Widget>[
                   Text(
                     title!,
-                    style: AppTypography.cardTitle,
+                    style: titleStyle,
                   ),
                   const SizedBox(height: AppSpacing.xxs),
                 ],
@@ -267,6 +387,9 @@ class ReportInfoBanner extends StatelessWidget {
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.35,
+                    fontWeight: emphasis == ReportInfoBannerEmphasis.primary
+                        ? FontWeight.w500
+                        : FontWeight.w400,
                   ),
                 ),
               ],
@@ -287,6 +410,7 @@ class ReportActionTile extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.tone = ReportSurfaceTone.neutral,
+    this.semanticsHint,
   });
 
   final IconData icon;
@@ -295,12 +419,13 @@ class ReportActionTile extends StatelessWidget {
   final VoidCallback onTap;
   final Widget? trailing;
   final ReportSurfaceTone tone;
+  final String? semanticsHint;
 
   @override
   Widget build(BuildContext context) {
     final _ReportSurfacePalette palette = _ReportSurfacePalette.fromTone(tone);
 
-    return Material(
+    final Widget tile = Material(
       color: AppColors.transparent,
       child: InkWell(
         onTap: onTap,
@@ -371,6 +496,14 @@ class ReportActionTile extends StatelessWidget {
           ),
         ),
       ),
+    );
+
+    if (semanticsHint == null) {
+      return tile;
+    }
+    return Semantics(
+      hint: semanticsHint,
+      child: tile,
     );
   }
 }

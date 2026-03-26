@@ -31,7 +31,13 @@ export class CitizenReportDetailDto {
   @ApiProperty({ enum: ReportStatus })
   status!: ReportStatus;
 
-  @ApiProperty()
+  @ApiProperty({ description: 'Short headline for the report' })
+  title!: string;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Optional extra context from the reporter',
+  })
   description!: string | null;
 
   @ApiProperty({ type: [String], description: 'Media URLs' })

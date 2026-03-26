@@ -12,6 +12,7 @@ import {
   Max,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
 
@@ -24,9 +25,19 @@ export class CreateReportWithLocationDto {
   @IsLongitude()
   longitude!: number;
 
+  @ApiProperty({
+    description: 'Short headline for lists and moderation',
+    example: 'Illegal dump behind the bus station',
+    maxLength: 120,
+  })
+  @IsString()
+  @MinLength(1)
+  @MaxLength(120)
+  title!: string;
+
   @ApiPropertyOptional({
-    description: 'Free-text report description',
-    example: 'Trash pile behind the bus station',
+    description: 'Optional extra context (not the headline)',
+    example: 'Waste has been accumulating for several weeks.',
   })
   @IsOptional()
   @IsString()

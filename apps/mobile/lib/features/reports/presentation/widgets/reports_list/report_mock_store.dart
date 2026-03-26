@@ -84,7 +84,7 @@ final List<MockReport> seedReportsCatalog = <MockReport>[
     score: 0,
     category: ReportCategory.illegalLandfill,
     address: 'Industrial zone, Kumanovo',
-    declineReason: 'Duplicate report — already tracked under site #42.',
+    declineReason: 'Duplicate report, already tracked under site #42.',
     createdAt: DateTime.now().subtract(const Duration(days: 8)),
   ),
   MockReport(
@@ -138,26 +138,26 @@ class ReportsListMockStore {
   }
 
   static MockReport fromListItem(ReportListItem r) {
-    final String rawTitle = r.title.trim().isNotEmpty ? r.title.trim() : 'Report';
     final ReportCategory category = r.category ?? ReportCategory.other;
-    final String stripped =
+    final String rawTitle = r.title.trim().isNotEmpty ? r.title.trim() : 'Report';
+    final String strippedHeadline =
         _stripCategoryPrefixFromDescription(rawTitle, category);
-    final String title;
-    if (stripped.isNotEmpty) {
-      title = stripped;
-    } else if (rawTitle.toLowerCase().startsWith('${category.label.toLowerCase()}:')) {
-      title = 'No additional details';
-    } else {
-      title = rawTitle;
-    }
+    final String title =
+        strippedHeadline.isNotEmpty ? strippedHeadline : rawTitle;
+    final String? optRaw = r.description?.trim();
+    final String strippedOpt = optRaw != null && optRaw.isNotEmpty
+        ? _stripCategoryPrefixFromDescription(optRaw, category)
+        : '';
+    final String description =
+        strippedOpt.isNotEmpty ? strippedOpt : title;
     final String loc = r.location.trim();
     final bool locationIsDistinct = loc.isNotEmpty &&
-        rawTitle.isNotEmpty &&
-        loc.toLowerCase() != rawTitle.toLowerCase();
+        title.isNotEmpty &&
+        loc.toLowerCase() != title.toLowerCase();
     return MockReport(
       reportId: r.id,
       title: title,
-      description: title,
+      description: description,
       status: _statusFromApi(r.status),
       score: r.pointsAwarded,
       category: category,
@@ -172,32 +172,23 @@ class ReportsListMockStore {
 
   static MockReport fromDetail(ReportDetail r) {
     final ReportCategory category = r.category ?? ReportCategory.other;
+    final String apiTitleRaw = r.title.trim();
+    final String strippedHeadline =
+        _stripCategoryPrefixFromDescription(apiTitleRaw, category);
+    final String title = apiTitleRaw.isNotEmpty
+        ? (strippedHeadline.isNotEmpty ? strippedHeadline : apiTitleRaw)
+        : 'Report';
     final String apiDescriptionRaw = (r.description ?? '').trim();
-    final bool hasApiDescription = apiDescriptionRaw.isNotEmpty;
-
-    final String descForFields;
-    if (hasApiDescription) {
-      final String stripped =
-          _stripCategoryPrefixFromDescription(apiDescriptionRaw, category);
-      descForFields =
-          stripped.isEmpty ? 'No additional details' : stripped;
-    } else {
-      descForFields = r.location;
-    }
-
-    final String trimmedFields = descForFields.trim();
-    final String title = trimmedFields.isNotEmpty
-        ? trimmedFields
-        : (r.site.description ?? 'Report');
-    final String description = trimmedFields.isNotEmpty
-        ? trimmedFields
-        : (hasApiDescription ? 'No additional details' : 'Report details');
+    final String strippedOpt = apiDescriptionRaw.isNotEmpty
+        ? _stripCategoryPrefixFromDescription(apiDescriptionRaw, category)
+        : '';
+    final String description =
+        strippedOpt.isNotEmpty ? strippedOpt : title;
 
     final String loc = (r.location).trim();
     final bool locationIsDistinct = loc.isNotEmpty &&
-        hasApiDescription &&
-        apiDescriptionRaw.isNotEmpty &&
-        loc.toLowerCase() != apiDescriptionRaw.toLowerCase();
+        strippedOpt.isNotEmpty &&
+        loc.toLowerCase() != strippedOpt.toLowerCase();
     final bool hasValidCoords = ReportGeoFence.contains(
       r.site.latitude,
       r.site.longitude,
@@ -230,13 +221,16 @@ class ReportsListMockStore {
 
   static void addSubmittedDraft(ReportDraft draft) {
     final ReportCategory category = draft.category ?? ReportCategory.other;
+    final String trimmedTitle = draft.title.trim();
     final String trimmedDescription = draft.description.trim();
     final String? trimmedAddress = draft.address?.trim();
 
     _submittedReports.insert(
       0,
       MockReport(
-        title: '${category.label} report',
+        title: trimmedTitle.isNotEmpty
+            ? trimmedTitle
+            : '${category.label} report',
         description: trimmedDescription.isNotEmpty
             ? trimmedDescription
             : 'Citizen report awaiting moderation and site review.',

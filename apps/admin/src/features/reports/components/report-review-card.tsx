@@ -384,7 +384,9 @@ export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, 
                 </div>
               ) : null}
               <div className={styles.body}>
-                <p className={styles.reportText}>{currentReport.description}</p>
+                {currentReport.description.trim().length > 0 ? (
+                  <p className={styles.reportText}>{currentReport.description}</p>
+                ) : null}
                 <div className={styles.metaGrid}>
                   <button
                     type="button"

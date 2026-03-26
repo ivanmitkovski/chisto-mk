@@ -70,8 +70,13 @@ class ApiSitesRepository implements SitesRepository {
 
   PollutionSite _siteListItemFromJson(Map<String, dynamic> json) {
     final String desc = json['description'] as String? ?? '';
+    final String latestTitle = json['latestReportTitle'] as String? ?? '';
     final String latest = json['latestReportDescription'] as String? ?? '';
-    final String title = desc.isNotEmpty ? desc : (latest.isNotEmpty ? latest : 'Pollution site');
+    final String title = desc.isNotEmpty
+        ? desc
+        : (latestTitle.isNotEmpty
+            ? latestTitle
+            : (latest.isNotEmpty ? latest : 'Pollution site'));
     final double distanceKm = (json['distanceKm'] as num?)?.toDouble() ?? 0;
     final int reportCount = (json['reportCount'] as num?)?.toInt() ?? 0;
     final String statusStr = json['status'] as String? ?? 'REPORTED';
@@ -89,7 +94,11 @@ class ApiSitesRepository implements SitesRepository {
     return PollutionSite(
       id: json['id'] as String? ?? '',
       title: title,
-      description: desc.isNotEmpty ? desc : latest,
+      description: desc.isNotEmpty
+          ? desc
+          : (latestTitle.isNotEmpty && latest.isNotEmpty
+              ? latest
+              : (latestTitle.isNotEmpty ? latestTitle : latest)),
       statusLabel: statusLabel,
       statusColor: statusColor,
       distanceKm: distanceKm,
@@ -137,11 +146,19 @@ class ApiSitesRepository implements SitesRepository {
       final String reporterLastName =
           (first['reporter'] as Map<String, dynamic>?)?['lastName'] as String? ?? '';
       final String reporterName = '$reporterFirstName $reporterLastName'.trim();
+      final String reportTitle = (first['title'] as String?)?.trim() ?? '';
+      final String bodyTrim = (first['description'] as String?)?.trim() ?? '';
+      final String resolvedTitle = reportTitle.isNotEmpty
+          ? reportTitle
+          : (bodyTrim.isNotEmpty ? bodyTrim : 'Report');
+      final String? resolvedBody =
+          bodyTrim.isNotEmpty && bodyTrim != resolvedTitle ? bodyTrim : null;
       firstReport = SiteReport(
         id: first['id'] as String? ?? '',
         reporterName: reporterName.isEmpty ? 'Anonymous' : reporterName,
         reportedAt: DateTime.tryParse(first['createdAt'] as String? ?? '') ?? DateTime.now(),
-        description: first['description'] as String? ?? '',
+        title: resolvedTitle,
+        description: resolvedBody,
         images: firstReportImages,
       );
       final List<dynamic> coList = first['coReporters'] as List<dynamic>? ?? <dynamic>[];
@@ -158,10 +175,15 @@ class ApiSitesRepository implements SitesRepository {
       }
     }
 
-    final String latestDesc = reports.isNotEmpty
-        ? (reports.first['description'] as String? ?? '')
-        : '';
-    final String title = desc.isNotEmpty ? desc : (latestDesc.isNotEmpty ? latestDesc : 'Pollution site');
+    final Map<String, dynamic>? firstReportJson =
+        reports.isNotEmpty ? reports.first : null;
+    final String latestTitle = firstReportJson?['title'] as String? ?? '';
+    final String latestDesc = firstReportJson?['description'] as String? ?? '';
+    final String title = desc.isNotEmpty
+        ? desc
+        : (latestTitle.trim().isNotEmpty
+            ? latestTitle.trim()
+            : (latestDesc.isNotEmpty ? latestDesc : 'Pollution site'));
     final String statusStr = json['status'] as String? ?? 'REPORTED';
     final (String statusLabel, Color statusColor) = _siteStatusToLabelAndColor(statusStr);
     final int reportCount = reports.length;
@@ -193,7 +215,11 @@ class ApiSitesRepository implements SitesRepository {
     return PollutionSite(
       id: json['id'] as String? ?? '',
       title: title,
-      description: desc.isNotEmpty ? desc : latestDesc,
+      description: desc.isNotEmpty
+          ? desc
+          : (latestTitle.trim().isNotEmpty && latestDesc.isNotEmpty
+              ? latestDesc
+              : (latestTitle.trim().isNotEmpty ? latestTitle : latestDesc)),
       statusLabel: statusLabel,
       statusColor: statusColor,
       distanceKm: 0,

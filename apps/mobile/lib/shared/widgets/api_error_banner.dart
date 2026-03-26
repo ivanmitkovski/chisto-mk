@@ -8,17 +8,23 @@ class ApiErrorBanner extends StatelessWidget {
     required this.message,
     this.onDismiss,
     this.onRetry,
+    this.detail,
   });
 
   final String message;
   final VoidCallback? onDismiss;
   final VoidCallback? onRetry;
+  final String? detail;
 
   @override
   Widget build(BuildContext context) {
+    final String semanticsLabel = detail != null && detail!.isNotEmpty
+        ? '$message $detail'
+        : message;
+
     return Semantics(
       liveRegion: true,
-      label: message,
+      label: semanticsLabel,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
@@ -80,6 +86,19 @@ class ApiErrorBanner extends StatelessWidget {
                 ],
               ],
             ),
+            if (detail != null && detail!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Padding(
+                padding: const EdgeInsets.only(left: 28),
+                child: Text(
+                  detail!,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textMuted,
+                        height: 1.35,
+                      ),
+                ),
+              ),
+            ],
             if (onRetry != null) ...[
               const SizedBox(height: AppSpacing.sm),
               Semantics(

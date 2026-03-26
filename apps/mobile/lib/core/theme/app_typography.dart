@@ -44,6 +44,13 @@ class AppTypography {
       fontWeight: FontWeight.w400,
       color: AppColors.textMuted,
     ),
+    titleSmall: TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w600,
+      color: AppColors.textPrimary,
+      letterSpacing: -0.2,
+      height: 1.25,
+    ),
     labelLarge: TextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w600,

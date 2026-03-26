@@ -4,6 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter_confetti/flutter_confetti.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -132,6 +134,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
     final bool hasReportNumber =
         widget.reportNumber != null && widget.reportNumber!.isNotEmpty;
     final bool hasAddress = address != null && address.trim().isNotEmpty;
+    final AppLocalizations l10n = context.l10n;
 
     return Dialog(
       backgroundColor: AppColors.transparent,
@@ -177,7 +180,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       Semantics(
-                    label: 'Report submitted successfully',
+                    label: l10n.reportSubmittedSemanticsSuccess,
                     image: true,
                     child: SizedBox(
                       width: 80,
@@ -226,7 +229,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'Report submitted',
+                    l10n.reportSubmittedTitle,
                     style: (AppTypography.textTheme.titleLarge ?? const TextStyle()).copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.4,
@@ -236,33 +239,24 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                   ),
                   if (hasReportNumber) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.inputFill,
-                        borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusPill),
-                      ),
-                      child: Text(
-                        widget.reportNumber!,
-                        style: (AppTypography.textTheme.bodyMedium ?? const TextStyle()).copyWith(
-                          fontFeatures: const <FontFeature>[
-                            FontFeature.tabularFigures(),
-                          ],
-                          color: AppColors.textSecondary,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    Text(
+                      l10n.reportSubmittedSavedAs(widget.reportNumber!),
+                      textAlign: TextAlign.center,
+                      style: (AppTypography.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+                        fontFeatures: const <FontFeature>[
+                          FontFeature.tabularFigures(),
+                        ],
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
                       ),
                     ),
                   ],
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     hasAddress
-                        ? '$categoryLabel near $address is now in the review queue.'
-                        : '$categoryLabel is now in the review queue.',
+                        ? l10n.reportSubmittedBodyWithAddress(categoryLabel, address.trim())
+                        : l10n.reportSubmittedBodyNoAddress(categoryLabel),
                     textAlign: TextAlign.center,
                     style: (AppTypography.textTheme.bodyMedium ?? const TextStyle()).copyWith(
                       color: AppColors.textSecondary,
@@ -281,7 +275,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                         ),
                         const SizedBox(width: AppSpacing.xs),
                         Text(
-                          'New site added to the map',
+                          l10n.reportSubmittedNewSiteBadge,
                           style: AppTypography.chipLabel.copyWith(
                             color: AppColors.accentInfo,
                             fontWeight: FontWeight.w600,
@@ -349,8 +343,8 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                                 Flexible(
                                   child: Text(
                                     hasAwarded
-                                        ? '+$pointsAwarded pts earned'
-                                        : 'Earn up to ${ReportPoints.maxPending} pts when approved',
+                                        ? l10n.reportSubmittedPointsEarned(pointsAwarded)
+                                        : l10n.reportSubmittedPointsPending(ReportPoints.maxPending),
                                     style: AppTypography.chipLabel.copyWith(
                                       fontWeight: FontWeight.w700,
                                       fontSize: 14,
@@ -373,7 +367,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                   if (widget.reportId != null &&
                       widget.reportId!.isNotEmpty) ...[
                     _ActionButton(
-                      label: 'View this report',
+                      label: l10n.reportSubmittedViewThisReport,
                       primary: true,
                       onPressed: () {
                         AppHaptics.light();
@@ -382,7 +376,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     _ActionButton(
-                      label: 'View all reports',
+                      label: l10n.reportSubmittedViewAllReports,
                       primary: false,
                       outlined: true,
                       onPressed: () {
@@ -393,7 +387,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                     ),
                   ] else
                     _ActionButton(
-                      label: 'View my reports',
+                      label: l10n.reportSubmittedViewInMyReports,
                       primary: true,
                       onPressed: () {
                         AppHaptics.light();
@@ -403,7 +397,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                     ),
                   const SizedBox(height: AppSpacing.sm),
                   _ActionButton(
-                    label: 'Report another',
+                    label: l10n.reportSubmittedReportAnother,
                     primary: false,
                     onPressed: () {
                       AppHaptics.light();
@@ -418,7 +412,7 @@ class _ReportSubmittedDialogState extends State<ReportSubmittedDialog>
                     right: 0,
                     child: ReportCircleIconButton(
                       icon: Icons.close_rounded,
-                      semanticLabel: 'Close',
+                      semanticLabel: l10n.semanticsClose,
                       onTap: () {
                         AppHaptics.tap();
                         Navigator.of(context)
