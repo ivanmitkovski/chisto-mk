@@ -2,10 +2,6 @@
   "@@locale": "en",
   "reportFlowHelpHint": "Tap the info button for tips on this step.",
   "reportHelpContextTitle": "Context",
-  "resumeDraftTitle": "Resume draft?",
-  "resumeDraftBody": "You have an unsaved report. Resume where you left off or start fresh.",
-  "resumeDraftStartFresh": "Start fresh",
-  "resumeDraftResume": "Resume",
   "reportStageEvidenceEyebrow": "Report a pollution site",
   "reportStageEvidenceTitle": "Evidence",
   "reportStageEvidenceSubtitle": "Photos and framing",
@@ -77,8 +73,6 @@
       }
     }
   },
-  "reportFlowJourneySeparator": " → ",
-  "reportDraftSaved": "Draft saved",
   "reportFlowEvidenceNeedsPhoto": "Add at least one photo to continue.",
   "reportFlowLocationOutsideMacedoniaHelper": "This location is outside Macedonia. Drag the pin into the country, then tap Confirm location.",
   "reportLocationAdvanceBlockedBanner": "Place the pin in Macedonia and tap Confirm location.",

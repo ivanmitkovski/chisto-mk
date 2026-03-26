@@ -2,10 +2,6 @@
   "@@locale": "mk",
   "reportFlowHelpHint": "Tap the info button for tips on this step.",
   "reportHelpContextTitle": "Context",
-  "resumeDraftTitle": "Resume draft?",
-  "resumeDraftBody": "You have an unsaved report. Resume where you left off or start fresh.",
-  "resumeDraftStartFresh": "Start fresh",
-  "resumeDraftResume": "Resume",
   "reportStageEvidenceEyebrow": "Report a pollution site",
   "reportStageEvidenceTitle": "Evidence",
   "reportStageEvidenceSubtitle": "Photos and framing",
@@ -77,8 +73,6 @@
       }
     }
   },
-  "reportFlowJourneySeparator": " → ",
-  "reportDraftSaved": "Нацртот е зачуван",
   "reportFlowEvidenceNeedsPhoto": "Додајте барем една фотографија за да продолжите.",
   "reportFlowLocationOutsideMacedoniaHelper": "Оваа локација е надвор од Македонија. Потегнете ја иглата во земјата, потоа допрете Потврди локација.",
   "reportLocationAdvanceBlockedBanner": "Поставете ја иглата во Македонија и допрете Потврди локација.",

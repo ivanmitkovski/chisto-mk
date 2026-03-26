@@ -15,19 +15,6 @@ class AppLocalizationsMk extends AppLocalizations {
   String get reportHelpContextTitle => 'Context';
 
   @override
-  String get resumeDraftTitle => 'Resume draft?';
-
-  @override
-  String get resumeDraftBody =>
-      'You have an unsaved report. Resume where you left off or start fresh.';
-
-  @override
-  String get resumeDraftStartFresh => 'Start fresh';
-
-  @override
-  String get resumeDraftResume => 'Resume';
-
-  @override
   String get reportStageEvidenceEyebrow => 'Report a pollution site';
 
   @override
@@ -211,12 +198,6 @@ class AppLocalizationsMk extends AppLocalizations {
   String semanticsNextStep(String label) {
     return 'Next: $label';
   }
-
-  @override
-  String get reportFlowJourneySeparator => ' → ';
-
-  @override
-  String get reportDraftSaved => 'Нацртот е зачуван';
 
   @override
   String get reportFlowEvidenceNeedsPhoto =>

@@ -9,7 +9,6 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/report_flow_preferences.dart';
-import 'package:chisto_mobile/features/reports/data/report_draft_storage.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
@@ -47,8 +46,7 @@ class NewReportScreen extends StatefulWidget {
   State<NewReportScreen> createState() => _NewReportScreenState();
 }
 
-class _NewReportScreenState extends State<NewReportScreen>
-    with WidgetsBindingObserver {
+class _NewReportScreenState extends State<NewReportScreen> {
   final ImagePicker _imagePicker = ImagePicker();
   final TextEditingController _titleController = TextEditingController();
   final FocusNode _titleFocus = FocusNode();
@@ -72,15 +70,9 @@ class _NewReportScreenState extends State<NewReportScreen>
   bool _reportFlowPrefsLoaded = false;
   bool _hasSeenReportHelpHint = true;
 
-  Timer? _draftSaveTimer;
-  Timer? _draftSavedHideTimer;
-  bool _showDraftSavedBanner = false;
-  DateTime? _lastDraftSavedBannerShown;
-
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _reportFlowPreferences.hasSeenReportHelpHint.then((bool v) {
       if (!mounted) return;
       setState(() {
@@ -95,49 +87,8 @@ class _NewReportScreenState extends State<NewReportScreen>
     } else {
       _titleController.text = _draft.title;
       _descriptionController.text = _draft.description;
-      WidgetsBinding.instance.addPostFrameCallback((_) => _offerRestoreDraft());
     }
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadReportingCapacity());
-  }
-
-  Future<void> _offerRestoreDraft() async {
-    if (!mounted) return;
-    final ({ReportDraft draft, int stageIndex})? saved =
-        await loadReportDraft();
-    if (!mounted || saved == null) return;
-    final bool? resume = await showCupertinoDialog<bool>(
-      context: context,
-      builder: (BuildContext dialogContext) => CupertinoAlertDialog(
-        title: Text(dialogContext.l10n.resumeDraftTitle),
-        content: Text(dialogContext.l10n.resumeDraftBody),
-        actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(dialogContext.l10n.resumeDraftStartFresh),
-          ),
-          CupertinoDialogAction(
-            isDefaultAction: true,
-            onPressed: () {
-              AppHaptics.light();
-              Navigator.of(dialogContext).pop(true);
-            },
-            child: Text(dialogContext.l10n.resumeDraftResume),
-          ),
-        ],
-      ),
-    );
-    if (!mounted) return;
-    if (resume == true) {
-      setState(() {
-        _draft = saved.draft;
-        _currentStage =
-            ReportStage.values[saved.stageIndex.clamp(0, ReportStage.values.length - 1)];
-        _titleController.text = _draft.title;
-        _descriptionController.text = _draft.description;
-      });
-      unawaited(_saveDraftImmediately());
-    }
-    await clearReportDraft();
   }
 
   Future<void> _dismissFlowHelpHint() async {
@@ -158,68 +109,12 @@ class _NewReportScreenState extends State<NewReportScreen>
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      _draftSaveTimer?.cancel();
-      unawaited(_saveDraftImmediately());
-    }
-  }
-
-  @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _draftSaveTimer?.cancel();
-    _draftSavedHideTimer?.cancel();
-    if (!_submitting) {
-      saveReportDraft(
-        draft: _draft,
-        stageIndex: ReportStage.values.indexOf(_currentStage),
-      );
-    }
     _titleController.dispose();
     _titleFocus.dispose();
     _descriptionController.dispose();
     _descriptionFocus.dispose();
     super.dispose();
-  }
-
-  void _scheduleDraftSave() {
-    if (_submitting) return;
-    _draftSaveTimer?.cancel();
-    _draftSaveTimer = Timer(const Duration(milliseconds: 1500), () {
-      if (!mounted || _submitting) return;
-      saveReportDraft(
-        draft: _draft,
-        stageIndex: ReportStage.values.indexOf(_currentStage),
-      ).then((_) {
-        if (!mounted) return;
-        _maybeShowDraftSavedBanner();
-      });
-    });
-  }
-
-  void _maybeShowDraftSavedBanner() {
-    final DateTime now = DateTime.now();
-    if (_lastDraftSavedBannerShown != null &&
-        now.difference(_lastDraftSavedBannerShown!) <
-            const Duration(seconds: 60)) {
-      return;
-    }
-    _lastDraftSavedBannerShown = now;
-    _draftSavedHideTimer?.cancel();
-    setState(() => _showDraftSavedBanner = true);
-    _draftSavedHideTimer = Timer(const Duration(seconds: 2), () {
-      if (mounted) setState(() => _showDraftSavedBanner = false);
-    });
-  }
-
-  Future<void> _saveDraftImmediately() async {
-    _draftSaveTimer?.cancel();
-    if (_submitting) return;
-    await saveReportDraft(
-      draft: _draft,
-      stageIndex: ReportStage.values.indexOf(_currentStage),
-    );
   }
 
   bool get _hasValidLocation {
@@ -293,7 +188,6 @@ class _NewReportScreenState extends State<NewReportScreen>
               photos: <XFile>[..._draft.photos, selectedFile],
             );
           });
-          _scheduleDraftSave();
           if (wasEmpty) {
             AppHaptics.success();
           }
@@ -315,7 +209,6 @@ class _NewReportScreenState extends State<NewReportScreen>
         ..removeAt(index);
       _draft = _draft.copyWith(photos: updated);
     });
-    _scheduleDraftSave();
   }
 
   void _setCleanupEffort(CleanupEffort effort) {
@@ -323,7 +216,6 @@ class _NewReportScreenState extends State<NewReportScreen>
     setState(() {
       _draft = _draft.copyWith(cleanupEffort: effort);
     });
-    _scheduleDraftSave();
   }
 
   void _onLocationChanged(LocationPickerResult result) {
@@ -345,7 +237,6 @@ class _NewReportScreenState extends State<NewReportScreen>
         address: result.address,
       );
     });
-    _scheduleDraftSave();
   }
 
   Widget _buildCleanupEffortField(BuildContext context) {
@@ -403,7 +294,6 @@ class _NewReportScreenState extends State<NewReportScreen>
       selected: _draft.category,
       onSelected: (ReportCategory cat) {
         setState(() => _draft = _draft.copyWith(category: cat));
-        _scheduleDraftSave();
       },
     );
   }
@@ -638,7 +528,6 @@ class _NewReportScreenState extends State<NewReportScreen>
         }
       }
       if (!mounted) return;
-      await clearReportDraft();
       if (!mounted) return;
       ServiceLocator.instance.profileNeedsRefresh.value++;
       setState(() {
@@ -715,7 +604,6 @@ class _NewReportScreenState extends State<NewReportScreen>
     });
     _titleController.text = '';
     _descriptionController.text = '';
-    _scheduleDraftSave();
   }
 
   @override
@@ -839,20 +727,6 @@ class _NewReportScreenState extends State<NewReportScreen>
             ),
           ],
         ),
-        if (_showDraftSavedBanner) ...<Widget>[
-          const SizedBox(height: AppSpacing.xxs),
-          Center(
-            child: Text(
-              context.l10n.reportDraftSaved,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColors.textMuted.withValues(alpha: 0.9),
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-        ],
       ],
     );
   }
@@ -1359,7 +1233,6 @@ class _NewReportScreenState extends State<NewReportScreen>
                       severity: value.round().clamp(1, 5),
                     ),
                   );
-                  _scheduleDraftSave();
                 },
               ),
               Row(
@@ -1433,7 +1306,6 @@ class _NewReportScreenState extends State<NewReportScreen>
             setState(() {
               _draft = _draft.copyWith(title: value);
             });
-            _scheduleDraftSave();
           },
           textInputAction: TextInputAction.next,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -1560,7 +1432,6 @@ class _NewReportScreenState extends State<NewReportScreen>
             setState(() {
               _draft = _draft.copyWith(description: value);
             });
-            _scheduleDraftSave();
           },
           textInputAction: TextInputAction.done,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(

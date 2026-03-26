@@ -112,30 +112,6 @@ abstract class AppLocalizations {
   /// **'Context'**
   String get reportHelpContextTitle;
 
-  /// No description provided for @resumeDraftTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Resume draft?'**
-  String get resumeDraftTitle;
-
-  /// No description provided for @resumeDraftBody.
-  ///
-  /// In en, this message translates to:
-  /// **'You have an unsaved report. Resume where you left off or start fresh.'**
-  String get resumeDraftBody;
-
-  /// No description provided for @resumeDraftStartFresh.
-  ///
-  /// In en, this message translates to:
-  /// **'Start fresh'**
-  String get resumeDraftStartFresh;
-
-  /// No description provided for @resumeDraftResume.
-  ///
-  /// In en, this message translates to:
-  /// **'Resume'**
-  String get resumeDraftResume;
-
   /// No description provided for @reportStageEvidenceEyebrow.
   ///
   /// In en, this message translates to:
@@ -477,18 +453,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next: {label}'**
   String semanticsNextStep(String label);
-
-  /// No description provided for @reportFlowJourneySeparator.
-  ///
-  /// In en, this message translates to:
-  /// **' → '**
-  String get reportFlowJourneySeparator;
-
-  /// No description provided for @reportDraftSaved.
-  ///
-  /// In en, this message translates to:
-  /// **'Draft saved'**
-  String get reportDraftSaved;
 
   /// No description provided for @reportFlowEvidenceNeedsPhoto.
   ///

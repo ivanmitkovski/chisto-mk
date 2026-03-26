@@ -2,10 +2,6 @@
   "@@locale": "sq",
   "reportFlowHelpHint": "Tap the info button for tips on this step.",
   "reportHelpContextTitle": "Context",
-  "resumeDraftTitle": "Resume draft?",
-  "resumeDraftBody": "You have an unsaved report. Resume where you left off or start fresh.",
-  "resumeDraftStartFresh": "Start fresh",
-  "resumeDraftResume": "Resume",
   "reportStageEvidenceEyebrow": "Report a pollution site",
   "reportStageEvidenceTitle": "Evidence",
   "reportStageEvidenceSubtitle": "Photos and framing",
@@ -77,8 +73,6 @@
       }
     }
   },
-  "reportFlowJourneySeparator": " → ",
-  "reportDraftSaved": "Drafti u ruajt",
   "reportFlowEvidenceNeedsPhoto": "Shtoni të paktën një foto për të vazhduar.",
   "reportFlowLocationOutsideMacedoniaHelper": "Ky vend është jashtë Maqedonisë. Tërhiqni kunjin brenda vendit, pastaj prekni Konfirmo vendndodhjen.",
   "reportLocationAdvanceBlockedBanner": "Vendosni kunjin në Maqedoni dhe prekni Konfirmo vendndodhjen.",
