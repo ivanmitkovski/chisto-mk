@@ -45,6 +45,11 @@ model User {
   auditLogs            AuditLog[]
   adminTempTokens      AdminTempToken[]
   adminPendingMfa      AdminPendingMfa?
+  siteVotes            SiteVote[]
+  siteSaves            SiteSave[]
+  siteComments         SiteComment[]
+  siteShareEvents      SiteShareEvent[]
+  siteCommentLikes     SiteCommentLike[]
 
   @@index([role])
   @@index([status])
@@ -211,12 +216,21 @@ model Site {
   address     String?
   description String?
   status      SiteStatus @default(REPORTED)
+  upvotesCount Int       @default(0)
+  commentsCount Int      @default(0)
+  savesCount    Int      @default(0)
+  sharesCount   Int      @default(0)
 
   reports     Report[]
   events      CleanupEvent[]
+  votes       SiteVote[]
+  saves       SiteSave[]
+  comments    SiteComment[]
+  shareEvents SiteShareEvent[]
 
   @@index([status])
   @@index([latitude, longitude])
+  @@index([createdAt])
 }
 
 enum SiteStatus {
@@ -354,4 +368,101 @@ model CleanupEvent {
   @@index([siteId])
   @@index([scheduledAt])
   @@index([status])
+}
+
+model SiteVote {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@index([userId, createdAt])
+  @@index([siteId, createdAt])
+}
+
+model SiteSave {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@index([userId, createdAt])
+  @@index([siteId, createdAt])
+}
+
+model SiteComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  parentId String?
+  parent   SiteComment?  @relation("SiteCommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  SiteComment[] @relation("SiteCommentReplies")
+  likes    SiteCommentLike[]
+
+  body      String
+  isDeleted Boolean @default(false)
+  likesCount Int    @default(0)
+
+  @@index([siteId, createdAt])
+  @@index([siteId, parentId, createdAt])
+  @@index([authorId, createdAt])
+}
+
+model SiteCommentLike {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  commentId String
+  comment   SiteComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([commentId, userId])
+  @@index([commentId, createdAt])
+  @@index([userId, createdAt])
+}
+
+enum SiteShareChannel {
+  native
+  link
+  whatsapp
+  facebook
+  x
+  other
+}
+
+model SiteShareEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  channel SiteShareChannel @default(native)
+
+  @@index([siteId, createdAt])
+  @@index([userId, createdAt])
 }

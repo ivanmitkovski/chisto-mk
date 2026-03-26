@@ -4,16 +4,15 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 enum FeedFilter {
-  all('All sites', 'Show all pollution reports', Icons.grid_view_rounded),
-  urgent('Urgent', 'Requires immediate attention', Icons.warning_amber_rounded),
-  nearby('Nearby', 'Closest to you first', Icons.near_me_rounded),
-  mostVoted('Most voted', 'By community support', Icons.trending_up_rounded),
-  recent('Recent', 'Newest reports first', Icons.schedule_rounded);
+  all('All', 'Balanced feed ranking'),
+  urgent('Urgent', 'High-priority incidents first'),
+  nearby('Nearby', 'Closest reports around you'),
+  mostVoted('Top support', 'Most community-backed'),
+  recent('Recent', 'Newest reports first');
 
-  const FeedFilter(this.label, this.subtitle, this.icon);
+  const FeedFilter(this.label, this.subtitle);
   final String label;
   final String subtitle;
-  final IconData icon;
 }
 
 class FeedFilterSheet extends StatelessWidget {
@@ -63,7 +62,7 @@ class FeedFilterSheet extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'Filter feed',
+                'Feed filters',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
@@ -71,7 +70,7 @@ class FeedFilterSheet extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                'Choose how to sort pollution reports',
+                'Choose how you want to browse reports',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -107,47 +106,30 @@ class _FilterTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+      padding: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radius14),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
           onTap: onTap,
           child: Ink(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.sm,
-              vertical: AppSpacing.sm,
+              vertical: 10,
             ),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              color: AppColors.inputFill.withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              color: isActive
+                  ? AppColors.primaryDark.withValues(alpha: 0.08)
+                  : AppColors.inputFill.withValues(alpha: 0.55),
+              border: Border.all(
+                color: isActive
+                    ? AppColors.primaryDark.withValues(alpha: 0.22)
+                    : AppColors.divider.withValues(alpha: 0.8),
+              ),
             ),
             child: Row(
               children: <Widget>[
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: isActive
-                        ? AppColors.primaryDark.withValues(alpha: 0.12)
-                        : AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: isActive
-                          ? AppColors.primaryDark.withValues(alpha: 0.3)
-                          : AppColors.divider,
-                      width: 1,
-                    ),
-                  ),
-                  child: Icon(
-                    filter.icon,
-                    size: 18,
-                    color: isActive
-                        ? AppColors.primaryDark
-                        : AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +138,7 @@ class _FilterTile extends StatelessWidget {
                         filter.label,
                         style:
                             Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   color: isActive
                                       ? AppColors.primaryDark
                                       : AppColors.textPrimary,
@@ -168,6 +150,7 @@ class _FilterTile extends StatelessWidget {
                         style:
                             Theme.of(context).textTheme.bodySmall?.copyWith(
                                   color: AppColors.textMuted,
+                                  fontSize: 12,
                                 ),
                       ),
                     ],
@@ -176,13 +159,13 @@ class _FilterTile extends StatelessWidget {
                 if (isActive)
                   const Icon(
                     CupertinoIcons.checkmark_circle_fill,
-                    size: 20,
+                    size: 18,
                     color: AppColors.primaryDark,
                   )
                 else
                   const Icon(
                     Icons.chevron_right_rounded,
-                    size: 18,
+                    size: 16,
                     color: AppColors.textMuted,
                   ),
               ],

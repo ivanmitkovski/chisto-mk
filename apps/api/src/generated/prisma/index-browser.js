@@ -230,7 +230,11 @@ exports.Prisma.SiteScalarFieldEnum = {
   longitude: 'longitude',
   address: 'address',
   description: 'description',
-  status: 'status'
+  status: 'status',
+  upvotesCount: 'upvotesCount',
+  commentsCount: 'commentsCount',
+  savesCount: 'savesCount',
+  sharesCount: 'sharesCount'
 };
 
 exports.Prisma.ReportScalarFieldEnum = {
@@ -297,6 +301,49 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   status: 'status',
   organizerId: 'organizerId',
   participantCount: 'participantCount'
+};
+
+exports.Prisma.SiteVoteScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  siteId: 'siteId',
+  userId: 'userId'
+};
+
+exports.Prisma.SiteSaveScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  siteId: 'siteId',
+  userId: 'userId'
+};
+
+exports.Prisma.SiteCommentScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  siteId: 'siteId',
+  authorId: 'authorId',
+  parentId: 'parentId',
+  body: 'body',
+  isDeleted: 'isDeleted',
+  likesCount: 'likesCount'
+};
+
+exports.Prisma.SiteCommentLikeScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  commentId: 'commentId',
+  userId: 'userId'
+};
+
+exports.Prisma.SiteShareEventScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  siteId: 'siteId',
+  userId: 'userId',
+  channel: 'channel'
 };
 
 exports.Prisma.SortOrder = {
@@ -380,6 +427,15 @@ exports.CleanupEventStatus = exports.$Enums.CleanupEventStatus = {
   DECLINED: 'DECLINED'
 };
 
+exports.SiteShareChannel = exports.$Enums.SiteShareChannel = {
+  native: 'native',
+  link: 'link',
+  whatsapp: 'whatsapp',
+  facebook: 'facebook',
+  x: 'x',
+  other: 'other'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserSession: 'UserSession',
@@ -396,7 +452,12 @@ exports.Prisma.ModelName = {
   SystemConfig: 'SystemConfig',
   FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',
-  CleanupEvent: 'CleanupEvent'
+  CleanupEvent: 'CleanupEvent',
+  SiteVote: 'SiteVote',
+  SiteSave: 'SiteSave',
+  SiteComment: 'SiteComment',
+  SiteCommentLike: 'SiteCommentLike',
+  SiteShareEvent: 'SiteShareEvent'
 };
 
 /**

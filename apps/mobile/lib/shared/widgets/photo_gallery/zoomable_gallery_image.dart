@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
 import 'package:chisto_mobile/shared/widgets/photo_gallery/gallery_image_item.dart';
+
+typedef GalleryInteractionEndCallback =
+    void Function(ScaleEndDetails details, Size viewportSize);
 
 class ZoomableGalleryImage extends StatefulWidget {
   const ZoomableGalleryImage({
@@ -10,11 +12,13 @@ class ZoomableGalleryImage extends StatefulWidget {
     required this.item,
     required this.controller,
     required this.onDoubleTap,
+    this.onInteractionEnd,
   });
 
   final GalleryImageItem item;
   final TransformationController controller;
   final ValueChanged<TapDownDetails> onDoubleTap;
+  final GalleryInteractionEndCallback? onInteractionEnd;
 
   @override
   State<ZoomableGalleryImage> createState() => _ZoomableGalleryImageState();
@@ -40,8 +44,14 @@ class _ZoomableGalleryImageState extends State<ZoomableGalleryImage> {
         maxScale: 4.5,
         panEnabled: true,
         scaleEnabled: true,
+        onInteractionEnd: (ScaleEndDetails details) {
+          final RenderBox? box = context.findRenderObject() as RenderBox?;
+          final Size viewport = box?.size ?? Size.zero;
+          widget.onInteractionEnd?.call(details, viewport);
+        },
         clipBehavior: Clip.none,
-        boundaryMargin: const EdgeInsets.all(AppSpacing.xl),
+        // Keep pan bounds tight so images do not drift into corner-stuck states.
+        boundaryMargin: EdgeInsets.zero,
         child: Center(
           child: AppSmartImage(
             image: widget.item.image,

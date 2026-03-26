@@ -298,9 +298,23 @@ class FullscreenPhotoGalleryScreen extends StatefulWidget {
 }
 
 class _FullscreenPhotoGalleryScreenState
-    extends State<FullscreenPhotoGalleryScreen> {
+    extends State<FullscreenPhotoGalleryScreen>
+    with TickerProviderStateMixin {
+  static const double _kZoomedThreshold = 1.01;
+  static const double _kSettleToIdentityThreshold = 1.03;
+  static const double _kDismissThreshold = 110;
+  static const double _kDismissVelocityThreshold = 700;
+  static const double _kDismissHapticThreshold = 96;
+  static const double _kDragMax = 220;
+  static const double _kChromeBottomGap = AppSpacing.sm;
+  static const double _kBottomChromeReservedHeight = 64;
+
   late final PageController _pageController;
   late final List<TransformationController> _zoomControllers;
+  late final AnimationController _dragSettleController;
+  late final AnimationController _matrixSettleController;
+  Animation<Matrix4>? _matrixSettleAnimation;
+  int? _matrixSettleIndex;
   late int _currentIndex;
   double _verticalDrag = 0;
   double _backgroundOpacity = 1;
@@ -308,7 +322,7 @@ class _FullscreenPhotoGalleryScreenState
   bool _didCrossDismissThreshold = false;
 
   bool get _isCurrentImageZoomed =>
-      _zoomControllers[_currentIndex].value.getMaxScaleOnAxis() > 1.01;
+      _zoomControllers[_currentIndex].value.getMaxScaleOnAxis() > _kZoomedThreshold;
 
   @override
   void initState() {
@@ -322,6 +336,22 @@ class _FullscreenPhotoGalleryScreenState
     for (final TransformationController controller in _zoomControllers) {
       controller.addListener(_handleZoomChanged);
     }
+    _dragSettleController = AnimationController(
+      vsync: this,
+      duration: AppMotion.medium,
+    );
+    _dragSettleController.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _verticalDrag = _verticalDragTween.evaluate(_dragSettleController);
+        _backgroundOpacity =
+            _backgroundOpacityTween.evaluate(_dragSettleController).clamp(0.28, 1.0);
+      });
+    });
+    _matrixSettleController = AnimationController(
+      vsync: this,
+      duration: AppMotion.fast,
+    );
   }
 
   @override
@@ -332,8 +362,13 @@ class _FullscreenPhotoGalleryScreenState
         ..removeListener(_handleZoomChanged)
         ..dispose();
     }
+    _dragSettleController.dispose();
+    _matrixSettleController.dispose();
     super.dispose();
   }
+
+  late Tween<double> _verticalDragTween = Tween<double>(begin: 0, end: 0);
+  late Tween<double> _backgroundOpacityTween = Tween<double>(begin: 1, end: 1);
 
   @override
   void didChangeDependencies() {
@@ -353,11 +388,14 @@ class _FullscreenPhotoGalleryScreenState
 
   void _handleVerticalDragUpdate(DragUpdateDetails details) {
     if (_isCurrentImageZoomed) return;
+    if (_dragSettleController.isAnimating) {
+      _dragSettleController.stop();
+    }
     setState(() {
       final double nextDrag =
           _verticalDrag + (details.delta.dy * (_verticalDrag == 0 ? 1 : 0.7));
-      _verticalDrag = nextDrag.clamp(-220, 220);
-      final bool crossedDismissThreshold = _verticalDrag.abs() > 96;
+      _verticalDrag = nextDrag.clamp(-_kDragMax, _kDragMax);
+      final bool crossedDismissThreshold = _verticalDrag.abs() > _kDismissHapticThreshold;
       if (crossedDismissThreshold != _didCrossDismissThreshold) {
         _didCrossDismissThreshold = crossedDismissThreshold;
         AppHaptics.light();
@@ -368,17 +406,18 @@ class _FullscreenPhotoGalleryScreenState
 
   void _handleVerticalDragEnd(DragEndDetails details) {
     if (_isCurrentImageZoomed) return;
-    if (_verticalDrag.abs() > 110 ||
+    if (_verticalDrag.abs() > _kDismissThreshold ||
         (details.primaryVelocity != null &&
-            details.primaryVelocity!.abs() > 700)) {
+            details.primaryVelocity!.abs() > _kDismissVelocityThreshold)) {
       Navigator.of(context).pop();
       return;
     }
-    setState(() {
-      _verticalDrag = 0;
-      _backgroundOpacity = 1;
-      _didCrossDismissThreshold = false;
-    });
+    _verticalDragTween = Tween<double>(begin: _verticalDrag, end: 0);
+    _backgroundOpacityTween = Tween<double>(begin: _backgroundOpacity, end: 1);
+    _dragSettleController
+      ..reset()
+      ..forward();
+    _didCrossDismissThreshold = false;
   }
 
   void _resetZoomIfNeeded(int index) {
@@ -388,7 +427,7 @@ class _FullscreenPhotoGalleryScreenState
 
   void _toggleZoom(TapDownDetails details, int index) {
     final TransformationController controller = _zoomControllers[index];
-    final bool isZoomed = controller.value.getMaxScaleOnAxis() > 1.01;
+    final bool isZoomed = controller.value.getMaxScaleOnAxis() > _kZoomedThreshold;
     if (isZoomed) {
       AppHaptics.light();
       controller.value = Matrix4.identity();
@@ -408,11 +447,73 @@ class _FullscreenPhotoGalleryScreenState
       ..scaleByDouble(scale, scale, 1, 1);
   }
 
+  void _handleInteractionEnd(int index) {
+    if (index < 0 || index >= _zoomControllers.length) return;
+    final TransformationController controller = _zoomControllers[index];
+    final Matrix4 current = controller.value;
+    final double scale = current.getMaxScaleOnAxis();
+    if (scale > _kSettleToIdentityThreshold) {
+      return;
+    }
+    final Matrix4 target = Matrix4.identity();
+
+    if (_isEffectivelySameMatrix(current, target)) {
+      return;
+    }
+
+    if (_matrixSettleController.isAnimating) {
+      _matrixSettleController.stop();
+    }
+    _matrixSettleController.removeListener(_onMatrixSettleTick);
+    _matrixSettleIndex = index;
+    _matrixSettleAnimation = Matrix4Tween(
+      begin: Matrix4.copy(current),
+      end: target,
+    ).animate(
+      CurvedAnimation(
+        parent: _matrixSettleController,
+        curve: AppMotion.emphasized,
+      ),
+    );
+    _matrixSettleController
+      ..reset()
+      ..addListener(_onMatrixSettleTick)
+      ..forward().whenComplete(() {
+        _matrixSettleController.removeListener(_onMatrixSettleTick);
+        if (_matrixSettleIndex != null &&
+            _matrixSettleIndex! >= 0 &&
+            _matrixSettleIndex! < _zoomControllers.length) {
+          _zoomControllers[_matrixSettleIndex!].value = target;
+        }
+        _matrixSettleIndex = null;
+      });
+  }
+
+  bool _isEffectivelySameMatrix(Matrix4 a, Matrix4 b, {double epsilon = 0.0008}) {
+    final List<double> sa = a.storage;
+    final List<double> sb = b.storage;
+    for (int i = 0; i < sa.length; i++) {
+      if ((sa[i] - sb[i]).abs() > epsilon) return false;
+    }
+    return true;
+  }
+
+  void _onMatrixSettleTick() {
+    final int? index = _matrixSettleIndex;
+    final Animation<Matrix4>? animation = _matrixSettleAnimation;
+    if (index == null || animation == null) return;
+    if (index < 0 || index >= _zoomControllers.length) return;
+    _zoomControllers[index].value = animation.value;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final double topInset = MediaQuery.of(context).padding.top;
     final double bottomInset = MediaQuery.of(context).padding.bottom;
     final double chromeOpacity = _isCurrentImageZoomed ? 0 : 1;
+    final double thumbnailRailBottom = bottomInset + _kChromeBottomGap;
+    final double bottomChromeReserve = _isCurrentImageZoomed
+        ? 0
+        : (bottomInset + _kBottomChromeReservedHeight);
     final Color backgroundColor = Color.lerp(
       AppColors.black,
       AppColors.primaryDark,
@@ -432,29 +533,36 @@ class _FullscreenPhotoGalleryScreenState
             child: Stack(
               children: <Widget>[
                 Center(
-                  child: Transform.translate(
-                    offset: Offset(0, _verticalDrag),
-                    child: PageView.builder(
-                      controller: _pageController,
-                      physics: _isCurrentImageZoomed
-                          ? const NeverScrollableScrollPhysics()
-                          : const BouncingScrollPhysics(),
-                      itemCount: widget.items.length,
-                      onPageChanged: (int index) {
-                        _resetZoomIfNeeded(_currentIndex);
-                        AppHaptics.tap();
-                        setState(() => _currentIndex = index);
-                        _prefetchAround(index);
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        final GalleryImageItem item = widget.items[index];
-                        return ZoomableGalleryImage(
-                          item: item,
-                          controller: _zoomControllers[index],
-                          onDoubleTap: (TapDownDetails details) =>
-                              _toggleZoom(details, index),
-                        );
-                      },
+                  child: Padding(
+                    // Reserve bottom chrome space so thumbnails/help never cover media.
+                    padding: EdgeInsets.only(bottom: bottomChromeReserve),
+                    child: Transform.translate(
+                      offset: Offset(0, _verticalDrag),
+                      child: PageView.builder(
+                        controller: _pageController,
+                        physics: _isCurrentImageZoomed
+                            ? const NeverScrollableScrollPhysics()
+                            : const BouncingScrollPhysics(),
+                        itemCount: widget.items.length,
+                        onPageChanged: (int index) {
+                          _resetZoomIfNeeded(_currentIndex);
+                          AppHaptics.tap();
+                          setState(() => _currentIndex = index);
+                          _prefetchAround(index);
+                        },
+                        itemBuilder: (BuildContext context, int index) {
+                          final GalleryImageItem item = widget.items[index];
+                          return ZoomableGalleryImage(
+                            item: item,
+                            controller: _zoomControllers[index],
+                            onDoubleTap: (TapDownDetails details) =>
+                                _toggleZoom(details, index),
+                            onInteractionEnd:
+                                (ScaleEndDetails details, Size viewportSize) =>
+                                    _handleInteractionEnd(index),
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
@@ -507,7 +615,7 @@ class _FullscreenPhotoGalleryScreenState
                           Positioned(
                             left: 0,
                             right: 0,
-                            bottom: bottomInset + AppSpacing.lg,
+                            bottom: thumbnailRailBottom,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: <Widget>[
@@ -532,31 +640,6 @@ class _FullscreenPhotoGalleryScreenState
                               ],
                             ),
                           ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: widget.items.length > 1
-                              ? bottomInset + 96
-                              : bottomInset + AppSpacing.xl,
-                          child: AnimatedOpacity(
-                            opacity: chromeOpacity,
-                            duration: AppMotion.fast,
-                            child: IgnorePointer(
-                              ignoring: chromeOpacity == 0,
-                              child: Center(
-                                child: GalleryGlassPill(
-                                  child: Text(
-                                    'Pinch or double-tap to zoom',
-                                    style: AppTypography.badgeLabel.copyWith(
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.textOnDark,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
@@ -577,27 +660,6 @@ class _FullscreenPhotoGalleryScreenState
                               alpha: 0.24 * chromeOpacity,
                             ),
                           ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: topInset + 52,
-                  child: AnimatedOpacity(
-                    opacity: chromeOpacity,
-                    duration: AppMotion.fast,
-                    child: IgnorePointer(
-                      ignoring: chromeOpacity == 0,
-                      child: Center(
-                        child: Text(
-                          'Drag down to close',
-                          style: AppTypography.badgeLabel.copyWith(
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textOnDarkMuted,
-                          ),
                         ),
                       ),
                     ),

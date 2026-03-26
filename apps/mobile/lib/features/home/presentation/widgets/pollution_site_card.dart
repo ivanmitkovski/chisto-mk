@@ -18,9 +18,14 @@ import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_widgets.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 
 class PollutionSiteCard extends StatefulWidget {
-  const PollutionSiteCard({super.key, required this.site});
+  const PollutionSiteCard({
+    super.key,
+    required this.site,
+  });
 
   final PollutionSite site;
 
@@ -39,6 +44,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   bool _didPrefetchImages = false;
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
+  bool _isUpvoteInFlight = false;
+  bool _isSaveInFlight = false;
+  bool _isShareInFlight = false;
+  double _upvoteIconScale = 1;
 
   // Cache for word-boundary truncation to avoid recomputing every build.
   String? _cachedTitleTruncated;
@@ -57,11 +66,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   @override
   void initState() {
     super.initState();
-    _isUpvoted = false;
+    _isUpvoted = site.isUpvotedByMe;
     _upvoteCount = site.score;
     _commentCount = site.commentCount;
-    _shareCount = (site.participantCount / 2).ceil();
+    _shareCount = site.shareCount;
     _sessionComments = List<Comment>.from(site.comments);
+    _isSaved = site.isSavedByMe;
   }
 
   @override
@@ -82,7 +92,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   void _onUpvoteTap() {
-    AppHaptics.tap();
+    if (_isUpvoteInFlight) return;
+    _isUpvoteInFlight = true;
+    final bool prevUpvoted = _isUpvoted;
+    final int prevCount = _upvoteCount;
     setState(() {
       if (_isUpvoted) {
         _isUpvoted = false;
@@ -91,13 +104,48 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         _isUpvoted = true;
         _upvoteCount += 1;
       }
+      _upvoteIconScale = 0.86;
+    });
+    Future<void>.delayed(const Duration(milliseconds: 120), () {
+      if (!mounted) return;
+      setState(() => _upvoteIconScale = 1);
+    });
+    final repo = ServiceLocator.instance.sitesRepository;
+    final future = prevUpvoted ? repo.removeSiteUpvote(site.id) : repo.upvoteSite(site.id);
+    future.then((snapshot) {
+      if (!mounted) return;
+      setState(() {
+        _isUpvoted = snapshot.isUpvotedByMe;
+        _upvoteCount = snapshot.upvotesCount;
+        _commentCount = snapshot.commentsCount;
+        _shareCount = snapshot.sharesCount;
+        _isSaved = snapshot.isSavedByMe;
+      });
+      AppHaptics.light();
+    }).catchError((_) {
+      if (!mounted) return;
+      setState(() {
+        _isUpvoted = prevUpvoted;
+        _upvoteCount = prevCount;
+      });
+      AppHaptics.medium();
+      AppSnack.show(
+        context,
+        message: 'Could not update upvote. Please try again.',
+        type: AppSnackType.warning,
+      );
+    }).whenComplete(() {
+      _isUpvoteInFlight = false;
     });
   }
 
-  void _toggleSave() {
+  Future<void> _toggleSave() async {
+    if (_isSaveInFlight) return;
+    _isSaveInFlight = true;
     AppHaptics.light();
+    final bool nextSaved = !_isSaved;
     setState(() {
-      _isSaved = !_isSaved;
+      _isSaved = nextSaved;
       _saveIconScale = 0.9;
     });
 
@@ -106,15 +154,40 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       setState(() => _saveIconScale = 1.0);
     });
 
-    final String message = _isSaved
+    final String message = nextSaved
         ? 'You will get updates for this site'
         : 'Removed from your saved sites';
     AppSnack.show(
       context,
       message: message,
-      type: _isSaved ? AppSnackType.success : AppSnackType.info,
+      type: nextSaved ? AppSnackType.success : AppSnackType.info,
       duration: const Duration(milliseconds: 1200),
     );
+    try {
+      final repo = ServiceLocator.instance.sitesRepository;
+      final snapshot = nextSaved
+          ? await repo.saveSite(site.id)
+          : await repo.unsaveSite(site.id);
+      if (!mounted) return;
+      setState(() {
+        _isSaved = snapshot.isSavedByMe;
+        _upvoteCount = snapshot.upvotesCount;
+        _commentCount = snapshot.commentsCount;
+        _shareCount = snapshot.sharesCount;
+        _isUpvoted = snapshot.isUpvotedByMe;
+      });
+    } catch (_) {
+      if (mounted) {
+        setState(() => _isSaved = !nextSaved);
+        AppSnack.show(
+          context,
+          message: 'Could not update saved state. Please try again.',
+          type: AppSnackType.warning,
+        );
+      }
+    } finally {
+      _isSaveInFlight = false;
+    }
   }
 
   Widget _buildAnimatedCount(int value, TextStyle style) {
@@ -219,7 +292,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
                         _buildEngagementRow(context),
-                        const SizedBox(height: AppSpacing.md),
+                        const SizedBox(height: AppSpacing.sm),
                         LayoutBuilder(
                           builder:
                               (
@@ -227,15 +300,21 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                 BoxConstraints constraints,
                               ) {
                                 final double maxWidth = constraints.maxWidth;
-                                final TextStyle titleStyle =
-                                    AppTypography.textTheme.titleMedium!;
+                                final TextStyle titleStyle = AppTypography
+                                    .textTheme
+                                    .titleSmall!
+                                    .copyWith(
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 17,
+                                      letterSpacing: -0.2,
+                                    );
                                 final TextStyle descStyle = AppTypography
                                     .textTheme
-                                    .bodyMedium!
+                                    .bodySmall!
                                     .copyWith(
                                       color: AppColors.textSecondary,
                                       height: 1.35,
-                                      fontSize: 15,
+                                      fontSize: 14,
                                     );
                                 final bool cacheValid =
                                     _cachedTruncationWidth == maxWidth &&
@@ -274,9 +353,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                 final bool redundant =
                                     titleNorm.isEmpty ||
                                     descNorm.isEmpty ||
-                                    titleNorm == descNorm ||
-                                    descNorm.startsWith(titleNorm) ||
-                                    titleNorm.startsWith(descNorm);
+                                    titleNorm == descNorm;
 
                                 return Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -307,10 +384,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                 );
                               },
                         ),
-                        const SizedBox(height: AppSpacing.lg),
+                        const SizedBox(height: AppSpacing.md),
                         PrimaryButton(
                           label: 'Take action',
-                          onPressed: () => _openTakeActionSheet(context),
+                          onPressed: () => _openTakeActionSheet(),
                         ),
                       ],
                     ),
@@ -339,6 +416,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
               controller: _pageController,
               itemCount: images.length,
               onPageChanged: (int index) {
+                AppHaptics.light();
                 setState(() {
                   _currentImageIndex = index;
                 });
@@ -387,7 +465,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      '${site.statusLabel} • ${site.distanceKm.toStringAsFixed(0)} km',
+                      site.distanceKm >= 0
+                          ? '${site.statusLabel} • ${_formatDistance(site.distanceKm)}'
+                          : site.statusLabel,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: AppColors.textOnDark,
                         fontWeight: FontWeight.w600,
@@ -436,8 +516,8 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     final TextStyle countStyle = Theme.of(context).textTheme.bodySmall!
         .copyWith(
           fontSize: _actionCountFontSize,
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w500,
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.w600,
           letterSpacing: -0.2,
         );
     final int commentCount = _commentCount;
@@ -459,23 +539,28 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                     children: <Widget>[
                       Semantics(
                         button: true,
-                        label: _isUpvoted ? 'Remove upvote' : 'Upvote',
+                        label: _isUpvoted
+                            ? 'Remove upvote for ${site.title}'
+                            : 'Upvote ${site.title}',
                         child: GestureDetector(
-                          onTap: _onUpvoteTap,
+                          onTap: _isUpvoteInFlight ? null : _onUpvoteTap,
                           behavior: HitTestBehavior.opaque,
                           child: SizedBox(
                             width: 44,
                             height: 44,
                             child: Center(
-                              child: SvgPicture.asset(
-                                AppAssets.cardArrowUp,
-                                width: _actionIconSize,
-                                height: _actionIconSize,
-                                colorFilter: ColorFilter.mode(
+                              child: AnimatedScale(
+                                duration: const Duration(milliseconds: 180),
+                                curve: AppMotion.emphasized,
+                                scale: _upvoteIconScale,
+                                child: Icon(
                                   _isUpvoted
+                                      ? Icons.arrow_circle_up_rounded
+                                      : Icons.arrow_circle_up_outlined,
+                                  size: _actionIconSize,
+                                  color: _isUpvoted
                                       ? AppColors.primaryDark
                                       : AppColors.textPrimary,
-                                  BlendMode.srcIn,
                                 ),
                               ),
                             ),
@@ -485,7 +570,8 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                       const SizedBox(width: 4),
                       Semantics(
                         button: true,
-                        label: '$_upvoteCount upvotes, tap to see who',
+                        label:
+                            '$_upvoteCount ${_upvoteCount == 1 ? 'upvote' : 'upvotes'} on ${site.title}, tap to see supporters',
                         child: GestureDetector(
                           onTap: () async {
                             AppHaptics.tap();
@@ -511,11 +597,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                 const SizedBox(width: 14),
                 Semantics(
                   button: true,
-                  label: 'Comments, $commentCount',
+                  label:
+                      '$commentCount ${commentCount == 1 ? 'comment' : 'comments'} on ${site.title}',
                   child: GestureDetector(
                     onTap: () {
                       AppHaptics.tap();
-                      _openCommentsSheet(context);
+                      _openCommentsSheet();
                     },
                     behavior: HitTestBehavior.opaque,
                     child: SizedBox(
@@ -528,14 +615,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                             width: 44,
                             height: 44,
                             child: Center(
-                              child: SvgPicture.asset(
-                                AppAssets.cardComments,
-                                width: _actionIconSize,
-                                height: _actionIconSize,
-                                colorFilter: const ColorFilter.mode(
-                                  AppColors.textPrimary,
-                                  BlendMode.srcIn,
-                                ),
+                              child: Icon(
+                                Icons.mode_comment_outlined,
+                                size: _actionIconSize,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                           ),
@@ -559,12 +642,15 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                 const SizedBox(width: 14),
                 Semantics(
                   button: true,
-                  label: 'Shares, $shareCount',
+                  label:
+                      '$shareCount ${shareCount == 1 ? 'share' : 'shares'} on ${site.title}',
                   child: GestureDetector(
-                    onTap: () {
-                      AppHaptics.tap();
-                      _openShareSheet(context);
-                    },
+                    onTap: _isShareInFlight
+                        ? null
+                        : () {
+                            AppHaptics.tap();
+                            _openShareSheet();
+                          },
                     behavior: HitTestBehavior.opaque,
                     child: SizedBox(
                       height: 44,
@@ -580,7 +666,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                                 AppAssets.cardShare,
                                 width: _actionIconSize,
                                 height: _actionIconSize,
-                                colorFilter: const ColorFilter.mode(
+                                colorFilter: ColorFilter.mode(
                                   AppColors.textPrimary,
                                   BlendMode.srcIn,
                                 ),
@@ -610,12 +696,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         ),
         Semantics(
           button: true,
-          label: _isSaved ? 'Unsave, stop updates' : 'Save and get updates',
+          label: _isSaved
+              ? 'Unsave ${site.title} and stop updates'
+              : 'Save ${site.title} and get updates',
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: () {
-              _toggleSave();
-            },
+            onTap: _isSaveInFlight ? null : () => _toggleSave(),
             child: SizedBox(
               width: 44,
               height: 44,
@@ -630,9 +716,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                         ? Icons.bookmark_rounded
                         : Icons.bookmark_border_rounded,
                     size: _actionIconSize,
-                    color: _isSaved
-                        ? AppColors.primaryDark
-                        : AppColors.textPrimary,
+                    color: AppColors.textPrimary,
                   ),
                 ),
               ),
@@ -643,19 +727,58 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     );
   }
 
-  void _openDetails(BuildContext context) {
+  Future<void> _openDetails(BuildContext context) async {
     AppHaptics.softTransition();
     for (int i = 0; i < site.galleryImages.length && i < 3; i++) {
       precacheImage(site.galleryImages[i], context);
     }
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(site: site),
       ),
     );
+    if (!mounted) return;
+    try {
+      final refreshed = await ServiceLocator.instance.sitesRepository.getSiteById(site.id);
+      if (!mounted || refreshed == null) return;
+      setState(() {
+        _isUpvoted = refreshed.isUpvotedByMe;
+        _isSaved = refreshed.isSavedByMe;
+        _upvoteCount = refreshed.score;
+        _commentCount = refreshed.commentCount;
+        _shareCount = refreshed.shareCount;
+      });
+    } catch (_) {}
   }
 
-  Future<void> _openCommentsSheet(BuildContext context) async {
+  Future<void> _openCommentsSheet() async {
+    Future<List<Comment>> loadComments(String sort) async {
+      final result = await ServiceLocator.instance.sitesRepository.getSiteComments(
+        site.id,
+        sort: sort,
+      );
+      if (mounted) {
+        setState(() => _commentCount = result.total);
+      }
+      return result.items.map(_commentFromSiteCommentItem).toList();
+    }
+    try {
+      final comments = await loadComments('top');
+      if (mounted) {
+        setState(() {
+          _sessionComments = comments;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'Could not load comments right now.',
+          type: AppSnackType.warning,
+        );
+      }
+    }
+    if (!mounted) return;
     final DraggableScrollableController sheetController =
         DraggableScrollableController();
     await showModalBottomSheet<void>(
@@ -706,6 +829,38 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   if (!mounted) return;
                   setState(() => _sessionComments = comments);
                 },
+                onCommentSubmitted: (String text, String? parentId) {
+                  return ServiceLocator.instance.sitesRepository.createSiteComment(
+                    site.id,
+                    text,
+                    parentId: parentId,
+                  ).then(_commentFromSiteCommentItem);
+                },
+                onCommentEdited: (String commentId, String body) {
+                  return ServiceLocator.instance.sitesRepository.updateSiteComment(
+                    site.id,
+                    commentId,
+                    body,
+                  );
+                },
+                onCommentDeleted: (String commentId) {
+                  return ServiceLocator.instance.sitesRepository.deleteSiteComment(
+                    site.id,
+                    commentId,
+                  );
+                },
+                onCommentLikeToggled: (String commentId, bool shouldLike) {
+                  return shouldLike
+                      ? ServiceLocator.instance.sitesRepository.likeSiteComment(
+                          site.id,
+                          commentId,
+                        ).then((_) {})
+                      : ServiceLocator.instance.sitesRepository.unlikeSiteComment(
+                          site.id,
+                          commentId,
+                        ).then((_) {});
+                },
+                onSortChanged: loadComments,
               ),
             );
           },
@@ -714,10 +869,11 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     );
   }
 
-  Future<void> _openTakeActionSheet(BuildContext context) async {
+  Future<void> _openTakeActionSheet() async {
+    if (_isShareInFlight) return;
     final TakeActionType? action = await TakeActionSheet.show(context);
-    if (action == null || !context.mounted) return;
-    await TakeActionCoordinator.execute(
+    if (action == null || !mounted) return;
+    final bool shareConfirmed = await TakeActionCoordinator.execute(
       context,
       action: action,
       site: site,
@@ -726,10 +882,28 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
       },
     );
+    if (action != TakeActionType.shareSite || !shareConfirmed) return;
+    _isShareInFlight = true;
+    try {
+      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
+      if (!mounted) return;
+      setState(() => _shareCount = snapshot.sharesCount);
+    } catch (_) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'Could not track share right now.',
+          type: AppSnackType.warning,
+        );
+      }
+    } finally {
+      _isShareInFlight = false;
+    }
   }
 
-  Future<void> _openShareSheet(BuildContext context) async {
-    await TakeActionCoordinator.execute(
+  Future<void> _openShareSheet() async {
+    if (_isShareInFlight) return;
+    final bool shareConfirmed = await TakeActionCoordinator.execute(
       context,
       action: TakeActionType.shareSite,
       site: site,
@@ -738,6 +912,23 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
       },
     );
+    if (!shareConfirmed) return;
+    _isShareInFlight = true;
+    try {
+      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
+      if (!mounted) return;
+      setState(() => _shareCount = snapshot.sharesCount);
+    } catch (_) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'Could not track share right now.',
+          type: AppSnackType.warning,
+        );
+      }
+    } finally {
+      _isShareInFlight = false;
+    }
   }
 
   Future<void> _showUpvotersSheet(BuildContext context) async {
@@ -788,6 +979,31 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
           },
         );
       },
+    );
+  }
+
+  String _formatDistance(double km) {
+    if (km < 1) {
+      final int meters = (km * 1000).round().clamp(1, 999);
+      return '$meters m';
+    }
+    if (km < 10) {
+      return '${km.toStringAsFixed(1)} km';
+    }
+    return '${km.toStringAsFixed(0)} km';
+  }
+
+  Comment _commentFromSiteCommentItem(SiteCommentItem item) {
+    final String currentUserId = ServiceLocator.instance.authState.userId ?? '';
+    return Comment(
+      id: item.id,
+      authorName: item.authorName,
+      text: item.body,
+      parentId: item.parentId,
+      likeCount: item.likeCount,
+      isLikedByMe: item.isLikedByMe,
+      isOwnedByMe: item.authorId == currentUserId,
+      replies: item.replies.map(_commentFromSiteCommentItem).toList(),
     );
   }
 }

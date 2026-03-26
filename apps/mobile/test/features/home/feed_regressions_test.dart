@@ -1,0 +1,50 @@
+import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_stats_row.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  test('site gallery returns all provided images', () {
+    final site = PollutionSite(
+      id: 'site_1',
+      title: 'Title',
+      description: 'Desc',
+      statusLabel: 'Verified',
+      statusColor: Colors.green,
+      distanceKm: -1,
+      score: 1,
+      participantCount: 0,
+      imageProvider: const AssetImage('assets/images/content/people_cleaning.png'),
+      images: const <ImageProvider>[
+        AssetImage('assets/images/content/people_cleaning.png'),
+        AssetImage('assets/images/content/people_cleaning.png'),
+      ],
+    );
+
+    expect(site.galleryImages.length, 2);
+  });
+
+  testWidgets('shows compact token for unknown distance', (tester) async {
+    final site = PollutionSite(
+      id: 'site_1',
+      title: 'Title',
+      description: 'Desc',
+      statusLabel: 'Verified',
+      statusColor: Colors.green,
+      distanceKm: -1,
+      score: 1,
+      participantCount: 0,
+      imageProvider: const AssetImage('assets/images/content/people_cleaning.png'),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SiteStatsRow(site: site),
+        ),
+      ),
+    );
+
+    expect(find.text('—'), findsOneWidget);
+  });
+}

@@ -19,7 +19,7 @@ class ShareSheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusPill)),
       ),
       clipBehavior: Clip.antiAlias,
       child: SafeArea(
@@ -38,14 +38,14 @@ class ShareSheet extends StatelessWidget {
               Center(
                 child: Container(
                   width: 36,
-                  height: 4,
+                  height: 5,
                   decoration: BoxDecoration(
                     color: AppColors.inputBorder,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 title,
                 style: Theme.of(

@@ -20,6 +20,9 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/device_platform.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/home/domain/models/comment.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 
 class PollutionSiteDetailScreen extends StatefulWidget {
   const PollutionSiteDetailScreen({
@@ -39,23 +42,50 @@ class PollutionSiteDetailScreen extends StatefulWidget {
 class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   late final Map<String, LatLng> _siteCoordinates;
   late final SiteIssueReportRepository _siteIssueRepo;
+  late PollutionSite _site;
   bool _hasReportedIssue = false;
+  bool _isSaved = false;
+  bool _isUpvoteInFlight = false;
+  double _upvoteScale = 1;
+  List<Comment> _comments = <Comment>[];
 
   @override
   void initState() {
     super.initState();
+    _site = widget.site;
     _siteCoordinates = <String, LatLng>{};
-    if (widget.site.latitude != null && widget.site.longitude != null) {
-      _siteCoordinates[widget.site.id] =
-          LatLng(widget.site.latitude!, widget.site.longitude!);
+    if (_site.latitude != null && _site.longitude != null) {
+      _siteCoordinates[_site.id] = LatLng(_site.latitude!, _site.longitude!);
     }
     _siteIssueRepo = SiteIssueReportRepository();
+    _isSaved = _site.isSavedByMe;
+    _comments = List<Comment>.from(_site.comments);
     _loadReportedState();
+    _refreshSiteDetails();
   }
 
   Future<void> _loadReportedState() async {
-    final bool reported = await _siteIssueRepo.hasReported(widget.site.id);
+    final bool reported = await _siteIssueRepo.hasReported(_site.id);
     if (mounted) setState(() => _hasReportedIssue = reported);
+  }
+
+  Future<void> _refreshSiteDetails() async {
+    try {
+      final PollutionSite? refreshed =
+          await ServiceLocator.instance.sitesRepository.getSiteById(_site.id);
+      if (!mounted || refreshed == null) return;
+      final double resolvedDistanceKm =
+          refreshed.distanceKm >= 0 ? refreshed.distanceKm : _site.distanceKm;
+      setState(() {
+        _site = refreshed.copyWith(distanceKm: resolvedDistanceKm);
+        _isSaved = refreshed.isSavedByMe;
+        _comments = List<Comment>.from(refreshed.comments);
+      });
+      if (refreshed.latitude != null && refreshed.longitude != null) {
+        _siteCoordinates[refreshed.id] =
+            LatLng(refreshed.latitude!, refreshed.longitude!);
+      }
+    } catch (_) {}
   }
 
   @override
@@ -77,9 +107,12 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
                     child: TabBarView(
                       children: <Widget>[
                         PollutionSiteTab(
-                          site: widget.site,
+                          site: _site,
                           isReported: _hasReportedIssue,
                           onTakeAction: () => _openTakeActionDialog(tabContext),
+                          onUpvoteTap: () => _onUpvoteTapped(tabContext),
+                          isUpvotePending: _isUpvoteInFlight,
+                          upvoteScale: _upvoteScale,
                           onScoreTap: () => _showUpvotersSheet(tabContext),
                           onCommentsTap: () => _showCommentsSheet(tabContext),
                           onParticipantsTap: () => _onParticipantsTap(tabContext),
@@ -87,14 +120,11 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
                           onReportedTap: () => _onReportedTap(tabContext),
                           onSaveTap: () => _onSaveTapped(tabContext),
                           onReportTap: () => _openReportIssueSheet(tabContext),
-                        onShareTap: () => TakeActionCoordinator.execute(
-                          tabContext,
-                          action: TakeActionType.shareSite,
-                          site: widget.site,
+                          isSaved: _isSaved,
+                          onShareTap: () => _onShareTap(tabContext),
                         ),
-                      ),
                         CleaningEventsTab(
-                          site: widget.site,
+                          site: _site,
                           onCreateEvent: _createEvent,
                         ),
                       ],
@@ -113,11 +143,11 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
     AppHaptics.softTransition();
     final EcoEvent? createdEvent = await EventsNavigation.openCreate(
       context,
-      preselectedSiteId: widget.site.id,
-      preselectedSiteName: widget.site.title,
+      preselectedSiteId: _site.id,
+      preselectedSiteName: _site.title,
       preselectedSiteImageUrl:
           'assets/images/references/onboarding_reference.png',
-      preselectedSiteDistanceKm: widget.site.distanceKm.toDouble(),
+      preselectedSiteDistanceKm: _site.distanceKm.toDouble(),
     );
     if (createdEvent == null || !mounted) return;
     await EventsNavigation.openDetail(context, eventId: createdEvent.id);
@@ -126,21 +156,25 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   Future<void> _openTakeActionDialog(BuildContext context) async {
     final TakeActionType? action = await TakeActionSheet.show(context);
     if (action == null || !context.mounted) return;
-    await TakeActionCoordinator.execute(
+    final bool shareConfirmed = await TakeActionCoordinator.execute(
       context,
       action: action,
-      site: widget.site,
+      site: _site,
       isFromSiteDetail: true,
       onSwitchToCleaningTab: () {
         DefaultTabController.of(context).animateTo(1);
       },
     );
+    if (action != TakeActionType.shareSite || !shareConfirmed) return;
+    try {
+      await ServiceLocator.instance.sitesRepository.shareSite(_site.id);
+    } catch (_) {}
   }
 
   Future<void> _openReportIssueSheet(BuildContext context) async {
     final bool? reported = await ReportIssueSheet.show(
       context,
-      site: widget.site,
+      site: _site,
       repository: _siteIssueRepo,
     );
     if (!context.mounted) return;
@@ -154,24 +188,92 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
     }
   }
 
-  void _onSaveTapped(BuildContext context) {
-    if (!mounted) return;
+  Future<void> _onSaveTapped(BuildContext context) async {
+    final bool nextSaved = !_isSaved;
+    setState(() => _isSaved = nextSaved);
+    try {
+      final snapshot = nextSaved
+          ? await ServiceLocator.instance.sitesRepository.saveSite(_site.id)
+          : await ServiceLocator.instance.sitesRepository.unsaveSite(_site.id);
+      if (!mounted) return;
+      setState(() => _isSaved = snapshot.isSavedByMe);
+    } catch (_) {}
+    if (!mounted || !context.mounted) return;
     AppSnack.show(
       context,
-      message: 'Site saved to your list.',
+      message: nextSaved ? 'Site saved to your list.' : 'Removed from saved sites.',
       type: AppSnackType.success,
     );
   }
 
+  Future<void> _onUpvoteTapped(BuildContext context) async {
+    if (_isUpvoteInFlight) return;
+    _isUpvoteInFlight = true;
+    final PollutionSite previous = _site;
+    final bool nextUpvoted = !_site.isUpvotedByMe;
+    setState(() {
+      _site = _site.copyWith(
+        isUpvotedByMe: nextUpvoted,
+        score: (_site.score + (nextUpvoted ? 1 : -1)).clamp(0, 9999),
+      );
+      _upvoteScale = 0.88;
+    });
+    Future<void>.delayed(const Duration(milliseconds: 120), () {
+      if (!mounted) return;
+      setState(() => _upvoteScale = 1);
+    });
+    try {
+      final snapshot = nextUpvoted
+          ? await ServiceLocator.instance.sitesRepository.upvoteSite(_site.id)
+          : await ServiceLocator.instance.sitesRepository.removeSiteUpvote(_site.id);
+      if (!mounted) return;
+      setState(() {
+        _site = _site.copyWith(
+          score: snapshot.upvotesCount,
+          commentsCount: snapshot.commentsCount,
+          shareCount: snapshot.sharesCount,
+          isUpvotedByMe: snapshot.isUpvotedByMe,
+          isSavedByMe: snapshot.isSavedByMe,
+        );
+        _isSaved = snapshot.isSavedByMe;
+      });
+      AppHaptics.light();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _site = previous);
+      AppHaptics.medium();
+      if (!context.mounted) return;
+      AppSnack.show(
+        context,
+        message: 'Could not update upvote. Please try again.',
+        type: AppSnackType.warning,
+      );
+    } finally {
+      _isUpvoteInFlight = false;
+    }
+  }
+
+  Future<void> _onShareTap(BuildContext context) async {
+    final bool shareConfirmed = await TakeActionCoordinator.execute(
+      context,
+      action: TakeActionType.shareSite,
+      site: _site,
+    );
+    if (!shareConfirmed) return;
+    try {
+      await ServiceLocator.instance.sitesRepository.shareSite(_site.id);
+    } catch (_) {}
+  }
+
   Future<void> _onReportedTap(BuildContext context) async {
-    final SiteReport? report = widget.site.firstReport;
+    final SiteReport? report = _site.firstReport;
     if (report == null) return;
     AppHaptics.tap();
     await FirstReportModal.show(context, report);
   }
 
   Future<void> _onParticipantsTap(BuildContext context) async {
-    final List<String> coReporters = widget.site.coReporterNames;
+    final List<String> coReporters = _site.coReporterNames;
     if (coReporters.isNotEmpty) {
       AppHaptics.tap();
       await CoReportersModal.show(context, coReporters);
@@ -182,6 +284,22 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
 
   Future<void> _showCommentsSheet(BuildContext context) async {
     AppHaptics.tap();
+    Future<List<Comment>> loadComments(String sort) async {
+      final result = await ServiceLocator.instance.sitesRepository.getSiteComments(
+        _site.id,
+        sort: sort,
+      );
+      return result.items.map(_commentFromSiteCommentItem).toList();
+    }
+    try {
+      final comments = await loadComments('top');
+      if (mounted) {
+        setState(() {
+          _comments = comments;
+        });
+      }
+    } catch (_) {}
+    if (!context.mounted) return;
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -203,9 +321,51 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
               ),
               clipBehavior: Clip.antiAlias,
               child: CommentsBottomSheet(
-                comments: widget.site.comments,
-                siteTitle: widget.site.title,
+                comments: _comments,
+                siteTitle: _site.title,
                 scrollController: scrollController,
+                onCommentsCountChanged: (int count) {
+                  if (!mounted) return;
+                  setState(() {
+                    _site = _site.copyWith(commentsCount: count);
+                  });
+                },
+                onCommentsChanged: (comments) {
+                  if (!mounted) return;
+                  setState(() => _comments = comments);
+                },
+                onCommentSubmitted: (String text, String? parentId) {
+                  return ServiceLocator.instance.sitesRepository.createSiteComment(
+                    _site.id,
+                    text,
+                    parentId: parentId,
+                  ).then(_commentFromSiteCommentItem);
+                },
+                onCommentEdited: (String commentId, String body) {
+                  return ServiceLocator.instance.sitesRepository.updateSiteComment(
+                    _site.id,
+                    commentId,
+                    body,
+                  );
+                },
+                onCommentDeleted: (String commentId) {
+                  return ServiceLocator.instance.sitesRepository.deleteSiteComment(
+                    _site.id,
+                    commentId,
+                  );
+                },
+                onCommentLikeToggled: (String commentId, bool shouldLike) {
+                  return shouldLike
+                      ? ServiceLocator.instance.sitesRepository.likeSiteComment(
+                          _site.id,
+                          commentId,
+                        ).then((_) {})
+                      : ServiceLocator.instance.sitesRepository.unlikeSiteComment(
+                          _site.id,
+                          commentId,
+                        ).then((_) {});
+                },
+                onSortChanged: loadComments,
               ),
             );
           },
@@ -215,7 +375,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   }
 
   Future<void> _showUpvotersSheet(BuildContext context) async {
-    final int count = widget.site.score.clamp(0, 999);
+    final int count = _site.score.clamp(0, 999);
     if (count == 0) {
       AppSnack.show(
         context,
@@ -265,7 +425,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   }
 
   Future<void> _showParticipantsSheet(BuildContext context) async {
-    final int count = widget.site.participantCount.clamp(0, 999);
+    final int count = _site.participantCount.clamp(0, 999);
     if (count == 0) {
       AppSnack.show(
         context,
@@ -313,7 +473,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   }
 
   Future<void> _showDirectionsSheet(BuildContext context) async {
-    final LatLng? point = _siteCoordinates[widget.site.id];
+    final LatLng? point = _siteCoordinates[_site.id];
     if (point == null) {
       AppSnack.show(
         context,
@@ -386,7 +546,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
           Expanded(
             child: Center(
               child: Text(
-                widget.site.title,
+                _site.title,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: 17,
@@ -434,6 +594,20 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
           Tab(text: 'Cleaning events'),
         ],
       ),
+    );
+  }
+
+  Comment _commentFromSiteCommentItem(SiteCommentItem item) {
+    final String currentUserId = ServiceLocator.instance.authState.userId ?? '';
+    return Comment(
+      id: item.id,
+      authorName: item.authorName,
+      text: item.body,
+      parentId: item.parentId,
+      likeCount: item.likeCount,
+      isLikedByMe: item.isLikedByMe,
+      isOwnedByMe: item.authorId == currentUserId,
+      replies: item.replies.map(_commentFromSiteCommentItem).toList(),
     );
   }
 }

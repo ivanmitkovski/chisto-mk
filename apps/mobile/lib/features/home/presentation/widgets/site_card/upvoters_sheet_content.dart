@@ -32,14 +32,14 @@ class UpvotersSheetContent extends StatelessWidget {
               Center(
                 child: Container(
                   width: 36,
-                  height: 4,
+                  height: 5,
                   decoration: BoxDecoration(
                     color: AppColors.inputBorder,
                     borderRadius: BorderRadius.circular(999),
                   ),
                 ),
               ),
-              const SizedBox(height: AppSpacing.sm),
+              const SizedBox(height: AppSpacing.md),
               Text(
                 'Upvoters',
                 style: Theme.of(

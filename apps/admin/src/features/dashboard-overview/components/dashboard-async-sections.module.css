@@ -135,7 +135,7 @@
 
 @media (min-width: 64rem) {
   .insightsRow {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
   }
 }
 
@@ -147,6 +147,72 @@
 
 .insightsError {
   min-width: 0;
+}
+
+.feedDiagnosticsCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.feedDiagnosticsTitle {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.feedDiagnosticsSubline {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.feedReasonList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.feedReasonRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.feedReasonCode {
+  color: var(--text-secondary);
+  text-transform: capitalize;
+}
+
+.feedReasonCount {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
+}
+
+.feedDriftList {
+  margin-top: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.feedDriftRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xs);
+}
+
+.feedDriftSite {
+  color: var(--text-secondary);
+}
+
+.feedDriftScore {
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-primary);
 }
 
 .insightsHeadingSkeleton {

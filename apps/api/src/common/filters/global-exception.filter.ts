@@ -21,6 +21,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
     const response = context.getResponse();
+    const request = context.getRequest<{ method?: string; url?: string; requestId?: string }>();
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
@@ -37,7 +38,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    console.error('Unhandled exception in request pipeline:', exception);
+    // Structured error logging with request correlation id for production diagnostics.
+    console.error(
+      JSON.stringify({
+        requestId: request?.requestId ?? null,
+        method: request?.method ?? null,
+        route: request?.url ?? null,
+        message: 'Unhandled exception in request pipeline',
+        error:
+          exception instanceof Error
+            ? { name: exception.name, message: exception.message }
+            : String(exception),
+      }),
+    );
 
     const fallback: ErrorResponse = {
       code: 'INTERNAL_ERROR',

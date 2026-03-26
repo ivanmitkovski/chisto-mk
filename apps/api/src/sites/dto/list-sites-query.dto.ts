@@ -1,7 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { SiteStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import { IsEnum, IsInt, IsNumber, IsOptional, Max, Min } from 'class-validator';
+import { IsBoolean, IsEnum, IsInt, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+
+export enum SiteFeedSort {
+  HYBRID = 'hybrid',
+  RECENT = 'recent',
+}
+
+export enum SiteFeedMode {
+  FOR_YOU = 'for_you',
+  LATEST = 'latest',
+}
 
 export class ListSitesQueryDto {
   @ApiPropertyOptional({
@@ -38,6 +48,33 @@ export class ListSitesQueryDto {
   @IsEnum(SiteStatus)
   status?: SiteStatus;
 
+  @ApiPropertyOptional({
+    enum: SiteFeedSort,
+    default: SiteFeedSort.HYBRID,
+    description: 'Feed sort mode',
+  })
+  @IsOptional()
+  @IsEnum(SiteFeedSort)
+  sort: SiteFeedSort = SiteFeedSort.HYBRID;
+
+  @ApiPropertyOptional({
+    enum: SiteFeedMode,
+    default: SiteFeedMode.FOR_YOU,
+    description: 'Feed mode for personalized vs latest ranking.',
+  })
+  @IsOptional()
+  @IsEnum(SiteFeedMode)
+  mode: SiteFeedMode = SiteFeedMode.FOR_YOU;
+
+  @ApiPropertyOptional({
+    description: 'Include ranking explainability metadata in each feed item.',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  @Type(() => Boolean)
+  explain = false;
+
   @ApiPropertyOptional({ default: 1, minimum: 1 })
   @Type(() => Number)
   @IsOptional()
@@ -52,4 +89,13 @@ export class ListSitesQueryDto {
   @Min(1)
   @Max(100)
   limit = 20;
+
+  @ApiPropertyOptional({
+    description:
+      'Cursor token for feed pagination. When set, server ignores page offset and returns next window.',
+    example: '1711470000000|site_123',
+  })
+  @IsOptional()
+  @IsString()
+  cursor?: string;
 }

@@ -22,6 +22,7 @@ export class ReportsUploadService {
   private readonly bucket: string | null = null;
   private readonly region: string;
   private readonly enabled: boolean;
+  private readonly signedUrlCache = new Map<string, { url: string; expiresAt: number }>();
 
   constructor(private readonly configService: ConfigService) {
     this.region =
@@ -120,6 +121,7 @@ export class ReportsUploadService {
       return urls ?? [];
     }
     const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    const now = Date.now();
     const result: string[] = [];
     for (const url of urls) {
       if (typeof url !== 'string' || !url.startsWith(base)) {
@@ -127,12 +129,22 @@ export class ReportsUploadService {
         continue;
       }
       const key = decodeURIComponent(url.slice(base.length).split('?')[0]);
+      const cacheHit = this.signedUrlCache.get(key);
+      if (cacheHit && cacheHit.expiresAt > now) {
+        result.push(cacheHit.url);
+        continue;
+      }
       try {
         const signed = await getSignedUrl(
           this.s3,
           new GetObjectCommand({ Bucket: this.bucket, Key: key }),
           { expiresIn: 3600 },
         );
+        this.signedUrlCache.set(key, {
+          url: signed,
+          // Keep a safety buffer so we do not serve nearly-expired links.
+          expiresAt: now + 50 * 60 * 1000,
+        });
         result.push(signed);
       } catch {
         result.push(url);

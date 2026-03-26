@@ -17,6 +17,11 @@ type AdminOverviewResponse = {
   sessionsActive: number;
   reportsTrend: Array<{ date: string; count: number }>;
   recentActivity: RecentActivityItem[];
+  feedDiagnostics?: {
+    reasonCodes: Array<{ code: string; count: number }>;
+    rankDriftSnapshot: Array<{ siteId: string; score: number; reasons: string[] }>;
+    recentIntegrityDemotions: number;
+  };
 };
 
 export async function getDashboardStats(): Promise<StatCard[]> {
@@ -57,6 +62,11 @@ export async function getDashboardOverview(): Promise<{
   reportsTrend: ReportsTrendItem[];
   recentActivity: RecentActivityItem[];
   cleanupEvents: { upcoming: number; completed: number; pending?: number; upcomingEvents: Array<{ id: string; name: string; date: string }> };
+  feedDiagnostics: {
+    reasonCodes: Array<{ code: string; count: number }>;
+    rankDriftSnapshot: Array<{ siteId: string; score: number; reasons: string[] }>;
+    recentIntegrityDemotions: number;
+  };
 }> {
   const token = await getAdminAuthTokenFromCookies();
   const overview = await apiFetch<AdminOverviewResponse>('/admin/overview', {
@@ -95,6 +105,11 @@ export async function getDashboardOverview(): Promise<{
     cleanupEvents: {
       ...overview.cleanupEvents,
       upcomingEvents: overview.cleanupEvents.upcomingEvents ?? [],
+    },
+    feedDiagnostics: {
+      reasonCodes: overview.feedDiagnostics?.reasonCodes ?? [],
+      rankDriftSnapshot: overview.feedDiagnostics?.rankDriftSnapshot ?? [],
+      recentIntegrityDemotions: overview.feedDiagnostics?.recentIntegrityDemotions ?? 0,
     },
   };
 }

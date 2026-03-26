@@ -31,7 +31,7 @@ class FeedSectionHeader extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Text(
-              'Pollution sites',
+              'Pollution feed',
               style: AppTypography.textTheme.titleLarge?.copyWith(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -50,31 +50,22 @@ class FeedSectionHeader extends StatelessWidget {
               child: AnimatedContainer(
                 duration: AppMotion.fast,
                 curve: AppMotion.emphasized,
-                constraints: const BoxConstraints(minHeight: 44),
+                constraints: const BoxConstraints(minHeight: 40),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.sm,
-                  vertical: 8,
+                  horizontal: 10,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
                   color: activeFilter == FeedFilter.all
                       ? AppColors.panelBackground
                       : AppColors.primaryDark.withValues(alpha: 0.08),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: activeFilter == FeedFilter.all
                         ? AppColors.divider
                         : AppColors.primaryDark.withValues(alpha: 0.25),
                     width: 1,
                   ),
-                  boxShadow: activeFilter == FeedFilter.all
-                      ? null
-                      : <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.primaryDark.withValues(alpha: 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -86,7 +77,7 @@ class FeedSectionHeader extends StatelessWidget {
                             color: activeFilter == FeedFilter.all
                                 ? AppColors.textSecondary
                                 : AppColors.primaryDark,
-                            fontSize: 13,
+                            fontSize: 12,
                             letterSpacing: -0.1,
                           ),
                     ),

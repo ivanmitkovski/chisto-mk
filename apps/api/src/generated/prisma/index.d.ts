@@ -93,6 +93,31 @@ export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
  * 
  */
 export type CleanupEvent = $Result.DefaultSelection<Prisma.$CleanupEventPayload>
+/**
+ * Model SiteVote
+ * 
+ */
+export type SiteVote = $Result.DefaultSelection<Prisma.$SiteVotePayload>
+/**
+ * Model SiteSave
+ * 
+ */
+export type SiteSave = $Result.DefaultSelection<Prisma.$SiteSavePayload>
+/**
+ * Model SiteComment
+ * 
+ */
+export type SiteComment = $Result.DefaultSelection<Prisma.$SiteCommentPayload>
+/**
+ * Model SiteCommentLike
+ * 
+ */
+export type SiteCommentLike = $Result.DefaultSelection<Prisma.$SiteCommentLikePayload>
+/**
+ * Model SiteShareEvent
+ * 
+ */
+export type SiteShareEvent = $Result.DefaultSelection<Prisma.$SiteShareEventPayload>
 
 /**
  * Enums
@@ -177,6 +202,18 @@ export const CleanupEventStatus: {
 
 export type CleanupEventStatus = (typeof CleanupEventStatus)[keyof typeof CleanupEventStatus]
 
+
+export const SiteShareChannel: {
+  native: 'native',
+  link: 'link',
+  whatsapp: 'whatsapp',
+  facebook: 'facebook',
+  x: 'x',
+  other: 'other'
+};
+
+export type SiteShareChannel = (typeof SiteShareChannel)[keyof typeof SiteShareChannel]
+
 }
 
 export type Role = $Enums.Role
@@ -210,6 +247,10 @@ export const ReportStatus: typeof $Enums.ReportStatus
 export type CleanupEventStatus = $Enums.CleanupEventStatus
 
 export const CleanupEventStatus: typeof $Enums.CleanupEventStatus
+
+export type SiteShareChannel = $Enums.SiteShareChannel
+
+export const SiteShareChannel: typeof $Enums.SiteShareChannel
 
 /**
  * ##  Prisma Client ʲˢ
@@ -491,6 +532,56 @@ export class PrismaClient<
     * ```
     */
   get cleanupEvent(): Prisma.CleanupEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteVote`: Exposes CRUD operations for the **SiteVote** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteVotes
+    * const siteVotes = await prisma.siteVote.findMany()
+    * ```
+    */
+  get siteVote(): Prisma.SiteVoteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteSave`: Exposes CRUD operations for the **SiteSave** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteSaves
+    * const siteSaves = await prisma.siteSave.findMany()
+    * ```
+    */
+  get siteSave(): Prisma.SiteSaveDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteComment`: Exposes CRUD operations for the **SiteComment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteComments
+    * const siteComments = await prisma.siteComment.findMany()
+    * ```
+    */
+  get siteComment(): Prisma.SiteCommentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteCommentLike`: Exposes CRUD operations for the **SiteCommentLike** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteCommentLikes
+    * const siteCommentLikes = await prisma.siteCommentLike.findMany()
+    * ```
+    */
+  get siteCommentLike(): Prisma.SiteCommentLikeDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteShareEvent`: Exposes CRUD operations for the **SiteShareEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteShareEvents
+    * const siteShareEvents = await prisma.siteShareEvent.findMany()
+    * ```
+    */
+  get siteShareEvent(): Prisma.SiteShareEventDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -940,7 +1031,12 @@ export namespace Prisma {
     SystemConfig: 'SystemConfig',
     FeatureFlag: 'FeatureFlag',
     AuditLog: 'AuditLog',
-    CleanupEvent: 'CleanupEvent'
+    CleanupEvent: 'CleanupEvent',
+    SiteVote: 'SiteVote',
+    SiteSave: 'SiteSave',
+    SiteComment: 'SiteComment',
+    SiteCommentLike: 'SiteCommentLike',
+    SiteShareEvent: 'SiteShareEvent'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -956,7 +1052,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2144,6 +2240,376 @@ export namespace Prisma {
           }
         }
       }
+      SiteVote: {
+        payload: Prisma.$SiteVotePayload<ExtArgs>
+        fields: Prisma.SiteVoteFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteVoteFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteVoteFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          findFirst: {
+            args: Prisma.SiteVoteFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteVoteFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          findMany: {
+            args: Prisma.SiteVoteFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>[]
+          }
+          create: {
+            args: Prisma.SiteVoteCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          createMany: {
+            args: Prisma.SiteVoteCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteVoteCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>[]
+          }
+          delete: {
+            args: Prisma.SiteVoteDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          update: {
+            args: Prisma.SiteVoteUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteVoteDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteVoteUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteVoteUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteVoteUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteVotePayload>
+          }
+          aggregate: {
+            args: Prisma.SiteVoteAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteVote>
+          }
+          groupBy: {
+            args: Prisma.SiteVoteGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteVoteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteVoteCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteVoteCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteSave: {
+        payload: Prisma.$SiteSavePayload<ExtArgs>
+        fields: Prisma.SiteSaveFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteSaveFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteSaveFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          findFirst: {
+            args: Prisma.SiteSaveFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteSaveFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          findMany: {
+            args: Prisma.SiteSaveFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>[]
+          }
+          create: {
+            args: Prisma.SiteSaveCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          createMany: {
+            args: Prisma.SiteSaveCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteSaveCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>[]
+          }
+          delete: {
+            args: Prisma.SiteSaveDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          update: {
+            args: Prisma.SiteSaveUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteSaveDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteSaveUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteSaveUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteSaveUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteSavePayload>
+          }
+          aggregate: {
+            args: Prisma.SiteSaveAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteSave>
+          }
+          groupBy: {
+            args: Prisma.SiteSaveGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteSaveGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteSaveCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteSaveCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteComment: {
+        payload: Prisma.$SiteCommentPayload<ExtArgs>
+        fields: Prisma.SiteCommentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteCommentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteCommentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          findFirst: {
+            args: Prisma.SiteCommentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteCommentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          findMany: {
+            args: Prisma.SiteCommentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>[]
+          }
+          create: {
+            args: Prisma.SiteCommentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          createMany: {
+            args: Prisma.SiteCommentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteCommentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>[]
+          }
+          delete: {
+            args: Prisma.SiteCommentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          update: {
+            args: Prisma.SiteCommentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteCommentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteCommentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteCommentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteCommentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentPayload>
+          }
+          aggregate: {
+            args: Prisma.SiteCommentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteComment>
+          }
+          groupBy: {
+            args: Prisma.SiteCommentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteCommentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteCommentCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteCommentCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteCommentLike: {
+        payload: Prisma.$SiteCommentLikePayload<ExtArgs>
+        fields: Prisma.SiteCommentLikeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteCommentLikeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteCommentLikeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          findFirst: {
+            args: Prisma.SiteCommentLikeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteCommentLikeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          findMany: {
+            args: Prisma.SiteCommentLikeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>[]
+          }
+          create: {
+            args: Prisma.SiteCommentLikeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          createMany: {
+            args: Prisma.SiteCommentLikeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteCommentLikeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>[]
+          }
+          delete: {
+            args: Prisma.SiteCommentLikeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          update: {
+            args: Prisma.SiteCommentLikeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteCommentLikeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteCommentLikeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteCommentLikeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteCommentLikeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteCommentLikePayload>
+          }
+          aggregate: {
+            args: Prisma.SiteCommentLikeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteCommentLike>
+          }
+          groupBy: {
+            args: Prisma.SiteCommentLikeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteCommentLikeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteCommentLikeCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteCommentLikeCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteShareEvent: {
+        payload: Prisma.$SiteShareEventPayload<ExtArgs>
+        fields: Prisma.SiteShareEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteShareEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteShareEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          findFirst: {
+            args: Prisma.SiteShareEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteShareEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          findMany: {
+            args: Prisma.SiteShareEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>[]
+          }
+          create: {
+            args: Prisma.SiteShareEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          createMany: {
+            args: Prisma.SiteShareEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteShareEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>[]
+          }
+          delete: {
+            args: Prisma.SiteShareEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          update: {
+            args: Prisma.SiteShareEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteShareEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteShareEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteShareEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteShareEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareEventPayload>
+          }
+          aggregate: {
+            args: Prisma.SiteShareEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteShareEvent>
+          }
+          groupBy: {
+            args: Prisma.SiteShareEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteShareEventCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareEventCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2268,6 +2734,11 @@ export namespace Prisma {
     featureFlag?: FeatureFlagOmit
     auditLog?: AuditLogOmit
     cleanupEvent?: CleanupEventOmit
+    siteVote?: SiteVoteOmit
+    siteSave?: SiteSaveOmit
+    siteComment?: SiteCommentOmit
+    siteCommentLike?: SiteCommentLikeOmit
+    siteShareEvent?: SiteShareEventOmit
   }
 
   /* Types for Logging */
@@ -2356,6 +2827,11 @@ export namespace Prisma {
     sessions: number
     auditLogs: number
     adminTempTokens: number
+    siteVotes: number
+    siteSaves: number
+    siteComments: number
+    siteShareEvents: number
+    siteCommentLikes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2367,6 +2843,11 @@ export namespace Prisma {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     auditLogs?: boolean | UserCountOutputTypeCountAuditLogsArgs
     adminTempTokens?: boolean | UserCountOutputTypeCountAdminTempTokensArgs
+    siteVotes?: boolean | UserCountOutputTypeCountSiteVotesArgs
+    siteSaves?: boolean | UserCountOutputTypeCountSiteSavesArgs
+    siteComments?: boolean | UserCountOutputTypeCountSiteCommentsArgs
+    siteShareEvents?: boolean | UserCountOutputTypeCountSiteShareEventsArgs
+    siteCommentLikes?: boolean | UserCountOutputTypeCountSiteCommentLikesArgs
   }
 
   // Custom InputTypes
@@ -2436,6 +2917,41 @@ export namespace Prisma {
     where?: AdminTempTokenWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteVoteWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteSavesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteSaveWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteCommentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteShareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareEventWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteCommentLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentLikeWhereInput
+  }
+
 
   /**
    * Count Type SiteCountOutputType
@@ -2444,11 +2960,19 @@ export namespace Prisma {
   export type SiteCountOutputType = {
     reports: number
     events: number
+    votes: number
+    saves: number
+    comments: number
+    shareEvents: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | SiteCountOutputTypeCountReportsArgs
     events?: boolean | SiteCountOutputTypeCountEventsArgs
+    votes?: boolean | SiteCountOutputTypeCountVotesArgs
+    saves?: boolean | SiteCountOutputTypeCountSavesArgs
+    comments?: boolean | SiteCountOutputTypeCountCommentsArgs
+    shareEvents?: boolean | SiteCountOutputTypeCountShareEventsArgs
   }
 
   // Custom InputTypes
@@ -2474,6 +2998,34 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: CleanupEventWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteVoteWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountSavesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteSaveWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountCommentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountShareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareEventWhereInput
   }
 
 
@@ -2514,6 +3066,46 @@ export namespace Prisma {
    */
   export type ReportCountOutputTypeCountCoReportersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReportCoReporterWhereInput
+  }
+
+
+  /**
+   * Count Type SiteCommentCountOutputType
+   */
+
+  export type SiteCommentCountOutputType = {
+    replies: number
+    likes: number
+  }
+
+  export type SiteCommentCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    replies?: boolean | SiteCommentCountOutputTypeCountRepliesArgs
+    likes?: boolean | SiteCommentCountOutputTypeCountLikesArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SiteCommentCountOutputType without action
+   */
+  export type SiteCommentCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentCountOutputType
+     */
+    select?: SiteCommentCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SiteCommentCountOutputType without action
+   */
+  export type SiteCommentCountOutputTypeCountRepliesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentWhereInput
+  }
+
+  /**
+   * SiteCommentCountOutputType without action
+   */
+  export type SiteCommentCountOutputTypeCountLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentLikeWhereInput
   }
 
 
@@ -2872,6 +3464,11 @@ export namespace Prisma {
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
     adminTempTokens?: boolean | User$adminTempTokensArgs<ExtArgs>
     adminPendingMfa?: boolean | User$adminPendingMfaArgs<ExtArgs>
+    siteVotes?: boolean | User$siteVotesArgs<ExtArgs>
+    siteSaves?: boolean | User$siteSavesArgs<ExtArgs>
+    siteComments?: boolean | User$siteCommentsArgs<ExtArgs>
+    siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
+    siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2958,6 +3555,11 @@ export namespace Prisma {
     auditLogs?: boolean | User$auditLogsArgs<ExtArgs>
     adminTempTokens?: boolean | User$adminTempTokensArgs<ExtArgs>
     adminPendingMfa?: boolean | User$adminPendingMfaArgs<ExtArgs>
+    siteVotes?: boolean | User$siteVotesArgs<ExtArgs>
+    siteSaves?: boolean | User$siteSavesArgs<ExtArgs>
+    siteComments?: boolean | User$siteCommentsArgs<ExtArgs>
+    siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
+    siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2975,6 +3577,11 @@ export namespace Prisma {
       auditLogs: Prisma.$AuditLogPayload<ExtArgs>[]
       adminTempTokens: Prisma.$AdminTempTokenPayload<ExtArgs>[]
       adminPendingMfa: Prisma.$AdminPendingMfaPayload<ExtArgs> | null
+      siteVotes: Prisma.$SiteVotePayload<ExtArgs>[]
+      siteSaves: Prisma.$SiteSavePayload<ExtArgs>[]
+      siteComments: Prisma.$SiteCommentPayload<ExtArgs>[]
+      siteShareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
+      siteCommentLikes: Prisma.$SiteCommentLikePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3401,6 +4008,11 @@ export namespace Prisma {
     auditLogs<T extends User$auditLogsArgs<ExtArgs> = {}>(args?: Subset<T, User$auditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     adminTempTokens<T extends User$adminTempTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$adminTempTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminTempTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     adminPendingMfa<T extends User$adminPendingMfaArgs<ExtArgs> = {}>(args?: Subset<T, User$adminPendingMfaArgs<ExtArgs>>): Prisma__AdminPendingMfaClient<$Result.GetResult<Prisma.$AdminPendingMfaPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    siteVotes<T extends User$siteVotesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteVotesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    siteSaves<T extends User$siteSavesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteSavesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    siteComments<T extends User$siteCommentsArgs<ExtArgs> = {}>(args?: Subset<T, User$siteCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    siteShareEvents<T extends User$siteShareEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$siteShareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    siteCommentLikes<T extends User$siteCommentLikesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteCommentLikesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4052,6 +4664,126 @@ export namespace Prisma {
      */
     include?: AdminPendingMfaInclude<ExtArgs> | null
     where?: AdminPendingMfaWhereInput
+  }
+
+  /**
+   * User.siteVotes
+   */
+  export type User$siteVotesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    where?: SiteVoteWhereInput
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    cursor?: SiteVoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteVoteScalarFieldEnum | SiteVoteScalarFieldEnum[]
+  }
+
+  /**
+   * User.siteSaves
+   */
+  export type User$siteSavesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    where?: SiteSaveWhereInput
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    cursor?: SiteSaveWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteSaveScalarFieldEnum | SiteSaveScalarFieldEnum[]
+  }
+
+  /**
+   * User.siteComments
+   */
+  export type User$siteCommentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    where?: SiteCommentWhereInput
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    cursor?: SiteCommentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * User.siteShareEvents
+   */
+  export type User$siteShareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    where?: SiteShareEventWhereInput
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    cursor?: SiteShareEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * User.siteCommentLikes
+   */
+  export type User$siteCommentLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    where?: SiteCommentLikeWhereInput
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    cursor?: SiteCommentLikeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
   }
 
   /**
@@ -12740,11 +13472,19 @@ export namespace Prisma {
   export type SiteAvgAggregateOutputType = {
     latitude: number | null
     longitude: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
   }
 
   export type SiteSumAggregateOutputType = {
     latitude: number | null
     longitude: number | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
   }
 
   export type SiteMinAggregateOutputType = {
@@ -12756,6 +13496,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
   }
 
   export type SiteMaxAggregateOutputType = {
@@ -12767,6 +13511,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus | null
+    upvotesCount: number | null
+    commentsCount: number | null
+    savesCount: number | null
+    sharesCount: number | null
   }
 
   export type SiteCountAggregateOutputType = {
@@ -12778,6 +13526,10 @@ export namespace Prisma {
     address: number
     description: number
     status: number
+    upvotesCount: number
+    commentsCount: number
+    savesCount: number
+    sharesCount: number
     _all: number
   }
 
@@ -12785,11 +13537,19 @@ export namespace Prisma {
   export type SiteAvgAggregateInputType = {
     latitude?: true
     longitude?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
   }
 
   export type SiteSumAggregateInputType = {
     latitude?: true
     longitude?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
   }
 
   export type SiteMinAggregateInputType = {
@@ -12801,6 +13561,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
   }
 
   export type SiteMaxAggregateInputType = {
@@ -12812,6 +13576,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
   }
 
   export type SiteCountAggregateInputType = {
@@ -12823,6 +13591,10 @@ export namespace Prisma {
     address?: true
     description?: true
     status?: true
+    upvotesCount?: true
+    commentsCount?: true
+    savesCount?: true
+    sharesCount?: true
     _all?: true
   }
 
@@ -12921,6 +13693,10 @@ export namespace Prisma {
     address: string | null
     description: string | null
     status: $Enums.SiteStatus
+    upvotesCount: number
+    commentsCount: number
+    savesCount: number
+    sharesCount: number
     _count: SiteCountAggregateOutputType | null
     _avg: SiteAvgAggregateOutputType | null
     _sum: SiteSumAggregateOutputType | null
@@ -12951,8 +13727,16 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
     reports?: boolean | Site$reportsArgs<ExtArgs>
     events?: boolean | Site$eventsArgs<ExtArgs>
+    votes?: boolean | Site$votesArgs<ExtArgs>
+    saves?: boolean | Site$savesArgs<ExtArgs>
+    comments?: boolean | Site$commentsArgs<ExtArgs>
+    shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -12965,6 +13749,10 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -12976,6 +13764,10 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
   }, ExtArgs["result"]["site"]>
 
   export type SiteSelectScalar = {
@@ -12987,12 +13779,20 @@ export namespace Prisma {
     address?: boolean
     description?: boolean
     status?: boolean
+    upvotesCount?: boolean
+    commentsCount?: boolean
+    savesCount?: boolean
+    sharesCount?: boolean
   }
 
-  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "address" | "description" | "status", ExtArgs["result"]["site"]>
+  export type SiteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "latitude" | "longitude" | "address" | "description" | "status" | "upvotesCount" | "commentsCount" | "savesCount" | "sharesCount", ExtArgs["result"]["site"]>
   export type SiteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | Site$reportsArgs<ExtArgs>
     events?: boolean | Site$eventsArgs<ExtArgs>
+    votes?: boolean | Site$votesArgs<ExtArgs>
+    saves?: boolean | Site$savesArgs<ExtArgs>
+    comments?: boolean | Site$commentsArgs<ExtArgs>
+    shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -13003,6 +13803,10 @@ export namespace Prisma {
     objects: {
       reports: Prisma.$ReportPayload<ExtArgs>[]
       events: Prisma.$CleanupEventPayload<ExtArgs>[]
+      votes: Prisma.$SiteVotePayload<ExtArgs>[]
+      saves: Prisma.$SiteSavePayload<ExtArgs>[]
+      comments: Prisma.$SiteCommentPayload<ExtArgs>[]
+      shareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -13016,6 +13820,10 @@ export namespace Prisma {
       address: string | null
       description: string | null
       status: $Enums.SiteStatus
+      upvotesCount: number
+      commentsCount: number
+      savesCount: number
+      sharesCount: number
     }, ExtArgs["result"]["site"]>
     composites: {}
   }
@@ -13412,6 +14220,10 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     reports<T extends Site$reportsArgs<ExtArgs> = {}>(args?: Subset<T, Site$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     events<T extends Site$eventsArgs<ExtArgs> = {}>(args?: Subset<T, Site$eventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    votes<T extends Site$votesArgs<ExtArgs> = {}>(args?: Subset<T, Site$votesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    saves<T extends Site$savesArgs<ExtArgs> = {}>(args?: Subset<T, Site$savesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    comments<T extends Site$commentsArgs<ExtArgs> = {}>(args?: Subset<T, Site$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    shareEvents<T extends Site$shareEventsArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -13449,6 +14261,10 @@ export namespace Prisma {
     readonly address: FieldRef<"Site", 'String'>
     readonly description: FieldRef<"Site", 'String'>
     readonly status: FieldRef<"Site", 'SiteStatus'>
+    readonly upvotesCount: FieldRef<"Site", 'Int'>
+    readonly commentsCount: FieldRef<"Site", 'Int'>
+    readonly savesCount: FieldRef<"Site", 'Int'>
+    readonly sharesCount: FieldRef<"Site", 'Int'>
   }
     
 
@@ -13887,6 +14703,102 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: CleanupEventScalarFieldEnum | CleanupEventScalarFieldEnum[]
+  }
+
+  /**
+   * Site.votes
+   */
+  export type Site$votesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    where?: SiteVoteWhereInput
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    cursor?: SiteVoteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteVoteScalarFieldEnum | SiteVoteScalarFieldEnum[]
+  }
+
+  /**
+   * Site.saves
+   */
+  export type Site$savesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    where?: SiteSaveWhereInput
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    cursor?: SiteSaveWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteSaveScalarFieldEnum | SiteSaveScalarFieldEnum[]
+  }
+
+  /**
+   * Site.comments
+   */
+  export type Site$commentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    where?: SiteCommentWhereInput
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    cursor?: SiteCommentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * Site.shareEvents
+   */
+  export type Site$shareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    where?: SiteShareEventWhereInput
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    cursor?: SiteShareEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
   }
 
   /**
@@ -20620,6 +21532,5519 @@ export namespace Prisma {
 
 
   /**
+   * Model SiteVote
+   */
+
+  export type AggregateSiteVote = {
+    _count: SiteVoteCountAggregateOutputType | null
+    _min: SiteVoteMinAggregateOutputType | null
+    _max: SiteVoteMaxAggregateOutputType | null
+  }
+
+  export type SiteVoteMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    userId: string | null
+  }
+
+  export type SiteVoteMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    userId: string | null
+  }
+
+  export type SiteVoteCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    siteId: number
+    userId: number
+    _all: number
+  }
+
+
+  export type SiteVoteMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+  }
+
+  export type SiteVoteMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+  }
+
+  export type SiteVoteCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type SiteVoteAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteVote to aggregate.
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteVotes to fetch.
+     */
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteVotes
+    **/
+    _count?: true | SiteVoteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteVoteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteVoteMaxAggregateInputType
+  }
+
+  export type GetSiteVoteAggregateType<T extends SiteVoteAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteVote]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteVote[P]>
+      : GetScalarType<T[P], AggregateSiteVote[P]>
+  }
+
+
+
+
+  export type SiteVoteGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteVoteWhereInput
+    orderBy?: SiteVoteOrderByWithAggregationInput | SiteVoteOrderByWithAggregationInput[]
+    by: SiteVoteScalarFieldEnum[] | SiteVoteScalarFieldEnum
+    having?: SiteVoteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteVoteCountAggregateInputType | true
+    _min?: SiteVoteMinAggregateInputType
+    _max?: SiteVoteMaxAggregateInputType
+  }
+
+  export type SiteVoteGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    siteId: string
+    userId: string
+    _count: SiteVoteCountAggregateOutputType | null
+    _min: SiteVoteMinAggregateOutputType | null
+    _max: SiteVoteMaxAggregateOutputType | null
+  }
+
+  type GetSiteVoteGroupByPayload<T extends SiteVoteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteVoteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteVoteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteVoteGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteVoteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteVoteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteVote"]>
+
+  export type SiteVoteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteVote"]>
+
+  export type SiteVoteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteVote"]>
+
+  export type SiteVoteSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+  }
+
+  export type SiteVoteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "userId", ExtArgs["result"]["siteVote"]>
+  export type SiteVoteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteVoteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteVoteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteVotePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteVote"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      siteId: string
+      userId: string
+    }, ExtArgs["result"]["siteVote"]>
+    composites: {}
+  }
+
+  type SiteVoteGetPayload<S extends boolean | null | undefined | SiteVoteDefaultArgs> = $Result.GetResult<Prisma.$SiteVotePayload, S>
+
+  type SiteVoteCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteVoteFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteVoteCountAggregateInputType | true
+    }
+
+  export interface SiteVoteDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteVote'], meta: { name: 'SiteVote' } }
+    /**
+     * Find zero or one SiteVote that matches the filter.
+     * @param {SiteVoteFindUniqueArgs} args - Arguments to find a SiteVote
+     * @example
+     * // Get one SiteVote
+     * const siteVote = await prisma.siteVote.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteVoteFindUniqueArgs>(args: SelectSubset<T, SiteVoteFindUniqueArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteVote that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteVoteFindUniqueOrThrowArgs} args - Arguments to find a SiteVote
+     * @example
+     * // Get one SiteVote
+     * const siteVote = await prisma.siteVote.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteVoteFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteVoteFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteVote that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteFindFirstArgs} args - Arguments to find a SiteVote
+     * @example
+     * // Get one SiteVote
+     * const siteVote = await prisma.siteVote.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteVoteFindFirstArgs>(args?: SelectSubset<T, SiteVoteFindFirstArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteVote that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteFindFirstOrThrowArgs} args - Arguments to find a SiteVote
+     * @example
+     * // Get one SiteVote
+     * const siteVote = await prisma.siteVote.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteVoteFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteVoteFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteVotes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteVotes
+     * const siteVotes = await prisma.siteVote.findMany()
+     * 
+     * // Get first 10 SiteVotes
+     * const siteVotes = await prisma.siteVote.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteVoteWithIdOnly = await prisma.siteVote.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteVoteFindManyArgs>(args?: SelectSubset<T, SiteVoteFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteVote.
+     * @param {SiteVoteCreateArgs} args - Arguments to create a SiteVote.
+     * @example
+     * // Create one SiteVote
+     * const SiteVote = await prisma.siteVote.create({
+     *   data: {
+     *     // ... data to create a SiteVote
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteVoteCreateArgs>(args: SelectSubset<T, SiteVoteCreateArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteVotes.
+     * @param {SiteVoteCreateManyArgs} args - Arguments to create many SiteVotes.
+     * @example
+     * // Create many SiteVotes
+     * const siteVote = await prisma.siteVote.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteVoteCreateManyArgs>(args?: SelectSubset<T, SiteVoteCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteVotes and returns the data saved in the database.
+     * @param {SiteVoteCreateManyAndReturnArgs} args - Arguments to create many SiteVotes.
+     * @example
+     * // Create many SiteVotes
+     * const siteVote = await prisma.siteVote.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteVotes and only return the `id`
+     * const siteVoteWithIdOnly = await prisma.siteVote.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteVoteCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteVoteCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteVote.
+     * @param {SiteVoteDeleteArgs} args - Arguments to delete one SiteVote.
+     * @example
+     * // Delete one SiteVote
+     * const SiteVote = await prisma.siteVote.delete({
+     *   where: {
+     *     // ... filter to delete one SiteVote
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteVoteDeleteArgs>(args: SelectSubset<T, SiteVoteDeleteArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteVote.
+     * @param {SiteVoteUpdateArgs} args - Arguments to update one SiteVote.
+     * @example
+     * // Update one SiteVote
+     * const siteVote = await prisma.siteVote.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteVoteUpdateArgs>(args: SelectSubset<T, SiteVoteUpdateArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteVotes.
+     * @param {SiteVoteDeleteManyArgs} args - Arguments to filter SiteVotes to delete.
+     * @example
+     * // Delete a few SiteVotes
+     * const { count } = await prisma.siteVote.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteVoteDeleteManyArgs>(args?: SelectSubset<T, SiteVoteDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteVotes
+     * const siteVote = await prisma.siteVote.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteVoteUpdateManyArgs>(args: SelectSubset<T, SiteVoteUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteVotes and returns the data updated in the database.
+     * @param {SiteVoteUpdateManyAndReturnArgs} args - Arguments to update many SiteVotes.
+     * @example
+     * // Update many SiteVotes
+     * const siteVote = await prisma.siteVote.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteVotes and only return the `id`
+     * const siteVoteWithIdOnly = await prisma.siteVote.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteVoteUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteVoteUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteVote.
+     * @param {SiteVoteUpsertArgs} args - Arguments to update or create a SiteVote.
+     * @example
+     * // Update or create a SiteVote
+     * const siteVote = await prisma.siteVote.upsert({
+     *   create: {
+     *     // ... data to create a SiteVote
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteVote we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteVoteUpsertArgs>(args: SelectSubset<T, SiteVoteUpsertArgs<ExtArgs>>): Prisma__SiteVoteClient<$Result.GetResult<Prisma.$SiteVotePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteVotes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteCountArgs} args - Arguments to filter SiteVotes to count.
+     * @example
+     * // Count the number of SiteVotes
+     * const count = await prisma.siteVote.count({
+     *   where: {
+     *     // ... the filter for the SiteVotes we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteVoteCountArgs>(
+      args?: Subset<T, SiteVoteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteVoteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteVoteAggregateArgs>(args: Subset<T, SiteVoteAggregateArgs>): Prisma.PrismaPromise<GetSiteVoteAggregateType<T>>
+
+    /**
+     * Group by SiteVote.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteVoteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteVoteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteVoteGroupByArgs['orderBy'] }
+        : { orderBy?: SiteVoteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteVoteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteVoteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteVote model
+   */
+  readonly fields: SiteVoteFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteVote.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteVoteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteVote model
+   */
+  interface SiteVoteFieldRefs {
+    readonly id: FieldRef<"SiteVote", 'String'>
+    readonly createdAt: FieldRef<"SiteVote", 'DateTime'>
+    readonly updatedAt: FieldRef<"SiteVote", 'DateTime'>
+    readonly siteId: FieldRef<"SiteVote", 'String'>
+    readonly userId: FieldRef<"SiteVote", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteVote findUnique
+   */
+  export type SiteVoteFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteVote to fetch.
+     */
+    where: SiteVoteWhereUniqueInput
+  }
+
+  /**
+   * SiteVote findUniqueOrThrow
+   */
+  export type SiteVoteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteVote to fetch.
+     */
+    where: SiteVoteWhereUniqueInput
+  }
+
+  /**
+   * SiteVote findFirst
+   */
+  export type SiteVoteFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteVote to fetch.
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteVotes to fetch.
+     */
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteVotes.
+     */
+    cursor?: SiteVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteVotes.
+     */
+    distinct?: SiteVoteScalarFieldEnum | SiteVoteScalarFieldEnum[]
+  }
+
+  /**
+   * SiteVote findFirstOrThrow
+   */
+  export type SiteVoteFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteVote to fetch.
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteVotes to fetch.
+     */
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteVotes.
+     */
+    cursor?: SiteVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteVotes.
+     */
+    distinct?: SiteVoteScalarFieldEnum | SiteVoteScalarFieldEnum[]
+  }
+
+  /**
+   * SiteVote findMany
+   */
+  export type SiteVoteFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteVotes to fetch.
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteVotes to fetch.
+     */
+    orderBy?: SiteVoteOrderByWithRelationInput | SiteVoteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteVotes.
+     */
+    cursor?: SiteVoteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteVotes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteVotes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteVotes.
+     */
+    distinct?: SiteVoteScalarFieldEnum | SiteVoteScalarFieldEnum[]
+  }
+
+  /**
+   * SiteVote create
+   */
+  export type SiteVoteCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteVote.
+     */
+    data: XOR<SiteVoteCreateInput, SiteVoteUncheckedCreateInput>
+  }
+
+  /**
+   * SiteVote createMany
+   */
+  export type SiteVoteCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteVotes.
+     */
+    data: SiteVoteCreateManyInput | SiteVoteCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteVote createManyAndReturn
+   */
+  export type SiteVoteCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteVotes.
+     */
+    data: SiteVoteCreateManyInput | SiteVoteCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteVote update
+   */
+  export type SiteVoteUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteVote.
+     */
+    data: XOR<SiteVoteUpdateInput, SiteVoteUncheckedUpdateInput>
+    /**
+     * Choose, which SiteVote to update.
+     */
+    where: SiteVoteWhereUniqueInput
+  }
+
+  /**
+   * SiteVote updateMany
+   */
+  export type SiteVoteUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteVotes.
+     */
+    data: XOR<SiteVoteUpdateManyMutationInput, SiteVoteUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteVotes to update
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * Limit how many SiteVotes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteVote updateManyAndReturn
+   */
+  export type SiteVoteUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteVotes.
+     */
+    data: XOR<SiteVoteUpdateManyMutationInput, SiteVoteUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteVotes to update
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * Limit how many SiteVotes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteVote upsert
+   */
+  export type SiteVoteUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteVote to update in case it exists.
+     */
+    where: SiteVoteWhereUniqueInput
+    /**
+     * In case the SiteVote found by the `where` argument doesn't exist, create a new SiteVote with this data.
+     */
+    create: XOR<SiteVoteCreateInput, SiteVoteUncheckedCreateInput>
+    /**
+     * In case the SiteVote was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteVoteUpdateInput, SiteVoteUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteVote delete
+   */
+  export type SiteVoteDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+    /**
+     * Filter which SiteVote to delete.
+     */
+    where: SiteVoteWhereUniqueInput
+  }
+
+  /**
+   * SiteVote deleteMany
+   */
+  export type SiteVoteDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteVotes to delete
+     */
+    where?: SiteVoteWhereInput
+    /**
+     * Limit how many SiteVotes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteVote without action
+   */
+  export type SiteVoteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteVote
+     */
+    select?: SiteVoteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteVote
+     */
+    omit?: SiteVoteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteVoteInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteSave
+   */
+
+  export type AggregateSiteSave = {
+    _count: SiteSaveCountAggregateOutputType | null
+    _min: SiteSaveMinAggregateOutputType | null
+    _max: SiteSaveMaxAggregateOutputType | null
+  }
+
+  export type SiteSaveMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    userId: string | null
+  }
+
+  export type SiteSaveMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    userId: string | null
+  }
+
+  export type SiteSaveCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    siteId: number
+    userId: number
+    _all: number
+  }
+
+
+  export type SiteSaveMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+  }
+
+  export type SiteSaveMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+  }
+
+  export type SiteSaveCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type SiteSaveAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteSave to aggregate.
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteSaves to fetch.
+     */
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteSaveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteSaves from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteSaves.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteSaves
+    **/
+    _count?: true | SiteSaveCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteSaveMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteSaveMaxAggregateInputType
+  }
+
+  export type GetSiteSaveAggregateType<T extends SiteSaveAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteSave]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteSave[P]>
+      : GetScalarType<T[P], AggregateSiteSave[P]>
+  }
+
+
+
+
+  export type SiteSaveGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteSaveWhereInput
+    orderBy?: SiteSaveOrderByWithAggregationInput | SiteSaveOrderByWithAggregationInput[]
+    by: SiteSaveScalarFieldEnum[] | SiteSaveScalarFieldEnum
+    having?: SiteSaveScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteSaveCountAggregateInputType | true
+    _min?: SiteSaveMinAggregateInputType
+    _max?: SiteSaveMaxAggregateInputType
+  }
+
+  export type SiteSaveGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    siteId: string
+    userId: string
+    _count: SiteSaveCountAggregateOutputType | null
+    _min: SiteSaveMinAggregateOutputType | null
+    _max: SiteSaveMaxAggregateOutputType | null
+  }
+
+  type GetSiteSaveGroupByPayload<T extends SiteSaveGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteSaveGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteSaveGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteSaveGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteSaveGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteSaveSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteSave"]>
+
+  export type SiteSaveSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteSave"]>
+
+  export type SiteSaveSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteSave"]>
+
+  export type SiteSaveSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+  }
+
+  export type SiteSaveOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "userId", ExtArgs["result"]["siteSave"]>
+  export type SiteSaveInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteSaveIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteSaveIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteSavePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteSave"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      siteId: string
+      userId: string
+    }, ExtArgs["result"]["siteSave"]>
+    composites: {}
+  }
+
+  type SiteSaveGetPayload<S extends boolean | null | undefined | SiteSaveDefaultArgs> = $Result.GetResult<Prisma.$SiteSavePayload, S>
+
+  type SiteSaveCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteSaveFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteSaveCountAggregateInputType | true
+    }
+
+  export interface SiteSaveDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteSave'], meta: { name: 'SiteSave' } }
+    /**
+     * Find zero or one SiteSave that matches the filter.
+     * @param {SiteSaveFindUniqueArgs} args - Arguments to find a SiteSave
+     * @example
+     * // Get one SiteSave
+     * const siteSave = await prisma.siteSave.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteSaveFindUniqueArgs>(args: SelectSubset<T, SiteSaveFindUniqueArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteSave that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteSaveFindUniqueOrThrowArgs} args - Arguments to find a SiteSave
+     * @example
+     * // Get one SiteSave
+     * const siteSave = await prisma.siteSave.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteSaveFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteSaveFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteSave that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveFindFirstArgs} args - Arguments to find a SiteSave
+     * @example
+     * // Get one SiteSave
+     * const siteSave = await prisma.siteSave.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteSaveFindFirstArgs>(args?: SelectSubset<T, SiteSaveFindFirstArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteSave that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveFindFirstOrThrowArgs} args - Arguments to find a SiteSave
+     * @example
+     * // Get one SiteSave
+     * const siteSave = await prisma.siteSave.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteSaveFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteSaveFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteSaves that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteSaves
+     * const siteSaves = await prisma.siteSave.findMany()
+     * 
+     * // Get first 10 SiteSaves
+     * const siteSaves = await prisma.siteSave.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteSaveWithIdOnly = await prisma.siteSave.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteSaveFindManyArgs>(args?: SelectSubset<T, SiteSaveFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteSave.
+     * @param {SiteSaveCreateArgs} args - Arguments to create a SiteSave.
+     * @example
+     * // Create one SiteSave
+     * const SiteSave = await prisma.siteSave.create({
+     *   data: {
+     *     // ... data to create a SiteSave
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteSaveCreateArgs>(args: SelectSubset<T, SiteSaveCreateArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteSaves.
+     * @param {SiteSaveCreateManyArgs} args - Arguments to create many SiteSaves.
+     * @example
+     * // Create many SiteSaves
+     * const siteSave = await prisma.siteSave.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteSaveCreateManyArgs>(args?: SelectSubset<T, SiteSaveCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteSaves and returns the data saved in the database.
+     * @param {SiteSaveCreateManyAndReturnArgs} args - Arguments to create many SiteSaves.
+     * @example
+     * // Create many SiteSaves
+     * const siteSave = await prisma.siteSave.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteSaves and only return the `id`
+     * const siteSaveWithIdOnly = await prisma.siteSave.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteSaveCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteSaveCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteSave.
+     * @param {SiteSaveDeleteArgs} args - Arguments to delete one SiteSave.
+     * @example
+     * // Delete one SiteSave
+     * const SiteSave = await prisma.siteSave.delete({
+     *   where: {
+     *     // ... filter to delete one SiteSave
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteSaveDeleteArgs>(args: SelectSubset<T, SiteSaveDeleteArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteSave.
+     * @param {SiteSaveUpdateArgs} args - Arguments to update one SiteSave.
+     * @example
+     * // Update one SiteSave
+     * const siteSave = await prisma.siteSave.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteSaveUpdateArgs>(args: SelectSubset<T, SiteSaveUpdateArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteSaves.
+     * @param {SiteSaveDeleteManyArgs} args - Arguments to filter SiteSaves to delete.
+     * @example
+     * // Delete a few SiteSaves
+     * const { count } = await prisma.siteSave.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteSaveDeleteManyArgs>(args?: SelectSubset<T, SiteSaveDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteSaves.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteSaves
+     * const siteSave = await prisma.siteSave.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteSaveUpdateManyArgs>(args: SelectSubset<T, SiteSaveUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteSaves and returns the data updated in the database.
+     * @param {SiteSaveUpdateManyAndReturnArgs} args - Arguments to update many SiteSaves.
+     * @example
+     * // Update many SiteSaves
+     * const siteSave = await prisma.siteSave.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteSaves and only return the `id`
+     * const siteSaveWithIdOnly = await prisma.siteSave.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteSaveUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteSaveUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteSave.
+     * @param {SiteSaveUpsertArgs} args - Arguments to update or create a SiteSave.
+     * @example
+     * // Update or create a SiteSave
+     * const siteSave = await prisma.siteSave.upsert({
+     *   create: {
+     *     // ... data to create a SiteSave
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteSave we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteSaveUpsertArgs>(args: SelectSubset<T, SiteSaveUpsertArgs<ExtArgs>>): Prisma__SiteSaveClient<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteSaves.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveCountArgs} args - Arguments to filter SiteSaves to count.
+     * @example
+     * // Count the number of SiteSaves
+     * const count = await prisma.siteSave.count({
+     *   where: {
+     *     // ... the filter for the SiteSaves we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteSaveCountArgs>(
+      args?: Subset<T, SiteSaveCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteSaveCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteSave.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteSaveAggregateArgs>(args: Subset<T, SiteSaveAggregateArgs>): Prisma.PrismaPromise<GetSiteSaveAggregateType<T>>
+
+    /**
+     * Group by SiteSave.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteSaveGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteSaveGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteSaveGroupByArgs['orderBy'] }
+        : { orderBy?: SiteSaveGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteSaveGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteSaveGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteSave model
+   */
+  readonly fields: SiteSaveFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteSave.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteSaveClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteSave model
+   */
+  interface SiteSaveFieldRefs {
+    readonly id: FieldRef<"SiteSave", 'String'>
+    readonly createdAt: FieldRef<"SiteSave", 'DateTime'>
+    readonly updatedAt: FieldRef<"SiteSave", 'DateTime'>
+    readonly siteId: FieldRef<"SiteSave", 'String'>
+    readonly userId: FieldRef<"SiteSave", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteSave findUnique
+   */
+  export type SiteSaveFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteSave to fetch.
+     */
+    where: SiteSaveWhereUniqueInput
+  }
+
+  /**
+   * SiteSave findUniqueOrThrow
+   */
+  export type SiteSaveFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteSave to fetch.
+     */
+    where: SiteSaveWhereUniqueInput
+  }
+
+  /**
+   * SiteSave findFirst
+   */
+  export type SiteSaveFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteSave to fetch.
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteSaves to fetch.
+     */
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteSaves.
+     */
+    cursor?: SiteSaveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteSaves from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteSaves.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteSaves.
+     */
+    distinct?: SiteSaveScalarFieldEnum | SiteSaveScalarFieldEnum[]
+  }
+
+  /**
+   * SiteSave findFirstOrThrow
+   */
+  export type SiteSaveFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteSave to fetch.
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteSaves to fetch.
+     */
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteSaves.
+     */
+    cursor?: SiteSaveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteSaves from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteSaves.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteSaves.
+     */
+    distinct?: SiteSaveScalarFieldEnum | SiteSaveScalarFieldEnum[]
+  }
+
+  /**
+   * SiteSave findMany
+   */
+  export type SiteSaveFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteSaves to fetch.
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteSaves to fetch.
+     */
+    orderBy?: SiteSaveOrderByWithRelationInput | SiteSaveOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteSaves.
+     */
+    cursor?: SiteSaveWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteSaves from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteSaves.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteSaves.
+     */
+    distinct?: SiteSaveScalarFieldEnum | SiteSaveScalarFieldEnum[]
+  }
+
+  /**
+   * SiteSave create
+   */
+  export type SiteSaveCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteSave.
+     */
+    data: XOR<SiteSaveCreateInput, SiteSaveUncheckedCreateInput>
+  }
+
+  /**
+   * SiteSave createMany
+   */
+  export type SiteSaveCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteSaves.
+     */
+    data: SiteSaveCreateManyInput | SiteSaveCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteSave createManyAndReturn
+   */
+  export type SiteSaveCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteSaves.
+     */
+    data: SiteSaveCreateManyInput | SiteSaveCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteSave update
+   */
+  export type SiteSaveUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteSave.
+     */
+    data: XOR<SiteSaveUpdateInput, SiteSaveUncheckedUpdateInput>
+    /**
+     * Choose, which SiteSave to update.
+     */
+    where: SiteSaveWhereUniqueInput
+  }
+
+  /**
+   * SiteSave updateMany
+   */
+  export type SiteSaveUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteSaves.
+     */
+    data: XOR<SiteSaveUpdateManyMutationInput, SiteSaveUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteSaves to update
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * Limit how many SiteSaves to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteSave updateManyAndReturn
+   */
+  export type SiteSaveUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteSaves.
+     */
+    data: XOR<SiteSaveUpdateManyMutationInput, SiteSaveUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteSaves to update
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * Limit how many SiteSaves to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteSave upsert
+   */
+  export type SiteSaveUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteSave to update in case it exists.
+     */
+    where: SiteSaveWhereUniqueInput
+    /**
+     * In case the SiteSave found by the `where` argument doesn't exist, create a new SiteSave with this data.
+     */
+    create: XOR<SiteSaveCreateInput, SiteSaveUncheckedCreateInput>
+    /**
+     * In case the SiteSave was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteSaveUpdateInput, SiteSaveUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteSave delete
+   */
+  export type SiteSaveDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+    /**
+     * Filter which SiteSave to delete.
+     */
+    where: SiteSaveWhereUniqueInput
+  }
+
+  /**
+   * SiteSave deleteMany
+   */
+  export type SiteSaveDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteSaves to delete
+     */
+    where?: SiteSaveWhereInput
+    /**
+     * Limit how many SiteSaves to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteSave without action
+   */
+  export type SiteSaveDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteSave
+     */
+    select?: SiteSaveSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteSave
+     */
+    omit?: SiteSaveOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteSaveInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteComment
+   */
+
+  export type AggregateSiteComment = {
+    _count: SiteCommentCountAggregateOutputType | null
+    _avg: SiteCommentAvgAggregateOutputType | null
+    _sum: SiteCommentSumAggregateOutputType | null
+    _min: SiteCommentMinAggregateOutputType | null
+    _max: SiteCommentMaxAggregateOutputType | null
+  }
+
+  export type SiteCommentAvgAggregateOutputType = {
+    likesCount: number | null
+  }
+
+  export type SiteCommentSumAggregateOutputType = {
+    likesCount: number | null
+  }
+
+  export type SiteCommentMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    authorId: string | null
+    parentId: string | null
+    body: string | null
+    isDeleted: boolean | null
+    likesCount: number | null
+  }
+
+  export type SiteCommentMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    siteId: string | null
+    authorId: string | null
+    parentId: string | null
+    body: string | null
+    isDeleted: boolean | null
+    likesCount: number | null
+  }
+
+  export type SiteCommentCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    siteId: number
+    authorId: number
+    parentId: number
+    body: number
+    isDeleted: number
+    likesCount: number
+    _all: number
+  }
+
+
+  export type SiteCommentAvgAggregateInputType = {
+    likesCount?: true
+  }
+
+  export type SiteCommentSumAggregateInputType = {
+    likesCount?: true
+  }
+
+  export type SiteCommentMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    authorId?: true
+    parentId?: true
+    body?: true
+    isDeleted?: true
+    likesCount?: true
+  }
+
+  export type SiteCommentMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    authorId?: true
+    parentId?: true
+    body?: true
+    isDeleted?: true
+    likesCount?: true
+  }
+
+  export type SiteCommentCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    siteId?: true
+    authorId?: true
+    parentId?: true
+    body?: true
+    isDeleted?: true
+    likesCount?: true
+    _all?: true
+  }
+
+  export type SiteCommentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteComment to aggregate.
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteComments to fetch.
+     */
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteComments
+    **/
+    _count?: true | SiteCommentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SiteCommentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SiteCommentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteCommentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteCommentMaxAggregateInputType
+  }
+
+  export type GetSiteCommentAggregateType<T extends SiteCommentAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteComment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteComment[P]>
+      : GetScalarType<T[P], AggregateSiteComment[P]>
+  }
+
+
+
+
+  export type SiteCommentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentWhereInput
+    orderBy?: SiteCommentOrderByWithAggregationInput | SiteCommentOrderByWithAggregationInput[]
+    by: SiteCommentScalarFieldEnum[] | SiteCommentScalarFieldEnum
+    having?: SiteCommentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteCommentCountAggregateInputType | true
+    _avg?: SiteCommentAvgAggregateInputType
+    _sum?: SiteCommentSumAggregateInputType
+    _min?: SiteCommentMinAggregateInputType
+    _max?: SiteCommentMaxAggregateInputType
+  }
+
+  export type SiteCommentGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    siteId: string
+    authorId: string
+    parentId: string | null
+    body: string
+    isDeleted: boolean
+    likesCount: number
+    _count: SiteCommentCountAggregateOutputType | null
+    _avg: SiteCommentAvgAggregateOutputType | null
+    _sum: SiteCommentSumAggregateOutputType | null
+    _min: SiteCommentMinAggregateOutputType | null
+    _max: SiteCommentMaxAggregateOutputType | null
+  }
+
+  type GetSiteCommentGroupByPayload<T extends SiteCommentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteCommentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteCommentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteCommentGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteCommentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteCommentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    authorId?: boolean
+    parentId?: boolean
+    body?: boolean
+    isDeleted?: boolean
+    likesCount?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+    replies?: boolean | SiteComment$repliesArgs<ExtArgs>
+    likes?: boolean | SiteComment$likesArgs<ExtArgs>
+    _count?: boolean | SiteCommentCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteComment"]>
+
+  export type SiteCommentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    authorId?: boolean
+    parentId?: boolean
+    body?: boolean
+    isDeleted?: boolean
+    likesCount?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+  }, ExtArgs["result"]["siteComment"]>
+
+  export type SiteCommentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    authorId?: boolean
+    parentId?: boolean
+    body?: boolean
+    isDeleted?: boolean
+    likesCount?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+  }, ExtArgs["result"]["siteComment"]>
+
+  export type SiteCommentSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    siteId?: boolean
+    authorId?: boolean
+    parentId?: boolean
+    body?: boolean
+    isDeleted?: boolean
+    likesCount?: boolean
+  }
+
+  export type SiteCommentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "authorId" | "parentId" | "body" | "isDeleted" | "likesCount", ExtArgs["result"]["siteComment"]>
+  export type SiteCommentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+    replies?: boolean | SiteComment$repliesArgs<ExtArgs>
+    likes?: boolean | SiteComment$likesArgs<ExtArgs>
+    _count?: boolean | SiteCommentCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SiteCommentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+  }
+  export type SiteCommentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    parent?: boolean | SiteComment$parentArgs<ExtArgs>
+  }
+
+  export type $SiteCommentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteComment"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      author: Prisma.$UserPayload<ExtArgs>
+      parent: Prisma.$SiteCommentPayload<ExtArgs> | null
+      replies: Prisma.$SiteCommentPayload<ExtArgs>[]
+      likes: Prisma.$SiteCommentLikePayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      siteId: string
+      authorId: string
+      parentId: string | null
+      body: string
+      isDeleted: boolean
+      likesCount: number
+    }, ExtArgs["result"]["siteComment"]>
+    composites: {}
+  }
+
+  type SiteCommentGetPayload<S extends boolean | null | undefined | SiteCommentDefaultArgs> = $Result.GetResult<Prisma.$SiteCommentPayload, S>
+
+  type SiteCommentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteCommentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteCommentCountAggregateInputType | true
+    }
+
+  export interface SiteCommentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteComment'], meta: { name: 'SiteComment' } }
+    /**
+     * Find zero or one SiteComment that matches the filter.
+     * @param {SiteCommentFindUniqueArgs} args - Arguments to find a SiteComment
+     * @example
+     * // Get one SiteComment
+     * const siteComment = await prisma.siteComment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteCommentFindUniqueArgs>(args: SelectSubset<T, SiteCommentFindUniqueArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteComment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteCommentFindUniqueOrThrowArgs} args - Arguments to find a SiteComment
+     * @example
+     * // Get one SiteComment
+     * const siteComment = await prisma.siteComment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteCommentFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteCommentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteComment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentFindFirstArgs} args - Arguments to find a SiteComment
+     * @example
+     * // Get one SiteComment
+     * const siteComment = await prisma.siteComment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteCommentFindFirstArgs>(args?: SelectSubset<T, SiteCommentFindFirstArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteComment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentFindFirstOrThrowArgs} args - Arguments to find a SiteComment
+     * @example
+     * // Get one SiteComment
+     * const siteComment = await prisma.siteComment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteCommentFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteCommentFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteComments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteComments
+     * const siteComments = await prisma.siteComment.findMany()
+     * 
+     * // Get first 10 SiteComments
+     * const siteComments = await prisma.siteComment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteCommentWithIdOnly = await prisma.siteComment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteCommentFindManyArgs>(args?: SelectSubset<T, SiteCommentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteComment.
+     * @param {SiteCommentCreateArgs} args - Arguments to create a SiteComment.
+     * @example
+     * // Create one SiteComment
+     * const SiteComment = await prisma.siteComment.create({
+     *   data: {
+     *     // ... data to create a SiteComment
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteCommentCreateArgs>(args: SelectSubset<T, SiteCommentCreateArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteComments.
+     * @param {SiteCommentCreateManyArgs} args - Arguments to create many SiteComments.
+     * @example
+     * // Create many SiteComments
+     * const siteComment = await prisma.siteComment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteCommentCreateManyArgs>(args?: SelectSubset<T, SiteCommentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteComments and returns the data saved in the database.
+     * @param {SiteCommentCreateManyAndReturnArgs} args - Arguments to create many SiteComments.
+     * @example
+     * // Create many SiteComments
+     * const siteComment = await prisma.siteComment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteComments and only return the `id`
+     * const siteCommentWithIdOnly = await prisma.siteComment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteCommentCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteCommentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteComment.
+     * @param {SiteCommentDeleteArgs} args - Arguments to delete one SiteComment.
+     * @example
+     * // Delete one SiteComment
+     * const SiteComment = await prisma.siteComment.delete({
+     *   where: {
+     *     // ... filter to delete one SiteComment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteCommentDeleteArgs>(args: SelectSubset<T, SiteCommentDeleteArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteComment.
+     * @param {SiteCommentUpdateArgs} args - Arguments to update one SiteComment.
+     * @example
+     * // Update one SiteComment
+     * const siteComment = await prisma.siteComment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteCommentUpdateArgs>(args: SelectSubset<T, SiteCommentUpdateArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteComments.
+     * @param {SiteCommentDeleteManyArgs} args - Arguments to filter SiteComments to delete.
+     * @example
+     * // Delete a few SiteComments
+     * const { count } = await prisma.siteComment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteCommentDeleteManyArgs>(args?: SelectSubset<T, SiteCommentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteComments
+     * const siteComment = await prisma.siteComment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteCommentUpdateManyArgs>(args: SelectSubset<T, SiteCommentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteComments and returns the data updated in the database.
+     * @param {SiteCommentUpdateManyAndReturnArgs} args - Arguments to update many SiteComments.
+     * @example
+     * // Update many SiteComments
+     * const siteComment = await prisma.siteComment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteComments and only return the `id`
+     * const siteCommentWithIdOnly = await prisma.siteComment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteCommentUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteCommentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteComment.
+     * @param {SiteCommentUpsertArgs} args - Arguments to update or create a SiteComment.
+     * @example
+     * // Update or create a SiteComment
+     * const siteComment = await prisma.siteComment.upsert({
+     *   create: {
+     *     // ... data to create a SiteComment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteComment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteCommentUpsertArgs>(args: SelectSubset<T, SiteCommentUpsertArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteComments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentCountArgs} args - Arguments to filter SiteComments to count.
+     * @example
+     * // Count the number of SiteComments
+     * const count = await prisma.siteComment.count({
+     *   where: {
+     *     // ... the filter for the SiteComments we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteCommentCountArgs>(
+      args?: Subset<T, SiteCommentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteCommentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteCommentAggregateArgs>(args: Subset<T, SiteCommentAggregateArgs>): Prisma.PrismaPromise<GetSiteCommentAggregateType<T>>
+
+    /**
+     * Group by SiteComment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteCommentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteCommentGroupByArgs['orderBy'] }
+        : { orderBy?: SiteCommentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteCommentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteCommentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteComment model
+   */
+  readonly fields: SiteCommentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteComment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteCommentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    parent<T extends SiteComment$parentArgs<ExtArgs> = {}>(args?: Subset<T, SiteComment$parentArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    replies<T extends SiteComment$repliesArgs<ExtArgs> = {}>(args?: Subset<T, SiteComment$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    likes<T extends SiteComment$likesArgs<ExtArgs> = {}>(args?: Subset<T, SiteComment$likesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteComment model
+   */
+  interface SiteCommentFieldRefs {
+    readonly id: FieldRef<"SiteComment", 'String'>
+    readonly createdAt: FieldRef<"SiteComment", 'DateTime'>
+    readonly updatedAt: FieldRef<"SiteComment", 'DateTime'>
+    readonly siteId: FieldRef<"SiteComment", 'String'>
+    readonly authorId: FieldRef<"SiteComment", 'String'>
+    readonly parentId: FieldRef<"SiteComment", 'String'>
+    readonly body: FieldRef<"SiteComment", 'String'>
+    readonly isDeleted: FieldRef<"SiteComment", 'Boolean'>
+    readonly likesCount: FieldRef<"SiteComment", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteComment findUnique
+   */
+  export type SiteCommentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteComment to fetch.
+     */
+    where: SiteCommentWhereUniqueInput
+  }
+
+  /**
+   * SiteComment findUniqueOrThrow
+   */
+  export type SiteCommentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteComment to fetch.
+     */
+    where: SiteCommentWhereUniqueInput
+  }
+
+  /**
+   * SiteComment findFirst
+   */
+  export type SiteCommentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteComment to fetch.
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteComments to fetch.
+     */
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteComments.
+     */
+    cursor?: SiteCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteComments.
+     */
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * SiteComment findFirstOrThrow
+   */
+  export type SiteCommentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteComment to fetch.
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteComments to fetch.
+     */
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteComments.
+     */
+    cursor?: SiteCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteComments.
+     */
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * SiteComment findMany
+   */
+  export type SiteCommentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteComments to fetch.
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteComments to fetch.
+     */
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteComments.
+     */
+    cursor?: SiteCommentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteComments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteComments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteComments.
+     */
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * SiteComment create
+   */
+  export type SiteCommentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteComment.
+     */
+    data: XOR<SiteCommentCreateInput, SiteCommentUncheckedCreateInput>
+  }
+
+  /**
+   * SiteComment createMany
+   */
+  export type SiteCommentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteComments.
+     */
+    data: SiteCommentCreateManyInput | SiteCommentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteComment createManyAndReturn
+   */
+  export type SiteCommentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteComments.
+     */
+    data: SiteCommentCreateManyInput | SiteCommentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteComment update
+   */
+  export type SiteCommentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteComment.
+     */
+    data: XOR<SiteCommentUpdateInput, SiteCommentUncheckedUpdateInput>
+    /**
+     * Choose, which SiteComment to update.
+     */
+    where: SiteCommentWhereUniqueInput
+  }
+
+  /**
+   * SiteComment updateMany
+   */
+  export type SiteCommentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteComments.
+     */
+    data: XOR<SiteCommentUpdateManyMutationInput, SiteCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteComments to update
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * Limit how many SiteComments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteComment updateManyAndReturn
+   */
+  export type SiteCommentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteComments.
+     */
+    data: XOR<SiteCommentUpdateManyMutationInput, SiteCommentUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteComments to update
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * Limit how many SiteComments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteComment upsert
+   */
+  export type SiteCommentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteComment to update in case it exists.
+     */
+    where: SiteCommentWhereUniqueInput
+    /**
+     * In case the SiteComment found by the `where` argument doesn't exist, create a new SiteComment with this data.
+     */
+    create: XOR<SiteCommentCreateInput, SiteCommentUncheckedCreateInput>
+    /**
+     * In case the SiteComment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteCommentUpdateInput, SiteCommentUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteComment delete
+   */
+  export type SiteCommentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    /**
+     * Filter which SiteComment to delete.
+     */
+    where: SiteCommentWhereUniqueInput
+  }
+
+  /**
+   * SiteComment deleteMany
+   */
+  export type SiteCommentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteComments to delete
+     */
+    where?: SiteCommentWhereInput
+    /**
+     * Limit how many SiteComments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteComment.parent
+   */
+  export type SiteComment$parentArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    where?: SiteCommentWhereInput
+  }
+
+  /**
+   * SiteComment.replies
+   */
+  export type SiteComment$repliesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+    where?: SiteCommentWhereInput
+    orderBy?: SiteCommentOrderByWithRelationInput | SiteCommentOrderByWithRelationInput[]
+    cursor?: SiteCommentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteCommentScalarFieldEnum | SiteCommentScalarFieldEnum[]
+  }
+
+  /**
+   * SiteComment.likes
+   */
+  export type SiteComment$likesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    where?: SiteCommentLikeWhereInput
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    cursor?: SiteCommentLikeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteComment without action
+   */
+  export type SiteCommentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteComment
+     */
+    select?: SiteCommentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteComment
+     */
+    omit?: SiteCommentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteCommentLike
+   */
+
+  export type AggregateSiteCommentLike = {
+    _count: SiteCommentLikeCountAggregateOutputType | null
+    _min: SiteCommentLikeMinAggregateOutputType | null
+    _max: SiteCommentLikeMaxAggregateOutputType | null
+  }
+
+  export type SiteCommentLikeMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    commentId: string | null
+    userId: string | null
+  }
+
+  export type SiteCommentLikeMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    commentId: string | null
+    userId: string | null
+  }
+
+  export type SiteCommentLikeCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    commentId: number
+    userId: number
+    _all: number
+  }
+
+
+  export type SiteCommentLikeMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    commentId?: true
+    userId?: true
+  }
+
+  export type SiteCommentLikeMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    commentId?: true
+    userId?: true
+  }
+
+  export type SiteCommentLikeCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    commentId?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type SiteCommentLikeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteCommentLike to aggregate.
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteCommentLikes to fetch.
+     */
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteCommentLikeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteCommentLikes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteCommentLikes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteCommentLikes
+    **/
+    _count?: true | SiteCommentLikeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteCommentLikeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteCommentLikeMaxAggregateInputType
+  }
+
+  export type GetSiteCommentLikeAggregateType<T extends SiteCommentLikeAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteCommentLike]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteCommentLike[P]>
+      : GetScalarType<T[P], AggregateSiteCommentLike[P]>
+  }
+
+
+
+
+  export type SiteCommentLikeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteCommentLikeWhereInput
+    orderBy?: SiteCommentLikeOrderByWithAggregationInput | SiteCommentLikeOrderByWithAggregationInput[]
+    by: SiteCommentLikeScalarFieldEnum[] | SiteCommentLikeScalarFieldEnum
+    having?: SiteCommentLikeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteCommentLikeCountAggregateInputType | true
+    _min?: SiteCommentLikeMinAggregateInputType
+    _max?: SiteCommentLikeMaxAggregateInputType
+  }
+
+  export type SiteCommentLikeGroupByOutputType = {
+    id: string
+    createdAt: Date
+    commentId: string
+    userId: string
+    _count: SiteCommentLikeCountAggregateOutputType | null
+    _min: SiteCommentLikeMinAggregateOutputType | null
+    _max: SiteCommentLikeMaxAggregateOutputType | null
+  }
+
+  type GetSiteCommentLikeGroupByPayload<T extends SiteCommentLikeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteCommentLikeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteCommentLikeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteCommentLikeGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteCommentLikeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteCommentLikeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    commentId?: boolean
+    userId?: boolean
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteCommentLike"]>
+
+  export type SiteCommentLikeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    commentId?: boolean
+    userId?: boolean
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteCommentLike"]>
+
+  export type SiteCommentLikeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    commentId?: boolean
+    userId?: boolean
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteCommentLike"]>
+
+  export type SiteCommentLikeSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    commentId?: boolean
+    userId?: boolean
+  }
+
+  export type SiteCommentLikeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "commentId" | "userId", ExtArgs["result"]["siteCommentLike"]>
+  export type SiteCommentLikeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteCommentLikeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteCommentLikeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    comment?: boolean | SiteCommentDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteCommentLikePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteCommentLike"
+    objects: {
+      comment: Prisma.$SiteCommentPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      commentId: string
+      userId: string
+    }, ExtArgs["result"]["siteCommentLike"]>
+    composites: {}
+  }
+
+  type SiteCommentLikeGetPayload<S extends boolean | null | undefined | SiteCommentLikeDefaultArgs> = $Result.GetResult<Prisma.$SiteCommentLikePayload, S>
+
+  type SiteCommentLikeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteCommentLikeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteCommentLikeCountAggregateInputType | true
+    }
+
+  export interface SiteCommentLikeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteCommentLike'], meta: { name: 'SiteCommentLike' } }
+    /**
+     * Find zero or one SiteCommentLike that matches the filter.
+     * @param {SiteCommentLikeFindUniqueArgs} args - Arguments to find a SiteCommentLike
+     * @example
+     * // Get one SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteCommentLikeFindUniqueArgs>(args: SelectSubset<T, SiteCommentLikeFindUniqueArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteCommentLike that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteCommentLikeFindUniqueOrThrowArgs} args - Arguments to find a SiteCommentLike
+     * @example
+     * // Get one SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteCommentLikeFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteCommentLikeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteCommentLike that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeFindFirstArgs} args - Arguments to find a SiteCommentLike
+     * @example
+     * // Get one SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteCommentLikeFindFirstArgs>(args?: SelectSubset<T, SiteCommentLikeFindFirstArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteCommentLike that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeFindFirstOrThrowArgs} args - Arguments to find a SiteCommentLike
+     * @example
+     * // Get one SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteCommentLikeFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteCommentLikeFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteCommentLikes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteCommentLikes
+     * const siteCommentLikes = await prisma.siteCommentLike.findMany()
+     * 
+     * // Get first 10 SiteCommentLikes
+     * const siteCommentLikes = await prisma.siteCommentLike.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteCommentLikeWithIdOnly = await prisma.siteCommentLike.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteCommentLikeFindManyArgs>(args?: SelectSubset<T, SiteCommentLikeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteCommentLike.
+     * @param {SiteCommentLikeCreateArgs} args - Arguments to create a SiteCommentLike.
+     * @example
+     * // Create one SiteCommentLike
+     * const SiteCommentLike = await prisma.siteCommentLike.create({
+     *   data: {
+     *     // ... data to create a SiteCommentLike
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteCommentLikeCreateArgs>(args: SelectSubset<T, SiteCommentLikeCreateArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteCommentLikes.
+     * @param {SiteCommentLikeCreateManyArgs} args - Arguments to create many SiteCommentLikes.
+     * @example
+     * // Create many SiteCommentLikes
+     * const siteCommentLike = await prisma.siteCommentLike.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteCommentLikeCreateManyArgs>(args?: SelectSubset<T, SiteCommentLikeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteCommentLikes and returns the data saved in the database.
+     * @param {SiteCommentLikeCreateManyAndReturnArgs} args - Arguments to create many SiteCommentLikes.
+     * @example
+     * // Create many SiteCommentLikes
+     * const siteCommentLike = await prisma.siteCommentLike.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteCommentLikes and only return the `id`
+     * const siteCommentLikeWithIdOnly = await prisma.siteCommentLike.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteCommentLikeCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteCommentLikeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteCommentLike.
+     * @param {SiteCommentLikeDeleteArgs} args - Arguments to delete one SiteCommentLike.
+     * @example
+     * // Delete one SiteCommentLike
+     * const SiteCommentLike = await prisma.siteCommentLike.delete({
+     *   where: {
+     *     // ... filter to delete one SiteCommentLike
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteCommentLikeDeleteArgs>(args: SelectSubset<T, SiteCommentLikeDeleteArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteCommentLike.
+     * @param {SiteCommentLikeUpdateArgs} args - Arguments to update one SiteCommentLike.
+     * @example
+     * // Update one SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteCommentLikeUpdateArgs>(args: SelectSubset<T, SiteCommentLikeUpdateArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteCommentLikes.
+     * @param {SiteCommentLikeDeleteManyArgs} args - Arguments to filter SiteCommentLikes to delete.
+     * @example
+     * // Delete a few SiteCommentLikes
+     * const { count } = await prisma.siteCommentLike.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteCommentLikeDeleteManyArgs>(args?: SelectSubset<T, SiteCommentLikeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteCommentLikes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteCommentLikes
+     * const siteCommentLike = await prisma.siteCommentLike.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteCommentLikeUpdateManyArgs>(args: SelectSubset<T, SiteCommentLikeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteCommentLikes and returns the data updated in the database.
+     * @param {SiteCommentLikeUpdateManyAndReturnArgs} args - Arguments to update many SiteCommentLikes.
+     * @example
+     * // Update many SiteCommentLikes
+     * const siteCommentLike = await prisma.siteCommentLike.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteCommentLikes and only return the `id`
+     * const siteCommentLikeWithIdOnly = await prisma.siteCommentLike.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteCommentLikeUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteCommentLikeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteCommentLike.
+     * @param {SiteCommentLikeUpsertArgs} args - Arguments to update or create a SiteCommentLike.
+     * @example
+     * // Update or create a SiteCommentLike
+     * const siteCommentLike = await prisma.siteCommentLike.upsert({
+     *   create: {
+     *     // ... data to create a SiteCommentLike
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteCommentLike we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteCommentLikeUpsertArgs>(args: SelectSubset<T, SiteCommentLikeUpsertArgs<ExtArgs>>): Prisma__SiteCommentLikeClient<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteCommentLikes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeCountArgs} args - Arguments to filter SiteCommentLikes to count.
+     * @example
+     * // Count the number of SiteCommentLikes
+     * const count = await prisma.siteCommentLike.count({
+     *   where: {
+     *     // ... the filter for the SiteCommentLikes we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteCommentLikeCountArgs>(
+      args?: Subset<T, SiteCommentLikeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteCommentLikeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteCommentLike.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteCommentLikeAggregateArgs>(args: Subset<T, SiteCommentLikeAggregateArgs>): Prisma.PrismaPromise<GetSiteCommentLikeAggregateType<T>>
+
+    /**
+     * Group by SiteCommentLike.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteCommentLikeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteCommentLikeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteCommentLikeGroupByArgs['orderBy'] }
+        : { orderBy?: SiteCommentLikeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteCommentLikeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteCommentLikeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteCommentLike model
+   */
+  readonly fields: SiteCommentLikeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteCommentLike.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteCommentLikeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    comment<T extends SiteCommentDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteCommentDefaultArgs<ExtArgs>>): Prisma__SiteCommentClient<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteCommentLike model
+   */
+  interface SiteCommentLikeFieldRefs {
+    readonly id: FieldRef<"SiteCommentLike", 'String'>
+    readonly createdAt: FieldRef<"SiteCommentLike", 'DateTime'>
+    readonly commentId: FieldRef<"SiteCommentLike", 'String'>
+    readonly userId: FieldRef<"SiteCommentLike", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteCommentLike findUnique
+   */
+  export type SiteCommentLikeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteCommentLike to fetch.
+     */
+    where: SiteCommentLikeWhereUniqueInput
+  }
+
+  /**
+   * SiteCommentLike findUniqueOrThrow
+   */
+  export type SiteCommentLikeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteCommentLike to fetch.
+     */
+    where: SiteCommentLikeWhereUniqueInput
+  }
+
+  /**
+   * SiteCommentLike findFirst
+   */
+  export type SiteCommentLikeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteCommentLike to fetch.
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteCommentLikes to fetch.
+     */
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteCommentLikes.
+     */
+    cursor?: SiteCommentLikeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteCommentLikes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteCommentLikes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteCommentLikes.
+     */
+    distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteCommentLike findFirstOrThrow
+   */
+  export type SiteCommentLikeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteCommentLike to fetch.
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteCommentLikes to fetch.
+     */
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteCommentLikes.
+     */
+    cursor?: SiteCommentLikeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteCommentLikes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteCommentLikes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteCommentLikes.
+     */
+    distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteCommentLike findMany
+   */
+  export type SiteCommentLikeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteCommentLikes to fetch.
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteCommentLikes to fetch.
+     */
+    orderBy?: SiteCommentLikeOrderByWithRelationInput | SiteCommentLikeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteCommentLikes.
+     */
+    cursor?: SiteCommentLikeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteCommentLikes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteCommentLikes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteCommentLikes.
+     */
+    distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
+  }
+
+  /**
+   * SiteCommentLike create
+   */
+  export type SiteCommentLikeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteCommentLike.
+     */
+    data: XOR<SiteCommentLikeCreateInput, SiteCommentLikeUncheckedCreateInput>
+  }
+
+  /**
+   * SiteCommentLike createMany
+   */
+  export type SiteCommentLikeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteCommentLikes.
+     */
+    data: SiteCommentLikeCreateManyInput | SiteCommentLikeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteCommentLike createManyAndReturn
+   */
+  export type SiteCommentLikeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteCommentLikes.
+     */
+    data: SiteCommentLikeCreateManyInput | SiteCommentLikeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteCommentLike update
+   */
+  export type SiteCommentLikeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteCommentLike.
+     */
+    data: XOR<SiteCommentLikeUpdateInput, SiteCommentLikeUncheckedUpdateInput>
+    /**
+     * Choose, which SiteCommentLike to update.
+     */
+    where: SiteCommentLikeWhereUniqueInput
+  }
+
+  /**
+   * SiteCommentLike updateMany
+   */
+  export type SiteCommentLikeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteCommentLikes.
+     */
+    data: XOR<SiteCommentLikeUpdateManyMutationInput, SiteCommentLikeUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteCommentLikes to update
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * Limit how many SiteCommentLikes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteCommentLike updateManyAndReturn
+   */
+  export type SiteCommentLikeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteCommentLikes.
+     */
+    data: XOR<SiteCommentLikeUpdateManyMutationInput, SiteCommentLikeUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteCommentLikes to update
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * Limit how many SiteCommentLikes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteCommentLike upsert
+   */
+  export type SiteCommentLikeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteCommentLike to update in case it exists.
+     */
+    where: SiteCommentLikeWhereUniqueInput
+    /**
+     * In case the SiteCommentLike found by the `where` argument doesn't exist, create a new SiteCommentLike with this data.
+     */
+    create: XOR<SiteCommentLikeCreateInput, SiteCommentLikeUncheckedCreateInput>
+    /**
+     * In case the SiteCommentLike was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteCommentLikeUpdateInput, SiteCommentLikeUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteCommentLike delete
+   */
+  export type SiteCommentLikeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+    /**
+     * Filter which SiteCommentLike to delete.
+     */
+    where: SiteCommentLikeWhereUniqueInput
+  }
+
+  /**
+   * SiteCommentLike deleteMany
+   */
+  export type SiteCommentLikeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteCommentLikes to delete
+     */
+    where?: SiteCommentLikeWhereInput
+    /**
+     * Limit how many SiteCommentLikes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteCommentLike without action
+   */
+  export type SiteCommentLikeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteCommentLike
+     */
+    select?: SiteCommentLikeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteCommentLike
+     */
+    omit?: SiteCommentLikeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteCommentLikeInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteShareEvent
+   */
+
+  export type AggregateSiteShareEvent = {
+    _count: SiteShareEventCountAggregateOutputType | null
+    _min: SiteShareEventMinAggregateOutputType | null
+    _max: SiteShareEventMaxAggregateOutputType | null
+  }
+
+  export type SiteShareEventMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    siteId: string | null
+    userId: string | null
+    channel: $Enums.SiteShareChannel | null
+  }
+
+  export type SiteShareEventMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    siteId: string | null
+    userId: string | null
+    channel: $Enums.SiteShareChannel | null
+  }
+
+  export type SiteShareEventCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    siteId: number
+    userId: number
+    channel: number
+    _all: number
+  }
+
+
+  export type SiteShareEventMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    siteId?: true
+    userId?: true
+    channel?: true
+  }
+
+  export type SiteShareEventMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    siteId?: true
+    userId?: true
+    channel?: true
+  }
+
+  export type SiteShareEventCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    siteId?: true
+    userId?: true
+    channel?: true
+    _all?: true
+  }
+
+  export type SiteShareEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareEvent to aggregate.
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareEvents to fetch.
+     */
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteShareEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteShareEvents
+    **/
+    _count?: true | SiteShareEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteShareEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteShareEventMaxAggregateInputType
+  }
+
+  export type GetSiteShareEventAggregateType<T extends SiteShareEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteShareEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteShareEvent[P]>
+      : GetScalarType<T[P], AggregateSiteShareEvent[P]>
+  }
+
+
+
+
+  export type SiteShareEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareEventWhereInput
+    orderBy?: SiteShareEventOrderByWithAggregationInput | SiteShareEventOrderByWithAggregationInput[]
+    by: SiteShareEventScalarFieldEnum[] | SiteShareEventScalarFieldEnum
+    having?: SiteShareEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteShareEventCountAggregateInputType | true
+    _min?: SiteShareEventMinAggregateInputType
+    _max?: SiteShareEventMaxAggregateInputType
+  }
+
+  export type SiteShareEventGroupByOutputType = {
+    id: string
+    createdAt: Date
+    siteId: string
+    userId: string
+    channel: $Enums.SiteShareChannel
+    _count: SiteShareEventCountAggregateOutputType | null
+    _min: SiteShareEventMinAggregateOutputType | null
+    _max: SiteShareEventMaxAggregateOutputType | null
+  }
+
+  type GetSiteShareEventGroupByPayload<T extends SiteShareEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteShareEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteShareEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteShareEventGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteShareEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteShareEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareEvent"]>
+
+  export type SiteShareEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareEvent"]>
+
+  export type SiteShareEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareEvent"]>
+
+  export type SiteShareEventSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    siteId?: boolean
+    userId?: boolean
+    channel?: boolean
+  }
+
+  export type SiteShareEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "siteId" | "userId" | "channel", ExtArgs["result"]["siteShareEvent"]>
+  export type SiteShareEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteShareEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SiteShareEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteShareEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteShareEvent"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      siteId: string
+      userId: string
+      channel: $Enums.SiteShareChannel
+    }, ExtArgs["result"]["siteShareEvent"]>
+    composites: {}
+  }
+
+  type SiteShareEventGetPayload<S extends boolean | null | undefined | SiteShareEventDefaultArgs> = $Result.GetResult<Prisma.$SiteShareEventPayload, S>
+
+  type SiteShareEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteShareEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteShareEventCountAggregateInputType | true
+    }
+
+  export interface SiteShareEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteShareEvent'], meta: { name: 'SiteShareEvent' } }
+    /**
+     * Find zero or one SiteShareEvent that matches the filter.
+     * @param {SiteShareEventFindUniqueArgs} args - Arguments to find a SiteShareEvent
+     * @example
+     * // Get one SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteShareEventFindUniqueArgs>(args: SelectSubset<T, SiteShareEventFindUniqueArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteShareEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteShareEventFindUniqueOrThrowArgs} args - Arguments to find a SiteShareEvent
+     * @example
+     * // Get one SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteShareEventFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteShareEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventFindFirstArgs} args - Arguments to find a SiteShareEvent
+     * @example
+     * // Get one SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteShareEventFindFirstArgs>(args?: SelectSubset<T, SiteShareEventFindFirstArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventFindFirstOrThrowArgs} args - Arguments to find a SiteShareEvent
+     * @example
+     * // Get one SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteShareEventFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteShareEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteShareEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteShareEvents
+     * const siteShareEvents = await prisma.siteShareEvent.findMany()
+     * 
+     * // Get first 10 SiteShareEvents
+     * const siteShareEvents = await prisma.siteShareEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteShareEventWithIdOnly = await prisma.siteShareEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteShareEventFindManyArgs>(args?: SelectSubset<T, SiteShareEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteShareEvent.
+     * @param {SiteShareEventCreateArgs} args - Arguments to create a SiteShareEvent.
+     * @example
+     * // Create one SiteShareEvent
+     * const SiteShareEvent = await prisma.siteShareEvent.create({
+     *   data: {
+     *     // ... data to create a SiteShareEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteShareEventCreateArgs>(args: SelectSubset<T, SiteShareEventCreateArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteShareEvents.
+     * @param {SiteShareEventCreateManyArgs} args - Arguments to create many SiteShareEvents.
+     * @example
+     * // Create many SiteShareEvents
+     * const siteShareEvent = await prisma.siteShareEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteShareEventCreateManyArgs>(args?: SelectSubset<T, SiteShareEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteShareEvents and returns the data saved in the database.
+     * @param {SiteShareEventCreateManyAndReturnArgs} args - Arguments to create many SiteShareEvents.
+     * @example
+     * // Create many SiteShareEvents
+     * const siteShareEvent = await prisma.siteShareEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteShareEvents and only return the `id`
+     * const siteShareEventWithIdOnly = await prisma.siteShareEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteShareEventCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteShareEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteShareEvent.
+     * @param {SiteShareEventDeleteArgs} args - Arguments to delete one SiteShareEvent.
+     * @example
+     * // Delete one SiteShareEvent
+     * const SiteShareEvent = await prisma.siteShareEvent.delete({
+     *   where: {
+     *     // ... filter to delete one SiteShareEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteShareEventDeleteArgs>(args: SelectSubset<T, SiteShareEventDeleteArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteShareEvent.
+     * @param {SiteShareEventUpdateArgs} args - Arguments to update one SiteShareEvent.
+     * @example
+     * // Update one SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteShareEventUpdateArgs>(args: SelectSubset<T, SiteShareEventUpdateArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteShareEvents.
+     * @param {SiteShareEventDeleteManyArgs} args - Arguments to filter SiteShareEvents to delete.
+     * @example
+     * // Delete a few SiteShareEvents
+     * const { count } = await prisma.siteShareEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteShareEventDeleteManyArgs>(args?: SelectSubset<T, SiteShareEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteShareEvents
+     * const siteShareEvent = await prisma.siteShareEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteShareEventUpdateManyArgs>(args: SelectSubset<T, SiteShareEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareEvents and returns the data updated in the database.
+     * @param {SiteShareEventUpdateManyAndReturnArgs} args - Arguments to update many SiteShareEvents.
+     * @example
+     * // Update many SiteShareEvents
+     * const siteShareEvent = await prisma.siteShareEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteShareEvents and only return the `id`
+     * const siteShareEventWithIdOnly = await prisma.siteShareEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteShareEventUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteShareEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteShareEvent.
+     * @param {SiteShareEventUpsertArgs} args - Arguments to update or create a SiteShareEvent.
+     * @example
+     * // Update or create a SiteShareEvent
+     * const siteShareEvent = await prisma.siteShareEvent.upsert({
+     *   create: {
+     *     // ... data to create a SiteShareEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteShareEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteShareEventUpsertArgs>(args: SelectSubset<T, SiteShareEventUpsertArgs<ExtArgs>>): Prisma__SiteShareEventClient<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteShareEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventCountArgs} args - Arguments to filter SiteShareEvents to count.
+     * @example
+     * // Count the number of SiteShareEvents
+     * const count = await prisma.siteShareEvent.count({
+     *   where: {
+     *     // ... the filter for the SiteShareEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteShareEventCountArgs>(
+      args?: Subset<T, SiteShareEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteShareEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteShareEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteShareEventAggregateArgs>(args: Subset<T, SiteShareEventAggregateArgs>): Prisma.PrismaPromise<GetSiteShareEventAggregateType<T>>
+
+    /**
+     * Group by SiteShareEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteShareEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteShareEventGroupByArgs['orderBy'] }
+        : { orderBy?: SiteShareEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteShareEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteShareEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteShareEvent model
+   */
+  readonly fields: SiteShareEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteShareEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteShareEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteShareEvent model
+   */
+  interface SiteShareEventFieldRefs {
+    readonly id: FieldRef<"SiteShareEvent", 'String'>
+    readonly createdAt: FieldRef<"SiteShareEvent", 'DateTime'>
+    readonly siteId: FieldRef<"SiteShareEvent", 'String'>
+    readonly userId: FieldRef<"SiteShareEvent", 'String'>
+    readonly channel: FieldRef<"SiteShareEvent", 'SiteShareChannel'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteShareEvent findUnique
+   */
+  export type SiteShareEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareEvent to fetch.
+     */
+    where: SiteShareEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareEvent findUniqueOrThrow
+   */
+  export type SiteShareEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareEvent to fetch.
+     */
+    where: SiteShareEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareEvent findFirst
+   */
+  export type SiteShareEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareEvent to fetch.
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareEvents to fetch.
+     */
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareEvents.
+     */
+    cursor?: SiteShareEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareEvents.
+     */
+    distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareEvent findFirstOrThrow
+   */
+  export type SiteShareEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareEvent to fetch.
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareEvents to fetch.
+     */
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareEvents.
+     */
+    cursor?: SiteShareEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareEvents.
+     */
+    distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareEvent findMany
+   */
+  export type SiteShareEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareEvents to fetch.
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareEvents to fetch.
+     */
+    orderBy?: SiteShareEventOrderByWithRelationInput | SiteShareEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteShareEvents.
+     */
+    cursor?: SiteShareEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareEvents.
+     */
+    distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareEvent create
+   */
+  export type SiteShareEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteShareEvent.
+     */
+    data: XOR<SiteShareEventCreateInput, SiteShareEventUncheckedCreateInput>
+  }
+
+  /**
+   * SiteShareEvent createMany
+   */
+  export type SiteShareEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteShareEvents.
+     */
+    data: SiteShareEventCreateManyInput | SiteShareEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteShareEvent createManyAndReturn
+   */
+  export type SiteShareEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteShareEvents.
+     */
+    data: SiteShareEventCreateManyInput | SiteShareEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareEvent update
+   */
+  export type SiteShareEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteShareEvent.
+     */
+    data: XOR<SiteShareEventUpdateInput, SiteShareEventUncheckedUpdateInput>
+    /**
+     * Choose, which SiteShareEvent to update.
+     */
+    where: SiteShareEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareEvent updateMany
+   */
+  export type SiteShareEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteShareEvents.
+     */
+    data: XOR<SiteShareEventUpdateManyMutationInput, SiteShareEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareEvents to update
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * Limit how many SiteShareEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareEvent updateManyAndReturn
+   */
+  export type SiteShareEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteShareEvents.
+     */
+    data: XOR<SiteShareEventUpdateManyMutationInput, SiteShareEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareEvents to update
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * Limit how many SiteShareEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareEvent upsert
+   */
+  export type SiteShareEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteShareEvent to update in case it exists.
+     */
+    where: SiteShareEventWhereUniqueInput
+    /**
+     * In case the SiteShareEvent found by the `where` argument doesn't exist, create a new SiteShareEvent with this data.
+     */
+    create: XOR<SiteShareEventCreateInput, SiteShareEventUncheckedCreateInput>
+    /**
+     * In case the SiteShareEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteShareEventUpdateInput, SiteShareEventUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteShareEvent delete
+   */
+  export type SiteShareEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+    /**
+     * Filter which SiteShareEvent to delete.
+     */
+    where: SiteShareEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareEvent deleteMany
+   */
+  export type SiteShareEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareEvents to delete
+     */
+    where?: SiteShareEventWhereInput
+    /**
+     * Limit how many SiteShareEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareEvent without action
+   */
+  export type SiteShareEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareEvent
+     */
+    select?: SiteShareEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareEvent
+     */
+    omit?: SiteShareEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareEventInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -20770,7 +27195,11 @@ export namespace Prisma {
     longitude: 'longitude',
     address: 'address',
     description: 'description',
-    status: 'status'
+    status: 'status',
+    upvotesCount: 'upvotesCount',
+    commentsCount: 'commentsCount',
+    savesCount: 'savesCount',
+    sharesCount: 'sharesCount'
   };
 
   export type SiteScalarFieldEnum = (typeof SiteScalarFieldEnum)[keyof typeof SiteScalarFieldEnum]
@@ -20858,6 +27287,64 @@ export namespace Prisma {
   };
 
   export type CleanupEventScalarFieldEnum = (typeof CleanupEventScalarFieldEnum)[keyof typeof CleanupEventScalarFieldEnum]
+
+
+  export const SiteVoteScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    siteId: 'siteId',
+    userId: 'userId'
+  };
+
+  export type SiteVoteScalarFieldEnum = (typeof SiteVoteScalarFieldEnum)[keyof typeof SiteVoteScalarFieldEnum]
+
+
+  export const SiteSaveScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    siteId: 'siteId',
+    userId: 'userId'
+  };
+
+  export type SiteSaveScalarFieldEnum = (typeof SiteSaveScalarFieldEnum)[keyof typeof SiteSaveScalarFieldEnum]
+
+
+  export const SiteCommentScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    siteId: 'siteId',
+    authorId: 'authorId',
+    parentId: 'parentId',
+    body: 'body',
+    isDeleted: 'isDeleted',
+    likesCount: 'likesCount'
+  };
+
+  export type SiteCommentScalarFieldEnum = (typeof SiteCommentScalarFieldEnum)[keyof typeof SiteCommentScalarFieldEnum]
+
+
+  export const SiteCommentLikeScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    commentId: 'commentId',
+    userId: 'userId'
+  };
+
+  export type SiteCommentLikeScalarFieldEnum = (typeof SiteCommentLikeScalarFieldEnum)[keyof typeof SiteCommentLikeScalarFieldEnum]
+
+
+  export const SiteShareEventScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    siteId: 'siteId',
+    userId: 'userId',
+    channel: 'channel'
+  };
+
+  export type SiteShareEventScalarFieldEnum = (typeof SiteShareEventScalarFieldEnum)[keyof typeof SiteShareEventScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -21093,6 +27580,20 @@ export namespace Prisma {
    */
   export type ListEnumCleanupEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CleanupEventStatus[]'>
     
+
+
+  /**
+   * Reference to a field of type 'SiteShareChannel'
+   */
+  export type EnumSiteShareChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareChannel'>
+    
+
+
+  /**
+   * Reference to a field of type 'SiteShareChannel[]'
+   */
+  export type ListEnumSiteShareChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareChannel[]'>
+    
   /**
    * Deep Input Types
    */
@@ -21132,6 +27633,11 @@ export namespace Prisma {
     auditLogs?: AuditLogListRelationFilter
     adminTempTokens?: AdminTempTokenListRelationFilter
     adminPendingMfa?: XOR<AdminPendingMfaNullableScalarRelationFilter, AdminPendingMfaWhereInput> | null
+    siteVotes?: SiteVoteListRelationFilter
+    siteSaves?: SiteSaveListRelationFilter
+    siteComments?: SiteCommentListRelationFilter
+    siteShareEvents?: SiteShareEventListRelationFilter
+    siteCommentLikes?: SiteCommentLikeListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -21165,6 +27671,11 @@ export namespace Prisma {
     auditLogs?: AuditLogOrderByRelationAggregateInput
     adminTempTokens?: AdminTempTokenOrderByRelationAggregateInput
     adminPendingMfa?: AdminPendingMfaOrderByWithRelationInput
+    siteVotes?: SiteVoteOrderByRelationAggregateInput
+    siteSaves?: SiteSaveOrderByRelationAggregateInput
+    siteComments?: SiteCommentOrderByRelationAggregateInput
+    siteShareEvents?: SiteShareEventOrderByRelationAggregateInput
+    siteCommentLikes?: SiteCommentLikeOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -21201,6 +27712,11 @@ export namespace Prisma {
     auditLogs?: AuditLogListRelationFilter
     adminTempTokens?: AdminTempTokenListRelationFilter
     adminPendingMfa?: XOR<AdminPendingMfaNullableScalarRelationFilter, AdminPendingMfaWhereInput> | null
+    siteVotes?: SiteVoteListRelationFilter
+    siteSaves?: SiteSaveListRelationFilter
+    siteComments?: SiteCommentListRelationFilter
+    siteShareEvents?: SiteShareEventListRelationFilter
+    siteCommentLikes?: SiteCommentLikeListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -21780,8 +28296,16 @@ export namespace Prisma {
     address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
+    upvotesCount?: IntFilter<"Site"> | number
+    commentsCount?: IntFilter<"Site"> | number
+    savesCount?: IntFilter<"Site"> | number
+    sharesCount?: IntFilter<"Site"> | number
     reports?: ReportListRelationFilter
     events?: CleanupEventListRelationFilter
+    votes?: SiteVoteListRelationFilter
+    saves?: SiteSaveListRelationFilter
+    comments?: SiteCommentListRelationFilter
+    shareEvents?: SiteShareEventListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -21793,8 +28317,16 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
     reports?: ReportOrderByRelationAggregateInput
     events?: CleanupEventOrderByRelationAggregateInput
+    votes?: SiteVoteOrderByRelationAggregateInput
+    saves?: SiteSaveOrderByRelationAggregateInput
+    comments?: SiteCommentOrderByRelationAggregateInput
+    shareEvents?: SiteShareEventOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -21809,8 +28341,16 @@ export namespace Prisma {
     address?: StringNullableFilter<"Site"> | string | null
     description?: StringNullableFilter<"Site"> | string | null
     status?: EnumSiteStatusFilter<"Site"> | $Enums.SiteStatus
+    upvotesCount?: IntFilter<"Site"> | number
+    commentsCount?: IntFilter<"Site"> | number
+    savesCount?: IntFilter<"Site"> | number
+    sharesCount?: IntFilter<"Site"> | number
     reports?: ReportListRelationFilter
     events?: CleanupEventListRelationFilter
+    votes?: SiteVoteListRelationFilter
+    saves?: SiteSaveListRelationFilter
+    comments?: SiteCommentListRelationFilter
+    shareEvents?: SiteShareEventListRelationFilter
   }, "id">
 
   export type SiteOrderByWithAggregationInput = {
@@ -21822,6 +28362,10 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     description?: SortOrderInput | SortOrder
     status?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
     _count?: SiteCountOrderByAggregateInput
     _avg?: SiteAvgOrderByAggregateInput
     _max?: SiteMaxOrderByAggregateInput
@@ -21841,6 +28385,10 @@ export namespace Prisma {
     address?: StringNullableWithAggregatesFilter<"Site"> | string | null
     description?: StringNullableWithAggregatesFilter<"Site"> | string | null
     status?: EnumSiteStatusWithAggregatesFilter<"Site"> | $Enums.SiteStatus
+    upvotesCount?: IntWithAggregatesFilter<"Site"> | number
+    commentsCount?: IntWithAggregatesFilter<"Site"> | number
+    savesCount?: IntWithAggregatesFilter<"Site"> | number
+    sharesCount?: IntWithAggregatesFilter<"Site"> | number
   }
 
   export type ReportWhereInput = {
@@ -22280,6 +28828,325 @@ export namespace Prisma {
     participantCount?: IntWithAggregatesFilter<"CleanupEvent"> | number
   }
 
+  export type SiteVoteWhereInput = {
+    AND?: SiteVoteWhereInput | SiteVoteWhereInput[]
+    OR?: SiteVoteWhereInput[]
+    NOT?: SiteVoteWhereInput | SiteVoteWhereInput[]
+    id?: StringFilter<"SiteVote"> | string
+    createdAt?: DateTimeFilter<"SiteVote"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteVote"> | Date | string
+    siteId?: StringFilter<"SiteVote"> | string
+    userId?: StringFilter<"SiteVote"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SiteVoteOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SiteVoteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    siteId_userId?: SiteVoteSiteIdUserIdCompoundUniqueInput
+    AND?: SiteVoteWhereInput | SiteVoteWhereInput[]
+    OR?: SiteVoteWhereInput[]
+    NOT?: SiteVoteWhereInput | SiteVoteWhereInput[]
+    createdAt?: DateTimeFilter<"SiteVote"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteVote"> | Date | string
+    siteId?: StringFilter<"SiteVote"> | string
+    userId?: StringFilter<"SiteVote"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "siteId_userId">
+
+  export type SiteVoteOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    _count?: SiteVoteCountOrderByAggregateInput
+    _max?: SiteVoteMaxOrderByAggregateInput
+    _min?: SiteVoteMinOrderByAggregateInput
+  }
+
+  export type SiteVoteScalarWhereWithAggregatesInput = {
+    AND?: SiteVoteScalarWhereWithAggregatesInput | SiteVoteScalarWhereWithAggregatesInput[]
+    OR?: SiteVoteScalarWhereWithAggregatesInput[]
+    NOT?: SiteVoteScalarWhereWithAggregatesInput | SiteVoteScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteVote"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteVote"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SiteVote"> | Date | string
+    siteId?: StringWithAggregatesFilter<"SiteVote"> | string
+    userId?: StringWithAggregatesFilter<"SiteVote"> | string
+  }
+
+  export type SiteSaveWhereInput = {
+    AND?: SiteSaveWhereInput | SiteSaveWhereInput[]
+    OR?: SiteSaveWhereInput[]
+    NOT?: SiteSaveWhereInput | SiteSaveWhereInput[]
+    id?: StringFilter<"SiteSave"> | string
+    createdAt?: DateTimeFilter<"SiteSave"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteSave"> | Date | string
+    siteId?: StringFilter<"SiteSave"> | string
+    userId?: StringFilter<"SiteSave"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SiteSaveOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SiteSaveWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    siteId_userId?: SiteSaveSiteIdUserIdCompoundUniqueInput
+    AND?: SiteSaveWhereInput | SiteSaveWhereInput[]
+    OR?: SiteSaveWhereInput[]
+    NOT?: SiteSaveWhereInput | SiteSaveWhereInput[]
+    createdAt?: DateTimeFilter<"SiteSave"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteSave"> | Date | string
+    siteId?: StringFilter<"SiteSave"> | string
+    userId?: StringFilter<"SiteSave"> | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "siteId_userId">
+
+  export type SiteSaveOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    _count?: SiteSaveCountOrderByAggregateInput
+    _max?: SiteSaveMaxOrderByAggregateInput
+    _min?: SiteSaveMinOrderByAggregateInput
+  }
+
+  export type SiteSaveScalarWhereWithAggregatesInput = {
+    AND?: SiteSaveScalarWhereWithAggregatesInput | SiteSaveScalarWhereWithAggregatesInput[]
+    OR?: SiteSaveScalarWhereWithAggregatesInput[]
+    NOT?: SiteSaveScalarWhereWithAggregatesInput | SiteSaveScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteSave"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteSave"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SiteSave"> | Date | string
+    siteId?: StringWithAggregatesFilter<"SiteSave"> | string
+    userId?: StringWithAggregatesFilter<"SiteSave"> | string
+  }
+
+  export type SiteCommentWhereInput = {
+    AND?: SiteCommentWhereInput | SiteCommentWhereInput[]
+    OR?: SiteCommentWhereInput[]
+    NOT?: SiteCommentWhereInput | SiteCommentWhereInput[]
+    id?: StringFilter<"SiteComment"> | string
+    createdAt?: DateTimeFilter<"SiteComment"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteComment"> | Date | string
+    siteId?: StringFilter<"SiteComment"> | string
+    authorId?: StringFilter<"SiteComment"> | string
+    parentId?: StringNullableFilter<"SiteComment"> | string | null
+    body?: StringFilter<"SiteComment"> | string
+    isDeleted?: BoolFilter<"SiteComment"> | boolean
+    likesCount?: IntFilter<"SiteComment"> | number
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    parent?: XOR<SiteCommentNullableScalarRelationFilter, SiteCommentWhereInput> | null
+    replies?: SiteCommentListRelationFilter
+    likes?: SiteCommentLikeListRelationFilter
+  }
+
+  export type SiteCommentOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    authorId?: SortOrder
+    parentId?: SortOrderInput | SortOrder
+    body?: SortOrder
+    isDeleted?: SortOrder
+    likesCount?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    author?: UserOrderByWithRelationInput
+    parent?: SiteCommentOrderByWithRelationInput
+    replies?: SiteCommentOrderByRelationAggregateInput
+    likes?: SiteCommentLikeOrderByRelationAggregateInput
+  }
+
+  export type SiteCommentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SiteCommentWhereInput | SiteCommentWhereInput[]
+    OR?: SiteCommentWhereInput[]
+    NOT?: SiteCommentWhereInput | SiteCommentWhereInput[]
+    createdAt?: DateTimeFilter<"SiteComment"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteComment"> | Date | string
+    siteId?: StringFilter<"SiteComment"> | string
+    authorId?: StringFilter<"SiteComment"> | string
+    parentId?: StringNullableFilter<"SiteComment"> | string | null
+    body?: StringFilter<"SiteComment"> | string
+    isDeleted?: BoolFilter<"SiteComment"> | boolean
+    likesCount?: IntFilter<"SiteComment"> | number
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    parent?: XOR<SiteCommentNullableScalarRelationFilter, SiteCommentWhereInput> | null
+    replies?: SiteCommentListRelationFilter
+    likes?: SiteCommentLikeListRelationFilter
+  }, "id">
+
+  export type SiteCommentOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    authorId?: SortOrder
+    parentId?: SortOrderInput | SortOrder
+    body?: SortOrder
+    isDeleted?: SortOrder
+    likesCount?: SortOrder
+    _count?: SiteCommentCountOrderByAggregateInput
+    _avg?: SiteCommentAvgOrderByAggregateInput
+    _max?: SiteCommentMaxOrderByAggregateInput
+    _min?: SiteCommentMinOrderByAggregateInput
+    _sum?: SiteCommentSumOrderByAggregateInput
+  }
+
+  export type SiteCommentScalarWhereWithAggregatesInput = {
+    AND?: SiteCommentScalarWhereWithAggregatesInput | SiteCommentScalarWhereWithAggregatesInput[]
+    OR?: SiteCommentScalarWhereWithAggregatesInput[]
+    NOT?: SiteCommentScalarWhereWithAggregatesInput | SiteCommentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteComment"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteComment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SiteComment"> | Date | string
+    siteId?: StringWithAggregatesFilter<"SiteComment"> | string
+    authorId?: StringWithAggregatesFilter<"SiteComment"> | string
+    parentId?: StringNullableWithAggregatesFilter<"SiteComment"> | string | null
+    body?: StringWithAggregatesFilter<"SiteComment"> | string
+    isDeleted?: BoolWithAggregatesFilter<"SiteComment"> | boolean
+    likesCount?: IntWithAggregatesFilter<"SiteComment"> | number
+  }
+
+  export type SiteCommentLikeWhereInput = {
+    AND?: SiteCommentLikeWhereInput | SiteCommentLikeWhereInput[]
+    OR?: SiteCommentLikeWhereInput[]
+    NOT?: SiteCommentLikeWhereInput | SiteCommentLikeWhereInput[]
+    id?: StringFilter<"SiteCommentLike"> | string
+    createdAt?: DateTimeFilter<"SiteCommentLike"> | Date | string
+    commentId?: StringFilter<"SiteCommentLike"> | string
+    userId?: StringFilter<"SiteCommentLike"> | string
+    comment?: XOR<SiteCommentScalarRelationFilter, SiteCommentWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SiteCommentLikeOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    commentId?: SortOrder
+    userId?: SortOrder
+    comment?: SiteCommentOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SiteCommentLikeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    commentId_userId?: SiteCommentLikeCommentIdUserIdCompoundUniqueInput
+    AND?: SiteCommentLikeWhereInput | SiteCommentLikeWhereInput[]
+    OR?: SiteCommentLikeWhereInput[]
+    NOT?: SiteCommentLikeWhereInput | SiteCommentLikeWhereInput[]
+    createdAt?: DateTimeFilter<"SiteCommentLike"> | Date | string
+    commentId?: StringFilter<"SiteCommentLike"> | string
+    userId?: StringFilter<"SiteCommentLike"> | string
+    comment?: XOR<SiteCommentScalarRelationFilter, SiteCommentWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "commentId_userId">
+
+  export type SiteCommentLikeOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    commentId?: SortOrder
+    userId?: SortOrder
+    _count?: SiteCommentLikeCountOrderByAggregateInput
+    _max?: SiteCommentLikeMaxOrderByAggregateInput
+    _min?: SiteCommentLikeMinOrderByAggregateInput
+  }
+
+  export type SiteCommentLikeScalarWhereWithAggregatesInput = {
+    AND?: SiteCommentLikeScalarWhereWithAggregatesInput | SiteCommentLikeScalarWhereWithAggregatesInput[]
+    OR?: SiteCommentLikeScalarWhereWithAggregatesInput[]
+    NOT?: SiteCommentLikeScalarWhereWithAggregatesInput | SiteCommentLikeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteCommentLike"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteCommentLike"> | Date | string
+    commentId?: StringWithAggregatesFilter<"SiteCommentLike"> | string
+    userId?: StringWithAggregatesFilter<"SiteCommentLike"> | string
+  }
+
+  export type SiteShareEventWhereInput = {
+    AND?: SiteShareEventWhereInput | SiteShareEventWhereInput[]
+    OR?: SiteShareEventWhereInput[]
+    NOT?: SiteShareEventWhereInput | SiteShareEventWhereInput[]
+    id?: StringFilter<"SiteShareEvent"> | string
+    createdAt?: DateTimeFilter<"SiteShareEvent"> | Date | string
+    siteId?: StringFilter<"SiteShareEvent"> | string
+    userId?: StringFilter<"SiteShareEvent"> | string
+    channel?: EnumSiteShareChannelFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SiteShareEventOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channel?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SiteShareEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SiteShareEventWhereInput | SiteShareEventWhereInput[]
+    OR?: SiteShareEventWhereInput[]
+    NOT?: SiteShareEventWhereInput | SiteShareEventWhereInput[]
+    createdAt?: DateTimeFilter<"SiteShareEvent"> | Date | string
+    siteId?: StringFilter<"SiteShareEvent"> | string
+    userId?: StringFilter<"SiteShareEvent"> | string
+    channel?: EnumSiteShareChannelFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type SiteShareEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channel?: SortOrder
+    _count?: SiteShareEventCountOrderByAggregateInput
+    _max?: SiteShareEventMaxOrderByAggregateInput
+    _min?: SiteShareEventMinOrderByAggregateInput
+  }
+
+  export type SiteShareEventScalarWhereWithAggregatesInput = {
+    AND?: SiteShareEventScalarWhereWithAggregatesInput | SiteShareEventScalarWhereWithAggregatesInput[]
+    OR?: SiteShareEventScalarWhereWithAggregatesInput[]
+    NOT?: SiteShareEventScalarWhereWithAggregatesInput | SiteShareEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteShareEvent"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteShareEvent"> | Date | string
+    siteId?: StringWithAggregatesFilter<"SiteShareEvent"> | string
+    userId?: StringWithAggregatesFilter<"SiteShareEvent"> | string
+    channel?: EnumSiteShareChannelWithAggregatesFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
+  }
+
   export type UserCreateInput = {
     id?: string
     createdAt?: Date | string
@@ -22311,6 +29178,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -22344,6 +29216,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -22377,6 +29254,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -22410,6 +29292,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -23034,8 +29921,16 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     reports?: ReportCreateNestedManyWithoutSiteInput
     events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -23047,8 +29942,16 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
     events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -23060,8 +29963,16 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     reports?: ReportUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -23073,8 +29984,16 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
     events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -23086,6 +30005,10 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
   }
 
   export type SiteUpdateManyMutationInput = {
@@ -23097,6 +30020,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type SiteUncheckedUpdateManyInput = {
@@ -23108,6 +30035,10 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportCreateInput = {
@@ -23572,6 +30503,304 @@ export namespace Prisma {
     participantCount?: IntFieldUpdateOperationsInput | number
   }
 
+  export type SiteVoteCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutVotesInput
+    user: UserCreateNestedOneWithoutSiteVotesInput
+  }
+
+  export type SiteVoteUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    userId: string
+  }
+
+  export type SiteVoteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutVotesNestedInput
+    user?: UserUpdateOneRequiredWithoutSiteVotesNestedInput
+  }
+
+  export type SiteVoteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteVoteCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    userId: string
+  }
+
+  export type SiteVoteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteVoteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutSavesInput
+    user: UserCreateNestedOneWithoutSiteSavesInput
+  }
+
+  export type SiteSaveUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    userId: string
+  }
+
+  export type SiteSaveUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutSavesNestedInput
+    user?: UserUpdateOneRequiredWithoutSiteSavesNestedInput
+  }
+
+  export type SiteSaveUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    userId: string
+  }
+
+  export type SiteSaveUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteSaveUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    site: SiteCreateNestedOneWithoutCommentsInput
+    author: UserCreateNestedOneWithoutSiteCommentsInput
+    parent?: SiteCommentCreateNestedOneWithoutRepliesInput
+    replies?: SiteCommentCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    replies?: SiteCommentUncheckedCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutCommentsNestedInput
+    author?: UserUpdateOneRequiredWithoutSiteCommentsNestedInput
+    parent?: SiteCommentUpdateOneWithoutRepliesNestedInput
+    replies?: SiteCommentUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    replies?: SiteCommentUncheckedUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+  }
+
+  export type SiteCommentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteCommentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteCommentLikeCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    comment: SiteCommentCreateNestedOneWithoutLikesInput
+    user: UserCreateNestedOneWithoutSiteCommentLikesInput
+  }
+
+  export type SiteCommentLikeUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    commentId: string
+    userId: string
+  }
+
+  export type SiteCommentLikeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comment?: SiteCommentUpdateOneRequiredWithoutLikesNestedInput
+    user?: UserUpdateOneRequiredWithoutSiteCommentLikesNestedInput
+  }
+
+  export type SiteCommentLikeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    commentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentLikeCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    commentId: string
+    userId: string
+  }
+
+  export type SiteCommentLikeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteCommentLikeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    commentId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteShareEventCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    channel?: $Enums.SiteShareChannel
+    site: SiteCreateNestedOneWithoutShareEventsInput
+    user: UserCreateNestedOneWithoutSiteShareEventsInput
+  }
+
+  export type SiteShareEventUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    userId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    site?: SiteUpdateOneRequiredWithoutShareEventsNestedInput
+    user?: UserUpdateOneRequiredWithoutSiteShareEventsNestedInput
+  }
+
+  export type SiteShareEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    userId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -23709,6 +30938,36 @@ export namespace Prisma {
     isNot?: AdminPendingMfaWhereInput | null
   }
 
+  export type SiteVoteListRelationFilter = {
+    every?: SiteVoteWhereInput
+    some?: SiteVoteWhereInput
+    none?: SiteVoteWhereInput
+  }
+
+  export type SiteSaveListRelationFilter = {
+    every?: SiteSaveWhereInput
+    some?: SiteSaveWhereInput
+    none?: SiteSaveWhereInput
+  }
+
+  export type SiteCommentListRelationFilter = {
+    every?: SiteCommentWhereInput
+    some?: SiteCommentWhereInput
+    none?: SiteCommentWhereInput
+  }
+
+  export type SiteShareEventListRelationFilter = {
+    every?: SiteShareEventWhereInput
+    some?: SiteShareEventWhereInput
+    none?: SiteShareEventWhereInput
+  }
+
+  export type SiteCommentLikeListRelationFilter = {
+    every?: SiteCommentLikeWhereInput
+    some?: SiteCommentLikeWhereInput
+    none?: SiteCommentLikeWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -23739,6 +30998,26 @@ export namespace Prisma {
   }
 
   export type AdminTempTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteVoteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteSaveOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteCommentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteShareEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteCommentLikeOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -24334,11 +31613,19 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
   }
 
   export type SiteAvgOrderByAggregateInput = {
     latitude?: SortOrder
     longitude?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
   }
 
   export type SiteMaxOrderByAggregateInput = {
@@ -24350,6 +31637,10 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
   }
 
   export type SiteMinOrderByAggregateInput = {
@@ -24361,11 +31652,19 @@ export namespace Prisma {
     address?: SortOrder
     description?: SortOrder
     status?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
   }
 
   export type SiteSumOrderByAggregateInput = {
     latitude?: SortOrder
     longitude?: SortOrder
+    upvotesCount?: SortOrder
+    commentsCount?: SortOrder
+    savesCount?: SortOrder
+    sharesCount?: SortOrder
   }
 
   export type FloatWithAggregatesFilter<$PrismaModel = never> = {
@@ -24700,6 +31999,185 @@ export namespace Prisma {
     _max?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
   }
 
+  export type SiteVoteSiteIdUserIdCompoundUniqueInput = {
+    siteId: string
+    userId: string
+  }
+
+  export type SiteVoteCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteVoteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteVoteMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteSaveSiteIdUserIdCompoundUniqueInput = {
+    siteId: string
+    userId: string
+  }
+
+  export type SiteSaveCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteSaveMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteSaveMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteCommentNullableScalarRelationFilter = {
+    is?: SiteCommentWhereInput | null
+    isNot?: SiteCommentWhereInput | null
+  }
+
+  export type SiteCommentCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    authorId?: SortOrder
+    parentId?: SortOrder
+    body?: SortOrder
+    isDeleted?: SortOrder
+    likesCount?: SortOrder
+  }
+
+  export type SiteCommentAvgOrderByAggregateInput = {
+    likesCount?: SortOrder
+  }
+
+  export type SiteCommentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    authorId?: SortOrder
+    parentId?: SortOrder
+    body?: SortOrder
+    isDeleted?: SortOrder
+    likesCount?: SortOrder
+  }
+
+  export type SiteCommentMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    siteId?: SortOrder
+    authorId?: SortOrder
+    parentId?: SortOrder
+    body?: SortOrder
+    isDeleted?: SortOrder
+    likesCount?: SortOrder
+  }
+
+  export type SiteCommentSumOrderByAggregateInput = {
+    likesCount?: SortOrder
+  }
+
+  export type SiteCommentScalarRelationFilter = {
+    is?: SiteCommentWhereInput
+    isNot?: SiteCommentWhereInput
+  }
+
+  export type SiteCommentLikeCommentIdUserIdCompoundUniqueInput = {
+    commentId: string
+    userId: string
+  }
+
+  export type SiteCommentLikeCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    commentId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteCommentLikeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    commentId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type SiteCommentLikeMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    commentId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type EnumSiteShareChannelFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareChannel | EnumSiteShareChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareChannelFilter<$PrismaModel> | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type SiteShareEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type SiteShareEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    siteId?: SortOrder
+    userId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type EnumSiteShareChannelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareChannel | EnumSiteShareChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareChannelWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareChannel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareChannelFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareChannelFilter<$PrismaModel>
+  }
+
   export type UserCreatemfaBackupCodesInput = {
     set: string[]
   }
@@ -24766,6 +32244,41 @@ export namespace Prisma {
     connect?: AdminPendingMfaWhereUniqueInput
   }
 
+  export type SiteVoteCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput> | SiteVoteCreateWithoutUserInput[] | SiteVoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutUserInput | SiteVoteCreateOrConnectWithoutUserInput[]
+    createMany?: SiteVoteCreateManyUserInputEnvelope
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+  }
+
+  export type SiteSaveCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput> | SiteSaveCreateWithoutUserInput[] | SiteSaveUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutUserInput | SiteSaveCreateOrConnectWithoutUserInput[]
+    createMany?: SiteSaveCreateManyUserInputEnvelope
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+  }
+
+  export type SiteCommentCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput> | SiteCommentCreateWithoutAuthorInput[] | SiteCommentUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutAuthorInput | SiteCommentCreateOrConnectWithoutAuthorInput[]
+    createMany?: SiteCommentCreateManyAuthorInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteShareEventCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput> | SiteShareEventCreateWithoutUserInput[] | SiteShareEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutUserInput | SiteShareEventCreateOrConnectWithoutUserInput[]
+    createMany?: SiteShareEventCreateManyUserInputEnvelope
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+  }
+
+  export type SiteCommentLikeCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
+    createMany?: SiteCommentLikeCreateManyUserInputEnvelope
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -24826,6 +32339,41 @@ export namespace Prisma {
     create?: XOR<AdminPendingMfaCreateWithoutUserInput, AdminPendingMfaUncheckedCreateWithoutUserInput>
     connectOrCreate?: AdminPendingMfaCreateOrConnectWithoutUserInput
     connect?: AdminPendingMfaWhereUniqueInput
+  }
+
+  export type SiteVoteUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput> | SiteVoteCreateWithoutUserInput[] | SiteVoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutUserInput | SiteVoteCreateOrConnectWithoutUserInput[]
+    createMany?: SiteVoteCreateManyUserInputEnvelope
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+  }
+
+  export type SiteSaveUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput> | SiteSaveCreateWithoutUserInput[] | SiteSaveUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutUserInput | SiteSaveCreateOrConnectWithoutUserInput[]
+    createMany?: SiteSaveCreateManyUserInputEnvelope
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+  }
+
+  export type SiteCommentUncheckedCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput> | SiteCommentCreateWithoutAuthorInput[] | SiteCommentUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutAuthorInput | SiteCommentCreateOrConnectWithoutAuthorInput[]
+    createMany?: SiteCommentCreateManyAuthorInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteShareEventUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput> | SiteShareEventCreateWithoutUserInput[] | SiteShareEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutUserInput | SiteShareEventCreateOrConnectWithoutUserInput[]
+    createMany?: SiteShareEventCreateManyUserInputEnvelope
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+  }
+
+  export type SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
+    createMany?: SiteCommentLikeCreateManyUserInputEnvelope
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -24991,6 +32539,76 @@ export namespace Prisma {
     update?: XOR<XOR<AdminPendingMfaUpdateToOneWithWhereWithoutUserInput, AdminPendingMfaUpdateWithoutUserInput>, AdminPendingMfaUncheckedUpdateWithoutUserInput>
   }
 
+  export type SiteVoteUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput> | SiteVoteCreateWithoutUserInput[] | SiteVoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutUserInput | SiteVoteCreateOrConnectWithoutUserInput[]
+    upsert?: SiteVoteUpsertWithWhereUniqueWithoutUserInput | SiteVoteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteVoteCreateManyUserInputEnvelope
+    set?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    disconnect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    delete?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    update?: SiteVoteUpdateWithWhereUniqueWithoutUserInput | SiteVoteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteVoteUpdateManyWithWhereWithoutUserInput | SiteVoteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+  }
+
+  export type SiteSaveUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput> | SiteSaveCreateWithoutUserInput[] | SiteSaveUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutUserInput | SiteSaveCreateOrConnectWithoutUserInput[]
+    upsert?: SiteSaveUpsertWithWhereUniqueWithoutUserInput | SiteSaveUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteSaveCreateManyUserInputEnvelope
+    set?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    disconnect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    delete?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    update?: SiteSaveUpdateWithWhereUniqueWithoutUserInput | SiteSaveUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteSaveUpdateManyWithWhereWithoutUserInput | SiteSaveUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+  }
+
+  export type SiteCommentUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput> | SiteCommentCreateWithoutAuthorInput[] | SiteCommentUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutAuthorInput | SiteCommentCreateOrConnectWithoutAuthorInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutAuthorInput | SiteCommentUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: SiteCommentCreateManyAuthorInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutAuthorInput | SiteCommentUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutAuthorInput | SiteCommentUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteShareEventUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput> | SiteShareEventCreateWithoutUserInput[] | SiteShareEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutUserInput | SiteShareEventCreateOrConnectWithoutUserInput[]
+    upsert?: SiteShareEventUpsertWithWhereUniqueWithoutUserInput | SiteShareEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteShareEventCreateManyUserInputEnvelope
+    set?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    disconnect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    delete?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    update?: SiteShareEventUpdateWithWhereUniqueWithoutUserInput | SiteShareEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteShareEventUpdateManyWithWhereWithoutUserInput | SiteShareEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+  }
+
+  export type SiteCommentLikeUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
+    upsert?: SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput | SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteCommentLikeCreateManyUserInputEnvelope
+    set?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    disconnect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    delete?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    update?: SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput | SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteCommentLikeUpdateManyWithWhereWithoutUserInput | SiteCommentLikeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -25113,6 +32731,76 @@ export namespace Prisma {
     update?: XOR<XOR<AdminPendingMfaUpdateToOneWithWhereWithoutUserInput, AdminPendingMfaUpdateWithoutUserInput>, AdminPendingMfaUncheckedUpdateWithoutUserInput>
   }
 
+  export type SiteVoteUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput> | SiteVoteCreateWithoutUserInput[] | SiteVoteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutUserInput | SiteVoteCreateOrConnectWithoutUserInput[]
+    upsert?: SiteVoteUpsertWithWhereUniqueWithoutUserInput | SiteVoteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteVoteCreateManyUserInputEnvelope
+    set?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    disconnect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    delete?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    update?: SiteVoteUpdateWithWhereUniqueWithoutUserInput | SiteVoteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteVoteUpdateManyWithWhereWithoutUserInput | SiteVoteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+  }
+
+  export type SiteSaveUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput> | SiteSaveCreateWithoutUserInput[] | SiteSaveUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutUserInput | SiteSaveCreateOrConnectWithoutUserInput[]
+    upsert?: SiteSaveUpsertWithWhereUniqueWithoutUserInput | SiteSaveUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteSaveCreateManyUserInputEnvelope
+    set?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    disconnect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    delete?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    update?: SiteSaveUpdateWithWhereUniqueWithoutUserInput | SiteSaveUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteSaveUpdateManyWithWhereWithoutUserInput | SiteSaveUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput> | SiteCommentCreateWithoutAuthorInput[] | SiteCommentUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutAuthorInput | SiteCommentCreateOrConnectWithoutAuthorInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutAuthorInput | SiteCommentUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: SiteCommentCreateManyAuthorInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutAuthorInput | SiteCommentUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutAuthorInput | SiteCommentUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteShareEventUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput> | SiteShareEventCreateWithoutUserInput[] | SiteShareEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutUserInput | SiteShareEventCreateOrConnectWithoutUserInput[]
+    upsert?: SiteShareEventUpsertWithWhereUniqueWithoutUserInput | SiteShareEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteShareEventCreateManyUserInputEnvelope
+    set?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    disconnect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    delete?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    update?: SiteShareEventUpdateWithWhereUniqueWithoutUserInput | SiteShareEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteShareEventUpdateManyWithWhereWithoutUserInput | SiteShareEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+  }
+
+  export type SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
+    upsert?: SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput | SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SiteCommentLikeCreateManyUserInputEnvelope
+    set?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    disconnect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    delete?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    update?: SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput | SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SiteCommentLikeUpdateManyWithWhereWithoutUserInput | SiteCommentLikeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutSessionsInput = {
     create?: XOR<UserCreateWithoutSessionsInput, UserUncheckedCreateWithoutSessionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSessionsInput
@@ -25207,6 +32895,34 @@ export namespace Prisma {
     connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
   }
 
+  export type SiteVoteCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput> | SiteVoteCreateWithoutSiteInput[] | SiteVoteUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutSiteInput | SiteVoteCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteVoteCreateManySiteInputEnvelope
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+  }
+
+  export type SiteSaveCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput> | SiteSaveCreateWithoutSiteInput[] | SiteSaveUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutSiteInput | SiteSaveCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteSaveCreateManySiteInputEnvelope
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+  }
+
+  export type SiteCommentCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput> | SiteCommentCreateWithoutSiteInput[] | SiteCommentUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutSiteInput | SiteCommentCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteCommentCreateManySiteInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteShareEventCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput> | SiteShareEventCreateWithoutSiteInput[] | SiteShareEventUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutSiteInput | SiteShareEventCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteShareEventCreateManySiteInputEnvelope
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -25219,6 +32935,34 @@ export namespace Prisma {
     connectOrCreate?: CleanupEventCreateOrConnectWithoutSiteInput | CleanupEventCreateOrConnectWithoutSiteInput[]
     createMany?: CleanupEventCreateManySiteInputEnvelope
     connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+  }
+
+  export type SiteVoteUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput> | SiteVoteCreateWithoutSiteInput[] | SiteVoteUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutSiteInput | SiteVoteCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteVoteCreateManySiteInputEnvelope
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+  }
+
+  export type SiteSaveUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput> | SiteSaveCreateWithoutSiteInput[] | SiteSaveUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutSiteInput | SiteSaveCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteSaveCreateManySiteInputEnvelope
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+  }
+
+  export type SiteCommentUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput> | SiteCommentCreateWithoutSiteInput[] | SiteCommentUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutSiteInput | SiteCommentCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteCommentCreateManySiteInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteShareEventUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput> | SiteShareEventCreateWithoutSiteInput[] | SiteShareEventUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutSiteInput | SiteShareEventCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteShareEventCreateManySiteInputEnvelope
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -25261,6 +33005,62 @@ export namespace Prisma {
     deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
   }
 
+  export type SiteVoteUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput> | SiteVoteCreateWithoutSiteInput[] | SiteVoteUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutSiteInput | SiteVoteCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteVoteUpsertWithWhereUniqueWithoutSiteInput | SiteVoteUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteVoteCreateManySiteInputEnvelope
+    set?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    disconnect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    delete?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    update?: SiteVoteUpdateWithWhereUniqueWithoutSiteInput | SiteVoteUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteVoteUpdateManyWithWhereWithoutSiteInput | SiteVoteUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+  }
+
+  export type SiteSaveUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput> | SiteSaveCreateWithoutSiteInput[] | SiteSaveUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutSiteInput | SiteSaveCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteSaveUpsertWithWhereUniqueWithoutSiteInput | SiteSaveUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteSaveCreateManySiteInputEnvelope
+    set?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    disconnect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    delete?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    update?: SiteSaveUpdateWithWhereUniqueWithoutSiteInput | SiteSaveUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteSaveUpdateManyWithWhereWithoutSiteInput | SiteSaveUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+  }
+
+  export type SiteCommentUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput> | SiteCommentCreateWithoutSiteInput[] | SiteCommentUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutSiteInput | SiteCommentCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutSiteInput | SiteCommentUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteCommentCreateManySiteInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutSiteInput | SiteCommentUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutSiteInput | SiteCommentUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteShareEventUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput> | SiteShareEventCreateWithoutSiteInput[] | SiteShareEventUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutSiteInput | SiteShareEventCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteShareEventUpsertWithWhereUniqueWithoutSiteInput | SiteShareEventUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteShareEventCreateManySiteInputEnvelope
+    set?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    disconnect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    delete?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    update?: SiteShareEventUpdateWithWhereUniqueWithoutSiteInput | SiteShareEventUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteShareEventUpdateManyWithWhereWithoutSiteInput | SiteShareEventUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -25287,6 +33087,62 @@ export namespace Prisma {
     update?: CleanupEventUpdateWithWhereUniqueWithoutSiteInput | CleanupEventUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: CleanupEventUpdateManyWithWhereWithoutSiteInput | CleanupEventUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+  }
+
+  export type SiteVoteUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput> | SiteVoteCreateWithoutSiteInput[] | SiteVoteUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteVoteCreateOrConnectWithoutSiteInput | SiteVoteCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteVoteUpsertWithWhereUniqueWithoutSiteInput | SiteVoteUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteVoteCreateManySiteInputEnvelope
+    set?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    disconnect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    delete?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    connect?: SiteVoteWhereUniqueInput | SiteVoteWhereUniqueInput[]
+    update?: SiteVoteUpdateWithWhereUniqueWithoutSiteInput | SiteVoteUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteVoteUpdateManyWithWhereWithoutSiteInput | SiteVoteUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+  }
+
+  export type SiteSaveUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput> | SiteSaveCreateWithoutSiteInput[] | SiteSaveUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteSaveCreateOrConnectWithoutSiteInput | SiteSaveCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteSaveUpsertWithWhereUniqueWithoutSiteInput | SiteSaveUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteSaveCreateManySiteInputEnvelope
+    set?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    disconnect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    delete?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    connect?: SiteSaveWhereUniqueInput | SiteSaveWhereUniqueInput[]
+    update?: SiteSaveUpdateWithWhereUniqueWithoutSiteInput | SiteSaveUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteSaveUpdateManyWithWhereWithoutSiteInput | SiteSaveUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput> | SiteCommentCreateWithoutSiteInput[] | SiteCommentUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutSiteInput | SiteCommentCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutSiteInput | SiteCommentUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteCommentCreateManySiteInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutSiteInput | SiteCommentUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutSiteInput | SiteCommentUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput> | SiteShareEventCreateWithoutSiteInput[] | SiteShareEventUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareEventCreateOrConnectWithoutSiteInput | SiteShareEventCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteShareEventUpsertWithWhereUniqueWithoutSiteInput | SiteShareEventUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteShareEventCreateManySiteInputEnvelope
+    set?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    disconnect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    delete?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+    update?: SiteShareEventUpdateWithWhereUniqueWithoutSiteInput | SiteShareEventUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteShareEventUpdateManyWithWhereWithoutSiteInput | SiteShareEventUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
   }
 
   export type ReportCreatemediaUrlsInput = {
@@ -25520,6 +33376,250 @@ export namespace Prisma {
     upsert?: SiteUpsertWithoutEventsInput
     connect?: SiteWhereUniqueInput
     update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutEventsInput, SiteUpdateWithoutEventsInput>, SiteUncheckedUpdateWithoutEventsInput>
+  }
+
+  export type SiteCreateNestedOneWithoutVotesInput = {
+    create?: XOR<SiteCreateWithoutVotesInput, SiteUncheckedCreateWithoutVotesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutVotesInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteVotesInput = {
+    create?: XOR<UserCreateWithoutSiteVotesInput, UserUncheckedCreateWithoutSiteVotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteVotesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutVotesNestedInput = {
+    create?: XOR<SiteCreateWithoutVotesInput, SiteUncheckedCreateWithoutVotesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutVotesInput
+    upsert?: SiteUpsertWithoutVotesInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutVotesInput, SiteUpdateWithoutVotesInput>, SiteUncheckedUpdateWithoutVotesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSiteVotesNestedInput = {
+    create?: XOR<UserCreateWithoutSiteVotesInput, UserUncheckedCreateWithoutSiteVotesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteVotesInput
+    upsert?: UserUpsertWithoutSiteVotesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteVotesInput, UserUpdateWithoutSiteVotesInput>, UserUncheckedUpdateWithoutSiteVotesInput>
+  }
+
+  export type SiteCreateNestedOneWithoutSavesInput = {
+    create?: XOR<SiteCreateWithoutSavesInput, SiteUncheckedCreateWithoutSavesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutSavesInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteSavesInput = {
+    create?: XOR<UserCreateWithoutSiteSavesInput, UserUncheckedCreateWithoutSiteSavesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteSavesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutSavesNestedInput = {
+    create?: XOR<SiteCreateWithoutSavesInput, SiteUncheckedCreateWithoutSavesInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutSavesInput
+    upsert?: SiteUpsertWithoutSavesInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutSavesInput, SiteUpdateWithoutSavesInput>, SiteUncheckedUpdateWithoutSavesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSiteSavesNestedInput = {
+    create?: XOR<UserCreateWithoutSiteSavesInput, UserUncheckedCreateWithoutSiteSavesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteSavesInput
+    upsert?: UserUpsertWithoutSiteSavesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteSavesInput, UserUpdateWithoutSiteSavesInput>, UserUncheckedUpdateWithoutSiteSavesInput>
+  }
+
+  export type SiteCreateNestedOneWithoutCommentsInput = {
+    create?: XOR<SiteCreateWithoutCommentsInput, SiteUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCommentsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteCommentsInput = {
+    create?: XOR<UserCreateWithoutSiteCommentsInput, UserUncheckedCreateWithoutSiteCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteCommentsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteCommentCreateNestedOneWithoutRepliesInput = {
+    create?: XOR<SiteCommentCreateWithoutRepliesInput, SiteCommentUncheckedCreateWithoutRepliesInput>
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutRepliesInput
+    connect?: SiteCommentWhereUniqueInput
+  }
+
+  export type SiteCommentCreateNestedManyWithoutParentInput = {
+    create?: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput> | SiteCommentCreateWithoutParentInput[] | SiteCommentUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutParentInput | SiteCommentCreateOrConnectWithoutParentInput[]
+    createMany?: SiteCommentCreateManyParentInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteCommentLikeCreateNestedManyWithoutCommentInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput> | SiteCommentLikeCreateWithoutCommentInput[] | SiteCommentLikeUncheckedCreateWithoutCommentInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutCommentInput | SiteCommentLikeCreateOrConnectWithoutCommentInput[]
+    createMany?: SiteCommentLikeCreateManyCommentInputEnvelope
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+  }
+
+  export type SiteCommentUncheckedCreateNestedManyWithoutParentInput = {
+    create?: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput> | SiteCommentCreateWithoutParentInput[] | SiteCommentUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutParentInput | SiteCommentCreateOrConnectWithoutParentInput[]
+    createMany?: SiteCommentCreateManyParentInputEnvelope
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+  }
+
+  export type SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput> | SiteCommentLikeCreateWithoutCommentInput[] | SiteCommentLikeUncheckedCreateWithoutCommentInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutCommentInput | SiteCommentLikeCreateOrConnectWithoutCommentInput[]
+    createMany?: SiteCommentLikeCreateManyCommentInputEnvelope
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutCommentsNestedInput = {
+    create?: XOR<SiteCreateWithoutCommentsInput, SiteUncheckedCreateWithoutCommentsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutCommentsInput
+    upsert?: SiteUpsertWithoutCommentsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutCommentsInput, SiteUpdateWithoutCommentsInput>, SiteUncheckedUpdateWithoutCommentsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSiteCommentsNestedInput = {
+    create?: XOR<UserCreateWithoutSiteCommentsInput, UserUncheckedCreateWithoutSiteCommentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteCommentsInput
+    upsert?: UserUpsertWithoutSiteCommentsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteCommentsInput, UserUpdateWithoutSiteCommentsInput>, UserUncheckedUpdateWithoutSiteCommentsInput>
+  }
+
+  export type SiteCommentUpdateOneWithoutRepliesNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutRepliesInput, SiteCommentUncheckedCreateWithoutRepliesInput>
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutRepliesInput
+    upsert?: SiteCommentUpsertWithoutRepliesInput
+    disconnect?: SiteCommentWhereInput | boolean
+    delete?: SiteCommentWhereInput | boolean
+    connect?: SiteCommentWhereUniqueInput
+    update?: XOR<XOR<SiteCommentUpdateToOneWithWhereWithoutRepliesInput, SiteCommentUpdateWithoutRepliesInput>, SiteCommentUncheckedUpdateWithoutRepliesInput>
+  }
+
+  export type SiteCommentUpdateManyWithoutParentNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput> | SiteCommentCreateWithoutParentInput[] | SiteCommentUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutParentInput | SiteCommentCreateOrConnectWithoutParentInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutParentInput | SiteCommentUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: SiteCommentCreateManyParentInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutParentInput | SiteCommentUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutParentInput | SiteCommentUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteCommentLikeUpdateManyWithoutCommentNestedInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput> | SiteCommentLikeCreateWithoutCommentInput[] | SiteCommentLikeUncheckedCreateWithoutCommentInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutCommentInput | SiteCommentLikeCreateOrConnectWithoutCommentInput[]
+    upsert?: SiteCommentLikeUpsertWithWhereUniqueWithoutCommentInput | SiteCommentLikeUpsertWithWhereUniqueWithoutCommentInput[]
+    createMany?: SiteCommentLikeCreateManyCommentInputEnvelope
+    set?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    disconnect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    delete?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    update?: SiteCommentLikeUpdateWithWhereUniqueWithoutCommentInput | SiteCommentLikeUpdateWithWhereUniqueWithoutCommentInput[]
+    updateMany?: SiteCommentLikeUpdateManyWithWhereWithoutCommentInput | SiteCommentLikeUpdateManyWithWhereWithoutCommentInput[]
+    deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutParentNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput> | SiteCommentCreateWithoutParentInput[] | SiteCommentUncheckedCreateWithoutParentInput[]
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutParentInput | SiteCommentCreateOrConnectWithoutParentInput[]
+    upsert?: SiteCommentUpsertWithWhereUniqueWithoutParentInput | SiteCommentUpsertWithWhereUniqueWithoutParentInput[]
+    createMany?: SiteCommentCreateManyParentInputEnvelope
+    set?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    disconnect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    delete?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    connect?: SiteCommentWhereUniqueInput | SiteCommentWhereUniqueInput[]
+    update?: SiteCommentUpdateWithWhereUniqueWithoutParentInput | SiteCommentUpdateWithWhereUniqueWithoutParentInput[]
+    updateMany?: SiteCommentUpdateManyWithWhereWithoutParentInput | SiteCommentUpdateManyWithWhereWithoutParentInput[]
+    deleteMany?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+  }
+
+  export type SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput = {
+    create?: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput> | SiteCommentLikeCreateWithoutCommentInput[] | SiteCommentLikeUncheckedCreateWithoutCommentInput[]
+    connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutCommentInput | SiteCommentLikeCreateOrConnectWithoutCommentInput[]
+    upsert?: SiteCommentLikeUpsertWithWhereUniqueWithoutCommentInput | SiteCommentLikeUpsertWithWhereUniqueWithoutCommentInput[]
+    createMany?: SiteCommentLikeCreateManyCommentInputEnvelope
+    set?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    disconnect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    delete?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+    update?: SiteCommentLikeUpdateWithWhereUniqueWithoutCommentInput | SiteCommentLikeUpdateWithWhereUniqueWithoutCommentInput[]
+    updateMany?: SiteCommentLikeUpdateManyWithWhereWithoutCommentInput | SiteCommentLikeUpdateManyWithWhereWithoutCommentInput[]
+    deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+  }
+
+  export type SiteCommentCreateNestedOneWithoutLikesInput = {
+    create?: XOR<SiteCommentCreateWithoutLikesInput, SiteCommentUncheckedCreateWithoutLikesInput>
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutLikesInput
+    connect?: SiteCommentWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteCommentLikesInput = {
+    create?: XOR<UserCreateWithoutSiteCommentLikesInput, UserUncheckedCreateWithoutSiteCommentLikesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteCommentLikesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteCommentUpdateOneRequiredWithoutLikesNestedInput = {
+    create?: XOR<SiteCommentCreateWithoutLikesInput, SiteCommentUncheckedCreateWithoutLikesInput>
+    connectOrCreate?: SiteCommentCreateOrConnectWithoutLikesInput
+    upsert?: SiteCommentUpsertWithoutLikesInput
+    connect?: SiteCommentWhereUniqueInput
+    update?: XOR<XOR<SiteCommentUpdateToOneWithWhereWithoutLikesInput, SiteCommentUpdateWithoutLikesInput>, SiteCommentUncheckedUpdateWithoutLikesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSiteCommentLikesNestedInput = {
+    create?: XOR<UserCreateWithoutSiteCommentLikesInput, UserUncheckedCreateWithoutSiteCommentLikesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteCommentLikesInput
+    upsert?: UserUpsertWithoutSiteCommentLikesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteCommentLikesInput, UserUpdateWithoutSiteCommentLikesInput>, UserUncheckedUpdateWithoutSiteCommentLikesInput>
+  }
+
+  export type SiteCreateNestedOneWithoutShareEventsInput = {
+    create?: XOR<SiteCreateWithoutShareEventsInput, SiteUncheckedCreateWithoutShareEventsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutShareEventsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteShareEventsInput = {
+    create?: XOR<UserCreateWithoutSiteShareEventsInput, UserUncheckedCreateWithoutSiteShareEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteShareEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumSiteShareChannelFieldUpdateOperationsInput = {
+    set?: $Enums.SiteShareChannel
+  }
+
+  export type SiteUpdateOneRequiredWithoutShareEventsNestedInput = {
+    create?: XOR<SiteCreateWithoutShareEventsInput, SiteUncheckedCreateWithoutShareEventsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutShareEventsInput
+    upsert?: SiteUpsertWithoutShareEventsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutShareEventsInput, SiteUpdateWithoutShareEventsInput>, SiteUncheckedUpdateWithoutShareEventsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutSiteShareEventsNestedInput = {
+    create?: XOR<UserCreateWithoutSiteShareEventsInput, UserUncheckedCreateWithoutSiteShareEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteShareEventsInput
+    upsert?: UserUpsertWithoutSiteShareEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteShareEventsInput, UserUpdateWithoutSiteShareEventsInput>, UserUncheckedUpdateWithoutSiteShareEventsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -25898,6 +33998,23 @@ export namespace Prisma {
     _max?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumSiteShareChannelFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareChannel | EnumSiteShareChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareChannelFilter<$PrismaModel> | $Enums.SiteShareChannel
+  }
+
+  export type NestedEnumSiteShareChannelWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareChannel | EnumSiteShareChannelFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareChannelWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareChannel
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareChannelFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareChannelFilter<$PrismaModel>
+  }
+
   export type ReportCreateWithoutReporterInput = {
     id?: string
     createdAt?: Date | string
@@ -26195,6 +34312,136 @@ export namespace Prisma {
     create: XOR<AdminPendingMfaCreateWithoutUserInput, AdminPendingMfaUncheckedCreateWithoutUserInput>
   }
 
+  export type SiteVoteCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutVotesInput
+  }
+
+  export type SiteVoteUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+  }
+
+  export type SiteVoteCreateOrConnectWithoutUserInput = {
+    where: SiteVoteWhereUniqueInput
+    create: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteVoteCreateManyUserInputEnvelope = {
+    data: SiteVoteCreateManyUserInput | SiteVoteCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteSaveCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutSavesInput
+  }
+
+  export type SiteSaveUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+  }
+
+  export type SiteSaveCreateOrConnectWithoutUserInput = {
+    where: SiteSaveWhereUniqueInput
+    create: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteSaveCreateManyUserInputEnvelope = {
+    data: SiteSaveCreateManyUserInput | SiteSaveCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteCommentCreateWithoutAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    site: SiteCreateNestedOneWithoutCommentsInput
+    parent?: SiteCommentCreateNestedOneWithoutRepliesInput
+    replies?: SiteCommentCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUncheckedCreateWithoutAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    replies?: SiteCommentUncheckedCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentCreateOrConnectWithoutAuthorInput = {
+    where: SiteCommentWhereUniqueInput
+    create: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type SiteCommentCreateManyAuthorInputEnvelope = {
+    data: SiteCommentCreateManyAuthorInput | SiteCommentCreateManyAuthorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteShareEventCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    channel?: $Enums.SiteShareChannel
+    site: SiteCreateNestedOneWithoutShareEventsInput
+  }
+
+  export type SiteShareEventUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventCreateOrConnectWithoutUserInput = {
+    where: SiteShareEventWhereUniqueInput
+    create: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteShareEventCreateManyUserInputEnvelope = {
+    data: SiteShareEventCreateManyUserInput | SiteShareEventCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteCommentLikeCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    comment: SiteCommentCreateNestedOneWithoutLikesInput
+  }
+
+  export type SiteCommentLikeUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    commentId: string
+  }
+
+  export type SiteCommentLikeCreateOrConnectWithoutUserInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    create: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteCommentLikeCreateManyUserInputEnvelope = {
+    data: SiteCommentLikeCreateManyUserInput | SiteCommentLikeCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutReporterInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
@@ -26453,6 +34700,144 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SiteVoteUpsertWithWhereUniqueWithoutUserInput = {
+    where: SiteVoteWhereUniqueInput
+    update: XOR<SiteVoteUpdateWithoutUserInput, SiteVoteUncheckedUpdateWithoutUserInput>
+    create: XOR<SiteVoteCreateWithoutUserInput, SiteVoteUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteVoteUpdateWithWhereUniqueWithoutUserInput = {
+    where: SiteVoteWhereUniqueInput
+    data: XOR<SiteVoteUpdateWithoutUserInput, SiteVoteUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SiteVoteUpdateManyWithWhereWithoutUserInput = {
+    where: SiteVoteScalarWhereInput
+    data: XOR<SiteVoteUpdateManyMutationInput, SiteVoteUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SiteVoteScalarWhereInput = {
+    AND?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+    OR?: SiteVoteScalarWhereInput[]
+    NOT?: SiteVoteScalarWhereInput | SiteVoteScalarWhereInput[]
+    id?: StringFilter<"SiteVote"> | string
+    createdAt?: DateTimeFilter<"SiteVote"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteVote"> | Date | string
+    siteId?: StringFilter<"SiteVote"> | string
+    userId?: StringFilter<"SiteVote"> | string
+  }
+
+  export type SiteSaveUpsertWithWhereUniqueWithoutUserInput = {
+    where: SiteSaveWhereUniqueInput
+    update: XOR<SiteSaveUpdateWithoutUserInput, SiteSaveUncheckedUpdateWithoutUserInput>
+    create: XOR<SiteSaveCreateWithoutUserInput, SiteSaveUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteSaveUpdateWithWhereUniqueWithoutUserInput = {
+    where: SiteSaveWhereUniqueInput
+    data: XOR<SiteSaveUpdateWithoutUserInput, SiteSaveUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SiteSaveUpdateManyWithWhereWithoutUserInput = {
+    where: SiteSaveScalarWhereInput
+    data: XOR<SiteSaveUpdateManyMutationInput, SiteSaveUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SiteSaveScalarWhereInput = {
+    AND?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+    OR?: SiteSaveScalarWhereInput[]
+    NOT?: SiteSaveScalarWhereInput | SiteSaveScalarWhereInput[]
+    id?: StringFilter<"SiteSave"> | string
+    createdAt?: DateTimeFilter<"SiteSave"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteSave"> | Date | string
+    siteId?: StringFilter<"SiteSave"> | string
+    userId?: StringFilter<"SiteSave"> | string
+  }
+
+  export type SiteCommentUpsertWithWhereUniqueWithoutAuthorInput = {
+    where: SiteCommentWhereUniqueInput
+    update: XOR<SiteCommentUpdateWithoutAuthorInput, SiteCommentUncheckedUpdateWithoutAuthorInput>
+    create: XOR<SiteCommentCreateWithoutAuthorInput, SiteCommentUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type SiteCommentUpdateWithWhereUniqueWithoutAuthorInput = {
+    where: SiteCommentWhereUniqueInput
+    data: XOR<SiteCommentUpdateWithoutAuthorInput, SiteCommentUncheckedUpdateWithoutAuthorInput>
+  }
+
+  export type SiteCommentUpdateManyWithWhereWithoutAuthorInput = {
+    where: SiteCommentScalarWhereInput
+    data: XOR<SiteCommentUpdateManyMutationInput, SiteCommentUncheckedUpdateManyWithoutAuthorInput>
+  }
+
+  export type SiteCommentScalarWhereInput = {
+    AND?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+    OR?: SiteCommentScalarWhereInput[]
+    NOT?: SiteCommentScalarWhereInput | SiteCommentScalarWhereInput[]
+    id?: StringFilter<"SiteComment"> | string
+    createdAt?: DateTimeFilter<"SiteComment"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteComment"> | Date | string
+    siteId?: StringFilter<"SiteComment"> | string
+    authorId?: StringFilter<"SiteComment"> | string
+    parentId?: StringNullableFilter<"SiteComment"> | string | null
+    body?: StringFilter<"SiteComment"> | string
+    isDeleted?: BoolFilter<"SiteComment"> | boolean
+    likesCount?: IntFilter<"SiteComment"> | number
+  }
+
+  export type SiteShareEventUpsertWithWhereUniqueWithoutUserInput = {
+    where: SiteShareEventWhereUniqueInput
+    update: XOR<SiteShareEventUpdateWithoutUserInput, SiteShareEventUncheckedUpdateWithoutUserInput>
+    create: XOR<SiteShareEventCreateWithoutUserInput, SiteShareEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteShareEventUpdateWithWhereUniqueWithoutUserInput = {
+    where: SiteShareEventWhereUniqueInput
+    data: XOR<SiteShareEventUpdateWithoutUserInput, SiteShareEventUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SiteShareEventUpdateManyWithWhereWithoutUserInput = {
+    where: SiteShareEventScalarWhereInput
+    data: XOR<SiteShareEventUpdateManyMutationInput, SiteShareEventUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SiteShareEventScalarWhereInput = {
+    AND?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+    OR?: SiteShareEventScalarWhereInput[]
+    NOT?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+    id?: StringFilter<"SiteShareEvent"> | string
+    createdAt?: DateTimeFilter<"SiteShareEvent"> | Date | string
+    siteId?: StringFilter<"SiteShareEvent"> | string
+    userId?: StringFilter<"SiteShareEvent"> | string
+    channel?: EnumSiteShareChannelFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
+  }
+
+  export type SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    update: XOR<SiteCommentLikeUpdateWithoutUserInput, SiteCommentLikeUncheckedUpdateWithoutUserInput>
+    create: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput>
+  }
+
+  export type SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    data: XOR<SiteCommentLikeUpdateWithoutUserInput, SiteCommentLikeUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SiteCommentLikeUpdateManyWithWhereWithoutUserInput = {
+    where: SiteCommentLikeScalarWhereInput
+    data: XOR<SiteCommentLikeUpdateManyMutationInput, SiteCommentLikeUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SiteCommentLikeScalarWhereInput = {
+    AND?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+    OR?: SiteCommentLikeScalarWhereInput[]
+    NOT?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+    id?: StringFilter<"SiteCommentLike"> | string
+    createdAt?: DateTimeFilter<"SiteCommentLike"> | Date | string
+    commentId?: StringFilter<"SiteCommentLike"> | string
+    userId?: StringFilter<"SiteCommentLike"> | string
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     createdAt?: Date | string
@@ -26483,6 +34868,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -26515,6 +34905,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -26563,6 +34958,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -26595,6 +34995,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminTempTokensInput = {
@@ -26627,6 +35032,11 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminTempTokensInput = {
@@ -26659,6 +35069,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminTempTokensInput = {
@@ -26707,6 +35122,11 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminTempTokensInput = {
@@ -26739,6 +35159,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminPendingMfaInput = {
@@ -26771,6 +35196,11 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminPendingMfaInput = {
@@ -26803,6 +35233,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminPendingMfaInput = {
@@ -26851,6 +35286,11 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminPendingMfaInput = {
@@ -26883,6 +35323,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminNotificationsInput = {
@@ -26915,6 +35360,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminNotificationsInput = {
@@ -26947,6 +35397,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminNotificationsInput = {
@@ -26995,6 +35450,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
@@ -27027,6 +35487,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPointTransactionsInput = {
@@ -27059,6 +35524,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -27091,6 +35561,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -27139,6 +35614,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -27171,6 +35651,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateWithoutSiteInput = {
@@ -27255,6 +35740,114 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SiteVoteCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSiteVotesInput
+  }
+
+  export type SiteVoteUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type SiteVoteCreateOrConnectWithoutSiteInput = {
+    where: SiteVoteWhereUniqueInput
+    create: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteVoteCreateManySiteInputEnvelope = {
+    data: SiteVoteCreateManySiteInput | SiteVoteCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteSaveCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSiteSavesInput
+  }
+
+  export type SiteSaveUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type SiteSaveCreateOrConnectWithoutSiteInput = {
+    where: SiteSaveWhereUniqueInput
+    create: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteSaveCreateManySiteInputEnvelope = {
+    data: SiteSaveCreateManySiteInput | SiteSaveCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteCommentCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    author: UserCreateNestedOneWithoutSiteCommentsInput
+    parent?: SiteCommentCreateNestedOneWithoutRepliesInput
+    replies?: SiteCommentCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    replies?: SiteCommentUncheckedCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentCreateOrConnectWithoutSiteInput = {
+    where: SiteCommentWhereUniqueInput
+    create: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteCommentCreateManySiteInputEnvelope = {
+    data: SiteCommentCreateManySiteInput | SiteCommentCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteShareEventCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    channel?: $Enums.SiteShareChannel
+    user: UserCreateNestedOneWithoutSiteShareEventsInput
+  }
+
+  export type SiteShareEventUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventCreateOrConnectWithoutSiteInput = {
+    where: SiteShareEventWhereUniqueInput
+    create: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteShareEventCreateManySiteInputEnvelope = {
+    data: SiteShareEventCreateManySiteInput | SiteShareEventCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutSiteInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutSiteInput, ReportUncheckedUpdateWithoutSiteInput>
@@ -27302,6 +35895,70 @@ export namespace Prisma {
     participantCount?: IntFilter<"CleanupEvent"> | number
   }
 
+  export type SiteVoteUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteVoteWhereUniqueInput
+    update: XOR<SiteVoteUpdateWithoutSiteInput, SiteVoteUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteVoteCreateWithoutSiteInput, SiteVoteUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteVoteUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteVoteWhereUniqueInput
+    data: XOR<SiteVoteUpdateWithoutSiteInput, SiteVoteUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteVoteUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteVoteScalarWhereInput
+    data: XOR<SiteVoteUpdateManyMutationInput, SiteVoteUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type SiteSaveUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteSaveWhereUniqueInput
+    update: XOR<SiteSaveUpdateWithoutSiteInput, SiteSaveUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteSaveCreateWithoutSiteInput, SiteSaveUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteSaveUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteSaveWhereUniqueInput
+    data: XOR<SiteSaveUpdateWithoutSiteInput, SiteSaveUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteSaveUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteSaveScalarWhereInput
+    data: XOR<SiteSaveUpdateManyMutationInput, SiteSaveUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type SiteCommentUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteCommentWhereUniqueInput
+    update: XOR<SiteCommentUpdateWithoutSiteInput, SiteCommentUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteCommentCreateWithoutSiteInput, SiteCommentUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteCommentUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteCommentWhereUniqueInput
+    data: XOR<SiteCommentUpdateWithoutSiteInput, SiteCommentUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteCommentUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteCommentScalarWhereInput
+    data: XOR<SiteCommentUpdateManyMutationInput, SiteCommentUncheckedUpdateManyWithoutSiteInput>
+  }
+
+  export type SiteShareEventUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteShareEventWhereUniqueInput
+    update: XOR<SiteShareEventUpdateWithoutSiteInput, SiteShareEventUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteShareEventCreateWithoutSiteInput, SiteShareEventUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteShareEventUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteShareEventWhereUniqueInput
+    data: XOR<SiteShareEventUpdateWithoutSiteInput, SiteShareEventUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteShareEventUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteShareEventScalarWhereInput
+    data: XOR<SiteShareEventUpdateManyMutationInput, SiteShareEventUncheckedUpdateManyWithoutSiteInput>
+  }
+
   export type SiteCreateWithoutReportsInput = {
     id?: string
     createdAt?: Date | string
@@ -27311,7 +35968,15 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutReportsInput = {
@@ -27323,7 +35988,15 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutReportsInput = {
@@ -27361,6 +36034,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -27393,6 +36071,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -27430,6 +36113,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutModeratedReportsInput = {
@@ -27462,6 +36150,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutModeratedReportsInput = {
@@ -27606,7 +36299,15 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutReportsInput = {
@@ -27618,7 +36319,15 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -27662,6 +36371,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -27694,6 +36408,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutModeratedReportsInput = {
@@ -27737,6 +36456,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutModeratedReportsInput = {
@@ -27769,6 +36493,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithoutPotentialDuplicatesInput = {
@@ -27929,6 +36658,11 @@ export namespace Prisma {
     auditLogs?: AuditLogCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCoReportedReportsInput = {
@@ -27961,6 +36695,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCoReportedReportsInput = {
@@ -28060,6 +36799,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoReportedReportsInput = {
@@ -28092,6 +36836,11 @@ export namespace Prisma {
     auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -28124,6 +36873,11 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -28156,6 +36910,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
     adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -28204,6 +36963,11 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -28236,6 +37000,11 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
     adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutEventsInput = {
@@ -28247,7 +37016,15 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     reports?: ReportCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutEventsInput = {
@@ -28259,7 +37036,15 @@ export namespace Prisma {
     address?: string | null
     description?: string | null
     status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
     reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutEventsInput = {
@@ -28287,7 +37072,15 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     reports?: ReportUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutEventsInput = {
@@ -28299,7 +37092,1445 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     description?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
     reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteCreateWithoutVotesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutVotesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutVotesInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutVotesInput, SiteUncheckedCreateWithoutVotesInput>
+  }
+
+  export type UserCreateWithoutSiteVotesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteVotesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteVotesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteVotesInput, UserUncheckedCreateWithoutSiteVotesInput>
+  }
+
+  export type SiteUpsertWithoutVotesInput = {
+    update: XOR<SiteUpdateWithoutVotesInput, SiteUncheckedUpdateWithoutVotesInput>
+    create: XOR<SiteCreateWithoutVotesInput, SiteUncheckedCreateWithoutVotesInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutVotesInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutVotesInput, SiteUncheckedUpdateWithoutVotesInput>
+  }
+
+  export type SiteUpdateWithoutVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutSiteVotesInput = {
+    update: XOR<UserUpdateWithoutSiteVotesInput, UserUncheckedUpdateWithoutSiteVotesInput>
+    create: XOR<UserCreateWithoutSiteVotesInput, UserUncheckedCreateWithoutSiteVotesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteVotesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteVotesInput, UserUncheckedUpdateWithoutSiteVotesInput>
+  }
+
+  export type UserUpdateWithoutSiteVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteVotesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCreateWithoutSavesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutSavesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutSavesInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutSavesInput, SiteUncheckedCreateWithoutSavesInput>
+  }
+
+  export type UserCreateWithoutSiteSavesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteSavesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteSavesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteSavesInput, UserUncheckedCreateWithoutSiteSavesInput>
+  }
+
+  export type SiteUpsertWithoutSavesInput = {
+    update: XOR<SiteUpdateWithoutSavesInput, SiteUncheckedUpdateWithoutSavesInput>
+    create: XOR<SiteCreateWithoutSavesInput, SiteUncheckedCreateWithoutSavesInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutSavesInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutSavesInput, SiteUncheckedUpdateWithoutSavesInput>
+  }
+
+  export type SiteUpdateWithoutSavesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutSavesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutSiteSavesInput = {
+    update: XOR<UserUpdateWithoutSiteSavesInput, UserUncheckedUpdateWithoutSiteSavesInput>
+    create: XOR<UserCreateWithoutSiteSavesInput, UserUncheckedCreateWithoutSiteSavesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteSavesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteSavesInput, UserUncheckedUpdateWithoutSiteSavesInput>
+  }
+
+  export type UserUpdateWithoutSiteSavesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteSavesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCreateWithoutCommentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutCommentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutCommentsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutCommentsInput, SiteUncheckedCreateWithoutCommentsInput>
+  }
+
+  export type UserCreateWithoutSiteCommentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteCommentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteCommentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteCommentsInput, UserUncheckedCreateWithoutSiteCommentsInput>
+  }
+
+  export type SiteCommentCreateWithoutRepliesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    site: SiteCreateNestedOneWithoutCommentsInput
+    author: UserCreateNestedOneWithoutSiteCommentsInput
+    parent?: SiteCommentCreateNestedOneWithoutRepliesInput
+    likes?: SiteCommentLikeCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUncheckedCreateWithoutRepliesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    likes?: SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentCreateOrConnectWithoutRepliesInput = {
+    where: SiteCommentWhereUniqueInput
+    create: XOR<SiteCommentCreateWithoutRepliesInput, SiteCommentUncheckedCreateWithoutRepliesInput>
+  }
+
+  export type SiteCommentCreateWithoutParentInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    site: SiteCreateNestedOneWithoutCommentsInput
+    author: UserCreateNestedOneWithoutSiteCommentsInput
+    replies?: SiteCommentCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentUncheckedCreateWithoutParentInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    replies?: SiteCommentUncheckedCreateNestedManyWithoutParentInput
+    likes?: SiteCommentLikeUncheckedCreateNestedManyWithoutCommentInput
+  }
+
+  export type SiteCommentCreateOrConnectWithoutParentInput = {
+    where: SiteCommentWhereUniqueInput
+    create: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput>
+  }
+
+  export type SiteCommentCreateManyParentInputEnvelope = {
+    data: SiteCommentCreateManyParentInput | SiteCommentCreateManyParentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteCommentLikeCreateWithoutCommentInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutSiteCommentLikesInput
+  }
+
+  export type SiteCommentLikeUncheckedCreateWithoutCommentInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type SiteCommentLikeCreateOrConnectWithoutCommentInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    create: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput>
+  }
+
+  export type SiteCommentLikeCreateManyCommentInputEnvelope = {
+    data: SiteCommentLikeCreateManyCommentInput | SiteCommentLikeCreateManyCommentInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteUpsertWithoutCommentsInput = {
+    update: XOR<SiteUpdateWithoutCommentsInput, SiteUncheckedUpdateWithoutCommentsInput>
+    create: XOR<SiteCreateWithoutCommentsInput, SiteUncheckedCreateWithoutCommentsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutCommentsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutCommentsInput, SiteUncheckedUpdateWithoutCommentsInput>
+  }
+
+  export type SiteUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutSiteCommentsInput = {
+    update: XOR<UserUpdateWithoutSiteCommentsInput, UserUncheckedUpdateWithoutSiteCommentsInput>
+    create: XOR<UserCreateWithoutSiteCommentsInput, UserUncheckedCreateWithoutSiteCommentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteCommentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteCommentsInput, UserUncheckedUpdateWithoutSiteCommentsInput>
+  }
+
+  export type UserUpdateWithoutSiteCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteCommentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCommentUpsertWithoutRepliesInput = {
+    update: XOR<SiteCommentUpdateWithoutRepliesInput, SiteCommentUncheckedUpdateWithoutRepliesInput>
+    create: XOR<SiteCommentCreateWithoutRepliesInput, SiteCommentUncheckedCreateWithoutRepliesInput>
+    where?: SiteCommentWhereInput
+  }
+
+  export type SiteCommentUpdateToOneWithWhereWithoutRepliesInput = {
+    where?: SiteCommentWhereInput
+    data: XOR<SiteCommentUpdateWithoutRepliesInput, SiteCommentUncheckedUpdateWithoutRepliesInput>
+  }
+
+  export type SiteCommentUpdateWithoutRepliesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutCommentsNestedInput
+    author?: UserUpdateOneRequiredWithoutSiteCommentsNestedInput
+    parent?: SiteCommentUpdateOneWithoutRepliesNestedInput
+    likes?: SiteCommentLikeUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateWithoutRepliesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    likes?: SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUpsertWithWhereUniqueWithoutParentInput = {
+    where: SiteCommentWhereUniqueInput
+    update: XOR<SiteCommentUpdateWithoutParentInput, SiteCommentUncheckedUpdateWithoutParentInput>
+    create: XOR<SiteCommentCreateWithoutParentInput, SiteCommentUncheckedCreateWithoutParentInput>
+  }
+
+  export type SiteCommentUpdateWithWhereUniqueWithoutParentInput = {
+    where: SiteCommentWhereUniqueInput
+    data: XOR<SiteCommentUpdateWithoutParentInput, SiteCommentUncheckedUpdateWithoutParentInput>
+  }
+
+  export type SiteCommentUpdateManyWithWhereWithoutParentInput = {
+    where: SiteCommentScalarWhereInput
+    data: XOR<SiteCommentUpdateManyMutationInput, SiteCommentUncheckedUpdateManyWithoutParentInput>
+  }
+
+  export type SiteCommentLikeUpsertWithWhereUniqueWithoutCommentInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    update: XOR<SiteCommentLikeUpdateWithoutCommentInput, SiteCommentLikeUncheckedUpdateWithoutCommentInput>
+    create: XOR<SiteCommentLikeCreateWithoutCommentInput, SiteCommentLikeUncheckedCreateWithoutCommentInput>
+  }
+
+  export type SiteCommentLikeUpdateWithWhereUniqueWithoutCommentInput = {
+    where: SiteCommentLikeWhereUniqueInput
+    data: XOR<SiteCommentLikeUpdateWithoutCommentInput, SiteCommentLikeUncheckedUpdateWithoutCommentInput>
+  }
+
+  export type SiteCommentLikeUpdateManyWithWhereWithoutCommentInput = {
+    where: SiteCommentLikeScalarWhereInput
+    data: XOR<SiteCommentLikeUpdateManyMutationInput, SiteCommentLikeUncheckedUpdateManyWithoutCommentInput>
+  }
+
+  export type SiteCommentCreateWithoutLikesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    site: SiteCreateNestedOneWithoutCommentsInput
+    author: UserCreateNestedOneWithoutSiteCommentsInput
+    parent?: SiteCommentCreateNestedOneWithoutRepliesInput
+    replies?: SiteCommentCreateNestedManyWithoutParentInput
+  }
+
+  export type SiteCommentUncheckedCreateWithoutLikesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+    replies?: SiteCommentUncheckedCreateNestedManyWithoutParentInput
+  }
+
+  export type SiteCommentCreateOrConnectWithoutLikesInput = {
+    where: SiteCommentWhereUniqueInput
+    create: XOR<SiteCommentCreateWithoutLikesInput, SiteCommentUncheckedCreateWithoutLikesInput>
+  }
+
+  export type UserCreateWithoutSiteCommentLikesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteCommentLikesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteCommentLikesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteCommentLikesInput, UserUncheckedCreateWithoutSiteCommentLikesInput>
+  }
+
+  export type SiteCommentUpsertWithoutLikesInput = {
+    update: XOR<SiteCommentUpdateWithoutLikesInput, SiteCommentUncheckedUpdateWithoutLikesInput>
+    create: XOR<SiteCommentCreateWithoutLikesInput, SiteCommentUncheckedCreateWithoutLikesInput>
+    where?: SiteCommentWhereInput
+  }
+
+  export type SiteCommentUpdateToOneWithWhereWithoutLikesInput = {
+    where?: SiteCommentWhereInput
+    data: XOR<SiteCommentUpdateWithoutLikesInput, SiteCommentUncheckedUpdateWithoutLikesInput>
+  }
+
+  export type SiteCommentUpdateWithoutLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutCommentsNestedInput
+    author?: UserUpdateOneRequiredWithoutSiteCommentsNestedInput
+    parent?: SiteCommentUpdateOneWithoutRepliesNestedInput
+    replies?: SiteCommentUpdateManyWithoutParentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateWithoutLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    replies?: SiteCommentUncheckedUpdateManyWithoutParentNestedInput
+  }
+
+  export type UserUpsertWithoutSiteCommentLikesInput = {
+    update: XOR<UserUpdateWithoutSiteCommentLikesInput, UserUncheckedUpdateWithoutSiteCommentLikesInput>
+    create: XOR<UserCreateWithoutSiteCommentLikesInput, UserUncheckedCreateWithoutSiteCommentLikesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteCommentLikesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteCommentLikesInput, UserUncheckedUpdateWithoutSiteCommentLikesInput>
+  }
+
+  export type UserUpdateWithoutSiteCommentLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteCommentLikesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCreateWithoutShareEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutShareEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutShareEventsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutShareEventsInput, SiteUncheckedCreateWithoutShareEventsInput>
+  }
+
+  export type UserCreateWithoutSiteShareEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteShareEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteShareEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteShareEventsInput, UserUncheckedCreateWithoutSiteShareEventsInput>
+  }
+
+  export type SiteUpsertWithoutShareEventsInput = {
+    update: XOR<SiteUpdateWithoutShareEventsInput, SiteUncheckedUpdateWithoutShareEventsInput>
+    create: XOR<SiteCreateWithoutShareEventsInput, SiteUncheckedCreateWithoutShareEventsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutShareEventsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutShareEventsInput, SiteUncheckedUpdateWithoutShareEventsInput>
+  }
+
+  export type SiteUpdateWithoutShareEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutShareEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutSiteShareEventsInput = {
+    update: XOR<UserUpdateWithoutSiteShareEventsInput, UserUncheckedUpdateWithoutSiteShareEventsInput>
+    create: XOR<UserCreateWithoutSiteShareEventsInput, UserUncheckedCreateWithoutSiteShareEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteShareEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteShareEventsInput, UserUncheckedUpdateWithoutSiteShareEventsInput>
+  }
+
+  export type UserUpdateWithoutSiteShareEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteShareEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateManyReporterInput = {
@@ -28395,6 +38626,44 @@ export namespace Prisma {
     tokenHash: string
     email: string
     expiresAt: Date | string
+  }
+
+  export type SiteVoteCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+  }
+
+  export type SiteSaveCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+  }
+
+  export type SiteCommentCreateManyAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+  }
+
+  export type SiteShareEventCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteCommentLikeCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    commentId: string
   }
 
   export type ReportUpdateWithoutReporterInput = {
@@ -28690,6 +38959,124 @@ export namespace Prisma {
     expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SiteVoteUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutVotesNestedInput
+  }
+
+  export type SiteVoteUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteVoteUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutSavesNestedInput
+  }
+
+  export type SiteSaveUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutCommentsNestedInput
+    parent?: SiteCommentUpdateOneWithoutRepliesNestedInput
+    replies?: SiteCommentUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    replies?: SiteCommentUncheckedUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteShareEventUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    site?: SiteUpdateOneRequiredWithoutShareEventsNestedInput
+  }
+
+  export type SiteShareEventUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteCommentLikeUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    comment?: SiteCommentUpdateOneRequiredWithoutLikesNestedInput
+  }
+
+  export type SiteCommentLikeUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    commentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentLikeUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    commentId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type ReportCreateManySiteInput = {
     id?: string
     createdAt?: Date | string
@@ -28717,6 +39104,38 @@ export namespace Prisma {
     status?: $Enums.CleanupEventStatus
     organizerId?: string | null
     participantCount?: number
+  }
+
+  export type SiteVoteCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type SiteSaveCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+  }
+
+  export type SiteCommentCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    authorId: string
+    parentId?: string | null
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+  }
+
+  export type SiteShareEventCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    channel?: $Enums.SiteShareChannel
   }
 
   export type ReportUpdateWithoutSiteInput = {
@@ -28808,6 +39227,106 @@ export namespace Prisma {
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     participantCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteVoteUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSiteVotesNestedInput
+  }
+
+  export type SiteVoteUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteVoteUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSiteSavesNestedInput
+  }
+
+  export type SiteSaveUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteSaveUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    author?: UserUpdateOneRequiredWithoutSiteCommentsNestedInput
+    parent?: SiteCommentUpdateOneWithoutRepliesNestedInput
+    replies?: SiteCommentUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    replies?: SiteCommentUncheckedUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    parentId?: NullableStringFieldUpdateOperationsInput | string | null
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteShareEventUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    user?: UserUpdateOneRequiredWithoutSiteShareEventsNestedInput
+  }
+
+  export type SiteShareEventUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareEventUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
 
   export type ReportCreateManyPotentialDuplicateOfInput = {
@@ -28905,6 +39424,78 @@ export namespace Prisma {
   }
 
   export type ReportCoReporterUncheckedUpdateManyWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentCreateManyParentInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    authorId: string
+    body: string
+    isDeleted?: boolean
+    likesCount?: number
+  }
+
+  export type SiteCommentLikeCreateManyCommentInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type SiteCommentUpdateWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutCommentsNestedInput
+    author?: UserUpdateOneRequiredWithoutSiteCommentsNestedInput
+    replies?: SiteCommentUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+    replies?: SiteCommentUncheckedUpdateManyWithoutParentNestedInput
+    likes?: SiteCommentLikeUncheckedUpdateManyWithoutCommentNestedInput
+  }
+
+  export type SiteCommentUncheckedUpdateManyWithoutParentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    isDeleted?: BoolFieldUpdateOperationsInput | boolean
+    likesCount?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type SiteCommentLikeUpdateWithoutCommentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSiteCommentLikesNestedInput
+  }
+
+  export type SiteCommentLikeUncheckedUpdateWithoutCommentInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteCommentLikeUncheckedUpdateManyWithoutCommentInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string

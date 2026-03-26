@@ -19,6 +19,7 @@ import { RecentActivityFeed } from './recent-activity-feed';
 import { ReportsTrendChart } from './reports-trend-chart';
 import { StatsOverview } from './stats-overview';
 import { UpcomingCleanupsCard } from './upcoming-cleanups-card';
+import { Card } from '@/components/ui';
 import { getReports, ReportsList } from '@/features/reports';
 import styles from './dashboard-async-sections.module.css';
 
@@ -228,6 +229,35 @@ export async function InsightsSection() {
                   completed={overview.cleanupEvents.completed}
                   upcomingEvents={overview.cleanupEvents.upcomingEvents}
                 />
+              </DashboardErrorBoundary>
+            </DashboardSectionWrapper>
+            <DashboardSectionWrapper delay={0.15} className={styles.insightCardWrapper}>
+              <DashboardErrorBoundary sectionName="Feed diagnostics">
+                <Card padding="md" className={styles.feedDiagnosticsCard}>
+                  <span className={styles.sectionLabel}>Feed ops</span>
+                  <h3 className={styles.feedDiagnosticsTitle}>Feed diagnostics</h3>
+                  <p className={styles.feedDiagnosticsSubline}>
+                    Integrity demotions (7d): {overview.feedDiagnostics.recentIntegrityDemotions}
+                  </p>
+                  <div className={styles.feedReasonList}>
+                    {overview.feedDiagnostics.reasonCodes.slice(0, 5).map((item) => (
+                      <div key={item.code} className={styles.feedReasonRow}>
+                        <span className={styles.feedReasonCode}>{item.code.replace(/_/g, ' ')}</span>
+                        <span className={styles.feedReasonCount}>{item.count}</span>
+                      </div>
+                    ))}
+                  </div>
+                  {overview.feedDiagnostics.rankDriftSnapshot.length > 0 ? (
+                    <div className={styles.feedDriftList}>
+                      {overview.feedDiagnostics.rankDriftSnapshot.slice(0, 3).map((item) => (
+                        <div key={item.siteId} className={styles.feedDriftRow}>
+                          <span className={styles.feedDriftSite}>{item.siteId}</span>
+                          <span className={styles.feedDriftScore}>{item.score.toFixed(3)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
+                </Card>
               </DashboardErrorBoundary>
             </DashboardSectionWrapper>
           </div>

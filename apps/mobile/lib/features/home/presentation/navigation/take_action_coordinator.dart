@@ -17,7 +17,7 @@ import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 class TakeActionCoordinator {
   const TakeActionCoordinator._();
 
-  static Future<void> execute(
+  static Future<bool> execute(
     BuildContext context, {
     required TakeActionType action,
     required PollutionSite site,
@@ -28,7 +28,7 @@ class TakeActionCoordinator {
     switch (action) {
       case TakeActionType.createEcoAction:
         await _handleCreateEcoAction(context, site: site);
-        break;
+        return false;
       case TakeActionType.joinAction:
         await _handleJoinAction(
           context,
@@ -36,17 +36,16 @@ class TakeActionCoordinator {
           isFromSiteDetail: isFromSiteDetail,
           onSwitchToCleaningTab: onSwitchToCleaningTab,
         );
-        break;
+        return false;
       case TakeActionType.donateContribute:
         await _handleDonate(context, site: site);
-        break;
+        return false;
       case TakeActionType.shareSite:
-        await _handleShareSite(
+        return _handleShareSite(
           context,
           site: site,
           onShareCountChanged: onShareCountChanged,
         );
-        break;
     }
   }
 
@@ -109,7 +108,7 @@ class TakeActionCoordinator {
     }
   }
 
-  static Future<void> _handleShareSite(
+  static Future<bool> _handleShareSite(
     BuildContext context, {
     required PollutionSite site,
     VoidCallback? onShareCountChanged,
@@ -128,7 +127,7 @@ class TakeActionCoordinator {
         subtitle: 'Help others discover and support this site',
       ),
     );
-    if (action == null || !context.mounted) return;
+    if (action == null || !context.mounted) return false;
     const String baseUrl = 'https://chisto.mk';
     final String siteUrl = '$baseUrl/sites/${site.id}';
     final String text = '${site.title}\n${site.description}\n\n$siteUrl';
@@ -139,11 +138,12 @@ class TakeActionCoordinator {
           AppSnack.show(context, message: 'Link copied', type: AppSnackType.success);
         }
         onShareCountChanged?.call();
-        break;
+        return true;
       case ShareAction.sendMessage:
         await Share.share(text, subject: site.title);
-        onShareCountChanged?.call();
-        break;
+        // share_plus v10 does not expose a reliable completion status for this path.
+        // To avoid false-positive counters, we do not increment here.
+        return false;
       case ShareAction.shareProfile:
         if (context.mounted) {
           AppSnack.show(
@@ -153,7 +153,7 @@ class TakeActionCoordinator {
           );
         }
         onShareCountChanged?.call();
-        break;
+        return true;
     }
   }
 }

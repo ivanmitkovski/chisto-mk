@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -31,10 +32,16 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
   bool _isLoading = true;
   AppError? _loadError;
   List<PollutionSite> _allSites = <PollutionSite>[];
+  List<PollutionSite> _visibleSites = <PollutionSite>[];
   List<FeedNotification> _notifications = <FeedNotification>[];
   FeedFilter _activeFilter = FeedFilter.all;
   final ScrollController _scrollController = ScrollController();
   AnimationController? _entranceController;
+  double? _userLatitude;
+  double? _userLongitude;
+  String? _nextCursor;
+  bool _hasMore = true;
+  bool _isLoadingMore = false;
 
   List<FeedNotification> _ensureNotificationsSeeded() {
     if (_notifications.isEmpty) {
@@ -50,21 +57,34 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
           .where((FeedNotification n) => !n.isRead)
           .length;
 
-  List<PollutionSite> get _sites {
+  List<PollutionSite> _computeVisibleSites() {
     final List<PollutionSite> source = _ensureSitesSeeded();
     switch (_activeFilter) {
       case FeedFilter.all:
-        return source;
+        return List<PollutionSite>.from(source);
       case FeedFilter.urgent:
-        return source.where((PollutionSite s) => s.urgencyLabel != null).toList();
+        final urgent = source.where((PollutionSite s) => s.urgencyLabel != null).toList();
+        if (urgent.isNotEmpty) return urgent;
+        final fallback = List<PollutionSite>.from(source)
+          ..sort((a, b) {
+            final scoreA = _statusPriority(a.statusLabel);
+            final scoreB = _statusPriority(b.statusLabel);
+            if (scoreA != scoreB) return scoreB.compareTo(scoreA);
+            return b.commentsCount.compareTo(a.commentsCount);
+          });
+        return fallback;
       case FeedFilter.nearby:
         return List<PollutionSite>.from(source)
           ..sort((PollutionSite a, PollutionSite b) => a.distanceKm.compareTo(b.distanceKm));
       case FeedFilter.mostVoted:
-        return List<PollutionSite>.from(source)
-          ..sort((PollutionSite a, PollutionSite b) => b.score.compareTo(a.score));
+        return List<PollutionSite>.from(source)..sort((PollutionSite a, PollutionSite b) {
+          final supportA = a.score + (a.commentsCount * 3) + (a.shareCount * 4);
+          final supportB = b.score + (b.commentsCount * 3) + (b.shareCount * 4);
+          return supportB.compareTo(supportA);
+        });
       case FeedFilter.recent:
-        return source.reversed.toList();
+        return List<PollutionSite>.from(source)
+          ..sort((a, b) => (b.rankingScore ?? 0).compareTo(a.rankingScore ?? 0));
     }
   }
 
@@ -75,6 +95,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       vsync: this,
       duration: AppMotion.slow,
     );
+    _scrollController.addListener(_onScroll);
     _loadFeed();
   }
 
@@ -84,18 +105,26 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       _isLoading = true;
     });
     try {
+      await _resolveUserLocation();
       final result = await ServiceLocator.instance.sitesRepository.getSites(
-        latitude: 41.6086,
-        longitude: 21.7453,
+        latitude: _userLatitude,
+        longitude: _userLongitude,
         radiusKm: 100,
         status: 'VERIFIED',
         page: 1,
-        limit: 50,
+        limit: 24,
+        mode: 'for_you',
+        sort: 'hybrid',
+        explain: true,
       );
       if (!mounted) return;
       final List<FeedNotification> notifications = _buildMockNotifications();
       setState(() {
         _allSites = result.sites;
+        _visibleSites = _computeVisibleSites();
+        _nextCursor = result.nextCursor;
+        _hasMore = (result.nextCursor?.isNotEmpty ?? false) || result.sites.length >= result.limit;
+        _isLoadingMore = false;
         _notifications = notifications;
         _isLoading = false;
         _loadError = null;
@@ -126,12 +155,83 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     }
   }
 
+  Future<void> _resolveUserLocation() async {
+    try {
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        _userLatitude = null;
+        _userLongitude = null;
+        return;
+      }
+      final LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        _userLatitude = null;
+        _userLongitude = null;
+        return;
+      }
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+      );
+      _userLatitude = position.latitude;
+      _userLongitude = position.longitude;
+    } catch (_) {
+      _userLatitude = null;
+      _userLongitude = null;
+    }
+  }
+
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     _entranceController?.dispose();
     super.dispose();
   }
+  void _onScroll() {
+    if (!_scrollController.hasClients || _isLoadingMore || _isLoading || !_hasMore) return;
+    final position = _scrollController.position;
+    if (position.pixels < position.maxScrollExtent - 640) return;
+    _loadMoreFeed();
+  }
+
+  Future<void> _loadMoreFeed() async {
+    if (_isLoadingMore || !_hasMore) return;
+    _isLoadingMore = true;
+    try {
+      final result = await ServiceLocator.instance.sitesRepository.getSites(
+        latitude: _userLatitude,
+        longitude: _userLongitude,
+        radiusKm: 100,
+        status: 'VERIFIED',
+        page: 1,
+        limit: 24,
+        mode: 'for_you',
+        sort: 'hybrid',
+        explain: true,
+        cursor: _nextCursor,
+      );
+      if (!mounted) return;
+      final mergedById = <String, PollutionSite>{
+        for (final site in _allSites) site.id: site,
+      };
+      for (final site in result.sites) {
+        mergedById[site.id] = site;
+      }
+      setState(() {
+        _allSites = mergedById.values.toList();
+        _visibleSites = _computeVisibleSites();
+        _nextCursor = result.nextCursor;
+        _hasMore =
+            (result.nextCursor?.isNotEmpty ?? false) || result.sites.length >= result.limit;
+      });
+    } catch (_) {
+      // Keep existing list; pagination is best-effort.
+    } finally {
+      _isLoadingMore = false;
+    }
+  }
+
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
@@ -201,7 +301,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
               SliverToBoxAdapter(
                 child: FeedSectionHeader(
                   activeFilter: _activeFilter,
-                  sitesCount: _sites.length,
+                  sitesCount: _visibleSites.length,
                   onFilterTap: () => _openFilterSheet(context),
                 ),
               ),
@@ -215,19 +315,36 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     onRetry: _loadFeed,
                   ),
                 )
-              else if (_sites.isEmpty)
+              else if (_visibleSites.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: _buildEmptyFilterState(context),
                 )
               else
                 SliverList.builder(
-                  itemCount: _sites.length,
+                  itemCount: _visibleSites.length + (_isLoadingMore ? 1 : 0),
                   itemBuilder: (BuildContext context, int index) {
+                    if (index >= _visibleSites.length) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                          vertical: AppSpacing.md,
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      );
+                    }
                     final AnimationController? controller = _entranceController;
                     final Widget card = Padding(
                       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                      child: PollutionSiteCard(site: _sites[index]),
+                      child: PollutionSiteCard(
+                        site: _visibleSites[index],
+                      ),
                     );
                     if (controller == null) return card;
                     final double staggerDelay = (index * 0.15).clamp(0.0, 0.6);
@@ -252,7 +369,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     );
                   },
                 ),
-              if (!_isLoading && _loadError == null && _sites.isNotEmpty)
+              if (!_isLoading && _loadError == null && _visibleSites.isNotEmpty && !_hasMore)
                 SliverToBoxAdapter(child: _buildFooter(context)),
             ],
           ),
@@ -307,7 +424,10 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         onSelected: (FeedFilter filter) {
           if (filter != _activeFilter) {
             Navigator.of(context).pop();
-            setState(() => _activeFilter = filter);
+            setState(() {
+              _activeFilter = filter;
+              _visibleSites = _computeVisibleSites();
+            });
             scrollToTop();
           } else {
             Navigator.of(context).pop();
@@ -407,7 +527,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                 ),
                 child: Icon(
-                  _activeFilter.icon,
+                  _emptyFilterIcon(_activeFilter),
                   size: 30,
                   color: AppColors.textMuted,
                 ),
@@ -490,6 +610,21 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     );
   }
 
+  IconData _emptyFilterIcon(FeedFilter filter) {
+    switch (filter) {
+      case FeedFilter.all:
+        return Icons.filter_alt_outlined;
+      case FeedFilter.urgent:
+        return Icons.warning_amber_rounded;
+      case FeedFilter.nearby:
+        return Icons.near_me_rounded;
+      case FeedFilter.mostVoted:
+        return Icons.trending_up_rounded;
+      case FeedFilter.recent:
+        return Icons.schedule_rounded;
+    }
+  }
+
   List<FeedNotification> _buildMockNotifications() {
     final DateTime now = DateTime.now();
     return <FeedNotification>[
@@ -534,6 +669,15 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         targetTabIndex: 0,
       ),
     ];
+  }
+
+  int _statusPriority(String statusLabel) {
+    final normalized = statusLabel.toLowerCase();
+    if (normalized.contains('reported')) return 4;
+    if (normalized.contains('verified')) return 3;
+    if (normalized.contains('in progress')) return 2;
+    if (normalized.contains('cleanup')) return 1;
+    return 0;
   }
 
 }

@@ -112,5 +112,24 @@ void main() {
 
       expect(site.commentCount, 0);
     });
+
+    test('copyWith updates engagement fields without mutating base data', () {
+      final PollutionSite site = buildSite();
+      final PollutionSite updated = site.copyWith(
+        score: 24,
+        shareCount: 5,
+        isUpvotedByMe: true,
+        isSavedByMe: true,
+      );
+
+      expect(updated.score, 24);
+      expect(updated.shareCount, 5);
+      expect(updated.isUpvotedByMe, isTrue);
+      expect(updated.isSavedByMe, isTrue);
+      expect(updated.id, site.id);
+      expect(updated.title, site.title);
+      expect(site.score, 10);
+      expect(site.isUpvotedByMe, isFalse);
+    });
   });
 }

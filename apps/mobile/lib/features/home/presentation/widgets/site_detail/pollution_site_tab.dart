@@ -8,6 +8,9 @@ class PollutionSiteTab extends StatefulWidget {
     super.key,
     required this.site,
     required this.onTakeAction,
+    this.onUpvoteTap,
+    this.isUpvotePending = false,
+    this.upvoteScale = 1,
     this.onScoreTap,
     this.onCommentsTap,
     this.onParticipantsTap,
@@ -17,10 +20,14 @@ class PollutionSiteTab extends StatefulWidget {
     this.onReportTap,
     this.onShareTap,
     this.isReported = false,
+    this.isSaved = false,
   });
 
   final PollutionSite site;
   final VoidCallback onTakeAction;
+  final VoidCallback? onUpvoteTap;
+  final bool isUpvotePending;
+  final double upvoteScale;
   final VoidCallback? onScoreTap;
   final VoidCallback? onCommentsTap;
   final VoidCallback? onParticipantsTap;
@@ -30,13 +37,28 @@ class PollutionSiteTab extends StatefulWidget {
   final VoidCallback? onReportTap;
   final VoidCallback? onShareTap;
   final bool isReported;
+  final bool isSaved;
 
   @override
   State<PollutionSiteTab> createState() => _PollutionSiteTabState();
 }
 
 class _PollutionSiteTabState extends State<PollutionSiteTab> {
-  bool _isSaved = false;
+  late bool _isSaved;
+
+  @override
+  void initState() {
+    super.initState();
+    _isSaved = widget.isSaved;
+  }
+
+  @override
+  void didUpdateWidget(covariant PollutionSiteTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.isSaved != widget.isSaved) {
+      _isSaved = widget.isSaved;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +82,9 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
               const SizedBox(height: AppSpacing.md),
               SiteStatsRow(
                 site: widget.site,
+                isUpvotePending: widget.isUpvotePending,
+                upvoteScale: widget.upvoteScale,
+                onUpvoteTap: widget.onUpvoteTap,
                 onScoreTap: widget.onScoreTap,
                 onCommentsTap: widget.onCommentsTap,
                 onParticipantsTap: widget.onParticipantsTap,
