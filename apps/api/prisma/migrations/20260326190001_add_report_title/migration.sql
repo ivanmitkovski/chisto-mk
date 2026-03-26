@@ -1,12 +1,13 @@
--- AlterTable
-ALTER TABLE "Report" ADD COLUMN "title" TEXT;
+-- Idempotent: safe if "title" was already added (e.g. partial deploy, manual hotfix).
+ALTER TABLE "Report" ADD COLUMN IF NOT EXISTS "title" TEXT;
 
--- Backfill from legacy description (truncated); fallback matches prior list fallback copy
+-- Backfill only rows that still need a title (avoids clobbering existing values).
 UPDATE "Report"
 SET "title" = CASE
   WHEN "description" IS NOT NULL AND LENGTH(TRIM("description")) > 0
   THEN LEFT(TRIM("description"), 120)
   ELSE 'Reported site'
-END;
+END
+WHERE "title" IS NULL;
 
 ALTER TABLE "Report" ALTER COLUMN "title" SET NOT NULL;
