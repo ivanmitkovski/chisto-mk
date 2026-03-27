@@ -348,6 +348,46 @@ exports.Prisma.SiteShareEventScalarFieldEnum = {
   channel: 'channel'
 };
 
+exports.Prisma.UserDeviceTokenScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  token: 'token',
+  platform: 'platform',
+  appVersion: 'appVersion',
+  locale: 'locale',
+  lastSeenAt: 'lastSeenAt',
+  revokedAt: 'revokedAt',
+  failureCount: 'failureCount'
+};
+
+exports.Prisma.UserNotificationScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  title: 'title',
+  body: 'body',
+  type: 'type',
+  isRead: 'isRead',
+  data: 'data',
+  sentAt: 'sentAt'
+};
+
+exports.Prisma.NotificationOutboxScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userNotificationId: 'userNotificationId',
+  deviceToken: 'deviceToken',
+  payload: 'payload',
+  attempts: 'attempts',
+  lastAttemptAt: 'lastAttemptAt',
+  deliveredAt: 'deliveredAt',
+  failedPermanently: 'failedPermanently',
+  idempotencyKey: 'idempotencyKey'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -355,6 +395,10 @@ exports.Prisma.SortOrder = {
 
 exports.Prisma.NullableJsonNullValueInput = {
   DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.JsonNullValueInput = {
   JsonNull: Prisma.JsonNull
 };
 
@@ -438,6 +482,21 @@ exports.SiteShareChannel = exports.$Enums.SiteShareChannel = {
   other: 'other'
 };
 
+exports.DevicePlatform = exports.$Enums.DevicePlatform = {
+  IOS: 'IOS',
+  ANDROID: 'ANDROID'
+};
+
+exports.NotificationType = exports.$Enums.NotificationType = {
+  SITE_UPDATE: 'SITE_UPDATE',
+  REPORT_STATUS: 'REPORT_STATUS',
+  UPVOTE: 'UPVOTE',
+  COMMENT: 'COMMENT',
+  NEARBY_REPORT: 'NEARBY_REPORT',
+  CLEANUP_EVENT: 'CLEANUP_EVENT',
+  SYSTEM: 'SYSTEM'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserSession: 'UserSession',
@@ -459,7 +518,10 @@ exports.Prisma.ModelName = {
   SiteSave: 'SiteSave',
   SiteComment: 'SiteComment',
   SiteCommentLike: 'SiteCommentLike',
-  SiteShareEvent: 'SiteShareEvent'
+  SiteShareEvent: 'SiteShareEvent',
+  UserDeviceToken: 'UserDeviceToken',
+  UserNotification: 'UserNotification',
+  NotificationOutbox: 'NotificationOutbox'
 };
 
 /**

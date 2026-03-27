@@ -52,6 +52,8 @@ model User {
   siteComments       SiteComment[]
   siteShareEvents    SiteShareEvent[]
   siteCommentLikes   SiteCommentLike[]
+  deviceTokens       UserDeviceToken[]
+  userNotifications  UserNotification[]
 
   @@index([role])
   @@index([status])
@@ -467,4 +469,77 @@ model SiteShareEvent {
 
   @@index([siteId, createdAt])
   @@index([userId, createdAt])
+}
+
+// ─── Push Notifications ─────────────────────────────────────────────
+
+enum DevicePlatform {
+  IOS
+  ANDROID
+}
+
+model UserDeviceToken {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  token        String         @unique
+  platform     DevicePlatform
+  appVersion   String?
+  locale       String?
+  lastSeenAt   DateTime       @default(now())
+  revokedAt    DateTime?
+  failureCount Int            @default(0)
+
+  @@index([userId, revokedAt])
+  @@index([token])
+}
+
+enum NotificationType {
+  SITE_UPDATE
+  REPORT_STATUS
+  UPVOTE
+  COMMENT
+  NEARBY_REPORT
+  CLEANUP_EVENT
+  SYSTEM
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title  String
+  body   String
+  type   NotificationType
+  isRead Boolean          @default(false)
+  data   Json?
+  sentAt DateTime?
+
+  @@index([userId, isRead, createdAt])
+  @@index([userId, createdAt])
+}
+
+model NotificationOutbox {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userNotificationId String
+  deviceToken        String
+  payload            Json
+  attempts           Int       @default(0)
+  lastAttemptAt      DateTime?
+  deliveredAt        DateTime?
+  failedPermanently  Boolean   @default(false)
+  idempotencyKey     String    @unique
+
+  @@index([deliveredAt, failedPermanently, attempts])
+  @@index([createdAt])
 }

@@ -9,6 +9,8 @@ import { PatchFeatureFlagDto } from './dto/patch-feature-flag.dto';
 const DEFAULT_FLAGS: Array<{ key: string; enabled: boolean }> = [
   { key: 'cleanup_events_mobile', enabled: false },
   { key: 'reports_map_heatmap', enabled: true },
+  { key: 'notifications_inbox_enabled', enabled: true },
+  { key: 'push_fcm_enabled', enabled: false },
 ];
 
 @Injectable()

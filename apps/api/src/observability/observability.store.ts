@@ -2,6 +2,21 @@ export class ObservabilityStore {
   private static requestsTotal = 0;
   private static requestsFailed = 0;
   private static requestDurationsMs: number[] = [];
+  private static feedRequestsTotal = 0;
+  private static feedCacheHits = 0;
+  private static feedDurationsMs: number[] = [];
+  private static feedCandidatePoolSizes: number[] = [];
+  private static feedFeedbackCounts: Record<string, number> = {};
+  private static feedCacheInvalidationCounts: Record<string, number> = {};
+  private static feedReasonCodeCounts: Record<string, number> = {};
+  private static feedPaginationContinuityIssues = 0;
+  private static pushSendsTotal = 0;
+  private static pushSendsSuccess = 0;
+  private static pushSendsFailure = 0;
+  private static pushSendsRevoked = 0;
+  private static pushTokenRevocations = 0;
+  private static pushQueueRetries = 0;
+  private static pushInboxReads = 0;
 
   static recordRequest(durationMs: number, statusCode: number): void {
     this.requestsTotal += 1;
@@ -12,6 +27,63 @@ export class ObservabilityStore {
     if (this.requestDurationsMs.length > 2000) {
       this.requestDurationsMs = this.requestDurationsMs.slice(-1200);
     }
+  }
+
+  static recordFeedRequest(input: {
+    durationMs: number;
+    candidatePoolSize: number;
+    cacheHit: boolean;
+  }): void {
+    this.feedRequestsTotal += 1;
+    if (input.cacheHit) this.feedCacheHits += 1;
+    this.feedDurationsMs.push(input.durationMs);
+    this.feedCandidatePoolSizes.push(input.candidatePoolSize);
+    if (this.feedDurationsMs.length > 2000) {
+      this.feedDurationsMs = this.feedDurationsMs.slice(-1200);
+    }
+    if (this.feedCandidatePoolSizes.length > 2000) {
+      this.feedCandidatePoolSizes = this.feedCandidatePoolSizes.slice(-1200);
+    }
+  }
+
+  static recordFeedFeedback(feedbackType: string): void {
+    const key = feedbackType || 'unknown';
+    this.feedFeedbackCounts[key] = (this.feedFeedbackCounts[key] ?? 0) + 1;
+  }
+
+  static recordFeedCacheInvalidation(reason: string): void {
+    const key = reason || 'unknown';
+    this.feedCacheInvalidationCounts[key] = (this.feedCacheInvalidationCounts[key] ?? 0) + 1;
+  }
+
+  static recordFeedReasonCodes(reasonCodes: string[]): void {
+    for (const reason of reasonCodes) {
+      const key = reason || 'unknown';
+      this.feedReasonCodeCounts[key] = (this.feedReasonCodeCounts[key] ?? 0) + 1;
+    }
+  }
+
+  static recordFeedPaginationContinuityIssue(): void {
+    this.feedPaginationContinuityIssues += 1;
+  }
+
+  static recordPushSend(outcome: 'success' | 'failure' | 'revoked'): void {
+    this.pushSendsTotal += 1;
+    if (outcome === 'success') this.pushSendsSuccess += 1;
+    else if (outcome === 'failure') this.pushSendsFailure += 1;
+    else if (outcome === 'revoked') this.pushSendsRevoked += 1;
+  }
+
+  static recordPushTokenRevocation(): void {
+    this.pushTokenRevocations += 1;
+  }
+
+  static recordPushQueueRetry(): void {
+    this.pushQueueRetries += 1;
+  }
+
+  static recordPushInboxRead(): void {
+    this.pushInboxReads += 1;
   }
 
   static snapshot() {
@@ -27,6 +99,50 @@ export class ObservabilityStore {
       p50Ms: p(50),
       p95Ms: p(95),
       p99Ms: p(99),
+      feedRequestsTotal: this.feedRequestsTotal,
+      feedCacheHits: this.feedCacheHits,
+      feedCacheHitRate:
+        this.feedRequestsTotal > 0
+          ? Number((this.feedCacheHits / this.feedRequestsTotal).toFixed(4))
+          : 0,
+      feedP95Ms: (() => {
+        const fs = [...this.feedDurationsMs].sort((a, b) => a - b);
+        if (fs.length === 0) return 0;
+        const idx = Math.min(fs.length - 1, Math.floor(0.95 * fs.length));
+        return Number(fs[idx].toFixed(2));
+      })(),
+      feedDurationBuckets: {
+        le100:
+          this.feedDurationsMs.filter((ms) => ms <= 100).length,
+        le250:
+          this.feedDurationsMs.filter((ms) => ms <= 250).length,
+        le500:
+          this.feedDurationsMs.filter((ms) => ms <= 500).length,
+        le1000:
+          this.feedDurationsMs.filter((ms) => ms <= 1000).length,
+        gt1000:
+          this.feedDurationsMs.filter((ms) => ms > 1000).length,
+      },
+      feedAvgCandidatePoolSize:
+        this.feedCandidatePoolSizes.length > 0
+          ? Number(
+              (
+                this.feedCandidatePoolSizes.reduce((acc, v) => acc + v, 0) /
+                this.feedCandidatePoolSizes.length
+              ).toFixed(2),
+            )
+          : 0,
+      feedFeedbackCounts: this.feedFeedbackCounts,
+      feedCacheInvalidationCounts: this.feedCacheInvalidationCounts,
+      feedReasonCodeCounts: this.feedReasonCodeCounts,
+      feedPaginationContinuityIssues: this.feedPaginationContinuityIssues,
+      pushSendsTotal: this.pushSendsTotal,
+      pushSendsSuccess: this.pushSendsSuccess,
+      pushSendsFailure: this.pushSendsFailure,
+      pushSendsRevoked: this.pushSendsRevoked,
+      pushTokenRevocations: this.pushTokenRevocations,
+      pushQueueRetries: this.pushQueueRetries,
+      pushInboxReads: this.pushInboxReads,
     };
   }
 }

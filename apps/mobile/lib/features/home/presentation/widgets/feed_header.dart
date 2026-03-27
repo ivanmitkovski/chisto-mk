@@ -32,10 +32,13 @@ class FeedHeader extends StatelessWidget {
         ),
         child: Row(
           children: <Widget>[
-            GestureDetector(
-              onTap: onProfileTap,
-              behavior: HitTestBehavior.opaque,
-              child: Container(
+            Semantics(
+              button: true,
+              label: 'Open profile',
+              child: GestureDetector(
+                onTap: onProfileTap,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
                 width: 46,
                 height: 46,
                 decoration: BoxDecoration(
@@ -58,6 +61,7 @@ class FeedHeader extends StatelessWidget {
                   },
                 ),
               ),
+            ),
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(

@@ -11,6 +11,7 @@ describe('SitesService', () => {
       { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
       { score: jest.fn(() => 0), scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: ['test'], components: {} })) } as any,
       { ensureSiteExists: ensureSiteExists ?? jest.fn(async () => undefined) } as any,
+      { emit: jest.fn() } as any,
     );
 
   it('rejects partial geo query (lat without lng)', async () => {
@@ -148,6 +149,7 @@ describe('SitesService', () => {
         })),
       } as any,
       { ensureSiteExists: jest.fn(async () => undefined) } as any,
+      { emit: jest.fn() } as any,
     );
 
     const result = await service.findAll({
@@ -215,6 +217,7 @@ describe('SitesService', () => {
         scoreDetailed: jest.fn(() => ({ score: 1, reasonCodes: ['test'], components: {} })),
       } as any,
       { ensureSiteExists: jest.fn(async () => undefined) } as any,
+      { emit: jest.fn() } as any,
     );
 
     const first = await service.findAll({ page: 1, limit: 20, sort: 'hybrid' } as any);

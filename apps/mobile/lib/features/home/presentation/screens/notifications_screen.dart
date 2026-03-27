@@ -1,23 +1,23 @@
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_widgets.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({
     super.key,
-    this.notifications = const <FeedNotification>[],
     this.availableSites = const <PollutionSite>[],
   });
 
-  final List<FeedNotification> notifications;
   final List<PollutionSite> availableSites;
 
   @override
@@ -26,25 +26,21 @@ class NotificationsScreen extends StatefulWidget {
 
 class _NotificationsScreenState extends State<NotificationsScreen>
     with SingleTickerProviderStateMixin {
-  late List<FeedNotification> _items;
+  List<UserNotification> _items = <UserNotification>[];
+  int _unreadCount = 0;
+  bool _isLoading = true;
   bool _showUnreadOnly = false;
   late final AnimationController _entranceController;
   final ScrollController _scrollController = ScrollController();
-  bool _isBackSwipeArmed = false;
-  double _backSwipeDx = 0;
 
   @override
   void initState() {
     super.initState();
-    _items = List<FeedNotification>.from(widget.notifications)
-      ..sort(
-        (FeedNotification a, FeedNotification b) =>
-            b.createdAt.compareTo(a.createdAt),
-      );
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
-    )..forward();
+    );
+    _loadNotifications();
   }
 
   @override
@@ -54,35 +50,56 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     super.dispose();
   }
 
-  int get _unreadCount => _items.where((FeedNotification n) => !n.isRead).length;
-
-  List<FeedNotification> get _visibleItems {
-    if (!_showUnreadOnly) return _items;
-    return _items.where((FeedNotification n) => !n.isRead).toList();
+  Future<void> _loadNotifications() async {
+    try {
+      final result = await ServiceLocator.instance.notificationsRepository
+          .getNotifications(
+        page: 1,
+        limit: 50,
+        onlyUnread: false,
+      );
+      if (!mounted) return;
+      setState(() {
+        _items = result.notifications;
+        _unreadCount = result.unreadCount;
+        _isLoading = false;
+      });
+      _entranceController.forward();
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
-  List<NotificationSection> get _sections {
-    final List<NotificationSection> sections = <NotificationSection>[];
+  List<UserNotification> get _visibleItems {
+    if (!_showUnreadOnly) return _items;
+    return _items.where((UserNotification n) => !n.isRead).toList();
+  }
+
+  List<_NotificationSection> get _sections {
+    final List<_NotificationSection> sections = <_NotificationSection>[];
     String? currentLabel;
-    List<FeedNotification> bucket = <FeedNotification>[];
-    for (final FeedNotification item in _visibleItems) {
+    List<UserNotification> bucket = <UserNotification>[];
+    for (final UserNotification item in _visibleItems) {
       final String label = _dayLabel(item.createdAt);
       currentLabel ??= label;
       if (label != currentLabel) {
-        sections.add(NotificationSection(title: currentLabel, items: bucket));
+        sections.add(_NotificationSection(title: currentLabel, items: bucket));
         currentLabel = label;
-        bucket = <FeedNotification>[];
+        bucket = <UserNotification>[];
       }
       bucket.add(item);
     }
     if (currentLabel != null && bucket.isNotEmpty) {
-      sections.add(NotificationSection(title: currentLabel, items: bucket));
+      sections.add(_NotificationSection(title: currentLabel, items: bucket));
     }
     return sections;
   }
 
   void _close() {
-    Navigator.of(context).pop(_items);
+    Navigator.of(context).pop();
   }
 
   Future<void> _scrollToTop() async {
@@ -94,40 +111,25 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     );
   }
 
-  void _handleBackSwipeStart(DragStartDetails details) {
-    _isBackSwipeArmed = details.globalPosition.dx <= 24;
-    _backSwipeDx = 0;
-  }
-
-  void _handleBackSwipeUpdate(DragUpdateDetails details) {
-    if (!_isBackSwipeArmed) return;
-    _backSwipeDx += details.primaryDelta ?? 0;
-  }
-
-  void _handleBackSwipeEnd(DragEndDetails details) {
-    if (!_isBackSwipeArmed) return;
-    final double velocity = details.primaryVelocity ?? 0;
-    final bool shouldClose = _backSwipeDx > 72 || velocity > 480;
-    _isBackSwipeArmed = false;
-    _backSwipeDx = 0;
-    if (!shouldClose) return;
-    AppHaptics.tap();
-    _close();
-  }
-
-  void _markAllRead() {
+  Future<void> _markAllRead() async {
     if (_unreadCount == 0) return;
     AppHaptics.medium();
+    try {
+      await ServiceLocator.instance.notificationsRepository.markAllAsRead();
+    } catch (_) {}
     setState(() {
       _items = _items
-          .map((FeedNotification n) => n.isRead ? n : n.copyWith(isRead: true))
+          .map((UserNotification n) => n.isRead ? n : n.copyWith(isRead: true))
           .toList();
+      _unreadCount = 0;
     });
-    AppSnack.show(
-      context,
-      message: 'All notifications marked as read',
-      type: AppSnackType.success,
-    );
+    if (mounted) {
+      AppSnack.show(
+        context,
+        message: 'All notifications marked as read',
+        type: AppSnackType.success,
+      );
+    }
   }
 
   PollutionSite? _findSiteById(String id) {
@@ -137,20 +139,25 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return null;
   }
 
-  Future<void> _openNotification(FeedNotification item) async {
+  Future<void> _openNotification(UserNotification item) async {
     AppHaptics.tap();
     if (!item.isRead) {
       _setReadState(item, true);
+      try {
+        await ServiceLocator.instance.notificationsRepository.markAsRead(item.id);
+      } catch (_) {}
     }
     final String? siteId = item.targetSiteId;
     if (siteId == null) return;
     final PollutionSite? site = _findSiteById(siteId);
     if (site == null) {
-      AppSnack.show(
-        context,
-        message: 'This site is no longer available.',
-        type: AppSnackType.warning,
-      );
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: 'This site is no longer available.',
+          type: AppSnackType.warning,
+        );
+      }
       return;
     }
 
@@ -159,25 +166,27 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(
           site: site,
-          initialTabIndex: item.targetTabIndex ?? 0,
+          initialTabIndex: int.tryParse(item.targetTab ?? '') ?? 0,
         ),
       ),
     );
   }
 
-  void _setReadState(FeedNotification item, bool isRead) {
+  void _setReadState(UserNotification item, bool isRead) {
     setState(() {
-      _items = _items.map((FeedNotification n) {
+      _items = _items.map((UserNotification n) {
         if (n.id != item.id) return n;
         return n.copyWith(isRead: isRead);
       }).toList();
+      _unreadCount = _items.where((UserNotification n) => !n.isRead).length;
     });
   }
 
-  void _deleteNotification(FeedNotification item) {
+  void _deleteNotification(UserNotification item) {
     AppHaptics.light();
     setState(() {
-      _items = _items.where((FeedNotification n) => n.id != item.id).toList();
+      _items = _items.where((UserNotification n) => n.id != item.id).toList();
+      _unreadCount = _items.where((UserNotification n) => !n.isRead).length;
     });
     AppSnack.show(
       context,
@@ -188,32 +197,13 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
-    await Future<void>.delayed(AppMotion.medium);
-    final DateTime now = DateTime.now();
-    final String? targetSiteId =
-        widget.availableSites.isNotEmpty ? widget.availableSites.first.id : null;
-    final FeedNotification refreshed = FeedNotification(
-      id: 'refresh-${now.microsecondsSinceEpoch}',
-      title: 'Fresh update',
-      message: 'A new report near you just received community support.',
-      createdAt: now,
-      type: FeedNotificationType.update,
-      isRead: false,
-      targetSiteId: targetSiteId,
-      targetTabIndex: 0,
-    );
-    setState(() {
-      _items = <FeedNotification>[refreshed, ..._items];
-    });
-    _entranceController
-      ..reset()
-      ..forward();
+    await _loadNotifications();
   }
 
   List<Widget> _buildSectionedChildren(BuildContext context) {
     final List<Widget> children = <Widget>[];
     int animationIndex = 0;
-    for (final NotificationSection section in _sections) {
+    for (final _NotificationSection section in _sections) {
       children.add(
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -231,7 +221,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           ),
         ),
       );
-      for (final FeedNotification item in section.items) {
+      for (final UserNotification item in section.items) {
         children.add(_buildAnimatedNotificationRow(item, animationIndex));
         animationIndex += 1;
       }
@@ -239,7 +229,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     return children;
   }
 
-  Widget _buildAnimatedNotificationRow(FeedNotification item, int index) {
+  Widget _buildAnimatedNotificationRow(UserNotification item, int index) {
     final double stagger = (index * 0.06).clamp(0.0, 0.5);
     final Animation<double> fade = CurvedAnimation(
       parent: _entranceController,
@@ -260,6 +250,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           curve: AppMotion.emphasized,
       ),
     ));
+
+    final _LegacyNotification adapted = _LegacyNotification.fromServer(item);
 
     return FadeTransition(
       opacity: fade,
@@ -292,7 +284,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             color: AppColors.accentDanger,
           ),
           child: NotificationTile(
-            item: item,
+            item: adapted.toFeedNotification(),
             onTap: () => _openNotification(item),
           ),
         ),
@@ -303,74 +295,52 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   @override
   Widget build(BuildContext context) {
     final double topHotZoneHeight = MediaQuery.of(context).padding.top + AppSpacing.xs;
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (bool didPop, dynamic result) {
-        if (didPop) return;
-        Navigator.of(context).pop(_items);
-      },
-      child: Scaffold(
-        backgroundColor: AppColors.appBackground,
-        body: Stack(
-          children: <Widget>[
-            GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onHorizontalDragStart: _handleBackSwipeStart,
-              onHorizontalDragUpdate: _handleBackSwipeUpdate,
-              onHorizontalDragEnd: _handleBackSwipeEnd,
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  children: <Widget>[
-                    _buildHeader(context),
-                    _buildFilters(context),
-                    if (_unreadCount > 0) _buildUnreadSummary(context),
-                    _buildInteractionHint(context),
-                    const SizedBox(height: AppSpacing.sm),
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: _handleRefresh,
-                        color: AppColors.primaryDark,
-                        child: AnimatedSwitcher(
-                          duration: AppMotion.medium,
-                          switchInCurve: AppMotion.emphasized,
-                          switchOutCurve: Curves.easeInCubic,
-                          child: _visibleItems.isEmpty
-                              ? _buildEmptyState(context)
-                              : ListView(
-                                  key: ValueKey<bool>(_showUnreadOnly),
-                                  controller: _scrollController,
-                                  padding: const EdgeInsets.fromLTRB(
-                                    AppSpacing.lg,
-                                    0,
-                                    AppSpacing.lg,
-                                    AppSpacing.xl,
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      body: Stack(
+        children: <Widget>[
+          SafeArea(
+            bottom: false,
+            child: Column(
+              children: <Widget>[
+                _buildHeader(context),
+                _buildFilters(context),
+                if (_unreadCount > 0) _buildUnreadSummary(context),
+                _buildInteractionHint(context),
+                const SizedBox(height: AppSpacing.sm),
+                Expanded(
+                  child: _isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : RefreshIndicator(
+                          onRefresh: _handleRefresh,
+                          color: AppColors.primaryDark,
+                          child: AnimatedSwitcher(
+                            duration: AppMotion.medium,
+                            switchInCurve: AppMotion.emphasized,
+                            switchOutCurve: Curves.easeInCubic,
+                            child: _visibleItems.isEmpty
+                                ? _buildEmptyState(context)
+                                : ListView(
+                                    key: ValueKey<bool>(_showUnreadOnly),
+                                    controller: _scrollController,
+                                    padding: const EdgeInsets.fromLTRB(
+                                      AppSpacing.lg,
+                                      0,
+                                      AppSpacing.lg,
+                                      AppSpacing.xl,
+                                    ),
+                                    physics: const BouncingScrollPhysics(
+                                      parent: AlwaysScrollableScrollPhysics(),
+                                    ),
+                                    children: _buildSectionedChildren(context),
                                   ),
-                                  physics: const BouncingScrollPhysics(
-                                    parent: AlwaysScrollableScrollPhysics(),
-                                  ),
-                                  children: _buildSectionedChildren(context),
-                                ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
+              ],
             ),
-            Positioned(
-              top: 0,
-              left: 0,
-              bottom: 0,
-              width: 28,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onHorizontalDragStart: _handleBackSwipeStart,
-                onHorizontalDragUpdate: _handleBackSwipeUpdate,
-                onHorizontalDragEnd: _handleBackSwipeEnd,
-              ),
-            ),
-            Positioned(
+          ),
+          Positioned(
               top: 0,
               left: 0,
               width: 112,
@@ -387,7 +357,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
               ),
             ),
-            Positioned(
+          Positioned(
               top: 0,
               right: 0,
               width: 112,
@@ -404,8 +374,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 ),
               ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -457,13 +426,28 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      _unreadCount == 0
-                          ? 'All caught up'
-                          : '$_unreadCount unread updates',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                    GestureDetector(
+                      onLongPress: () {
+                        // Dev-safe preview so notification UX can be validated before
+                        // APNs/Firebase production credentials are available.
+                        ServiceLocator.instance.pushNotificationService
+                            .showDebugLocalNotification();
+                        AppSnack.show(
+                          context,
+                          message:
+                              'Local notification preview triggered',
+                          type: AppSnackType.info,
+                        );
+                      },
+                      behavior: HitTestBehavior.opaque,
+                      child: Text(
+                        _unreadCount == 0
+                            ? 'All caught up'
+                            : '$_unreadCount unread updates',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.textMuted,
+                            ),
+                      ),
                     ),
                   ],
                 ),
@@ -569,7 +553,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          'Swipe right to mark read/unread · left to delete',
+          'Swipe right to mark read/unread \u00b7 left to delete',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textMuted.withValues(alpha: 0.85),
                 fontSize: 12,
@@ -653,3 +637,68 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   }
 }
 
+class _NotificationSection {
+  const _NotificationSection({required this.title, required this.items});
+  final String title;
+  final List<UserNotification> items;
+}
+
+class _LegacyNotification {
+  _LegacyNotification({
+    required this.id,
+    required this.title,
+    required this.message,
+    required this.createdAt,
+    required this.isRead,
+    required this.type,
+    this.targetSiteId,
+    this.targetTabIndex,
+  });
+
+  factory _LegacyNotification.fromServer(UserNotification n) {
+    return _LegacyNotification(
+      id: n.id,
+      title: n.title,
+      message: n.body,
+      createdAt: n.createdAt,
+      isRead: n.isRead,
+      type: _mapType(n.type),
+      targetSiteId: n.targetSiteId,
+      targetTabIndex: int.tryParse(n.targetTab ?? ''),
+    );
+  }
+
+  final String id;
+  final String title;
+  final String message;
+  final DateTime createdAt;
+  final bool isRead;
+  final FeedNotificationType type;
+  final String? targetSiteId;
+  final int? targetTabIndex;
+
+  static FeedNotificationType _mapType(UserNotificationType type) {
+    switch (type) {
+      case UserNotificationType.upvote:
+      case UserNotificationType.comment:
+        return FeedNotificationType.action;
+      case UserNotificationType.system:
+        return FeedNotificationType.system;
+      default:
+        return FeedNotificationType.update;
+    }
+  }
+
+  FeedNotification toFeedNotification() {
+    return FeedNotification(
+      id: id,
+      title: title,
+      message: message,
+      createdAt: createdAt,
+      type: type,
+      isRead: isRead,
+      targetSiteId: targetSiteId,
+      targetTabIndex: targetTabIndex,
+    );
+  }
+}

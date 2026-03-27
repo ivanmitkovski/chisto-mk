@@ -59,6 +59,9 @@ class SitesListResult {
     required this.page,
     required this.limit,
     this.nextCursor,
+    this.servedFromCache = false,
+    this.isStaleFallback = false,
+    this.cachedAt,
   });
 
   final List<PollutionSite> sites;
@@ -66,6 +69,9 @@ class SitesListResult {
   final int page;
   final int limit;
   final String? nextCursor;
+  final bool servedFromCache;
+  final bool isStaleFallback;
+  final DateTime? cachedAt;
 }
 
 class EngagementSnapshot {

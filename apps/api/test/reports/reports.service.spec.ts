@@ -44,6 +44,8 @@ function makeService(overrides?: {
   const siteEventsService = { emitSiteUpdated: jest.fn() };
   const reportsOwnerEventsService = { emit: jest.fn() };
 
+  const eventEmitter = { emit: jest.fn() };
+
   const service = new ReportsService(
     prisma as never,
     audit as never,
@@ -52,6 +54,7 @@ function makeService(overrides?: {
     notificationEventsService as never,
     siteEventsService as never,
     reportsOwnerEventsService as never,
+    eventEmitter as never,
   );
 
   return { service, prisma };

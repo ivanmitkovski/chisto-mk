@@ -1,10 +1,12 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma, ReportStatus, Site, SiteShareChannel, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { SiteEventsService } from '../admin-events/site-events.service';
 import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { distanceInMeters } from '../common/utils/distance';
+import { ObservabilityStore } from '../observability/observability.store';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
@@ -49,6 +51,52 @@ const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
 
 @Injectable()
 export class SitesService {
+  private readonly feedCacheTtlMs = 15_000;
+  private readonly feedQueryTimeoutMs = 5_000;
+  private readonly feedResponseCache = new Map<
+    string,
+    {
+      cachedAt: number;
+      value: {
+        data: Array<
+          Site & {
+            reportCount: number;
+            latestReportTitle: string | null;
+            latestReportDescription: string | null;
+            latestReportCategory: string | null;
+            latestReportCreatedAt: string | null;
+            latestReportNumber: string | null;
+            latestReportMediaUrls?: string[];
+            latestReportReporterName?: string | null;
+            latestReportReporterAvatarUrl?: string | null;
+            latestReportReporterId?: string | null;
+            upvotesCount: number;
+            commentsCount: number;
+            savesCount: number;
+            sharesCount: number;
+            isUpvotedByMe: boolean;
+            isSavedByMe: boolean;
+            rankingScore: number;
+            rankingReasons: string[];
+            rankingComponents?: Record<string, number>;
+            distanceKm?: number;
+          }
+        >;
+        meta: { page: number; limit: number; total: number; nextCursor?: string | null };
+      };
+    }
+  >();
+  private readonly feedCacheSiteIndex = new Map<string, Set<string>>();
+  private readonly feedUserPreferences = new Map<
+    string,
+    {
+      hiddenSiteIds: Set<string>;
+      mutedCategories: Map<string, number>;
+      seenSiteIds: Map<string, number>;
+      updatedAt: number;
+    }
+  >();
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
@@ -56,6 +104,7 @@ export class SitesService {
     private readonly siteEventsService: SiteEventsService,
     private readonly feedRanking: FeedRankingService,
     private readonly siteEngagement: SiteEngagementService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async create(dto: CreateSiteDto): Promise<Site> {
@@ -66,6 +115,7 @@ export class SitesService {
         description: dto.description ?? null,
       },
     });
+    this.invalidateFeedCache('site_created');
     this.siteEventsService.emitSiteCreated(site.id);
     return site;
   }
@@ -97,6 +147,18 @@ export class SitesService {
     >;
     meta: { page: number; limit: number; total: number; nextCursor?: string | null };
   }> {
+    const startedAt = Date.now();
+    const cacheKey = this.buildFeedCacheKey(query, user);
+    const cached = this.feedResponseCache.get(cacheKey);
+    const nowMs = Date.now();
+    if (cached && nowMs - cached.cachedAt <= this.feedCacheTtlMs) {
+      ObservabilityStore.recordFeedRequest({
+        durationMs: Date.now() - startedAt,
+        candidatePoolSize: cached.value.data.length,
+        cacheHit: true,
+      });
+      return cached.value;
+    }
     if ((query.lat != null) !== (query.lng != null)) {
       throw new BadRequestException({
         code: 'INVALID_GEO_QUERY',
@@ -128,14 +190,23 @@ export class SitesService {
       };
     }
 
-    const cursorClause = this.decodeFeedCursor(query.cursor);
+    const rankedHybrid = query.sort === SiteFeedSort.HYBRID && query.mode !== SiteFeedMode.LATEST;
+    const cursorState = this.decodeFeedCursor(query.cursor, rankedHybrid);
+    const cursorClause = cursorState?.dbClause ?? null;
     const feedWhere: Prisma.SiteWhereInput = cursorClause ? { AND: [where, cursorClause] } : where;
     const candidateLimit = Math.min(300, Math.max(query.limit * 6, query.limit));
-    const sites = await this.prisma.site.findMany({
-      where: feedWhere,
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      take: candidateLimit,
-      include: {
+    let sites: Awaited<ReturnType<typeof this.prisma.site.findMany>>;
+    try {
+      sites = await this.withTimeout(
+        this.prisma.site.findMany({
+        where: feedWhere,
+        orderBy: [
+          { reports: { _max: { createdAt: 'desc' } } } as Prisma.SiteOrderByWithRelationInput,
+          { createdAt: 'desc' },
+          { id: 'desc' },
+        ],
+        take: candidateLimit,
+        include: {
         reports: {
           orderBy: { createdAt: 'desc' },
           take: 1,
@@ -166,8 +237,22 @@ export class SitesService {
             }
           : false,
         _count: { select: { reports: true } },
-      },
-    });
+        },
+      }),
+        this.feedQueryTimeoutMs,
+        'Feed query timed out',
+      );
+    } catch (error) {
+      if (cached) {
+        ObservabilityStore.recordFeedRequest({
+          durationMs: Date.now() - startedAt,
+          candidatePoolSize: cached.value.data.length,
+          cacheHit: true,
+        });
+        return cached.value;
+      }
+      throw error;
+    }
     const siteIds = sites.map((s) => s.id);
     const recentCutoff = new Date(Date.now() - 2 * 60 * 60 * 1000);
     const canGroupVelocity =
@@ -237,7 +322,7 @@ export class SitesService {
       distanceKm?: number;
     };
 
-    const enrichedPromises = sites.map(async (site) => {
+    const enrichedRows = await this.mapWithConcurrency(sites, 10, async (site) => {
       const { reports, votes, saves, _count, ...siteBase } = site;
       const firstReport = reports[0];
       const mediaUrls = firstReport?.mediaUrls?.length
@@ -304,7 +389,14 @@ export class SitesService {
               },
             };
       return {
-        ...siteBase,
+        id: siteBase.id,
+        latitude: siteBase.latitude,
+        longitude: siteBase.longitude,
+        description: siteBase.description,
+        status: siteBase.status,
+        upvotesCount: siteBase.upvotesCount,
+        commentsCount: siteBase.commentsCount,
+        sharesCount: siteBase.sharesCount,
         reportCount: _count.reports,
         latestReportTitle: firstReport?.title ?? null,
         latestReportDescription: firstReport?.description ?? null,
@@ -315,33 +407,32 @@ export class SitesService {
         latestReportReporterName,
         latestReportReporterAvatarUrl,
         latestReportReporterId,
-        upvotesCount: siteBase.upvotesCount,
-        commentsCount: siteBase.commentsCount,
         savesCount: siteBase.savesCount,
-        sharesCount: siteBase.sharesCount,
         isUpvotedByMe: Array.isArray(votes) && votes.length > 0,
         isSavedByMe: Array.isArray(saves) && saves.length > 0,
         rankingScore: rankingDetail.score,
         rankingReasons: rankingDetail.reasonCodes,
         ...(query.explain ? { rankingComponents: rankingDetail.components } : {}),
         distanceKm,
+        createdAt: siteBase.createdAt,
+        updatedAt: siteBase.updatedAt,
       } as SiteEnriched;
     });
-
-    let enriched = await Promise.all(enrichedPromises);
+    let enriched = enrichedRows;
+    enriched = this.applyUserPreferences(enriched, user);
 
     if (hasGeo && query.lat != null && query.lng != null) {
       const radiusMeters = (query.radiusKm ?? 10) * 1000;
       enriched = enriched.filter((s) => (s.distanceKm ?? 0) * 1000 <= radiusMeters);
     }
     enriched = enriched.sort((a, b) => {
-      if (query.sort === SiteFeedSort.HYBRID && query.mode !== SiteFeedMode.LATEST) {
+      if (rankedHybrid) {
         if (b.rankingScore !== a.rankingScore) return b.rankingScore - a.rankingScore;
         if ((a.distanceKm ?? Number.MAX_SAFE_INTEGER) !== (b.distanceKm ?? Number.MAX_SAFE_INTEGER)) {
           return (a.distanceKm ?? Number.MAX_SAFE_INTEGER) - (b.distanceKm ?? Number.MAX_SAFE_INTEGER);
         }
-      } else if (b.createdAt.getTime() !== a.createdAt.getTime()) {
-        return b.createdAt.getTime() - a.createdAt.getTime();
+      } else if (b.rankingScore !== a.rankingScore) {
+        return b.rankingScore - a.rankingScore;
       }
       if (b.createdAt.getTime() !== a.createdAt.getTime()) {
         return b.createdAt.getTime() - a.createdAt.getTime();
@@ -349,16 +440,51 @@ export class SitesService {
       return b.id.localeCompare(a.id);
     });
     enriched = this.applyDiversityRerank(enriched, query);
+    if (cursorState?.hybrid != null) {
+      enriched = enriched.filter((row) => this.isAfterRankedCursor(row, cursorState.hybrid!));
+    }
 
-    const total = enriched.length;
+    const total = query.cursor ? 0 : await this.prisma.site.count({ where });
     const skip = query.cursor ? 0 : (query.page - 1) * query.limit;
     const data = enriched.slice(skip, skip + query.limit);
     const nextCursor = data.length === query.limit
-      ? this.encodeFeedCursor(data[data.length - 1].createdAt, data[data.length - 1].id)
+      ? rankedHybrid
+        ? this.encodeHybridFeedCursor(
+            data[data.length - 1].rankingScore,
+            data[data.length - 1].id,
+            data[data.length - 1].createdAt,
+          )
+        : this.encodeRankedFeedCursor(data[data.length - 1].rankingScore, data[data.length - 1].id)
       : null;
 
-    return {
-      data,
+    const responseData = data.map((row) => ({
+      id: row.id,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      description: row.description,
+      status: row.status,
+      reportCount: row.reportCount,
+      latestReportTitle: row.latestReportTitle,
+      latestReportDescription: row.latestReportDescription,
+      latestReportCategory: row.latestReportCategory,
+      latestReportCreatedAt: row.latestReportCreatedAt,
+      latestReportNumber: row.latestReportNumber,
+      latestReportMediaUrls: row.latestReportMediaUrls,
+      latestReportReporterName: row.latestReportReporterName,
+      latestReportReporterAvatarUrl: row.latestReportReporterAvatarUrl,
+      latestReportReporterId: row.latestReportReporterId,
+      upvotesCount: row.upvotesCount,
+      commentsCount: row.commentsCount,
+      sharesCount: row.sharesCount,
+      isUpvotedByMe: row.isUpvotedByMe,
+      isSavedByMe: row.isSavedByMe,
+      rankingScore: row.rankingScore,
+      rankingReasons: row.rankingReasons,
+      ...(query.explain ? { rankingComponents: row.rankingComponents } : {}),
+      distanceKm: row.distanceKm,
+    }));
+    const response = {
+      data: responseData as typeof data,
       meta: {
         page: query.page,
         limit: query.limit,
@@ -366,6 +492,28 @@ export class SitesService {
         nextCursor,
       },
     };
+    const duplicateCount = new Set(data.map((row) => row.id)).size !== data.length;
+    if (duplicateCount) {
+      ObservabilityStore.recordFeedPaginationContinuityIssue();
+    }
+    ObservabilityStore.recordFeedReasonCodes(
+      data.flatMap((row) => row.rankingReasons ?? []),
+    );
+    this.feedResponseCache.set(cacheKey, { cachedAt: nowMs, value: response });
+    this.indexCacheKeySites(
+      cacheKey,
+      data.map((row) => row.id),
+    );
+    if (this.feedResponseCache.size > 300) {
+      const oldestKey = this.feedResponseCache.keys().next().value as string | undefined;
+      if (oldestKey) this.removeCacheKey(oldestKey);
+    }
+    ObservabilityStore.recordFeedRequest({
+      durationMs: Date.now() - startedAt,
+      candidatePoolSize: enriched.length,
+      cacheHit: false,
+    });
+    return response;
   }
 
   async findAllForMap(query: ListSitesMapQueryDto) {
@@ -722,6 +870,8 @@ export class SitesService {
       });
       return comment;
     });
+    this.invalidateFeedCache('comment_created', siteId);
+    this.emitSiteNotification(siteId, user.userId, 'COMMENT', 'New comment on a site you follow');
     return {
       id: result.id,
       parentId: result.parentId,
@@ -768,6 +918,7 @@ export class SitesService {
         select: { id: true, likesCount: true },
       });
     });
+    this.invalidateFeedCache('comment_liked', siteId);
     return { commentId: result.id, likesCount: result.likesCount, isLikedByMe: true };
   }
 
@@ -799,6 +950,7 @@ export class SitesService {
         select: { id: true, likesCount: true },
       });
     });
+    this.invalidateFeedCache('comment_unliked', siteId);
     return { commentId: result.id, likesCount: Math.max(0, result.likesCount), isLikedByMe: false };
   }
 
@@ -846,6 +998,7 @@ export class SitesService {
       data: { body },
       include: { author: { select: { firstName: true, lastName: true } } },
     });
+    this.invalidateFeedCache('comment_updated', siteId);
     return {
       id: updated.id,
       parentId: updated.parentId,
@@ -915,35 +1068,43 @@ export class SitesService {
       }
       return updated.count;
     });
+    this.invalidateFeedCache('comment_deleted', siteId);
     return { commentId, deletedCount: affectedCount };
   }
 
   async upvoteSite(siteId: string, user: AuthenticatedUser) {
     await this.siteEngagement.upvote(siteId, user.userId);
+    this.invalidateFeedCache('site_upvoted', siteId);
+    this.emitSiteNotification(siteId, user.userId, 'UPVOTE', 'Your report received an upvote');
     return this.getEngagementSnapshot(siteId, user.userId);
   }
 
   async removeSiteUpvote(siteId: string, user: AuthenticatedUser) {
     await this.siteEngagement.removeUpvote(siteId, user.userId);
+    this.invalidateFeedCache('site_upvote_removed', siteId);
     return this.getEngagementSnapshot(siteId, user.userId);
   }
 
   async saveSite(siteId: string, user: AuthenticatedUser) {
     await this.siteEngagement.save(siteId, user.userId);
+    this.invalidateFeedCache('site_saved', siteId);
     return this.getEngagementSnapshot(siteId, user.userId);
   }
 
   async unsaveSite(siteId: string, user: AuthenticatedUser) {
     await this.siteEngagement.unsave(siteId, user.userId);
+    this.invalidateFeedCache('site_unsaved', siteId);
     return this.getEngagementSnapshot(siteId, user.userId);
   }
 
   async shareSite(siteId: string, dto: ShareSiteDto, user: AuthenticatedUser) {
     await this.siteEngagement.share(siteId, user.userId, dto.channel ?? SiteShareChannel.native);
+    this.invalidateFeedCache('site_shared', siteId);
     return this.getEngagementSnapshot(siteId, user.userId);
   }
 
   async trackFeedEvent(dto: TrackFeedEventDto, user: AuthenticatedUser) {
+    await this.siteEngagement.ensureSiteExists(dto.siteId);
     const metadata = {
       sessionId: dto.sessionId ?? null,
       ...(dto.metadata ? { metadata: dto.metadata } : {}),
@@ -955,6 +1116,23 @@ export class SitesService {
       resourceId: dto.siteId,
       metadata,
     });
+    if (dto.eventType === 'impression') {
+      const prefs = this.feedUserPreferences.get(user.userId) ?? {
+        hiddenSiteIds: new Set<string>(),
+        mutedCategories: new Map<string, number>(),
+        seenSiteIds: new Map<string, number>(),
+        updatedAt: Date.now(),
+      };
+      prefs.seenSiteIds.set(dto.siteId, Date.now());
+      if (prefs.seenSiteIds.size > 300) {
+        const oldest = [...prefs.seenSiteIds.entries()].sort((a, b) => a[1] - b[1]).slice(0, 80);
+        for (const [siteId] of oldest) {
+          prefs.seenSiteIds.delete(siteId);
+        }
+      }
+      prefs.updatedAt = Date.now();
+      this.feedUserPreferences.set(user.userId, prefs);
+    }
     return { ok: true };
   }
 
@@ -971,6 +1149,9 @@ export class SitesService {
       resourceId: siteId,
       metadata,
     });
+    this.applyFeedFeedbackPreference(user.userId, siteId, dto.feedbackType);
+    ObservabilityStore.recordFeedFeedback(dto.feedbackType);
+    this.invalidateFeedCache('feed_feedback', siteId);
     return { ok: true, siteId, feedbackType: dto.feedbackType };
   }
 
@@ -1058,6 +1239,7 @@ export class SitesService {
       metadata: { from: site.status, to: dto.status },
     });
 
+    this.invalidateFeedCache('site_status_updated');
     return updated;
   }
 
@@ -1137,7 +1319,14 @@ export class SitesService {
     }
   }
 
-  private applyDiversityRerank<T extends { id: string; latestReportCategory: string | null; rankingScore: number }>(
+  private applyDiversityRerank<
+    T extends {
+      id: string;
+      latestReportCategory: string | null;
+      latestReportReporterId?: string | null;
+      rankingScore: number;
+    },
+  >(
     rows: T[],
     query: ListSitesQueryDto,
   ): T[] {
@@ -1152,7 +1341,12 @@ export class SitesService {
         continue;
       }
       const prevCategory = output[output.length - 1].latestReportCategory;
-      const candidateIndex = remaining.findIndex((item) => item.latestReportCategory !== prevCategory);
+      const prevAuthor = output[output.length - 1].latestReportReporterId ?? null;
+      const candidateIndex = remaining.findIndex(
+        (item) =>
+          item.latestReportCategory !== prevCategory &&
+          (item.latestReportReporterId ?? null) !== prevAuthor,
+      );
       if (candidateIndex >= 0 && candidateIndex <= 3) {
         output.push(...remaining.splice(candidateIndex, 1));
       } else {
@@ -1163,23 +1357,228 @@ export class SitesService {
   }
 
   private encodeFeedCursor(createdAt: Date, id: string): string {
-    return `${createdAt.getTime()}|${id}`;
+    return `c|${createdAt.getTime()}|${id}`;
   }
 
-  private decodeFeedCursor(cursor?: string): Prisma.SiteWhereInput | null {
+  private encodeRankedFeedCursor(rankingScore: number, id: string): string {
+    return `r|${rankingScore.toFixed(8)}|${id}`;
+  }
+
+  private encodeHybridFeedCursor(rankingScore: number, id: string, createdAt: Date): string {
+    return `h|${rankingScore.toFixed(8)}|${id}|${createdAt.getTime()}`;
+  }
+
+  private decodeFeedCursor(
+    cursor: string | undefined,
+    hybridRanked: boolean,
+  ): { dbClause: Prisma.SiteWhereInput | null; hybrid?: { score: number; id: string } } | null {
     if (!cursor) return null;
-    const [timestampRaw, id] = cursor.split('|');
+    const [kind, first, second] = cursor.split('|');
+    if (kind === 'r') {
+      const score = Number(first);
+      const id = second;
+      if (!Number.isFinite(score) || !id) return { dbClause: null };
+      return { dbClause: null, hybrid: { score, id } };
+    }
+    if (kind === 'h') {
+      const score = Number(first);
+      const id = second;
+      if (!hybridRanked || !Number.isFinite(score) || !id) return { dbClause: null };
+      return { dbClause: null, hybrid: { score, id } };
+    }
+    const timestampRaw = kind === 'c' ? first : kind;
+    const id = kind === 'c' ? second : first;
     const timestamp = Number(timestampRaw);
-    if (!Number.isFinite(timestamp) || !id) return null;
+    if (!Number.isFinite(timestamp) || !id) return { dbClause: null };
     const createdAt = new Date(timestamp);
-    if (Number.isNaN(createdAt.getTime())) return null;
+    if (Number.isNaN(createdAt.getTime())) return { dbClause: null };
     return {
-      OR: [
-        { createdAt: { lt: createdAt } },
-        {
-          AND: [{ createdAt }, { id: { lt: id } }],
-        },
-      ],
+      dbClause: {
+        OR: [
+          { createdAt: { lt: createdAt } },
+          {
+            AND: [{ createdAt }, { id: { lt: id } }],
+          },
+        ],
+      },
     };
+  }
+
+  private buildFeedCacheKey(query: ListSitesQueryDto, user?: AuthenticatedUser): string {
+    return [
+      user?.userId ?? 'anon',
+      query.page,
+      query.limit,
+      query.sort,
+      query.mode,
+      query.status ?? '',
+      query.lat?.toFixed(4) ?? '',
+      query.lng?.toFixed(4) ?? '',
+      query.radiusKm,
+      query.cursor ?? '',
+      query.explain ? 1 : 0,
+    ].join('|');
+  }
+
+  private isAfterRankedCursor(
+    row: { rankingScore: number; id: string },
+    cursor: { score: number; id: string },
+  ): boolean {
+    if (row.rankingScore < cursor.score) return true;
+    if (row.rankingScore > cursor.score) return false;
+    return row.id.localeCompare(cursor.id) < 0;
+  }
+
+  private indexCacheKeySites(cacheKey: string, siteIds: string[]): void {
+    for (const siteId of siteIds) {
+      const set = this.feedCacheSiteIndex.get(siteId) ?? new Set<string>();
+      set.add(cacheKey);
+      this.feedCacheSiteIndex.set(siteId, set);
+    }
+  }
+
+  private removeCacheKey(cacheKey: string): void {
+    const cached = this.feedResponseCache.get(cacheKey);
+    if (cached) {
+      for (const row of cached.value.data) {
+        const keys = this.feedCacheSiteIndex.get(row.id);
+        if (!keys) continue;
+        keys.delete(cacheKey);
+        if (keys.size === 0) this.feedCacheSiteIndex.delete(row.id);
+      }
+    }
+    this.feedResponseCache.delete(cacheKey);
+  }
+
+  private invalidateFeedCache(reason: string, siteId?: string): void {
+    ObservabilityStore.recordFeedCacheInvalidation(reason);
+    if (siteId) {
+      const keys = this.feedCacheSiteIndex.get(siteId);
+      if (keys && keys.size > 0) {
+        for (const key of [...keys]) {
+          this.removeCacheKey(key);
+        }
+        this.feedCacheSiteIndex.delete(siteId);
+        return;
+      }
+    }
+    this.feedResponseCache.clear();
+    this.feedCacheSiteIndex.clear();
+  }
+
+  private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
+    let timer: NodeJS.Timeout | null = null;
+    try {
+      return await Promise.race<T>([
+        promise,
+        new Promise<T>((_, reject) => {
+          timer = setTimeout(() => reject(new Error(message)), timeoutMs);
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
+  private async mapWithConcurrency<T, R>(
+    input: T[],
+    concurrency: number,
+    mapper: (item: T) => Promise<R>,
+  ): Promise<R[]> {
+    const results = new Array<R>(input.length);
+    let cursor = 0;
+    const workers = Array.from({ length: Math.max(1, concurrency) }, async () => {
+      while (true) {
+        const index = cursor++;
+        if (index >= input.length) break;
+        results[index] = await mapper(input[index]);
+      }
+    });
+    await Promise.all(workers);
+    return results;
+  }
+
+  private applyFeedFeedbackPreference(
+    userId: string,
+    siteId: string,
+    feedbackType: SubmitFeedFeedbackDto['feedbackType'],
+  ): void {
+    const prefs = this.feedUserPreferences.get(userId) ?? {
+      hiddenSiteIds: new Set<string>(),
+      mutedCategories: new Map<string, number>(),
+      seenSiteIds: new Map<string, number>(),
+      updatedAt: Date.now(),
+    };
+    if (feedbackType === 'not_relevant') {
+      prefs.hiddenSiteIds.add(siteId);
+    }
+    prefs.updatedAt = Date.now();
+    this.feedUserPreferences.set(userId, prefs);
+  }
+
+  private applyUserPreferences<
+    T extends { id: string; latestReportCategory: string | null; rankingScore: number },
+  >(rows: T[], user?: AuthenticatedUser): T[] {
+    if (!user) return rows;
+    const prefs = this.feedUserPreferences.get(user.userId);
+    if (!prefs) return rows;
+    if (Date.now() - prefs.updatedAt > 7 * 24 * 60 * 60 * 1000) {
+      this.feedUserPreferences.delete(user.userId);
+      return rows;
+    }
+    const filtered = rows.filter((row) => !prefs.hiddenSiteIds.has(row.id));
+    const now = Date.now();
+    return filtered.map((row) => {
+      const key = row.latestReportCategory?.toUpperCase() ?? '';
+      let penalty = prefs.mutedCategories.get(key) ?? 0;
+      const seenAt = prefs.seenSiteIds.get(row.id);
+      if (seenAt != null && now - seenAt < 24 * 60 * 60 * 1000) {
+        penalty += 0.05;
+      }
+      if (penalty <= 0) return row;
+      return {
+        ...row,
+        rankingScore: Math.max(0, row.rankingScore - penalty),
+      };
+    });
+  }
+
+  private emitSiteNotification(
+    siteId: string,
+    actorUserId: string,
+    type: 'UPVOTE' | 'COMMENT' | 'SITE_UPDATE',
+    body: string,
+  ): void {
+    this.prisma.site
+      .findUnique({
+        where: { id: siteId },
+        select: {
+          id: true,
+          reports: {
+            select: { reporterId: true },
+            where: { reporterId: { not: null } },
+            take: 50,
+          },
+        },
+      })
+      .then((site) => {
+        if (!site) return;
+        const recipientIds = [
+          ...new Set(
+            site.reports
+              .map((r) => r.reporterId)
+              .filter((id): id is string => id != null && id !== actorUserId),
+          ),
+        ];
+        if (recipientIds.length === 0) return;
+        this.eventEmitter.emit('notification.send', {
+          recipientUserIds: recipientIds,
+          title: type === 'UPVOTE' ? 'New upvote' : type === 'COMMENT' ? 'New comment' : 'Site update',
+          body,
+          type,
+          data: { siteId, targetTab: '0' },
+        });
+      })
+      .catch(() => {});
   }
 }

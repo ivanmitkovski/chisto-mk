@@ -19,6 +19,7 @@ import { SystemConfigModule } from './system-config/system-config.module';
 import { FeatureFlagsModule } from './feature-flags/feature-flags.module';
 import { PublicConfigModule } from './public-config/public-config.module';
 import { CleanupEventsModule } from './cleanup-events/cleanup-events.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { ObservabilityModule } from './observability/observability.module';
 
 @Module({
@@ -44,6 +45,7 @@ import { ObservabilityModule } from './observability/observability.module';
     FeatureFlagsModule,
     PublicConfigModule,
     CleanupEventsModule,
+    NotificationsModule,
     ObservabilityModule,
   ],
   controllers: [AppController],

@@ -109,10 +109,14 @@ class _FilterTile extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: AppColors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          onTap: onTap,
-          child: Ink(
+        child: Semantics(
+          button: true,
+          selected: isActive,
+          label: '${filter.label} filter',
+          child: InkWell(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            onTap: onTap,
+            child: Ink(
             padding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.sm,
               vertical: 10,
@@ -171,6 +175,7 @@ class _FilterTile extends StatelessWidget {
               ],
             ),
           ),
+        ),
         ),
       ),
     );
