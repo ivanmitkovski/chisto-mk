@@ -29,6 +29,8 @@ const mockUser = {
   totalPointsEarned: 0,
   totalPointsSpent: 0,
   lastActiveAt: null,
+  avatarObjectKey: null,
+  avatarUpdatedAt: null,
 };
 
 const mockAdmin = {
@@ -45,6 +47,7 @@ function makePrisma() {
       findFirst: jest.fn(),
       findUnique: jest.fn(),
       create: jest.fn(),
+      update: jest.fn(),
     },
     userSession: {
       create: jest.fn(),
@@ -101,6 +104,14 @@ function makeEventEmitter() {
   return { emit: jest.fn(), on: jest.fn() };
 }
 
+function makeReportsUploadService() {
+  return {
+    signPrivateObjectKey: jest.fn().mockResolvedValue(null),
+    uploadProfileAvatar: jest.fn(),
+    deleteObjectByKey: jest.fn().mockResolvedValue(undefined),
+  };
+}
+
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: ReturnType<typeof makePrisma>;
@@ -117,6 +128,7 @@ describe('AuthService', () => {
     const otpService = makeOtpService();
     const audit = makeAudit();
     const eventEmitter = makeEventEmitter();
+    const reportsUploadService = makeReportsUploadService();
     service = new AuthService(
       prisma as any,
       jwt as unknown as JwtService,
@@ -125,6 +137,7 @@ describe('AuthService', () => {
       otpSender as any,
       audit as any,
       eventEmitter as any,
+      reportsUploadService as any,
     );
   });
 
@@ -322,6 +335,56 @@ describe('AuthService', () => {
       prisma.userSession.findUnique.mockResolvedValue(null);
       await service.logout('tid.nope');
       expect(prisma.userSession.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('avatar lifecycle', () => {
+    it('returns signed avatar URL from me()', async () => {
+      const reportsUpload = {
+        signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/avatar'),
+      };
+      (service as any).reportsUploadService = reportsUpload;
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        totpSecret: null,
+        avatarObjectKey: 'profile-avatars/user-1/a.webp',
+      });
+
+      const result = await service.me({
+        userId: 'user-1',
+        role: Role.USER,
+        email: 'u@x.com',
+        phoneNumber: '+38970000000',
+      });
+      expect(result.avatarUrl).toBe('https://signed/avatar');
+      expect(reportsUpload.signPrivateObjectKey).toHaveBeenCalledWith('profile-avatars/user-1/a.webp');
+    });
+
+    it('uploads avatar and updates user key', async () => {
+      const reportsUpload = {
+        uploadProfileAvatar: jest.fn().mockResolvedValue('profile-avatars/user-1/new.webp'),
+        signPrivateObjectKey: jest.fn().mockResolvedValue('https://signed/new'),
+        deleteObjectByKey: jest.fn().mockResolvedValue(undefined),
+      };
+      (service as any).reportsUploadService = reportsUpload;
+      prisma.user.findUnique.mockResolvedValue({
+        id: 'user-1',
+        status: UserStatus.ACTIVE,
+        avatarObjectKey: 'profile-avatars/user-1/old.webp',
+      });
+      const result = await service.uploadAvatar('user-1', {
+        buffer: Buffer.from('x'),
+        mimetype: 'image/jpeg',
+        size: 1,
+        originalname: 'a.jpg',
+      } as Express.Multer.File);
+
+      expect(result.avatarUrl).toBe('https://signed/new');
+      expect(prisma.user.update).toHaveBeenCalledWith({
+        where: { id: 'user-1' },
+        data: { avatarObjectKey: 'profile-avatars/user-1/new.webp', avatarUpdatedAt: expect.any(Date) },
+      });
+      expect(reportsUpload.deleteObjectByKey).toHaveBeenCalledWith('profile-avatars/user-1/old.webp');
     });
   });
 });

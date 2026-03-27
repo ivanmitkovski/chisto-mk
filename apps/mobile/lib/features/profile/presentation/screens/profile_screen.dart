@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -22,6 +25,32 @@ import 'package:chisto_mobile/features/profile/presentation/screens/weekly_ranki
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/settings_list_tile.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+
+String? _profilePeekNormalizeUrl(String? url) {
+  final String? trimmed = url?.trim();
+  if (trimmed == null || trimmed.isEmpty) return null;
+  return trimmed;
+}
+
+bool _profileHeaderHasPeekablePhoto(ProfileUser user) {
+  if (profileAvatarState.localFile != null) return true;
+  return _profilePeekNormalizeUrl(
+        profileAvatarState.remoteUrl ?? user.avatarUrl,
+      ) !=
+      null;
+}
+
+ImageProvider? _profileHeaderPeekImageProvider(ProfileUser user) {
+  final File? local = profileAvatarState.localFile;
+  if (local != null) return FileImage(local);
+  final String? url = _profilePeekNormalizeUrl(
+    profileAvatarState.remoteUrl ?? user.avatarUrl,
+  );
+  if (url == null) return null;
+  return NetworkImage(url);
+}
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -49,7 +78,9 @@ class _ProfileScreenState extends State<ProfileScreen>
       _profileUser = _profileUserFromAuthState();
     }
     _loadProfile();
-    ServiceLocator.instance.profileNeedsRefresh.addListener(_onProfileNeedsRefresh);
+    ServiceLocator.instance.profileNeedsRefresh.addListener(
+      _onProfileNeedsRefresh,
+    );
   }
 
   void _onProfileNeedsRefresh() {
@@ -65,6 +96,7 @@ class _ProfileScreenState extends State<ProfileScreen>
         _profileUser = loaded;
         _profileLoadError = loaded == null ? AppError.unknown() : null;
       });
+      profileAvatarState.setRemoteUrl(loaded?.avatarUrl);
       await _loadReportCapacity();
       if (loaded != null) _controller.forward();
     } on AppError catch (e) {
@@ -92,8 +124,10 @@ class _ProfileScreenState extends State<ProfileScreen>
 
   Future<void> _loadReportCapacity() async {
     try {
-      final ReportCapacity capacity =
-          await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      final ReportCapacity capacity = await ServiceLocator
+          .instance
+          .reportsApiRepository
+          .getReportingCapacity();
       if (!mounted) return;
       setState(() => _reportCapacity = capacity);
     } catch (_) {
@@ -117,7 +151,9 @@ class _ProfileScreenState extends State<ProfileScreen>
   }
 
   static bool _isAuthError(String code) =>
-      code == 'UNAUTHORIZED' || code == 'INVALID_TOKEN_USER' || code == 'ACCOUNT_NOT_ACTIVE';
+      code == 'UNAUTHORIZED' ||
+      code == 'INVALID_TOKEN_USER' ||
+      code == 'ACCOUNT_NOT_ACTIVE';
 
   ProfileUser _profileUserFromAuthState() {
     final authState = ServiceLocator.instance.authState;
@@ -132,12 +168,16 @@ class _ProfileScreenState extends State<ProfileScreen>
       level: 1,
       pointsToNextLevel: 100,
       avatarColor: AppColors.primary,
+      avatarUrl: null,
     );
   }
 
   @override
   void dispose() {
-    ServiceLocator.instance.profileNeedsRefresh.removeListener(_onProfileNeedsRefresh);
+    ProfileAvatarPeek.hide();
+    ServiceLocator.instance.profileNeedsRefresh.removeListener(
+      _onProfileNeedsRefresh,
+    );
     _controller.dispose();
     super.dispose();
   }
@@ -152,10 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       return Scaffold(
         backgroundColor: AppColors.appBackground,
         body: SafeArea(
-          child: AppErrorView(
-            error: _profileLoadError!,
-            onRetry: _loadProfile,
-          ),
+          child: AppErrorView(error: _profileLoadError!, onRetry: _loadProfile),
         ),
       );
     }
@@ -183,24 +220,20 @@ class _ProfileScreenState extends State<ProfileScreen>
       parent: _controller,
       curve: AppMotion.emphasized,
     );
-    final Animation<Offset> levelSlide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.6, curve: AppMotion.emphasized),
-      ),
-    );
-    final Animation<Offset> weeklySlide = Tween<Offset>(
-      begin: const Offset(0, 0.08),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.2, 1.0, curve: AppMotion.emphasized),
-      ),
-    );
+    final Animation<Offset> levelSlide =
+        Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.0, 0.6, curve: AppMotion.emphasized),
+          ),
+        );
+    final Animation<Offset> weeklySlide =
+        Tween<Offset>(begin: const Offset(0, 0.08), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.2, 1.0, curve: AppMotion.emphasized),
+          ),
+        );
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
@@ -228,179 +261,196 @@ class _ProfileScreenState extends State<ProfileScreen>
                     AppSpacing.xl,
                   ),
                   child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    FadeTransition(
-                      opacity: primaryOpacity,
-                      child: SlideTransition(
-                        position: levelSlide,
-                        child: _LevelAndPointsCard(user: user),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      FadeTransition(
+                        opacity: primaryOpacity,
+                        child: SlideTransition(
+                          position: levelSlide,
+                          child: _LevelAndPointsCard(user: user),
+                        ),
                       ),
-                    ),
-                    if (_reportCapacity != null) ...<Widget>[
+                      if (_reportCapacity != null) ...<Widget>[
+                        const SizedBox(height: AppSpacing.md),
+                        FadeTransition(
+                          opacity: primaryOpacity,
+                          child: ProfileReportCapacityCard(
+                            capacity: _reportCapacity!,
+                          ),
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.md),
                       FadeTransition(
                         opacity: primaryOpacity,
-                        child: ProfileReportCapacityCard(capacity: _reportCapacity!),
-                      ),
-                    ],
-                    const SizedBox(height: AppSpacing.md),
-                    FadeTransition(
-                      opacity: primaryOpacity,
-                      child: SlideTransition(
-                        position: weeklySlide,
-                        child: _WeeklyRankCard(
-                          points: user.points,
-                          onViewRankings: () {
-                            AppHaptics.softTransition();
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) => const WeeklyRankingsScreen(),
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(
-                      'Account details',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.1,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.shadowLight,
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: AppColors.divider.withValues(alpha: 0.9),
-                        ),
-                      ),
-                      child: Column(
-                        children: <Widget>[
-                          SettingsListTile(
-                            leadingIcon: Icons.person_outline_rounded,
-                            title: 'General info',
-                            onTap: () async {
-                              AppHaptics.tap();
-                              final ProfileUser? updated = await Navigator.of(context).push<ProfileUser>(
-                                MaterialPageRoute<ProfileUser>(
-                                  builder: (_) => ProfileGeneralInfoScreen(user: user),
-                                ),
-                              );
-                              if (!mounted || updated == null) return;
-                              setState(() => _profileUser = updated);
-                            },
-                            showDividerBelow: true,
-                          ),
-                          SettingsListTile(
-                            leadingIcon: Icons.lock_outline_rounded,
-                            title: 'Password',
-                            onTap: () {
-                              AppHaptics.tap();
+                        child: SlideTransition(
+                          position: weeklySlide,
+                          child: _WeeklyRankCard(
+                            points: user.points,
+                            onViewRankings: () {
+                              AppHaptics.softTransition();
                               Navigator.of(context).push(
                                 MaterialPageRoute<void>(
-                                  builder: (_) => const ProfilePasswordScreen(),
+                                  builder: (_) => const WeeklyRankingsScreen(),
                                 ),
                               );
                             },
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(
-                      'Support',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.1,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.shadowLight,
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: AppColors.divider.withValues(alpha: 0.9),
                         ),
                       ),
-                      child: SettingsListTile(
-                        leadingIcon: Icons.help_outline_rounded,
-                        title: 'Help center',
-                        onTap: () => ProfileActionsHandler.handleHelp(context),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    Text(
-                      'Account',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.1,
-                          ),
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
-                        boxShadow: <BoxShadow>[
-                          BoxShadow(
-                            color: AppColors.shadowLight,
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        border: Border.all(
-                          color: AppColors.divider.withValues(alpha: 0.9),
+                      const SizedBox(height: AppSpacing.xl),
+                      Text(
+                        'Account details',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.1,
                         ),
                       ),
-                      child: Column(
-                        children: <Widget>[
-                          SettingsListTile(
-                            leadingIcon: Icons.logout_rounded,
-                            title: 'Sign out',
-                            onTap: () =>
-                                ProfileActionsHandler.handleLogout(context),
-                            showTrailingChevron: false,
-                            showDividerBelow: true,
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.panelBackground,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radius18,
                           ),
-                          SettingsListTile(
-                            leadingIcon: Icons.person_remove_rounded,
-                            title: 'Delete account',
-                            onTap: () => ProfileActionsHandler.handleDeleteAccount(
-                              context,
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: AppColors.shadowLight,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
                             ),
-                            isDestructive: true,
-                            showTrailingChevron: false,
+                          ],
+                          border: Border.all(
+                            color: AppColors.divider.withValues(alpha: 0.9),
                           ),
-                        ],
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            SettingsListTile(
+                              leadingIcon: Icons.person_outline_rounded,
+                              title: 'General info',
+                              onTap: () async {
+                                AppHaptics.tap();
+                                final ProfileUser? updated =
+                                    await Navigator.of(
+                                      context,
+                                    ).push<ProfileUser>(
+                                      MaterialPageRoute<ProfileUser>(
+                                        builder: (_) =>
+                                            ProfileGeneralInfoScreen(
+                                              user: user,
+                                            ),
+                                      ),
+                                    );
+                                if (!mounted || updated == null) return;
+                                setState(() => _profileUser = updated);
+                              },
+                              showDividerBelow: true,
+                            ),
+                            SettingsListTile(
+                              leadingIcon: Icons.lock_outline_rounded,
+                              title: 'Password',
+                              onTap: () {
+                                AppHaptics.tap();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute<void>(
+                                    builder: (_) =>
+                                        const ProfilePasswordScreen(),
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.xl),
+                      Text(
+                        'Support',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.panelBackground,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radius18,
+                          ),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: AppColors.shadowLight,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: AppColors.divider.withValues(alpha: 0.9),
+                          ),
+                        ),
+                        child: SettingsListTile(
+                          leadingIcon: Icons.help_outline_rounded,
+                          title: 'Help center',
+                          onTap: () =>
+                              ProfileActionsHandler.handleHelp(context),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.xl),
+                      Text(
+                        'Account',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.1,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.panelBackground,
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radius18,
+                          ),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: AppColors.shadowLight,
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                          border: Border.all(
+                            color: AppColors.divider.withValues(alpha: 0.9),
+                          ),
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            SettingsListTile(
+                              leadingIcon: Icons.logout_rounded,
+                              title: 'Sign out',
+                              onTap: () =>
+                                  ProfileActionsHandler.handleLogout(context),
+                              showTrailingChevron: false,
+                              showDividerBelow: true,
+                            ),
+                            SettingsListTile(
+                              leadingIcon: Icons.person_remove_rounded,
+                              title: 'Delete account',
+                              onTap: () =>
+                                  ProfileActionsHandler.handleDeleteAccount(
+                                    context,
+                                  ),
+                              isDestructive: true,
+                              showTrailingChevron: false,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
             ),
           ],
         ),
@@ -410,10 +460,7 @@ class _ProfileScreenState extends State<ProfileScreen>
 }
 
 class _ProfileHeader extends StatelessWidget {
-  const _ProfileHeader({
-    required this.user,
-    this.onProfileUpdated,
-  });
+  const _ProfileHeader({required this.user, this.onProfileUpdated});
 
   final ProfileUser user;
   final void Function(ProfileUser)? onProfileUpdated;
@@ -426,10 +473,7 @@ class _ProfileHeader extends StatelessWidget {
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: <Color>[
-            AppColors.primaryDark,
-            AppColors.primary,
-          ],
+          colors: <Color>[AppColors.primaryDark, AppColors.primary],
         ),
         borderRadius: const BorderRadius.vertical(
           bottom: Radius.circular(AppSpacing.radiusCard),
@@ -445,31 +489,46 @@ class _ProfileHeader extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            const Row(
-              children: <Widget>[
-                AppBackButton(),
-                Spacer(),
-              ],
-            ),
+            const Row(children: <Widget>[AppBackButton(), Spacer()]),
             const SizedBox(height: AppSpacing.md),
             Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                GestureDetector(
-                  onTap: () async {
-                    AppHaptics.tap();
-                    final ProfileUser? updated = await Navigator.of(context).push<ProfileUser>(
-                      MaterialPageRoute<ProfileUser>(
-                        builder: (_) => ProfileGeneralInfoScreen(user: user),
-                      ),
-                    );
-                    if (updated != null) onProfileUpdated?.call(updated);
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: AnimatedBuilder(
-                    animation: profileAvatarState,
-                    builder: (BuildContext context, Widget? child) {
-                      return Container(
+                AnimatedBuilder(
+                  animation: profileAvatarState,
+                  builder: (BuildContext context, Widget? child) {
+                    final bool canPeek = _profileHeaderHasPeekablePhoto(user);
+                    return GestureDetector(
+                      onTap: () async {
+                        AppHaptics.tap();
+                        final ProfileUser? updated =
+                            await Navigator.of(context).push<ProfileUser>(
+                                  MaterialPageRoute<ProfileUser>(
+                                    builder: (_) =>
+                                        ProfileGeneralInfoScreen(user: user),
+                                  ),
+                                );
+                        if (updated != null) {
+                          onProfileUpdated?.call(updated);
+                        }
+                      },
+                      onLongPress: canPeek
+                          ? () {
+                              final ImageProvider? img =
+                                  _profileHeaderPeekImageProvider(user);
+                              if (img == null) return;
+                              ProfileAvatarPeek.show(
+                                context,
+                                image: img,
+                                semanticLabel: context
+                                    .l10n.profileAvatarPeekSemantic,
+                              );
+                            }
+                          : null,
+                      onLongPressUp:
+                          canPeek ? ProfileAvatarPeek.hide : null,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
                         width: AppSpacing.avatarLg,
                         height: AppSpacing.avatarLg,
                         decoration: BoxDecoration(
@@ -480,24 +539,25 @@ class _ProfileHeader extends StatelessWidget {
                             width: 2,
                           ),
                         ),
-                        child: CircleAvatar(
-                          backgroundColor: AppColors.white.withValues(alpha: 0.9),
-                          foregroundImage: profileAvatarState.localFile != null
-                              ? FileImage(profileAvatarState.localFile!)
-                              : null,
-                          child: profileAvatarState.localFile == null
-                              ? Text(
-                                  user.name.isNotEmpty ? user.name[0] : '?',
-                                  style: AppTypography.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.primaryDark,
-                                  ),
-                                )
-                              : null,
-                        ),
-                      );
-                    },
-                  ),
+                        child: profileAvatarState.localFile != null
+                            ? CircleAvatar(
+                                backgroundColor: AppColors.white.withValues(
+                                  alpha: 0.9,
+                                ),
+                                foregroundImage: FileImage(
+                                  profileAvatarState.localFile!,
+                                ),
+                              )
+                            : AppAvatar(
+                                name: user.name,
+                                size: AppSpacing.avatarLg,
+                                imageUrl:
+                                    profileAvatarState.remoteUrl ??
+                                    user.avatarUrl,
+                              ),
+                      ),
+                    );
+                  },
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -520,8 +580,8 @@ class _ProfileHeader extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textOnDarkMuted,
-                            ),
+                          color: AppColors.textOnDarkMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -586,16 +646,16 @@ class _LevelAndPointsCard extends StatelessWidget {
                     Text(
                       'Level $level',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textPrimary,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       '$pointsToNext pts to next level',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -619,7 +679,9 @@ class _LevelAndPointsCard extends StatelessWidget {
                     widthFactor: progress.clamp(0.0, 1.0),
                     child: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusCircle,
+                        ),
                         gradient: LinearGradient(
                           colors: <Color>[
                             AppColors.primaryDark,
@@ -649,10 +711,7 @@ class _LevelAndPointsCard extends StatelessWidget {
 }
 
 class _WeeklyRankCard extends StatelessWidget {
-  const _WeeklyRankCard({
-    required this.points,
-    required this.onViewRankings,
-  });
+  const _WeeklyRankCard({required this.points, required this.onViewRankings});
 
   final int points;
   final VoidCallback onViewRankings;
@@ -696,16 +755,16 @@ class _WeeklyRankCard extends StatelessWidget {
                 Text(
                   'My weekly rank',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '$points pts',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                 ),
               ],
             ),
@@ -733,7 +792,8 @@ class ProfileReportCapacityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ReportCapacityUiState ui = mapReportCapacityToUiState(capacity);
-    final String subtitle = ui.kind == ReportCapacityUiKind.cooldown &&
+    final String subtitle =
+        ui.kind == ReportCapacityUiKind.cooldown &&
             capacity.retryAfterSeconds != null &&
             capacity.retryAfterSeconds! > 0
         ? '${ui.bannerMessage} (${capacity.retryAfterSeconds}s remaining)'
@@ -781,4 +841,3 @@ class ProfileReportCapacityCard extends StatelessWidget {
     );
   }
 }
-

@@ -561,6 +561,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report submitted successfully'**
   String get reportSubmittedSemanticsSuccess;
+
+  /// No description provided for @profileAvatarSourceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profileAvatarSourceTitle;
+
+  /// No description provided for @profileAvatarSourceSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a new photo or choose from your library. You can crop it in the next step.'**
+  String get profileAvatarSourceSubtitle;
+
+  /// No description provided for @profileAvatarSourceCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get profileAvatarSourceCamera;
+
+  /// No description provided for @profileAvatarSourceCameraHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Front camera works best with good light.'**
+  String get profileAvatarSourceCameraHint;
+
+  /// No description provided for @profileAvatarSourcePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get profileAvatarSourcePhotos;
+
+  /// No description provided for @profileAvatarSourcePhotosHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick any image you already have.'**
+  String get profileAvatarSourcePhotosHint;
+
+  /// No description provided for @profileAvatarSourceRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove current photo'**
+  String get profileAvatarSourceRemove;
+
+  /// No description provided for @profileAvatarSourceRemoveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show your initials instead of a picture'**
+  String get profileAvatarSourceRemoveHint;
+
+  /// No description provided for @profileAvatarRemoveConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove profile photo?'**
+  String get profileAvatarRemoveConfirmTitle;
+
+  /// No description provided for @profileAvatarRemoveConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your picture will be deleted and your initials will be shown instead.'**
+  String get profileAvatarRemoveConfirmMessage;
+
+  /// No description provided for @profileAvatarRemoveConfirmCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get profileAvatarRemoveConfirmCancel;
+
+  /// No description provided for @profileAvatarRemoveConfirmRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get profileAvatarRemoveConfirmRemove;
+
+  /// No description provided for @profileAvatarRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo removed'**
+  String get profileAvatarRemovedMessage;
+
+  /// No description provided for @profileAvatarRemoveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not remove your photo. Please try again.'**
+  String get profileAvatarRemoveFailed;
+
+  /// No description provided for @profileAvatarSourceRecommended.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended'**
+  String get profileAvatarSourceRecommended;
+
+  /// No description provided for @profileAvatarCropMoveAndScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Move and scale'**
+  String get profileAvatarCropMoveAndScale;
+
+  /// No description provided for @profileAvatarCropHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinch to zoom · drag to position'**
+  String get profileAvatarCropHint;
+
+  /// No description provided for @profileAvatarCropLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading photo…'**
+  String get profileAvatarCropLoading;
+
+  /// No description provided for @profileAvatarCropCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get profileAvatarCropCancel;
+
+  /// No description provided for @profileAvatarCropDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get profileAvatarCropDone;
+
+  /// No description provided for @profileAvatarTapToChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to change photo'**
+  String get profileAvatarTapToChange;
+
+  /// No description provided for @profileAvatarUploadingCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get profileAvatarUploadingCaption;
+
+  /// No description provided for @profileAvatarCropEditorSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Crop your profile photo. Pinch to zoom and drag to position the image.'**
+  String get profileAvatarCropEditorSemantic;
+
+  /// No description provided for @profileAvatarCropFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not crop the photo. Please try again.'**
+  String get profileAvatarCropFailed;
+
+  /// No description provided for @profileAvatarCameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the camera right now. Please try again in a moment.'**
+  String get profileAvatarCameraUnavailable;
+
+  /// No description provided for @profileAvatarReadPhotoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not read the photo. Please try again.'**
+  String get profileAvatarReadPhotoFailed;
+
+  /// No description provided for @profileAvatarProcessPhotoFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not process the photo. Please try again.'**
+  String get profileAvatarProcessPhotoFailed;
+
+  /// No description provided for @profileAvatarPeekSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile photo'**
+  String get profileAvatarPeekSemantic;
 }
 
 class _AppLocalizationsDelegate

@@ -11,7 +11,11 @@
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>We use your location to help autofill your city and improve report accuracy.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>We use the camera so you can capture photos and report pollution sites.</string>
+	<string>We use the camera for profile photos and to capture photos for pollution reports.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library so you can choose a profile picture.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Allows saving images when you export or share content from the app.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>

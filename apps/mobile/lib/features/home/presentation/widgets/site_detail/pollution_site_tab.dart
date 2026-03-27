@@ -111,6 +111,7 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
                 SiteReportedRow(
                   reporterName: widget.site.firstReport!.reporterName,
                   reportedAgo: widget.site.firstReport!.reportedAgo,
+                  reporterAvatarUrl: widget.site.firstReport!.reporterAvatarUrl,
                   onTap: widget.onReportedTap,
                 ),
               ],

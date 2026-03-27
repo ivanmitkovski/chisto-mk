@@ -8,10 +8,12 @@ class SiteReport {
     required this.title,
     this.description,
     this.images = const [],
+    this.reporterAvatarUrl,
   });
 
   final String id;
   final String reporterName;
+  final String? reporterAvatarUrl;
   final DateTime reportedAt;
   final String title;
   final String? description;

@@ -269,4 +269,101 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportSubmittedSemanticsSuccess => 'Пријавата е успешно испратена';
+
+  @override
+  String get profileAvatarSourceTitle => 'Профилна фотографија';
+
+  @override
+  String get profileAvatarSourceSubtitle =>
+      'Направете нова фотографија или одберете од вашата библиотека. Во следниот чекор можете да ја исечете.';
+
+  @override
+  String get profileAvatarSourceCamera => 'Камера';
+
+  @override
+  String get profileAvatarSourceCameraHint =>
+      'Предната камера е најдобра со добра светлина.';
+
+  @override
+  String get profileAvatarSourcePhotos => 'Фотографии';
+
+  @override
+  String get profileAvatarSourcePhotosHint =>
+      'Одберете слика што веќе ја имате.';
+
+  @override
+  String get profileAvatarSourceRemove => 'Отстрани ја фотографијата';
+
+  @override
+  String get profileAvatarSourceRemoveHint => 'Прикажи иницијали наместо слика';
+
+  @override
+  String get profileAvatarRemoveConfirmTitle =>
+      'Да се отстрани профилната фотографија?';
+
+  @override
+  String get profileAvatarRemoveConfirmMessage =>
+      'Фотографијата ќе биде избришана и ќе се прикажат вашите иницијали.';
+
+  @override
+  String get profileAvatarRemoveConfirmCancel => 'Откажи';
+
+  @override
+  String get profileAvatarRemoveConfirmRemove => 'Отстрани';
+
+  @override
+  String get profileAvatarRemovedMessage =>
+      'Профилната фотографија е отстранета';
+
+  @override
+  String get profileAvatarRemoveFailed =>
+      'Не можеше да се отстрани фотографијата. Обидете се повторно.';
+
+  @override
+  String get profileAvatarSourceRecommended => 'Препорачано';
+
+  @override
+  String get profileAvatarCropMoveAndScale => 'Помести и размери';
+
+  @override
+  String get profileAvatarCropHint =>
+      'Зближете со стискање · повлечете за позиција';
+
+  @override
+  String get profileAvatarCropLoading => 'Се вчитува фотографијата…';
+
+  @override
+  String get profileAvatarCropCancel => 'Откажи';
+
+  @override
+  String get profileAvatarCropDone => 'Готово';
+
+  @override
+  String get profileAvatarTapToChange => 'Допрете за да ја смените сликата';
+
+  @override
+  String get profileAvatarUploadingCaption => 'Се испраќа…';
+
+  @override
+  String get profileAvatarCropEditorSemantic =>
+      'Исечете ја профилната фотографија. Зближете со стискање и повлечете за да ја позиционирате сликата.';
+
+  @override
+  String get profileAvatarCropFailed =>
+      'Не можеше да се исече фотографијата. Обидете се повторно.';
+
+  @override
+  String get profileAvatarCameraUnavailable =>
+      'Камерата не е достапна сега. Обидете се повторно за момент.';
+
+  @override
+  String get profileAvatarReadPhotoFailed =>
+      'Не можеше да се прочита фотографијата. Обидете се повторно.';
+
+  @override
+  String get profileAvatarProcessPhotoFailed =>
+      'Не можеше да се обработи фотографијата. Обидете се повторно.';
+
+  @override
+  String get profileAvatarPeekSemantic => 'Профилна фотографија';
 }

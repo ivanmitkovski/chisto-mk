@@ -14,6 +14,7 @@ class ProfileUser {
     required this.level,
     required this.pointsToNextLevel,
     required this.avatarColor,
+    this.avatarUrl,
   });
 
   final String id;
@@ -26,6 +27,34 @@ class ProfileUser {
   final int level;
   final int pointsToNextLevel;
   final Color avatarColor;
+  final String? avatarUrl;
+
+  ProfileUser copyWith({
+    String? name,
+    String? firstName,
+    String? lastName,
+    String? phoneNumber,
+    int? points,
+    int? totalPointsEarned,
+    int? level,
+    int? pointsToNextLevel,
+    Color? avatarColor,
+    String? avatarUrl,
+  }) {
+    return ProfileUser(
+      id: id,
+      name: name ?? this.name,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      points: points ?? this.points,
+      totalPointsEarned: totalPointsEarned ?? this.totalPointsEarned,
+      level: level ?? this.level,
+      pointsToNextLevel: pointsToNextLevel ?? this.pointsToNextLevel,
+      avatarColor: avatarColor ?? this.avatarColor,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+    );
+  }
 }
 
 class WeeklyRankingEntry {
@@ -57,6 +86,7 @@ class ProfileMockData {
     level: 2,
     pointsToNextLevel: 50,
     avatarColor: AppColors.primary,
+    avatarUrl: null,
   );
 
   static const List<WeeklyRankingEntry> weeklyRankings = <WeeklyRankingEntry>[
@@ -77,4 +107,3 @@ class ProfileMockData {
     WeeklyRankingEntry(position: 10, name: 'Gretchen Torff', points: 650),
   ];
 }
-

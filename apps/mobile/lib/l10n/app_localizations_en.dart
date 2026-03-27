@@ -268,4 +268,99 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportSubmittedSemanticsSuccess => 'Report submitted successfully';
+
+  @override
+  String get profileAvatarSourceTitle => 'Profile photo';
+
+  @override
+  String get profileAvatarSourceSubtitle =>
+      'Take a new photo or choose from your library. You can crop it in the next step.';
+
+  @override
+  String get profileAvatarSourceCamera => 'Camera';
+
+  @override
+  String get profileAvatarSourceCameraHint =>
+      'Front camera works best with good light.';
+
+  @override
+  String get profileAvatarSourcePhotos => 'Photos';
+
+  @override
+  String get profileAvatarSourcePhotosHint =>
+      'Pick any image you already have.';
+
+  @override
+  String get profileAvatarSourceRemove => 'Remove current photo';
+
+  @override
+  String get profileAvatarSourceRemoveHint =>
+      'Show your initials instead of a picture';
+
+  @override
+  String get profileAvatarRemoveConfirmTitle => 'Remove profile photo?';
+
+  @override
+  String get profileAvatarRemoveConfirmMessage =>
+      'Your picture will be deleted and your initials will be shown instead.';
+
+  @override
+  String get profileAvatarRemoveConfirmCancel => 'Cancel';
+
+  @override
+  String get profileAvatarRemoveConfirmRemove => 'Remove';
+
+  @override
+  String get profileAvatarRemovedMessage => 'Profile photo removed';
+
+  @override
+  String get profileAvatarRemoveFailed =>
+      'Could not remove your photo. Please try again.';
+
+  @override
+  String get profileAvatarSourceRecommended => 'Recommended';
+
+  @override
+  String get profileAvatarCropMoveAndScale => 'Move and scale';
+
+  @override
+  String get profileAvatarCropHint => 'Pinch to zoom · drag to position';
+
+  @override
+  String get profileAvatarCropLoading => 'Loading photo…';
+
+  @override
+  String get profileAvatarCropCancel => 'Cancel';
+
+  @override
+  String get profileAvatarCropDone => 'Done';
+
+  @override
+  String get profileAvatarTapToChange => 'Tap to change photo';
+
+  @override
+  String get profileAvatarUploadingCaption => 'Uploading…';
+
+  @override
+  String get profileAvatarCropEditorSemantic =>
+      'Crop your profile photo. Pinch to zoom and drag to position the image.';
+
+  @override
+  String get profileAvatarCropFailed =>
+      'Could not crop the photo. Please try again.';
+
+  @override
+  String get profileAvatarCameraUnavailable =>
+      'Unable to open the camera right now. Please try again in a moment.';
+
+  @override
+  String get profileAvatarReadPhotoFailed =>
+      'Could not read the photo. Please try again.';
+
+  @override
+  String get profileAvatarProcessPhotoFailed =>
+      'Could not process the photo. Please try again.';
+
+  @override
+  String get profileAvatarPeekSemantic => 'Profile photo';
 }

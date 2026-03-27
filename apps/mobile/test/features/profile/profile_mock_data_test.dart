@@ -64,5 +64,16 @@ void main() {
       expect(current, isNotNull);
       expect(current!.name, ProfileMockData.currentUser.name);
     });
+
+    test('ProfileUser.copyWith updates avatarUrl only', () {
+      const ProfileUser base = ProfileMockData.currentUser;
+      final ProfileUser updated = base.copyWith(
+        avatarUrl: 'https://signed/avatar.webp',
+      );
+
+      expect(updated.avatarUrl, 'https://signed/avatar.webp');
+      expect(updated.name, base.name);
+      expect(updated.id, base.id);
+    });
   });
 }

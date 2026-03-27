@@ -140,6 +140,8 @@ exports.Prisma.UserScalarFieldEnum = {
   reportEmergencyWindowDays: 'reportEmergencyWindowDays',
   reportEmergencyUsedAt: 'reportEmergencyUsedAt',
   lastActiveAt: 'lastActiveAt',
+  avatarObjectKey: 'avatarObjectKey',
+  avatarUpdatedAt: 'avatarUpdatedAt',
   totpSecret: 'totpSecret',
   mfaBackupCodes: 'mfaBackupCodes'
 };

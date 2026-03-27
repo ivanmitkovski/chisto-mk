@@ -29,6 +29,7 @@ import {
 } from './types/auth-response.type';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
+import { ReportsUploadService } from '../reports/reports-upload.service';
 
 const OTP_EXPIRES_SECONDS = 600;
 const LOGIN_MAX_ATTEMPTS = 5;
@@ -64,6 +65,7 @@ export class AuthService {
     @Inject(OTP_SENDER) private readonly otpSender: OtpSender,
     private readonly audit: AuditService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly reportsUploadService: ReportsUploadService,
   ) {
     const isProduction = configService.get<string>('NODE_ENV') === 'production';
     const smsProvider = configService.get<string>('SMS_PROVIDER')?.toLowerCase() ?? 'none';
@@ -480,6 +482,7 @@ export class AuthService {
     totalPointsEarned: number;
     totalPointsSpent: number;
     mfaEnabled: boolean;
+    avatarUrl: string | null;
   }> {
     const user = await this.prisma.user.findUnique({
       where: { id: authenticatedUser.userId },
@@ -496,6 +499,7 @@ export class AuthService {
         totalPointsEarned: true,
         totalPointsSpent: true,
         totpSecret: true,
+        avatarObjectKey: true,
       },
     });
 
@@ -506,8 +510,9 @@ export class AuthService {
       });
     }
 
-    const { totpSecret: _, ...rest } = user;
-    return { ...rest, mfaEnabled: !!user.totpSecret };
+    const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
+    const { totpSecret: _, avatarObjectKey: __, ...rest } = user;
+    return { ...rest, mfaEnabled: !!user.totpSecret, avatarUrl };
   }
 
   async setupMfa(userId: string): Promise<{ uri: string; secret: string }> {
@@ -673,7 +678,7 @@ export class AuthService {
   async updateProfile(
     userId: string,
     dto: UpdateProfileDto,
-  ): Promise<{ id: string; firstName: string; lastName: string; email: string; phoneNumber: string }> {
+  ): Promise<{ id: string; firstName: string; lastName: string; email: string; phoneNumber: string; avatarUrl: string | null }> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: { id: true, status: true },
@@ -700,16 +705,98 @@ export class AuthService {
     if (Object.keys(data).length === 0) {
       const updated = await this.prisma.user.findUnique({
         where: { id: userId },
-        select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true },
+        select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true, avatarObjectKey: true },
       });
       if (!updated) throw new UnauthorizedException({ code: 'INVALID_TOKEN_USER', message: 'User not found' });
-      return updated;
+      return {
+        id: updated.id,
+        firstName: updated.firstName,
+        lastName: updated.lastName,
+        email: updated.email,
+        phoneNumber: updated.phoneNumber,
+        avatarUrl: await this.reportsUploadService.signPrivateObjectKey(updated.avatarObjectKey),
+      };
     }
-    return this.prisma.user.update({
+    const updated = await this.prisma.user.update({
       where: { id: userId },
       data,
-      select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true },
+      select: { id: true, firstName: true, lastName: true, email: true, phoneNumber: true, avatarObjectKey: true },
     });
+    return {
+      id: updated.id,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      email: updated.email,
+      phoneNumber: updated.phoneNumber,
+      avatarUrl: await this.reportsUploadService.signPrivateObjectKey(updated.avatarObjectKey),
+    };
+  }
+
+  async uploadAvatar(
+    userId: string,
+    file: Express.Multer.File | undefined,
+  ): Promise<{ avatarUrl: string | null }> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, status: true, avatarObjectKey: true },
+    });
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN_USER',
+        message: 'User not found',
+      });
+    }
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_NOT_ACTIVE',
+        message: 'Account is not active',
+      });
+    }
+    if (!file) {
+      throw new BadRequestException({
+        code: 'AVATAR_FILE_REQUIRED',
+        message: 'Avatar image file is required.',
+      });
+    }
+    const nextKey = await this.reportsUploadService.uploadProfileAvatar(userId, file);
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: { avatarObjectKey: nextKey, avatarUpdatedAt: new Date() },
+    });
+    const signedUrl = await this.reportsUploadService.signPrivateObjectKey(nextKey);
+    if (user.avatarObjectKey) {
+      void this.reportsUploadService.deleteObjectByKey(user.avatarObjectKey).catch(() => {});
+    }
+    return { avatarUrl: signedUrl };
+  }
+
+  async removeAvatar(userId: string): Promise<void> {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, status: true, avatarObjectKey: true },
+    });
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'INVALID_TOKEN_USER',
+        message: 'User not found',
+      });
+    }
+    if (user.status !== UserStatus.ACTIVE) {
+      throw new UnauthorizedException({
+        code: 'ACCOUNT_NOT_ACTIVE',
+        message: 'Account is not active',
+      });
+    }
+    await this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        avatarObjectKey: null,
+        avatarUpdatedAt: new Date(),
+      },
+    });
+    if (user.avatarObjectKey) {
+      void this.reportsUploadService.deleteObjectByKey(user.avatarObjectKey).catch(() => {});
+    }
   }
 
   async deleteAccount(userId: string): Promise<void> {

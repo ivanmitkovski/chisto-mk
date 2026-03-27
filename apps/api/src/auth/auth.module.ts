@@ -8,10 +8,12 @@ import { JwtStrategy } from './jwt.strategy';
 import { RolesGuard } from './roles.guard';
 import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
+import { ReportsUploadModule } from '../reports/reports-upload.module';
 
 @Module({
   imports: [
     AuditModule,
+    ReportsUploadModule,
     OtpModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

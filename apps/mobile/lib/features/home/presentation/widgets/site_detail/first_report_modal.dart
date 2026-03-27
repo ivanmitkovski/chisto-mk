@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 class FirstReportModal extends StatelessWidget {
@@ -68,18 +69,11 @@ class FirstReportModal extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: <Widget>[
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: AppColors.inputFill,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.person_rounded,
-                            size: 22,
-                            color: AppColors.textMuted,
-                          ),
+                        AppAvatar(
+                          name: report.reporterName,
+                          size: 40,
+                          fontSize: 14,
+                          imageUrl: report.reporterAvatarUrl,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         Expanded(

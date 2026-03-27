@@ -31,6 +31,10 @@ class PollutionSite {
     this.feedReasons = const <String>[],
     this.rankingScore,
     this.rankingComponents,
+    this.latestReporterName,
+    this.latestReporterAvatarUrl,
+    this.latestReportAt,
+    this.latestReporterUserId,
   }) : coReporterNames = coReporterNames ?? const [];
 
   final String id;
@@ -72,6 +76,14 @@ class PollutionSite {
   final double? rankingScore;
   final Map<String, double>? rankingComponents;
 
+  /// Latest report author (feed list API).
+  final String? latestReporterName;
+  final String? latestReporterAvatarUrl;
+  final DateTime? latestReportAt;
+
+  /// When non-null, matches [User.id] of [latestReporterName] (feed: `latestReportReporterId`).
+  final String? latestReporterUserId;
+
   PollutionSite copyWith({
     String? id,
     String? title,
@@ -98,6 +110,10 @@ class PollutionSite {
     List<String>? feedReasons,
     double? rankingScore,
     Map<String, double>? rankingComponents,
+    String? latestReporterName,
+    String? latestReporterAvatarUrl,
+    DateTime? latestReportAt,
+    String? latestReporterUserId,
   }) {
     return PollutionSite(
       id: id ?? this.id,
@@ -125,6 +141,12 @@ class PollutionSite {
       feedReasons: feedReasons ?? this.feedReasons,
       rankingScore: rankingScore ?? this.rankingScore,
       rankingComponents: rankingComponents ?? this.rankingComponents,
+      latestReporterName: latestReporterName ?? this.latestReporterName,
+      latestReporterAvatarUrl:
+          latestReporterAvatarUrl ?? this.latestReporterAvatarUrl,
+      latestReportAt: latestReportAt ?? this.latestReportAt,
+      latestReporterUserId:
+          latestReporterUserId ?? this.latestReporterUserId,
     );
   }
 }

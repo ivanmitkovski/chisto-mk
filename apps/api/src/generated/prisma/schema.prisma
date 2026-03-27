@@ -32,6 +32,8 @@ model User {
   reportEmergencyWindowDays Int       @default(7)
   reportEmergencyUsedAt     DateTime?
   lastActiveAt              DateTime?
+  avatarObjectKey           String?
+  avatarUpdatedAt           DateTime?
 
   totpSecret     String? // Base32-encoded TOTP secret when 2FA enabled
   mfaBackupCodes String[] @default([]) // Hashed backup codes

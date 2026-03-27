@@ -3163,6 +3163,8 @@ export namespace Prisma {
     reportEmergencyWindowDays: number | null
     reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
+    avatarObjectKey: string | null
+    avatarUpdatedAt: Date | null
     totpSecret: string | null
   }
 
@@ -3186,6 +3188,8 @@ export namespace Prisma {
     reportEmergencyWindowDays: number | null
     reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
+    avatarObjectKey: string | null
+    avatarUpdatedAt: Date | null
     totpSecret: string | null
   }
 
@@ -3209,6 +3213,8 @@ export namespace Prisma {
     reportEmergencyWindowDays: number
     reportEmergencyUsedAt: number
     lastActiveAt: number
+    avatarObjectKey: number
+    avatarUpdatedAt: number
     totpSecret: number
     mfaBackupCodes: number
     _all: number
@@ -3253,6 +3259,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: true
     reportEmergencyUsedAt?: true
     lastActiveAt?: true
+    avatarObjectKey?: true
+    avatarUpdatedAt?: true
     totpSecret?: true
   }
 
@@ -3276,6 +3284,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: true
     reportEmergencyUsedAt?: true
     lastActiveAt?: true
+    avatarObjectKey?: true
+    avatarUpdatedAt?: true
     totpSecret?: true
   }
 
@@ -3299,6 +3309,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: true
     reportEmergencyUsedAt?: true
     lastActiveAt?: true
+    avatarObjectKey?: true
+    avatarUpdatedAt?: true
     totpSecret?: true
     mfaBackupCodes?: true
     _all?: true
@@ -3410,6 +3422,8 @@ export namespace Prisma {
     reportEmergencyWindowDays: number
     reportEmergencyUsedAt: Date | null
     lastActiveAt: Date | null
+    avatarObjectKey: string | null
+    avatarUpdatedAt: Date | null
     totpSecret: string | null
     mfaBackupCodes: string[]
     _count: UserCountAggregateOutputType | null
@@ -3453,6 +3467,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: boolean
     reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
+    avatarObjectKey?: boolean
+    avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
     reports?: boolean | User$reportsArgs<ExtArgs>
@@ -3492,6 +3508,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: boolean
     reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
+    avatarObjectKey?: boolean
+    avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3516,6 +3534,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: boolean
     reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
+    avatarObjectKey?: boolean
+    avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
   }, ExtArgs["result"]["user"]>
@@ -3540,11 +3560,13 @@ export namespace Prisma {
     reportEmergencyWindowDays?: boolean
     reportEmergencyUsedAt?: boolean
     lastActiveAt?: boolean
+    avatarObjectKey?: boolean
+    avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "reportCreditsAvailable" | "reportCreditsSpentTotal" | "reportEmergencyWindowDays" | "reportEmergencyUsedAt" | "lastActiveAt" | "totpSecret" | "mfaBackupCodes", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "reportCreditsAvailable" | "reportCreditsSpentTotal" | "reportEmergencyWindowDays" | "reportEmergencyUsedAt" | "lastActiveAt" | "avatarObjectKey" | "avatarUpdatedAt" | "totpSecret" | "mfaBackupCodes", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | User$reportsArgs<ExtArgs>
     moderatedReports?: boolean | User$moderatedReportsArgs<ExtArgs>
@@ -3603,6 +3625,8 @@ export namespace Prisma {
       reportEmergencyWindowDays: number
       reportEmergencyUsedAt: Date | null
       lastActiveAt: Date | null
+      avatarObjectKey: string | null
+      avatarUpdatedAt: Date | null
       totpSecret: string | null
       mfaBackupCodes: string[]
     }, ExtArgs["result"]["user"]>
@@ -4061,6 +4085,8 @@ export namespace Prisma {
     readonly reportEmergencyWindowDays: FieldRef<"User", 'Int'>
     readonly reportEmergencyUsedAt: FieldRef<"User", 'DateTime'>
     readonly lastActiveAt: FieldRef<"User", 'DateTime'>
+    readonly avatarObjectKey: FieldRef<"User", 'String'>
+    readonly avatarUpdatedAt: FieldRef<"User", 'DateTime'>
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly mfaBackupCodes: FieldRef<"User", 'String[]'>
   }
@@ -27078,6 +27104,8 @@ export namespace Prisma {
     reportEmergencyWindowDays: 'reportEmergencyWindowDays',
     reportEmergencyUsedAt: 'reportEmergencyUsedAt',
     lastActiveAt: 'lastActiveAt',
+    avatarObjectKey: 'avatarObjectKey',
+    avatarUpdatedAt: 'avatarUpdatedAt',
     totpSecret: 'totpSecret',
     mfaBackupCodes: 'mfaBackupCodes'
   };
@@ -27622,6 +27650,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFilter<"User"> | number
     reportEmergencyUsedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    avatarObjectKey?: StringNullableFilter<"User"> | string | null
+    avatarUpdatedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
     reports?: ReportListRelationFilter
@@ -27660,6 +27690,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: SortOrder
     reportEmergencyUsedAt?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrderInput | SortOrder
+    avatarObjectKey?: SortOrderInput | SortOrder
+    avatarUpdatedAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
     reports?: ReportOrderByRelationAggregateInput
@@ -27701,6 +27733,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFilter<"User"> | number
     reportEmergencyUsedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    avatarObjectKey?: StringNullableFilter<"User"> | string | null
+    avatarUpdatedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
     reports?: ReportListRelationFilter
@@ -27739,6 +27773,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: SortOrder
     reportEmergencyUsedAt?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrderInput | SortOrder
+    avatarObjectKey?: SortOrderInput | SortOrder
+    avatarUpdatedAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -27771,6 +27807,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntWithAggregatesFilter<"User"> | number
     reportEmergencyUsedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     lastActiveAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    avatarObjectKey?: StringNullableWithAggregatesFilter<"User"> | string | null
+    avatarUpdatedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
   }
@@ -29167,6 +29205,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -29205,6 +29245,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -29243,6 +29285,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -29281,6 +29325,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -29319,6 +29365,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
   }
@@ -29343,6 +29391,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
   }
@@ -29367,6 +29417,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
   }
@@ -31041,6 +31093,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: SortOrder
     reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
+    avatarObjectKey?: SortOrder
+    avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
     mfaBackupCodes?: SortOrder
   }
@@ -31074,6 +31128,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: SortOrder
     reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
+    avatarObjectKey?: SortOrder
+    avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
   }
 
@@ -31097,6 +31153,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: SortOrder
     reportEmergencyUsedAt?: SortOrder
     lastActiveAt?: SortOrder
+    avatarObjectKey?: SortOrder
+    avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
   }
 
@@ -34858,6 +34916,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -34895,6 +34955,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -34948,6 +35010,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -34985,6 +35049,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -35022,6 +35088,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -35059,6 +35127,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -35112,6 +35182,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -35149,6 +35221,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -35186,6 +35260,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -35223,6 +35299,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -35276,6 +35354,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -35313,6 +35393,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -35350,6 +35432,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -35387,6 +35471,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -35440,6 +35526,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -35477,6 +35565,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -35514,6 +35604,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -35551,6 +35643,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -35604,6 +35698,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -35641,6 +35737,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -36024,6 +36122,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
@@ -36061,6 +36161,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
@@ -36103,6 +36205,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -36140,6 +36244,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -36361,6 +36467,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
@@ -36398,6 +36506,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
@@ -36446,6 +36556,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -36483,6 +36595,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -36648,6 +36762,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -36685,6 +36801,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -36789,6 +36907,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -36826,6 +36946,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -36863,6 +36985,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -36900,6 +37024,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -36953,6 +37079,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -36990,6 +37118,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -37168,6 +37298,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -37205,6 +37337,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -37309,6 +37443,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -37346,6 +37482,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -37428,6 +37566,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -37465,6 +37605,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -37569,6 +37711,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -37606,6 +37750,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -37688,6 +37834,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -37725,6 +37873,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -37918,6 +38068,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -37955,6 +38107,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -38092,6 +38246,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -38129,6 +38285,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -38219,6 +38377,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -38256,6 +38416,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
@@ -38338,6 +38500,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportCreateNestedManyWithoutReporterInput
@@ -38375,6 +38539,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: number
     reportEmergencyUsedAt?: Date | string | null
     lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
@@ -38479,6 +38645,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUpdateManyWithoutReporterNestedInput
@@ -38516,6 +38684,8 @@ export namespace Prisma {
     reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
     reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput

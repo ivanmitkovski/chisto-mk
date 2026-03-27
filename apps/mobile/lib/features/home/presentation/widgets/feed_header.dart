@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_notification_bell.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 class FeedHeader extends StatelessWidget {
   const FeedHeader({
     super.key,
@@ -43,10 +45,17 @@ class FeedHeader extends StatelessWidget {
                     width: 2,
                   ),
                 ),
-                child: const CircleAvatar(
-                  radius: 21,
-                  backgroundImage:
-                      AssetImage('assets/images/content/people_cleaning.png'),
+                child: AnimatedBuilder(
+                  animation: profileAvatarState,
+                  builder: (BuildContext context, Widget? child) {
+                    return AppAvatar(
+                      name: displayName,
+                      size: 42,
+                      fontSize: 14,
+                      localImagePath: profileAvatarState.localPath,
+                      imageUrl: profileAvatarState.remoteUrl,
+                    );
+                  },
                 ),
               ),
             ),

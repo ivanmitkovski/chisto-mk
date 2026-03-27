@@ -2,35 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 
 class SiteReportedRow extends StatelessWidget {
   const SiteReportedRow({
     super.key,
     required this.reporterName,
     required this.reportedAgo,
+    this.reporterAvatarUrl,
     this.onTap,
   });
 
   final String reporterName;
   final String reportedAgo;
+  final String? reporterAvatarUrl;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     final Widget row = Row(
       children: <Widget>[
-        Container(
-          width: 28,
-          height: 28,
-          decoration: BoxDecoration(
-            color: AppColors.inputFill,
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.person_outline_rounded,
-            size: 16,
-            color: AppColors.textMuted,
-          ),
+        AppAvatar(
+          name: reporterName,
+          size: 28,
+          fontSize: 11,
+          imageUrl: reporterAvatarUrl,
         ),
         const SizedBox(width: AppSpacing.sm),
         Expanded(

@@ -6,6 +6,7 @@ import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/access_token_expiry.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String _keyUserId = 'chisto_user_id';
@@ -172,6 +173,8 @@ class ApiAuthRepository implements AuthRepository {
   Future<void> _performLocalLogout() async {
     _cancelProactiveRefresh();
     _authState.setUnauthenticated();
+    profileAvatarState.setRemoteUrl(null);
+    profileAvatarState.clearLocalPath();
     await _tokenStorage.clearTokens();
   }
 
@@ -223,6 +226,8 @@ class ApiAuthRepository implements AuthRepository {
     final String? storedAccess = await _tokenStorage.accessToken;
     if (storedAccess == null || storedAccess.isEmpty) {
       _authState.setUnauthenticated();
+      profileAvatarState.setRemoteUrl(null);
+      profileAvatarState.clearLocalPath();
       return;
     }
 
@@ -321,6 +326,7 @@ class ApiAuthRepository implements AuthRepository {
       accessToken: accessToken,
       phoneNumber: phoneNumber,
     );
+    profileAvatarState.setRemoteUrl(_extractAvatarUrl(json));
     _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
@@ -329,9 +335,18 @@ class ApiAuthRepository implements AuthRepository {
     _scheduleProactiveRefresh();
   }
 
+  String? _extractAvatarUrl(Map<String, dynamic> json) {
+    final String? raw = json['avatarUrl'] as String?;
+    final String? trimmed = raw?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+    return trimmed;
+  }
+
   Future<void> _clearLocalSession() async {
     _cancelProactiveRefresh();
     _authState.setUnauthenticated();
+    profileAvatarState.setRemoteUrl(null);
+    profileAvatarState.clearLocalPath();
     await _tokenStorage.clearTokens();
   }
 }

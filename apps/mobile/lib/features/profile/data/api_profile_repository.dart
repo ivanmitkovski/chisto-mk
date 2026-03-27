@@ -21,11 +21,12 @@ class ApiProfileRepository implements ProfileRepository {
     final String name = '$firstName $lastName'.trim();
     final String phoneNumber =
         (json['phoneNumber'] as String?)?.trim().isNotEmpty == true
-            ? (json['phoneNumber'] as String)
-            : '—';
+        ? (json['phoneNumber'] as String)
+        : '—';
     final int pointsBalance = (json['pointsBalance'] as num?)?.toInt() ?? 0;
     final int totalPointsEarned =
         (json['totalPointsEarned'] as num?)?.toInt() ?? 0;
+    final String? avatarUrl = (json['avatarUrl'] as String?)?.trim();
 
     final int level = (totalPointsEarned ~/ 100) + 1;
     final int pointsToNextLevel = 100 - (totalPointsEarned % 100);
@@ -41,6 +42,7 @@ class ApiProfileRepository implements ProfileRepository {
       level: level,
       pointsToNextLevel: pointsToNextLevel,
       avatarColor: AppColors.primary,
+      avatarUrl: (avatarUrl?.isNotEmpty ?? false) ? avatarUrl : null,
     );
   }
 
@@ -58,10 +60,23 @@ class ApiProfileRepository implements ProfileRepository {
     }
     if (body.isEmpty) return null;
 
-    await _client.patch(
-      '/auth/me',
-      body: body,
-    );
+    await _client.patch('/auth/me', body: body);
     return getMe();
+  }
+
+  @override
+  Future<String?> uploadAvatar(String filePath) async {
+    final ApiResponse response = await _client.postMultipart(
+      '/auth/me/avatar',
+      <String>[filePath],
+    );
+    final String? avatarUrl = (response.json?['avatarUrl'] as String?)?.trim();
+    if (avatarUrl == null || avatarUrl.isEmpty) return null;
+    return avatarUrl;
+  }
+
+  @override
+  Future<void> removeAvatar() async {
+    await _client.delete('/auth/me/avatar');
   }
 }

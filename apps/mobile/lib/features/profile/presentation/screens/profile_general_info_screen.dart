@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -15,6 +16,9 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
+import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_flow.dart';
 
 class ProfileGeneralInfoScreen extends StatefulWidget {
   const ProfileGeneralInfoScreen({super.key, this.user});
@@ -23,7 +27,8 @@ class ProfileGeneralInfoScreen extends StatefulWidget {
   final ProfileUser? user;
 
   @override
-  State<ProfileGeneralInfoScreen> createState() => _ProfileGeneralInfoScreenState();
+  State<ProfileGeneralInfoScreen> createState() =>
+      _ProfileGeneralInfoScreenState();
 }
 
 class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
@@ -35,27 +40,34 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   final GlobalKey _phoneFieldKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   bool _isSaving = false;
+  bool _isAvatarBusy = false;
   String? _localAvatarPath;
-
+  String? _remoteAvatarUrl;
   void _initFromUser(ProfileUser user) {
     _nameController = TextEditingController(
       text: user.firstName.isNotEmpty || user.lastName.isNotEmpty
           ? '${user.firstName} ${user.lastName}'.trim()
           : user.name,
     );
-    _phoneController = TextEditingController(text: formatPhoneForDisplay(user.phoneNumber));
+    _phoneController = TextEditingController(
+      text: formatPhoneForDisplay(user.phoneNumber),
+    );
   }
 
   Future<void> _fetchAndInitUser() async {
     try {
-      final ProfileUser user = await ServiceLocator.instance.profileRepository.getMe();
+      final ProfileUser user = await ServiceLocator.instance.profileRepository
+          .getMe();
       if (!mounted) return;
       setState(() {
-        _nameController.text = user.firstName.isNotEmpty || user.lastName.isNotEmpty
+        _nameController.text =
+            user.firstName.isNotEmpty || user.lastName.isNotEmpty
             ? '${user.firstName} ${user.lastName}'.trim()
             : user.name;
         _phoneController.text = formatPhoneForDisplay(user.phoneNumber);
+        _remoteAvatarUrl = _normalizeAvatarUrl(user.avatarUrl);
       });
+      profileAvatarState.setRemoteUrl(_normalizeAvatarUrl(user.avatarUrl));
     } on AppError catch (e) {
       if (!mounted) return;
       if (_isAuthError(e.code)) {
@@ -77,7 +89,16 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   }
 
   static bool _isAuthError(String code) =>
-      code == 'UNAUTHORIZED' || code == 'INVALID_TOKEN_USER' || code == 'ACCOUNT_NOT_ACTIVE';
+      code == 'UNAUTHORIZED' ||
+      code == 'INVALID_TOKEN_USER' ||
+      code == 'ACCOUNT_NOT_ACTIVE';
+
+  /// Treat blank / whitespace as no avatar so we never offer "remove" for initials-only.
+  static String? _normalizeAvatarUrl(String? url) {
+    final String? trimmed = url?.trim();
+    if (trimmed == null || trimmed.isEmpty) return null;
+    return trimmed;
+  }
 
   @override
   void initState() {
@@ -89,6 +110,13 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) => _fetchAndInitUser());
     }
     _localAvatarPath = profileAvatarState.localPath;
+    // When [user] is passed from Profile, it is the source of truth — do not fall back to
+    // [profileAvatarState.remoteUrl], which can be stale and incorrectly show "Remove".
+    _remoteAvatarUrl = _normalizeAvatarUrl(
+      widget.user != null
+          ? widget.user!.avatarUrl
+          : profileAvatarState.remoteUrl,
+    );
     _nameFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
     _nameFocus.addListener(_onFocusChange);
@@ -109,9 +137,17 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   void _scrollToFocusedField() {
     if (!mounted) return;
     if (_phoneFocus.hasFocus) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _scrollPhoneFieldAboveKeyboard());
-      Future<void>.delayed(const Duration(milliseconds: 300), _scrollPhoneFieldAboveKeyboard);
-      Future<void>.delayed(const Duration(milliseconds: 550), _scrollPhoneFieldAboveKeyboard);
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _scrollPhoneFieldAboveKeyboard(),
+      );
+      Future<void>.delayed(
+        const Duration(milliseconds: 300),
+        _scrollPhoneFieldAboveKeyboard,
+      );
+      Future<void>.delayed(
+        const Duration(milliseconds: 550),
+        _scrollPhoneFieldAboveKeyboard,
+      );
       return;
     }
     final BuildContext? ctx = _nameFieldKey.currentContext;
@@ -151,7 +187,10 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     if (rect.bottom <= safeY) return;
     final double delta = rect.bottom - safeY;
     final ScrollPosition position = _scrollController.position;
-    final double targetOffset = (position.pixels + delta).clamp(0.0, position.maxScrollExtent);
+    final double targetOffset = (position.pixels + delta).clamp(
+      0.0,
+      position.maxScrollExtent,
+    );
     if ((targetOffset - position.pixels).abs() < 1) return;
     _scrollController.animateTo(
       targetOffset,
@@ -173,11 +212,28 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       level: 1,
       pointsToNextLevel: 100,
       avatarColor: AppColors.primary,
+      avatarUrl: null,
     );
+  }
+
+  ImageProvider? _generalInfoPeekImageProvider() {
+    final String? local = _localAvatarPath?.trim();
+    if (local != null && local.isNotEmpty) {
+      return FileImage(File(local));
+    }
+    final String? url = _normalizeAvatarUrl(_remoteAvatarUrl);
+    if (url == null) return null;
+    return NetworkImage(url);
+  }
+
+  bool _canPeekGeneralInfoAvatar() {
+    if (_isSaving || _isAvatarBusy) return false;
+    return _generalInfoPeekImageProvider() != null;
   }
 
   @override
   void dispose() {
+    ProfileAvatarPeek.hide();
     _nameFocus.removeListener(_scrollToFocusedField);
     _phoneFocus.removeListener(_scrollToFocusedField);
     _nameFocus.removeListener(_onFocusChange);
@@ -194,7 +250,11 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     if (_isSaving) return;
     final String nameTrimmed = _nameController.text.trim();
     if (nameTrimmed.isEmpty) {
-      AppSnack.show(context, message: 'Name is required', type: AppSnackType.warning);
+      AppSnack.show(
+        context,
+        message: 'Name is required',
+        type: AppSnackType.warning,
+      );
       return;
     }
     if (nameTrimmed.length > 100) {
@@ -206,19 +266,27 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       return;
     }
     final int spaceIndex = nameTrimmed.indexOf(' ');
-    final String firstName = spaceIndex >= 0 ? nameTrimmed.substring(0, spaceIndex) : nameTrimmed;
-    final String lastName = spaceIndex >= 0 ? nameTrimmed.substring(spaceIndex + 1).trim() : '';
+    final String firstName = spaceIndex >= 0
+        ? nameTrimmed.substring(0, spaceIndex)
+        : nameTrimmed;
+    final String lastName = spaceIndex >= 0
+        ? nameTrimmed.substring(spaceIndex + 1).trim()
+        : '';
 
     setState(() => _isSaving = true);
     AppHaptics.light();
 
     try {
-      final ProfileUser? updated = await ServiceLocator.instance.profileRepository.updateProfile(
-        firstName: firstName,
-        lastName: lastName,
-      );
+      final ProfileUser? updated = await ServiceLocator
+          .instance
+          .profileRepository
+          .updateProfile(firstName: firstName, lastName: lastName);
       if (!mounted) return;
-      AppSnack.show(context, message: 'Profile updated', type: AppSnackType.success);
+      AppSnack.show(
+        context,
+        message: 'Profile updated',
+        type: AppSnackType.success,
+      );
       if (updated != null) {
         Navigator.of(context).pop(updated);
       }
@@ -238,13 +306,112 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   }
 
   Future<void> _handleChangeAvatar() async {
-    AppHaptics.tap();
+    if (_isSaving || _isAvatarBusy) return;
+    AppHaptics.softTransition();
+    final bool showRemove = _normalizeAvatarUrl(_remoteAvatarUrl) != null;
+    final ProfileAvatarFlowResult flow = await runProfileAvatarFlow(
+      context,
+      showRemoveOption: showRemove,
+    );
     if (!mounted) return;
-    AppSnack.show(context, message: 'Coming soon', type: AppSnackType.info);
+    if (flow.kind == ProfileAvatarFlowKind.cancelled) return;
+    if (flow.kind == ProfileAvatarFlowKind.remove) {
+      await _removeAvatarConfirmed();
+      return;
+    }
+    final String? pickedPath = flow.uploadPath;
+    if (pickedPath == null || pickedPath.isEmpty) return;
+
+    final String? previousLocalPath = _localAvatarPath;
+    setState(() {
+      _isAvatarBusy = true;
+      _localAvatarPath = pickedPath;
+    });
+    profileAvatarState.setLocalPath(pickedPath);
+
+    try {
+      final String? avatarUrl = await ServiceLocator.instance.profileRepository
+          .uploadAvatar(pickedPath);
+      if (!mounted) return;
+      setState(() {
+        _remoteAvatarUrl = _normalizeAvatarUrl(avatarUrl);
+        _localAvatarPath = null;
+      });
+      profileAvatarState.clearLocalPath();
+      profileAvatarState.setRemoteUrl(_normalizeAvatarUrl(avatarUrl));
+      AppSnack.show(
+        context,
+        message: 'Profile picture updated',
+        type: AppSnackType.success,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _localAvatarPath = previousLocalPath;
+      });
+      if (previousLocalPath != null && previousLocalPath.isNotEmpty) {
+        profileAvatarState.setLocalPath(previousLocalPath);
+      } else {
+        profileAvatarState.clearLocalPath();
+      }
+      if (_isAuthError(e.code)) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+    } finally {
+      if (mounted) {
+        setState(() => _isAvatarBusy = false);
+      }
+    }
+  }
+
+  Future<void> _removeAvatarConfirmed() async {
+    setState(() => _isAvatarBusy = true);
+    try {
+      await ServiceLocator.instance.profileRepository.removeAvatar();
+      if (!mounted) return;
+      setState(() {
+        _remoteAvatarUrl = null;
+        _localAvatarPath = null;
+      });
+      profileAvatarState.clearLocalPath();
+      profileAvatarState.setRemoteUrl(null);
+      AppHaptics.success();
+      AppSnack.show(
+        context,
+        message: context.l10n.profileAvatarRemovedMessage,
+        type: AppSnackType.success,
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      if (_isAuthError(e.code)) {
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          AppRoutes.signIn,
+          (Route<dynamic> route) => false,
+        );
+        return;
+      }
+      AppSnack.show(context, message: e.message, type: AppSnackType.error);
+    } catch (_) {
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: context.l10n.profileAvatarRemoveFailed,
+        type: AppSnackType.error,
+      );
+    } finally {
+      if (mounted) setState(() => _isAvatarBusy = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final double avatarDiameter = AppSpacing.avatarLg + AppSpacing.lg;
+    final bool canPeekAvatar = _canPeekGeneralInfoAvatar();
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
       resizeToAvoidBottomInset: false,
@@ -253,7 +420,12 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, 0),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                0,
+              ),
               child: AppBackButton(backgroundColor: AppColors.inputFill),
             ),
             const SizedBox(height: AppSpacing.sm),
@@ -265,16 +437,16 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                   Text(
                     'General info',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
-                        ),
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: -0.2,
+                    ),
                   ),
                   const SizedBox(height: 2),
                   Text(
                     'Edit your profile details',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),
@@ -295,38 +467,170 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                     Center(
                       child: Column(
                         children: <Widget>[
-                          GestureDetector(
-                            onTap: _handleChangeAvatar,
-                            behavior: HitTestBehavior.opaque,
-                            child: Container(
-                              width: AppSpacing.avatarLg + AppSpacing.lg,
-                              height: AppSpacing.avatarLg + AppSpacing.lg,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColors.inputFill,
-                              ),
-                              child: _localAvatarPath != null
-                                  ? ClipOval(
-                                      child: Image.file(
-                                        File(_localAvatarPath!),
-                                        fit: BoxFit.cover,
+                          Semantics(
+                            label: _isAvatarBusy
+                                ? 'Updating profile photo'
+                                : 'Profile photo. Double tap to change',
+                            button: true,
+                            enabled: !_isSaving && !_isAvatarBusy,
+                            child: Material(
+                              color: AppColors.transparent,
+                              child: InkWell(
+                                onTap: _isSaving || _isAvatarBusy
+                                    ? null
+                                    : _handleChangeAvatar,
+                                onLongPress: canPeekAvatar
+                                    ? () {
+                                        final ImageProvider? image =
+                                            _generalInfoPeekImageProvider();
+                                        if (image == null) return;
+                                        ProfileAvatarPeek.show(
+                                          context,
+                                          image: image,
+                                          semanticLabel: context.l10n
+                                              .profileAvatarPeekSemantic,
+                                        );
+                                      }
+                                    : null,
+                                onLongPressUp: canPeekAvatar
+                                    ? ProfileAvatarPeek.hide
+                                    : null,
+                                customBorder: const CircleBorder(),
+                                child: SizedBox(
+                                  width: avatarDiameter + 14,
+                                  height: avatarDiameter + 14,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    clipBehavior: Clip.none,
+                                    children: <Widget>[
+                                      ClipOval(
+                                        clipBehavior: Clip.antiAlias,
+                                        child: AnimatedContainer(
+                                          duration: AppMotion.fast,
+                                          curve: AppMotion.smooth,
+                                          width: avatarDiameter,
+                                          height: avatarDiameter,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.inputFill,
+                                            border: Border.all(
+                                              color: _isAvatarBusy
+                                                  ? AppColors.primary
+                                                      .withValues(alpha: 0.45)
+                                                  : AppColors.primaryDark
+                                                      .withValues(alpha: 0.12),
+                                              width: _isAvatarBusy ? 2.5 : 1.5,
+                                            ),
+                                          ),
+                                          child: Stack(
+                                            fit: StackFit.expand,
+                                            clipBehavior: Clip.hardEdge,
+                                            children: <Widget>[
+                                              Positioned.fill(
+                                                child: _localAvatarPath != null
+                                                    ? Image.file(
+                                                        File(
+                                                          _localAvatarPath!,
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                        filterQuality:
+                                                            FilterQuality
+                                                                .medium,
+                                                      )
+                                                    : AppAvatar(
+                                                        name: _nameController
+                                                                .text
+                                                                .trim()
+                                                                .isEmpty
+                                                            ? 'User'
+                                                            : _nameController
+                                                                  .text
+                                                                  .trim(),
+                                                        size: avatarDiameter,
+                                                        imageUrl:
+                                                            _remoteAvatarUrl,
+                                                      ),
+                                              ),
+                                              if (_isAvatarBusy)
+                                                Positioned.fill(
+                                                  child: ColoredBox(
+                                                    color: AppColors.black
+                                                        .withValues(
+                                                          alpha: 0.28,
+                                                        ),
+                                                    child: const Center(
+                                                      child: SizedBox(
+                                                        width: 28,
+                                                        height: 28,
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          strokeWidth: 2.5,
+                                                          color:
+                                                              AppColors.white,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    )
-                                  : const Icon(
-                                      Icons.person_outline_rounded,
-                                      size: AppSpacing.iconLg + AppSpacing.md,
-                                      color: AppColors.textMuted,
-                                    ),
+                                      if (!_isAvatarBusy)
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
+                                          child: DecoratedBox(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              color: AppColors.primaryDark,
+                                              border: Border.all(
+                                                color: AppColors.white,
+                                                width: 2,
+                                              ),
+                                              boxShadow: <BoxShadow>[
+                                                BoxShadow(
+                                                  color: AppColors.black
+                                                      .withValues(alpha: 0.12),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: const Padding(
+                                              padding: EdgeInsets.all(6),
+                                              child: Icon(
+                                                Icons.camera_alt_rounded,
+                                                size: 16,
+                                                color: AppColors.white,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(height: AppSpacing.sm),
-                          TextButton(
-                            onPressed: _handleChangeAvatar,
-                            child: Text(
-                              'Upload new image',
-                              style: AppTypography.cardSubtitle.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.primaryDark,
+                          ExcludeSemantics(
+                            child: AnimatedSwitcher(
+                              duration: AppMotion.fast,
+                              switchInCurve: AppMotion.smooth,
+                              switchOutCurve: AppMotion.standardCurve,
+                              child: Text(
+                                _isAvatarBusy
+                                    ? context
+                                        .l10n.profileAvatarUploadingCaption
+                                    : context.l10n.profileAvatarTapToChange,
+                                key: ValueKey<bool>(_isAvatarBusy),
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall
+                                    ?.copyWith(
+                                  color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w500,
+                                  letterSpacing: -0.1,
+                                ),
                               ),
                             ),
                           ),
@@ -337,7 +641,9 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                     Container(
                       decoration: BoxDecoration(
                         color: AppColors.panelBackground,
-                        borderRadius: BorderRadius.circular(AppSpacing.radius18),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radius18,
+                        ),
                         boxShadow: <BoxShadow>[
                           BoxShadow(
                             color: AppColors.shadowLight,
@@ -356,9 +662,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                           children: <Widget>[
                             Text(
                               'Name',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w600,
@@ -372,17 +676,16 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                 controller: _nameController,
                                 focusNode: _nameFocus,
                                 textInputAction: TextInputAction.next,
-                                onSubmitted: (_) =>
-                                    FocusScope.of(context).requestFocus(_phoneFocus),
+                                onSubmitted: (_) => FocusScope.of(
+                                  context,
+                                ).requestFocus(_phoneFocus),
                                 decoration: _inputDecoration('Your name'),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
                               'Mobile phone',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
+                              style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: AppColors.textSecondary,
                                     fontWeight: FontWeight.w600,
@@ -407,10 +710,13 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                               padding: const EdgeInsets.all(AppSpacing.sm),
                               decoration: BoxDecoration(
                                 color: AppColors.inputFill,
-                                borderRadius:
-                                    BorderRadius.circular(AppSpacing.radius14),
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radius14,
+                                ),
                                 border: Border.all(
-                                  color: AppColors.divider.withValues(alpha: 0.9),
+                                  color: AppColors.divider.withValues(
+                                    alpha: 0.9,
+                                  ),
                                 ),
                               ),
                               child: Row(
@@ -446,7 +752,12 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.lg),
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
               child: PrimaryButton(
                 label: _isSaving ? 'Saving…' : 'Update info',
                 onPressed: _isSaving ? null : _handleSave,
@@ -461,9 +772,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: AppTypography.cardSubtitle.copyWith(
-        fontSize: 15,
-      ),
+      hintStyle: AppTypography.cardSubtitle.copyWith(fontSize: 15),
       filled: true,
       fillColor: AppColors.inputFill,
       contentPadding: const EdgeInsets.symmetric(
@@ -485,4 +794,3 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     );
   }
 }
-

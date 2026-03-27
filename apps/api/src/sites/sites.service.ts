@@ -80,6 +80,9 @@ export class SitesService {
         latestReportCreatedAt: string | null;
         latestReportNumber: string | null;
         latestReportMediaUrls?: string[];
+        latestReportReporterName?: string | null;
+        latestReportReporterAvatarUrl?: string | null;
+        latestReportReporterId?: string | null;
         upvotesCount: number;
         commentsCount: number;
         savesCount: number;
@@ -143,6 +146,9 @@ export class SitesService {
             category: true,
             createdAt: true,
             reportNumber: true,
+            reporter: {
+              select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
+            },
           },
         },
         votes: user
@@ -216,6 +222,9 @@ export class SitesService {
       latestReportCreatedAt: string | null;
       latestReportNumber: string | null;
       latestReportMediaUrls?: string[];
+      latestReportReporterName?: string | null;
+      latestReportReporterAvatarUrl?: string | null;
+      latestReportReporterId?: string | null;
       upvotesCount: number;
       commentsCount: number;
       savesCount: number;
@@ -234,6 +243,18 @@ export class SitesService {
       const mediaUrls = firstReport?.mediaUrls?.length
         ? await this.reportsUploadService.signUrls(firstReport.mediaUrls)
         : undefined;
+      let latestReportReporterName: string | null = null;
+      let latestReportReporterAvatarUrl: string | null = null;
+      let latestReportReporterId: string | null = null;
+      const feedRep = firstReport?.reporter;
+      if (feedRep) {
+        latestReportReporterId = feedRep.id;
+        const nm = `${feedRep.firstName ?? ''} ${feedRep.lastName ?? ''}`.trim();
+        latestReportReporterName = nm.length > 0 ? nm : null;
+        latestReportReporterAvatarUrl = await this.reportsUploadService.signPrivateObjectKey(
+          feedRep.avatarObjectKey,
+        );
+      }
       const latestReportDate = firstReport?.createdAt ?? siteBase.createdAt;
       const distanceKm =
         hasGeo && query.lat != null && query.lng != null
@@ -291,6 +312,9 @@ export class SitesService {
         latestReportCreatedAt: firstReport?.createdAt?.toISOString() ?? null,
         latestReportNumber: firstReport?.reportNumber ?? null,
         latestReportMediaUrls: mediaUrls,
+        latestReportReporterName,
+        latestReportReporterAvatarUrl,
+        latestReportReporterId,
         upvotesCount: siteBase.upvotesCount,
         commentsCount: siteBase.commentsCount,
         savesCount: siteBase.savesCount,
@@ -378,6 +402,16 @@ export class SitesService {
       include: {
         reports: {
           orderBy: { createdAt: 'desc' },
+          include: {
+            reporter: {
+              select: { firstName: true, lastName: true, avatarObjectKey: true },
+            },
+            coReporters: {
+              include: {
+                user: { select: { firstName: true, lastName: true } },
+              },
+            },
+          },
         },
         events: {
           orderBy: { scheduledAt: 'asc' },
@@ -393,10 +427,48 @@ export class SitesService {
     }
 
     const reportsWithSignedUrls = await Promise.all(
-      site.reports.map(async (r) => ({
-        ...r,
-        mediaUrls: await this.reportsUploadService.signUrls(r.mediaUrls),
-      })),
+      site.reports.map(async (r) => {
+        const mediaUrls = await this.reportsUploadService.signUrls(r.mediaUrls);
+        const reporter =
+          r.reporter == null
+            ? null
+            : {
+                firstName: r.reporter.firstName,
+                lastName: r.reporter.lastName,
+                avatarUrl: await this.reportsUploadService.signPrivateObjectKey(
+                  r.reporter.avatarObjectKey,
+                ),
+              };
+        const coReporters = r.coReporters.map((cr) => ({
+          id: cr.id,
+          createdAt: cr.createdAt,
+          reportId: cr.reportId,
+          userId: cr.userId,
+          user: cr.user
+            ? { firstName: cr.user.firstName, lastName: cr.user.lastName }
+            : null,
+        }));
+        return {
+          id: r.id,
+          createdAt: r.createdAt,
+          reportNumber: r.reportNumber,
+          siteId: r.siteId,
+          reporterId: r.reporterId,
+          title: r.title,
+          description: r.description,
+          mediaUrls,
+          category: r.category,
+          severity: r.severity,
+          cleanupEffort: r.cleanupEffort,
+          status: r.status,
+          moderatedAt: r.moderatedAt,
+          moderationReason: r.moderationReason,
+          moderatedById: r.moderatedById,
+          potentialDuplicateOfId: r.potentialDuplicateOfId,
+          reporter,
+          coReporters,
+        };
+      }),
     );
 
     let isUpvotedByMe = false;

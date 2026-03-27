@@ -1,4 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import * as multer from 'multer';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -267,6 +269,56 @@ export class AuthController {
       });
     }
     await this.authService.deleteAccount(user.userId);
+  }
+
+  @Post(['me/avatar', 'avatar'])
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiBearerAuth()
+  @UseInterceptors(
+    FilesInterceptor('files', 1, {
+      storage: multer.memoryStorage(),
+      limits: { fileSize: 8 * 1024 * 1024 },
+    }),
+  )
+  @ApiOperation({
+    summary:
+      'Upload or replace profile avatar (canonical: POST /auth/me/avatar; alias: POST /auth/avatar)',
+  })
+  @ApiOkResponse({ description: 'Avatar uploaded successfully' })
+  uploadAvatar(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<{ avatarUrl: string | null }> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.authService.uploadAvatar(user.userId, files?.[0]);
+  }
+
+  @Delete(['me/avatar', 'avatar'])
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Remove profile avatar (canonical: DELETE /auth/me/avatar; alias: DELETE /auth/avatar)',
+  })
+  @ApiNoContentResponse({ description: 'Avatar removed' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeAvatar(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+  ): Promise<void> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    await this.authService.removeAvatar(user.userId);
   }
 
   @Get('admin/ping')

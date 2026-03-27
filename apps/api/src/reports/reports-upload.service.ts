@@ -4,8 +4,10 @@ import {
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import sharp from 'sharp';
+import { randomUUID } from 'crypto';
 
 const ALLOWED_MIMES = new Set([
   'image/jpeg',
@@ -15,6 +17,8 @@ const ALLOWED_MIMES = new Set([
 ]);
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp)$/i;
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+const MAX_AVATAR_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
+const AVATAR_SIGNED_URL_TTL_SECONDS = 15 * 60;
 
 @Injectable()
 export class ReportsUploadService {
@@ -151,5 +155,116 @@ export class ReportsUploadService {
       }
     }
     return result;
+  }
+
+  async uploadProfileAvatar(
+    userId: string,
+    file: { buffer: Buffer; mimetype: string; size: number; originalname: string },
+  ): Promise<string> {
+    if (!this.enabled || !this.s3 || !this.bucket) {
+      throw new ServiceUnavailableException({
+        code: 'S3_NOT_CONFIGURED',
+        message: 'File upload is not configured. S3_BUCKET_NAME is required.',
+      });
+    }
+
+    if (!file || !file.buffer || file.size <= 0) {
+      throw new BadRequestException({
+        code: 'AVATAR_FILE_REQUIRED',
+        message: 'Avatar image file is required.',
+      });
+    }
+
+    const normalizedMime = (file.mimetype || '').toLowerCase();
+    if (!ALLOWED_MIMES.has(normalizedMime)) {
+      throw new BadRequestException({
+        code: 'INVALID_AVATAR_TYPE',
+        message: 'Avatar must be a jpeg, png, or webp image.',
+      });
+    }
+    if (file.size > MAX_AVATAR_FILE_SIZE_BYTES) {
+      throw new BadRequestException({
+        code: 'AVATAR_FILE_TOO_LARGE',
+        message: 'Avatar exceeds 8MB limit.',
+      });
+    }
+
+    const processed = await this.processAvatarImage(file.buffer);
+    const objectKey = `profile-avatars/${userId}/${Date.now()}-${randomUUID()}.webp`;
+    await this.s3.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: objectKey,
+        Body: processed,
+        ContentType: 'image/webp',
+        CacheControl: 'private, max-age=300',
+      }),
+    );
+    return objectKey;
+  }
+
+  async signPrivateObjectKey(objectKey: string | null | undefined): Promise<string | null> {
+    if (!objectKey || !this.enabled || !this.s3 || !this.bucket) {
+      return null;
+    }
+    const now = Date.now();
+    const cacheHit = this.signedUrlCache.get(objectKey);
+    if (cacheHit && cacheHit.expiresAt > now) {
+      return cacheHit.url;
+    }
+    try {
+      const signed = await getSignedUrl(
+        this.s3,
+        new GetObjectCommand({ Bucket: this.bucket, Key: objectKey }),
+        { expiresIn: AVATAR_SIGNED_URL_TTL_SECONDS },
+      );
+      this.signedUrlCache.set(objectKey, {
+        url: signed,
+        expiresAt: now + 13 * 60 * 1000,
+      });
+      return signed;
+    } catch {
+      // Avoid failing profile reads when avatar object was removed or unavailable.
+      this.signedUrlCache.delete(objectKey);
+      return null;
+    }
+  }
+
+  async deleteObjectByKey(objectKey: string | null | undefined): Promise<void> {
+    if (!objectKey || !this.enabled || !this.s3 || !this.bucket) {
+      return;
+    }
+    this.signedUrlCache.delete(objectKey);
+    await this.s3.send(
+      new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: objectKey,
+      }),
+    );
+  }
+
+  private async processAvatarImage(input: Buffer): Promise<Buffer> {
+    try {
+      const image = sharp(input, { failOn: 'error' });
+      const meta = await image.metadata();
+      const width = meta.width ?? 0;
+      const height = meta.height ?? 0;
+      if (width <= 0 || height <= 0) {
+        throw new Error('invalid dimensions');
+      }
+      const square = Math.min(width, height);
+      const left = Math.floor((width - square) / 2);
+      const top = Math.floor((height - square) / 2);
+      return await image
+        .extract({ left, top, width: square, height: square })
+        .resize(512, 512, { fit: 'cover' })
+        .webp({ quality: 82, effort: 4 })
+        .toBuffer();
+    } catch {
+      throw new BadRequestException({
+        code: 'INVALID_AVATAR_IMAGE',
+        message: 'Avatar image could not be processed.',
+      });
+    }
   }
 }

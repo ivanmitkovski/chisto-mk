@@ -304,6 +304,15 @@ class ApiSitesRepository implements SitesRepository {
           .toList(),
       rankingScore: (json['rankingScore'] as num?)?.toDouble(),
       rankingComponents: _rankingComponentsFromJson(json['rankingComponents']),
+      latestReporterName: json['latestReportReporterName'] as String?,
+      latestReporterAvatarUrl:
+          json['latestReportReporterAvatarUrl'] as String?,
+      latestReporterUserId: json['latestReportReporterId'] as String?,
+      latestReportAt: () {
+        final String? s = json['latestReportCreatedAt'] as String?;
+        if (s == null || s.isEmpty) return null;
+        return DateTime.tryParse(s);
+      }(),
     );
   }
 
@@ -317,11 +326,13 @@ class ApiSitesRepository implements SitesRepository {
         eventsJson.whereType<Map<String, dynamic>>().toList();
 
     SiteReport? firstReport;
+    String? latestReporterUserId;
     final Set<String> uniqueImageUrls = <String>{};
     List<String> coReporterNames = <String>[];
 
     if (reports.isNotEmpty) {
       final Map<String, dynamic> first = reports.first;
+      latestReporterUserId = first['reporterId'] as String?;
       for (final Map<String, dynamic> r in reports) {
         final List<dynamic> mediaList = r['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
         for (final dynamic m in mediaList) {
@@ -335,10 +346,11 @@ class ApiSitesRepository implements SitesRepository {
           .whereType<String>()
           .map<ImageProvider>((String u) => imageProviderForSiteMedia(u))
           .toList();
-      final String reporterFirstName =
-          (first['reporter'] as Map<String, dynamic>?)?['firstName'] as String? ?? '';
-      final String reporterLastName =
-          (first['reporter'] as Map<String, dynamic>?)?['lastName'] as String? ?? '';
+      final Map<String, dynamic>? reporterJson =
+          first['reporter'] as Map<String, dynamic>?;
+      final String reporterFirstName = reporterJson?['firstName'] as String? ?? '';
+      final String reporterLastName = reporterJson?['lastName'] as String? ?? '';
+      final String? reporterAvatarUrl = reporterJson?['avatarUrl'] as String?;
       final String reporterName = '$reporterFirstName $reporterLastName'.trim();
       final String reportTitle = (first['title'] as String?)?.trim() ?? '';
       final String bodyTrim = (first['description'] as String?)?.trim() ?? '';
@@ -354,6 +366,7 @@ class ApiSitesRepository implements SitesRepository {
         title: resolvedTitle,
         description: resolvedBody,
         images: firstReportImages,
+        reporterAvatarUrl: reporterAvatarUrl,
       );
       final List<dynamic> coList = first['coReporters'] as List<dynamic>? ?? <dynamic>[];
       for (final dynamic co in coList) {
@@ -442,6 +455,13 @@ class ApiSitesRepository implements SitesRepository {
       feedReasons: const <String>[],
       rankingScore: null,
       rankingComponents: null,
+      latestReporterName:
+          firstReport != null && firstReport.reporterName != 'Anonymous'
+              ? firstReport.reporterName
+              : null,
+      latestReporterAvatarUrl: firstReport?.reporterAvatarUrl,
+      latestReportAt: firstReport?.reportedAt,
+      latestReporterUserId: latestReporterUserId,
     );
   }
 

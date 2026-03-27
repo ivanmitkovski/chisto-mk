@@ -268,4 +268,98 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportSubmittedSemanticsSuccess => 'Raporti u dërgua me sukses';
+
+  @override
+  String get profileAvatarSourceTitle => 'Foto e profilit';
+
+  @override
+  String get profileAvatarSourceSubtitle =>
+      'Bëni një foto të re ose zgjidhni nga biblioteka juaj. Më pas mund ta përshtatni kadrimin.';
+
+  @override
+  String get profileAvatarSourceCamera => 'Kamera';
+
+  @override
+  String get profileAvatarSourceCameraHint =>
+      'Kamera e përparme me dritë të mirë funksionon më mirë.';
+
+  @override
+  String get profileAvatarSourcePhotos => 'Fotografi';
+
+  @override
+  String get profileAvatarSourcePhotosHint =>
+      'Zgjidhni çdo imazh që keni ruajtur.';
+
+  @override
+  String get profileAvatarSourceRemove => 'Hiq foton aktuale';
+
+  @override
+  String get profileAvatarSourceRemoveHint =>
+      'Shfaq inicialët në vend të fotos';
+
+  @override
+  String get profileAvatarRemoveConfirmTitle => 'Të hiqet fotoja e profilit?';
+
+  @override
+  String get profileAvatarRemoveConfirmMessage =>
+      'Fotoja do të fshihet dhe do të shfaqen inicialët tuaj.';
+
+  @override
+  String get profileAvatarRemoveConfirmCancel => 'Anulo';
+
+  @override
+  String get profileAvatarRemoveConfirmRemove => 'Hiq';
+
+  @override
+  String get profileAvatarRemovedMessage => 'Fotoja e profilit u hoq';
+
+  @override
+  String get profileAvatarRemoveFailed => 'Nuk hoqej fotoja. Provoni përsëri.';
+
+  @override
+  String get profileAvatarSourceRecommended => 'E rekomanduar';
+
+  @override
+  String get profileAvatarCropMoveAndScale => 'Lëviz dhe shkallëzo';
+
+  @override
+  String get profileAvatarCropHint =>
+      'Zmadhoj me dy gishta · zhvendos për pozicion';
+
+  @override
+  String get profileAvatarCropLoading => 'Po ngarkohet fotoja…';
+
+  @override
+  String get profileAvatarCropCancel => 'Anulo';
+
+  @override
+  String get profileAvatarCropDone => 'Bërë';
+
+  @override
+  String get profileAvatarTapToChange => 'Prek për të ndryshuar foton';
+
+  @override
+  String get profileAvatarUploadingCaption => 'Duke ngarkuar…';
+
+  @override
+  String get profileAvatarCropEditorSemantic =>
+      'Prisni foton e profilit. Zoom me dy gishta dhe zhvendoseni imazhin.';
+
+  @override
+  String get profileAvatarCropFailed => 'Nuk u prit fotoja. Provoni përsëri.';
+
+  @override
+  String get profileAvatarCameraUnavailable =>
+      'Kamera nuk hapet tani. Provoni përsëri pas pak.';
+
+  @override
+  String get profileAvatarReadPhotoFailed =>
+      'Nuk lexohej fotoja. Provoni përsëri.';
+
+  @override
+  String get profileAvatarProcessPhotoFailed =>
+      'Nuk përpunohej fotoja. Provoni përsëri.';
+
+  @override
+  String get profileAvatarPeekSemantic => 'Foto e profilit';
 }
