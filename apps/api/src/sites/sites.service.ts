@@ -27,6 +27,29 @@ type SiteWithReportsAndEvents = Prisma.SiteGetPayload<{
   include: { reports: true; events: true };
 }>;
 
+type FeedSiteRow = Prisma.SiteGetPayload<{
+  include: {
+    reports: {
+      orderBy: { createdAt: 'desc' };
+      take: 1;
+      select: {
+        title: true;
+        description: true;
+        mediaUrls: true;
+        category: true;
+        createdAt: true;
+        reportNumber: true;
+        reporter: {
+          select: { id: true; firstName: true; lastName: true; avatarObjectKey: true };
+        };
+      };
+    };
+    votes: { where: { userId: string }; select: { id: true }; take: 1 } | false;
+    saves: { where: { userId: string }; select: { id: true }; take: 1 } | false;
+    _count: { select: { reports: true } };
+  };
+}>;
+
 export type SiteCommentTreeNode = {
   id: string;
   parentId: string | null;
@@ -195,7 +218,7 @@ export class SitesService {
     const cursorClause = cursorState?.dbClause ?? null;
     const feedWhere: Prisma.SiteWhereInput = cursorClause ? { AND: [where, cursorClause] } : where;
     const candidateLimit = Math.min(300, Math.max(query.limit * 6, query.limit));
-    let sites: Awaited<ReturnType<typeof this.prisma.site.findMany>>;
+    let sites: FeedSiteRow[];
     try {
       sites = await this.withTimeout(
         this.prisma.site.findMany({
@@ -392,6 +415,7 @@ export class SitesService {
         id: siteBase.id,
         latitude: siteBase.latitude,
         longitude: siteBase.longitude,
+        address: siteBase.address,
         description: siteBase.description,
         status: siteBase.status,
         upvotesCount: siteBase.upvotesCount,
@@ -1354,10 +1378,6 @@ export class SitesService {
       }
     }
     return output;
-  }
-
-  private encodeFeedCursor(createdAt: Date, id: string): string {
-    return `c|${createdAt.getTime()}|${id}`;
   }
 
   private encodeRankedFeedCursor(rankingScore: number, id: string): string {

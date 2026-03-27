@@ -471,8 +471,6 @@ model SiteShareEvent {
   @@index([userId, createdAt])
 }
 
-// ─── Push Notifications ─────────────────────────────────────────────
-
 enum DevicePlatform {
   IOS
   ANDROID
