@@ -35,6 +35,25 @@ void main() {
       expect(model.sentAt, isNull);
       expect(model.data, isNull);
     });
+
+    test('parses thread and group metadata fields', () {
+      final model = UserNotification.fromJson(<String, dynamic>{
+        'id': 'n3',
+        'title': 'Grouped',
+        'body': 'Body',
+        'type': 'COMMENT',
+        'isRead': false,
+        'createdAt': '2026-03-27T10:00:00.000Z',
+        'threadKey': 'site:abc',
+        'groupKey': 'COMMENT:site:abc',
+      });
+
+      expect(model.threadKey, 'site:abc');
+      expect(model.groupKey, 'COMMENT:site:abc');
+      expect(
+        toNotificationTypeApiValue(UserNotificationType.comment),
+        'COMMENT',
+      );
+    });
   });
 }
-

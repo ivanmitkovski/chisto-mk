@@ -12,17 +12,21 @@ import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-const ImageProvider _placeholderImage =
-    AssetImage('assets/images/content/people_cleaning.png');
+const ImageProvider _placeholderImage = AssetImage(
+  'assets/images/content/people_cleaning.png',
+);
 
 class ApiSitesRepository implements SitesRepository {
   ApiSitesRepository({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
   static const Duration _feedCacheTtl = Duration(seconds: 20);
-  static const String _feedPersistedCacheKey = 'feed_cache_first_page_v1';
-  final Map<String, ({SitesListResult result, DateTime cachedAt})> _memoryFeedCache =
-      <String, ({SitesListResult result, DateTime cachedAt})>{};
+  static const Duration _feedPersistedCacheTtl = Duration(hours: 24);
+  static const String _feedPersistedCacheKey = 'feed_cache_pages_v2';
+  static const int _maxPersistedFeeds = 8;
+  static const int _maxPersistedPagesPerFeed = 6;
+  final Map<String, ({SitesListResult result, DateTime cachedAt})>
+  _memoryFeedCache = <String, ({SitesListResult result, DateTime cachedAt})>{};
 
   @override
   Future<SitesListResult> getSites({
@@ -59,9 +63,20 @@ class ApiSitesRepository implements SitesRepository {
       explain: explain,
       cursor: cursor,
     );
+    final String scopeKey = _feedScopeKey(
+      latitude: latitude,
+      longitude: longitude,
+      radiusKm: radiusKm,
+      status: status,
+      limit: limit,
+      sort: sort,
+      mode: mode,
+      explain: explain,
+    );
     final now = DateTime.now();
     final cacheHit = _memoryFeedCache[cacheKey];
-    if (cacheHit != null && now.difference(cacheHit.cachedAt) <= _feedCacheTtl) {
+    if (cacheHit != null &&
+        now.difference(cacheHit.cachedAt) <= _feedCacheTtl) {
       return SitesListResult(
         sites: cacheHit.result.sites,
         total: cacheHit.result.total,
@@ -84,31 +99,40 @@ class ApiSitesRepository implements SitesRepository {
         limit: limit,
       );
       _memoryFeedCache[cacheKey] = (result: result, cachedAt: now);
-
-      // Persist only first-page feed snapshot as offline fallback.
-      if ((cursor == null || cursor.isEmpty) && page == 1) {
-        unawaited(_persistFirstPageSnapshot(cacheKey, json, now));
-      }
+      unawaited(
+        _persistFeedSnapshot(
+          scopeKey: scopeKey,
+          requestKey: cacheKey,
+          payload: json,
+          now: now,
+          page: page,
+          cursor: cursor,
+          nextCursor: result.nextCursor,
+        ),
+      );
       return result;
     } on AppError {
-      // If initial feed request fails, try persisted first-page fallback.
-      if ((cursor == null || cursor.isEmpty) && page == 1) {
-        final fallback = await _loadPersistedFirstPageSnapshot(cacheKey);
-        if (fallback != null) {
-          final DateTime fallbackCachedAt =
-              fallback.cachedAt ?? now;
-          _memoryFeedCache[cacheKey] = (result: fallback, cachedAt: fallbackCachedAt);
-          return SitesListResult(
-            sites: fallback.sites,
-            total: fallback.total,
-            page: fallback.page,
-            limit: fallback.limit,
-            nextCursor: fallback.nextCursor,
-            servedFromCache: true,
-            isStaleFallback: true,
-            cachedAt: fallbackCachedAt,
-          );
-        }
+      final fallback = await _loadPersistedFeedSnapshot(
+        requestKey: cacheKey,
+        scopeKey: scopeKey,
+        page: page,
+      );
+      if (fallback != null) {
+        final DateTime fallbackCachedAt = fallback.cachedAt ?? now;
+        _memoryFeedCache[cacheKey] = (
+          result: fallback,
+          cachedAt: fallbackCachedAt,
+        );
+        return SitesListResult(
+          sites: fallback.sites,
+          total: fallback.total,
+          page: fallback.page,
+          limit: fallback.limit,
+          nextCursor: fallback.nextCursor,
+          servedFromCache: true,
+          isStaleFallback: true,
+          cachedAt: fallbackCachedAt,
+        );
       }
       rethrow;
     }
@@ -163,37 +187,171 @@ class ApiSitesRepository implements SitesRepository {
     ].join('|');
   }
 
-  Future<void> _persistFirstPageSnapshot(
-    String cacheKey,
-    Map<String, dynamic> payload,
-    DateTime now,
-  ) async {
+  String _feedScopeKey({
+    required double? latitude,
+    required double? longitude,
+    required double radiusKm,
+    required String? status,
+    required int limit,
+    required String sort,
+    required String mode,
+    required bool explain,
+  }) {
+    return [
+      latitude?.toStringAsFixed(4) ?? '',
+      longitude?.toStringAsFixed(4) ?? '',
+      radiusKm.toStringAsFixed(1),
+      status ?? '',
+      limit.toString(),
+      sort,
+      mode,
+      explain ? '1' : '0',
+    ].join('|');
+  }
+
+  Future<void> _persistFeedSnapshot({
+    required String scopeKey,
+    required String requestKey,
+    required Map<String, dynamic> payload,
+    required DateTime now,
+    required int page,
+    required String? cursor,
+    required String? nextCursor,
+  }) async {
     final prefs = await SharedPreferences.getInstance();
-    final wrapper = <String, dynamic>{
-      'cacheKey': cacheKey,
+    final decoded = _decodePersistedFeedStore(
+      prefs.getString(_feedPersistedCacheKey),
+    );
+    final Map<String, dynamic> feeds =
+        (decoded['feeds'] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    final Map<String, dynamic> scope =
+        (feeds[scopeKey] as Map<String, dynamic>?) ?? <String, dynamic>{};
+    final List<dynamic> existingPages =
+        (scope['pages'] as List<dynamic>?) ?? <dynamic>[];
+
+    final List<Map<String, dynamic>> pages = existingPages
+        .whereType<Map<String, dynamic>>()
+        .where((entry) {
+          final int cachedAtMs = (entry['cachedAtMs'] as num?)?.toInt() ?? 0;
+          if (cachedAtMs <= 0) return false;
+          final DateTime cachedAt = DateTime.fromMillisecondsSinceEpoch(
+            cachedAtMs,
+          );
+          return now.difference(cachedAt) <= _feedPersistedCacheTtl;
+        })
+        .toList();
+
+    if ((cursor == null || cursor.isEmpty) && page == 1) {
+      pages.clear();
+    }
+    pages.removeWhere(
+      (entry) => (entry['requestKey'] as String?) == requestKey,
+    );
+    pages.add(<String, dynamic>{
+      'requestKey': requestKey,
+      'page': page,
+      'cursor': cursor ?? '',
+      'nextCursor': nextCursor ?? '',
       'cachedAtMs': now.millisecondsSinceEpoch,
       'payload': payload,
+    });
+    pages.sort((a, b) {
+      final int pageA = (a['page'] as num?)?.toInt() ?? 1;
+      final int pageB = (b['page'] as num?)?.toInt() ?? 1;
+      return pageA.compareTo(pageB);
+    });
+    if (pages.length > _maxPersistedPagesPerFeed) {
+      pages.removeRange(0, pages.length - _maxPersistedPagesPerFeed);
+    }
+
+    feeds[scopeKey] = <String, dynamic>{
+      'updatedAtMs': now.millisecondsSinceEpoch,
+      'pages': pages,
     };
+    if (feeds.length > _maxPersistedFeeds) {
+      final entries = feeds.entries.toList()
+        ..sort((a, b) {
+          final int aMs =
+              ((a.value as Map<String, dynamic>?)?['updatedAtMs'] as num?)
+                  ?.toInt() ??
+              0;
+          final int bMs =
+              ((b.value as Map<String, dynamic>?)?['updatedAtMs'] as num?)
+                  ?.toInt() ??
+              0;
+          return bMs.compareTo(aMs);
+        });
+      final allowed = entries
+          .take(_maxPersistedFeeds)
+          .map((e) => e.key)
+          .toSet();
+      feeds.removeWhere((key, value) => !allowed.contains(key));
+    }
+
+    final wrapper = <String, dynamic>{'version': 2, 'feeds': feeds};
     await prefs.setString(_feedPersistedCacheKey, jsonEncode(wrapper));
   }
 
-  Future<SitesListResult?> _loadPersistedFirstPageSnapshot(String cacheKey) async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_feedPersistedCacheKey);
-    if (raw == null || raw.isEmpty) return null;
+  Map<String, dynamic> _decodePersistedFeedStore(String? raw) {
+    if (raw == null || raw.isEmpty) return <String, dynamic>{};
     final decoded = jsonDecode(raw);
-    if (decoded is! Map<String, dynamic>) return null;
-    if ((decoded['cacheKey'] as String?) != cacheKey) return null;
-    final int cachedAtMs = (decoded['cachedAtMs'] as num?)?.toInt() ?? 0;
+    if (decoded is! Map<String, dynamic>) return <String, dynamic>{};
+    return decoded;
+  }
+
+  Future<SitesListResult?> _loadPersistedFeedSnapshot({
+    required String requestKey,
+    required String scopeKey,
+    required int page,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final decoded = _decodePersistedFeedStore(
+      prefs.getString(_feedPersistedCacheKey),
+    );
+    final Map<String, dynamic> feeds =
+        (decoded['feeds'] as Map<String, dynamic>?) ?? const {};
+    final Map<String, dynamic>? scope =
+        feeds[scopeKey] as Map<String, dynamic>?;
+    if (scope == null) return null;
+    final List<dynamic> pages =
+        (scope['pages'] as List<dynamic>?) ?? const <dynamic>[];
+
+    Map<String, dynamic>? selected = pages
+        .whereType<Map<String, dynamic>>()
+        .cast<Map<String, dynamic>?>()
+        .firstWhere(
+          (entry) => (entry?['requestKey'] as String?) == requestKey,
+          orElse: () => null,
+        );
+    selected ??= pages
+        .whereType<Map<String, dynamic>>()
+        .cast<Map<String, dynamic>?>()
+        .firstWhere(
+          (entry) => ((entry?['page'] as num?)?.toInt() ?? -1) == page,
+          orElse: () => null,
+        );
+    if (selected == null) return null;
+
+    final int cachedAtMs = (selected['cachedAtMs'] as num?)?.toInt() ?? 0;
     if (cachedAtMs <= 0) return null;
-    final cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
-    if (DateTime.now().difference(cachedAt) > const Duration(hours: 6)) return null;
-    final payload = decoded['payload'];
+    final DateTime cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
+    if (DateTime.now().difference(cachedAt) > _feedPersistedCacheTtl) {
+      return null;
+    }
+
+    final dynamic payload = selected['payload'];
     if (payload is! Map<String, dynamic>) return null;
     final int limit =
-        ((payload['meta'] as Map<String, dynamic>?)?['limit'] as num?)?.toInt() ??
+        ((payload['meta'] as Map<String, dynamic>?)?['limit'] as num?)
+            ?.toInt() ??
         20;
-    final SitesListResult parsed = _sitesListResultFromJson(payload, page: 1, limit: limit);
+    final int resolvedPage = ((selected['page'] as num?)?.toInt() ?? page)
+        .clamp(1, 999999);
+    final SitesListResult parsed = _sitesListResultFromJson(
+      payload,
+      page: resolvedPage,
+      limit: limit,
+    );
     return SitesListResult(
       sites: parsed.sites,
       total: parsed.total,
@@ -202,6 +360,12 @@ class ApiSitesRepository implements SitesRepository {
       nextCursor: parsed.nextCursor,
       cachedAt: cachedAt,
     );
+  }
+
+  Future<void> _clearFeedCaches() async {
+    _memoryFeedCache.clear();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_feedPersistedCacheKey);
   }
 
   @override
@@ -220,33 +384,41 @@ class ApiSitesRepository implements SitesRepository {
   @override
   Future<EngagementSnapshot> upvoteSite(String id) async {
     final ApiResponse response = await _client.post('/sites/$id/upvote');
+    unawaited(_clearFeedCaches());
     return _engagementSnapshotFromJson(response.json);
   }
 
   @override
   Future<EngagementSnapshot> removeSiteUpvote(String id) async {
     final ApiResponse response = await _client.delete('/sites/$id/upvote');
+    unawaited(_clearFeedCaches());
     return _engagementSnapshotFromJson(response.json);
   }
 
   @override
   Future<EngagementSnapshot> saveSite(String id) async {
     final ApiResponse response = await _client.post('/sites/$id/save');
+    unawaited(_clearFeedCaches());
     return _engagementSnapshotFromJson(response.json);
   }
 
   @override
   Future<EngagementSnapshot> unsaveSite(String id) async {
     final ApiResponse response = await _client.delete('/sites/$id/save');
+    unawaited(_clearFeedCaches());
     return _engagementSnapshotFromJson(response.json);
   }
 
   @override
-  Future<EngagementSnapshot> shareSite(String id, {String channel = 'native'}) async {
+  Future<EngagementSnapshot> shareSite(
+    String id, {
+    String channel = 'native',
+  }) async {
     final ApiResponse response = await _client.post(
       '/sites/$id/share',
       body: <String, dynamic>{'channel': channel},
     );
+    unawaited(_clearFeedCaches());
     return _engagementSnapshotFromJson(response.json);
   }
 
@@ -264,7 +436,9 @@ class ApiSitesRepository implements SitesRepository {
       'sort=$sort',
       if (parentId != null && parentId.isNotEmpty) 'parentId=$parentId',
     ].join('&');
-    final ApiResponse response = await _client.get('/sites/$id/comments?$query');
+    final ApiResponse response = await _client.get(
+      '/sites/$id/comments?$query',
+    );
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
     final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
@@ -282,7 +456,11 @@ class ApiSitesRepository implements SitesRepository {
   }
 
   @override
-  Future<SiteCommentItem> createSiteComment(String id, String body, {String? parentId}) async {
+  Future<SiteCommentItem> createSiteComment(
+    String id,
+    String body, {
+    String? parentId,
+  }) async {
     final ApiResponse response = await _client.post(
       '/sites/$id/comments',
       body: <String, dynamic>{
@@ -296,7 +474,11 @@ class ApiSitesRepository implements SitesRepository {
   }
 
   @override
-  Future<void> updateSiteComment(String siteId, String commentId, String body) async {
+  Future<void> updateSiteComment(
+    String siteId,
+    String commentId,
+    String body,
+  ) async {
     await _client.patch(
       '/sites/$siteId/comments/$commentId',
       body: <String, dynamic>{'body': body},
@@ -309,31 +491,51 @@ class ApiSitesRepository implements SitesRepository {
   }
 
   @override
-  Future<SiteCommentLikeSnapshot> likeSiteComment(String siteId, String commentId) async {
-    final response = await _client.post('/sites/$siteId/comments/$commentId/like');
+  Future<SiteCommentLikeSnapshot> likeSiteComment(
+    String siteId,
+    String commentId,
+  ) async {
+    final response = await _client.post(
+      '/sites/$siteId/comments/$commentId/like',
+    );
     return _siteCommentLikeSnapshotFromJson(response.json);
   }
 
   @override
-  Future<SiteCommentLikeSnapshot> unlikeSiteComment(String siteId, String commentId) async {
-    final response = await _client.delete('/sites/$siteId/comments/$commentId/like');
+  Future<SiteCommentLikeSnapshot> unlikeSiteComment(
+    String siteId,
+    String commentId,
+  ) async {
+    final response = await _client.delete(
+      '/sites/$siteId/comments/$commentId/like',
+    );
     return _siteCommentLikeSnapshotFromJson(response.json);
   }
 
   @override
-  Future<SiteMediaResult> getSiteMedia(String id, {int page = 1, int limit = 24}) async {
-    final ApiResponse response = await _client.get('/sites/$id/media?page=$page&limit=$limit');
+  Future<SiteMediaResult> getSiteMedia(
+    String id, {
+    int page = 1,
+    int limit = 24,
+  }) async {
+    final ApiResponse response = await _client.get(
+      '/sites/$id/media?page=$page&limit=$limit',
+    );
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
     final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
     final List<SiteMediaItem> items = data
         .whereType<Map<String, dynamic>>()
-        .map<SiteMediaItem>((Map<String, dynamic> item) => SiteMediaItem(
-              id: item['id'] as String? ?? '',
-              reportId: item['reportId'] as String? ?? '',
-              url: item['url'] as String? ?? '',
-              createdAt: DateTime.tryParse(item['createdAt'] as String? ?? '') ?? DateTime.now(),
-            ))
+        .map<SiteMediaItem>(
+          (Map<String, dynamic> item) => SiteMediaItem(
+            id: item['id'] as String? ?? '',
+            reportId: item['reportId'] as String? ?? '',
+            url: item['url'] as String? ?? '',
+            createdAt:
+                DateTime.tryParse(item['createdAt'] as String? ?? '') ??
+                DateTime.now(),
+          ),
+        )
         .toList();
     final Map<String, dynamic>? meta = json['meta'] as Map<String, dynamic>?;
     return SiteMediaResult(
@@ -377,6 +579,7 @@ class ApiSitesRepository implements SitesRepository {
         ...?metadata?.letMap('metadata'),
       },
     );
+    unawaited(_clearFeedCaches());
   }
 
   PollutionSite _siteListItemFromJson(Map<String, dynamic> json) {
@@ -386,15 +589,18 @@ class ApiSitesRepository implements SitesRepository {
     final String title = desc.isNotEmpty
         ? desc
         : (_normalizeFeedTitle(latestTitle).isNotEmpty
-            ? _normalizeFeedTitle(latestTitle)
-            : (latest.isNotEmpty ? latest : 'Pollution site'));
+              ? _normalizeFeedTitle(latestTitle)
+              : (latest.isNotEmpty ? latest : 'Pollution site'));
     final double distanceKm = json.containsKey('distanceKm')
         ? ((json['distanceKm'] as num?)?.toDouble() ?? -1)
         : -1;
     final int reportCount = (json['reportCount'] as num?)?.toInt() ?? 0;
     final String statusStr = json['status'] as String? ?? 'REPORTED';
-    final (String statusLabel, Color statusColor) = _siteStatusToLabelAndColor(statusStr);
-    final int score = (json['upvotesCount'] as num?)?.toInt() ?? reportCount * 5;
+    final (String statusLabel, Color statusColor) = _siteStatusToLabelAndColor(
+      statusStr,
+    );
+    final int score =
+        (json['upvotesCount'] as num?)?.toInt() ?? reportCount * 5;
     final int commentsCount = (json['commentsCount'] as num?)?.toInt() ?? 0;
     final int sharesCount = (json['sharesCount'] as num?)?.toInt() ?? 0;
     final bool isUpvotedByMe = json['isUpvotedByMe'] == true;
@@ -419,8 +625,8 @@ class ApiSitesRepository implements SitesRepository {
       description: desc.isNotEmpty
           ? desc
           : (latestTitle.isNotEmpty && latest.isNotEmpty
-              ? latest
-              : (latestTitle.isNotEmpty ? latestTitle : latest)),
+                ? latest
+                : (latestTitle.isNotEmpty ? latestTitle : latest)),
       statusLabel: statusLabel,
       statusColor: statusColor,
       distanceKm: distanceKm,
@@ -438,14 +644,14 @@ class ApiSitesRepository implements SitesRepository {
       coReporterNames: <String>[],
       latitude: lat,
       longitude: lng,
-      feedReasons: (json['rankingReasons'] as List<dynamic>? ?? const <dynamic>[])
-          .whereType<String>()
-          .toList(),
+      feedReasons:
+          (json['rankingReasons'] as List<dynamic>? ?? const <dynamic>[])
+              .whereType<String>()
+              .toList(),
       rankingScore: (json['rankingScore'] as num?)?.toDouble(),
       rankingComponents: _rankingComponentsFromJson(json['rankingComponents']),
       latestReporterName: json['latestReportReporterName'] as String?,
-      latestReporterAvatarUrl:
-          json['latestReportReporterAvatarUrl'] as String?,
+      latestReporterAvatarUrl: json['latestReportReporterAvatarUrl'] as String?,
       latestReporterUserId: json['latestReportReporterId'] as String?,
       latestReportAt: () {
         final String? s = json['latestReportCreatedAt'] as String?;
@@ -457,12 +663,16 @@ class ApiSitesRepository implements SitesRepository {
 
   PollutionSite _siteDetailFromJson(Map<String, dynamic> json) {
     final String desc = json['description'] as String? ?? '';
-    final List<dynamic> reportsJson = json['reports'] as List<dynamic>? ?? <dynamic>[];
-    final List<Map<String, dynamic>> reports =
-        reportsJson.whereType<Map<String, dynamic>>().toList();
-    final List<dynamic> eventsJson = json['events'] as List<dynamic>? ?? <dynamic>[];
-    final List<Map<String, dynamic>> events =
-        eventsJson.whereType<Map<String, dynamic>>().toList();
+    final List<dynamic> reportsJson =
+        json['reports'] as List<dynamic>? ?? <dynamic>[];
+    final List<Map<String, dynamic>> reports = reportsJson
+        .whereType<Map<String, dynamic>>()
+        .toList();
+    final List<dynamic> eventsJson =
+        json['events'] as List<dynamic>? ?? <dynamic>[];
+    final List<Map<String, dynamic>> events = eventsJson
+        .whereType<Map<String, dynamic>>()
+        .toList();
 
     SiteReport? firstReport;
     String? latestReporterUserId;
@@ -473,22 +683,26 @@ class ApiSitesRepository implements SitesRepository {
       final Map<String, dynamic> first = reports.first;
       latestReporterUserId = first['reporterId'] as String?;
       for (final Map<String, dynamic> r in reports) {
-        final List<dynamic> mediaList = r['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
+        final List<dynamic> mediaList =
+            r['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
         for (final dynamic m in mediaList) {
           if (m is String && m.isNotEmpty) {
             uniqueImageUrls.add(m);
           }
         }
       }
-      final List<dynamic> firstMediaList = first['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
+      final List<dynamic> firstMediaList =
+          first['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
       final List<ImageProvider> firstReportImages = firstMediaList
           .whereType<String>()
           .map<ImageProvider>((String u) => imageProviderForSiteMedia(u))
           .toList();
       final Map<String, dynamic>? reporterJson =
           first['reporter'] as Map<String, dynamic>?;
-      final String reporterFirstName = reporterJson?['firstName'] as String? ?? '';
-      final String reporterLastName = reporterJson?['lastName'] as String? ?? '';
+      final String reporterFirstName =
+          reporterJson?['firstName'] as String? ?? '';
+      final String reporterLastName =
+          reporterJson?['lastName'] as String? ?? '';
       final String? reporterAvatarUrl = reporterJson?['avatarUrl'] as String?;
       final String reporterName = '$reporterFirstName $reporterLastName'.trim();
       final String reportTitle = (first['title'] as String?)?.trim() ?? '';
@@ -501,16 +715,20 @@ class ApiSitesRepository implements SitesRepository {
       firstReport = SiteReport(
         id: first['id'] as String? ?? '',
         reporterName: reporterName.isEmpty ? 'Anonymous' : reporterName,
-        reportedAt: DateTime.tryParse(first['createdAt'] as String? ?? '') ?? DateTime.now(),
+        reportedAt:
+            DateTime.tryParse(first['createdAt'] as String? ?? '') ??
+            DateTime.now(),
         title: resolvedTitle,
         description: resolvedBody,
         images: firstReportImages,
         reporterAvatarUrl: reporterAvatarUrl,
       );
-      final List<dynamic> coList = first['coReporters'] as List<dynamic>? ?? <dynamic>[];
+      final List<dynamic> coList =
+          first['coReporters'] as List<dynamic>? ?? <dynamic>[];
       for (final dynamic co in coList) {
         if (co is Map<String, dynamic>) {
-          final Map<String, dynamic>? user = co['user'] as Map<String, dynamic>?;
+          final Map<String, dynamic>? user =
+              co['user'] as Map<String, dynamic>?;
           if (user != null) {
             final String fn = user['firstName'] as String? ?? '';
             final String ln = user['lastName'] as String? ?? '';
@@ -521,19 +739,25 @@ class ApiSitesRepository implements SitesRepository {
       }
     }
 
-    final Map<String, dynamic>? firstReportJson =
-        reports.isNotEmpty ? reports.first : null;
-    final String latestTitle = _normalizeFeedTitle(firstReportJson?['title'] as String? ?? '');
+    final Map<String, dynamic>? firstReportJson = reports.isNotEmpty
+        ? reports.first
+        : null;
+    final String latestTitle = _normalizeFeedTitle(
+      firstReportJson?['title'] as String? ?? '',
+    );
     final String latestDesc = firstReportJson?['description'] as String? ?? '';
     final String title = desc.isNotEmpty
         ? desc
         : (latestTitle.trim().isNotEmpty
-            ? latestTitle.trim()
-            : (latestDesc.isNotEmpty ? latestDesc : 'Pollution site'));
+              ? latestTitle.trim()
+              : (latestDesc.isNotEmpty ? latestDesc : 'Pollution site'));
     final String statusStr = json['status'] as String? ?? 'REPORTED';
-    final (String statusLabel, Color statusColor) = _siteStatusToLabelAndColor(statusStr);
+    final (String statusLabel, Color statusColor) = _siteStatusToLabelAndColor(
+      statusStr,
+    );
     final int reportCount = reports.length;
-    final int score = (json['upvotesCount'] as num?)?.toInt() ?? reportCount * 5;
+    final int score =
+        (json['upvotesCount'] as num?)?.toInt() ?? reportCount * 5;
     final int commentsCount = (json['commentsCount'] as num?)?.toInt() ?? 0;
     final int sharesCount = (json['sharesCount'] as num?)?.toInt() ?? 0;
     final bool isUpvotedByMe = json['isUpvotedByMe'] == true;
@@ -545,15 +769,18 @@ class ApiSitesRepository implements SitesRepository {
       final int pc = (ev['participantCount'] as num?)?.toInt() ?? 0;
       totalParticipants += pc;
       final String scheduledStr = ev['scheduledAt'] as String? ?? '';
-      final DateTime dateTime = DateTime.tryParse(scheduledStr) ?? DateTime.now();
-      cleaningEvents.add(CleaningEvent(
-        id: ev['id'] as String? ?? '',
-        title: 'Cleanup event',
-        dateTime: dateTime,
-        participantCount: pc,
-        statusLabel: 'Upcoming',
-        statusColor: AppColors.primaryDark,
-      ));
+      final DateTime dateTime =
+          DateTime.tryParse(scheduledStr) ?? DateTime.now();
+      cleaningEvents.add(
+        CleaningEvent(
+          id: ev['id'] as String? ?? '',
+          title: 'Cleanup event',
+          dateTime: dateTime,
+          participantCount: pc,
+          statusLabel: 'Upcoming',
+          statusColor: AppColors.primaryDark,
+        ),
+      );
     }
 
     final List<ImageProvider> imageProviders = uniqueImageUrls
@@ -571,8 +798,8 @@ class ApiSitesRepository implements SitesRepository {
       description: desc.isNotEmpty
           ? desc
           : (latestTitle.trim().isNotEmpty && latestDesc.isNotEmpty
-              ? latestDesc
-              : (latestTitle.trim().isNotEmpty ? latestTitle : latestDesc)),
+                ? latestDesc
+                : (latestTitle.trim().isNotEmpty ? latestTitle : latestDesc)),
       statusLabel: statusLabel,
       statusColor: statusColor,
       distanceKm: json.containsKey('distanceKm')
@@ -596,8 +823,8 @@ class ApiSitesRepository implements SitesRepository {
       rankingComponents: null,
       latestReporterName:
           firstReport != null && firstReport.reporterName != 'Anonymous'
-              ? firstReport.reporterName
-              : null,
+          ? firstReport.reporterName
+          : null,
       latestReporterAvatarUrl: firstReport?.reporterAvatarUrl,
       latestReportAt: firstReport?.reportedAt,
       latestReporterUserId: latestReporterUserId,
@@ -655,14 +882,17 @@ class ApiSitesRepository implements SitesRepository {
   }
 
   SiteCommentItem _siteCommentFromJson(Map<String, dynamic> item) {
-    final List<dynamic> repliesJson = item['replies'] as List<dynamic>? ?? <dynamic>[];
+    final List<dynamic> repliesJson =
+        item['replies'] as List<dynamic>? ?? <dynamic>[];
     return SiteCommentItem(
       id: item['id'] as String? ?? '',
       parentId: item['parentId'] as String?,
       authorId: item['authorId'] as String? ?? '',
       authorName: item['authorName'] as String? ?? 'Anonymous',
       body: item['body'] as String? ?? '',
-      createdAt: DateTime.tryParse(item['createdAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(item['createdAt'] as String? ?? '') ??
+          DateTime.now(),
       likeCount: (item['likesCount'] as num?)?.toInt() ?? 0,
       isLikedByMe: item['isLikedByMe'] == true,
       replies: repliesJson
@@ -673,7 +903,9 @@ class ApiSitesRepository implements SitesRepository {
     );
   }
 
-  SiteCommentLikeSnapshot _siteCommentLikeSnapshotFromJson(Map<String, dynamic>? json) {
+  SiteCommentLikeSnapshot _siteCommentLikeSnapshotFromJson(
+    Map<String, dynamic>? json,
+  ) {
     if (json == null) throw AppError.unknown();
     return SiteCommentLikeSnapshot(
       commentId: json['commentId'] as String? ?? '',

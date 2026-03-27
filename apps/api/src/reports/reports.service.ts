@@ -1294,6 +1294,8 @@ export class ReportsService {
         title: 'Report status updated',
         body: `Your report has been ${statusLabel}`,
         type: 'REPORT_STATUS',
+        threadKey: `report:${reportId}`,
+        groupKey: `REPORT_STATUS:site:${updated.siteId}`,
         data: { reportId, siteId: updated.siteId, status: dto.status },
       });
     }

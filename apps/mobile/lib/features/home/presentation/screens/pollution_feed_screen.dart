@@ -59,7 +59,9 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       case FeedFilter.all:
         return List<PollutionSite>.from(source);
       case FeedFilter.urgent:
-        final urgent = source.where((PollutionSite s) => s.urgencyLabel != null).toList();
+        final urgent = source
+            .where((PollutionSite s) => s.urgencyLabel != null)
+            .toList();
         if (urgent.isNotEmpty) return urgent;
         final fallback = List<PollutionSite>.from(source)
           ..sort((a, b) {
@@ -70,22 +72,27 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
           });
         return fallback;
       case FeedFilter.nearby:
-        return List<PollutionSite>.from(source)..sort((PollutionSite a, PollutionSite b) {
-          final bool aKnown = a.distanceKm >= 0;
-          final bool bKnown = b.distanceKm >= 0;
-          if (aKnown != bKnown) return aKnown ? -1 : 1;
-          if (!aKnown && !bKnown) return b.score.compareTo(a.score);
-          return a.distanceKm.compareTo(b.distanceKm);
-        });
+        return List<PollutionSite>.from(source)
+          ..sort((PollutionSite a, PollutionSite b) {
+            final bool aKnown = a.distanceKm >= 0;
+            final bool bKnown = b.distanceKm >= 0;
+            if (aKnown != bKnown) return aKnown ? -1 : 1;
+            if (!aKnown && !bKnown) return b.score.compareTo(a.score);
+            return a.distanceKm.compareTo(b.distanceKm);
+          });
       case FeedFilter.mostVoted:
-        return List<PollutionSite>.from(source)..sort((PollutionSite a, PollutionSite b) {
+        return List<PollutionSite>.from(source)..sort((
+          PollutionSite a,
+          PollutionSite b,
+        ) {
           final supportA = a.score + (a.commentsCount * 3) + (a.shareCount * 4);
           final supportB = b.score + (b.commentsCount * 3) + (b.shareCount * 4);
           return supportB.compareTo(supportA);
         });
       case FeedFilter.recent:
-        return List<PollutionSite>.from(source)
-          ..sort((a, b) => (b.rankingScore ?? 0).compareTo(a.rankingScore ?? 0));
+        return List<PollutionSite>.from(
+          source,
+        )..sort((a, b) => (b.rankingScore ?? 0).compareTo(a.rankingScore ?? 0));
     }
   }
 
@@ -136,7 +143,8 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         _isLoading = false;
         _loadError = null;
       });
-      if (!_hasShownEntrance && !(MediaQuery.maybeOf(context)?.disableAnimations ?? false)) {
+      if (!_hasShownEntrance &&
+          !(MediaQuery.maybeOf(context)?.disableAnimations ?? false)) {
         _entranceController?.forward(from: 0);
       }
       _hasShownEntrance = true;
@@ -193,8 +201,14 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     _skeletonController?.dispose();
     super.dispose();
   }
+
   void _onScroll() {
-    if (!_scrollController.hasClients || _isLoadingMore || _isLoading || !_hasMore) return;
+    if (!_scrollController.hasClients ||
+        _isLoadingMore ||
+        _isLoading ||
+        !_hasMore) {
+      return;
+    }
     final position = _scrollController.position;
     if (position.pixels < position.maxScrollExtent - 640) return;
     _loadMoreFeed();
@@ -252,7 +266,6 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     }
   }
 
-
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
     await _loadFeed();
@@ -269,21 +282,24 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   Future<void> _openNotifications() async {
     AppHaptics.softTransition();
-    await Navigator.of(context).push<void>(
-      CupertinoPageRoute<void>(
-        builder: (_) => NotificationsScreen(
-          availableSites: _ensureSitesSeeded(),
-        ),
+    final int? unreadAfter = await Navigator.of(context).push<int>(
+      CupertinoPageRoute<int>(
+        builder: (_) =>
+            NotificationsScreen(availableSites: _ensureSitesSeeded()),
       ),
     );
     if (!mounted) return;
+    if (unreadAfter != null) {
+      setState(() {
+        _serverUnreadCount = unreadAfter;
+      });
+    }
     unawaited(_refreshUnreadCount());
   }
 
   Future<void> _refreshUnreadCount() async {
     try {
-      final int count = await ServiceLocator.instance
-          .notificationsRepository
+      final int count = await ServiceLocator.instance.notificationsRepository
           .getUnreadCount();
       if (!mounted) return;
       setState(() {
@@ -294,7 +310,8 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   @override
   Widget build(BuildContext context) {
-    final double topHotZoneHeight = MediaQuery.of(context).padding.top + AppSpacing.xs;
+    final double topHotZoneHeight =
+        MediaQuery.of(context).padding.top + AppSpacing.xs;
     return Stack(
       children: <Widget>[
         RefreshIndicator(
@@ -309,7 +326,8 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
             slivers: <Widget>[
               SliverToBoxAdapter(
                 child: FeedHeader(
-                  displayName: ServiceLocator.instance.authState.displayName ?? 'You',
+                  displayName:
+                      ServiceLocator.instance.authState.displayName ?? 'You',
                   unreadCount: _unreadNotificationsCount,
                   onProfileTap: () {
                     AppHaptics.softTransition();
@@ -334,10 +352,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
               else if (_loadError != null)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: AppErrorView(
-                    error: _loadError!,
-                    onRetry: _loadFeed,
-                  ),
+                  child: AppErrorView(error: _loadError!, onRetry: _loadFeed),
                 )
               else if (_visibleSites.isEmpty)
                 SliverFillRemaining(
@@ -346,7 +361,9 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                 )
               else
                 SliverList.builder(
-                  itemCount: _visibleSites.length + ((_isLoadingMore || _loadMoreFailed) ? 1 : 0),
+                  itemCount:
+                      _visibleSites.length +
+                      ((_isLoadingMore || _loadMoreFailed) ? 1 : 0),
                   itemBuilder: (BuildContext context, int index) {
                     if (index >= _visibleSites.length) {
                       if (_loadMoreFailed) {
@@ -381,38 +398,54 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     final AnimationController? controller = _entranceController;
                     final Widget card = RepaintBoundary(
                       child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-                      child: PollutionSiteCard(
-                        site: _visibleSites[index],
-                        feedSessionId: _feedSessionId,
-                        onHidden: _hideSiteFromFeed,
-                      ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.lg,
+                        ),
+                        child: PollutionSiteCard(
+                          site: _visibleSites[index],
+                          feedSessionId: _feedSessionId,
+                          onHidden: _hideSiteFromFeed,
+                        ),
                       ),
                     );
                     if (controller == null) return card;
                     final double staggerDelay = (index * 0.15).clamp(0.0, 0.6);
-                    final double staggerEnd = (staggerDelay + 0.4).clamp(0.0, 1.0);
+                    final double staggerEnd = (staggerDelay + 0.4).clamp(
+                      0.0,
+                      1.0,
+                    );
                     final Animation<double> opacity = CurvedAnimation(
                       parent: controller,
-                      curve: Interval(staggerDelay, staggerEnd, curve: AppMotion.standardCurve),
+                      curve: Interval(
+                        staggerDelay,
+                        staggerEnd,
+                        curve: AppMotion.standardCurve,
+                      ),
                     );
-                    final Animation<Offset> slide = Tween<Offset>(
-                      begin: const Offset(0, 0.08),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: controller,
-                      curve: Interval(staggerDelay, staggerEnd, curve: AppMotion.emphasized),
-                    ));
+                    final Animation<Offset> slide =
+                        Tween<Offset>(
+                          begin: const Offset(0, 0.08),
+                          end: Offset.zero,
+                        ).animate(
+                          CurvedAnimation(
+                            parent: controller,
+                            curve: Interval(
+                              staggerDelay,
+                              staggerEnd,
+                              curve: AppMotion.emphasized,
+                            ),
+                          ),
+                        );
                     return FadeTransition(
                       opacity: opacity,
-                      child: SlideTransition(
-                        position: slide,
-                        child: card,
-                      ),
+                      child: SlideTransition(position: slide, child: card),
                     );
                   },
                 ),
-              if (!_isLoading && _loadError == null && _visibleSites.isNotEmpty && !_hasMore)
+              if (!_isLoading &&
+                  _loadError == null &&
+                  _visibleSites.isNotEmpty &&
+                  !_hasMore)
                 SliverToBoxAdapter(child: _buildFooter(context)),
             ],
           ),
@@ -503,17 +536,17 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
           Text(
             'You\u2019re all caught up',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w500,
-                ),
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
+            ),
           ),
           const SizedBox(height: AppSpacing.xxs),
           Text(
             'Pull to refresh for new reports',
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted.withValues(alpha: 0.6),
-                  fontSize: 13,
-                ),
+              color: AppColors.textMuted.withValues(alpha: 0.6),
+              fontSize: 13,
+            ),
           ),
         ],
       ),
@@ -541,7 +574,9 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     switch (_activeFilter) {
       case FeedFilter.urgent:
       case FeedFilter.nearby:
-        if (!_locationAvailable) return 'Turn on location services and allow access';
+        if (!_locationAvailable) {
+          return 'Turn on location services and allow access';
+        }
         return 'Show all sites or try another filter';
       case FeedFilter.mostVoted:
       case FeedFilter.recent:
@@ -601,7 +636,9 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   scrollToTop();
                 },
                 style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryDark.withValues(alpha: 0.12),
+                  backgroundColor: AppColors.primaryDark.withValues(
+                    alpha: 0.12,
+                  ),
                   foregroundColor: AppColors.primaryDark,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
@@ -647,17 +684,14 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Column(
-            children: List<Widget>.generate(
-              3,
-              (int index) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: index == 2 ? 0 : AppSpacing.lg,
-                  ),
-                  child: FeedSkeletonCard(shimmerT: controller.value),
-                );
-              },
-            ),
+            children: List<Widget>.generate(3, (int index) {
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: index == 2 ? 0 : AppSpacing.lg,
+                ),
+                child: FeedSkeletonCard(shimmerT: controller.value),
+              );
+            }),
           ),
         );
       },
@@ -694,5 +728,4 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       _visibleSites = _computeVisibleSites();
     });
   }
-
 }

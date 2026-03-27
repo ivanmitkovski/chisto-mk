@@ -372,7 +372,19 @@ exports.Prisma.UserNotificationScalarFieldEnum = {
   type: 'type',
   isRead: 'isRead',
   data: 'data',
-  sentAt: 'sentAt'
+  sentAt: 'sentAt',
+  threadKey: 'threadKey',
+  groupKey: 'groupKey'
+};
+
+exports.Prisma.UserNotificationPreferenceScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  userId: 'userId',
+  type: 'type',
+  muted: 'muted',
+  mutedUntil: 'mutedUntil'
 };
 
 exports.Prisma.NotificationOutboxScalarFieldEnum = {
@@ -527,6 +539,7 @@ exports.Prisma.ModelName = {
   SiteShareEvent: 'SiteShareEvent',
   UserDeviceToken: 'UserDeviceToken',
   UserNotification: 'UserNotification',
+  UserNotificationPreference: 'UserNotificationPreference',
   NotificationOutbox: 'NotificationOutbox'
 };
 
