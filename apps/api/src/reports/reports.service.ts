@@ -6,6 +6,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   AdminNotificationCategory,
   AdminNotificationTone,
@@ -73,6 +74,7 @@ export class ReportsService {
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   /** Fallback for reports created before reportNumber column (e.g. during migration). */
@@ -1286,6 +1288,14 @@ export class ReportsService {
         'report_updated',
         { kind: 'status_changed', status: dto.status },
       );
+      const statusLabel = dto.status.toLowerCase().replace(/_/g, ' ');
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [report.reporterId],
+        title: 'Report status updated',
+        body: `Your report has been ${statusLabel}`,
+        type: 'REPORT_STATUS',
+        data: { reportId, siteId: updated.siteId, status: dto.status },
+      });
     }
     return updated;
   }

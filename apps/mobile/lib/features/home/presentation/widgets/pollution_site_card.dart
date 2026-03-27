@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -25,9 +28,13 @@ class PollutionSiteCard extends StatefulWidget {
   const PollutionSiteCard({
     super.key,
     required this.site,
+    this.feedSessionId,
+    this.onHidden,
   });
 
   final PollutionSite site;
+  final String? feedSessionId;
+  final ValueChanged<String>? onHidden;
 
   @override
   State<PollutionSiteCard> createState() => _PollutionSiteCardState();
@@ -48,6 +55,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   bool _isSaveInFlight = false;
   bool _isShareInFlight = false;
   double _upvoteIconScale = 1;
+  final DateTime _openedAt = DateTime.now();
+  bool _impressionTracked = false;
+  Timer? _impressionTimer;
 
   // Cache for word-boundary truncation to avoid recomputing every build.
   String? _cachedTitleTruncated;
@@ -66,18 +76,50 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   @override
   void initState() {
     super.initState();
+    _syncFromSite();
+  }
+
+  @override
+  void dispose() {
+    _impressionTimer?.cancel();
+    final int dwellSeconds = DateTime.now().difference(_openedAt).inSeconds;
+    if (_impressionTracked && dwellSeconds >= 2) {
+      _trackFeedEvent(
+        'dwell_bucket',
+        metadata: <String, dynamic>{'bucket': _dwellBucketForSeconds(dwellSeconds)},
+      );
+    }
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(covariant PollutionSiteCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final bool changedSite = oldWidget.site.id != widget.site.id;
+    final bool changedEngagement =
+        oldWidget.site.score != widget.site.score ||
+        oldWidget.site.commentCount != widget.site.commentCount ||
+        oldWidget.site.shareCount != widget.site.shareCount ||
+        oldWidget.site.isUpvotedByMe != widget.site.isUpvotedByMe ||
+        oldWidget.site.isSavedByMe != widget.site.isSavedByMe;
+    if (changedSite || changedEngagement) {
+      _syncFromSite();
+      if (changedSite) {
+        _impressionTracked = false;
+        _impressionTimer?.cancel();
+        _impressionTimer = null;
+      }
+    }
+  }
+
+  void _syncFromSite() {
     _isUpvoted = site.isUpvotedByMe;
     _upvoteCount = site.score;
     _commentCount = site.commentCount;
     _shareCount = site.shareCount;
     _sessionComments = List<Comment>.from(site.comments);
     _isSaved = site.isSavedByMe;
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
   }
 
   @override
@@ -122,6 +164,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         _isSaved = snapshot.isSavedByMe;
       });
       AppHaptics.light();
+      _trackFeedEvent('upvote');
     }).catchError((_) {
       if (!mounted) return;
       setState(() {
@@ -176,6 +219,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         _shareCount = snapshot.sharesCount;
         _isUpvoted = snapshot.isUpvotedByMe;
       });
+      _trackFeedEvent('save', metadata: <String, dynamic>{'saved': snapshot.isSavedByMe});
     } catch (_) {
       if (mounted) {
         setState(() => _isSaved = !nextSaved);
@@ -248,10 +292,26 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      button: false,
-      label: 'Pollution site: ${site.title}. Tap to open details.',
-      child: Container(
+    return VisibilityDetector(
+      key: ValueKey<String>('feed-card-${site.id}'),
+      onVisibilityChanged: (VisibilityInfo info) {
+        if (_impressionTracked) return;
+        if (info.visibleFraction < 0.5) {
+          _impressionTimer?.cancel();
+          _impressionTimer = null;
+          return;
+        }
+        _impressionTimer ??= Timer(const Duration(milliseconds: 500), () {
+          if (!mounted || _impressionTracked) return;
+          _trackFeedEvent('impression');
+          _impressionTracked = true;
+          _impressionTimer = null;
+        });
+      },
+      child: Semantics(
+        button: false,
+        label: 'Pollution site: ${site.title}. Tap to open details.',
+        child: Container(
         margin: const EdgeInsets.only(bottom: AppSpacing.lg),
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
@@ -397,6 +457,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             ),
           ),
         ),
+        ),
       ),
     );
   }
@@ -406,7 +467,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
 
     return Semantics(
       image: true,
-      label: 'Photo of pollution site',
+      label: 'Photo of ${site.title}',
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Stack(
@@ -425,7 +486,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
               physics: const BouncingScrollPhysics(),
               itemBuilder: (BuildContext context, int index) {
                 return SizedBox.expand(
-                  child: AppSmartImage(image: images[index]),
+                  child: AppSmartImage(
+                    image: images[index],
+                    semanticLabel: 'Photo ${index + 1} of ${site.title}',
+                  ),
                 );
               },
             ),
@@ -474,6 +538,31 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: AppSpacing.sm,
+              right: AppSpacing.sm,
+              child: Semantics(
+                button: true,
+                label: 'Feed options',
+                child: InkWell(
+                  onTap: _openFeedbackSheet,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      color: AppColors.black.withValues(alpha: 0.34),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                    ),
+                    child: const Icon(
+                      Icons.more_horiz_rounded,
+                      color: AppColors.textOnDark,
+                      size: 20,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -729,6 +818,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
 
   Future<void> _openDetails(BuildContext context) async {
     AppHaptics.softTransition();
+    _trackFeedEvent('detail_open');
     for (int i = 0; i < site.galleryImages.length && i < 3; i++) {
       precacheImage(site.galleryImages[i], context);
     }
@@ -752,6 +842,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   Future<void> _openCommentsSheet() async {
+    _trackFeedEvent('comment_open');
     Future<List<Comment>> loadComments(String sort) async {
       final result = await ServiceLocator.instance.sitesRepository.getSiteComments(
         site.id,
@@ -888,6 +979,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
       if (!mounted) return;
       setState(() => _shareCount = snapshot.sharesCount);
+      _trackFeedEvent('share');
     } catch (_) {
       if (mounted) {
         AppSnack.show(
@@ -918,6 +1010,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
       if (!mounted) return;
       setState(() => _shareCount = snapshot.sharesCount);
+      _trackFeedEvent('share');
     } catch (_) {
       if (mounted) {
         AppSnack.show(
@@ -942,10 +1035,11 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       return;
     }
 
-    final List<String> names = List<String>.generate(
-      count,
-      (int index) => 'Eco volunteer ${index + 1}',
-    );
+    final List<String> names = <String>[
+      'Community supporter',
+      'Local resident',
+      'Verified citizen',
+    ];
 
     await showModalBottomSheet<void>(
       context: context,
@@ -1004,6 +1098,214 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       isLikedByMe: item.isLikedByMe,
       isOwnedByMe: item.authorId == currentUserId,
       replies: item.replies.map(_commentFromSiteCommentItem).toList(),
+    );
+  }
+
+  String _dwellBucketForSeconds(int seconds) {
+    if (seconds < 5) return '2_4s';
+    if (seconds < 15) return '5_14s';
+    if (seconds < 30) return '15_29s';
+    return '30s_plus';
+  }
+
+  void _trackFeedEvent(String eventType, {Map<String, dynamic>? metadata}) {
+    unawaited(
+      ServiceLocator.instance.sitesRepository.trackFeedEvent(
+        site.id,
+        eventType: eventType,
+        sessionId: widget.feedSessionId,
+        metadata: metadata,
+      ),
+    );
+  }
+
+  Future<void> _onFeedbackSelected(_FeedFeedbackAction action) async {
+    final String feedbackType = switch (action) {
+      _FeedFeedbackAction.notRelevant => 'not_relevant',
+      _FeedFeedbackAction.showLess => 'show_more',
+      _FeedFeedbackAction.duplicate => 'duplicate',
+      _FeedFeedbackAction.misleading => 'misleading',
+      _FeedFeedbackAction.hide => 'not_relevant',
+    };
+    try {
+      await ServiceLocator.instance.sitesRepository.submitFeedFeedback(
+        site.id,
+        feedbackType: feedbackType,
+        sessionId: widget.feedSessionId,
+        metadata: <String, dynamic>{'source': 'feed_card_menu', 'action': action.name},
+      );
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: action == _FeedFeedbackAction.hide
+            ? 'Post hidden from your feed'
+            : 'Thanks for your feedback',
+        type: AppSnackType.info,
+      );
+      if (action == _FeedFeedbackAction.hide) {
+        widget.onHidden?.call(site.id);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: 'Could not submit feedback right now.',
+        type: AppSnackType.warning,
+      );
+    }
+  }
+
+  Future<void> _openFeedbackSheet() async {
+    AppHaptics.tap();
+    final action = await showModalBottomSheet<_FeedFeedbackAction>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.transparent,
+      barrierColor: AppColors.overlay,
+      builder: (BuildContext context) => const _FeedFeedbackSheet(),
+    );
+    if (action == null) return;
+    await _onFeedbackSelected(action);
+  }
+}
+
+enum _FeedFeedbackAction { notRelevant, showLess, duplicate, misleading, hide }
+
+class _FeedFeedbackSheet extends StatelessWidget {
+  const _FeedFeedbackSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: AppColors.panelBackground,
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusSheet),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.lg,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: AppSpacing.sheetHandle,
+                  height: AppSpacing.sheetHandleHeight,
+                  decoration: BoxDecoration(
+                    color: AppColors.divider,
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Feed options',
+                style: AppTypography.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Tune what you want to see',
+                style: AppTypography.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              _FeedbackTile(
+                icon: Icons.visibility_off_outlined,
+                title: 'Not relevant',
+                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.notRelevant),
+              ),
+              _FeedbackTile(
+                icon: Icons.auto_awesome_outlined,
+                title: 'Show less like this',
+                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.showLess),
+              ),
+              _FeedbackTile(
+                icon: Icons.copy_all_outlined,
+                title: 'Duplicate',
+                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.duplicate),
+              ),
+              _FeedbackTile(
+                icon: Icons.warning_amber_rounded,
+                title: 'Misleading',
+                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.misleading),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                child: Divider(height: 1, color: AppColors.divider),
+              ),
+              _FeedbackTile(
+                icon: Icons.hide_source_rounded,
+                title: 'Hide this post',
+                isDestructive: true,
+                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.hide),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FeedbackTile extends StatelessWidget {
+  const _FeedbackTile({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.isDestructive = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool isDestructive;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color iconColor = isDestructive ? AppColors.accentDanger : AppColors.textPrimary;
+    final Color textColor = isDestructive ? AppColors.accentDanger : AppColors.textPrimary;
+    return Material(
+      color: AppColors.transparent,
+      child: InkWell(
+        onTap: () {
+          AppHaptics.tap();
+          onTap();
+        },
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+          child: Row(
+            children: <Widget>[
+              Icon(icon, size: AppSpacing.iconLg, color: iconColor),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Text(
+                  title,
+                  style: AppTypography.textTheme.bodyLarge?.copyWith(
+                    color: textColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

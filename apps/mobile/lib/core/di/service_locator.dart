@@ -12,6 +12,9 @@ import 'package:chisto_mobile/features/events/domain/repositories/events_reposit
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:chisto_mobile/features/notifications/data/api_notifications_repository.dart';
+import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
+import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
@@ -36,6 +39,8 @@ class ServiceLocator {
   ReportsApiRepository? _reportsApiRepository;
   ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
+  NotificationsRepository? _notificationsRepository;
+  PushNotificationService? _pushNotificationService;
 
   /// Increment to trigger profile refresh (e.g. after report submit).
   final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
@@ -52,6 +57,8 @@ class ServiceLocator {
   ReportsApiRepository get reportsApiRepository => _reportsApiRepository!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
+  NotificationsRepository get notificationsRepository => _notificationsRepository!;
+  PushNotificationService get pushNotificationService => _pushNotificationService!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -74,11 +81,17 @@ class ServiceLocator {
       },
     );
 
+    _notificationsRepository = ApiNotificationsRepository(client: _apiClient!);
+    _pushNotificationService = PushNotificationService(
+      repository: _notificationsRepository!,
+    );
+
     _authRepository = ApiAuthRepository(
       client: _apiClient!,
       authState: _authState!,
       tokenStorage: _tokenStorage!,
       preferences: prefs,
+      pushService: _pushNotificationService,
     );
 
     _apiClient!.refreshSession = () async {
@@ -116,6 +129,8 @@ class ServiceLocator {
     _reportsApiRepository = null;
     _reportsRealtimeService = null;
     _sitesRepository = null;
+    _notificationsRepository = null;
+    _pushNotificationService = null;
     _initialized = false;
   }
 }

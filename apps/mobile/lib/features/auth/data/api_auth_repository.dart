@@ -6,6 +6,7 @@ import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/access_token_expiry.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
+import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +19,7 @@ class ApiAuthRepository implements AuthRepository {
     required AuthState authState,
     required SecureTokenStorage tokenStorage,
     required SharedPreferences preferences,
+    this.pushService,
   })  : _client = client,
         _authState = authState,
         _tokenStorage = tokenStorage,
@@ -27,6 +29,7 @@ class ApiAuthRepository implements AuthRepository {
   final AuthState _authState;
   final SecureTokenStorage _tokenStorage;
   final SharedPreferences _preferences;
+  final PushNotificationService? pushService;
   Timer? _proactiveRefreshTimer;
 
   @override
@@ -54,6 +57,7 @@ class ApiAuthRepository implements AuthRepository {
     if (json == null) throw AppError.unknown();
     await _saveAndNotify(json);
     _scheduleProactiveRefresh();
+    unawaited(_initPushAfterAuth());
   }
 
   @override
@@ -78,6 +82,7 @@ class ApiAuthRepository implements AuthRepository {
     if (json == null) throw AppError.unknown();
     await _saveAndNotify(json);
     _scheduleProactiveRefresh();
+    unawaited(_initPushAfterAuth());
   }
 
   @override
@@ -172,6 +177,7 @@ class ApiAuthRepository implements AuthRepository {
 
   Future<void> _performLocalLogout() async {
     _cancelProactiveRefresh();
+    unawaited(pushService?.unregisterCurrentToken() ?? Future<void>.value());
     _authState.setUnauthenticated();
     profileAvatarState.setRemoteUrl(null);
     profileAvatarState.clearLocalPath();
@@ -265,6 +271,7 @@ class ApiAuthRepository implements AuthRepository {
       }
       _applyUserProfile(json, storedAccess);
       _scheduleProactiveRefresh();
+      unawaited(_initPushAfterAuth());
     } on AppError catch (e) {
       if (e.code == 'UNAUTHORIZED' || e.code == 'INVALID_TOKEN_USER') {
         try {
@@ -333,6 +340,12 @@ class ApiAuthRepository implements AuthRepository {
       phoneNumber: phoneNumber,
     );
     _scheduleProactiveRefresh();
+  }
+
+  Future<void> _initPushAfterAuth() async {
+    try {
+      await pushService?.initialize();
+    } catch (_) {}
   }
 
   String? _extractAvatarUrl(Map<String, dynamic> json) {

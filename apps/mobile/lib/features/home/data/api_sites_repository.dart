@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/cache/site_image_provider.dart';
 
@@ -8,6 +10,7 @@ import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 const ImageProvider _placeholderImage =
     AssetImage('assets/images/content/people_cleaning.png');
@@ -16,6 +19,10 @@ class ApiSitesRepository implements SitesRepository {
   ApiSitesRepository({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
+  static const Duration _feedCacheTtl = Duration(seconds: 20);
+  static const String _feedPersistedCacheKey = 'feed_cache_first_page_v1';
+  final Map<String, ({SitesListResult result, DateTime cachedAt})> _memoryFeedCache =
+      <String, ({SitesListResult result, DateTime cachedAt})>{};
 
   @override
   Future<SitesListResult> getSites({
@@ -40,28 +47,160 @@ class ApiSitesRepository implements SitesRepository {
     queryParams.add('explain=$explain');
     if (cursor != null && cursor.isNotEmpty) queryParams.add('cursor=$cursor');
     final String path = '/sites?${queryParams.join('&')}';
+    final String cacheKey = _feedCacheKey(
+      latitude: latitude,
+      longitude: longitude,
+      radiusKm: radiusKm,
+      status: status,
+      page: page,
+      limit: limit,
+      sort: sort,
+      mode: mode,
+      explain: explain,
+      cursor: cursor,
+    );
+    final now = DateTime.now();
+    final cacheHit = _memoryFeedCache[cacheKey];
+    if (cacheHit != null && now.difference(cacheHit.cachedAt) <= _feedCacheTtl) {
+      return SitesListResult(
+        sites: cacheHit.result.sites,
+        total: cacheHit.result.total,
+        page: cacheHit.result.page,
+        limit: cacheHit.result.limit,
+        nextCursor: cacheHit.result.nextCursor,
+        servedFromCache: true,
+        isStaleFallback: false,
+        cachedAt: cacheHit.cachedAt,
+      );
+    }
 
-    final ApiResponse response = await _client.get(path);
-    final Map<String, dynamic>? json = response.json;
-    if (json == null) throw AppError.unknown();
+    try {
+      final ApiResponse response = await _client.get(path);
+      final Map<String, dynamic>? json = response.json;
+      if (json == null) throw AppError.unknown();
+      final SitesListResult result = _sitesListResultFromJson(
+        json,
+        page: page,
+        limit: limit,
+      );
+      _memoryFeedCache[cacheKey] = (result: result, cachedAt: now);
 
+      // Persist only first-page feed snapshot as offline fallback.
+      if ((cursor == null || cursor.isEmpty) && page == 1) {
+        unawaited(_persistFirstPageSnapshot(cacheKey, json, now));
+      }
+      return result;
+    } on AppError {
+      // If initial feed request fails, try persisted first-page fallback.
+      if ((cursor == null || cursor.isEmpty) && page == 1) {
+        final fallback = await _loadPersistedFirstPageSnapshot(cacheKey);
+        if (fallback != null) {
+          final DateTime fallbackCachedAt =
+              fallback.cachedAt ?? now;
+          _memoryFeedCache[cacheKey] = (result: fallback, cachedAt: fallbackCachedAt);
+          return SitesListResult(
+            sites: fallback.sites,
+            total: fallback.total,
+            page: fallback.page,
+            limit: fallback.limit,
+            nextCursor: fallback.nextCursor,
+            servedFromCache: true,
+            isStaleFallback: true,
+            cachedAt: fallbackCachedAt,
+          );
+        }
+      }
+      rethrow;
+    }
+  }
+
+  SitesListResult _sitesListResultFromJson(
+    Map<String, dynamic> json, {
+    required int page,
+    required int limit,
+  }) {
     final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
     final List<PollutionSite> sites = data
         .whereType<Map<String, dynamic>>()
         .map<PollutionSite>(_siteListItemFromJson)
         .toList();
-
     final Map<String, dynamic>? meta = json['meta'] as Map<String, dynamic>?;
     final int total = (meta?['total'] as num?)?.toInt() ?? sites.length;
     final int pageVal = (meta?['page'] as num?)?.toInt() ?? page;
     final int limitVal = (meta?['limit'] as num?)?.toInt() ?? limit;
-
     return SitesListResult(
       sites: sites,
       total: total,
       page: pageVal,
       limit: limitVal,
       nextCursor: meta?['nextCursor'] as String?,
+    );
+  }
+
+  String _feedCacheKey({
+    required double? latitude,
+    required double? longitude,
+    required double radiusKm,
+    required String? status,
+    required int page,
+    required int limit,
+    required String sort,
+    required String mode,
+    required bool explain,
+    required String? cursor,
+  }) {
+    return [
+      latitude?.toStringAsFixed(4) ?? '',
+      longitude?.toStringAsFixed(4) ?? '',
+      radiusKm.toStringAsFixed(1),
+      status ?? '',
+      page.toString(),
+      limit.toString(),
+      sort,
+      mode,
+      explain ? '1' : '0',
+      cursor ?? '',
+    ].join('|');
+  }
+
+  Future<void> _persistFirstPageSnapshot(
+    String cacheKey,
+    Map<String, dynamic> payload,
+    DateTime now,
+  ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final wrapper = <String, dynamic>{
+      'cacheKey': cacheKey,
+      'cachedAtMs': now.millisecondsSinceEpoch,
+      'payload': payload,
+    };
+    await prefs.setString(_feedPersistedCacheKey, jsonEncode(wrapper));
+  }
+
+  Future<SitesListResult?> _loadPersistedFirstPageSnapshot(String cacheKey) async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_feedPersistedCacheKey);
+    if (raw == null || raw.isEmpty) return null;
+    final decoded = jsonDecode(raw);
+    if (decoded is! Map<String, dynamic>) return null;
+    if ((decoded['cacheKey'] as String?) != cacheKey) return null;
+    final int cachedAtMs = (decoded['cachedAtMs'] as num?)?.toInt() ?? 0;
+    if (cachedAtMs <= 0) return null;
+    final cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
+    if (DateTime.now().difference(cachedAt) > const Duration(hours: 6)) return null;
+    final payload = decoded['payload'];
+    if (payload is! Map<String, dynamic>) return null;
+    final int limit =
+        ((payload['meta'] as Map<String, dynamic>?)?['limit'] as num?)?.toInt() ??
+        20;
+    final SitesListResult parsed = _sitesListResultFromJson(payload, page: 1, limit: limit);
+    return SitesListResult(
+      sites: parsed.sites,
+      total: parsed.total,
+      page: parsed.page,
+      limit: parsed.limit,
+      nextCursor: parsed.nextCursor,
+      cachedAt: cachedAt,
     );
   }
 

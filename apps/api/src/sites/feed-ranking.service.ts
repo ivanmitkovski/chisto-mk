@@ -36,13 +36,35 @@ export type RankingExplainability = {
 
 @Injectable()
 export class FeedRankingService {
+  private static readNumberEnv(key: string, fallback: number): number {
+    const raw = process.env[key];
+    if (!raw) return fallback;
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  }
+
   // Freshness decays smoothly; balanced to keep quality posts visible for ~1-2 days.
-  private static readonly RECENCY_HALF_LIFE_HOURS = 26;
+  private static readonly RECENCY_HALF_LIFE_HOURS = FeedRankingService.readNumberEnv(
+    'FEED_RANKER_RECENCY_HALF_LIFE_HOURS',
+    26,
+  );
   // Balanced weight profile: freshness + engagement quality + local relevance + trust.
-  private static readonly WEIGHT_RECENCY = 0.34;
-  private static readonly WEIGHT_ENGAGEMENT = 0.38;
-  private static readonly WEIGHT_DISTANCE = 0.2;
-  private static readonly WEIGHT_TRUST = 0.08;
+  private static readonly WEIGHT_RECENCY = FeedRankingService.readNumberEnv(
+    'FEED_RANKER_WEIGHT_RECENCY',
+    0.34,
+  );
+  private static readonly WEIGHT_ENGAGEMENT = FeedRankingService.readNumberEnv(
+    'FEED_RANKER_WEIGHT_ENGAGEMENT',
+    0.38,
+  );
+  private static readonly WEIGHT_DISTANCE = FeedRankingService.readNumberEnv(
+    'FEED_RANKER_WEIGHT_DISTANCE',
+    0.2,
+  );
+  private static readonly WEIGHT_TRUST = FeedRankingService.readNumberEnv(
+    'FEED_RANKER_WEIGHT_TRUST',
+    0.08,
+  );
   // Anti-gaming and saturation controls.
   private static readonly MAX_EFFECTIVE_UPVOTES = 80;
   private static readonly MAX_EFFECTIVE_COMMENTS = 55;

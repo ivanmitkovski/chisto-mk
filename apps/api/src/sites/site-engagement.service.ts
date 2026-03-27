@@ -36,6 +36,7 @@ export class SiteEngagementService {
   }
 
   async removeUpvote(siteId: string, userId: string): Promise<void> {
+    await this.ensureSiteExists(siteId);
     await this.prisma.$transaction(async (tx) => {
       const deleted = await tx.siteVote.deleteMany({
         where: { siteId, userId },
@@ -66,6 +67,7 @@ export class SiteEngagementService {
   }
 
   async unsave(siteId: string, userId: string): Promise<void> {
+    await this.ensureSiteExists(siteId);
     await this.prisma.$transaction(async (tx) => {
       const deleted = await tx.siteSave.deleteMany({
         where: { siteId, userId },

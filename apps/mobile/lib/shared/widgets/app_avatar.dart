@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
-class AppAvatar extends StatelessWidget {
+class AppAvatar extends StatefulWidget {
   const AppAvatar({
     super.key,
     required this.name,
@@ -23,38 +23,72 @@ class AppAvatar extends StatelessWidget {
   final String? localImagePath;
 
   @override
-  Widget build(BuildContext context) {
-    final String initials = _initials(name);
+  State<AppAvatar> createState() => _AppAvatarState();
+}
 
-    final String? path = localImagePath?.trim();
-    if (path != null && path.isNotEmpty) {
-      final File file = File(path);
-      if (file.existsSync()) {
-        return ClipOval(
-          child: SizedBox(
-            width: size,
-            height: size,
-            child: Image.file(
-              file,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => _InitialsCircle(
-                initials: initials,
-                size: size,
-                fontSize: fontSize,
-              ),
-            ),
-          ),
-        );
-      }
+class _AppAvatarState extends State<AppAvatar> {
+  Future<bool>? _localFileExists;
+
+  @override
+  void initState() {
+    super.initState();
+    _localFileExists = _checkLocalFile(widget.localImagePath);
+  }
+
+  @override
+  void didUpdateWidget(covariant AppAvatar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.localImagePath != widget.localImagePath) {
+      _localFileExists = _checkLocalFile(widget.localImagePath);
     }
+  }
 
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
+  Future<bool> _checkLocalFile(String? rawPath) async {
+    final String? path = rawPath?.trim();
+    if (path == null || path.isEmpty) return false;
+    return File(path).exists();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final String initials = _initials(widget.name);
+    final String? path = widget.localImagePath?.trim();
+    if (path != null && path.isNotEmpty) {
+      return FutureBuilder<bool>(
+        future: _localFileExists,
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          if (snapshot.data == true) {
+            return ClipOval(
+              child: SizedBox(
+                width: widget.size,
+                height: widget.size,
+                child: Image.file(
+                  File(path),
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => _InitialsCircle(
+                    initials: initials,
+                    size: widget.size,
+                    fontSize: widget.fontSize,
+                  ),
+                ),
+              ),
+            );
+          }
+          return _buildRemoteOrFallback(initials);
+        },
+      );
+    }
+    return _buildRemoteOrFallback(initials);
+  }
+
+  Widget _buildRemoteOrFallback(String initials) {
+    if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
       return ClipOval(
         child: SizedBox(
-          width: size,
-          height: size,
+          width: widget.size,
+          height: widget.size,
           child: Image.network(
-            imageUrl!,
+            widget.imageUrl!,
             fit: BoxFit.cover,
             loadingBuilder:
                 (
@@ -65,15 +99,15 @@ class AppAvatar extends StatelessWidget {
                   if (loadingProgress == null) return child;
                   return _InitialsCircle(
                     initials: initials,
-                    size: size,
-                    fontSize: fontSize,
+                    size: widget.size,
+                    fontSize: widget.fontSize,
                     showLoadingRing: true,
                   );
                 },
             errorBuilder: (_, _, _) => _InitialsCircle(
               initials: initials,
-              size: size,
-              fontSize: fontSize,
+              size: widget.size,
+              fontSize: widget.fontSize,
             ),
           ),
         ),
@@ -82,8 +116,8 @@ class AppAvatar extends StatelessWidget {
 
     return _InitialsCircle(
       initials: initials,
-      size: size,
-      fontSize: fontSize,
+      size: widget.size,
+      fontSize: widget.fontSize,
     );
   }
 
