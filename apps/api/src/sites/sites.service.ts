@@ -223,11 +223,7 @@ export class SitesService {
       sites = await this.withTimeout(
         this.prisma.site.findMany({
         where: feedWhere,
-        orderBy: [
-          { reports: { _max: { createdAt: 'desc' } } } as Prisma.SiteOrderByWithRelationInput,
-          { createdAt: 'desc' },
-          { id: 'desc' },
-        ],
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
         take: candidateLimit,
         include: {
         reports: {

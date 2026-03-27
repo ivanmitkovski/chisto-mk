@@ -378,11 +378,17 @@ exports.Prisma.UserNotificationScalarFieldEnum = {
 exports.Prisma.NotificationOutboxScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
   userNotificationId: 'userNotificationId',
   deviceToken: 'deviceToken',
   payload: 'payload',
   attempts: 'attempts',
+  nextRetryAt: 'nextRetryAt',
+  processingAt: 'processingAt',
+  leaseOwner: 'leaseOwner',
   lastAttemptAt: 'lastAttemptAt',
+  lastErrorCode: 'lastErrorCode',
+  lastErrorMessage: 'lastErrorMessage',
   deliveredAt: 'deliveredAt',
   failedPermanently: 'failedPermanently',
   idempotencyKey: 'idempotencyKey'

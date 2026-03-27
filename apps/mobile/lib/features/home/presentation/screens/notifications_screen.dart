@@ -29,6 +29,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   List<UserNotification> _items = <UserNotification>[];
   int _unreadCount = 0;
   bool _isLoading = true;
+  bool _isLoadingMore = false;
+  bool _hasMore = true;
+  int _page = 1;
   bool _showUnreadOnly = false;
   late final AnimationController _entranceController;
   final ScrollController _scrollController = ScrollController();
@@ -40,37 +43,56 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       vsync: this,
       duration: AppMotion.slow,
     );
+    _scrollController.addListener(_onScroll);
     _loadNotifications();
   }
 
   @override
   void dispose() {
     _entranceController.dispose();
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
 
-  Future<void> _loadNotifications() async {
+  Future<void> _loadNotifications({bool reset = true}) async {
     try {
+      final int targetPage = reset ? 1 : _page + 1;
       final result = await ServiceLocator.instance.notificationsRepository
           .getNotifications(
-        page: 1,
-        limit: 50,
+        page: targetPage,
+        limit: 30,
         onlyUnread: false,
       );
       if (!mounted) return;
       setState(() {
-        _items = result.notifications;
+        _items = reset
+            ? result.notifications
+            : <UserNotification>[..._items, ...result.notifications];
         _unreadCount = result.unreadCount;
         _isLoading = false;
+        _isLoadingMore = false;
+        _page = targetPage;
+        _hasMore = result.notifications.length >= result.limit;
       });
-      _entranceController.forward();
+      if (reset) _entranceController.forward(from: 0);
     } catch (_) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
+        _isLoadingMore = false;
       });
     }
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients || _isLoadingMore || !_hasMore || _isLoading) {
+      return;
+    }
+    final position = _scrollController.position;
+    if (position.pixels < position.maxScrollExtent - 260) return;
+    setState(() => _isLoadingMore = true);
+    _loadNotifications(reset: false);
   }
 
   List<UserNotification> get _visibleItems {
@@ -145,7 +167,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       _setReadState(item, true);
       try {
         await ServiceLocator.instance.notificationsRepository.markAsRead(item.id);
-      } catch (_) {}
+      } catch (_) {
+        if (!mounted) return;
+        _setReadState(item, false);
+      }
     }
     final String? siteId = item.targetSiteId;
     if (siteId == null) return;
@@ -162,6 +187,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     }
 
     AppHaptics.softTransition();
+    if (!mounted) return;
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(
@@ -197,7 +223,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
-    await _loadNotifications();
+    await _loadNotifications(reset: true);
   }
 
   List<Widget> _buildSectionedChildren(BuildContext context) {
@@ -337,6 +363,11 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                           ),
                         ),
                 ),
+                if (_isLoadingMore)
+                  const Padding(
+                    padding: EdgeInsets.only(bottom: AppSpacing.md),
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
               ],
             ),
           ),

@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
+import { ConfigService } from '@nestjs/config';
 import { NotificationType, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from './notifications.service';
@@ -21,6 +22,7 @@ export class NotificationDispatcherService {
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
     private readonly fcm: FcmPushService,
+    private readonly configService: ConfigService,
   ) {}
 
   @OnEvent('notification.send')
@@ -45,8 +47,9 @@ export class NotificationDispatcherService {
       type: event.type,
       ...(event.data ? { data: event.data } : {}),
     });
+    if (!notificationId) return;
 
-    if (!this.fcm.isEnabled() || !this.fcm.isReady()) return;
+    if (!(await this.isPushEnabled()) || !this.fcm.isReady()) return;
 
     const tokens = await this.notificationsService.getActiveTokensForUser(userId);
     if (tokens.length === 0) return;
@@ -77,5 +80,14 @@ export class NotificationDispatcherService {
       where: { id: notificationId },
       data: { sentAt: new Date() },
     });
+  }
+
+  private async isPushEnabled(): Promise<boolean> {
+    const fromEnv = this.configService.get<string>('PUSH_FCM_ENABLED', 'false') === 'true';
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'push_fcm_enabled' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? fromEnv;
   }
 }

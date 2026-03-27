@@ -86,6 +86,15 @@ export class MetricsController {
       '# HELP push_inbox_reads_total Notification inbox read operations',
       '# TYPE push_inbox_reads_total counter',
       `push_inbox_reads_total ${s.pushInboxReads}`,
+      '# HELP push_queue_depth Current undelivered push outbox depth',
+      '# TYPE push_queue_depth gauge',
+      `push_queue_depth ${s.pushQueueDepth}`,
+      '# HELP push_active_leases Current push outbox items under lease',
+      '# TYPE push_active_leases gauge',
+      `push_active_leases ${s.pushActiveLeases}`,
+      '# HELP push_dead_letter_total Push outbox rows marked permanently failed',
+      '# TYPE push_dead_letter_total gauge',
+      `push_dead_letter_total ${s.pushDeadLetterCount}`,
       '',
     ].join('\n');
   }

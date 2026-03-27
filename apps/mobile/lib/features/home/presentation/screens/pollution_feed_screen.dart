@@ -46,8 +46,6 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
   bool _isLoadingMore = false;
   bool _loadMoreFailed = false;
   bool _hasShownEntrance = false;
-  bool _isFeedStaleFallback = false;
-  DateTime? _feedCachedAt;
   bool _locationAvailable = true;
   late final String _feedSessionId;
 
@@ -135,8 +133,6 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         _hasMore = result.nextCursor?.isNotEmpty ?? false;
         _isLoadingMore = false;
         _loadMoreFailed = false;
-        _isFeedStaleFallback = result.isStaleFallback;
-        _feedCachedAt = result.cachedAt;
         _isLoading = false;
         _loadError = null;
       });
@@ -333,36 +329,6 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                   onFilterTap: () => _openFilterSheet(context),
                 ),
               ),
-              if (_isFeedStaleFallback)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      0,
-                      AppSpacing.lg,
-                      AppSpacing.sm,
-                    ),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.sm,
-                        vertical: AppSpacing.xs,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.accentWarning.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      ),
-                      child: Text(
-                        _feedCachedAt == null
-                            ? 'Showing cached feed while reconnecting'
-                            : 'Showing cached feed from ${_formatCachedAt(_feedCachedAt!)}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textPrimary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  ),
-                ),
               if (_isLoading)
                 SliverToBoxAdapter(child: _buildSkeletonList())
               else if (_loadError != null)
@@ -711,14 +677,6 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       case FeedFilter.recent:
         return Icons.schedule_rounded;
     }
-  }
-
-  String _formatCachedAt(DateTime dt) {
-    final Duration diff = DateTime.now().difference(dt);
-    if (diff.inMinutes < 1) return 'just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
   }
 
   int _statusPriority(String statusLabel) {

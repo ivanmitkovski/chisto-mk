@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NotificationType, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
@@ -27,14 +28,46 @@ type NotificationListResponse = {
   };
 };
 
+type DeadLetterListResponse = {
+  data: Array<{
+    id: string;
+    userNotificationId: string;
+    deviceTokenSuffix: string;
+    attempts: number;
+    lastErrorCode: string | null;
+    lastErrorMessage: string | null;
+    lastAttemptAt: string | null;
+    createdAt: string;
+  }>;
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+  };
+};
+
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly configService: ConfigService,
+  ) {}
 
   async listForUser(
     user: AuthenticatedUser,
     query: ListNotificationsQueryDto,
   ): Promise<NotificationListResponse> {
+    if (!(await this.isInboxEnabled())) {
+      return {
+        data: [],
+        meta: {
+          page: query.page,
+          limit: query.limit,
+          total: 0,
+          unreadCount: 0,
+        },
+      };
+    }
     const where: Prisma.UserNotificationWhereInput = {
       userId: user.userId,
       ...(query.onlyUnread ? { isRead: false } : {}),
@@ -77,6 +110,7 @@ export class NotificationsService {
   }
 
   async getUnreadCount(user: AuthenticatedUser): Promise<{ unreadCount: number }> {
+    if (!(await this.isInboxEnabled())) return { unreadCount: 0 };
     const unreadCount = await this.prisma.userNotification.count({
       where: { userId: user.userId, isRead: false },
     });
@@ -84,6 +118,7 @@ export class NotificationsService {
   }
 
   async markOneRead(user: AuthenticatedUser, notificationId: string): Promise<void> {
+    if (!(await this.isInboxEnabled())) return;
     const notification = await this.prisma.userNotification.findFirst({
       where: { id: notificationId, userId: user.userId },
       select: { id: true, isRead: true },
@@ -105,6 +140,7 @@ export class NotificationsService {
   }
 
   async markAllRead(user: AuthenticatedUser): Promise<{ updated: number }> {
+    if (!(await this.isInboxEnabled())) return { updated: 0 };
     const result = await this.prisma.userNotification.updateMany({
       where: { userId: user.userId, isRead: false },
       data: { isRead: true },
@@ -175,6 +211,7 @@ export class NotificationsService {
     type: NotificationType;
     data?: Record<string, unknown>;
   }): Promise<string> {
+    if (!(await this.isInboxEnabled())) return '';
     const notification = await this.prisma.userNotification.create({
       data: {
         userId: input.userId,
@@ -193,5 +230,58 @@ export class NotificationsService {
       where: { userId, revokedAt: null },
       select: { id: true, token: true, platform: true },
     });
+  }
+
+  async listDeadLetters(page = 1, limit = 20): Promise<DeadLetterListResponse> {
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.min(100, Math.max(1, limit));
+    const skip = (safePage - 1) * safeLimit;
+    const [rows, total] = await this.prisma.$transaction([
+      this.prisma.notificationOutbox.findMany({
+        where: { failedPermanently: true },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: safeLimit,
+        select: {
+          id: true,
+          userNotificationId: true,
+          deviceToken: true,
+          attempts: true,
+          lastErrorCode: true,
+          lastErrorMessage: true,
+          lastAttemptAt: true,
+          createdAt: true,
+        },
+      }),
+      this.prisma.notificationOutbox.count({
+        where: { failedPermanently: true },
+      }),
+    ]);
+    return {
+      data: rows.map((row) => ({
+        id: row.id,
+        userNotificationId: row.userNotificationId,
+        deviceTokenSuffix: row.deviceToken.slice(-8),
+        attempts: row.attempts,
+        lastErrorCode: row.lastErrorCode,
+        lastErrorMessage: row.lastErrorMessage,
+        lastAttemptAt: row.lastAttemptAt?.toISOString() ?? null,
+        createdAt: row.createdAt.toISOString(),
+      })),
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+      },
+    };
+  }
+
+  private async isInboxEnabled(): Promise<boolean> {
+    const fromEnv = this.configService.get<string>('NOTIFICATIONS_INBOX_ENABLED', 'true') === 'true';
+    const row = await this.prisma.featureFlag.findUnique({
+      where: { key: 'notifications_inbox_enabled' },
+      select: { enabled: true },
+    });
+    return row?.enabled ?? fromEnv;
   }
 }
