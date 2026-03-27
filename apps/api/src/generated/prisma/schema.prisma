@@ -528,16 +528,23 @@ model UserNotification {
 model NotificationOutbox {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   userNotificationId String
   deviceToken        String
   payload            Json
   attempts           Int       @default(0)
+  nextRetryAt        DateTime?
+  processingAt       DateTime?
+  leaseOwner         String?
   lastAttemptAt      DateTime?
+  lastErrorCode      String?
+  lastErrorMessage   String?
   deliveredAt        DateTime?
   failedPermanently  Boolean   @default(false)
   idempotencyKey     String    @unique
 
   @@index([deliveredAt, failedPermanently, attempts])
+  @@index([processingAt, nextRetryAt])
   @@index([createdAt])
 }

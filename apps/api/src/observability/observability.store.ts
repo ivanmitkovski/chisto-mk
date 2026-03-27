@@ -17,6 +17,9 @@ export class ObservabilityStore {
   private static pushTokenRevocations = 0;
   private static pushQueueRetries = 0;
   private static pushInboxReads = 0;
+  private static pushQueueDepth = 0;
+  private static pushActiveLeases = 0;
+  private static pushDeadLetterCount = 0;
 
   static recordRequest(durationMs: number, statusCode: number): void {
     this.requestsTotal += 1;
@@ -86,6 +89,16 @@ export class ObservabilityStore {
     this.pushInboxReads += 1;
   }
 
+  static setPushQueueStats(input: {
+    queueDepth: number;
+    activeLeases: number;
+    deadLetterCount: number;
+  }): void {
+    this.pushQueueDepth = input.queueDepth;
+    this.pushActiveLeases = input.activeLeases;
+    this.pushDeadLetterCount = input.deadLetterCount;
+  }
+
   static snapshot() {
     const sorted = [...this.requestDurationsMs].sort((a, b) => a - b);
     const p = (percentile: number) => {
@@ -143,6 +156,9 @@ export class ObservabilityStore {
       pushTokenRevocations: this.pushTokenRevocations,
       pushQueueRetries: this.pushQueueRetries,
       pushInboxReads: this.pushInboxReads,
+      pushQueueDepth: this.pushQueueDepth,
+      pushActiveLeases: this.pushActiveLeases,
+      pushDeadLetterCount: this.pushDeadLetterCount,
     };
   }
 }

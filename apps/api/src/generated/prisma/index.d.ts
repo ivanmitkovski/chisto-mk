@@ -29768,10 +29768,16 @@ export namespace Prisma {
   export type NotificationOutboxMinAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    updatedAt: Date | null
     userNotificationId: string | null
     deviceToken: string | null
     attempts: number | null
+    nextRetryAt: Date | null
+    processingAt: Date | null
+    leaseOwner: string | null
     lastAttemptAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
     deliveredAt: Date | null
     failedPermanently: boolean | null
     idempotencyKey: string | null
@@ -29780,10 +29786,16 @@ export namespace Prisma {
   export type NotificationOutboxMaxAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    updatedAt: Date | null
     userNotificationId: string | null
     deviceToken: string | null
     attempts: number | null
+    nextRetryAt: Date | null
+    processingAt: Date | null
+    leaseOwner: string | null
     lastAttemptAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
     deliveredAt: Date | null
     failedPermanently: boolean | null
     idempotencyKey: string | null
@@ -29792,11 +29804,17 @@ export namespace Prisma {
   export type NotificationOutboxCountAggregateOutputType = {
     id: number
     createdAt: number
+    updatedAt: number
     userNotificationId: number
     deviceToken: number
     payload: number
     attempts: number
+    nextRetryAt: number
+    processingAt: number
+    leaseOwner: number
     lastAttemptAt: number
+    lastErrorCode: number
+    lastErrorMessage: number
     deliveredAt: number
     failedPermanently: number
     idempotencyKey: number
@@ -29815,10 +29833,16 @@ export namespace Prisma {
   export type NotificationOutboxMinAggregateInputType = {
     id?: true
     createdAt?: true
+    updatedAt?: true
     userNotificationId?: true
     deviceToken?: true
     attempts?: true
+    nextRetryAt?: true
+    processingAt?: true
+    leaseOwner?: true
     lastAttemptAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
     deliveredAt?: true
     failedPermanently?: true
     idempotencyKey?: true
@@ -29827,10 +29851,16 @@ export namespace Prisma {
   export type NotificationOutboxMaxAggregateInputType = {
     id?: true
     createdAt?: true
+    updatedAt?: true
     userNotificationId?: true
     deviceToken?: true
     attempts?: true
+    nextRetryAt?: true
+    processingAt?: true
+    leaseOwner?: true
     lastAttemptAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
     deliveredAt?: true
     failedPermanently?: true
     idempotencyKey?: true
@@ -29839,11 +29869,17 @@ export namespace Prisma {
   export type NotificationOutboxCountAggregateInputType = {
     id?: true
     createdAt?: true
+    updatedAt?: true
     userNotificationId?: true
     deviceToken?: true
     payload?: true
     attempts?: true
+    nextRetryAt?: true
+    processingAt?: true
+    leaseOwner?: true
     lastAttemptAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
     deliveredAt?: true
     failedPermanently?: true
     idempotencyKey?: true
@@ -29939,11 +29975,17 @@ export namespace Prisma {
   export type NotificationOutboxGroupByOutputType = {
     id: string
     createdAt: Date
+    updatedAt: Date
     userNotificationId: string
     deviceToken: string
     payload: JsonValue
     attempts: number
+    nextRetryAt: Date | null
+    processingAt: Date | null
+    leaseOwner: string | null
     lastAttemptAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
     deliveredAt: Date | null
     failedPermanently: boolean
     idempotencyKey: string
@@ -29971,11 +30013,17 @@ export namespace Prisma {
   export type NotificationOutboxSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     userNotificationId?: boolean
     deviceToken?: boolean
     payload?: boolean
     attempts?: boolean
+    nextRetryAt?: boolean
+    processingAt?: boolean
+    leaseOwner?: boolean
     lastAttemptAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
     deliveredAt?: boolean
     failedPermanently?: boolean
     idempotencyKey?: boolean
@@ -29984,11 +30032,17 @@ export namespace Prisma {
   export type NotificationOutboxSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     userNotificationId?: boolean
     deviceToken?: boolean
     payload?: boolean
     attempts?: boolean
+    nextRetryAt?: boolean
+    processingAt?: boolean
+    leaseOwner?: boolean
     lastAttemptAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
     deliveredAt?: boolean
     failedPermanently?: boolean
     idempotencyKey?: boolean
@@ -29997,11 +30051,17 @@ export namespace Prisma {
   export type NotificationOutboxSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     userNotificationId?: boolean
     deviceToken?: boolean
     payload?: boolean
     attempts?: boolean
+    nextRetryAt?: boolean
+    processingAt?: boolean
+    leaseOwner?: boolean
     lastAttemptAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
     deliveredAt?: boolean
     failedPermanently?: boolean
     idempotencyKey?: boolean
@@ -30010,17 +30070,23 @@ export namespace Prisma {
   export type NotificationOutboxSelectScalar = {
     id?: boolean
     createdAt?: boolean
+    updatedAt?: boolean
     userNotificationId?: boolean
     deviceToken?: boolean
     payload?: boolean
     attempts?: boolean
+    nextRetryAt?: boolean
+    processingAt?: boolean
+    leaseOwner?: boolean
     lastAttemptAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
     deliveredAt?: boolean
     failedPermanently?: boolean
     idempotencyKey?: boolean
   }
 
-  export type NotificationOutboxOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userNotificationId" | "deviceToken" | "payload" | "attempts" | "lastAttemptAt" | "deliveredAt" | "failedPermanently" | "idempotencyKey", ExtArgs["result"]["notificationOutbox"]>
+  export type NotificationOutboxOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "userNotificationId" | "deviceToken" | "payload" | "attempts" | "nextRetryAt" | "processingAt" | "leaseOwner" | "lastAttemptAt" | "lastErrorCode" | "lastErrorMessage" | "deliveredAt" | "failedPermanently" | "idempotencyKey", ExtArgs["result"]["notificationOutbox"]>
 
   export type $NotificationOutboxPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "NotificationOutbox"
@@ -30028,11 +30094,17 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       createdAt: Date
+      updatedAt: Date
       userNotificationId: string
       deviceToken: string
       payload: Prisma.JsonValue
       attempts: number
+      nextRetryAt: Date | null
+      processingAt: Date | null
+      leaseOwner: string | null
       lastAttemptAt: Date | null
+      lastErrorCode: string | null
+      lastErrorMessage: string | null
       deliveredAt: Date | null
       failedPermanently: boolean
       idempotencyKey: string
@@ -30461,11 +30533,17 @@ export namespace Prisma {
   interface NotificationOutboxFieldRefs {
     readonly id: FieldRef<"NotificationOutbox", 'String'>
     readonly createdAt: FieldRef<"NotificationOutbox", 'DateTime'>
+    readonly updatedAt: FieldRef<"NotificationOutbox", 'DateTime'>
     readonly userNotificationId: FieldRef<"NotificationOutbox", 'String'>
     readonly deviceToken: FieldRef<"NotificationOutbox", 'String'>
     readonly payload: FieldRef<"NotificationOutbox", 'Json'>
     readonly attempts: FieldRef<"NotificationOutbox", 'Int'>
+    readonly nextRetryAt: FieldRef<"NotificationOutbox", 'DateTime'>
+    readonly processingAt: FieldRef<"NotificationOutbox", 'DateTime'>
+    readonly leaseOwner: FieldRef<"NotificationOutbox", 'String'>
     readonly lastAttemptAt: FieldRef<"NotificationOutbox", 'DateTime'>
+    readonly lastErrorCode: FieldRef<"NotificationOutbox", 'String'>
+    readonly lastErrorMessage: FieldRef<"NotificationOutbox", 'String'>
     readonly deliveredAt: FieldRef<"NotificationOutbox", 'DateTime'>
     readonly failedPermanently: FieldRef<"NotificationOutbox", 'Boolean'>
     readonly idempotencyKey: FieldRef<"NotificationOutbox", 'String'>
@@ -31181,11 +31259,17 @@ export namespace Prisma {
   export const NotificationOutboxScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
     userNotificationId: 'userNotificationId',
     deviceToken: 'deviceToken',
     payload: 'payload',
     attempts: 'attempts',
+    nextRetryAt: 'nextRetryAt',
+    processingAt: 'processingAt',
+    leaseOwner: 'leaseOwner',
     lastAttemptAt: 'lastAttemptAt',
+    lastErrorCode: 'lastErrorCode',
+    lastErrorMessage: 'lastErrorMessage',
     deliveredAt: 'deliveredAt',
     failedPermanently: 'failedPermanently',
     idempotencyKey: 'idempotencyKey'
@@ -33218,11 +33302,17 @@ export namespace Prisma {
     NOT?: NotificationOutboxWhereInput | NotificationOutboxWhereInput[]
     id?: StringFilter<"NotificationOutbox"> | string
     createdAt?: DateTimeFilter<"NotificationOutbox"> | Date | string
+    updatedAt?: DateTimeFilter<"NotificationOutbox"> | Date | string
     userNotificationId?: StringFilter<"NotificationOutbox"> | string
     deviceToken?: StringFilter<"NotificationOutbox"> | string
     payload?: JsonFilter<"NotificationOutbox">
     attempts?: IntFilter<"NotificationOutbox"> | number
+    nextRetryAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    processingAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    leaseOwner?: StringNullableFilter<"NotificationOutbox"> | string | null
     lastAttemptAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"NotificationOutbox"> | string | null
+    lastErrorMessage?: StringNullableFilter<"NotificationOutbox"> | string | null
     deliveredAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
     failedPermanently?: BoolFilter<"NotificationOutbox"> | boolean
     idempotencyKey?: StringFilter<"NotificationOutbox"> | string
@@ -33231,11 +33321,17 @@ export namespace Prisma {
   export type NotificationOutboxOrderByWithRelationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userNotificationId?: SortOrder
     deviceToken?: SortOrder
     payload?: SortOrder
     attempts?: SortOrder
+    nextRetryAt?: SortOrderInput | SortOrder
+    processingAt?: SortOrderInput | SortOrder
+    leaseOwner?: SortOrderInput | SortOrder
     lastAttemptAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
     deliveredAt?: SortOrderInput | SortOrder
     failedPermanently?: SortOrder
     idempotencyKey?: SortOrder
@@ -33248,11 +33344,17 @@ export namespace Prisma {
     OR?: NotificationOutboxWhereInput[]
     NOT?: NotificationOutboxWhereInput | NotificationOutboxWhereInput[]
     createdAt?: DateTimeFilter<"NotificationOutbox"> | Date | string
+    updatedAt?: DateTimeFilter<"NotificationOutbox"> | Date | string
     userNotificationId?: StringFilter<"NotificationOutbox"> | string
     deviceToken?: StringFilter<"NotificationOutbox"> | string
     payload?: JsonFilter<"NotificationOutbox">
     attempts?: IntFilter<"NotificationOutbox"> | number
+    nextRetryAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    processingAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    leaseOwner?: StringNullableFilter<"NotificationOutbox"> | string | null
     lastAttemptAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"NotificationOutbox"> | string | null
+    lastErrorMessage?: StringNullableFilter<"NotificationOutbox"> | string | null
     deliveredAt?: DateTimeNullableFilter<"NotificationOutbox"> | Date | string | null
     failedPermanently?: BoolFilter<"NotificationOutbox"> | boolean
   }, "id" | "idempotencyKey">
@@ -33260,11 +33362,17 @@ export namespace Prisma {
   export type NotificationOutboxOrderByWithAggregationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userNotificationId?: SortOrder
     deviceToken?: SortOrder
     payload?: SortOrder
     attempts?: SortOrder
+    nextRetryAt?: SortOrderInput | SortOrder
+    processingAt?: SortOrderInput | SortOrder
+    leaseOwner?: SortOrderInput | SortOrder
     lastAttemptAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
     deliveredAt?: SortOrderInput | SortOrder
     failedPermanently?: SortOrder
     idempotencyKey?: SortOrder
@@ -33281,11 +33389,17 @@ export namespace Prisma {
     NOT?: NotificationOutboxScalarWhereWithAggregatesInput | NotificationOutboxScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"NotificationOutbox"> | string
     createdAt?: DateTimeWithAggregatesFilter<"NotificationOutbox"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"NotificationOutbox"> | Date | string
     userNotificationId?: StringWithAggregatesFilter<"NotificationOutbox"> | string
     deviceToken?: StringWithAggregatesFilter<"NotificationOutbox"> | string
     payload?: JsonWithAggregatesFilter<"NotificationOutbox">
     attempts?: IntWithAggregatesFilter<"NotificationOutbox"> | number
+    nextRetryAt?: DateTimeNullableWithAggregatesFilter<"NotificationOutbox"> | Date | string | null
+    processingAt?: DateTimeNullableWithAggregatesFilter<"NotificationOutbox"> | Date | string | null
+    leaseOwner?: StringNullableWithAggregatesFilter<"NotificationOutbox"> | string | null
     lastAttemptAt?: DateTimeNullableWithAggregatesFilter<"NotificationOutbox"> | Date | string | null
+    lastErrorCode?: StringNullableWithAggregatesFilter<"NotificationOutbox"> | string | null
+    lastErrorMessage?: StringNullableWithAggregatesFilter<"NotificationOutbox"> | string | null
     deliveredAt?: DateTimeNullableWithAggregatesFilter<"NotificationOutbox"> | Date | string | null
     failedPermanently?: BoolWithAggregatesFilter<"NotificationOutbox"> | boolean
     idempotencyKey?: StringWithAggregatesFilter<"NotificationOutbox"> | string
@@ -35157,11 +35271,17 @@ export namespace Prisma {
   export type NotificationOutboxCreateInput = {
     id?: string
     createdAt?: Date | string
+    updatedAt?: Date | string
     userNotificationId: string
     deviceToken: string
     payload: JsonNullValueInput | InputJsonValue
     attempts?: number
+    nextRetryAt?: Date | string | null
+    processingAt?: Date | string | null
+    leaseOwner?: string | null
     lastAttemptAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
     deliveredAt?: Date | string | null
     failedPermanently?: boolean
     idempotencyKey: string
@@ -35170,11 +35290,17 @@ export namespace Prisma {
   export type NotificationOutboxUncheckedCreateInput = {
     id?: string
     createdAt?: Date | string
+    updatedAt?: Date | string
     userNotificationId: string
     deviceToken: string
     payload: JsonNullValueInput | InputJsonValue
     attempts?: number
+    nextRetryAt?: Date | string | null
+    processingAt?: Date | string | null
+    leaseOwner?: string | null
     lastAttemptAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
     deliveredAt?: Date | string | null
     failedPermanently?: boolean
     idempotencyKey: string
@@ -35183,11 +35309,17 @@ export namespace Prisma {
   export type NotificationOutboxUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userNotificationId?: StringFieldUpdateOperationsInput | string
     deviceToken?: StringFieldUpdateOperationsInput | string
     payload?: JsonNullValueInput | InputJsonValue
     attempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
     lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failedPermanently?: BoolFieldUpdateOperationsInput | boolean
     idempotencyKey?: StringFieldUpdateOperationsInput | string
@@ -35196,11 +35328,17 @@ export namespace Prisma {
   export type NotificationOutboxUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userNotificationId?: StringFieldUpdateOperationsInput | string
     deviceToken?: StringFieldUpdateOperationsInput | string
     payload?: JsonNullValueInput | InputJsonValue
     attempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
     lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failedPermanently?: BoolFieldUpdateOperationsInput | boolean
     idempotencyKey?: StringFieldUpdateOperationsInput | string
@@ -35209,11 +35347,17 @@ export namespace Prisma {
   export type NotificationOutboxCreateManyInput = {
     id?: string
     createdAt?: Date | string
+    updatedAt?: Date | string
     userNotificationId: string
     deviceToken: string
     payload: JsonNullValueInput | InputJsonValue
     attempts?: number
+    nextRetryAt?: Date | string | null
+    processingAt?: Date | string | null
+    leaseOwner?: string | null
     lastAttemptAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
     deliveredAt?: Date | string | null
     failedPermanently?: boolean
     idempotencyKey: string
@@ -35222,11 +35366,17 @@ export namespace Prisma {
   export type NotificationOutboxUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userNotificationId?: StringFieldUpdateOperationsInput | string
     deviceToken?: StringFieldUpdateOperationsInput | string
     payload?: JsonNullValueInput | InputJsonValue
     attempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
     lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failedPermanently?: BoolFieldUpdateOperationsInput | boolean
     idempotencyKey?: StringFieldUpdateOperationsInput | string
@@ -35235,11 +35385,17 @@ export namespace Prisma {
   export type NotificationOutboxUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userNotificationId?: StringFieldUpdateOperationsInput | string
     deviceToken?: StringFieldUpdateOperationsInput | string
     payload?: JsonNullValueInput | InputJsonValue
     attempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    processingAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseOwner?: NullableStringFieldUpdateOperationsInput | string | null
     lastAttemptAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     deliveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     failedPermanently?: BoolFieldUpdateOperationsInput | boolean
     idempotencyKey?: StringFieldUpdateOperationsInput | string
@@ -36795,11 +36951,17 @@ export namespace Prisma {
   export type NotificationOutboxCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userNotificationId?: SortOrder
     deviceToken?: SortOrder
     payload?: SortOrder
     attempts?: SortOrder
+    nextRetryAt?: SortOrder
+    processingAt?: SortOrder
+    leaseOwner?: SortOrder
     lastAttemptAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
     deliveredAt?: SortOrder
     failedPermanently?: SortOrder
     idempotencyKey?: SortOrder
@@ -36812,10 +36974,16 @@ export namespace Prisma {
   export type NotificationOutboxMaxOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userNotificationId?: SortOrder
     deviceToken?: SortOrder
     attempts?: SortOrder
+    nextRetryAt?: SortOrder
+    processingAt?: SortOrder
+    leaseOwner?: SortOrder
     lastAttemptAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
     deliveredAt?: SortOrder
     failedPermanently?: SortOrder
     idempotencyKey?: SortOrder
@@ -36824,10 +36992,16 @@ export namespace Prisma {
   export type NotificationOutboxMinOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    updatedAt?: SortOrder
     userNotificationId?: SortOrder
     deviceToken?: SortOrder
     attempts?: SortOrder
+    nextRetryAt?: SortOrder
+    processingAt?: SortOrder
+    leaseOwner?: SortOrder
     lastAttemptAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
     deliveredAt?: SortOrder
     failedPermanently?: SortOrder
     idempotencyKey?: SortOrder

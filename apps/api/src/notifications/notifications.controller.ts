@@ -104,6 +104,24 @@ export class NotificationsController {
       tokenRevocations: s.pushTokenRevocations,
       queueRetries: s.pushQueueRetries,
       inboxReads: s.pushInboxReads,
+      queueDepth: s.pushQueueDepth,
+      activeLeases: s.pushActiveLeases,
+      deadLetterCount: s.pushDeadLetterCount,
     };
+  }
+
+  @Get('admin/dead-letters')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiOperation({ summary: 'List dead-letter push outbox entries (admin only)' })
+  @ApiOkResponse({ description: 'Dead-letter queue entries' })
+  deadLetters(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.notificationsService.listDeadLetters(
+      Number(page ?? '1'),
+      Number(limit ?? '20'),
+    );
   }
 }
