@@ -7,6 +7,7 @@ import {
   Patch,
   Post,
   Query,
+  ParseEnumPipe,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -25,6 +26,8 @@ import { NotificationsService } from './notifications.service';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
 import { ObservabilityStore } from '../observability/observability.store';
+import { UpdateNotificationPreferenceDto } from './dto/update-notification-preference.dto';
+import { NotificationType } from '../prisma-client';
 
 @ApiTags('notifications')
 @Controller('notifications')
@@ -66,6 +69,24 @@ export class NotificationsController {
   @ApiOkResponse({ description: 'Batch update result' })
   markAllRead(@CurrentUser() user: AuthenticatedUser) {
     return this.notificationsService.markAllRead(user);
+  }
+
+  @Get('preferences')
+  @ApiOperation({ summary: 'List notification preferences for current user' })
+  @ApiOkResponse({ description: 'Notification preferences' })
+  preferences(@CurrentUser() user: AuthenticatedUser) {
+    return this.notificationsService.listPreferences(user);
+  }
+
+  @Patch('preferences/:type')
+  @ApiOperation({ summary: 'Update preference for notification type' })
+  @ApiOkResponse({ description: 'Updated notification preference' })
+  updatePreference(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('type', new ParseEnumPipe(NotificationType)) type: NotificationType,
+    @Body() dto: UpdateNotificationPreferenceDto,
+  ) {
+    return this.notificationsService.updatePreference(user, type, dto);
   }
 
   @Post('devices')

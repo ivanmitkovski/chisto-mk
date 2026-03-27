@@ -1592,6 +1592,8 @@ export class SitesService {
           title: type === 'UPVOTE' ? 'New upvote' : type === 'COMMENT' ? 'New comment' : 'Site update',
           body,
           type,
+          threadKey: `site:${siteId}`,
+          groupKey: `${type}:site:${siteId}`,
           data: { siteId, targetTab: '0' },
         });
       })

@@ -1,10 +1,15 @@
+import 'dart:async';
+
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/feed_notification.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:chisto_mobile/features/notifications/data/notification_open_diagnostics.dart';
+import 'package:chisto_mobile/features/notifications/domain/notifications_grouping.dart';
 import 'package:chisto_mobile/features/notifications/domain/models/user_notification.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/notifications/notification_widgets.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -31,8 +36,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   bool _isLoading = true;
   bool _isLoadingMore = false;
   bool _hasMore = true;
+  bool _loadMoreFailed = false;
+  String? _loadErrorMessage;
   int _page = 1;
   bool _showUnreadOnly = false;
+  bool _queryOnlyUnread = false;
+  final Set<String> _archivedNotificationIds = <String>{};
+  List<NotificationPreference> _preferences = const <NotificationPreference>[];
+  bool _isPreferencesLoading = false;
   late final AnimationController _entranceController;
   final ScrollController _scrollController = ScrollController();
 
@@ -44,7 +55,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       duration: AppMotion.slow,
     );
     _scrollController.addListener(_onScroll);
-    _loadNotifications();
+    _loadNotifications(reset: true, onlyUnread: false);
+    unawaited(_loadPreferences());
   }
 
   @override
@@ -55,73 +67,79 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     super.dispose();
   }
 
-  Future<void> _loadNotifications({bool reset = true}) async {
+  Future<void> _loadNotifications({bool reset = true, bool? onlyUnread}) async {
+    final bool targetOnlyUnread = onlyUnread ?? _queryOnlyUnread;
+    if (reset) {
+      setState(() {
+        _isLoading = true;
+        _loadErrorMessage = null;
+        _loadMoreFailed = false;
+        _queryOnlyUnread = targetOnlyUnread;
+      });
+    }
     try {
       final int targetPage = reset ? 1 : _page + 1;
       final result = await ServiceLocator.instance.notificationsRepository
           .getNotifications(
-        page: targetPage,
-        limit: 30,
-        onlyUnread: false,
-      );
+            page: targetPage,
+            limit: 30,
+            onlyUnread: targetOnlyUnread,
+          );
       if (!mounted) return;
+      final List<UserNotification> merged = reset
+          ? result.notifications
+          : <UserNotification>[..._items, ...result.notifications];
       setState(() {
-        _items = reset
-            ? result.notifications
-            : <UserNotification>[..._items, ...result.notifications];
+        _items = merged;
         _unreadCount = result.unreadCount;
         _isLoading = false;
         _isLoadingMore = false;
         _page = targetPage;
-        _hasMore = result.notifications.length >= result.limit;
+        _hasMore = merged.length < result.total;
+        _loadMoreFailed = false;
+        _loadErrorMessage = null;
       });
       if (reset) _entranceController.forward(from: 0);
-    } catch (_) {
+    } catch (error) {
       if (!mounted) return;
       setState(() {
         _isLoading = false;
         _isLoadingMore = false;
+        if (reset) {
+          _loadErrorMessage = _friendlyErrorMessage(error);
+        } else {
+          _loadMoreFailed = true;
+        }
       });
     }
   }
 
   void _onScroll() {
-    if (!_scrollController.hasClients || _isLoadingMore || !_hasMore || _isLoading) {
+    if (!_scrollController.hasClients ||
+        _isLoadingMore ||
+        !_hasMore ||
+        _isLoading) {
       return;
     }
     final position = _scrollController.position;
     if (position.pixels < position.maxScrollExtent - 260) return;
     setState(() => _isLoadingMore = true);
-    _loadNotifications(reset: false);
+    _loadNotifications(reset: false, onlyUnread: _queryOnlyUnread);
   }
 
   List<UserNotification> get _visibleItems {
-    if (!_showUnreadOnly) return _items;
-    return _items.where((UserNotification n) => !n.isRead).toList();
+    final List<UserNotification> base = _items
+        .where((UserNotification n) => !_archivedNotificationIds.contains(n.id))
+        .toList();
+    if (!_showUnreadOnly) return base;
+    return base.where((UserNotification n) => !n.isRead).toList();
   }
 
-  List<_NotificationSection> get _sections {
-    final List<_NotificationSection> sections = <_NotificationSection>[];
-    String? currentLabel;
-    List<UserNotification> bucket = <UserNotification>[];
-    for (final UserNotification item in _visibleItems) {
-      final String label = _dayLabel(item.createdAt);
-      currentLabel ??= label;
-      if (label != currentLabel) {
-        sections.add(_NotificationSection(title: currentLabel, items: bucket));
-        currentLabel = label;
-        bucket = <UserNotification>[];
-      }
-      bucket.add(item);
-    }
-    if (currentLabel != null && bucket.isNotEmpty) {
-      sections.add(_NotificationSection(title: currentLabel, items: bucket));
-    }
-    return sections;
-  }
+  List<NotificationSectionGroup> get _sections =>
+      groupNotificationsByDay(_visibleItems);
 
   void _close() {
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(_unreadCount);
   }
 
   Future<void> _scrollToTop() async {
@@ -136,15 +154,30 @@ class _NotificationsScreenState extends State<NotificationsScreen>
   Future<void> _markAllRead() async {
     if (_unreadCount == 0) return;
     AppHaptics.medium();
-    try {
-      await ServiceLocator.instance.notificationsRepository.markAllAsRead();
-    } catch (_) {}
+    final List<UserNotification> previousItems = _items;
+    final int previousUnread = _unreadCount;
     setState(() {
       _items = _items
           .map((UserNotification n) => n.isRead ? n : n.copyWith(isRead: true))
           .toList();
       _unreadCount = 0;
     });
+    try {
+      await ServiceLocator.instance.notificationsRepository.markAllAsRead();
+      unawaited(_refreshUnreadCountFromServer());
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _items = previousItems;
+        _unreadCount = previousUnread;
+      });
+      AppSnack.show(
+        context,
+        message: 'Could not mark all as read. Please try again.',
+        type: AppSnackType.warning,
+      );
+      return;
+    }
     if (mounted) {
       AppSnack.show(
         context,
@@ -163,10 +196,14 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   Future<void> _openNotification(UserNotification item) async {
     AppHaptics.tap();
+    NotificationOpenDiagnostics.recordOpenAttempt('list_tap');
     if (!item.isRead) {
       _setReadState(item, true);
       try {
-        await ServiceLocator.instance.notificationsRepository.markAsRead(item.id);
+        await ServiceLocator.instance.notificationsRepository.markAsRead(
+          item.id,
+        );
+        unawaited(_refreshUnreadCountFromServer());
       } catch (_) {
         if (!mounted) return;
         _setReadState(item, false);
@@ -174,8 +211,16 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     }
     final String? siteId = item.targetSiteId;
     if (siteId == null) return;
-    final PollutionSite? site = _findSiteById(siteId);
+    PollutionSite? site = _findSiteById(siteId);
     if (site == null) {
+      try {
+        site = await ServiceLocator.instance.sitesRepository.getSiteById(
+          siteId,
+        );
+      } catch (_) {}
+    }
+    if (site == null) {
+      NotificationOpenDiagnostics.recordOpenFailure('site_missing');
       if (mounted) {
         AppSnack.show(
           context,
@@ -188,10 +233,11 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
     AppHaptics.softTransition();
     if (!mounted) return;
+    NotificationOpenDiagnostics.recordOpenSuccess('list_tap');
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(
-          site: site,
+          site: site!,
           initialTabIndex: int.tryParse(item.targetTab ?? '') ?? 0,
         ),
       ),
@@ -208,28 +254,225 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     });
   }
 
-  void _deleteNotification(UserNotification item) {
+  Future<void> _toggleReadFromSwipe(UserNotification item) async {
+    final bool nextRead = !item.isRead;
+    _setReadState(item, nextRead);
+    if (nextRead) {
+      try {
+        await ServiceLocator.instance.notificationsRepository.markAsRead(
+          item.id,
+        );
+        unawaited(_refreshUnreadCountFromServer());
+      } catch (_) {
+        if (!mounted) return;
+        _setReadState(item, !nextRead);
+        AppSnack.show(
+          context,
+          message: 'Could not update read state. Please try again.',
+          type: AppSnackType.warning,
+        );
+      }
+      return;
+    }
+    AppSnack.show(
+      context,
+      message: 'Marked as unread (local).',
+      type: AppSnackType.info,
+    );
+  }
+
+  void _archiveNotification(UserNotification item) {
     AppHaptics.light();
     setState(() {
-      _items = _items.where((UserNotification n) => n.id != item.id).toList();
-      _unreadCount = _items.where((UserNotification n) => !n.isRead).length;
+      _archivedNotificationIds.add(item.id);
+      _unreadCount = _items
+          .where(
+            (UserNotification n) =>
+                !_archivedNotificationIds.contains(n.id) && !n.isRead,
+          )
+          .length;
     });
     AppSnack.show(
       context,
-      message: 'Notification removed',
+      message: 'Notification archived from this view',
       type: AppSnackType.info,
     );
   }
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
-    await _loadNotifications(reset: true);
+    await _loadNotifications(reset: true, onlyUnread: _showUnreadOnly);
+  }
+
+  Future<void> _refreshUnreadCountFromServer() async {
+    try {
+      final int latest = await ServiceLocator.instance.notificationsRepository
+          .getUnreadCount();
+      if (!mounted) return;
+      setState(() => _unreadCount = latest);
+    } catch (_) {}
+  }
+
+  Future<void> _loadPreferences() async {
+    setState(() => _isPreferencesLoading = true);
+    try {
+      final prefs = await ServiceLocator.instance.notificationsRepository
+          .getPreferences();
+      if (!mounted) return;
+      setState(() {
+        _preferences = prefs;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      AppSnack.show(
+        context,
+        message: 'Could not load notification preferences.',
+        type: AppSnackType.warning,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isPreferencesLoading = false);
+      }
+    }
+  }
+
+  Future<void> _togglePreference(UserNotificationType type, bool muted) async {
+    final int index = _preferences.indexWhere((p) => p.type == type);
+    if (index < 0) return;
+    final NotificationPreference previous = _preferences[index];
+    setState(() {
+      _preferences = _preferences
+          .map((p) => p.type == type ? p.copyWith(muted: muted) : p)
+          .toList();
+    });
+    try {
+      final updated = await ServiceLocator.instance.notificationsRepository
+          .setPreference(type: type, muted: muted);
+      if (!mounted) return;
+      setState(() {
+        _preferences = _preferences
+            .map((p) => p.type == type ? updated : p)
+            .toList();
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _preferences = _preferences
+            .map((p) => p.type == type ? previous : p)
+            .toList();
+      });
+      AppSnack.show(
+        context,
+        message: 'Could not update preference. Please try again.',
+        type: AppSnackType.warning,
+      );
+    }
+  }
+
+  void _openPreferencesSheet() {
+    AppHaptics.tap();
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      useSafeArea: true,
+      backgroundColor: AppColors.transparent,
+      builder: (context) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppSpacing.radiusSheet),
+            ),
+          ),
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.md,
+                AppSpacing.lg,
+                AppSpacing.lg,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: AppSpacing.sheetHandle,
+                      height: AppSpacing.sheetHandleHeight,
+                      decoration: BoxDecoration(
+                        color: AppColors.divider,
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusXs,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    'Notification preferences',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    'Mute notification types you do not want to receive.',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  if (_isPreferencesLoading)
+                    const Center(child: CircularProgressIndicator())
+                  else
+                    ..._preferences.map(
+                      (pref) => SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text(_notificationTypeLabel(pref.type)),
+                        subtitle: Text(
+                          pref.muted ? 'Muted' : 'Enabled',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: AppColors.textMuted),
+                        ),
+                        value: pref.muted,
+                        onChanged: (value) =>
+                            _togglePreference(pref.type, value),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _notificationTypeLabel(UserNotificationType type) {
+    switch (type) {
+      case UserNotificationType.siteUpdate:
+        return 'Site updates';
+      case UserNotificationType.reportStatus:
+        return 'Report status';
+      case UserNotificationType.upvote:
+        return 'Upvotes';
+      case UserNotificationType.comment:
+        return 'Comments';
+      case UserNotificationType.nearbyReport:
+        return 'Nearby reports';
+      case UserNotificationType.cleanupEvent:
+        return 'Cleanup events';
+      case UserNotificationType.system:
+        return 'System';
+    }
   }
 
   List<Widget> _buildSectionedChildren(BuildContext context) {
     final List<Widget> children = <Widget>[];
     int animationIndex = 0;
-    for (final _NotificationSection section in _sections) {
+    for (final NotificationSectionGroup section in _sections) {
       children.add(
         Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -241,9 +484,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           child: Text(
             section.title,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w600,
-                ),
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       );
@@ -262,20 +505,20 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       curve: Interval(
         stagger,
         (stagger + 0.45).clamp(0.0, 1.0),
-          curve: AppMotion.standardCurve,
+        curve: AppMotion.standardCurve,
       ),
     );
-    final Animation<Offset> slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _entranceController,
-      curve: Interval(
-        stagger,
-        (stagger + 0.45).clamp(0.0, 1.0),
-          curve: AppMotion.emphasized,
-      ),
-    ));
+    final Animation<Offset> slide =
+        Tween<Offset>(begin: const Offset(0, 0.06), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _entranceController,
+            curve: Interval(
+              stagger,
+              (stagger + 0.45).clamp(0.0, 1.0),
+              curve: AppMotion.emphasized,
+            ),
+          ),
+        );
 
     final _LegacyNotification adapted = _LegacyNotification.fromServer(item);
 
@@ -288,12 +531,12 @@ class _NotificationsScreenState extends State<NotificationsScreen>
           direction: DismissDirection.horizontal,
           confirmDismiss: (DismissDirection direction) async {
             if (direction == DismissDirection.startToEnd) {
-              _setReadState(item, !item.isRead);
+              await _toggleReadFromSwipe(item);
               AppHaptics.tap();
               return false;
             }
-            _deleteNotification(item);
-            return true;
+            _archiveNotification(item);
+            return false;
           },
           background: SwipeActionBackground(
             icon: item.isRead
@@ -304,10 +547,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             color: AppColors.primaryDark,
           ),
           secondaryBackground: const SwipeActionBackground(
-            icon: Icons.delete_outline_rounded,
-            label: 'Delete',
+            icon: Icons.archive_outlined,
+            label: 'Archive',
             alignment: Alignment.centerRight,
-            color: AppColors.accentDanger,
+            color: AppColors.textMuted,
           ),
           child: NotificationTile(
             item: adapted.toFeedNotification(),
@@ -320,7 +563,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final double topHotZoneHeight = MediaQuery.of(context).padding.top + AppSpacing.xs;
+    final double topHotZoneHeight =
+        MediaQuery.of(context).padding.top + AppSpacing.xs;
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       body: Stack(
@@ -336,7 +580,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 const SizedBox(height: AppSpacing.sm),
                 Expanded(
                   child: _isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? _buildLoadingSkeleton()
+                      : _loadErrorMessage != null && _items.isEmpty
+                      ? _buildErrorState(context)
                       : RefreshIndicator(
                           onRefresh: _handleRefresh,
                           color: AppColors.primaryDark,
@@ -358,7 +604,34 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                                     physics: const BouncingScrollPhysics(
                                       parent: AlwaysScrollableScrollPhysics(),
                                     ),
-                                    children: _buildSectionedChildren(context),
+                                    children: <Widget>[
+                                      ..._buildSectionedChildren(context),
+                                      if (_loadMoreFailed)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            top: AppSpacing.sm,
+                                          ),
+                                          child: OutlinedButton.icon(
+                                            onPressed: () {
+                                              setState(() {
+                                                _loadMoreFailed = false;
+                                                _isLoadingMore = true;
+                                              });
+                                              _loadNotifications(
+                                                reset: false,
+                                                onlyUnread: _queryOnlyUnread,
+                                              );
+                                            },
+                                            icon: const Icon(
+                                              Icons.refresh_rounded,
+                                              size: 18,
+                                            ),
+                                            label: const Text(
+                                              'Retry loading more',
+                                            ),
+                                          ),
+                                        ),
+                                    ],
                                   ),
                           ),
                         ),
@@ -372,39 +645,39 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             ),
           ),
           Positioned(
-              top: 0,
-              left: 0,
-              width: 112,
-              height: topHotZoneHeight,
-              child: Semantics(
-                button: true,
-                label: 'Scroll notifications to top',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    AppHaptics.tap();
-                    _scrollToTop();
-                  },
-                ),
+            top: 0,
+            left: 0,
+            width: 112,
+            height: topHotZoneHeight,
+            child: Semantics(
+              button: true,
+              label: 'Scroll notifications to top',
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  AppHaptics.tap();
+                  _scrollToTop();
+                },
               ),
             ),
+          ),
           Positioned(
-              top: 0,
-              right: 0,
-              width: 112,
-              height: topHotZoneHeight,
-              child: Semantics(
-                button: true,
-                label: 'Scroll notifications to top',
-                child: GestureDetector(
-                  behavior: HitTestBehavior.translucent,
-                  onTap: () {
-                    AppHaptics.tap();
-                    _scrollToTop();
-                  },
-                ),
+            top: 0,
+            right: 0,
+            width: 112,
+            height: topHotZoneHeight,
+            child: Semantics(
+              button: true,
+              label: 'Scroll notifications to top',
+              child: GestureDetector(
+                behavior: HitTestBehavior.translucent,
+                onTap: () {
+                  AppHaptics.tap();
+                  _scrollToTop();
+                },
               ),
             ),
+          ),
         ],
       ),
     );
@@ -424,14 +697,19 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             children: <Widget>[
               AppBackButton(onPressed: _close),
               const Spacer(),
+              IconButton(
+                onPressed: _openPreferencesSheet,
+                icon: const Icon(Icons.tune_rounded),
+                tooltip: 'Notification preferences',
+              ),
               FilledButton.tonal(
                 onPressed: _unreadCount > 0 ? _markAllRead : null,
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.inputFill,
                   foregroundColor: AppColors.textPrimary,
-                  textStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                  textStyle: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.sm,
                     vertical: 8,
@@ -452,9 +730,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     Text(
                       'Notifications',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: -0.3,
-                          ),
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                     const SizedBox(height: 2),
                     GestureDetector(
@@ -465,8 +743,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                             .showDebugLocalNotification();
                         AppSnack.show(
                           context,
-                          message:
-                              'Local notification preview triggered',
+                          message: 'Local notification preview triggered',
                           type: AppSnackType.info,
                         );
                       },
@@ -476,8 +753,8 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                             ? 'All caught up'
                             : '$_unreadCount unread updates',
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ),
                   ],
@@ -501,8 +778,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             label: 'All',
             selected: !_showUnreadOnly,
             onTap: () {
+              if (!_showUnreadOnly) return;
               AppHaptics.tap();
               setState(() => _showUnreadOnly = false);
+              _loadNotifications(reset: true, onlyUnread: false);
             },
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -510,8 +789,10 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             label: 'Unread',
             selected: _showUnreadOnly,
             onTap: () {
+              if (_showUnreadOnly) return;
               AppHaptics.tap();
               setState(() => _showUnreadOnly = true);
+              _loadNotifications(reset: true, onlyUnread: true);
             },
           ),
         ],
@@ -536,9 +817,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
         decoration: BoxDecoration(
           color: AppColors.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.22),
-          ),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.22)),
         ),
         child: Row(
           children: <Widget>[
@@ -562,9 +841,9 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                     ? '1 unread notification needs your attention'
                     : '$_unreadCount unread notifications need your attention',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -584,19 +863,21 @@ class _NotificationsScreenState extends State<NotificationsScreen>
       child: Align(
         alignment: Alignment.centerLeft,
         child: Text(
-          'Swipe right to mark read/unread \u00b7 left to delete',
+          'Swipe right to mark read/unread \u00b7 left to archive',
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted.withValues(alpha: 0.85),
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+            color: AppColors.textMuted.withValues(alpha: 0.85),
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final String title = _showUnreadOnly ? 'No unread notifications' : 'No notifications yet';
+    final String title = _showUnreadOnly
+        ? 'No unread notifications'
+        : 'No notifications yet';
     final String message = _showUnreadOnly
         ? 'You are all caught up. New updates will appear here.'
         : 'When people react to sites and actions, you will see updates here.';
@@ -623,17 +904,17 @@ class _NotificationsScreenState extends State<NotificationsScreen>
             Text(
               title,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               message,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
             ),
             if (_showUnreadOnly) ...<Widget>[
               const SizedBox(height: AppSpacing.md),
@@ -641,6 +922,7 @@ class _NotificationsScreenState extends State<NotificationsScreen>
                 onPressed: () {
                   AppHaptics.tap();
                   setState(() => _showUnreadOnly = false);
+                  _loadNotifications(reset: true, onlyUnread: false);
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.divider),
@@ -657,21 +939,80 @@ class _NotificationsScreenState extends State<NotificationsScreen>
     );
   }
 
-  String _dayLabel(DateTime value) {
-    final DateTime now = DateTime.now();
-    final DateTime today = DateTime(now.year, now.month, now.day);
-    final DateTime input = DateTime(value.year, value.month, value.day);
-    final int diff = today.difference(input).inDays;
-    if (diff == 0) return 'Today';
-    if (diff == 1) return 'Yesterday';
-    return '${value.day.toString().padLeft(2, '0')}.${value.month.toString().padLeft(2, '0')}.${value.year}';
+  Widget _buildErrorState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            const Icon(
+              Icons.wifi_off_rounded,
+              size: 34,
+              color: AppColors.textMuted,
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              'Could not load notifications',
+              style: Theme.of(
+                context,
+              ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              _loadErrorMessage ??
+                  'Please check your connection and try again.',
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            FilledButton.icon(
+              onPressed: () =>
+                  _loadNotifications(reset: true, onlyUnread: _showUnreadOnly),
+              icon: const Icon(Icons.refresh_rounded),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      ),
+    );
   }
-}
 
-class _NotificationSection {
-  const _NotificationSection({required this.title, required this.items});
-  final String title;
-  final List<UserNotification> items;
+  Widget _buildLoadingSkeleton() {
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.xl,
+      ),
+      itemCount: 6,
+      itemBuilder: (BuildContext context, int index) {
+        return Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+          child: Container(
+            height: 96,
+            decoration: BoxDecoration(
+              color: AppColors.inputFill,
+              borderRadius: BorderRadius.circular(AppSpacing.radius18),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  String _friendlyErrorMessage(Object error) {
+    if (error is AppError) {
+      if (error.code == 'NETWORK_ERROR' || error.code == 'TIMEOUT') {
+        return 'Network issue while loading notifications.';
+      }
+      return error.message;
+    }
+    return 'Something went wrong while loading notifications.';
+  }
 }
 
 class _LegacyNotification {

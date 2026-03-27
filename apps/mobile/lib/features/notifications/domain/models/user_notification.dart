@@ -39,6 +39,8 @@ class UserNotification {
     required this.createdAt,
     this.data,
     this.sentAt,
+    this.threadKey,
+    this.groupKey,
   });
 
   factory UserNotification.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,8 @@ class UserNotification {
       sentAt: json['sentAt'] != null
           ? DateTime.parse(json['sentAt'] as String)
           : null,
+      threadKey: json['threadKey'] as String?,
+      groupKey: json['groupKey'] as String?,
     );
   }
 
@@ -64,6 +68,8 @@ class UserNotification {
   final DateTime createdAt;
   final Map<String, dynamic>? data;
   final DateTime? sentAt;
+  final String? threadKey;
+  final String? groupKey;
 
   UserNotification copyWith({bool? isRead}) {
     return UserNotification(
@@ -75,9 +81,60 @@ class UserNotification {
       createdAt: createdAt,
       data: data,
       sentAt: sentAt,
+      threadKey: threadKey,
+      groupKey: groupKey,
     );
   }
 
   String? get targetSiteId => data?['siteId'] as String?;
   String? get targetTab => data?['targetTab'] as String?;
+}
+
+String toNotificationTypeApiValue(UserNotificationType type) {
+  switch (type) {
+    case UserNotificationType.siteUpdate:
+      return 'SITE_UPDATE';
+    case UserNotificationType.reportStatus:
+      return 'REPORT_STATUS';
+    case UserNotificationType.upvote:
+      return 'UPVOTE';
+    case UserNotificationType.comment:
+      return 'COMMENT';
+    case UserNotificationType.nearbyReport:
+      return 'NEARBY_REPORT';
+    case UserNotificationType.cleanupEvent:
+      return 'CLEANUP_EVENT';
+    case UserNotificationType.system:
+      return 'SYSTEM';
+  }
+}
+
+class NotificationPreference {
+  const NotificationPreference({
+    required this.type,
+    required this.muted,
+    this.mutedUntil,
+  });
+
+  factory NotificationPreference.fromJson(Map<String, dynamic> json) {
+    return NotificationPreference(
+      type: parseNotificationType(json['type'] as String?),
+      muted: json['muted'] as bool? ?? false,
+      mutedUntil: (json['mutedUntil'] as String?) != null
+          ? DateTime.tryParse(json['mutedUntil'] as String)
+          : null,
+    );
+  }
+
+  final UserNotificationType type;
+  final bool muted;
+  final DateTime? mutedUntil;
+
+  NotificationPreference copyWith({bool? muted, DateTime? mutedUntil}) {
+    return NotificationPreference(
+      type: type,
+      muted: muted ?? this.muted,
+      mutedUntil: mutedUntil ?? this.mutedUntil,
+    );
+  }
 }

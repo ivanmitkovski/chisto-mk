@@ -18,13 +18,13 @@ class ApiNotificationsRepository implements NotificationsRepository {
     final ApiResponse response = await _client.get('/notifications$query');
     final Map<String, dynamic> json = response.json!;
     final List<dynamic> data = json['data'] as List<dynamic>;
-    final Map<String, dynamic> meta =
-        json['meta'] as Map<String, dynamic>;
+    final Map<String, dynamic> meta = json['meta'] as Map<String, dynamic>;
 
     return NotificationsListResult(
       notifications: data
-          .map((dynamic e) =>
-              UserNotification.fromJson(e as Map<String, dynamic>))
+          .map(
+            (dynamic e) => UserNotification.fromJson(e as Map<String, dynamic>),
+          )
           .toList(),
       total: (meta['total'] as num).toInt(),
       unreadCount: (meta['unreadCount'] as num).toInt(),
@@ -35,8 +35,9 @@ class ApiNotificationsRepository implements NotificationsRepository {
 
   @override
   Future<int> getUnreadCount() async {
-    final ApiResponse response =
-        await _client.get('/notifications/unread-count');
+    final ApiResponse response = await _client.get(
+      '/notifications/unread-count',
+    );
     final Map<String, dynamic> json = response.json!;
     return (json['unreadCount'] as num).toInt();
   }
@@ -49,6 +50,32 @@ class ApiNotificationsRepository implements NotificationsRepository {
   @override
   Future<void> markAllAsRead() async {
     await _client.patch('/notifications/read-all');
+  }
+
+  @override
+  Future<List<NotificationPreference>> getPreferences() async {
+    final ApiResponse response = await _client.get(
+      '/notifications/preferences',
+    );
+    final Map<String, dynamic> json = response.json!;
+    final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
+    return data
+        .whereType<Map<String, dynamic>>()
+        .map(NotificationPreference.fromJson)
+        .toList();
+  }
+
+  @override
+  Future<NotificationPreference> setPreference({
+    required UserNotificationType type,
+    required bool muted,
+  }) async {
+    final String typeValue = toNotificationTypeApiValue(type);
+    final ApiResponse response = await _client.patch(
+      '/notifications/preferences/$typeValue',
+      body: <String, dynamic>{'muted': muted},
+    );
+    return NotificationPreference.fromJson(response.json!);
   }
 
   @override

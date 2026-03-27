@@ -38,22 +38,23 @@ model User {
   totpSecret     String? // Base32-encoded TOTP secret when 2FA enabled
   mfaBackupCodes String[] @default([]) // Hashed backup codes
 
-  reports            Report[]            @relation("ReporterReports")
-  moderatedReports   Report[]            @relation("ModeratorReports")
-  adminNotifications AdminNotification[]
-  pointTransactions  PointTransaction[]
-  coReportedReports  ReportCoReporter[]
-  sessions           UserSession[]
-  auditLogs          AuditLog[]
-  adminTempTokens    AdminTempToken[]
-  adminPendingMfa    AdminPendingMfa?
-  siteVotes          SiteVote[]
-  siteSaves          SiteSave[]
-  siteComments       SiteComment[]
-  siteShareEvents    SiteShareEvent[]
-  siteCommentLikes   SiteCommentLike[]
-  deviceTokens       UserDeviceToken[]
-  userNotifications  UserNotification[]
+  reports                 Report[]                     @relation("ReporterReports")
+  moderatedReports        Report[]                     @relation("ModeratorReports")
+  adminNotifications      AdminNotification[]
+  pointTransactions       PointTransaction[]
+  coReportedReports       ReportCoReporter[]
+  sessions                UserSession[]
+  auditLogs               AuditLog[]
+  adminTempTokens         AdminTempToken[]
+  adminPendingMfa         AdminPendingMfa?
+  siteVotes               SiteVote[]
+  siteSaves               SiteSave[]
+  siteComments            SiteComment[]
+  siteShareEvents         SiteShareEvent[]
+  siteCommentLikes        SiteCommentLike[]
+  deviceTokens            UserDeviceToken[]
+  userNotifications       UserNotification[]
+  notificationPreferences UserNotificationPreference[]
 
   @@index([role])
   @@index([status])
@@ -514,15 +515,35 @@ model UserNotification {
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title  String
-  body   String
-  type   NotificationType
-  isRead Boolean          @default(false)
-  data   Json?
-  sentAt DateTime?
+  title     String
+  body      String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  data      Json?
+  sentAt    DateTime?
+  threadKey String?
+  groupKey  String?
 
   @@index([userId, isRead, createdAt])
   @@index([userId, createdAt])
+  @@index([userId, type])
+  @@index([userId, groupKey, createdAt])
+}
+
+model UserNotificationPreference {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  type       NotificationType
+  muted      Boolean          @default(false)
+  mutedUntil DateTime?
+
+  @@unique([userId, type])
+  @@index([userId, muted])
 }
 
 model NotificationOutbox {

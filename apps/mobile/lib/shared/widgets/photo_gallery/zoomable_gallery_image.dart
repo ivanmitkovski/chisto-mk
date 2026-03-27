@@ -57,6 +57,8 @@ class _ZoomableGalleryImageState extends State<ZoomableGalleryImage> {
             image: widget.item.image,
             fit: BoxFit.contain,
             semanticLabel: widget.item.semanticLabel,
+            decodePreset: AppSmartImageDecodePreset.fullQuality,
+            enableRetry: false,
           ),
         ),
       ),

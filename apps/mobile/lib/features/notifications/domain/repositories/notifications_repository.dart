@@ -29,6 +29,13 @@ abstract class NotificationsRepository {
 
   Future<void> markAllAsRead();
 
+  Future<List<NotificationPreference>> getPreferences();
+
+  Future<NotificationPreference> setPreference({
+    required UserNotificationType type,
+    required bool muted,
+  });
+
   Future<void> registerDeviceToken({
     required String token,
     required String platform,

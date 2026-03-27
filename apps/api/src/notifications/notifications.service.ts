@@ -6,6 +6,7 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ObservabilityStore } from '../observability/observability.store';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
+import { UpdateNotificationPreferenceDto } from './dto/update-notification-preference.dto';
 
 type NotificationListItem = {
   id: string;
@@ -16,6 +17,8 @@ type NotificationListItem = {
   data: unknown;
   createdAt: string;
   sentAt: string | null;
+  threadKey: string | null;
+  groupKey: string | null;
 };
 
 type NotificationListResponse = {
@@ -44,6 +47,12 @@ type DeadLetterListResponse = {
     limit: number;
     total: number;
   };
+};
+
+type NotificationPreferenceItem = {
+  type: NotificationType;
+  muted: boolean;
+  mutedUntil: string | null;
 };
 
 @Injectable()
@@ -99,6 +108,8 @@ export class NotificationsService {
         data: n.data,
         createdAt: n.createdAt.toISOString(),
         sentAt: n.sentAt?.toISOString() ?? null,
+        threadKey: n.threadKey ?? null,
+        groupKey: n.groupKey ?? null,
       })),
       meta: {
         page: query.page,
@@ -146,6 +157,67 @@ export class NotificationsService {
       data: { isRead: true },
     });
     return { updated: result.count };
+  }
+
+  async listPreferences(
+    user: AuthenticatedUser,
+  ): Promise<{ data: NotificationPreferenceItem[] }> {
+    const rows = await this.prisma.userNotificationPreference.findMany({
+      where: { userId: user.userId },
+      select: { type: true, muted: true, mutedUntil: true },
+    });
+    const byType = new Map<NotificationType, { muted: boolean; mutedUntil: Date | null }>();
+    for (const row of rows) {
+      byType.set(row.type, { muted: row.muted, mutedUntil: row.mutedUntil });
+    }
+    const data = Object.values(NotificationType).map((type) => {
+      const pref = byType.get(type);
+      return {
+        type,
+        muted: pref?.muted ?? false,
+        mutedUntil: pref?.mutedUntil?.toISOString() ?? null,
+      };
+    });
+    return { data };
+  }
+
+  async updatePreference(
+    user: AuthenticatedUser,
+    type: NotificationType,
+    dto: UpdateNotificationPreferenceDto,
+  ): Promise<NotificationPreferenceItem> {
+    const parsedMutedUntil =
+      dto.mutedUntil != null && dto.mutedUntil.trim() !== ''
+        ? new Date(dto.mutedUntil)
+        : null;
+    const mutedUntil = dto.muted && parsedMutedUntil && !Number.isNaN(parsedMutedUntil.getTime())
+      ? parsedMutedUntil
+      : null;
+    const row = await this.prisma.userNotificationPreference.upsert({
+      where: {
+        userId_type: { userId: user.userId, type },
+      },
+      create: {
+        userId: user.userId,
+        type,
+        muted: dto.muted,
+        mutedUntil,
+      },
+      update: {
+        muted: dto.muted,
+        mutedUntil,
+      },
+      select: {
+        type: true,
+        muted: true,
+        mutedUntil: true,
+      },
+    });
+    return {
+      type: row.type,
+      muted: row.muted,
+      mutedUntil: row.mutedUntil?.toISOString() ?? null,
+    };
   }
 
   async registerDeviceToken(
@@ -210,14 +282,19 @@ export class NotificationsService {
     body: string;
     type: NotificationType;
     data?: Record<string, unknown>;
+    threadKey?: string;
+    groupKey?: string;
   }): Promise<string> {
     if (!(await this.isInboxEnabled())) return '';
+    if (await this.isTypeMuted(input.userId, input.type)) return '';
     const notification = await this.prisma.userNotification.create({
       data: {
         userId: input.userId,
         title: input.title,
         body: input.body,
         type: input.type,
+        ...(input.threadKey ? { threadKey: input.threadKey } : {}),
+        ...(input.groupKey ? { groupKey: input.groupKey } : {}),
         ...(input.data ? { data: input.data as Prisma.InputJsonValue } : {}),
       },
       select: { id: true },
@@ -274,6 +351,24 @@ export class NotificationsService {
         total,
       },
     };
+  }
+
+  private async isTypeMuted(
+    userId: string,
+    type: NotificationType,
+  ): Promise<boolean> {
+    const pref = await this.prisma.userNotificationPreference.findUnique({
+      where: { userId_type: { userId, type } },
+      select: { muted: true, mutedUntil: true },
+    });
+    if (!pref?.muted) return false;
+    if (pref.mutedUntil == null) return true;
+    if (pref.mutedUntil.getTime() > Date.now()) return true;
+    await this.prisma.userNotificationPreference.update({
+      where: { userId_type: { userId, type } },
+      data: { muted: false, mutedUntil: null },
+    });
+    return false;
   }
 
   private async isInboxEnabled(): Promise<boolean> {

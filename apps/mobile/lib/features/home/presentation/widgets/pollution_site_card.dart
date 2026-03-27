@@ -22,6 +22,7 @@ import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_card_widgets.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/cache/site_image_prefetch_queue.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 
 class PollutionSiteCard extends StatefulWidget {
@@ -49,6 +50,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   bool _isSaved = false;
   double _saveIconScale = 1.0;
   bool _didPrefetchImages = false;
+  bool _isCardVisible = true;
   final PageController _pageController = PageController();
   int _currentImageIndex = 0;
   bool _isUpvoteInFlight = false;
@@ -86,7 +88,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     if (_impressionTracked && dwellSeconds >= 2) {
       _trackFeedEvent(
         'dwell_bucket',
-        metadata: <String, dynamic>{'bucket': _dwellBucketForSeconds(dwellSeconds)},
+        metadata: <String, dynamic>{
+          'bucket': _dwellBucketForSeconds(dwellSeconds),
+        },
       );
     }
     _pageController.dispose();
@@ -128,9 +132,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     if (_didPrefetchImages) return;
     _didPrefetchImages = true;
     final List<ImageProvider> images = site.galleryImages;
-    for (int i = 0; i < images.length && i < 3; i++) {
-      precacheImage(images[i], context);
-    }
+    SiteImagePrefetchQueue.instance.prefetchList(
+      context,
+      images,
+      maxItems: 3,
+      shouldPrefetch: () => mounted,
+    );
   }
 
   void _onUpvoteTap() {
@@ -153,33 +160,38 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       setState(() => _upvoteIconScale = 1);
     });
     final repo = ServiceLocator.instance.sitesRepository;
-    final future = prevUpvoted ? repo.removeSiteUpvote(site.id) : repo.upvoteSite(site.id);
-    future.then((snapshot) {
-      if (!mounted) return;
-      setState(() {
-        _isUpvoted = snapshot.isUpvotedByMe;
-        _upvoteCount = snapshot.upvotesCount;
-        _commentCount = snapshot.commentsCount;
-        _shareCount = snapshot.sharesCount;
-        _isSaved = snapshot.isSavedByMe;
-      });
-      AppHaptics.light();
-      _trackFeedEvent('upvote');
-    }).catchError((_) {
-      if (!mounted) return;
-      setState(() {
-        _isUpvoted = prevUpvoted;
-        _upvoteCount = prevCount;
-      });
-      AppHaptics.medium();
-      AppSnack.show(
-        context,
-        message: 'Could not update upvote. Please try again.',
-        type: AppSnackType.warning,
-      );
-    }).whenComplete(() {
-      _isUpvoteInFlight = false;
-    });
+    final future = prevUpvoted
+        ? repo.removeSiteUpvote(site.id)
+        : repo.upvoteSite(site.id);
+    future
+        .then((snapshot) {
+          if (!mounted) return;
+          setState(() {
+            _isUpvoted = snapshot.isUpvotedByMe;
+            _upvoteCount = snapshot.upvotesCount;
+            _commentCount = snapshot.commentsCount;
+            _shareCount = snapshot.sharesCount;
+            _isSaved = snapshot.isSavedByMe;
+          });
+          AppHaptics.light();
+          _trackFeedEvent('upvote');
+        })
+        .catchError((_) {
+          if (!mounted) return;
+          setState(() {
+            _isUpvoted = prevUpvoted;
+            _upvoteCount = prevCount;
+          });
+          AppHaptics.medium();
+          AppSnack.show(
+            context,
+            message: 'Could not update upvote. Please try again.',
+            type: AppSnackType.warning,
+          );
+        })
+        .whenComplete(() {
+          _isUpvoteInFlight = false;
+        });
   }
 
   Future<void> _toggleSave() async {
@@ -219,7 +231,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         _shareCount = snapshot.sharesCount;
         _isUpvoted = snapshot.isUpvotedByMe;
       });
-      _trackFeedEvent('save', metadata: <String, dynamic>{'saved': snapshot.isSavedByMe});
+      _trackFeedEvent(
+        'save',
+        metadata: <String, dynamic>{'saved': snapshot.isSavedByMe},
+      );
     } catch (_) {
       if (mounted) {
         setState(() => _isSaved = !nextSaved);
@@ -295,6 +310,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     return VisibilityDetector(
       key: ValueKey<String>('feed-card-${site.id}'),
       onVisibilityChanged: (VisibilityInfo info) {
+        _isCardVisible = info.visibleFraction > 0.14;
         if (_impressionTracked) return;
         if (info.visibleFraction < 0.5) {
           _impressionTimer?.cancel();
@@ -312,151 +328,154 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         button: false,
         label: 'Pollution site: ${site.title}. Tap to open details.',
         child: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-        decoration: BoxDecoration(
-          color: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(_cardRadius),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: AppSpacing.md,
-              offset: const Offset(0, 4),
-            ),
-            BoxShadow(
-              color: AppColors.shadowMedium,
-              blurRadius: AppSpacing.lg,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(_cardRadius),
-          child: Material(
-            color: AppColors.transparent,
-            child: InkWell(
-              onTap: () => _openDetails(context),
-              splashColor: AppColors.primary.withValues(alpha: 0.08),
-              highlightColor: AppColors.black.withValues(alpha: 0.02),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  _buildImage(context),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      AppSpacing.lg,
-                      AppSpacing.md,
-                      AppSpacing.lg,
-                      AppSpacing.lg,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        _buildEngagementRow(context),
-                        const SizedBox(height: AppSpacing.sm),
-                        LayoutBuilder(
-                          builder:
-                              (
-                                BuildContext context,
-                                BoxConstraints constraints,
-                              ) {
-                                final double maxWidth = constraints.maxWidth;
-                                final TextStyle titleStyle = AppTypography
-                                    .textTheme
-                                    .titleSmall!
-                                    .copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 17,
-                                      letterSpacing: -0.2,
+          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+          decoration: BoxDecoration(
+            color: AppColors.panelBackground,
+            borderRadius: BorderRadius.circular(_cardRadius),
+            boxShadow: <BoxShadow>[
+              BoxShadow(
+                color: AppColors.shadowLight,
+                blurRadius: AppSpacing.md,
+                offset: const Offset(0, 4),
+              ),
+              BoxShadow(
+                color: AppColors.shadowMedium,
+                blurRadius: AppSpacing.lg,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(_cardRadius),
+            child: Material(
+              color: AppColors.transparent,
+              child: InkWell(
+                onTap: () => _openDetails(context),
+                splashColor: AppColors.primary.withValues(alpha: 0.08),
+                highlightColor: AppColors.black.withValues(alpha: 0.02),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    _buildImage(context),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        AppSpacing.md,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          _buildEngagementRow(context),
+                          const SizedBox(height: AppSpacing.sm),
+                          LayoutBuilder(
+                            builder:
+                                (
+                                  BuildContext context,
+                                  BoxConstraints constraints,
+                                ) {
+                                  final double maxWidth = constraints.maxWidth;
+                                  final TextStyle titleStyle = AppTypography
+                                      .textTheme
+                                      .titleSmall!
+                                      .copyWith(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 17,
+                                        letterSpacing: -0.2,
+                                      );
+                                  final TextStyle descStyle = AppTypography
+                                      .textTheme
+                                      .bodySmall!
+                                      .copyWith(
+                                        color: AppColors.textSecondary,
+                                        height: 1.35,
+                                        fontSize: 14,
+                                      );
+                                  final bool cacheValid =
+                                      _cachedTruncationWidth == maxWidth &&
+                                      _cachedTitleKey == site.title &&
+                                      _cachedDescKey == site.description &&
+                                      _cachedTitleTruncated != null &&
+                                      _cachedDescTruncated != null;
+                                  String titleDisplay;
+                                  String descDisplay;
+                                  if (cacheValid) {
+                                    titleDisplay = _cachedTitleTruncated!;
+                                    descDisplay = _cachedDescTruncated!;
+                                  } else {
+                                    titleDisplay = _truncateAtWordBoundary(
+                                      site.title,
+                                      style: titleStyle,
+                                      maxWidth: maxWidth,
+                                      maxLines: 1,
                                     );
-                                final TextStyle descStyle = AppTypography
-                                    .textTheme
-                                    .bodySmall!
-                                    .copyWith(
-                                      color: AppColors.textSecondary,
-                                      height: 1.35,
-                                      fontSize: 14,
+                                    descDisplay = _truncateAtWordBoundary(
+                                      site.description,
+                                      style: descStyle,
+                                      maxWidth: maxWidth,
+                                      maxLines: 2,
                                     );
-                                final bool cacheValid =
-                                    _cachedTruncationWidth == maxWidth &&
-                                    _cachedTitleKey == site.title &&
-                                    _cachedDescKey == site.description &&
-                                    _cachedTitleTruncated != null &&
-                                    _cachedDescTruncated != null;
-                                String titleDisplay;
-                                String descDisplay;
-                                if (cacheValid) {
-                                  titleDisplay = _cachedTitleTruncated!;
-                                  descDisplay = _cachedDescTruncated!;
-                                } else {
-                                  titleDisplay = _truncateAtWordBoundary(
-                                    site.title,
-                                    style: titleStyle,
-                                    maxWidth: maxWidth,
-                                    maxLines: 1,
-                                  );
-                                  descDisplay = _truncateAtWordBoundary(
-                                    site.description,
-                                    style: descStyle,
-                                    maxWidth: maxWidth,
-                                    maxLines: 2,
-                                  );
-                                  _cachedTitleTruncated = titleDisplay;
-                                  _cachedDescTruncated = descDisplay;
-                                  _cachedTitleKey = site.title;
-                                  _cachedDescKey = site.description;
-                                  _cachedTruncationWidth = maxWidth;
-                                }
-                                final String titleNorm =
-                                    site.title.trim().toLowerCase();
-                                final String descNorm =
-                                    site.description.trim().toLowerCase();
-                                final bool redundant =
-                                    titleNorm.isEmpty ||
-                                    descNorm.isEmpty ||
-                                    titleNorm == descNorm;
+                                    _cachedTitleTruncated = titleDisplay;
+                                    _cachedDescTruncated = descDisplay;
+                                    _cachedTitleKey = site.title;
+                                    _cachedDescKey = site.description;
+                                    _cachedTruncationWidth = maxWidth;
+                                  }
+                                  final String titleNorm = site.title
+                                      .trim()
+                                      .toLowerCase();
+                                  final String descNorm = site.description
+                                      .trim()
+                                      .toLowerCase();
+                                  final bool redundant =
+                                      titleNorm.isEmpty ||
+                                      descNorm.isEmpty ||
+                                      titleNorm == descNorm;
 
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    SizedBox(
-                                      width: maxWidth,
-                                      child: Text(
-                                        titleDisplay,
-                                        style: titleStyle,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                    if (!redundant) ...[
-                                      const SizedBox(height: AppSpacing.xs),
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
                                       SizedBox(
                                         width: maxWidth,
                                         child: Text(
-                                          descDisplay,
-                                          style: descStyle,
-                                          maxLines: 2,
+                                          titleDisplay,
+                                          style: titleStyle,
+                                          maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
+                                      if (!redundant) ...[
+                                        const SizedBox(height: AppSpacing.xs),
+                                        SizedBox(
+                                          width: maxWidth,
+                                          child: Text(
+                                            descDisplay,
+                                            style: descStyle,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ],
-                                  ],
-                                );
-                              },
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        PrimaryButton(
-                          label: 'Take action',
-                          onPressed: () => _openTakeActionSheet(),
-                        ),
-                      ],
+                                  );
+                                },
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          PrimaryButton(
+                            label: 'Take action',
+                            onPressed: () => _openTakeActionSheet(),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         ),
       ),
     );
@@ -489,6 +508,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   child: AppSmartImage(
                     image: images[index],
                     semanticLabel: 'Photo ${index + 1} of ${site.title}',
+                    decodePreset: AppSmartImageDecodePreset.feed,
                   ),
                 );
               },
@@ -555,7 +575,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                     height: 34,
                     decoration: BoxDecoration(
                       color: AppColors.black.withValues(alpha: 0.34),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                      borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusPill,
+                      ),
                     ),
                     child: const Icon(
                       Icons.more_horiz_rounded,
@@ -591,14 +613,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   void _prefetchAround(int index, List<ImageProvider> images) {
-    final int previous = index - 1;
-    final int next = index + 1;
-    if (previous >= 0 && previous < images.length) {
-      precacheImage(images[previous], context);
-    }
-    if (next >= 0 && next < images.length) {
-      precacheImage(images[next], context);
-    }
+    SiteImagePrefetchQueue.instance.prefetchAround(
+      context,
+      images,
+      index,
+      shouldPrefetch: () => mounted && _isCardVisible,
+    );
   }
 
   Widget _buildEngagementRow(BuildContext context) {
@@ -619,8 +639,8 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
             child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
                 SizedBox(
                   height: 44,
                   child: Row(
@@ -819,9 +839,12 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   Future<void> _openDetails(BuildContext context) async {
     AppHaptics.softTransition();
     _trackFeedEvent('detail_open');
-    for (int i = 0; i < site.galleryImages.length && i < 3; i++) {
-      precacheImage(site.galleryImages[i], context);
-    }
+    SiteImagePrefetchQueue.instance.prefetchList(
+      context,
+      site.galleryImages,
+      maxItems: 3,
+      shouldPrefetch: () => mounted,
+    );
     await Navigator.of(context).push(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(site: site),
@@ -829,7 +852,8 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     );
     if (!mounted) return;
     try {
-      final refreshed = await ServiceLocator.instance.sitesRepository.getSiteById(site.id);
+      final refreshed = await ServiceLocator.instance.sitesRepository
+          .getSiteById(site.id);
       if (!mounted || refreshed == null) return;
       setState(() {
         _isUpvoted = refreshed.isUpvotedByMe;
@@ -844,15 +868,14 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   Future<void> _openCommentsSheet() async {
     _trackFeedEvent('comment_open');
     Future<List<Comment>> loadComments(String sort) async {
-      final result = await ServiceLocator.instance.sitesRepository.getSiteComments(
-        site.id,
-        sort: sort,
-      );
+      final result = await ServiceLocator.instance.sitesRepository
+          .getSiteComments(site.id, sort: sort);
       if (mounted) {
         setState(() => _commentCount = result.total);
       }
       return result.items.map(_commentFromSiteCommentItem).toList();
     }
+
     try {
       final comments = await loadComments('top');
       if (mounted) {
@@ -905,7 +928,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.panelBackground,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusPill)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(AppSpacing.radiusPill),
+                ),
               ),
               clipBehavior: Clip.antiAlias,
               child: CommentsBottomSheet(
@@ -921,35 +946,26 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                   setState(() => _sessionComments = comments);
                 },
                 onCommentSubmitted: (String text, String? parentId) {
-                  return ServiceLocator.instance.sitesRepository.createSiteComment(
-                    site.id,
-                    text,
-                    parentId: parentId,
-                  ).then(_commentFromSiteCommentItem);
+                  return ServiceLocator.instance.sitesRepository
+                      .createSiteComment(site.id, text, parentId: parentId)
+                      .then(_commentFromSiteCommentItem);
                 },
                 onCommentEdited: (String commentId, String body) {
-                  return ServiceLocator.instance.sitesRepository.updateSiteComment(
-                    site.id,
-                    commentId,
-                    body,
-                  );
+                  return ServiceLocator.instance.sitesRepository
+                      .updateSiteComment(site.id, commentId, body);
                 },
                 onCommentDeleted: (String commentId) {
-                  return ServiceLocator.instance.sitesRepository.deleteSiteComment(
-                    site.id,
-                    commentId,
-                  );
+                  return ServiceLocator.instance.sitesRepository
+                      .deleteSiteComment(site.id, commentId);
                 },
                 onCommentLikeToggled: (String commentId, bool shouldLike) {
                   return shouldLike
-                      ? ServiceLocator.instance.sitesRepository.likeSiteComment(
-                          site.id,
-                          commentId,
-                        ).then((_) {})
-                      : ServiceLocator.instance.sitesRepository.unlikeSiteComment(
-                          site.id,
-                          commentId,
-                        ).then((_) {});
+                      ? ServiceLocator.instance.sitesRepository
+                            .likeSiteComment(site.id, commentId)
+                            .then((_) {})
+                      : ServiceLocator.instance.sitesRepository
+                            .unlikeSiteComment(site.id, commentId)
+                            .then((_) {});
                 },
                 onSortChanged: loadComments,
               ),
@@ -970,13 +986,17 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       site: site,
       isFromSiteDetail: false,
       onShareCountChanged: () {
-        if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
+        if (mounted) {
+          setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
+        }
       },
     );
     if (action != TakeActionType.shareSite || !shareConfirmed) return;
     _isShareInFlight = true;
     try {
-      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
+      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(
+        site.id,
+      );
       if (!mounted) return;
       setState(() => _shareCount = snapshot.sharesCount);
       _trackFeedEvent('share');
@@ -1001,13 +1021,17 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       site: site,
       isFromSiteDetail: false,
       onShareCountChanged: () {
-        if (mounted) setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
+        if (mounted) {
+          setState(() => _shareCount = (_shareCount + 1).clamp(0, 9999));
+        }
       },
     );
     if (!shareConfirmed) return;
     _isShareInFlight = true;
     try {
-      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(site.id);
+      final snapshot = await ServiceLocator.instance.sitesRepository.shareSite(
+        site.id,
+      );
       if (!mounted) return;
       setState(() => _shareCount = snapshot.sharesCount);
       _trackFeedEvent('share');
@@ -1061,7 +1085,9 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
             return Container(
               decoration: const BoxDecoration(
                 color: AppColors.panelBackground,
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusPill)),
+                borderRadius: BorderRadius.vertical(
+                  top: Radius.circular(AppSpacing.radiusPill),
+                ),
               ),
               clipBehavior: Clip.antiAlias,
               child: UpvotersSheetContent(
@@ -1132,7 +1158,10 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         site.id,
         feedbackType: feedbackType,
         sessionId: widget.feedSessionId,
-        metadata: <String, dynamic>{'source': 'feed_card_menu', 'action': action.name},
+        metadata: <String, dynamic>{
+          'source': 'feed_card_menu',
+          'action': action.name,
+        },
       );
       if (!mounted) return;
       AppSnack.show(
@@ -1227,22 +1256,26 @@ class _FeedFeedbackSheet extends StatelessWidget {
               _FeedbackTile(
                 icon: Icons.visibility_off_outlined,
                 title: 'Not relevant',
-                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.notRelevant),
+                onTap: () =>
+                    Navigator.of(context).pop(_FeedFeedbackAction.notRelevant),
               ),
               _FeedbackTile(
                 icon: Icons.auto_awesome_outlined,
                 title: 'Show less like this',
-                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.showLess),
+                onTap: () =>
+                    Navigator.of(context).pop(_FeedFeedbackAction.showLess),
               ),
               _FeedbackTile(
                 icon: Icons.copy_all_outlined,
                 title: 'Duplicate',
-                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.duplicate),
+                onTap: () =>
+                    Navigator.of(context).pop(_FeedFeedbackAction.duplicate),
               ),
               _FeedbackTile(
                 icon: Icons.warning_amber_rounded,
                 title: 'Misleading',
-                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.misleading),
+                onTap: () =>
+                    Navigator.of(context).pop(_FeedFeedbackAction.misleading),
               ),
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: AppSpacing.xs),
@@ -1252,7 +1285,8 @@ class _FeedFeedbackSheet extends StatelessWidget {
                 icon: Icons.hide_source_rounded,
                 title: 'Hide this post',
                 isDestructive: true,
-                onTap: () => Navigator.of(context).pop(_FeedFeedbackAction.hide),
+                onTap: () =>
+                    Navigator.of(context).pop(_FeedFeedbackAction.hide),
               ),
             ],
           ),
@@ -1277,8 +1311,12 @@ class _FeedbackTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color iconColor = isDestructive ? AppColors.accentDanger : AppColors.textPrimary;
-    final Color textColor = isDestructive ? AppColors.accentDanger : AppColors.textPrimary;
+    final Color iconColor = isDestructive
+        ? AppColors.accentDanger
+        : AppColors.textPrimary;
+    final Color textColor = isDestructive
+        ? AppColors.accentDanger
+        : AppColors.textPrimary;
     return Material(
       color: AppColors.transparent,
       child: InkWell(
@@ -1309,4 +1347,3 @@ class _FeedbackTile extends StatelessWidget {
     );
   }
 }
-

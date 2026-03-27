@@ -12,6 +12,8 @@ export type NotificationEvent = {
   body: string;
   type: NotificationType;
   data?: Record<string, unknown>;
+  threadKey?: string;
+  groupKey?: string;
 };
 
 @Injectable()
@@ -45,6 +47,8 @@ export class NotificationDispatcherService {
       title: event.title,
       body: event.body,
       type: event.type,
+      ...(event.threadKey ? { threadKey: event.threadKey } : {}),
+      ...(event.groupKey ? { groupKey: event.groupKey } : {}),
       ...(event.data ? { data: event.data } : {}),
     });
     if (!notificationId) return;
