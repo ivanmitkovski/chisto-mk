@@ -1,4 +1,22 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { createHash } from 'node:crypto';
+
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  MessageEvent as NestMessageEvent,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Res,
+  Sse,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
@@ -25,11 +43,19 @@ import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 import { SitesService } from './sites.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
+import { Observable, concat, defer, finalize, from, interval, map, merge } from 'rxjs';
+import { SiteEventsService } from '../admin-events/site-events.service';
+import { ObservabilityStore } from '../observability/observability.store';
 
 @ApiTags('sites')
 @Controller('sites')
 export class SitesController {
-  constructor(private readonly sitesService: SitesService) {}
+  private static readonly HEARTBEAT_INTERVAL_MS = 30_000;
+
+  constructor(
+    private readonly sitesService: SitesService,
+    private readonly siteEventsService: SiteEventsService,
+  ) {}
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -60,10 +86,81 @@ export class SitesController {
   }
 
   @Get('map')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiOperation({ summary: 'List sites for map view with geo bounds and high limit' })
   @ApiOkResponse({ description: 'Sites for map fetched successfully' })
-  findAllForMap(@Query() query: ListSitesMapQueryDto) {
-    return this.sitesService.findAllForMap(query);
+  async findAllForMap(
+    @Query() query: ListSitesMapQueryDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const body = await this.sitesService.findAllForMap(query);
+    const etag = SitesController.weakEtagForMapBody(body);
+    res.setHeader('ETag', etag);
+    res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
+    return body;
+  }
+
+  private static weakEtagForMapBody(body: {
+    data: Array<{ id: string; updatedAt?: Date | string }>;
+  }): string {
+    const h = createHash('sha1');
+    for (const row of body.data) {
+      h.update(row.id);
+      const u =
+        row.updatedAt instanceof Date
+          ? row.updatedAt.toISOString()
+          : String(row.updatedAt ?? '');
+      h.update(u);
+    }
+    return `W/"${h.digest('hex').slice(0, 24)}"`;
+  }
+
+  @Get('events')
+  @Sse()
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 30, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Server-Sent Events stream for site updates (mobile map)' })
+  streamSiteEvents(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Headers('last-event-id') lastEventId?: string,
+  ): Observable<NestMessageEvent> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return defer(() => {
+      ObservabilityStore.recordMapSseConnected();
+      const replayEvents = this.siteEventsService.getReplaySince(lastEventId);
+      if (replayEvents.length > 0) {
+        ObservabilityStore.recordMapSseReplayEvents(replayEvents.length);
+      }
+      const toSseEvent = (
+        event: { eventId: string; type: string } & Record<string, unknown>,
+      ): NestMessageEvent => {
+        ObservabilityStore.recordMapSseEventEmitted();
+        return {
+          data: event as object,
+          type: event.type,
+          id: event.eventId,
+        };
+      };
+      const replay$ = from(replayEvents).pipe(map((event) => toSseEvent(event)));
+      const live$ = this.siteEventsService.getEvents().pipe(
+        map((event) => toSseEvent(event)),
+      );
+      const heartbeat$ = interval(SitesController.HEARTBEAT_INTERVAL_MS).pipe(
+        map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
+      );
+      return concat(replay$, merge(live$, heartbeat$)).pipe(
+        finalize(() => {
+          ObservabilityStore.recordMapSseDisconnected();
+        }),
+      );
+    });
   }
 
   @Get(':id')

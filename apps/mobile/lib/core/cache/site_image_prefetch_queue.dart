@@ -12,7 +12,8 @@ class SiteImagePrefetchQueue {
 
   static final SiteImagePrefetchQueue instance = SiteImagePrefetchQueue._();
 
-  static const int _maxConcurrent = 2;
+  /// Slightly higher concurrency helps map pin warm-up on fast pans without flooding IO.
+  static const int _maxConcurrent = 3;
   static const int _maxQueueSize = 24;
   static const int _recentCapacity = 120;
 
@@ -97,10 +98,19 @@ class SiteImagePrefetchQueue {
     }
   }
 
+  ImageProvider _rootImageProvider(ImageProvider provider) {
+    ImageProvider p = provider;
+    while (p is ResizeImage) {
+      p = p.imageProvider;
+    }
+    return p;
+  }
+
   Future<void> _run(_PrefetchTask task) async {
     _inFlightKeys.add(task.key);
     try {
-      if (task.provider case final CachedNetworkImageProvider provider) {
+      if (_rootImageProvider(task.provider)
+          case final CachedNetworkImageProvider provider) {
         final BaseCacheManager manager =
             provider.cacheManager ?? DefaultCacheManager();
         final String cacheKey = provider.cacheKey ?? provider.url;
@@ -153,7 +163,7 @@ class SiteImagePrefetchQueue {
   }
 
   String? _prefetchKey(ImageProvider provider) {
-    if (provider case final CachedNetworkImageProvider p) {
+    if (_rootImageProvider(provider) case final CachedNetworkImageProvider p) {
       return p.cacheKey ?? p.url;
     }
     if (provider case final FileImage p) {

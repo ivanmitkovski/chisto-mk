@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -12,17 +13,22 @@ class PollutionMarker extends StatelessWidget {
     required this.isSelected,
     required this.entranceDelay,
     required this.onTap,
+    this.animate = true,
   });
 
   final PollutionSite site;
   final bool isSelected;
   final Duration entranceDelay;
   final VoidCallback onTap;
+  final bool animate;
 
   static const int _animationMs = 500;
 
   @override
   Widget build(BuildContext context) {
+    if (!animate) {
+      return _buildMarkerBody(context);
+    }
     final int delayMs = entranceDelay.inMilliseconds;
     final int totalMs = _animationMs + delayMs;
     final double delayFraction = delayMs / totalMs;
@@ -40,13 +46,19 @@ class PollutionMarker extends StatelessWidget {
           child: Opacity(opacity: entrance, child: child),
         );
       },
-      child: Semantics(
-        button: true,
-        label: '${site.title}, ${site.statusLabel} severity',
-        child: GestureDetector(
-          onTap: onTap,
-          child: RepaintBoundary(
-            child: AnimatedScale(
+      child: _buildMarkerBody(context),
+    );
+  }
+
+  Widget _buildMarkerBody(BuildContext context) {
+    return Semantics(
+      button: true,
+      label:
+          '${site.title}, ${site.statusLabel} severity. Double tap to preview.',
+      child: GestureDetector(
+        onTap: onTap,
+        child: RepaintBoundary(
+          child: AnimatedScale(
             scale: isSelected ? 1.18 : 1.0,
             duration: AppMotion.medium,
             curve: isSelected ? Curves.easeOutBack : Curves.easeOutCubic,
@@ -63,8 +75,9 @@ class PollutionMarker extends StatelessWidget {
                       spreadRadius: 4,
                     ),
                   BoxShadow(
-                    color: AppColors.black
-                        .withValues(alpha: isSelected ? 0.28 : 0.18),
+                    color: AppColors.black.withValues(
+                      alpha: isSelected ? 0.28 : 0.18,
+                    ),
                     blurRadius: isSelected ? 16 : 8,
                     offset: Offset(0, isSelected ? 8 : 4),
                   ),
@@ -84,11 +97,11 @@ class PollutionMarker extends StatelessWidget {
                 padding: const EdgeInsets.all(2),
                 child: ClipOval(
                   child: Image(
-                    image: site.imageProvider,
+                    image: mapPinImageProviderForSite(site),
                     fit: BoxFit.cover,
+                    gaplessPlayback: true,
                   ),
                 ),
-              ),
               ),
             ),
           ),
@@ -106,12 +119,16 @@ class ClusterMarker extends StatefulWidget {
     required this.count,
     required this.entranceDelay,
     required this.onTap,
+    this.animate = true,
+    this.pulseEnabled = true,
   });
 
   final ClusterBucket bucket;
   final int count;
   final Duration entranceDelay;
   final VoidCallback onTap;
+  final bool animate;
+  final bool pulseEnabled;
 
   @override
   State<ClusterMarker> createState() => _ClusterMarkerState();
@@ -131,14 +148,16 @@ class _ClusterMarkerState extends State<ClusterMarker>
     _pulseController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: (2800 - intensity * 800).round()),
-    )..repeat(reverse: true);
-    _pulseScale = Tween<double>(
-      begin: 1.0,
-      end: 1.0 + 0.04 * intensity,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
+    );
+    if (widget.pulseEnabled) {
+      _pulseController.repeat(reverse: true);
+    } else {
+      _pulseController.value = 1;
+    }
+    _pulseScale = Tween<double>(begin: 1.0, end: 1.0 + 0.04 * intensity)
+        .animate(
+          CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+        );
     _tapScaleController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 120),
@@ -159,8 +178,9 @@ class _ClusterMarkerState extends State<ClusterMarker>
 
   @override
   Widget build(BuildContext context) {
-    final Color dominant = widget.bucket.dominantColor;
-    final int count = widget.count;
+    if (!widget.animate) {
+      return _buildClusterBody(context);
+    }
     final int delayMs = widget.entranceDelay.inMilliseconds;
     final int totalMs = _animationMs + delayMs;
     final double delayFraction = delayMs / totalMs;
@@ -178,62 +198,71 @@ class _ClusterMarkerState extends State<ClusterMarker>
           child: Opacity(opacity: entrance, child: child),
         );
       },
-      child: Semantics(
-        button: true,
-        label:
-            '$count pollution site${count == 1 ? '' : 's'} clustered. Tap to expand.',
-        child: GestureDetector(
-          onTapDown: (_) => _tapScaleController.forward(),
-          onTapUp: (_) => _tapScaleController.reverse(),
-          onTapCancel: () => _tapScaleController.reverse(),
-          onTap: widget.onTap,
-          child: AnimatedBuilder(
-            animation: Listenable.merge(<Listenable>[_pulseScale, _tapScale]),
-            builder: (BuildContext context, Widget? child) {
-              return Transform.scale(
-                scale: _pulseScale.value * _tapScale.value,
-                child: child,
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  center: Alignment.topLeft,
-                  radius: 1.2,
-                  colors: <Color>[
-                    dominant.withValues(alpha: 0.98),
-                    dominant.withValues(alpha: 0.85),
-                    dominant.withValues(alpha: 0.72),
-                  ],
-                ),
-                border: Border.all(
-                  color: AppColors.white.withValues(alpha: 0.5),
-                  width: 2,
-                ),
-                boxShadow: <BoxShadow>[
-                  BoxShadow(
-                    color: dominant.withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    spreadRadius: 1,
-                  ),
-                  BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
+      child: _buildClusterBody(context),
+    );
+  }
+
+  Widget _buildClusterBody(BuildContext context) {
+    final Color dominant = widget.bucket.dominantColor;
+    final int count = widget.count;
+    return Semantics(
+      button: true,
+      label:
+          '$count pollution site${count == 1 ? '' : 's'} clustered. Double tap to expand.',
+      child: GestureDetector(
+        onTapDown: (_) => _tapScaleController.forward(),
+        onTapUp: (_) => _tapScaleController.reverse(),
+        onTapCancel: () => _tapScaleController.reverse(),
+        onTap: widget.onTap,
+        child: AnimatedBuilder(
+          animation: Listenable.merge(<Listenable>[_pulseScale, _tapScale]),
+          builder: (BuildContext context, Widget? child) {
+            final double pulseScale = widget.pulseEnabled
+                ? _pulseScale.value
+                : 1.0;
+            return Transform.scale(
+              scale: pulseScale * _tapScale.value,
+              child: child,
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                center: Alignment.topLeft,
+                radius: 1.2,
+                colors: <Color>[
+                  dominant.withValues(alpha: 0.98),
+                  dominant.withValues(alpha: 0.85),
+                  dominant.withValues(alpha: 0.72),
                 ],
               ),
-              child: Center(
-                child: Text(
-                  count >= 100 ? '99+' : '$count',
-                  style: TextStyle(
-                    color: AppColors.textOnDark,
-                    fontWeight: FontWeight.w700,
-                    fontSize: count >= 10 ? 12 : 14,
-                    height: 1,
-                    letterSpacing: -0.3,
-                  ),
+              border: Border.all(
+                color: AppColors.white.withValues(alpha: 0.5),
+                width: 2,
+              ),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                  color: dominant.withValues(alpha: 0.3),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                ),
+                BoxShadow(
+                  color: AppColors.shadowLight,
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Center(
+              child: Text(
+                count >= 100 ? '99+' : '$count',
+                style: TextStyle(
+                  color: AppColors.textOnDark,
+                  fontWeight: FontWeight.w700,
+                  fontSize: count >= 10 ? 12 : 14,
+                  height: 1,
+                  letterSpacing: -0.3,
                 ),
               ),
             ),
@@ -246,7 +275,9 @@ class _ClusterMarkerState extends State<ClusterMarker>
 
 /// Pulsing accuracy ring with animated entrance for user location.
 class UserLocationDot extends StatefulWidget {
-  const UserLocationDot({super.key});
+  const UserLocationDot({super.key, this.animate = true});
+
+  final bool animate;
 
   @override
   State<UserLocationDot> createState() => _UserLocationDotState();
@@ -264,13 +295,20 @@ class _UserLocationDotState extends State<UserLocationDot>
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2400),
-    )..repeat();
-    _ringScale = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
     );
-    _ringOpacity = Tween<double>(begin: 0.5, end: 0.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeOut),
-    );
+    if (widget.animate) {
+      _pulseController.repeat();
+    } else {
+      _pulseController.value = 1;
+    }
+    _ringScale = Tween<double>(
+      begin: 0.5,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
+    _ringOpacity = Tween<double>(
+      begin: 0.5,
+      end: 0.0,
+    ).animate(CurvedAnimation(parent: _pulseController, curve: Curves.easeOut));
   }
 
   @override
@@ -281,6 +319,25 @@ class _UserLocationDotState extends State<UserLocationDot>
 
   @override
   Widget build(BuildContext context) {
+    if (!widget.animate) {
+      return Semantics(
+        label: 'Your current location',
+        child: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              width: 14,
+              height: 14,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
     return TweenAnimationBuilder<double>(
       duration: const Duration(milliseconds: 500),
       curve: Curves.easeOutBack,

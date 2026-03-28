@@ -41,7 +41,7 @@ function makeService(overrides?: {
   const reportsUploadService = { signUrls: jest.fn() };
   const reportEventsService = { emitReportCreated: jest.fn(), emitReportStatusUpdated: jest.fn() };
   const notificationEventsService = { emitNotificationCreated: jest.fn() };
-  const siteEventsService = { emitSiteUpdated: jest.fn() };
+  const siteEventsService = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() };
   const reportsOwnerEventsService = { emit: jest.fn() };
 
   const eventEmitter = { emit: jest.fn() };

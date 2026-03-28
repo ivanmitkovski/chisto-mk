@@ -6,6 +6,10 @@ class AppColors {
   static const Color primary = Color(0xFF2FD788);
   static const Color primaryDark = Color(0xFF14B96A);
   static const Color appBackground = Color(0xFFF4F5F7);
+  /// Base tone behind raster map tiles (Carto light); avoids default FlutterMap grey (#E0E0E0).
+  static const Color mapLightPaper = Color(0xFFF5F3F0);
+  /// Base tone behind Carto dark tiles while pixels load.
+  static const Color mapDarkPaper = Color(0xFF1A1A1A);
   static const Color panelBackground = Color(0xFFFFFFFF);
   static const Color textPrimary = Color(0xFF121212);
   static const Color textSecondary = Color(0xFF4C4C4C);

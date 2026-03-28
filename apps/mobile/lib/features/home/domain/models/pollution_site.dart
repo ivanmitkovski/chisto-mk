@@ -18,6 +18,7 @@ class PollutionSite {
     this.isSavedByMe = false,
     required this.participantCount,
     required this.imageProvider,
+    this.primaryImageUrl,
     this.images,
     this.comments = const [],
     this.commentsCount = 0,
@@ -49,6 +50,10 @@ class PollutionSite {
   final bool isSavedByMe;
   final int participantCount;
   final ImageProvider imageProvider;
+
+  /// First remote (or local file) media URL when known; used for map pin thumbnails.
+  final String? primaryImageUrl;
+
   final List<ImageProvider>? images;
   final List<Comment> comments;
   final int commentsCount;
@@ -97,6 +102,7 @@ class PollutionSite {
     bool? isSavedByMe,
     int? participantCount,
     ImageProvider? imageProvider,
+    String? primaryImageUrl,
     List<ImageProvider>? images,
     List<Comment>? comments,
     int? commentsCount,
@@ -128,6 +134,7 @@ class PollutionSite {
       isSavedByMe: isSavedByMe ?? this.isSavedByMe,
       participantCount: participantCount ?? this.participantCount,
       imageProvider: imageProvider ?? this.imageProvider,
+      primaryImageUrl: primaryImageUrl ?? this.primaryImageUrl,
       images: images ?? this.images,
       comments: comments ?? this.comments,
       commentsCount: commentsCount ?? this.commentsCount,

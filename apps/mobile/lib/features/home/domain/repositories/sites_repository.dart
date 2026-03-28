@@ -2,6 +2,10 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 
 /// Repository for sites API (pollution sites for map/feed).
 abstract class SitesRepository {
+  /// [getSitesForMap] JSON shape: `full` (default API) vs `lite` (smaller payload, map-optimized).
+  static const String mapDetailFull = 'full';
+  static const String mapDetailLite = 'lite';
+
   /// List sites with optional geo filter. When lat/lng provided, sorts by distance.
   Future<SitesListResult> getSites({
     double? latitude,
@@ -14,6 +18,19 @@ abstract class SitesRepository {
     String mode = 'for_you',
     bool explain = false,
     String? cursor,
+  });
+
+  /// Map-focused query for marker refresh.
+  Future<MapSitesResult> getSitesForMap({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 80,
+    int limit = 200,
+    double? minLatitude,
+    double? maxLatitude,
+    double? minLongitude,
+    double? maxLongitude,
+    String mapDetail = mapDetailLite,
   });
 
   /// Get single site by ID with reports and events.
@@ -31,12 +48,26 @@ abstract class SitesRepository {
     String sort = 'top',
     String? parentId,
   });
-  Future<SiteCommentItem> createSiteComment(String id, String body, {String? parentId});
+  Future<SiteCommentItem> createSiteComment(
+    String id,
+    String body, {
+    String? parentId,
+  });
   Future<void> updateSiteComment(String siteId, String commentId, String body);
   Future<void> deleteSiteComment(String siteId, String commentId);
-  Future<SiteCommentLikeSnapshot> likeSiteComment(String siteId, String commentId);
-  Future<SiteCommentLikeSnapshot> unlikeSiteComment(String siteId, String commentId);
-  Future<SiteMediaResult> getSiteMedia(String id, {int page = 1, int limit = 24});
+  Future<SiteCommentLikeSnapshot> likeSiteComment(
+    String siteId,
+    String commentId,
+  );
+  Future<SiteCommentLikeSnapshot> unlikeSiteComment(
+    String siteId,
+    String commentId,
+  );
+  Future<SiteMediaResult> getSiteMedia(
+    String id, {
+    int page = 1,
+    int limit = 24,
+  });
   Future<void> trackFeedEvent(
     String siteId, {
     required String eventType,
@@ -72,6 +103,24 @@ class SitesListResult {
   final bool servedFromCache;
   final bool isStaleFallback;
   final DateTime? cachedAt;
+}
+
+class MapSitesResult {
+  const MapSitesResult({
+    required this.sites,
+    this.servedFromCache = false,
+    this.cachedAt,
+    this.isStaleFallback = false,
+    this.signedMediaExpiresAt,
+  });
+
+  final List<PollutionSite> sites;
+  final bool servedFromCache;
+  final DateTime? cachedAt;
+  final bool isStaleFallback;
+
+  /// When set (from GET /sites/map `meta`), map should refetch before this time for fresh presigned URLs.
+  final DateTime? signedMediaExpiresAt;
 }
 
 class EngagementSnapshot {

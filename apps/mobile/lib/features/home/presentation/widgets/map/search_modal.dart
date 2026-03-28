@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -70,14 +71,18 @@ class _MapSearchModalState extends State<MapSearchModal> {
       _filteredResultsCache = widget.allSites;
       return _filteredResultsCache!;
     }
-    final List<String> terms =
-        q.split(RegExp(r'\s+')).where((String t) => t.isNotEmpty).toList();
+    final List<String> terms = q
+        .split(RegExp(r'\s+'))
+        .where((String t) => t.isNotEmpty)
+        .toList();
     if (terms.isEmpty) {
       _filteredResultsCache = widget.allSites;
       return _filteredResultsCache!;
     }
 
-    final List<PollutionSite> matches = widget.allSites.where((PollutionSite s) {
+    final List<PollutionSite> matches = widget.allSites.where((
+      PollutionSite s,
+    ) {
       final String title = s.title.toLowerCase();
       for (final String term in terms) {
         if (title.contains(term)) continue;
@@ -92,8 +97,16 @@ class _MapSearchModalState extends State<MapSearchModal> {
     matches.sort((PollutionSite a, PollutionSite b) {
       final String aTitle = a.title.toLowerCase();
       final String bTitle = b.title.toLowerCase();
-      final int aExact = aTitle == q ? 0 : aTitle.startsWith(q) ? 1 : 2;
-      final int bExact = bTitle == q ? 0 : bTitle.startsWith(q) ? 1 : 2;
+      final int aExact = aTitle == q
+          ? 0
+          : aTitle.startsWith(q)
+          ? 1
+          : 2;
+      final int bExact = bTitle == q
+          ? 0
+          : bTitle.startsWith(q)
+          ? 1
+          : 2;
       if (aExact != bExact) return aExact.compareTo(bExact);
       return aTitle.compareTo(bTitle);
     });
@@ -161,7 +174,9 @@ class _MapSearchModalState extends State<MapSearchModal> {
                             width: 36,
                             height: 4,
                             decoration: BoxDecoration(
-                              color: AppColors.textMuted.withValues(alpha: 0.25),
+                              color: AppColors.textMuted.withValues(
+                                alpha: 0.25,
+                              ),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ),
@@ -177,65 +192,75 @@ class _MapSearchModalState extends State<MapSearchModal> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                               Expanded(
-                                child: TextField(
-                                  controller: _controller,
-                                  focusNode: _focusNode,
-                                  textInputAction: TextInputAction.search,
-                                  decoration: InputDecoration(
-                                    filled: false,
-                                    hintText: 'Search pollution sites',
-                                    hintStyle: Theme.of(context)
+                                child: Semantics(
+                                  textField: true,
+                                  label: 'Search pollution sites',
+                                  hint:
+                                      'Type a title, category, or description',
+                                  child: TextField(
+                                    controller: _controller,
+                                    focusNode: _focusNode,
+                                    textInputAction: TextInputAction.search,
+                                    decoration: InputDecoration(
+                                      filled: false,
+                                      hintText: 'Search pollution sites',
+                                      hintStyle: Theme.of(context)
+                                          .textTheme
+                                          .bodyMedium
+                                          ?.copyWith(
+                                            color: AppColors.textMuted
+                                                .withValues(alpha: 0.9),
+                                            fontSize: isCompact ? 16 : 17,
+                                            letterSpacing: -0.2,
+                                          ),
+                                      prefixIcon: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16,
+                                          right: 10,
+                                        ),
+                                        child: Icon(
+                                          Icons.search_rounded,
+                                          size: isCompact ? 21 : 22,
+                                          color: AppColors.textMuted.withValues(
+                                            alpha: 0.85,
+                                          ),
+                                        ),
+                                      ),
+                                      suffixIcon: _controller.text.isNotEmpty
+                                          ? IconButton(
+                                              icon: Icon(
+                                                Icons.cancel_rounded,
+                                                size: 18,
+                                                color: AppColors.textMuted,
+                                              ),
+                                              tooltip: 'Clear search',
+                                              onPressed: () {
+                                                _controller.clear();
+                                                if (mounted) setState(() {});
+                                              },
+                                              style: IconButton.styleFrom(
+                                                minimumSize: const Size(40, 40),
+                                                tapTargetSize:
+                                                    MaterialTapTargetSize
+                                                        .shrinkWrap,
+                                              ),
+                                            )
+                                          : null,
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: isCompact ? 14 : 16,
+                                      ),
+                                      isDense: true,
+                                    ),
+                                    style: Theme.of(context)
                                         .textTheme
                                         .bodyMedium
                                         ?.copyWith(
-                                          color: AppColors.textMuted
-                                              .withValues(alpha: 0.9),
                                           fontSize: isCompact ? 16 : 17,
                                           letterSpacing: -0.2,
                                         ),
-                                    prefixIcon: Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16, right: 10),
-                                      child: Icon(
-                                        Icons.search_rounded,
-                                        size: isCompact ? 21 : 22,
-                                        color: AppColors.textMuted
-                                            .withValues(alpha: 0.85),
-                                      ),
-                                    ),
-                                    suffixIcon: _controller.text.isNotEmpty
-                                        ? IconButton(
-                                            icon: Icon(
-                                              Icons.cancel_rounded,
-                                              size: 18,
-                                              color: AppColors.textMuted,
-                                            ),
-                                            onPressed: () {
-                                              _controller.clear();
-                                              if (mounted) setState(() {});
-                                            },
-                                            style: IconButton.styleFrom(
-                                              minimumSize: const Size(40, 40),
-                                              tapTargetSize:
-                                                  MaterialTapTargetSize
-                                                      .shrinkWrap,
-                                            ),
-                                          )
-                                        : null,
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: isCompact ? 14 : 16,
-                                    ),
-                                    isDense: true,
                                   ),
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium
-                                      ?.copyWith(
-                                        fontSize: isCompact ? 16 : 17,
-                                        letterSpacing: -0.2,
-                                      ),
                                 ),
                               ),
                               SizedBox(width: isCompact ? 8 : 12),
@@ -246,7 +271,9 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                   borderRadius: BorderRadius.circular(10),
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 12),
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
                                     child: Text(
                                       'Cancel',
                                       style: Theme.of(context)
@@ -269,12 +296,13 @@ class _MapSearchModalState extends State<MapSearchModal> {
                             child: Center(
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: isCompact
-                                        ? AppSpacing.lg
-                                        : AppSpacing.xl,
-                                    vertical: isCompact
-                                        ? AppSpacing.xl
-                                        : AppSpacing.xxl),
+                                  horizontal: isCompact
+                                      ? AppSpacing.lg
+                                      : AppSpacing.xl,
+                                  vertical: isCompact
+                                      ? AppSpacing.xl
+                                      : AppSpacing.xxl,
+                                ),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: <Widget>[
@@ -282,8 +310,9 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                       width: isCompact ? 56 : 64,
                                       height: isCompact ? 56 : 64,
                                       decoration: BoxDecoration(
-                                        color: AppColors.inputFill
-                                            .withValues(alpha: 0.7),
+                                        color: AppColors.inputFill.withValues(
+                                          alpha: 0.7,
+                                        ),
                                         shape: BoxShape.circle,
                                       ),
                                       child: Icon(
@@ -291,14 +320,16 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                             ? Icons.search_off_rounded
                                             : Icons.place_rounded,
                                         size: isCompact ? 28 : 32,
-                                        color: AppColors.textMuted
-                                            .withValues(alpha: 0.6),
+                                        color: AppColors.textMuted.withValues(
+                                          alpha: 0.6,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(
-                                        height: isCompact
-                                            ? AppSpacing.md
-                                            : AppSpacing.lg),
+                                      height: isCompact
+                                          ? AppSpacing.md
+                                          : AppSpacing.lg,
+                                    ),
                                     Text(
                                       hasQuery
                                           ? 'No matching sites'
@@ -317,7 +348,8 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                     if (hasQuery)
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                            top: AppSpacing.sm),
+                                          top: AppSpacing.sm,
+                                        ),
                                         child: Text(
                                           'Try a different search term',
                                           style: Theme.of(context)
@@ -334,7 +366,8 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                     else
                                       Padding(
                                         padding: const EdgeInsets.only(
-                                            top: AppSpacing.xs),
+                                          top: AppSpacing.xs,
+                                        ),
                                         child: Text(
                                           'Find pollution sites by name or type',
                                           style: Theme.of(context)
@@ -387,14 +420,15 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                 ),
                                 separatorBuilder:
                                     (BuildContext context, int index) {
-                                  return Divider(
-                                    height: 1,
-                                    indent: 0,
-                                    endIndent: 0,
-                                    color: AppColors.divider
-                                        .withValues(alpha: 0.35),
-                                  );
-                                },
+                                      return Divider(
+                                        height: 1,
+                                        indent: 0,
+                                        endIndent: 0,
+                                        color: AppColors.divider.withValues(
+                                          alpha: 0.35,
+                                        ),
+                                      );
+                                    },
                                 itemBuilder: (BuildContext context, int index) {
                                   final PollutionSite site = results[index];
                                   return RepaintBoundary(
@@ -427,8 +461,7 @@ class _MapSearchModalState extends State<MapSearchModal> {
     final double screenW = mq.size.width;
     final bool isCompact = screenW < 400 || screenH < 600;
     final double horizontalPadding = isCompact ? AppSpacing.sm : AppSpacing.md;
-    final double maxContentWidth =
-        screenW > 600 ? 480.0 : double.infinity;
+    final double maxContentWidth = screenW > 600 ? 480.0 : double.infinity;
     final List<PollutionSite> results = _filteredResults;
     final bool isEmpty = results.isEmpty;
     final bool hasQuery = _controller.text.trim().isNotEmpty;
@@ -511,8 +544,9 @@ class _SearchResultTile extends StatelessWidget {
                     width: thumbSize,
                     height: thumbSize,
                     child: Image(
-                      image: site.imageProvider,
+                      image: mapPinImageProviderForSite(site),
                       fit: BoxFit.cover,
+                      gaplessPlayback: true,
                     ),
                   ),
                 ),
@@ -528,11 +562,11 @@ class _SearchResultTile extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: compact ? 15 : 16,
-                            letterSpacing: -0.2,
-                            height: 1.3,
-                          ),
+                        fontWeight: FontWeight.w600,
+                        fontSize: compact ? 15 : 16,
+                        letterSpacing: -0.2,
+                        height: 1.3,
+                      ),
                     ),
                     if (site.pollutionType != null ||
                         site.statusLabel.isNotEmpty) ...[
@@ -541,14 +575,11 @@ class _SearchResultTile extends StatelessWidget {
                         site.pollutionType ?? site.statusLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodySmall
-                            ?.copyWith(
-                              color: AppColors.textMuted,
-                              fontSize: compact ? 12 : 13,
-                              letterSpacing: -0.1,
-                            ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textMuted,
+                          fontSize: compact ? 12 : 13,
+                          letterSpacing: -0.1,
+                        ),
                       ),
                     ],
                   ],

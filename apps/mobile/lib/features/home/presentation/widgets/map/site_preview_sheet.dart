@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -46,7 +47,7 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
       }
       return '${(m / 1000).toStringAsFixed(1)} km away';
     }
-    return '${site.distanceKm.toStringAsFixed(0)} km';
+    return '${site.distanceKm.toStringAsFixed(0)} km away';
   }
 
   @override
@@ -66,6 +67,7 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
             child: Semantics(
               label:
                   '${widget.site.title} preview. Swipe up for details, swipe down to dismiss.',
+              hint: 'Use the action buttons for directions or full details.',
               child: _buildPreviewCard(context, widget.site),
             ),
           ),
@@ -130,9 +132,7 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
                               site.title,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleSmall
+                              style: Theme.of(context).textTheme.titleSmall
                                   ?.copyWith(
                                     color: AppColors.textPrimary,
                                     fontWeight: FontWeight.w600,
@@ -140,31 +140,35 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
                                   ),
                             ),
                             const SizedBox(height: 8),
-                            Row(
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 6,
+                              crossAxisAlignment: WrapCrossAlignment.center,
                               children: <Widget>[
                                 CompactBadge(
                                   label: site.statusLabel,
                                   color: site.statusColor,
                                 ),
-                                const SizedBox(width: 8),
-                                Icon(
-                                  Icons.place_outlined,
-                                  size: 14,
-                                  color: AppColors.textMuted,
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    _formatDistanceFromUser(site),
-                                    overflow: TextOverflow.ellipsis,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .labelMedium
-                                        ?.copyWith(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 12,
-                                        ),
-                                  ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.place_outlined,
+                                      size: 14,
+                                      color: AppColors.textMuted,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      _formatDistanceFromUser(site),
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .labelMedium
+                                          ?.copyWith(
+                                            color: AppColors.textSecondary,
+                                            fontSize: 12,
+                                          ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -178,7 +182,10 @@ class _SitePreviewSheetState extends State<SitePreviewSheet> {
                             AppHaptics.sheetDismiss();
                             widget.onDismiss();
                           },
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusXl,
+                          ),
+                          splashFactory: InkSparkle.splashFactory,
                           child: Padding(
                             padding: const EdgeInsets.all(6),
                             child: Icon(
@@ -240,8 +247,8 @@ class SitePreviewImage extends StatelessWidget {
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-      boxShadow: <BoxShadow>[
-            BoxShadow(
+        boxShadow: <BoxShadow>[
+          BoxShadow(
             color: AppColors.shadowLight,
             blurRadius: 12,
             offset: const Offset(0, 4),
@@ -251,8 +258,9 @@ class SitePreviewImage extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
         child: Image(
-          image: site.imageProvider,
+          image: mapPinImageProviderForSite(site),
           fit: BoxFit.cover,
+          gaplessPlayback: true,
         ),
       ),
     );
@@ -260,11 +268,7 @@ class SitePreviewImage extends StatelessWidget {
 }
 
 class CompactBadge extends StatelessWidget {
-  const CompactBadge({
-    super.key,
-    required this.label,
-    required this.color,
-  });
+  const CompactBadge({super.key, required this.label, required this.color});
 
   final String label;
   final Color color;
@@ -272,7 +276,10 @@ class CompactBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xxs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xxs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -280,10 +287,10 @@ class CompactBadge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: 11,
-            ),
+          color: color,
+          fontWeight: FontWeight.w600,
+          fontSize: 11,
+        ),
       ),
     );
   }
@@ -305,7 +312,7 @@ class ActionPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        final Color fg = primary ? AppColors.textOnDark : AppColors.primaryDark;
+    final Color fg = primary ? AppColors.textOnDark : AppColors.primaryDark;
     final Color bg = primary
         ? AppColors.primaryDark
         : AppColors.primary.withValues(alpha: 0.12);
@@ -315,7 +322,10 @@ class ActionPill extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.sm,
+          ),
           decoration: BoxDecoration(
             color: bg,
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
@@ -328,10 +338,10 @@ class ActionPill extends StatelessWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
+                  color: fg,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

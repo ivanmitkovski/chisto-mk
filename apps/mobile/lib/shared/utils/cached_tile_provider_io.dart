@@ -7,6 +7,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
+/// Shared client improves parallel tile fetches (connection reuse) on slow links.
+final http.Client _mapTileHttpClient = http.Client();
+
 TileProvider? createCachedTileProvider({int maxStaleDays = 30}) =>
     _CachedTileProvider(maxStaleDays: maxStaleDays);
 
@@ -117,9 +120,9 @@ class _CachedTileImageProvider
     }
 
     try {
-      final http.Response response = await http
+      final http.Response response = await _mapTileHttpClient
           .get(Uri.parse(url), headers: headers ?? <String, String>{})
-          .timeout(const Duration(seconds: 5));
+          .timeout(const Duration(seconds: 12));
       if (response.statusCode == 200 && response.bodyBytes.isNotEmpty) {
         await file.writeAsBytes(response.bodyBytes);
         final ui.ImmutableBuffer buffer =

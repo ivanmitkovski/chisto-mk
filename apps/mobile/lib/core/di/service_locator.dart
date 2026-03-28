@@ -11,6 +11,7 @@ import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
+import 'package:chisto_mobile/features/home/data/map_realtime/map_realtime_service.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/api_notifications_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
@@ -39,6 +40,7 @@ class ServiceLocator {
   ReportsApiRepository? _reportsApiRepository;
   ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
+  MapRealtimeService? _mapRealtimeService;
   NotificationsRepository? _notificationsRepository;
   PushNotificationService? _pushNotificationService;
 
@@ -57,8 +59,11 @@ class ServiceLocator {
   ReportsApiRepository get reportsApiRepository => _reportsApiRepository!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
-  NotificationsRepository get notificationsRepository => _notificationsRepository!;
-  PushNotificationService get pushNotificationService => _pushNotificationService!;
+  MapRealtimeService get mapRealtimeService => _mapRealtimeService!;
+  NotificationsRepository get notificationsRepository =>
+      _notificationsRepository!;
+  PushNotificationService get pushNotificationService =>
+      _pushNotificationService!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -111,12 +116,19 @@ class ServiceLocator {
       config: _config!,
       authState: _authState!,
     );
+    _mapRealtimeService = MapRealtimeService(
+      config: _config!,
+      authState: _authState!,
+    );
     _sitesRepository = ApiSitesRepository(client: _apiClient!);
 
     _initialized = true;
   }
 
   void reset() {
+    _reportsRealtimeService?.dispose();
+    _mapRealtimeService?.dispose();
+    _pushNotificationService?.dispose();
     _config = null;
     _authState = null;
     _tokenStorage = null;
@@ -128,6 +140,7 @@ class ServiceLocator {
     _profileRepository = null;
     _reportsApiRepository = null;
     _reportsRealtimeService = null;
+    _mapRealtimeService = null;
     _sitesRepository = null;
     _notificationsRepository = null;
     _pushNotificationService = null;

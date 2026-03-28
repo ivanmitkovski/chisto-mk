@@ -23,6 +23,8 @@ class ApiSitesRepository implements SitesRepository {
   static const Duration _feedCacheTtl = Duration(seconds: 20);
   static const Duration _feedPersistedCacheTtl = Duration(hours: 24);
   static const String _feedPersistedCacheKey = 'feed_cache_pages_v2';
+  static const String _mapPersistedCacheKey = 'map_sites_snapshot_v1';
+  static const Duration _mapPersistedCacheTtl = Duration(hours: 6);
   static const int _maxPersistedFeeds = 8;
   static const int _maxPersistedPagesPerFeed = 6;
   final Map<String, ({SitesListResult result, DateTime cachedAt})>
@@ -133,6 +135,48 @@ class ApiSitesRepository implements SitesRepository {
           isStaleFallback: true,
           cachedAt: fallbackCachedAt,
         );
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Future<MapSitesResult> getSitesForMap({
+    required double latitude,
+    required double longitude,
+    double radiusKm = 80,
+    int limit = 200,
+    double? minLatitude,
+    double? maxLatitude,
+    double? minLongitude,
+    double? maxLongitude,
+    String mapDetail = SitesRepository.mapDetailLite,
+  }) async {
+    final List<String> queryParams = <String>[
+      'lat=$latitude',
+      'lng=$longitude',
+      'radiusKm=$radiusKm',
+      'limit=$limit',
+      'detail=$mapDetail',
+      if (minLatitude != null) 'minLat=$minLatitude',
+      if (maxLatitude != null) 'maxLat=$maxLatitude',
+      if (minLongitude != null) 'minLng=$minLongitude',
+      if (maxLongitude != null) 'maxLng=$maxLongitude',
+    ];
+    try {
+      final ApiResponse response = await _client.get(
+        '/sites/map?${queryParams.join('&')}',
+      );
+      final Map<String, dynamic>? json = response.json;
+      if (json == null) {
+        throw AppError.unknown();
+      }
+      unawaited(_persistMapSnapshot(json));
+      return _mapSitesResultFromPayload(json);
+    } on AppError {
+      final MapSitesResult? fallback = await _loadPersistedMapSnapshot();
+      if (fallback != null) {
+        return fallback;
       }
       rethrow;
     }
@@ -366,6 +410,47 @@ class ApiSitesRepository implements SitesRepository {
     _memoryFeedCache.clear();
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_feedPersistedCacheKey);
+    await prefs.remove(_mapPersistedCacheKey);
+  }
+
+  Future<void> _persistMapSnapshot(Map<String, dynamic> payload) async {
+    final prefs = await SharedPreferences.getInstance();
+    final wrapper = <String, dynamic>{
+      'cachedAtMs': DateTime.now().millisecondsSinceEpoch,
+      'payload': payload,
+    };
+    await prefs.setString(_mapPersistedCacheKey, jsonEncode(wrapper));
+  }
+
+  Future<MapSitesResult?> _loadPersistedMapSnapshot() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? raw = prefs.getString(_mapPersistedCacheKey);
+    if (raw == null || raw.isEmpty) {
+      return null;
+    }
+    final Object? decoded = jsonDecode(raw);
+    if (decoded is! Map<String, dynamic>) {
+      return null;
+    }
+    final int cachedAtMs = (decoded['cachedAtMs'] as num?)?.toInt() ?? 0;
+    if (cachedAtMs <= 0) {
+      return null;
+    }
+    final DateTime cachedAt = DateTime.fromMillisecondsSinceEpoch(cachedAtMs);
+    if (DateTime.now().difference(cachedAt) > _mapPersistedCacheTtl) {
+      return null;
+    }
+    final Object? payload = decoded['payload'];
+    if (payload is! Map<String, dynamic>) {
+      return null;
+    }
+    final MapSitesResult parsed = _mapSitesResultFromPayload(
+      payload,
+      servedFromCache: true,
+      cachedAt: cachedAt,
+      isStaleFallback: true,
+    );
+    return parsed.sites.isEmpty ? null : parsed;
   }
 
   @override
@@ -586,11 +671,15 @@ class ApiSitesRepository implements SitesRepository {
     final String desc = json['description'] as String? ?? '';
     final String latestTitle = json['latestReportTitle'] as String? ?? '';
     final String latest = json['latestReportDescription'] as String? ?? '';
+    final String? addr = json['address'] as String?;
+    final String trimmedAddr = addr?.trim() ?? '';
     final String title = desc.isNotEmpty
         ? desc
         : (_normalizeFeedTitle(latestTitle).isNotEmpty
               ? _normalizeFeedTitle(latestTitle)
-              : (latest.isNotEmpty ? latest : 'Pollution site'));
+              : (latest.isNotEmpty
+                    ? latest
+                    : (trimmedAddr.isNotEmpty ? trimmedAddr : 'Pollution site')));
     final double distanceKm = json.containsKey('distanceKm')
         ? ((json['distanceKm'] as num?)?.toDouble() ?? -1)
         : -1;
@@ -636,6 +725,7 @@ class ApiSitesRepository implements SitesRepository {
       isSavedByMe: isSavedByMe,
       participantCount: 0,
       imageProvider: imageProvider,
+      primaryImageUrl: firstImageUrl,
       images: imageUrls.isNotEmpty
           ? imageUrls.map<ImageProvider>(imageProviderForSiteMedia).toList()
           : null,
@@ -661,6 +751,34 @@ class ApiSitesRepository implements SitesRepository {
     );
   }
 
+  MapSitesResult _mapSitesResultFromPayload(
+    Map<String, dynamic> json, {
+    bool servedFromCache = false,
+    DateTime? cachedAt,
+    bool isStaleFallback = false,
+  }) {
+    final List<dynamic> data = json['data'] as List<dynamic>? ?? <dynamic>[];
+    final List<PollutionSite> sites = data
+        .whereType<Map<String, dynamic>>()
+        .map<PollutionSite>(_siteListItemFromJson)
+        .toList();
+    DateTime? signedMediaExpiresAt;
+    final Object? metaRaw = json['meta'];
+    if (metaRaw is Map<String, dynamic>) {
+      final String? s = metaRaw['signedMediaExpiresAt'] as String?;
+      if (s != null && s.isNotEmpty) {
+        signedMediaExpiresAt = DateTime.tryParse(s);
+      }
+    }
+    return MapSitesResult(
+      sites: sites,
+      servedFromCache: servedFromCache,
+      cachedAt: cachedAt,
+      isStaleFallback: isStaleFallback,
+      signedMediaExpiresAt: signedMediaExpiresAt,
+    );
+  }
+
   PollutionSite _siteDetailFromJson(Map<String, dynamic> json) {
     final String desc = json['description'] as String? ?? '';
     final List<dynamic> reportsJson =
@@ -676,7 +794,8 @@ class ApiSitesRepository implements SitesRepository {
 
     SiteReport? firstReport;
     String? latestReporterUserId;
-    final Set<String> uniqueImageUrls = <String>{};
+    final List<String> orderedUniqueImageUrls = <String>[];
+    final Set<String> seenImageUrls = <String>{};
     List<String> coReporterNames = <String>[];
 
     if (reports.isNotEmpty) {
@@ -686,8 +805,8 @@ class ApiSitesRepository implements SitesRepository {
         final List<dynamic> mediaList =
             r['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
         for (final dynamic m in mediaList) {
-          if (m is String && m.isNotEmpty) {
-            uniqueImageUrls.add(m);
+          if (m is String && m.isNotEmpty && seenImageUrls.add(m)) {
+            orderedUniqueImageUrls.add(m);
           }
         }
       }
@@ -783,12 +902,15 @@ class ApiSitesRepository implements SitesRepository {
       );
     }
 
-    final List<ImageProvider> imageProviders = uniqueImageUrls
+    final List<ImageProvider> imageProviders = orderedUniqueImageUrls
         .map<ImageProvider>(imageProviderForSiteMedia)
         .toList();
     final ImageProvider imageProvider = imageProviders.isNotEmpty
         ? imageProviders.first
         : _placeholderImage;
+    final String? primaryImageUrl = orderedUniqueImageUrls.isNotEmpty
+        ? orderedUniqueImageUrls.first
+        : null;
 
     final double? lat = (json['latitude'] as num?)?.toDouble();
     final double? lng = (json['longitude'] as num?)?.toDouble();
@@ -811,6 +933,7 @@ class ApiSitesRepository implements SitesRepository {
       isSavedByMe: isSavedByMe,
       participantCount: totalParticipants,
       imageProvider: imageProvider,
+      primaryImageUrl: primaryImageUrl,
       images: imageProviders.isNotEmpty ? imageProviders : null,
       commentsCount: commentsCount,
       firstReport: firstReport,

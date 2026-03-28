@@ -1,6 +1,7 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import compression from 'compression';
 import { AppModule } from './app.module';
 import { validateEnv } from './config/env';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
@@ -9,6 +10,7 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 async function bootstrap() {
   validateEnv();
   const app = await NestFactory.create(AppModule);
+  app.use(compression({ threshold: 1024 }));
   app.enableShutdownHooks();
 
   const allowedOriginsEnv = process.env.CORS_ORIGINS;

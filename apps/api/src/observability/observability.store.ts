@@ -20,6 +20,16 @@ export class ObservabilityStore {
   private static pushQueueDepth = 0;
   private static pushActiveLeases = 0;
   private static pushDeadLetterCount = 0;
+  private static mapRequestsTotal = 0;
+  private static mapCacheHits = 0;
+  private static mapFallbackResponses = 0;
+  private static mapDurationsMs: number[] = [];
+  private static mapCandidatePoolSizes: number[] = [];
+  private static mapSseConnectionsTotal = 0;
+  private static mapSseConnectionsActive = 0;
+  private static mapSseReconnectHints = 0;
+  private static mapSseEventsEmitted = 0;
+  private static mapSseReplayEvents = 0;
 
   static recordRequest(durationMs: number, statusCode: number): void {
     this.requestsTotal += 1;
@@ -87,6 +97,46 @@ export class ObservabilityStore {
 
   static recordPushInboxRead(): void {
     this.pushInboxReads += 1;
+  }
+
+  static recordMapRequest(input: {
+    durationMs: number;
+    candidatePoolSize: number;
+    cacheHit: boolean;
+    servedFromFallback?: boolean;
+  }): void {
+    this.mapRequestsTotal += 1;
+    if (input.cacheHit) this.mapCacheHits += 1;
+    if (input.servedFromFallback) this.mapFallbackResponses += 1;
+    this.mapDurationsMs.push(input.durationMs);
+    this.mapCandidatePoolSizes.push(input.candidatePoolSize);
+    if (this.mapDurationsMs.length > 2000) {
+      this.mapDurationsMs = this.mapDurationsMs.slice(-1200);
+    }
+    if (this.mapCandidatePoolSizes.length > 2000) {
+      this.mapCandidatePoolSizes = this.mapCandidatePoolSizes.slice(-1200);
+    }
+  }
+
+  static recordMapSseConnected(): void {
+    this.mapSseConnectionsTotal += 1;
+    this.mapSseConnectionsActive += 1;
+  }
+
+  static recordMapSseDisconnected(): void {
+    this.mapSseConnectionsActive = Math.max(0, this.mapSseConnectionsActive - 1);
+  }
+
+  static recordMapSseReconnectHint(): void {
+    this.mapSseReconnectHints += 1;
+  }
+
+  static recordMapSseEventEmitted(): void {
+    this.mapSseEventsEmitted += 1;
+  }
+
+  static recordMapSseReplayEvents(count: number): void {
+    this.mapSseReplayEvents += Math.max(0, count);
   }
 
   static setPushQueueStats(input: {
@@ -159,6 +209,40 @@ export class ObservabilityStore {
       pushQueueDepth: this.pushQueueDepth,
       pushActiveLeases: this.pushActiveLeases,
       pushDeadLetterCount: this.pushDeadLetterCount,
+      mapRequestsTotal: this.mapRequestsTotal,
+      mapCacheHits: this.mapCacheHits,
+      mapFallbackResponses: this.mapFallbackResponses,
+      mapCacheHitRate:
+        this.mapRequestsTotal > 0
+          ? Number((this.mapCacheHits / this.mapRequestsTotal).toFixed(4))
+          : 0,
+      mapP95Ms: (() => {
+        const ms = [...this.mapDurationsMs].sort((a, b) => a - b);
+        if (ms.length === 0) return 0;
+        const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
+        return Number(ms[idx].toFixed(2));
+      })(),
+      mapDurationBuckets: {
+        le100: this.mapDurationsMs.filter((ms) => ms <= 100).length,
+        le250: this.mapDurationsMs.filter((ms) => ms <= 250).length,
+        le500: this.mapDurationsMs.filter((ms) => ms <= 500).length,
+        le1000: this.mapDurationsMs.filter((ms) => ms <= 1000).length,
+        gt1000: this.mapDurationsMs.filter((ms) => ms > 1000).length,
+      },
+      mapAvgCandidatePoolSize:
+        this.mapCandidatePoolSizes.length > 0
+          ? Number(
+              (
+                this.mapCandidatePoolSizes.reduce((acc, v) => acc + v, 0) /
+                this.mapCandidatePoolSizes.length
+              ).toFixed(2),
+            )
+          : 0,
+      mapSseConnectionsTotal: this.mapSseConnectionsTotal,
+      mapSseConnectionsActive: this.mapSseConnectionsActive,
+      mapSseReconnectHints: this.mapSseReconnectHints,
+      mapSseEventsEmitted: this.mapSseEventsEmitted,
+      mapSseReplayEvents: this.mapSseReplayEvents,
     };
   }
 }

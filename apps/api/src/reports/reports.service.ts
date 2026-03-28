@@ -230,20 +230,30 @@ export class ReportsService {
   private async transitionSiteToVerifiedIfFirstApproved(
     tx: Pick<PrismaService, 'site'>,
     siteId: string,
-  ): Promise<void> {
+  ): Promise<
+    | {
+        id: string;
+        status: SiteStatus;
+        latitude: number;
+        longitude: number;
+        updatedAt: Date;
+      }
+    | null
+  > {
     const site = await tx.site.findUnique({
       where: { id: siteId },
-      select: { id: true, status: true },
+      select: { id: true, status: true, latitude: true, longitude: true },
     });
     if (!site || site.status !== SiteStatus.REPORTED) {
-      return;
+      return null;
     }
 
-    await tx.site.update({
+    const updated = await tx.site.update({
       where: { id: siteId },
       data: { status: SiteStatus.VERIFIED },
+      select: { id: true, status: true, latitude: true, longitude: true, updatedAt: true },
     });
-    this.siteEventsService.emitSiteUpdated(siteId);
+    return updated;
   }
 
   private async findPrimaryReportId(reportId: string): Promise<string> {
@@ -525,6 +535,7 @@ export class ReportsService {
 
       let siteId: string;
       let isNewSite: boolean;
+      let siteUpdatedAt: Date | null = null;
 
       if (targetSiteId) {
         siteId = targetSiteId;
@@ -546,6 +557,7 @@ export class ReportsService {
         });
         siteId = newSite.id;
         isNewSite = true;
+        siteUpdatedAt = newSite.updatedAt;
       }
 
       const newReport = await tx.report.create({
@@ -601,6 +613,7 @@ export class ReportsService {
         siteId,
         isNewSite,
         pointsAwarded: 0, // Points awarded when admin approves, not at submit
+        siteUpdatedAt,
         notificationId: notification.id,
         notificationTitle: notification.title,
       };
@@ -617,6 +630,16 @@ export class ReportsService {
       result.notificationId,
       result.notificationTitle,
     );
+    if (result.isNewSite) {
+      this.siteEventsService.emitSiteCreated(result.siteId, {
+        status: SiteStatus.REPORTED,
+        latitude,
+        longitude,
+        ...(result.siteUpdatedAt != null ? { updatedAt: result.siteUpdatedAt } : {}),
+      });
+    } else {
+      this.siteEventsService.emitSiteUpdated(result.siteId, { kind: 'updated' });
+    }
     return {
       reportId: result.reportId,
       reportNumber: result.reportNumber,
@@ -1071,7 +1094,16 @@ export class ReportsService {
 
     const newCoReporterIds = [...mergedReporterIds].filter((userId) => !currentCoReporterIds.has(userId));
 
-    await this.prisma.$transaction(async (tx) => {
+    const mergeTxResult = await this.prisma.$transaction(async (tx) => {
+      let siteStatusEvent:
+        | {
+            id: string;
+            status: SiteStatus;
+            latitude: number;
+            longitude: number;
+            updatedAt: Date;
+          }
+        | null = null;
       if (newCoReporterIds.length > 0) {
         await tx.reportCoReporter.createMany({
           data: newCoReporterIds.map((userId) => ({
@@ -1101,7 +1133,7 @@ export class ReportsService {
         },
       });
       if (approvedCountForSite === 1) {
-        await this.transitionSiteToVerifiedIfFirstApproved(tx, primaryReport.siteId);
+        siteStatusEvent = await this.transitionSiteToVerifiedIfFirstApproved(tx, primaryReport.siteId);
       }
 
       await tx.report.updateMany({
@@ -1114,7 +1146,18 @@ export class ReportsService {
           moderationReason: dto.reason ?? 'Merged duplicate',
         },
       });
+      return { siteStatusEvent };
     });
+    const siteStatusEvent = mergeTxResult.siteStatusEvent;
+    if (siteStatusEvent != null) {
+      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
+        kind: 'status_changed',
+        status: siteStatusEvent.status,
+        latitude: siteStatusEvent.latitude,
+        longitude: siteStatusEvent.longitude,
+        updatedAt: siteStatusEvent.updatedAt,
+      });
+    }
 
     await this.audit.log({
       actorId: moderator.userId,
@@ -1200,7 +1243,7 @@ export class ReportsService {
 
     const now = new Date();
 
-    const updated = await this.prisma.$transaction(async (tx) => {
+    const updatedResult = await this.prisma.$transaction(async (tx) => {
       const updatedReport = await tx.report.update({
         where: { id: reportId },
         data: {
@@ -1256,6 +1299,15 @@ export class ReportsService {
         }
       }
 
+      let siteStatusEvent:
+        | {
+            id: string;
+            status: SiteStatus;
+            latitude: number;
+            longitude: number;
+            updatedAt: Date;
+          }
+        | null = null;
       if (dto.status === 'APPROVED') {
         const otherApprovedCount = await tx.report.count({
           where: {
@@ -1265,12 +1317,23 @@ export class ReportsService {
           },
         });
         if (otherApprovedCount === 0) {
-          await this.transitionSiteToVerifiedIfFirstApproved(tx, updatedReport.siteId);
+          siteStatusEvent = await this.transitionSiteToVerifiedIfFirstApproved(tx, updatedReport.siteId);
         }
       }
 
-      return updatedReport;
+      return { updatedReport, siteStatusEvent };
     });
+    const updated = updatedResult.updatedReport;
+    if (updatedResult.siteStatusEvent != null) {
+      const siteStatusEvent = updatedResult.siteStatusEvent;
+      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
+        kind: 'status_changed',
+        status: siteStatusEvent.status,
+        latitude: siteStatusEvent.latitude,
+        longitude: siteStatusEvent.longitude,
+        updatedAt: siteStatusEvent.updatedAt,
+      });
+    }
 
     await this.audit.log({
       actorId: moderator.userId,

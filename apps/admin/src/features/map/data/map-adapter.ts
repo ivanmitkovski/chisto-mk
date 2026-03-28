@@ -19,6 +19,7 @@ export type SiteMapRow = {
 
 type MapResponse = {
   data: SiteMapRow[];
+  meta?: { signedMediaExpiresAt: string };
 };
 
 export async function fetchSitesForMap(params: {

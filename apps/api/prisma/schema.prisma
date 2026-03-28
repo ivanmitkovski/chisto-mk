@@ -235,6 +235,8 @@ model Site {
 
   @@index([status])
   @@index([latitude, longitude])
+  /// Map queries often filter by status plus lat/lng bounding box.
+  @@index([status, latitude, longitude])
   @@index([createdAt])
 }
 

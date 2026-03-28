@@ -38,6 +38,8 @@ class AppRoutes {
   static const String forgotPasswordSuccess = '/auth/forgot-password/success';
   static const String location = '/auth/location';
   static const String home = '/home';
+  /// Opens home on the map tab; pass [MapSiteFocusRouteArgs] to focus a site pin.
+  static const String homeMapFocus = '/home/map-focus';
   static const String homeEvents = '/home/events';
   static const String newReport = '/reports/new';
   static const String eventsCreate = '/events/create';
@@ -75,6 +77,21 @@ class EventRouteArguments {
   const EventRouteArguments({required this.eventId});
 
   final String eventId;
+}
+
+/// Deep link: `Navigator.pushNamed(context, AppRoutes.homeMapFocus, arguments: MapSiteFocusRouteArgs(siteId: id))`.
+class MapSiteFocusRouteArgs {
+  const MapSiteFocusRouteArgs({required this.siteId});
+
+  final String siteId;
+}
+
+/// Prefer this over raw `int` tab index when you need map focus in one place.
+class HomeRouteArgs {
+  const HomeRouteArgs({this.initialTabIndex = 0, this.mapSiteIdToFocus});
+
+  final int initialTabIndex;
+  final String? mapSiteIdToFocus;
 }
 
 class AppRouter {
@@ -167,10 +184,32 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.home:
-        final int initialTabIndex =
-            settings.arguments is int ? settings.arguments! as int : 0;
+        int initialTabIndex = 0;
+        String? mapSiteIdToFocus;
+        final Object? homeArgs = settings.arguments;
+        if (homeArgs is HomeRouteArgs) {
+          initialTabIndex = homeArgs.initialTabIndex;
+          mapSiteIdToFocus = homeArgs.mapSiteIdToFocus;
+        } else if (homeArgs is int) {
+          initialTabIndex = homeArgs;
+        }
         return MaterialPageRoute<void>(
-          builder: (_) => HomeShell(initialTabIndex: initialTabIndex),
+          builder: (_) => HomeShell(
+            initialTabIndex: initialTabIndex,
+            mapSiteIdToFocus: mapSiteIdToFocus,
+          ),
+          settings: settings,
+        );
+      case AppRoutes.homeMapFocus:
+        final Object? a = settings.arguments;
+        final String siteId = a is MapSiteFocusRouteArgs
+            ? a.siteId
+            : (a is String ? a : '');
+        return MaterialPageRoute<void>(
+          builder: (_) => HomeShell(
+            initialTabIndex: 2,
+            mapSiteIdToFocus: siteId.isNotEmpty ? siteId : null,
+          ),
           settings: settings,
         );
       case AppRoutes.homeEvents:

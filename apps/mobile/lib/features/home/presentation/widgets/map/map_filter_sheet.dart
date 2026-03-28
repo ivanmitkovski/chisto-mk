@@ -74,7 +74,9 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusSheet)),
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusSheet),
+        ),
       ),
       child: SafeArea(
         top: false,
@@ -106,13 +108,14 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
                   Text(
                     'Filter sites',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                        ),
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close_rounded, size: 22),
                     color: AppColors.textMuted,
+                    tooltip: 'Close filters',
                     onPressed: () {
                       AppHaptics.sheetDismiss();
                       widget.onDismiss();
@@ -168,9 +171,9 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
               Text(
                 '$visibleCount of ${widget.totalCount} sites visible',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                      fontSize: 13,
-                    ),
+                  color: AppColors.textMuted,
+                  fontSize: 13,
+                ),
               ),
             ],
           ),
@@ -181,11 +184,7 @@ class _MapFilterSheetState extends State<MapFilterSheet> {
 }
 
 class FilterSection extends StatelessWidget {
-  const FilterSection({
-    super.key,
-    required this.title,
-    required this.child,
-  });
+  const FilterSection({super.key, required this.title, required this.child});
 
   final String title;
   final Widget child;
@@ -203,10 +202,10 @@ class FilterSection extends StatelessWidget {
           child: Text(
             title,
             style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
-                ),
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.2,
+            ),
           ),
         ),
         child,
@@ -231,13 +230,20 @@ class TypeChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
+      selected: isActive,
       label: 'Filter $label sites',
+      hint: isActive
+          ? 'Double tap to hide this type'
+          : 'Double tap to show this type',
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
           duration: AppMotion.fast,
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius14, vertical: AppSpacing.radius10),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.radius14,
+            vertical: AppSpacing.radius10,
+          ),
           decoration: BoxDecoration(
             color: isActive
                 ? AppColors.primary.withValues(alpha: 0.12)
@@ -253,12 +259,10 @@ class TypeChip extends StatelessWidget {
           child: Text(
             label,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: isActive
-                      ? AppColors.primaryDark
-                      : AppColors.textSecondary,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                  fontSize: 14,
-                ),
+              color: isActive ? AppColors.primaryDark : AppColors.textSecondary,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+              fontSize: 14,
+            ),
           ),
         ),
       ),
@@ -291,18 +295,27 @@ class StatusChip extends StatelessWidget {
 
     return Semantics(
       button: true,
+      selected: isActive,
       label: 'Filter $label severity sites',
+      hint: isActive
+          ? 'Double tap to hide this severity'
+          : 'Double tap to show this severity',
       child: GestureDetector(
         onTap: onTap,
         child: AnimatedContainer(
           duration: AppMotion.fast,
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.sm,
+            vertical: AppSpacing.xs,
+          ),
           decoration: BoxDecoration(
             color: background,
             borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
             border: Border.all(
-              color: isActive ? color.withValues(alpha: 0.5) : AppColors.transparent,
+              color: isActive
+                  ? color.withValues(alpha: 0.5)
+                  : AppColors.transparent,
               width: 1,
             ),
           ),
@@ -321,10 +334,10 @@ class StatusChip extends StatelessWidget {
               Text(
                 label,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: textColor,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 12,
-                    ),
+                  color: textColor,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
+                ),
               ),
             ],
           ),

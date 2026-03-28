@@ -20,9 +20,16 @@ import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/services.dart';
 
 class HomeShell extends StatefulWidget {
-  const HomeShell({super.key, this.initialTabIndex = 0});
+  const HomeShell({
+    super.key,
+    this.initialTabIndex = 0,
+    this.mapSiteIdToFocus,
+  });
 
   final int initialTabIndex;
+
+  /// When set, opens the map tab and focuses this site (deep link / notification).
+  final String? mapSiteIdToFocus;
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -38,13 +45,23 @@ class _HomeShellState extends State<HomeShell> {
   bool _isLaunchingReportFlow = false;
 
   bool _hasVisitedMap = false;
-  final ValueNotifier<String?> _mapPendingSiteFocus = ValueNotifier<String?>(null);
+  final ValueNotifier<String?> _mapPendingSiteFocus = ValueNotifier<String?>(
+    null,
+  );
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.initialTabIndex.clamp(0, 3);
     _hasVisitedMap = _currentIndex == 2;
+    final String? focusId = widget.mapSiteIdToFocus?.trim();
+    if (focusId != null && focusId.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _mapPendingSiteFocus.value = focusId;
+        }
+      });
+    }
   }
 
   @override
@@ -81,11 +98,10 @@ class _HomeShellState extends State<HomeShell> {
           _hasVisitedMap
               ? PollutionMapScreen(
                   pendingSiteFocus: _mapPendingSiteFocus,
+                  isActive: _currentIndex == 2,
                 )
               : _MapTabPlaceholder(),
-          EventsFeedScreen(
-            key: _eventsFeedKey,
-          ),
+          EventsFeedScreen(key: _eventsFeedKey),
         ],
       ),
       bottomNavigationBar: Container(
@@ -179,7 +195,8 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<bool> _ensureCanStartReportFlow() async {
     try {
-      final capacity = await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      final capacity = await ServiceLocator.instance.reportsApiRepository
+          .getReportingCapacity();
       if (capacity.creditsAvailable > 0 || capacity.emergencyAvailable) {
         return true;
       }
@@ -196,11 +213,7 @@ class _HomeShellState extends State<HomeShell> {
         );
         return false;
       }
-      AppSnack.show(
-        context,
-        message: e.message,
-        type: AppSnackType.warning,
-      );
+      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
       return false;
     } catch (_) {
       if (!mounted) return false;
@@ -243,7 +256,9 @@ class _HomeShellState extends State<HomeShell> {
           isScrollControlled: true,
           backgroundColor: AppColors.panelBackground,
           shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusSheet)),
+            borderRadius: BorderRadius.vertical(
+              top: Radius.circular(AppSpacing.radiusSheet),
+            ),
           ),
           builder: (_) => PhotoReviewSheet(file: selectedFile),
         );
@@ -330,14 +345,20 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
               ],
             ),
             child: widget.enabled
-                ? const Icon(CupertinoIcons.add, color: AppColors.textOnDark, size: 28)
+                ? const Icon(
+                    CupertinoIcons.add,
+                    color: AppColors.textOnDark,
+                    size: 28,
+                  )
                 : const Center(
                     child: SizedBox(
                       width: 22,
                       height: 22,
                       child: CircularProgressIndicator(
                         strokeWidth: 2.4,
-                        valueColor: AlwaysStoppedAnimation<Color>(AppColors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.white,
+                        ),
                       ),
                     ),
                   ),

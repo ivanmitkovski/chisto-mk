@@ -20,7 +20,6 @@ class MapActionsMenu extends StatefulWidget {
     required this.onZoomToFit,
     required this.onToggleRotationLock,
     required this.onLocateMe,
-    this.onRefresh,
   });
 
   final bool showHeatmap;
@@ -33,7 +32,6 @@ class MapActionsMenu extends StatefulWidget {
   final VoidCallback onZoomToFit;
   final VoidCallback onToggleRotationLock;
   final VoidCallback onLocateMe;
-  final VoidCallback? onRefresh;
 
   @override
   State<MapActionsMenu> createState() => _MapActionsMenuState();
@@ -42,18 +40,17 @@ class MapActionsMenu extends StatefulWidget {
 class _MapActionsMenuState extends State<MapActionsMenu>
     with SingleTickerProviderStateMixin {
   static const Duration _duration = Duration(milliseconds: 320);
-  int get _actionCount => widget.onRefresh != null ? 6 : 5;
-  List<int> get _actionOrder => widget.onRefresh != null
-      ? <int>[5, 4, 2, 3, 1, 0]
-      : const <int>[4, 2, 3, 1, 0];
+  static const int _actionCount = 5;
+  static const List<int> _actionOrder = <int>[4, 2, 3, 1, 0];
 
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: _duration,
   );
-  static const int _maxActions = 6;
-  late final List<Animation<double>> _itemAnimations =
-      _buildItemAnimations(_controller);
+  static const int _maxActions = 5;
+  late final List<Animation<double>> _itemAnimations = _buildItemAnimations(
+    _controller,
+  );
 
   List<Animation<double>> _buildItemAnimations(AnimationController controller) {
     return List<Animation<double>>.generate(
@@ -74,12 +71,6 @@ class _MapActionsMenuState extends State<MapActionsMenu>
       return _itemAnimations[_itemAnimations.length - 1];
     }
     return _itemAnimations[index];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.addListener(() => setState(() {}));
   }
 
   @override
@@ -129,7 +120,8 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                       width: 1,
                     ),
                   ),
-                  child: iconChild ??
+                  child:
+                      iconChild ??
                       Icon(
                         icon,
                         size: 20,
@@ -146,63 +138,70 @@ class _MapActionsMenuState extends State<MapActionsMenu>
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: <Widget>[
-        ...List<Widget>.generate(
-          _actionCount,
-          (int i) {
-            final int idx = _actionOrder[i];
-            return AnimatedBuilder(
-              animation: _controller,
-              builder: (BuildContext context, Widget? child) {
-                return SizeTransition(
-                  sizeFactor: _animationAt(idx),
-                  axis: Axis.vertical,
-                  axisAlignment: 1,
-                  child: SlideTransition(
-                    position: Tween<Offset>(
-                      begin: const Offset(0, 0.5),
-                      end: Offset.zero,
-                    ).animate(CurvedAnimation(
-                      parent: _controller,
-                      curve: Interval(
-                        idx * 0.08,
-                        (idx * 0.08) + 0.5,
-                        curve: Curves.easeOutCubic,
-                      ),
-                    )),
-                    child: FadeTransition(
-                      opacity: _animationAt(idx),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                        child: _buildAction(idx),
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, _) {
+        final bool menuOpen = _controller.value > 0.5;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            ...List<Widget>.generate(_actionCount, (int i) {
+              final int idx = _actionOrder[i];
+              return IgnorePointer(
+                ignoring: !menuOpen,
+                child: ExcludeSemantics(
+                  excluding: !menuOpen,
+                  child: SizeTransition(
+                    sizeFactor: _animationAt(idx),
+                    axis: Axis.vertical,
+                    axisAlignment: 1,
+                    child: SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(0, 0.5),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: _controller,
+                              curve: Interval(
+                                idx * 0.08,
+                                (idx * 0.08) + 0.5,
+                                curve: Curves.easeOutCubic,
+                              ),
+                            ),
+                          ),
+                      child: FadeTransition(
+                        opacity: _animationAt(idx),
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                          child: _buildAction(idx),
+                        ),
                       ),
                     ),
                   ),
-                );
-              },
-            );
-          },
-        ),
-        AnimatedRotation(
-          turns: _controller.value * 0.125,
-          duration: _duration,
-          curve: Curves.easeInOutCubic,
-          child: _frostedButton(
-            onTap: () {
-              AppHaptics.light();
-              _toggle();
-            },
-            icon: Icons.apps_rounded,
-            semanticLabel: _controller.value > 0.5
-                ? 'Close actions menu'
-                : 'Open actions menu',
-            iconColor: AppColors.primaryDark,
-          ),
-        ),
-      ],
+                ),
+              );
+            }),
+            AnimatedRotation(
+              turns: _controller.value * 0.125,
+              duration: _duration,
+              curve: Curves.easeInOutCubic,
+              child: _frostedButton(
+                onTap: () {
+                  AppHaptics.light();
+                  _toggle();
+                },
+                icon: Icons.apps_rounded,
+                semanticLabel: menuOpen
+                    ? 'Close actions menu'
+                    : 'Open actions menu',
+                iconColor: AppColors.primaryDark,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -212,9 +211,10 @@ class _MapActionsMenuState extends State<MapActionsMenu>
         return _frostedButton(
           onTap: widget.onToggleHeatmap,
           icon: Icons.whatshot_rounded,
-          semanticLabel:
-              widget.showHeatmap ? 'Hide heatmap' : 'Show heatmap',
-          iconColor: widget.showHeatmap ? AppColors.primary : AppColors.primaryDark,
+          semanticLabel: widget.showHeatmap ? 'Hide heatmap' : 'Show heatmap',
+          iconColor: widget.showHeatmap
+              ? AppColors.primary
+              : AppColors.primaryDark,
         );
       case 1:
         return _frostedButton(
@@ -267,13 +267,6 @@ class _MapActionsMenuState extends State<MapActionsMenu>
                       : AppColors.primaryDark,
                 ),
         );
-      case 5:
-        if (widget.onRefresh == null) return const SizedBox.shrink();
-        return _frostedButton(
-          onTap: widget.onRefresh!,
-          icon: Icons.refresh_rounded,
-          semanticLabel: 'Refresh sites',
-        );
       default:
         return const SizedBox.shrink();
     }
@@ -325,10 +318,10 @@ class MapFilterButton extends StatelessWidget {
                   Text(
                     '$visibleCount',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
                   ),
                   if (hasFilterActive) ...[
                     const SizedBox(width: 6),
