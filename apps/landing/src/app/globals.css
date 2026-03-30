@@ -2,8 +2,47 @@
   box-sizing: border-box;
 }
 
+html {
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   margin: 0;
-  background-color: #fff;
-  color: #000;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background-color: #f8fafc;
+  color: #0f172a;
+  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+}
+
+/* Skip link: visible on focus for keyboard users (WCAG 2.4.1). */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0.5rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #063a24;
+  text-decoration: none;
+  background: #ffffff;
+  border: 2px solid rgba(37, 219, 134, 0.6);
+  border-radius: 9999px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.12);
+}
+
+.skip-link:focus {
+  left: max(0.5rem, env(safe-area-inset-left, 0px));
+  outline: none;
+}
+
+.skip-link:focus-visible {
+  outline: 2px solid rgba(37, 219, 134, 0.85);
+  outline-offset: 2px;
 }

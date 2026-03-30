@@ -1,20 +1,42 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { Metadata, Viewport } from "next";
+import { Noto_Sans } from "next/font/google";
+import { headers } from "next/headers";
+import { defaultLocale, isLocale } from "@/i18n/config";
+import "./globals.css";
+
+/** So `headers().get("x-locale")` runs per request (middleware sets it). */
+export const dynamic = "force-dynamic";
+
+const notoSans = Noto_Sans({
+  subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
-  title: 'Chisto.mk — Civic Environmental Platform',
-  description:
-    'Report pollution, join cleanup events, and make North Macedonia cleaner. Together we can make a difference.',
+  title: { default: "Chisto.mk", template: "%s" },
+  description: "Граѓанска еколошка платформа за Македонија.",
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  themeColor: "#f8fafc",
+  colorScheme: "light",
+};
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const h = await headers();
+  const raw = h.get("x-locale");
+  const locale = raw && isLocale(raw) ? raw : defaultLocale;
+  const htmlLang = locale === "sr" ? "sr-Cyrl" : locale === "rom" ? "rom" : locale;
+
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang={htmlLang} className={notoSans.variable} suppressHydrationWarning>
+      <body className={notoSans.className}>{children}</body>
     </html>
   );
 }
