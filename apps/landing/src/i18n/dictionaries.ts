@@ -44,7 +44,7 @@ export type WipDictionary = {
   notifyEmailLabel: string;
   /** Announced while the notify form is submitting. */
   notifySubmitPendingLabel: string;
-  /** Skip link target — first focusable, jumps to main content. */
+  /** Skip link target: first focusable, jumps to main content. */
   skipToContent: string;
   /** Announced while the countdown is hydrating (client-only). */
   countdownLoadingStatus: string;
@@ -70,17 +70,16 @@ const mk: WipDictionary = {
   languageSelectAria: "Јазик",
   notifyTitle: "Известувања",
   notifyDescription:
-    "Внесете е-пошта за известувања за стартот на платформата и за други важни новости. Адресата не ја користиме за други цели.",
+    "Оставете е-пошта и ќе ве известиме за стартот на платформата и за важни новости.",
   notifyPlaceholder: "ваша@епошта.mk",
-  notifySubmit: "Испрати",
+  notifySubmit: "Пријави се",
   notifySuccess: "Ви благодариме! Ќе ве известиме наскоро со важни новости околу платформата.",
   notifyErrorInvalid: "Внесете важечка е-пошта.",
   notifyErrorSave: "Не успеа зачувувањето. Обидете се подоцна.",
   notifyAlreadySubscribed: "Оваа е-пошта веќе е пријавена.",
-  notifyLegalHint:
-    "Ја користиме адресата само за известувања што ги побаравте. Можете да се откажете во секој момент.",
+  notifyLegalHint: "Само за Chisto.mk. Не ја споделуваме со други.",
   notifyConsentLabel:
-    "Се согласувам да добивам е-пошта од Chisto.mk за вакви известувања.",
+    "Се согласувам да добивам известувања од Chisto.mk на оваа е-пошта.",
   notifyErrorConsent: "Потребна е согласност за да продолжите.",
   notifyTriggerLabel: "Извести ме",
   notifyTriggerLoadingLabel: "Се вчитува…",
@@ -112,17 +111,16 @@ const en: WipDictionary = {
   languageSelectAria: "Language",
   notifyTitle: "Get notified",
   notifyDescription:
-    "Get email updates for the launch and other important news. We only use your address for these messages.",
+    "Drop your email and we’ll tell you when we launch and when there’s news worth sharing.",
   notifyPlaceholder: "you@example.com",
-  notifySubmit: "Send",
+  notifySubmit: "Sign up",
   notifySuccess: "Thanks! We’ll email you with news about the platform.",
   notifyErrorInvalid: "Enter a valid email address.",
   notifyErrorSave: "Couldn't save your signup. Please try again.",
   notifyAlreadySubscribed: "This email is already registered.",
-  notifyLegalHint:
-    "We use your email only for these updates. You can unsubscribe at any time.",
+  notifyLegalHint: "Chisto.mk only. We don’t share your address.",
   notifyConsentLabel:
-    "I agree to receive emails from Chisto.mk about these updates.",
+    "I agree to get Chisto.mk updates at this email address.",
   notifyErrorConsent: "Please accept the checkbox to continue.",
   notifyTriggerLabel: "Notify me",
   notifyTriggerLoadingLabel: "Loading…",
@@ -154,17 +152,16 @@ const sq: WipDictionary = {
   languageSelectAria: "Gjuha",
   notifyTitle: "Njoftime",
   notifyDescription:
-    "Lini email-in për nisjen e platformës së plotë dhe lajme të rëndësishme. Adresa nuk përdoret për qëllime të tjera.",
+    "Lini email-in dhe do t'ju njoftojmë për nisjen e platformës dhe për lajme të rëndësishme.",
   notifyPlaceholder: "ju@shembull.com",
-  notifySubmit: "Dërgo",
+  notifySubmit: "Regjistrohu",
   notifySuccess: "Faleminderit! Do t'ju njoftojmë së shpejti me lajme të rëndësishme.",
   notifyErrorInvalid: "Shkruani një adresë email të vlefshme.",
   notifyErrorSave: "Nuk u ruajt. Provoni përsëri më vonë.",
   notifyAlreadySubscribed: "Kjo adresë email është tashmë e regjistruar.",
-  notifyLegalHint:
-    "E përdorim adresën vetëm për njoftimet që kërkuat. Mund të çregjistroheni kur të doni.",
+  notifyLegalHint: "Vetëm për Chisto.mk. Nuk e ndajmë adresën.",
   notifyConsentLabel:
-    "Pranoj të marr email nga Chisto.mk për këto njoftime.",
+    "Pranoj të marr njoftime nga Chisto.mk në këtë email.",
   notifyErrorConsent: "Duhet të pranoni kutizën për të vazhduar.",
   notifyTriggerLabel: "Njoftomë",
   notifyTriggerLoadingLabel: "Po ngarkohet…",
@@ -197,15 +194,15 @@ const rom: WipDictionary = {
   languageSelectAria: "Chib",
   notifyTitle: "Zhuti",
   notifyDescription:
-    "De e-mail te zhutes kana startis puri platforma thaj lajme baro. Na kam taj kerava vash kado.",
+    "De e-mail, te zhutes kana startis platforma thaj kana si but lajme.",
   notifyPlaceholder: "tu@misal.com",
   notifySubmit: "De",
   notifySuccess: "Nais! Kam taj kerava kana zhuti but.",
   notifyErrorInvalid: "De lacho e-mail.",
   notifyErrorSave: "Nashti te ruvava. Prova but.",
   notifyAlreadySubscribed: "Kado e-mail hi but.",
-  notifyLegalHint: "Na e-mail kam taj kerava vash so tu mangela. Lesho zhuti kana nashti.",
-  notifyConsentLabel: "Kam te zhutav e-mail pa Chisto.mk pa kado lajme.",
+  notifyLegalHint: "Vash Chisto.mk. Na e del vash aver.",
+  notifyConsentLabel: "Kam te zhutav e-mail pa Chisto.mk pa kado.",
   notifyErrorConsent: "De o chek.",
   notifyTriggerLabel: "Zhuti misa",
   notifyTriggerLoadingLabel: "De dikhela…",
@@ -237,17 +234,16 @@ const sr: WipDictionary = {
   languageSelectAria: "Језик",
   notifyTitle: "Обавештења",
   notifyDescription:
-    "Оставите е-пошту за обавештења о покретању целе платформе и важним вестима. Адреса се не користи за друге сврхе.",
+    "Оставите е-пошту и јавићемо вам се за покретање платформе и за важне вести.",
   notifyPlaceholder: "ваша@епошта.рс",
-  notifySubmit: "Пошаљи",
+  notifySubmit: "Пријави се",
   notifySuccess: "Хвала! Јавићемо вам се ускоро са важним новостима о платформи.",
   notifyErrorInvalid: "Унесите исправну е-пошту.",
   notifyErrorSave: "Чување није успело. Покушајте касније.",
   notifyAlreadySubscribed: "Ова е-пошта је већ пријављена.",
-  notifyLegalHint:
-    "Користимо адресу само за обавештења која сте затражили. Можете да се одјавите у било ком тренутку.",
+  notifyLegalHint: "Само за Chisto.mk. Не делимо адресу са другима.",
   notifyConsentLabel:
-    "Слажем се да примам е-пошту од Chisto.mk за ова обавештења.",
+    "Слажем се да примам обавештења од Chisto.mk на ову е-пошту.",
   notifyErrorConsent: "Потребна је сагласност да бисте наставили.",
   notifyTriggerLabel: "Обавести ме",
   notifyTriggerLoadingLabel: "Учитава се…",
