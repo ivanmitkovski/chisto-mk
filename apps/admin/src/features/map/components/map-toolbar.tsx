@@ -70,7 +70,7 @@ export function MapToolbar({ statusFilter, onStatusChange, onFitBounds, onRefres
           type="button"
           className={styles.toolbarBtn}
           onClick={onFitBounds}
-          aria-label="Fit map to North Macedonia bounds"
+          aria-label="Fit map to Macedonia bounds"
         >
           <Icon name="location" size={16} />
           Fit bounds

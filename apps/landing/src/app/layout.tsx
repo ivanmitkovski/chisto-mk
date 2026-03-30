@@ -1,20 +1,6 @@
-import type { Metadata } from 'next';
-import './globals.css';
+import type { ReactNode } from "react";
 
-export const metadata: Metadata = {
-  title: 'Chisto.mk — Civic Environmental Platform',
-  description:
-    'Report pollution, join cleanup events, and make North Macedonia cleaner. Together we can make a difference.',
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <html lang="en">
-      <body>{children}</body>
-    </html>
-  );
+/** Root pass-through; `<html>` / `<body>` live in `[locale]/layout.tsx` (next-intl). */
+export default function RootLayout({ children }: { children: ReactNode }) {
+  return children;
 }

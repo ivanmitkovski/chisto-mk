@@ -1,0 +1,624 @@
+{
+  "metadata": {
+    "siteName": "Chisto.mk",
+    "home": {
+      "title": "Chisto.mk | Civic environmental platform",
+      "description": "Report litter, illegal dumping, or dirty air where you live. Chisto.mk is a Macedonian app for real places and real follow-up."
+    },
+    "about": {
+      "title": "About us | Chisto.mk",
+      "description": "Civic app for litter and dirty air in Macedonia."
+    },
+    "contact": {
+      "title": "Contact | Chisto.mk",
+      "description": "Questions, partnerships, or bug reports. Write to us; we read every message."
+    },
+    "news": {
+      "title": "News | Chisto.mk",
+      "description": "Product updates, field notes, and stories from the Chisto.mk team."
+    },
+    "press": {
+      "title": "Press & media | Chisto.mk",
+      "description": "Brand assets and a short boilerplate for journalists writing about Chisto.mk."
+    },
+    "terms": {
+      "title": "Terms of use | Chisto.mk",
+      "description": "Terms governing use of the Chisto.mk website and mobile application."
+    },
+    "privacy": {
+      "title": "Privacy policy | Chisto.mk",
+      "description": "How Chisto.mk processes personal data under EU-aligned transparency standards."
+    },
+    "cookies": {
+      "title": "Cookie policy | Chisto.mk",
+      "description": "How Chisto.mk uses cookies and similar technologies, including analytics after consent."
+    },
+    "data": {
+      "title": "Your data & account | Chisto.mk",
+      "description": "How to request access, correction, or deletion of your personal data and Chisto.mk account."
+    }
+  },
+  "nav": {
+    "menu": "Menu",
+    "home": "Home",
+    "about": "About us",
+    "news": "News",
+    "press": "Press",
+    "contact": "Contact"
+  },
+  "common": {
+    "download": "Download",
+    "send": "Send",
+    "subscribe": "Subscribe",
+    "language": "Language",
+    "scrollToTop": "Back to top",
+    "skipToContent": "Skip to main content"
+  },
+  "cookieConsent": {
+    "regionLabel": "Cookie consent",
+    "bannerText": "We use strictly necessary cookies to run this site. With your consent we also load anonymous usage analytics (Vercel Analytics) to improve the experience. You can change your choice anytime via Cookie settings in the footer.",
+    "acceptAll": "Accept all",
+    "rejectNonEssential": "Necessary only",
+    "customize": "Customize",
+    "dialogTitle": "Cookie preferences",
+    "dialogIntro": "Necessary cookies are always on. You can opt in to analytics below.",
+    "analyticsLabel": "Usage analytics",
+    "analyticsDescription": "Helps us understand traffic and errors in aggregate (Vercel Analytics).",
+    "necessaryNote": "Strictly necessary cookies support security, your language choice, and this consent record.",
+    "save": "Save preferences",
+    "cancel": "Cancel"
+  },
+  "hero": {
+    "title": "Live in a clean environment.",
+    "subtitle": "Environmental issues are easier to solve once they are on a map with a photo. Chisto.mk does that in public, across Macedonia.",
+    "phoneDeckRegionLabel": "App preview. Swipe horizontally or use the left and right arrow keys to change the screen.",
+    "phoneDeckDotsLabel": "Choose app screen",
+    "phoneDeckSlideLogin": "Login screen",
+    "phoneDeckSlideWelcome": "Welcome screen",
+    "phoneDeckSlideMap": "Map screen"
+  },
+  "howItWorks": {
+    "title": "How it works",
+    "subtitle": "No workshop jargon. Install, report, show up.",
+    "steps": [
+      {
+        "title": "Get the app",
+        "description": "iOS or Android. Sign up with an email you actually check."
+      },
+      {
+        "title": "Drop a pin",
+        "description": "Waste by the path? Smoky chimney? Put it on the map with a short note and a picture if you can."
+      },
+      {
+        "title": "Join a clean-up",
+        "description": "When someone organises a pick-up or planting day nearby, you will see it in the app."
+      }
+    ]
+  },
+  "features": {
+    "badge": "Features",
+    "block1Title": "What you see is where it happened",
+    "block2Title": "When posting is not enough",
+    "block2Body": "Open reports stay visible so neighbours, journalists, and officials cannot pretend the mess was never there. When a group schedules work, you can join instead of only liking a post.",
+    "mock": {
+      "urgent": "Urgent",
+      "pollutionSites": "Pollution sites",
+      "takeAction": "Take action",
+      "before": "Before"
+    },
+    "items": [
+      {
+        "title": "Pins, not walls of text",
+        "description": "A map beats a comment thread when you need to find the same ditch or playground again."
+      },
+      {
+        "title": "Photos and dates",
+        "description": "Rough category, timestamp, optional before/after. Enough for a volunteer group or a municipal desk to start from."
+      },
+      {
+        "title": "From report to broom",
+        "description": "If there is a scheduled action, it lives next to the reports so people can show up with gloves, not just opinions."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "number": "10000+",
+        "label": "Active users"
+      },
+      {
+        "number": "800kg",
+        "label": "Trash collected"
+      },
+      {
+        "number": "1750",
+        "label": "Reports"
+      },
+      {
+        "number": "120",
+        "label": "Eco actions"
+      }
+    ]
+  },
+  "faq": {
+    "badge": "FAQ",
+    "title": "Frequently asked questions",
+    "items": [
+      {
+        "title": "What is Chisto.mk?",
+        "content": "A mobile app and website from people in the region. You report environmental damage or mess, it stays public on a map, and you can hook into volunteer actions when they exist.",
+        "variant": "green"
+      },
+      {
+        "title": "Is the app free?",
+        "content": "Yes. Accounts and reports are free. We charge nothing at signup. If that ever changes, we will say so clearly.",
+        "variant": "white"
+      },
+      {
+        "title": "Who sees my reports?",
+        "content": "Reports are designed to be visible to the community and relevant actors so issues can be verified and addressed. You can read more in our privacy policy.",
+        "variant": "white"
+      },
+      {
+        "title": "Can I report anonymously?",
+        "content": "Account options and privacy settings depend on the version of the app you use. Check in-app settings or contact us for the latest options.",
+        "variant": "green"
+      },
+      {
+        "title": "How do clean-up events work?",
+        "content": "Organisers can publish actions in the app. You can browse nearby events, sign up where available, and see outcomes after the activity.",
+        "variant": "green"
+      },
+      {
+        "title": "How can organisations partner with you?",
+        "content": "Municipalities, NGOs, and companies can reach out via the contact form to explore data access, campaigns, or joint activities.",
+        "variant": "white"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Try the app",
+    "subtitle": "If you walk past the same rubbish every week, it costs nothing to document it once. Someone else might already be organising a pick-up."
+  },
+  "footer": {
+    "links": "Links",
+    "legal": "Legal",
+    "newsletter": "Newsletter",
+    "stayUpToDate": "Stay up to date",
+    "emailPlaceholder": "Your email",
+    "subscribedSuccess": "Subscribed successfully!",
+    "copyright": "Copyright {year} Chisto.mk. All rights reserved.",
+    "linkHome": "Home",
+    "linkPlatform": "Platform",
+    "linkNews": "News",
+    "linkPress": "Press",
+    "linkContact": "Contact",
+    "terms": "Terms of use",
+    "privacy": "Privacy policy",
+    "cookies": "Cookie policy",
+    "cookieSettings": "Cookie settings",
+    "linkData": "Your data & account"
+  },
+  "contact": {
+    "kicker": "Contact",
+    "title": "Write us",
+    "successTitle": "Thank you!",
+    "successBody": "We will get back to you shortly.",
+    "submitError": "We could not send your message. Please try again later or email us directly.",
+    "fullName": "Full name",
+    "phone": "Phone number",
+    "email": "Email",
+    "message": "Message",
+    "placeholders": {
+      "fullName": "Your name",
+      "phone": "+389 70 123 456",
+      "email": "you@example.com",
+      "message": "How can we help?"
+    }
+  },
+  "newsletter": {
+    "genericError": "Something went wrong. Please try again."
+  },
+  "appStore": {
+    "appleAria": "Download on the App Store",
+    "googleAria": "Get it on Google Play"
+  },
+  "phoneMockup": {
+    "loginWelcomeBack": "Welcome back",
+    "loginSubtitle": "Sign in to continue",
+    "loginButton": "Sign in",
+    "welcomeTitle": "Nearby reports",
+    "welcomeSubtitle": "Pins from people in your area. Tap one to see the photo.",
+    "welcomeButton": "Continue"
+  },
+  "errors": {
+    "required": "This field is required",
+    "requiredNamed": "{label} is required",
+    "emailRequired": "Email is required",
+    "emailInvalid": "Invalid email address",
+    "phoneRequired": "Phone number is required",
+    "phoneInvalid": "Invalid phone number"
+  },
+  "aboutPage": {
+    "badge": "About us",
+    "title": "Chisto.mk is a civic app for litter and dirty air in Macedonia.",
+    "subtitle": "You report waste, illegal dumping, or dirty air with a photo and a pin on the map. The same place stays visible for everyone.",
+    "creatorsPhotoPlaceholder": "Photo coming soon",
+    "creatorsSectionTitle": "Team",
+    "teamCarouselPrev": "Previous team member",
+    "teamCarouselNext": "Next team member",
+    "creators": [
+      {
+        "name": "TBC",
+        "role": "Bio later",
+        "imageAlt": "Team placeholder, Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "TBC",
+        "role": "Bio later",
+        "imageAlt": "Team placeholder, Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "TBC",
+        "role": "Bio later",
+        "imageAlt": "Team placeholder, Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "TBC",
+        "role": "Bio later",
+        "imageAlt": "Team placeholder, Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "TBC",
+        "role": "Bio later",
+        "imageAlt": "Team placeholder, Chisto.mk",
+        "imageSrc": ""
+      }
+    ]
+  },
+  "newsPage": {
+    "badge": "News",
+    "title": "Updates from the team",
+    "lead": "Release notes, partnerships, and occasional write-ups when something worth sharing happens.",
+    "demoNotice": "These articles are sample content for the site. A managed news feed will replace them when our publishing tools go live.",
+    "featuredLabel": "Featured",
+    "latestHeading": "More stories",
+    "readMore": "Read more",
+    "backToNews": "Back to news",
+    "newsCategory": {
+      "release": "Release",
+      "partnership": "Partnership",
+      "community": "Community",
+      "product": "Product"
+    },
+    "emptyTitle": "Fresh posts soon",
+    "emptyBody": "We are still wiring a simple feed here. Until then, follow our social channels or drop us a line if you have a story tip.",
+    "contactCta": "Suggest a story or ask a question"
+  },
+  "pressPage": {
+    "badge": "Press",
+    "title": "Media resources",
+    "lead": "Journalists and partners can use the materials below. For anything else, send us an email. We answer serious inquiries.",
+    "assetsTitle": "Brand",
+    "logoTitle": "Mark",
+    "logoBody": "SVG suitable for light backgrounds. Use clear space around the symbol; do not stretch or change colours.",
+    "downloadMark": "Download chisto-mark.svg",
+    "inquiriesTitle": "Contact",
+    "inquiriesLead": "Press and partnership questions:",
+    "boilerplateTitle": "Short description",
+    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. People report litter, illegal dumping, and dirty air on a public map with photos and locations, and can join local clean-up actions when organisers post them in the app."
+  },
+  "termsPage": {
+    "badge": "Legal",
+    "title": "Terms of use",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdated": "28 March 2026",
+    "noticeTitle": "Before you rely on these terms",
+    "noticeBody": "Complete all bracketed fields with verified legal and operational information before treating this text as final. App store privacy declarations should match this document and your published app. This is not legal advice and does not guarantee store approval. Consider review by qualified counsel in North Macedonia (and, for EEA users, EU counsel) where appropriate.",
+    "sections": [
+      {
+        "title": "Introduction",
+        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
+      },
+      {
+        "title": "1. Definitions",
+        "body": "1.1 \"Account\" means the user profile created to access certain features of the Platform.\n\n1.2 \"Content\" means any text, images, photographs, videos, data, or other materials submitted, posted, or displayed on the Platform.\n\n1.3 \"Cleanup Event\" means an organized environmental cleanup activity posted on the Platform.\n\n1.4 \"Report\" means a user-submitted record about a mapped pollution site, including location data, narrative fields, and optional photographs.\n\n1.5 \"Services\" means all functionalities provided through the Platform, including waste reporting, cleanup organization, map visualization, and community engagement features.\n\n1.6 \"User Content\" means all Content submitted by users to the Platform."
+      },
+      {
+        "title": "2. Legal framework and applicability",
+        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of North Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of North Macedonia and the European Union."
+      },
+      {
+        "title": "3. Platform description and scope",
+        "body": "3.1 Service overview\n\nChisto.mk is a civic environmental platform. Through our mobile apps (iOS and Android) and public website, users can:\n\nView and interact with mapped pollution \"sites\" and user-submitted reports (including photos and locations)\nComment on sites, save or share them, and see cleanup events scheduled at a site\nCreate an account to submit reports, participate in the community, and receive optional notifications\n\nWe may also share aggregated or anonymised statistics with municipalities or partners where we describe in our Privacy Policy.\n\n3.2 Platform role\n\nChisto.mk functions as a technology platform only. We do not:\n\nProvide waste collection or environmental cleanup services ourselves\nGuarantee that any authority will act on a report\nAssume responsibility for third-party cleanup events or injuries at such events\nVerify every user submission in real time (moderation may happen after publication)\n\n3.3 No service guarantees\n\nWhile we strive to keep the Platform available, we do not guarantee:\n\nUninterrupted or error-free operation\nMunicipal or institutional action based on submitted reports\nSpecific processing times\nCompatibility with every device or operating system version"
+      },
+      {
+        "title": "4. User eligibility and account registration",
+        "body": "4.1 Age requirements\n\nYou must be at least 18 years old to create an Account. Users under 18 may view public content under parental supervision but may not register.\n\n4.2 Account creation\n\nTo access account features in our mobile apps, you register with:\n\nA valid email address\nA mobile phone number you can verify with a one-time code (SMS or similar)\nYour name and a password that meets our security rules\nOptional profile information (for example a profile photo) where the product offers it\n\nThe public website may not offer full account registration; where it does not, account terms apply when you use the apps.\n\n4.3 Account security\n\nYou are solely responsible for:\n\nMaintaining the confidentiality of your login credentials\nAll activities occurring under your Account\nImmediately notifying us of any unauthorized access\n\nWe are not liable for losses arising from unauthorized use of your Account unless due to our gross negligence.\n\n4.4 Account accuracy\n\nYou represent and warrant that:\n\nAll registration information is accurate, current, and complete\nYou will maintain and update your information as necessary\nYou will not impersonate any person or entity\nYou will not create multiple accounts for improper purposes"
+      },
+      {
+        "title": "5. User obligations and prohibited conduct",
+        "body": "5.1 Permitted use\n\nYou may use the Platform solely for:\n\nReporting legitimate waste and pollution incidents\nOrganizing or participating in cleanup events\nViewing environmental data and maps\nEngaging constructively with the community\n\n5.2 Prohibited activities\n\nYou must not:\n\n5.2.1 False reporting\n\nSubmit knowingly false, misleading, or inaccurate reports\nFabricate waste incidents or locations\nManipulate geolocation data\n\n5.2.2 Harmful content\n\nUpload content that is defamatory, obscene, threatening, or hateful\nPost discriminatory content based on race, ethnicity, religion, gender, or other protected characteristics\nShare content that violates privacy rights of identifiable individuals\nInclude personal data of third parties without consent\n\n5.2.3 Platform abuse\n\nUse automated systems, bots, or scrapers to access the Platform\nAttempt to gain unauthorized access to Platform systems\nInterfere with or disrupt Platform functionality\nCircumvent security measures or authentication mechanisms\n\n5.2.4 Commercial misuse\n\nUse the Platform for unauthorized commercial purposes\nPost spam, advertising, or promotional content without permission\nCollect user data for marketing purposes\n\n5.2.5 Intellectual property violations\n\nUpload content that infringes third-party copyrights, trademarks, or other intellectual property rights\n\n5.3 Consequence of violations\n\nWe reserve the right to, without prior notice:\n\nRemove violating content\nSuspend or terminate your Account\nReport illegal activities to competent authorities\nPursue legal remedies for damages"
+      },
+      {
+        "title": "6. User content and intellectual property",
+        "body": "6.1 User content ownership\n\nYou retain all ownership rights to your User Content. By submitting Content to the Platform, you grant Chisto.mk a worldwide, non-exclusive, royalty-free, sublicensable license to:\n\nDisplay, reproduce, and distribute your Content on the Platform\nUse aggregated and anonymized data for statistical analysis and municipal reporting\nInclude your Content in promotional materials (with your consent)\n\n6.2 User content representations\n\nBy submitting Content, you represent and warrant that:\n\nYou own or have necessary rights to the Content\nYour Content does not infringe third-party rights\nYour Content complies with applicable laws\nYou have obtained necessary consents for any identifiable individuals in photographs\n\n6.3 Platform content ownership\n\nAll Platform software, design, text, graphics, logos, and other materials (excluding User Content) are owned by Chisto.mk or our licensors and are protected by:\n\nMacedonian copyright law (Law on Copyright and Related Rights, Official Gazette No. 47/2023)\nMacedonian trademark law (Law on Industrial Property, Official Gazette No. 21/2009)\nInternational intellectual property treaties\n\n6.4 Limited license to users\n\nWe grant you a limited, non-exclusive, non-transferable license to access and use the Platform for personal, non-commercial purposes. This license does not permit:\n\nModification, distribution, or reproduction of Platform content\nReverse engineering or decompiling Platform software\nCreating derivative works\nCommercial exploitation without written permission"
+      },
+      {
+        "title": "7. Privacy and data protection",
+        "body": "7.1 Your use of the Platform is subject to our Privacy Policy, which is incorporated into these Terms by reference.\n\n7.2 We process personal data in accordance with:\n\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (GDPR)\nOur Privacy Policy available at [PRIVACY_POLICY_URL]\n\n7.3 Processing of your personal data is described in our Privacy Policy, including the legal bases in Section 4 of that Policy. Where we rely on consent, it applies only to the processing stated there and you may withdraw it as described in the Privacy Policy. Other processing may rely on contract, legitimate interests, legal obligation, or other bases permitted by law."
+      },
+      {
+        "title": "8. Consumer rights (EU and Macedonian users)",
+        "body": "8.1 Digital services and price\n\nThe core civic map and reporting features are currently provided without charge. Where we do not ask you to pay for access, many consumer \"distance contract\" rules (including the 14-day right of withdrawal under Directive 2011/83/EU) often do not apply in the same way as for paid digital content. Nothing in this Section limits mandatory rights that still apply to you under North Macedonian or EU law.\n\n8.2 Information we provide\n\nWe aim to give clear information about:\n\nWho operates the Platform (Section 17)\nWhat the Service does (Section 3)\nHow to complain (Section 13)\n\n8.3 Consumer disputes\n\nMacedonian consumers may file complaints with:\n\nCommission for Consumer Protection (Комисија за заштита на потрошувачите)\nEU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr\n\nContact us at [CONTACT_EMAIL] or [CONTACT_ADDRESS] for service issues before you escalate where reasonable."
+      },
+      {
+        "title": "9. Disclaimer of warranties",
+        "body": "9.1 THE PLATFORM IS PROVIDED \"AS IS\" AND \"AS AVAILABLE\" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO:\n\nMERCHANTABILITY\nFITNESS FOR A PARTICULAR PURPOSE\nNON-INFRINGEMENT\nACCURACY, RELIABILITY, OR COMPLETENESS OF CONTENT\nUNINTERRUPTED OR ERROR-FREE OPERATION\n\n9.2 We do not warrant that:\n\nThe Platform will meet your specific requirements\nUser-submitted reports will result in municipal action\nPlatform data is current, accurate, or complete\nDefects will be corrected\nThe Platform is free from viruses or harmful components\n\n9.3 Some jurisdictions do not allow disclaimer of implied warranties. In such jurisdictions, the above disclaimers may not apply, and you may have additional rights."
+      },
+      {
+        "title": "10. Limitation of liability",
+        "body": "10.1 General limitations\n\nTO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:\n\n10.1.1 Chisto.mk shall not be liable for:\n\nIndirect, incidental, special, consequential, or punitive damages\nLoss of profits, data, use, goodwill, or other intangible losses\nDamages arising from user reliance on Platform content\nDamages resulting from third-party actions or content\n\n10.1.2 Our total aggregate liability for all claims shall not exceed the greater of [AMOUNT] EUR and the fees you paid us for the Service in the 12 months preceding the claim. If you paid no fees in that period (for example because the Service is free), the cap is [AMOUNT] EUR.\n\n10.2 Liability for mandatory legal obligations\n\nNothing in these Terms excludes or limits liability for:\n\nDeath or personal injury caused by gross negligence\nFraud or fraudulent misrepresentation\nViolations of mandatory consumer protection rights\nOther liability that cannot be excluded under Macedonian law\n\n10.3 Third-party liability\n\nWe are not responsible for:\n\nActions or omissions of cleanup event organizers\nInjuries or damages occurring during cleanup events\nMunicipal responses (or lack thereof) to reports\nThird-party content, websites, or services linked from the Platform"
+      },
+      {
+        "title": "11. Indemnification",
+        "body": "11.1 To the fullest extent permitted by applicable law, you agree to indemnify, defend, and hold harmless Chisto.mk, its officers, directors, employees, and agents from any claims, liabilities, damages, losses, costs, and expenses (including reasonable legal fees) arising from:\n\nYour violation of these Terms\nYour violation of any laws or third-party rights\nYour User Content\nYour use of the Platform\n\n11.2 We reserve the right to assume exclusive defense and control of any matter subject to indemnification, at your expense."
+      },
+      {
+        "title": "12. Modification and termination",
+        "body": "12.1 Modification of Terms\n\n12.1.1 We may modify these Terms at any time by posting updated Terms on the Platform.\n\n12.1.2 We will provide at least 30 days' notice of material changes via:\n\nEmail notification to registered users\nProminent notice on the Platform\nIn-app notification\n\n12.1.3 Continued use of the Platform after the effective date constitutes acceptance of modified Terms.\n\n12.1.4 If you do not agree to modifications, you must discontinue use and may close your Account.\n\n12.2 Platform modifications\n\nWe reserve the right to modify, suspend, or discontinue the Platform (or any features) at any time without liability.\n\n12.3 Termination by User\n\nYou may terminate your Account at any time through account settings in the apps where available, or by contacting [CONTACT_EMAIL].\n\n12.4 Termination by Chisto.mk\n\nWe may suspend or terminate your Account immediately if:\n\nYou breach these Terms\nYour conduct creates legal risk for us\nWe are required to do so by law\nWe cease operating the Platform\n\n12.5 Effect of termination\n\nUpon termination:\n\nYour access rights immediately cease\nWe may delete your Account data (subject to legal retention obligations)\nSections 6, 10, 11, 14, and 16 survive termination"
+      },
+      {
+        "title": "13. Dispute resolution and complaints",
+        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of North Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
+      },
+      {
+        "title": "14. Governing law and jurisdiction",
+        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of North Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of North Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of North Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
+      },
+      {
+        "title": "15. Force majeure",
+        "body": "Neither party shall be liable for failure to perform obligations due to circumstances beyond reasonable control, including:\n\nNatural disasters, pandemics, or public health emergencies\nWar, terrorism, or civil unrest\nGovernment actions or regulations\nInternet or telecommunications failures\nCyberattacks or data breaches affecting third-party infrastructure\n\nPerformance obligations are suspended during force majeure events and resume when circumstances permit."
+      },
+      {
+        "title": "16. General provisions",
+        "body": "16.1 Entire agreement\n\nThese Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Chisto.mk.\n\n16.2 Severability\n\nIf any provision is found invalid or unenforceable, that provision shall be limited or eliminated to the minimum extent necessary, and remaining provisions remain in full effect.\n\n16.3 No waiver\n\nFailure to enforce any provision does not constitute a waiver of that provision or any other provision.\n\n16.4 Assignment\n\nYou may not assign these Terms without our prior written consent. We may assign our rights and obligations without restriction.\n\n16.5 Language\n\nThese Terms are executed in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in North Macedonia; the English version prevails for international disputes.\n\n16.6 Relationship\n\nNothing in these Terms creates a partnership, joint venture, employment, or agency relationship.\n\n16.7 Third-party rights\n\nThese Terms do not confer rights upon any third parties.\n\n16.8 Notices\n\nLegal notices must be sent to:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAddress: [REGISTERED_ADDRESS]\n\nNotices to you may be sent to your registered email address."
+      },
+      {
+        "title": "17. Contact information",
+        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
+      }
+    ]
+  },
+  "privacyPage": {
+    "badge": "Legal",
+    "title": "Privacy policy",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdated": "[DATE]",
+    "noticeTitle": "Before you rely on this policy",
+    "noticeBody": "Complete all bracketed fields with accurate details. Apple App Privacy labels and Google Play Data safety should match this Policy and your live build (including Firebase push, map tiles, and optional website analytics). Update this Policy when you change SDKs or retention practices. Not legal advice.",
+    "sections": [
+      {
+        "title": "1. Introduction",
+        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of North Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+      },
+      {
+        "title": "2. Scope and application",
+        "body": "2.1 This Privacy Policy applies to personal data we process when you:\n\nUse the Chisto.mk mobile apps\nUse the website at [WEBSITE_URL] (including forms or newsletters we operate)\nEmail or otherwise contact us\n\nIt also covers processing by subprocessors we use to host or operate the service (listed in general terms below and in agreements we maintain).\n\n2.2 This Policy does not govern:\n\nIndependent websites or apps you open via links from us (their policies apply)\nProcessing by public authorities or third parties that act on their own legal basis\nContent you exchange with other users outside our systems\n\n2.3 By using the Platform, you confirm that you have read this Policy. Some processing relies on consent (for example optional marketing or optional analytics on the website); you may withdraw consent where the law allows, as described below."
+      },
+      {
+        "title": "3. Personal data we collect",
+        "body": "We collect personal data to run the civic map, authenticate users, moderate content, and improve reliability. Categories include:\n\n3.1 Data you provide directly\n\n3.1.1 Account data (apps)\n\nFirst and last name\nEmail address\nMobile phone number (used for sign-in and verification with one-time codes)\nPassword (we store a secure hash, not the plain password)\nOptional profile photo and in-app preferences\nOptional multi-factor authentication data if you enable it\nGamification fields tied to your account (for example points), where the product includes them\n\n3.1.2 Reports and sites\n\nWhen you submit a pollution report we collect the report text, category and similar fields you enter, photos you attach, coordinates and address or place text for the location, timestamps, and moderation outcomes. Reports are linked to a \"site\" record on the map. Other users may see public report and site content according to product rules.\n\n3.1.3 Community and events\n\nComments and likes on sites, saves, and share actions you trigger\nCleanup events shown in the product (scheduled time, linked site, organiser fields the UI collects, participant counts)\n\n3.1.4 Support and contact\n\nWhat you send us by email, contact forms, or comparable channels\n\n3.1.5 Payments\n\nWe do not operate in-app purchases or paid subscriptions in the current product. If we introduce paid features later, we will update this Policy and name the payment processor.\n\n3.2 Data collected automatically\n\n3.2.1 Technical and security data\n\nIP address, device type, operating system and app or browser version where available\nSession or device records we need for security (for example refresh token identifiers, optional device description)\nServer and application logs for reliability and abuse detection\n\n3.2.2 Usage data\n\nInteractions needed to operate features you use (for example opening a report, voting, commenting)\nOptional product analytics if implemented in the apps (we will describe the vendor here when enabled)\n\n3.2.3 Location\n\nPrecise location when you choose to attach a location to a report or use map features that require it. We do not intend to track your location continuously in the background; if that ever changes, we will ask for a separate permission and update this Policy.\n\n3.2.4 Push notifications\n\nIf you opt in, we store a push device token (for example via Firebase Cloud Messaging) and related preference flags so we can deliver notifications you request.\n\n3.2.5 Website cookies and storage\n\nThe public website uses strictly necessary storage plus, if you agree, Vercel Web Analytics. Details are in the Cookie Policy.\n\n3.3 Third-party sources\n\nWe may use mapping or geocoding services (for example Carto basemaps or Esri imagery in the apps, and geocoding helpers) to render maps or resolve addresses; those providers may receive technical requests needed to load tiles or geocode coordinates. We do not operate social login in the current apps; if we add it, we will update this section."
+      },
+      {
+        "title": "4. Legal basis for processing",
+        "body": "Under GDPR Article 6, we rely on:\n\n4.1 Contract (Art. 6(1)(b))\n\nOperating accounts, publishing reports you submit, showing map content, comments, events, and notifications you ask for.\n\n4.2 Legitimate interests (Art. 6(1)(f))\n\nSecuring the service, preventing abuse, debugging and reliability, internal statistics that do not require marketing profiles, and limited product improvement, balanced against your rights.\n\n4.3 Legal obligation (Art. 6(1)(c))\n\nAccounting, tax, or regulatory duties where they apply, and lawful requests from authorities.\n\n4.4 Consent (Art. 6(1)(a))\n\nWhere required, for example optional marketing communications, optional website analytics cookies, or any future feature we offer only on an opt-in basis. You may withdraw consent without affecting earlier processing that was lawful.\n\n4.5 Vital interests (Art. 6(1)(d))\n\nRare processing needed to protect life or serious safety."
+      },
+      {
+        "title": "5. How we use your personal data",
+        "body": "5.1 Running the Platform\n\nAuthenticate you, maintain your profile, and operate map, report, comment, event, and notification features you use.\n\n5.2 Safety, trust, and moderation\n\nReview reports of abuse, enforce our Terms, protect users, and keep infrastructure stable.\n\n5.3 Communications\n\nSend service messages (for example security notices or report status) using contact details you provide. Marketing or newsletter messages only where we have a lawful basis (usually consent).\n\n5.4 Aggregates for partners\n\nProduce statistics that do not identify individuals where we describe in agreements or product copy.\n\n5.5 Legal and compliance\n\nMeet retention duties, respond to lawful requests, and defend legal claims.\n\n5.6 Improvement\n\nUnderstand errors and performance in aggregate; we avoid unnecessary profiling beyond what the product needs."
+      },
+      {
+        "title": "6. Data sharing and disclosure",
+        "body": "6.1 Consent or instruction\n\nWe share data with third parties when you ask us to or when you deliberately make content public in the product.\n\n6.2 Infrastructure and operations\n\nWe use vetted processors, for example:\n\nHosting and API infrastructure: [HOSTING_PROVIDER] in [SERVER_LOCATION] (or as updated in our records)\nEmail delivery for website forms or newsletters: commonly [EMAIL_PROVIDER] (for example Resend) unless we name another vendor\nPush notifications: Google Firebase Cloud Messaging for device delivery\nWebsite analytics (if you opt in on the site): Vercel Web Analytics\nOptional additional tools: [SUPPORT_PROVIDER], [ANALYTICS_PROVIDER] when we actually deploy them\n\nContracts require processors to use data only on our instructions and to apply appropriate security.\n\n6.3 Maps and geolocation helpers\n\nMap tiles may be loaded from Carto (OpenStreetMap-based raster tiles) and, where the UI offers it, Esri or similar imagery providers. Geocoding may use platform APIs you already bundle. Those providers receive technical requests (tile coordinates, IP in server logs) as normal for map delivery.\n\n6.4 Authorities and aggregates\n\nWe may share anonymised or aggregated environmental statistics with municipalities or partners. We may disclose identifiers or content if the law compels us, to protect rights and safety, or to enforce our Terms.\n\n6.5 Reorganisation or succession\n\nIf we merge, restructure, or another organisation continues the service, personal data may transfer to the successor. We will require them to respect this Policy or notify you.\n\n6.6 Public visibility\n\nReports, comments, usernames, and event listings you publish may be visible to other users and, depending on configuration, on the open web."
+      },
+      {
+        "title": "7. International data transfers",
+        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of North Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
+      },
+      {
+        "title": "8. Data retention",
+        "body": "We keep personal data only as long as needed for the purposes above or as the law requires. Exact schedules evolve with the product; the following reflects our current intent.\n\n8.1 Accounts and security\n\nProfile and credentials: while your account is active, then typically up to 90 days after closure unless law or dispute resolution needs more time.\nSessions and security logs: long enough to detect abuse (often months, not years, unless an investigation needs longer).\n\n8.2 Reports, sites, and community content\n\nEnvironmental reports may stay visible as part of the civic map for a long time or indefinitely because they document conditions in the public interest. If you exercise erasure rights, we may remove or anonymise your personal link to a report (for example detaching your account) while keeping non-personal location and imagery that cannot identify you, unless law requires otherwise. We handle erasure and anonymisation requests in line with this description.\n\nPhotos and rich media: retained with the report until deletion or anonymisation rules apply.\nComments, votes, saves: retained until you delete them, we moderate them away, or the related site is removed according to product rules.\n\n8.3 Events\n\nCleanup events stay linked to sites for scheduling history; any participant lists follow the same principles as account data.\n\n8.4 Marketing and contact history\n\nMarketing consents and proof of opt-in or opt-out: as required by law, usually a few years after the last message.\n\n8.5 Legal, tax, and backups\n\nRecords we must keep for accounting, tax, or litigation hold periods set by Macedonian law.\nBackups rotate; purging from backups may lag production deletion by up to 90 days.\n\n8.6 Inactive accounts\n\nWe may warn you before deleting long-inactive accounts, then remove personal data subject to the report anonymisation rules above."
+      },
+      {
+        "title": "9. Your rights under GDPR",
+        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
+      },
+      {
+        "title": "10. Data security",
+        "body": "We implement technical and organizational measures appropriate to the risk, taking into account the nature of the processing and the state of the art.\n\n10.1 Measures we may use\n\nDepending on how the service is hosted and developed, measures may include:\n\nEncryption of personal data in transit (for example TLS)\nPasswords stored using strong one-way hashing\nAccess controls for systems and accounts, including multi-factor authentication for administrative access where we deploy it\nPatching, monitoring, and logging for reliability and abuse detection\nSafeguards against common application risks (for example input validation and protections against injection and cross-site scripting where applicable)\n\nWe review and adjust controls as the service evolves.\n\n10.2 Organization and vendors\n\nWe maintain practices suited to our size and risk, including how we work with hosting and other processors we engage.\n\n10.3 Personal data breaches\n\nIf we become aware of a breach that is likely to affect your rights and freedoms, we will notify the supervisory authority without undue delay and within 72 hours where the GDPR or applicable law requires it, and we will inform affected users when the law requires that too.\n\n10.4 Your part\n\nUse a strong unique password, enable multi-factor authentication in the apps if offered, sign out on shared devices, and contact us promptly if you suspect unauthorized access to your account."
+      },
+      {
+        "title": "11. Children's privacy",
+        "body": "11.1 The Platform is not intended for children under 18 years of age.\n\n11.2 We do not knowingly collect personal data from children under 18 without parental consent.\n\n11.3 If we become aware that we have collected data from a child under 18 without verified parental consent, we will delete that information as quickly as possible.\n\n11.4 If you are a parent or guardian and believe your child has provided personal data to us, please contact us at [PRIVACY_EMAIL].\n\n11.5 Parents may supervise minors' use of the Platform, but minors may not create accounts independently."
+      },
+      {
+        "title": "12. Cookies and tracking technologies",
+        "body": "The public website uses strictly necessary storage plus optional Vercel Web Analytics if you opt in through our banner. We do not run separate functional or marketing cookie toggles on the site today. Full detail is in the Cookie Policy at [COOKIE_POLICY_URL].\n\nThe mobile apps use on-device storage, push tokens, and map caches as described in Sections 3 and 6, not browser cookies."
+      },
+      {
+        "title": "13. Third-party links and services",
+        "body": "13.1 The website may link to social profiles or partner pages. The apps load map tiles and geocoding from providers such as Carto (OpenStreetMap data) or Esri where offered.\n\n13.2 Those services have their own privacy notices. We do not control them.\n\n13.3 We do not embed social login in the current mobile product. If we add integrations, we will list them here."
+      },
+      {
+        "title": "14. Changes to this Privacy Policy",
+        "body": "14.1 Notification of changes\n\nWe may update this Privacy Policy from time to time. When we make material changes, we will notify you by:\n\nEmail notification to registered users (at least 30 days before changes take effect)\nProminent notice on the Platform\nIn-app notification\nUpdated \"Last Updated\" date at the top of this Policy\n\n14.2 Your acceptance\n\nContinued use of the Platform after changes take effect constitutes acceptance of the updated Policy. If you do not agree with changes, you must stop using the Platform and may close your account.\n\n14.3 Version history\n\nWe maintain a version history of this Policy. Previous versions are available upon request at [PRIVACY_EMAIL]."
+      },
+      {
+        "title": "15. Specific provisions for Macedonian users",
+        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of North Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in North Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
+      },
+      {
+        "title": "16. Contact us",
+        "body": "For questions, concerns, or requests regarding this Privacy Policy or your personal data:\n\nPrivacy inquiries:\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nAddress: [REGISTERED_ADDRESS]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nGeneral contact:\nEmail: [CONTACT_EMAIL]\nWebsite: [WEBSITE_URL]\nResponse time: We aim to respond to all privacy inquiries within 48 hours and resolve requests within 30 days.\n\nBY USING THE PLATFORM, YOU CONFIRM THAT YOU HAVE READ THIS PRIVACY POLICY. WE PROCESS PERSONAL DATA AS DESCRIBED HEREIN, INCLUDING PROCESSING THAT DOES NOT RELY ON CONSENT WHERE THE LAW ALLOWS OTHER LEGAL BASES."
+      }
+    ]
+  },
+  "cookiesPage": {
+    "badge": "Legal",
+    "title": "Cookie policy",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "",
+    "effectiveDate": "",
+    "noticeTitle": "Before you rely on this cookie policy",
+    "noticeBody": "What the live website does (consent storage, optional analytics identifiers) should match this table and the Privacy Policy. Mobile apps use on-device storage and push tokens as described there, not this browser-focused summary. Bracketed URLs are set through your deployment environment. Not legal advice.",
+    "tableTitle": "8. Detailed cookie and storage table (website)",
+    "tableIntro": "This table describes technologies on the public Chisto.mk website. The apps use on-device storage and Firebase messaging tokens instead; see the Privacy Policy.\n\nBY CONTINUING TO USE OUR WEBSITE, YOU ACKNOWLEDGE THAT YOU HAVE READ AND UNDERSTOOD THIS COOKIE POLICY.",
+    "colName": "Name",
+    "colProvider": "Provider",
+    "colPurpose": "Purpose",
+    "colDuration": "Duration",
+    "colType": "Type",
+    "sections": [
+      {
+        "title": "1. Introduction",
+        "body": "Effective date: [EFFECTIVE_DATE].\n\n1.1 About this policy\n\nThis Cookie Policy explains how [LEGAL_ENTITY_NAME] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\") uses cookies and similar storage on the Chisto.mk marketing website. Mobile apps follow the Privacy Policy for device storage, push tokens, and map caches.\n\nRead this Policy together with:\n\n• Privacy Policy: [PRIVACY_POLICY_URL]\n• Terms of Use: [TERMS_URL]\n\n1.2 Legal framework\n\nWe comply with the ePrivacy framework as transposed in North Macedonia, the GDPR where it applies, the Law on Personal Data Protection (Official Gazette No. 42/2020), and the Law on Electronic Communications (Official Gazette No. 39/2014).\n\n1.3 Consent on the website\n\nStrictly necessary storage works without consent. Optional Vercel Web Analytics loads only if you accept analytics in our banner. You can reopen choices via Cookie settings in the footer ([COOKIE_PREFERENCES_URL])."
+      },
+      {
+        "title": "2. What are cookies?",
+        "body": "2.1 Definition\n\nCookies are small files a site stores in your browser. Local storage is a related browser feature we use to remember your analytics choice.\n\n2.2 Duration and party\n\n• Session cookies expire when you close the browser.\n• Persistent cookies or storage entries stay until they expire or you clear site data.\n• First-party entries are set by our site. Third-party scripts (Vercel Analytics, when enabled) may set their own identifiers under Vercel's policies.\n\n2.3 Mobile apps\n\nApps use secure storage, SQLite or file caches, Firebase Cloud Messaging tokens, and similar tools described in the Privacy Policy rather than browser cookies."
+      },
+      {
+        "title": "3. Why we use cookies",
+        "body": "On the website we use storage to:\n\n• Remember whether you accepted or rejected optional analytics\n• Keep the site working (security, load balancing, and similar basics handled by our host)\n• If you opt in, measure aggregate traffic with Vercel Web Analytics\n\nWe do not use marketing or social advertising pixels on this site today."
+      },
+      {
+        "title": "4. Categories we use on the website",
+        "body": "4.1 Strictly necessary storage\n\nWe store your analytics choice in browser localStorage (key chisto_cookie_consent_v1) so the banner does not reset every visit and so we can respect rejections. Our hosting provider may also set short-lived technical cookies for security or delivery. Legal basis: legitimate interests and, where applicable, provision of the service you request.\n\n4.2 Optional analytics (consent)\n\nIf you opt in, we load Vercel Web Analytics to collect aggregate page views and performance metrics. Legal basis: consent. You can withdraw consent anytime via Cookie settings ([COOKIE_PREFERENCES_URL]).\n\n4.3 What we do not use here\n\nWe do not operate a separate marketing pixel, Facebook Pixel, or Google Ads tags on this marketing site in the current build. If that changes, we will update this Policy and the banner before enabling them."
+      },
+      {
+        "title": "5. Mobile applications",
+        "body": "5.1 Technologies\n\nThe apps store login tokens securely, cache map tiles for performance, keep preferences locally, and register Firebase Cloud Messaging tokens when you enable notifications.\n\n5.2 Advertising identifiers\n\nWe do not use the advertising ID to serve third-party ads in the current product. OS-level ad settings still apply generally on your device.\n\n5.3 Permissions\n\nWe request access to location, camera, photos, and notifications only when a feature needs them. You can change permissions in device settings."
+      },
+      {
+        "title": "6. How to manage cookies",
+        "body": "6.1 Banner and footer\n\nOn your first visit we ask whether to enable optional analytics. You can reopen the choice from \"Cookie settings\" in the footer ([COOKIE_PREFERENCES_URL]). The marketing site does not expose account-level cookie menus.\n\n6.2 Browser controls\n\nYou may clear or block cookies and site data in your browser; blocking everything can break the site.\n\n6.3 Do Not Track\n\nBrowsers may send DNT signals; we do not treat DNT as a binding legal request today because industry practice is inconsistent."
+      },
+      {
+        "title": "7. Cookie lifespan",
+        "body": "Consent records in localStorage remain until you clear site data or we bump the storage version. Vercel Analytics identifiers follow Vercel's documentation (often well under two years). Hosting cookies are typically short session cookies."
+      },
+      {
+        "title": "8. Social links",
+        "body": "The website may show ordinary links to social networks. Simply visiting our pages does not embed social login. If you click through to a network, that network's policy applies."
+      },
+      {
+        "title": "9. Data protection and security",
+        "body": "9.1 Security\n\nWe serve the site over HTTPS and limit access to analytics dashboards.\n\n9.2 Retention\n\nAnalytics data is handled under Vercel's terms. When you withdraw consent we stop loading their script on future page loads.\n\n9.3 Transfers\n\nVercel may process data in the United States or other regions. We rely on appropriate safeguards described in their documentation and our Privacy Policy."
+      },
+      {
+        "title": "10. Your rights",
+        "body": "Under the GDPR and applicable local law, you have rights regarding data collected through cookies, including:\n\n• Right of access: Information about cookie-related data we hold\n• Right to erasure: Deletion of cookie data where applicable\n• Right to object: Object to processing based on legitimate interests where provided by law\n• Right to withdraw consent: At any time for non-essential cookies\n• Right to lodge a complaint: With a supervisory authority\n\nHow to exercise your rights:\n\n• Email: [PRIVACY_EMAIL]\n• Cookie settings: [COOKIE_PREFERENCES_URL]\n\nSupervisory authority (North Macedonia):\n\nAgency for Personal Data Protection. Website: https://www.dzlp.mk. Email: info@dzlp.mk"
+      },
+      {
+        "title": "11. Children's privacy",
+        "body": "11.1 Our Platform is not directed at children under 18 years of age.\n\n11.2 We do not knowingly collect cookie data from children under 18.\n\n11.3 If you are a parent or guardian and believe your child has been tracked through cookies without appropriate consent, contact us at [PRIVACY_EMAIL]."
+      },
+      {
+        "title": "12. Updates to this policy",
+        "body": "12.1 Policy changes\n\nWe may update this Cookie Policy to reflect changes in our use of cookies, new legal requirements, improvements to the Platform, or user feedback.\n\n12.2 Notification\n\nWe may notify you of material changes by updating the \"Last updated\" date at the top, email (for significant changes where appropriate), a prominent notice on the Platform, or an updated cookie consent banner.\n\n12.3 Your acceptance\n\nContinued use of the Platform after changes take effect constitutes acceptance of the updated Policy. If you do not agree, adjust your cookie settings or stop using the Platform."
+      },
+      {
+        "title": "13. Contact information",
+        "body": "Questions about cookies:\n\n• Email: [PRIVACY_EMAIL]\n• Phone: [CONTACT_PHONE]\n• Address: [REGISTERED_ADDRESS]\n\nData protection officer (if applicable):\n\n• Email: [DPO_EMAIL]\n\nGeneral contact:\n\n• Email: [CONTACT_EMAIL]\n• Website: [WEBSITE_URL]"
+      }
+    ],
+    "cookieRows": [
+      {
+        "name": "chisto_cookie_consent_v1 (localStorage)",
+        "provider": "[LEGAL_ENTITY_NAME]",
+        "purpose": "Stores your analytics opt-in or opt-out so the banner can stay aligned with your choice.",
+        "duration": "Until you clear site data or we change the storage key",
+        "type": "Strictly necessary; first-party"
+      },
+      {
+        "name": "Vercel Web Analytics identifiers",
+        "provider": "Vercel Inc.",
+        "purpose": "Aggregate page views and performance metrics when you opt in to analytics.",
+        "duration": "Per Vercel documentation",
+        "type": "Analytics; third-party (loaded only after consent)"
+      },
+      {
+        "name": "Hosting and security cookies",
+        "provider": "[HOSTING_PROVIDER]",
+        "purpose": "Delivery, routing, bot protection, or TLS session continuity as implemented by the host.",
+        "duration": "Session to days (host default)",
+        "type": "Strictly necessary; third-party"
+      },
+      {
+        "name": "Next.js / application cookies (if any)",
+        "provider": "[LEGAL_ENTITY_NAME]",
+        "purpose": "Short-lived first-party cookies may be used where needed for forms, sessions, or routing on the website.",
+        "duration": "Session",
+        "type": "Strictly necessary; first-party"
+      }
+    ]
+  },
+  "dataPage": {
+    "badge": "Privacy",
+    "title": "Your data and account",
+    "lead": "This page explains how to manage your Chisto.mk account and exercise privacy rights. It works together with our Privacy Policy, Cookie Policy, and Terms of use.",
+    "requestTitle": "Requests: access, correction, deletion, and portability",
+    "requestIntro": "Use the channel below to request a copy of your personal data, corrections, restriction, objection where applicable, or account deletion. We may ask for reasonable proof of identity (for example an email from your registered address or a one-time verification step) before we act on sensitive requests.",
+    "requestCta": "Open data request channel",
+    "requestMissing": "Set NEXT_PUBLIC_DATA_REQUEST_URL in your deployment environment (email address or HTTPS URL) so this button works for visitors.",
+    "linkPrivacy": "Privacy policy",
+    "linkTerms": "Terms of use",
+    "lastUpdatedLabel": "Last updated",
+    "lastUpdated": "28 March 2026",
+    "noticeTitle": "Before you rely on this page",
+    "noticeBody": "Self-service export, identity checks, and timelines here should match how your product works in practice. Complete bracketed fields for your organisation. Not legal advice.",
+    "sections": [
+      {
+        "title": "1. Account and profile",
+        "body": "Accounts are created in the Chisto.mk mobile apps with your email, mobile phone number, password, and phone verification using one-time codes. Keep credentials secret.\n\nUpdate profile fields inside the app where offered. Use a strong unique password. If the app offers authenticator-based MFA, turning it on reduces takeover risk.\n\nThe public website may not provide full registration; use the apps for account features."
+      },
+      {
+        "title": "2. Viewing and exporting your data",
+        "body": "You may have the right to obtain confirmation of processing and a copy of your personal data (GDPR Art. 15). Where technically feasible, we provide self-service views in the product; otherwise submit a request via the channel above.\n\nFor data portability (GDPR Art. 20), you may request a structured, commonly used, machine-readable export (for example JSON or CSV) of data you provided and that we process by automated means based on contract or consent. We will provide it within a reasonable period, typically within thirty (30) days of verification unless applicable law requires a shorter or longer deadline."
+      },
+      {
+        "title": "3. Corrections",
+        "body": "If personal data is inaccurate or incomplete, you may request rectification (GDPR Art. 16) using the same channel. We will correct obvious errors promptly; complex disputes may require additional verification."
+      },
+      {
+        "title": "4. Account deletion and what we keep",
+        "body": "You may request deletion of your Account (GDPR Art. 17) via the data request channel or in-app settings if available. After deletion, we remove or anonymise personal data except where retention is necessary: for example to comply with accounting or tax law, to establish or defend legal claims during applicable limitation periods, or to meet a specific legal obligation. We will explain any limited retention if it applies to you.\n\nSome environmental report content you published may remain visible without personal identifiers, as described in the Data retention and erasure parts of this Privacy Policy (Section 8)."
+      },
+      {
+        "title": "5. Marketing and communications preferences",
+        "body": "Service-related messages (security, reports, events) may be necessary.\n\nNewsletters or marketing need a lawful basis, usually consent. Unsubscribe with the link in each email or contact us. Website email may be sent through providers such as Resend; name the live vendor in your subprocessors list."
+      },
+      {
+        "title": "6. Cookies and similar technologies",
+        "body": "On the website, use Cookie settings in the footer to allow or refuse optional Vercel Web Analytics. Strictly necessary storage still applies. See the Cookie Policy for detail."
+      },
+      {
+        "title": "7. Response times, appeals, and complaints",
+        "body": "We aim to respond to verified requests without undue delay and within any statutory deadline (for example one month under the GDPR, with possible extensions for complex requests).\n\nIf you are unhappy with our response, you may complain to [SUPERVISORY_AUTHORITY_NAME] or your local data protection authority. You may also seek judicial remedy where applicable law allows."
+      }
+    ],
+    "linkCookies": "Cookie policy"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for does not exist or has been moved.",
+    "home": "Back to home"
+  }
+}

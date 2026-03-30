@@ -1,0 +1,624 @@
+{
+  "metadata": {
+    "siteName": "Chisto.mk",
+    "home": {
+      "title": "Chisto.mk | Platformë qytetare mjedisore",
+      "description": "Raportoni mbeturina, hedhje të paligjshme ose tym aty ku jetoni. Chisto.mk është një aplikacion maqedonas për vende reale dhe përgjigje reale."
+    },
+    "about": {
+      "title": "Rreth nesh | Chisto.mk",
+      "description": "Aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoninë e Veriut."
+    },
+    "contact": {
+      "title": "Kontakt | Chisto.mk",
+      "description": "Pyetje, partneritet ose raportim defektesh në aplikacion. Na shkruani, i lexojmë të gjitha mesazhet."
+    },
+    "news": {
+      "title": "Lajme | Chisto.mk",
+      "description": "Përditësime produkti, shënime nga terreni dhe histori nga ekipi i Chisto.mk."
+    },
+    "press": {
+      "title": "Shtypi & media | Chisto.mk",
+      "description": "Materiale të markës dhe një përshkrim i shkurtër për gazetarët që shkruajnë për Chisto.mk."
+    },
+    "terms": {
+      "title": "Kushtet e përdorimit | Chisto.mk",
+      "description": "Kushtet që rregullojnë përdorimin e faqes dhe aplikacionit mobil Chisto.mk."
+    },
+    "privacy": {
+      "title": "Politika e privatësisë | Chisto.mk",
+      "description": "Si Chisto.mk përpunon të dhënat personale sipas standardeve të transparencës në stilin e BE-së."
+    },
+    "cookies": {
+      "title": "Politika e cookies | Chisto.mk",
+      "description": "Si Chisto.mk përdor cookies dhe teknologji të ngjashme, përfshirë analitikën vetëm pas pëlqimit."
+    },
+    "data": {
+      "title": "Të dhënat dhe llogaria juaj | Chisto.mk",
+      "description": "Si të kërkoni qasje, korrigjim ose fshirje të të dhënave personale dhe llogarisë në Chisto.mk."
+    }
+  },
+  "nav": {
+    "menu": "Menuja",
+    "home": "Ballina",
+    "about": "Rreth nesh",
+    "news": "Lajme",
+    "press": "Media",
+    "contact": "Kontakt"
+  },
+  "common": {
+    "download": "Shkarko",
+    "send": "Dërgo",
+    "subscribe": "Abonohu",
+    "language": "Gjuha",
+    "scrollToTop": "Kthehu lart",
+    "skipToContent": "Kalo te përmbajtja kryesore"
+  },
+  "cookieConsent": {
+    "regionLabel": "Pëlqimi për cookies",
+    "bannerText": "Përdorim cookies striktisht të nevojshme për faqen. Me pëlqimin tuaj ngarkojmë edhe analitikë anonime të përdorimit (Vercel Analytics) për përmirësim. Mund ta ndryshoni zgjedhjen në çdo kohë te „Cilësimet e cookies“ në fund të faqes.",
+    "acceptAll": "Prano të gjitha",
+    "rejectNonEssential": "Vetëm të nevojshmet",
+    "customize": "Përshtat",
+    "dialogTitle": "Preferencat për cookies",
+    "dialogIntro": "Cookies e nevojshme janë gjithmonë aktive. Më poshtë mund të pranoni analitikën.",
+    "analyticsLabel": "Analitikë përdorimi",
+    "analyticsDescription": "Na ndihmon të kuptojmë trafikun dhe gabimet në agregat (Vercel Analytics).",
+    "necessaryNote": "Cookies striktisht të nevojshme mbështesin sigurinë, zgjedhjen e gjuhës dhe regjistrin e pëlqimit.",
+    "save": "Ruaj preferencat",
+    "cancel": "Anulo"
+  },
+  "hero": {
+    "title": "Jetoni në një mjedis të pastër.",
+    "subtitle": "Problemet mjedisore zgjidhen më lehtë kur janë në hartë me foto. Chisto.mk e bën këtë publikisht, nëpër Maqedoni.",
+    "phoneDeckRegionLabel": "Parapamje e aplikacionit. Rrëshqitni horizontalisht ose përdorni shigjetat majtas dhe djathtas për të ndryshuar ekranin.",
+    "phoneDeckDotsLabel": "Zgjidhni ekranin e aplikacionit",
+    "phoneDeckSlideLogin": "Ekrani i hyrjes",
+    "phoneDeckSlideWelcome": "Ekrani i mirëseardhjes",
+    "phoneDeckSlideMap": "Ekrani i hartës"
+  },
+  "howItWorks": {
+    "title": "Si funksionon",
+    "subtitle": "Pa zhargon. Instaloni, raportoni, dilni.",
+    "steps": [
+      {
+        "title": "Merrni aplikacionin",
+        "description": "iOS ose Android. Regjistrohuni me një email që e hapni vërtet."
+      },
+      {
+        "title": "Vendosni një pin",
+        "description": "Mbeturina përgjatë shtigjit? Tym nga oxhaku? Vendoseni në hartë me një shënim të shkurtër dhe foto nëse mundeni."
+      },
+      {
+        "title": "Në aksion pastrimi",
+        "description": "Kur dikush organizon mbledhje ose mbjellje afër, do ta shihni në aplikacion."
+      }
+    ]
+  },
+  "features": {
+    "badge": "Veçoritë",
+    "block1Title": "Ajo që shihni është aty ku ndodhi",
+    "block2Title": "Kur postimi nuk mjafton",
+    "block2Body": "Raportet e hapura mbeten të dukshme që fqinjët, gazetarët dhe zyrtarët të mos pretendojnë se nuk pati problem. Kur një grup planifikon punë, mund të bashkoheni në vend që të pëlqeni vetëm një postim.",
+    "mock": {
+      "urgent": "Urgjente",
+      "pollutionSites": "Vendet e ndotjes",
+      "takeAction": "Veproni",
+      "before": "Para"
+    },
+    "items": [
+      {
+        "title": "Pin, jo mure teksti",
+        "description": "Harta fiton kur duhet të gjeni të njëjtën gropë ose kënd lojërash përsëri."
+      },
+      {
+        "title": "Foto dhe data",
+        "description": "Kategori e përafërt, kohë, opsionale para/pas. Mjaftueshëm që një grup vullnetarësh ose zyra komunale të fillojë."
+      },
+      {
+        "title": "Nga raport te fshesa",
+        "description": "Nëse ka një aksion të planifikuar, qëndron pranë raporteve që të vini me doreza, jo vetëm me mendime."
+      }
+    ]
+  },
+  "stats": {
+    "items": [
+      {
+        "number": "10000+",
+        "label": "Përdorues aktivë"
+      },
+      {
+        "number": "800kg",
+        "label": "Mbeturina e grumbulluar"
+      },
+      {
+        "number": "1750",
+        "label": "Raporte"
+      },
+      {
+        "number": "120",
+        "label": "Aksione ekologjike"
+      }
+    ]
+  },
+  "faq": {
+    "badge": "PyPy",
+    "title": "Pyetje të shpeshta",
+    "items": [
+      {
+        "title": "Çfarë është Chisto.mk?",
+        "content": "Aplikacion celular dhe sajt nga njerëz në rajon. Raportoni dëmtime ose rrëmujë mjedisore; qëndron publike në hartë dhe mund të lidheni me aksione vullnetare kur ekzistojnë.",
+        "variant": "green"
+      },
+      {
+        "title": "A është aplikacioni falas?",
+        "content": "Po. Llogaritë dhe raportet janë falas. Nuk ngarkojmë në regjistrim. Nëse kjo ndonjëherë ndryshon, do ta themi qartë.",
+        "variant": "white"
+      },
+      {
+        "title": "Kush i sheh raportet e mia?",
+        "content": "Raportet janë të dizajnuara të jenë të dukshme për bashkësinë dhe aktorët përkatës që problemet të verifikohen dhe adresohen. Lexoni më shumë në politikën e privatësisë.",
+        "variant": "white"
+      },
+      {
+        "title": "A mund të raportoj në mënyrë anonime?",
+        "content": "Opsionet e llogarisë dhe privatësisë varen nga versioni i aplikacionit. Kontrolloni cilësimet ose na kontaktoni për opsionet më të fundit.",
+        "variant": "green"
+      },
+      {
+        "title": "Si funksionojnë aksionet e pastrimit?",
+        "content": "Organizatorët mund të publikojnë aksione në aplikacion. Mund të shfletoni ngjarje afër jush, të regjistroheni ku është e mundur dhe të shihni rezultatet pas aktivitetit.",
+        "variant": "green"
+      },
+      {
+        "title": "Si mund të bashkëpunojnë organizatat?",
+        "content": "Komunat, OJQ-të dhe kompanitë mund të na kontaktojnë përmes formularit të kontaktit për të eksploruar qasjen në të dhëna, fushata ose aktivitete të përbashkëta.",
+        "variant": "white"
+      }
+    ]
+  },
+  "cta": {
+    "title": "Provoni aplikacionin",
+    "subtitle": "Nëse kaloni çdo javë pranë të njëjtave mbeturina, nuk kushton asgjë t'i dokumentoni një herë. Dikush tjetër mund të jetë duke organizuar një mbledhje."
+  },
+  "footer": {
+    "links": "Lidhje",
+    "legal": "Ligjore",
+    "newsletter": "Buletini",
+    "stayUpToDate": "Qëndroni të përditësuar",
+    "emailPlaceholder": "Email-i juaj",
+    "subscribedSuccess": "U abonuat me sukses!",
+    "copyright": "Të drejtat e autorit {year} Chisto.mk. Të gjitha të drejtat e rezervuara.",
+    "linkHome": "Ballina",
+    "linkPlatform": "Platforma",
+    "linkNews": "Lajme",
+    "linkPress": "Media",
+    "linkContact": "Kontakt",
+    "terms": "Kushtet e përdorimit",
+    "privacy": "Politika e privatësisë",
+    "cookies": "Politika e cookies",
+    "cookieSettings": "Cilësimet e cookies",
+    "linkData": "Të dhënat dhe llogaria juaj"
+  },
+  "contact": {
+    "kicker": "Kontakt",
+    "title": "Na shkruani",
+    "successTitle": "Faleminderit!",
+    "successBody": "Do t'ju përgjigjemi së shpejti.",
+    "submitError": "Nuk mundëm ta dërgonim mesazhin. Provoni përsëri më vonë ose na shkruani direkt me email.",
+    "fullName": "Emri i plotë",
+    "phone": "Numri i telefonit",
+    "email": "Email",
+    "message": "Mesazhi",
+    "placeholders": {
+      "fullName": "Emri Mbiemri",
+      "phone": "+389 70 123 456",
+      "email": "ju@shembull.com",
+      "message": "Si mund t'ju ndihmojmë?"
+    }
+  },
+  "newsletter": {
+    "genericError": "Diçka shkoi keq. Ju lutemi provoni përsëri."
+  },
+  "appStore": {
+    "appleAria": "Shkarkoni në App Store",
+    "googleAria": "Merrni në Google Play"
+  },
+  "phoneMockup": {
+    "loginWelcomeBack": "Mirë se erdët përsëri",
+    "loginSubtitle": "Hyni për të vazhduar",
+    "loginButton": "Hyr",
+    "welcomeTitle": "Raporte afër jush",
+    "welcomeSubtitle": "Pin nga njerëz në zonën tuaj. Prekni për të parë foton.",
+    "welcomeButton": "Vazhdo"
+  },
+  "errors": {
+    "required": "Kjo fushë është e detyrueshme",
+    "requiredNamed": "{label} është e detyrueshme",
+    "emailRequired": "Email-i është i detyrueshëm",
+    "emailInvalid": "Adresë email e pavlefshme",
+    "phoneRequired": "Numri i telefonit është i detyrueshëm",
+    "phoneInvalid": "Numër telefoni i pavlefshëm"
+  },
+  "aboutPage": {
+    "badge": "Rreth nesh",
+    "title": "Chisto.mk është aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoninë e Veriut.",
+    "subtitle": "Raportoni mbeturina, hedhje të paligjshme ose ajër të ndotur me foto dhe pikë në hartë. I njëjti vend mbetet i dukshëm për të gjithë.",
+    "creatorsPhotoPlaceholder": "Foto së shpejti",
+    "creatorsSectionTitle": "Ekipi",
+    "teamCarouselPrev": "Anëtari i mëparshëm i ekipit",
+    "teamCarouselNext": "Anëtari tjetër i ekipit",
+    "creators": [
+      {
+        "name": "Emri më vonë",
+        "role": "Bio më vonë",
+        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "Emri më vonë",
+        "role": "Bio më vonë",
+        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "Emri më vonë",
+        "role": "Bio më vonë",
+        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "Emri më vonë",
+        "role": "Bio më vonë",
+        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "imageSrc": ""
+      },
+      {
+        "name": "Emri më vonë",
+        "role": "Bio më vonë",
+        "imageAlt": "Vend mbajtës, ekip Chisto.mk",
+        "imageSrc": ""
+      }
+    ]
+  },
+  "newsPage": {
+    "badge": "Lajme",
+    "title": "Përditësime nga ekipi",
+    "lead": "Shënime versionesh, partneritete dhe herë pas here artikuj kur ka diçka për t'u ndarë.",
+    "demoNotice": "Këto artikuj janë përmbajtje demonstruese. Një sistem i menaxhueshëm lajmesh do t'i zëvendësojë kur të jetë gati.",
+    "featuredLabel": "Në fokus",
+    "latestHeading": "Më shumë histori",
+    "readMore": "Lexo më shumë",
+    "backToNews": "Kthehu te lajmet",
+    "newsCategory": {
+      "release": "Publikim",
+      "partnership": "Partneritet",
+      "community": "Komunitet",
+      "product": "Produkt"
+    },
+    "emptyTitle": "Postime të reja së shpejti",
+    "emptyBody": "Po përgatisim një listë të thjeshtë këtu. Deri atëherë na ndiqni në rrjetet sociale ose na shkruani nëse keni një sugjerim historie.",
+    "contactCta": "Sugjero një histori ose bëj një pyetje"
+  },
+  "pressPage": {
+    "badge": "Media",
+    "title": "Burime për media",
+    "lead": "Materialet më poshtë janë për gazetarë dhe partnerë. Për gjithçka tjetër na shkruani me email. Përgjigjemi pyetjeve serioze.",
+    "assetsTitle": "Marka",
+    "logoTitle": "Shenja",
+    "logoBody": "SVG për sfonde të çelëta. Lini hapësirë rreth simbolit; mos e zgjatni dhe mos i ndryshoni ngjyrat.",
+    "downloadMark": "Shkarko chisto-mark.svg",
+    "inquiriesTitle": "Kontakt",
+    "inquiriesLead": "Pyetje për shtyp dhe partneritet:",
+    "boilerplateTitle": "Përshkrim i shkurtër",
+    "boilerplate": "Chisto.mk është një platformë qytetare mjedisore në Maqedoni. Njerëzit raportojnë mbeturina, hedhje të paligjshme dhe tym në një hartë publike me foto dhe vendndodhje, dhe mund të bashkohen në aksione lokale pastrimi kur organizatorët i postojnë në aplikacion."
+  },
+  "termsPage": {
+    "badge": "Ligjore",
+    "title": "Kushtet e përdorimit",
+    "lastUpdatedLabel": "Përditësuar për herë të fundit",
+    "lastUpdated": "28 mars 2026",
+    "noticeTitle": "Para se të mbështeteni në këto kushte",
+    "noticeBody": "Plotësoni të gjitha fushat në kllapa me të dhëna të verifikuara ligjore dhe operative para se ta trajtoni këtë tekst si përfundimtar. Deklaratat e privatësisë në dyqanet e aplikacioneve duhet të përputhen me këtë dokument dhe aplikacionin e publikuar. Jo këshillë ligjore dhe nuk garanton miratimin në dyqan. Konsideroni rishikim nga këshilltar i kualifikuar në Maqedoninë e Veriut (dhe, për përdorues në EEA, në BE) ku është e përshtatshme.",
+    "sections": [
+      {
+        "title": "Hyrje",
+        "body": "Këto Kushte të Përdorimit („Kushtet“) përbëjnë një marrëveshje ligjërisht detyruese midis jush („Përdoruesi“, „ju“ ose „tuaj“) dhe [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë së Veriut me numër regjistrimi [REGISTRATION_NUMBER], me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“).\n\nDuke hyrë ose përdorur aplikacionin celular dhe platformën web Chisto.mk (së bashku, „Platforma“), ju pranoni të detyroheni nga këto Kushte. Nëse nuk pajtoheni, duhet të ndaloni menjëherë përdorimin e Platformës.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE]."
+      },
+      {
+        "title": "1. Përkufizimet",
+        "body": "1.1 „Llogaria“ do të thotë profili i përdoruesit i krijuar për të hyrë në veçori të caktuara të Platformës.\n\n1.2 „Përmbajtja“ do të thotë çdo tekst, imazhe, fotografi, video, të dhëna ose materiale të tjera të dorëzuara, të postuara ose të shfaqura në Platformë.\n\n1.3 „Ngjarje pastrimi“ do të thotë një aktivitet i organizuar pastrimi mjedisor i postuar në Platformë.\n\n1.4 „Raporti“ do të thotë një regjistër i dorëzuar nga përdoruesi për një vend ndotjeje të shënuar në hartë, duke përfshirë të dhëna vendndodhjeje, fusha përshkruese dhe fotografi opsionale.\n\n1.5 „Shërbimet“ do të thotë të gjitha funksionalitetet e ofruara përmes Platformës, duke përfshirë raportimin e mbeturinave, organizimin e pastrimit, vizualizimin e hartës dhe veçoritë e angazhimit të komunitetit.\n\n1.6 „Përmbajtja e përdoruesit“ do të thotë e gjithë Përmbajtja e dorëzuar nga përdoruesit në Platformë."
+      },
+      {
+        "title": "2. Kuadri ligjor dhe zbatimi",
+        "body": "2.1 Këto Kushte rregullohen nga:\n\nLigji për Marrëdhëniet e Detyrimeve i Republikës së Maqedonisë së Veriut (Gazeta Zyrtare Nr. 18/2001)\nLigji për Mbrojtjen e Konsumatorit (Gazeta Zyrtare Nr. 26/2023)\nLigji për Tregtinë Elektronike (Gazeta Zyrtare Nr. 39/2014)\nLigji për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679 (Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave - GDPR)\nDirektiva për të Drejtat e Konsumatorit 2011/83/BE\n\n2.2 Këto Kushte aplikohen për të gjithë përdoruesit që hyjnë në Platformë nga çdo juridiksion, me mbrojtje specifike konsumatori të zbatueshme për përdoruesit brenda Republikës së Maqedonisë së Veriut dhe Bashkimit Evropian."
+      },
+      {
+        "title": "3. Përshkrimi dhe qëllimi i platformës",
+        "body": "3.1 Përmbledhje e shërbimit\n\nChisto.mk është një platformë qytetare mjedisore. Përmes aplikacioneve tona celulare (iOS dhe Android) dhe uebsajtit publik, përdoruesit mund të:\n\nShohin dhe ndërveprojnë me vende ndotjeje të shënuara në hartë dhe raporte të dorëzuara nga përdoruesit (përfshirë foto dhe vendndodhje)\nKomentojnë në vende, t'i ruajnë ose ndajnë, dhe të shohin ngjarje pastrimi të planifikuara në një vend\nKrijojnë një llogari për të dorëzuar raporte, të marrin pjesë në komunitet dhe të marrin njoftime opsionale\n\nMund të ndajmë gjithashtu statistika të agreguara ose të anonimizuara me komunat ose partnerët ku e përshkruajmë në Politikën tonë të privatësisë.\n\n3.2 Roli i platformës\n\nChisto.mk funksionon vetëm si platformë teknologjike. Ne nuk:\n\nOfrojmë vetë shërbime mbledhje mbeturinash ose pastrimi mjedisor\nGarantojmë se ndonjë autoritet do të veprojë mbi një raport\nMarrim përgjegjësi për ngjarje pastrimi të palëve të treta ose për lëndime në ato ngjarje\nVerifikojmë çdo dorëzim përdoruesi në kohë reale (moderimi mund të bëhet pas publikimit)\n\n3.3 Pa garanci shërbimi\n\nEdhe pse përpiqemi ta mbajmë Platformën të disponueshme, nuk garantojmë:\n\nFunksionim të pandërprerë ose pa gabime\nVeprim komunale ose institucional bazuar në raporte\nKohë specifike përpunimi\nPajtueshmëri me çdo pajisje ose version sistemi operativ"
+      },
+      {
+        "title": "4. Kualifikimi i përdoruesit dhe regjistrimi i llogarisë",
+        "body": "4.1 Kërkesat e moshës\n\nDuhet të jeni të paktën 18 vjeç për të krijuar një Llogari. Përdoruesit nën 18 vjeç mund të shohin përmbajtje publike nën mbikëqyrje prindërore por nuk mund të regjistrohen.\n\n4.2 Krijimi i llogarisë\n\nPër të hyrë në veçoritë e llogarisë në aplikacionet tona celulare, regjistroheni me:\n\nNjë adresë email të vlefshme\nNjë numër telefoni celular që mund ta verifikoni me një kod një herë (SMS ose i ngjashëm)\nEmrin tuaj dhe një fjalëkalim që plotëson rregullat tona të sigurisë\nInformacion opsional profili (p.sh. foto profili) ku e ofron produkti\n\nUebsajti publik mund të mos ofrojë regjistrim të plotë llogarie; ku nuk e ofron, kushtet e llogarisë zbatohen kur përdorni aplikacionet.\n\n4.3 Siguria e llogarisë\n\nJu jeni përgjegjës vetëm për:\n\nRuajtjen e konfidencialitetit të kredencialeve tuaja të hyrjes\nTë gjitha aktivitetet që ndodhin nën Llogarinë tuaj\nNjoftimin tonë menjëherë për çdo hyrje të paautorizuar\n\nNe nuk jemi përgjegjës për humbje që rrjedhin nga përdorimi i paautorizuar i Llogarisë suaj përveç nëse është për shkak të neglizhencës sonë të rëndë.\n\n4.4 Saktësia e llogarisë\n\nJu deklaroni dhe garantoni se:\n\nTë gjitha informacionet e regjistrimit janë të sakta, aktuale dhe të plota\nDo të mbani dhe përditësoni informacionin tuaj sipas nevojës\nNuk do të personifikoni ndonjë person ose entitet\nNuk do të krijoni llogari të shumta për qëllime të papërshtatshme"
+      },
+      {
+        "title": "5. Detyrimet e përdoruesit dhe sjellja e ndaluar",
+        "body": "5.1 Përdorimi i lejuar\n\nMund ta përdorni Platformën vetëm për:\n\nRaportimin e incidenteve legjitim të mbeturinave dhe ndotjes\nOrganizimin ose pjesëmarrjen në ngjarje pastrimi\nShikimin e të dhënave mjedisore dhe hartave\nAngazhimin konstruktiv me komunitetin\n\n5.2 Aktivitete të ndaluara\n\nNuk duhet:\n\n5.2.1 Raportim i rremë\n\nDorëzoni raporte me dijeni të rreme, mashtruese ose të pasakta\nFabrikoni incidente mbeturinash ose vendndodhje\nManipuloni të dhëna gjeolokacioni\n\n5.2.2 Përmbajtje dëmtuese\n\nNgarkoni përmbajtje që është shpifëse, e pahijshme, kërcënuese ose e urrejtjes\nPostoni përmbajtje diskriminuese bazuar në racë, etni, fe, gjini ose karakteristika të tjera të mbrojtura\nNdani përmbajtje që shkel të drejtat e privatësisë së individëve të identifikueshëm\nPërfshini të dhëna personale të palëve të treta pa pëlqim\n\n5.2.3 Abuzim i platformës\n\nPërdorni sisteme të automatizuara, bots ose scrapers për të hyrë në Platformë\nPërpiquni të merrni hyrje të paautorizuar në sistemet e Platformës\nNdërhyni ose pengoni funksionalitetin e Platformës\nAnashkaloni masat e sigurisë ose mekanizmat e vërtetimit\n\n5.2.4 Keqpërdorim komercial\n\nPërdorni Platformën për qëllime tregtare të paautorizuara\nPostoni spam, reklama ose përmbajtje promovuese pa leje\nMblidhni të dhëna përdoruesish për qëllime marketingu\n\n5.2.5 Shkelje të pronësisë intelektuale\n\nNgarkoni përmbajtje që shkel të drejtat e autorit, markat tregtare ose të drejta të tjera të pronësisë intelektuale të palëve të treta\n\n5.3 Pasoja të shkeljeve\n\nNe rezervojmë të drejtën, pa njoftim paraprak:\n\nTë heqim përmbajtje shkelëse\nTë pezullojmë ose ndërpresim Llogarinë tuaj\nTë raportojmë aktivitete të paligjshme te autoritetet kompetente\nTë ndjekim zgjidhje ligjore për dëme"
+      },
+      {
+        "title": "6. Përmbajtja e përdoruesit dhe pronësia intelektuale",
+        "body": "6.1 Pronësia e përmbajtjes së përdoruesit\n\nJu mbani të gjitha të drejtat e pronësisë për Përmbajtjen tuaj të Përdoruesit. Duke dorëzuar Përmbajtje në Platformë, ju i jepni Chisto.mk një licencë botërore, jo-ekskluzive, pa tarifë autoriale, që mund të nënlicencohet për të:\n\nShfaqur, riprodhuar dhe shpërndarë Përmbajtjen tuaj në Platformë\nPërdorur të dhëna të grumbulluara dhe anonime për analizë statistikore dhe raportim komunal\nPërfshirë Përmbajtjen tuaj në materiale promovuese (me pëlqimin tuaj)\n\n6.2 Deklarime të përmbajtjes së përdoruesit\n\nDuke dorëzuar Përmbajtje, ju deklaroni dhe garantoni se:\n\nJeni pronar ose keni të drejta të nevojshme për Përmbajtjen\nPërmbajtja juaj nuk shkel të drejtat e palëve të treta\nPërmbajtja juaj është në përputhje me ligjet e zbatueshme\nKeni marrë pëlqime të nevojshme për çdo individ të identifikueshëm në fotografi\n\n6.3 Pronësia e përmbajtjes së platformës\n\nE gjithë softueri i Platformës, dizajni, teksti, grafika, logot dhe materiale të tjera (duke përjashtuar Përmbajtjen e Përdoruesit) janë në pronësi të Chisto.mk ose licencuesve tanë dhe mbrohen nga:\n\nLigji maqedonas i të drejtave të autorit (Ligji për të Drejtën e Autorit dhe të Drejta të Lidhura, Gazeta Zyrtare Nr. 47/2023)\nLigji maqedonas i markave tregtare (Ligji për Pronësinë Industriale, Gazeta Zyrtare Nr. 21/2009)\nTraktate ndërkombëtare të pronësisë intelektuale\n\n6.4 Licencë e kufizuar për përdoruesit\n\nNe ju japim një licencë të kufizuar, jo-ekskluzive, të patransferueshme për të hyrë dhe përdorur Platformën për qëllime personale, jo-komerciale. Kjo licencë nuk lejon:\n\nModifikim, shpërndarje ose riprodhim të përmbajtjes së Platformës\nInxhinieri e kundërt ose dekompilim të softuerit të Platformës\nKrijimin e veprave të derivuara\nShfrytëzim komercial pa leje me shkrim"
+      },
+      {
+        "title": "7. Privatësia dhe mbrojtja e të dhënave",
+        "body": "7.1 Përdorimi juaj i Platformës i nënshtrohet Politikës sonë të Privatësisë, e cila është e përfshirë në këto Kushte me referencë.\n\n7.2 Ne përpunojmë të dhëna personale në përputhje me:\n\nLigjin për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nRregulloren (BE) 2016/679 (GDPR)\nPolitikën tonë të Privatësisë të disponueshme në [PRIVACY_POLICY_URL]\n\n7.3 Përpunimi i të dhënave tuaja personale përshkruhet në Politikën e privatësisë, përfshirë bazat ligjore në seksionin 4 të asaj Politike. Ku mbështetemi në pëlqim, ai vlen vetëm për përpunimin e deklaruar atje dhe mund ta tërhiqni siç përshkruhet në Politikën e privatësisë. Përpunime të tjera mund të mbështeten në kontratë, interesa legjitime, detyrim ligjor ose baza të tjera që lejon ligji."
+      },
+      {
+        "title": "8. Të drejtat e konsumatorit (përdorues të BE-së dhe Maqedonisë)",
+        "body": "8.1 Shërbime digjitale dhe çmimi\n\nVeçoritë kryesore të hartës qytetare dhe raportimit ofrohen aktualisht pa pagesë. Ku nuk ju kërkojmë të paguani për qasje, shumë rregulla të kontratës në distancë për konsumatorët (përfshirë të drejtën 14-ditore të tërheqjes sipas Direktivës 2011/83/BE) shpesh nuk zbatohen njësoj si për përmbajtje digjitale të paguar. Asgjë në këtë Seksion nuk kufizon të drejta të detyrueshme që ju vlejnë sipas ligjit të Maqedonisë së Veriut ose të BE-së.\n\n8.2 Informacioni që ofrojmë\n\nSynojmë të japim informacion të qartë për:\n\nKush operon Platformën (Seksioni 17)\nÇfarë bën Shërbimi (Seksioni 3)\nSi të ankoheni (Seksioni 13)\n\n8.3 Mosmarrëveshje konsumatore\n\nKonsumatorët maqedonas mund të paraqesin ankesa te:\n\nKomisioni për Mbrojtjen e Konsumatorit\nPlatforma e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr\n\nNa kontaktoni në [CONTACT_EMAIL] ose [CONTACT_ADDRESS] për çështje shërbimi para eskalimit kur është e arsyeshme."
+      },
+      {
+        "title": "9. Mohimi i garancive",
+        "body": "9.1 Platforma ofrohet „si është“ dhe „si është e disponueshme“ pa garanci të asnjë lloji, qoftë të shprehura ose të nënkuptuara, duke përfshirë por pa u kufizuar në:\n\nTREGTUESHMËRI\nPËRSHTATSHMËRI PËR NJË QËLLIM TË VEÇANTË\nMOSPRISHJE\nSAKTËSI, BESUESHMËRI OSE PLOTËSI E PËRMBAJTJES\nOPERIM I PANDËRPRERË OSE PA GABIME\n\n9.2 Ne nuk garantojmë se:\n\nPlatforma do të plotësojë kërkesat tuaja specifike\nRaportet e dorëzuara nga përdoruesit do të rezultojnë në veprime komunale\nTë dhënat e Platformës janë aktuale, të sakta ose të plota\nDefektet do të korrigjohen\nPlatforma është e lirë nga viruse ose komponentë dëmtues\n\n9.3 Disa juridiksione nuk lejojnë mohimin e garancive të nënkuptuara. Në juridiksione të tilla, mohimet e mësipërme mund të mos aplikohen dhe ju mund të keni të drejta shtesë."
+      },
+      {
+        "title": "10. Kufizimi i përgjegjësisë",
+        "body": "10.1 Kufizime të përgjithshme\n\nNë masën maksimale të lejuar nga ligji i zbatueshëm:\n\n10.1.1 Chisto.mk nuk do të jetë përgjegjës për:\n\nDëme indirekte, aksidentale, speciale, pasojore ose ndëshkuese\nHumbje fitimesh, të dhënash, përdorimi, vullnetit të mirë ose humbje të tjera jo-materiale\nDëme që rrjedhin nga mbështetja e përdoruesit në përmbajtjen e Platformës\nDëme që rrjedhin nga veprime ose përmbajtje e palëve të treta\n\n10.1.2 Përgjegjësia jonë totale agregate për të gjitha pretendimet nuk do të tejkalojë shumën më të madhe midis [AMOUNT] EUR dhe tarifave që na keni paguar për Shërbimin në 12 muajt para pretendimit. Nëse nuk keni paguar tarifa në atë periudhë (p.sh. sepse Shërbimi është falas), tavani është [AMOUNT] EUR.\n\n10.2 Përgjegjësi për detyrime të detyrueshme ligjore\n\nAsgjë në këto Kushte nuk përjashton ose kufizon përgjegjësinë për:\n\nVdekje ose lëndim personal të shkaktuar nga neglizhencë e rëndë\nMashtrim ose përfaqësim mashtrues\nShkelje të të drejtave të detyrueshme të konsumatorit\nPërgjegjësi tjetër që nuk mund të përjashtohet sipas ligjit maqedonas\n\n10.3 Përgjegjësia e palëve të treta\n\nNe nuk jemi përgjegjës për:\n\nVeprimet ose shmangiet e organizatorëve të ngjarjeve të pastrimit\nLëndime ose dëme që ndodhin gjatë ngjarjeve të pastrimit\nPërgjigjet komunale (ose mungesën e tyre) ndaj raporteve\nPërmbajtje, faqe interneti ose shërbime të palëve të treta të lidhura nga Platforma"
+      },
+      {
+        "title": "11. Dëmshpërblimi",
+        "body": "11.1 Në masën maksimale të lejuar nga ligji i zbatueshëm, ju pranoni të dëmshpërbleni, mbrojeni dhe mbani të padëmtuar Chisto.mk, zyrtarët, drejtorët, punonjësit dhe agjentët e saj nga çdo pretendim, detyrime, dëme, humbje, kosto dhe shpenzime (duke përfshirë honorare të arsyeshme ligjore) që rrjedhin nga:\n\nShkelja juaj e këtyre Kushteve\nShkelja juaj e ligjeve ose të drejtave të palëve të treta\nPërmbajtja juaj e përdoruesit\nPërdorimi juaj i Platformës\n\n11.2 Ne rezervojmë të drejtën të marrim mbrojtje dhe kontroll ekskluziv të çdo çështjeje që i nënshtrohet dëmshpërblimit, me shpenzimet tuaja."
+      },
+      {
+        "title": "12. Modifikimi dhe ndërprerja",
+        "body": "12.1 Modifikimi i kushteve\n\n12.1.1 Ne mund t'i modifikojmë këto Kushte në çdo kohë duke postuar Kushte të përditësuara në Platformë.\n\n12.1.2 Do të ofrojmë të paktën 30 ditë njoftim për ndryshime materiale përmes:\n\nNjoftimi me email për përdoruesit e regjistruar\nNjoftimi të dukshëm në Platformë\nNjoftimi në aplikacion\n\n12.1.3 Përdorimi i vazhdueshëm i Platformës pas datës efektive përbën pranim të Kushteve të modifikuara.\n\n12.1.4 Nëse nuk pajtoheni me modifikimet, duhet të ndaloni përdorimin dhe mund ta mbyllni Llogarinë tuaj.\n\n12.2 Modifikime të platformës\n\nNe rezervojmë të drejtën të modifikojmë, pezullojmë ose ndërpresim Platformën (ose çdo veçori) në çdo kohë pa përgjegjësi.\n\n12.3 Ndërprerja nga përdoruesi\n\nMund ta ndërprisni Llogarinë tuaj në çdo kohë përmes cilësimeve të llogarisë në aplikacionet ku ofrohen, ose duke kontaktuar [CONTACT_EMAIL].\n\n12.4 Ndërprerja nga Chisto.mk\n\nNe mund ta pezullojmë ose ndërpresim Llogarinë tuaj menjëherë nëse:\n\nShkelni këto Kushte\nSjellja juaj krijon rrezik ligjor për ne\nJemi të detyruar ta bëjmë sipas ligjit\nNdalojmë operimin e Platformës\n\n12.5 Efekti i ndërprerjes\n\nPas ndërprerjes:\n\nTë drejtat tuaja të aksesit pushojnë menjëherë\nNe mund t'i fshijmë të dhënat e Llogarisë suaj (subjekt i detyrimeve ligjore të ruajtjes)\nSeksionet 6, 10, 11, 14 dhe 16 mbijetojnë ndërprerjen"
+      },
+      {
+        "title": "13. Zgjidhja e mosmarrëveshjeve dhe ankesat",
+        "body": "13.1 Procedura e ankesave\n\nPërpara fillimit të procedurave formale, ju inkurajojmë të na kontaktoni në:\n\nEmail: [CONTACT_EMAIL]\nAdresë: [CONTACT_ADDRESS]\nTelefon: [CONTACT_PHONE]\n\nDo të përpiqemi të zgjidhim ankesat brenda 30 ditësh nga marrja.\n\n13.2 Zgjidhje miqësore\n\nJemi të angazhuar për të zgjidhur mosmarrëveshjet në mënyrë miqësore dhe me besim të mirë.\n\n13.3 Ndërmjetësim\n\nNëse zgjidhja e drejtpërdrejtë dështon, palët mund të kërkojnë ndërmjetësim përmes shërbimeve të njohura të ndërmjetësimit në Republikën e Maqedonisë së Veriut.\n\n13.4 ADR konsumatore\n\nKonsumatorët e BE-së mund të përdorin platformën e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr"
+      },
+      {
+        "title": "14. Ligji rregullues dhe juridiksioni",
+        "body": "14.1 Ligji rregullues\n\nKëto Kushte rregullohen dhe interpretohen në përputhje me ligjet e Republikës së Maqedonisë së Veriut, pa marrë parasysh parimet e konfliktit të ligjeve.\n\n14.2 Juridiksioni\n\n14.2.1 Për mosmarrëveshje me konsumatorët: gjykatat kompetente në Republikën e Maqedonisë së Veriut siç përcaktohet nga ligjet e detyrueshme të mbrojtjes së konsumatorit (përgjithësisht, vendbanimi i konsumatorit).\n\n14.2.2 Për mosmarrëveshje me përdorues që nuk janë konsumatorë (p.sh. organizime që përdorin Platformën në cilësi profesionale): gjykatat e [COURT_LOCATION], Republika e Maqedonisë së Veriut, kanë juridiksion ekskluziv.\n\n14.3 Të drejta të detyrueshme konsumatore\n\nAsgjë në këtë seksion nuk kufizon të drejtat e detyrueshme të konsumatorit sipas ligjit të BE-së ose maqedonas, duke përfshirë të drejtën për të ngritur procedura në vendin e rezidencës së konsumatorit."
+      },
+      {
+        "title": "15. Forcë e madhe",
+        "body": "Asnjë palë nuk do të jetë përgjegjëse për dështimin për të kryer detyrime për shkak të rrethanave përtej kontrollit të arsyeshëm, duke përfshirë:\n\nKatastrofa natyrore, pandemi ose emergjenca e shëndetit publik\nLuftë, terrorizëm ose trazira civile\nVeprime ose rregullore qeveritare\nDështime interneti ose telekomunikacioni\nSulme kibernetike ose shkelje të dhënash që ndikojnë në infrastrukturën e palëve të treta\n\nDetyrimet e performancës pezullohen gjatë ngjarjeve të forcës së madhe dhe rifillojnë kur rrethanat lejojnë."
+      },
+      {
+        "title": "16. Dispozita të përgjithshme",
+        "body": "16.1 Marrëveshja e plotë\n\nKëto Kushte, së bashku me Politikën tonë të Privatësisë dhe Politikën e cookies, përbëjnë marrëveshjen e plotë midis jush dhe Chisto.mk.\n\n16.2 Ndarje\n\nNëse ndonjë dispozitë gjendet e pavlefshme ose e pazbatueshme, ajo dispozitë do të kufizohet ose eliminohet në masën minimale të nevojshme, dhe dispozitat e mbetura mbeten në fuqi të plotë.\n\n16.3 Pa heqje dorë\n\nDështimi për të zbatuar ndonjë dispozitë nuk përbën heqje dorë nga ajo dispozitë ose ndonjë dispozitë tjetër.\n\n16.4 Caktimi\n\nJu nuk mund t'i caktoni këto Kushte pa pëlqimin tonë paraprak me shkrim. Ne mund t'i caktojmë të drejtat dhe detyrimet tona pa kufizime.\n\n16.5 Gjuha\n\nKëto Kushte ekzekutohen në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Maqedoninë e Veriut; versioni anglisht ka përparësi për mosmarrëveshje ndërkombëtare.\n\n16.6 Marrëdhënie\n\nAsgjë në këto Kushte nuk krijon partneritet, sipërmarrje të përbashkët, punësim ose marrëdhënie agjensie.\n\n16.7 Të drejtat e palëve të treta\n\nKëto Kushte nuk u japin të drejta palëve të treta.\n\n16.8 Njoftimet\n\nNjoftimet ligjore duhet të dërgohen në:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAdresë: [REGISTERED_ADDRESS]\n\nNjoftimet për ju mund të dërgohen në adresën tuaj të regjistruar me email."
+      },
+      {
+        "title": "17. Informacioni i kontaktit",
+        "body": "Ofruesi i shërbimit:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nNumri i regjistrimit: [REGISTRATION_NUMBER]\nID-ja tatimore: [TAX_ID]\nAdresa e regjistruar: [REGISTERED_ADDRESS]\n\nKontakt:\n\nEmail: [CONTACT_EMAIL]\nTelefon: [CONTACT_PHONE]\nFaqja e internetit: [WEBSITE_URL]\n\nZyrtari për mbrojtjen e të dhënave (nëse aplikohet):\n\nEmail: [DPO_EMAIL]\n\nAutoriteti rregullator:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nFaqja e internetit: https://www.dzlp.mk\n\nDuke përdorur Platformën, ju pranoni se keni lexuar, kuptuar dhe pajtoheni të detyroheni nga këto Kushte të Përdorimit."
+      }
+    ]
+  },
+  "privacyPage": {
+    "badge": "Ligjore",
+    "title": "Politika e privatësisë",
+    "lastUpdatedLabel": "Përditësuar për herë të fundit",
+    "lastUpdated": "[DATE]",
+    "noticeTitle": "Para se të mbështeteni në këtë politikë",
+    "noticeBody": "Plotësoni fushat në kllapa me detaje të sakta. Etiketat Apple App Privacy dhe Google Play Data safety duhet të përputhen me këtë Politikë dhe versionin publik (përfshirë push Firebase, pllakat e hartës dhe analitikën opsionale të uebsajtit). Përditësoni Politikën kur ndryshoni SDK ose praktikat e ruajtjes. Jo këshillë ligjore.",
+    "sections": [
+      {
+        "title": "1. Hyrje",
+        "body": "1.1 Kush jemi ne\n\nKjo Politikë Privatësie përshkruan se si [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë së Veriut me numër regjistrimi [REGISTRATION_NUMBER] dhe me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“), mbledh, përdor, ruan dhe mbron të dhënat tuaja personale kur përdorni aplikacionet tona celulare (iOS dhe Android) dhe uebsajtin tonë publik (së bashku, „Platforma“).\n\nNe e operojmë Chisto.mk si një nismë qytetare mjedisore e fokusuar në transparencë dhe raportim komunitar për gjendjen vendore të mjedisit.\n\nShumica e veçorive të llogarisë, raportimit dhe ndërveprimit me hartën funksionojnë në aplikacione. Uebsajti është kryesisht marketing, informacion ligjor dhe kontakt; mund të përdorë pak cookies ose ruajtje lokale siç përshkruhet në Politikën tonë të cookies.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.2 Angazhimi ynë\n\nJemi të angazhuar për të mbrojtur privatësinë tuaj dhe për t'u përmbajtur ligjeve të zbatueshme për mbrojtjen e të dhënave, duke përfshirë:\n\nLigjin për Mbrojtjen e të Dhënave Personale të Republikës së Maqedonisë së Veriut (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679, Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave („GDPR“)\nLigji për Komunikimet Elektronike (Gazeta Zyrtare Nr. 39/2014)\n\n1.3 Informacioni i kontaktit\n\nKontrolluesi i të dhënave:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nTelefon: [CONTACT_PHONE]\nZyrtari për Mbrojtjen e të Dhënave (nëse aplikohet):\nEmail: [DPO_EMAIL]\nAutoriteti mbikëqyrës:\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+      },
+      {
+        "title": "2. Fusha dhe zbatimi",
+        "body": "2.1 Kjo Politikë Privatësie aplikohet për të dhënat personale që përpunojmë kur ju:\n\nPërdorni aplikacionet celulare Chisto.mk\nPërdorni uebsajtin në [WEBSITE_URL] (përfshirë formularët ose buletinet që operojmë)\nNa dërgoni email ose na kontaktoni ndryshe\n\nPërfshin gjithashtu përpunimin nga nënprocesorët që përdorim për të hostuar ose operuar shërbimin (të listuar në mënyrë të përgjithshme më poshtë dhe në marrëveshjet që mbajmë).\n\n2.2 Kjo Politikë nuk rregullon:\n\nUebfaqe ose aplikacione të pavarura që hapni përmes lidhjeve nga ne (zbatohen politikat e tyre)\nPërpunimin nga autoritetet publike ose palë të treta që veprojnë me bazë të vet ligjore\nPërmbajtjen që shkëmbeni me përdorues të tjerë jashtë sistemeve tona\n\n2.3 Duke përdorur Platformën, konfirmoni se e keni lexuar këtë Politikë. Disa përpunime mbështeten në pëlqim (p.sh. marketing opsional ose analitikë opsionale në uebsajt); mund ta tërhiqni pëlqimin ku lejon ligji, siç përshkruhet më poshtë."
+      },
+      {
+        "title": "3. Të dhënat personale që mblidhim",
+        "body": "Mbledhim të dhëna personale për të operuar hartën qytetare, të vërtetojmë përdoruesit, të moderojmë përmbajtjen dhe të përmirësojmë besueshmërinë. Kategoritë përfshijnë:\n\n3.1 Të dhëna që ofroni drejtpërdrejt\n\n3.1.1 Të dhënat e llogarisë (aplikacione)\n\nEmri dhe mbiemri\nAdresa e email-it\nNumri i telefonit celular (përdoret për hyrje dhe verifikim me kode një herë)\nFjalëkalimi (ruajmë një hash të sigurt, jo fjalëkalimin e thjeshtë)\nFoto opsionale e profilit dhe preferenca në aplikacion\nTë dhëna opsionale autentifikimi me shumë faktorë nëse e aktivizoni\nFusha gamifikimi të lidhura me llogarinë tuaj (p.sh. pikë), ku i përfshin produkti\n\n3.1.2 Raportet dhe vendet\n\nKur dorëzoni një raport ndotjeje mbledhim tekstin e raportit, kategorinë dhe fusha të ngjashme që futni, fotot që bashkëngjitni, koordinatat dhe adresën ose tekstin e vendit për vendndodhjen, vulat kohore dhe rezultatet e moderimit. Raportet lidhen me një regjistër „vendi“ në hartë. Përdorues të tjerë mund të shohin përmbajtje publike raporti dhe vendi sipas rregullave të produktit.\n\n3.1.3 Komuniteti dhe ngjarjet\n\nKomentet dhe pëlqimet në vende, ruajtjet dhe veprime ndarjeje që nisni\nNgjarje pastrimi të shfaqura në produkt (kohë e planifikuar, vend i lidhur, fusha organizatori që mbledh ndërfaqja, numër pjesëmarrësish)\n\n3.1.4 Mbështetje dhe kontakt\n\nÇfarë na dërgoni me email, formularë kontakti ose kanale të krahasueshme\n\n3.1.5 Pagesat\n\nNuk operojmë blerje brenda aplikacionit ose abonime me pagesë në produktin aktual. Nëse futim veçori me pagesë më vonë, do ta përditësojmë këtë Politikë dhe do të përmendim procesorin e pagesës.\n\n3.2 Të dhëna të mbledhura automatikisht\n\n3.2.1 Të dhëna teknike dhe sigurie\n\nAdresa IP, lloji i pajisjes, sistemi operativ dhe versioni i aplikacionit ose shfletuesit ku disponohet\nRegjistra sesioni ose pajisjeje që na duhen për siguri (p.sh. identifikues token rifreskimi, përshkrim opsional pajisjeje)\nRegjistra serveri dhe aplikacioni për besueshmëri dhe zbulim abuzimi\n\n3.2.2 Të dhëna përdorimi\n\nNdërveprimet e nevojshme për të operuar veçoritë që përdorni (p.sh. hapja e një raporti, votimi, komentimi)\nAnalitikë opsionale produkti nëse zbatohet në aplikacione (do të përshkruajmë ofruesin këtu kur aktivizohet)\n\n3.2.3 Vendndodhja\n\nVendndodhje e saktë kur zgjidhni të bashkëngjitni vendndodhje në një raport ose përdorni veçori harte që e kërkojnë. Nuk synojmë të gjurmojmë vendndodhjen tuaj vazhdimisht në sfond; nëse kjo ndonjëherë ndryshon, do të kërkojmë leje të veçantë dhe do ta përditësojmë këtë Politikë.\n\n3.2.4 Njoftimet push\n\nNëse pranoni, ruajmë një token pajisjeje push (p.sh. përmes Firebase Cloud Messaging) dhe flamuj preferencash për të dërguar njoftimet që kërkoni.\n\n3.2.5 Cookies dhe ruajtje në uebsajt\n\nUebsajti publik përdor ruajtje striktisht të nevojshme plus, nëse pranoni, Vercel Web Analytics. Detajet janë në Politikën e cookies.\n\n3.3 Burime të palëve të treta\n\nMund të përdorim shërbime hartëzimi ose gjeokodimi (p.sh. pllaka bazë Carto ose imazhe Esri në aplikacione dhe ndihmës gjeokodimi) për të shfaqur hartat ose zgjidhur adresat; ato ofrues mund të marrin kërkesa teknike për të ngarkuar pllaka ose gjeokoduar koordinata. Nuk operojmë hyrje sociale në aplikacionet aktuale; nëse e shtojmë, do ta përditësojmë këtë seksion."
+      },
+      {
+        "title": "4. Baza ligjore për përpunimin",
+        "body": "Sipas Neni 6 të GDPR, mbështetemi në:\n\n4.1 Kontrata (Neni 6(1)(b))\n\nOperimi i llogarive, publikimi i raporteve që dorëzoni, shfaqja e përmbajtjes së hartës, komenteve, ngjarjeve dhe njoftimeve që kërkoni.\n\n4.2 Interesa legjitime (Neni 6(1)(f))\n\nSigurimi i shërbimit, parandalimi i abuzimit, korrigjimi dhe besueshmëria, statistika e brendshme që nuk kërkon profile marketingu dhe përmirësim i kufizuar produkti, në ekuilibër me të drejtat tuaja.\n\n4.3 Detyrim ligjor (Neni 6(1)(c))\n\nKontabilitet, tatim ose detyra rregullatore ku zbatohen, dhe kërkesa të ligjshme nga autoritetet.\n\n4.4 Pëlqim (Neni 6(1)(a))\n\nKu kërkohet, p.sh. komunikime marketingu opsionale, cookies analitike opsionale në uebsajt, ose çdo veçori e ardhshme që ofrojmë vetëm me hyrje. Mund ta tërhiqni pëlqimin pa prekur përpunimin e mëparshëm që ishte i ligjshëm.\n\n4.5 Interesa jetike (Neni 6(1)(d))\n\nPërpunim i rrallë i nevojshëm për të mbrojtur jetën ose sigurinë serioze."
+      },
+      {
+        "title": "5. Si i përdorim të dhënat tuaja personale",
+        "body": "5.1 Operimi i Platformës\n\nT'ju vërtetojmë, të mbajmë profilin tuaj dhe të operojmë veçoritë e hartës, raportit, komenteve, ngjarjeve dhe njoftimeve që përdorni.\n\n5.2 Siguria, besimi dhe moderimi\n\nShqyrtojmë raporte abuzimi, zbatojmë Kushtet tona, mbrojmë përdoruesit dhe mbajmë infrastrukturën të qëndrueshme.\n\n5.3 Komunikime\n\nDërgojmë mesazhe shërbimi (p.sh. njoftime sigurie ose status raporti) duke përdorur detajet e kontaktit që jepni. Marketingu ose buletini vetëm kur kemi bazë të ligjshme (zakonisht pëlqim).\n\n5.4 Agregate për partnerët\n\nProdhojmë statistika që nuk identifikojnë individë ku e përshkruajmë në marrëveshje ose tekst produkti.\n\n5.5 Ligjore dhe përputhshmëri\n\nPlotësojmë detyrime ruajtjeje, përgjigjemi kërkesave të ligjshme dhe mbrojmë pretendime ligjore.\n\n5.6 Përmirësim\n\nKuptojmë gabimet dhe performancën në agregat; shmangim profilizim të panevojshëm përtej asaj që kërkon produkti."
+      },
+      {
+        "title": "6. Ndarja dhe zbulimi i të dhënave",
+        "body": "6.1 Pëlqim ose udhëzim\n\nNdajmë të dhëna me palë të treta kur na kërkoni ose kur bëni qëllimisht përmbajtje publike në produkt.\n\n6.2 Infrastrukturë dhe operacione\n\nPërdorim procesorë të verifikuar, p.sh.:\n\nHosting dhe infrastrukturë API: [HOSTING_PROVIDER] në [SERVER_LOCATION] (ose siç përditësohet në regjistrat tanë)\nDërgim email për formularë uebsajti ose buletin: zakonisht [EMAIL_PROVIDER] (p.sh. Resend) përveç nëse përmendim një ofrues tjetër\nNjoftime push: Google Firebase Cloud Messaging për dërgim në pajisje\nAnalitikë uebsajti (nëse pranoni në sajt): Vercel Web Analytics\nMjete shtesë opsionale: [SUPPORT_PROVIDER], [ANALYTICS_PROVIDER] kur i vendosim në të vërtetë\n\nMarrëveshjet kërkojnë që procesorët të përdorin të dhënat vetëm sipas udhëzimeve tona dhe të zbatojnë siguri të përshtatshme.\n\n6.3 Hartat dhe ndihmësit e gjeolokalizimit\n\nPllakat e hartës mund të ngarkohen nga Carto (pllaka raster bazuar në OpenStreetMap) dhe, ku ofron ndërfaqja, Esri ose ofrues të ngjashëm imazhesh. Gjeokodimi mund të përdorë API platformash që tashmë janë në paketë. Ato ofrues marrin kërkesa teknike (koordinata pllakash, IP në regjistra serveri) si zakonisht për dorëzim harte.\n\n6.4 Autoritete dhe agregate\n\nMund të ndajmë statistika mjedisore të anonimizuara ose të agreguara me komunat ose partnerët. Mund të zbulojmë identifikues ose përmbajtje nëse ligji na detyron, për të mbrojtur të drejta dhe siguri, ose për të zbatuar Kushtet tona.\n\n6.5 Riorganizim ose pasardhësi\n\nNëse përzihemi, ristrukturohemi ose një organizatë tjetër vazhdon shërbimin, të dhënat personale mund të transfierohen te pasardhësi. Do të kërkojmë të respektojnë këtë Politikë ose t'ju njoftojnë juve.\n\n6.6 Dukshmëria publike\n\nRaportet, komentet, emrat e përdoruesve dhe listimet e ngjarjeve që publikoni mund të jenë të dukshme për përdorues të tjerë dhe, varësisht nga konfigurimi, në web të hapur."
+      },
+      {
+        "title": "7. Transferet ndërkombëtare të të dhënave",
+        "body": "7.1 Vendndodhjet e ruajtjes së të dhënave\n\nTë dhënat tuaja personale ruhen kryesisht në servera të vendosur në [SERVER_COUNTRY/REGION].\n\n7.2 Transferet jashtë BE/EEA\n\nNëse transferojmë të dhëna në vende jashtë Zonës Ekonomike Evropiane që nuk kanë një vendim adekuatësie nga Komisioni Evropian, sigurohemi mbrojtje të përshtatshme:\n\nKlauzolat standarde kontraktore të BE-së (SCCs)\nRregullat korporative detyruese (ku aplikohet)\nCertifikimi i marrësit sipas kornizave të miratuara\nPëlqimi juaj eksplicit për transfere specifike\n\n7.3 Konteksti maqedonas\n\nSi vend kandidat për anëtarësim në BE, Republika e Maqedonisë së Veriut e harmonon kornizën e saj të mbrojtjes së të dhënave me standardet e BE-së. Ne e trajtojmë mbrojtjen e të dhënave me të njëjtën rreptësi si shtetet anëtare të BE-së."
+      },
+      {
+        "title": "8. Ruajtja e të dhënave",
+        "body": "Mbajmë të dhëna personale vetëm sa kohë që na duhen për qëllimet e mësipërme ose siç kërkon ligji. Oraret e sakta evoluojnë me produktin; më poshtë pasqyron qëllimin tonë aktual.\n\n8.1 Llogaritë dhe siguria\n\nProfili dhe kredencialet: përderisa llogaria juaj është aktive, pastaj zakonisht deri në 90 ditë pas mbylljes përveçse kur ligji ose zgjidhja e mosmarrëveshjeve kërkon më shumë kohë.\nSesionet dhe regjistrat e sigurisë: mjaftueshëm gjatë për të zbuluar abuzimin (shpesh muaj, jo vjet, përveçse kur një hetim kërkon më gjatë).\n\n8.2 Raportet, vendet dhe përmbajtja e komunitetit\n\nRaportet mjedisore mund të mbeten të dukshme si pjesë e hartës qytetare për një kohë të gjatë ose pa afat fundi sepse dokumentojnë gjendje në interes publik. Nëse ushtroni të drejta fshirjeje, mund të heqim ose të anonimizojmë lidhjen tuaj personale me një raport (p.sh. shkëputja e llogarisë suaj) duke mbajtur vendndodhje jo-personale dhe imazhe që nuk mund t'ju identifikojnë juve, përveçse kur ligji kërkon ndryshe. Ne trajtojmë kërkesat për fshirje dhe anonimizim në përputhje me këtë përshkrim.\n\nFoto dhe media të pasura: ruhen me raportin deri sa të zbatohen rregullat e fshirjes ose anonimizimit.\nKomentet, votat, ruajtjet: ruhen derisa t'i fshini ju, t'i moderojmë ne, ose vendi i lidhur të hiqet sipas rregullave të produktit.\n\n8.3 Ngjarjet\n\nNgjarjet e pastrimit mbeten të lidhura me vendet për historik planifikimi; çdo lista pjesëmarrësish ndjek të njëjtat parime si të dhënat e llogarisë.\n\n8.4 Marketingu dhe historia e kontaktit\n\nPëlqimet e marketingut dhe prova e hyrjes ose daljes: siç kërkon ligji, zakonisht disa vjet pas mesazhit të fundit.\n\n8.5 Ligjore, tatim dhe kopje rezervë\n\nRegjistra që duhen mbajtur për kontabilitet, tatim ose mbajtje për procedura gjyqësore sipas ligjit maqedonas.\nKopjet rezervë rrotullohen; pastrimi nga kopjet rezervë mund të mbetet pas fshirjes në prodhim deri në 90 ditë.\n\n8.6 Llogari joaktive\n\nMund t'ju paralajmërojmë para fshirjes së llogarive joaktive për një kohë të gjatë, pastaj heqim të dhënat personale subjekt rregullave të anonimizimit të raporteve më sipër."
+      },
+      {
+        "title": "9. Të drejtat tuaja sipas GDPR",
+        "body": "Sipas GDPR dhe ligjit maqedonas për mbrojtjen e të dhënave, keni të drejtat e mëposhtme:\n\n9.1 E drejta e aksesit (Neni 15)\n\nKeni të drejtë të merrni:\n\nKonfirmim nëse përpunojmë të dhënat tuaja personale\nNjë kopje të të dhënave tuaja personale\nInformacion mbi qëllimet e përpunimit, kategoritë, marrësit dhe periudhat e ruajtjes\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me subjekt „Kërkesë për akses në të dhëna“\nKoha e përgjigjes: Brenda 30 ditësh (mund të zgjatet deri në 60 ditë për kërkesa komplekse)\nKostoja: Falas për kërkesën e parë; tarifë e arsyeshme për kërkesa të tepërta\n\n9.2 E drejta e rektifikimit (Neni 16)\n\nKeni të drejtë të korrigjoni të dhëna personale të pasakta ose të paplota.\n\nSi ta ushtroni:\n\nPërditësoni drejtpërdrejt përmes cilësimeve të llogarisë në aplikacionet ku ofrohen\nEmail në [PRIVACY_EMAIL] me informacion të saktë\nKoha e përgjigjes: Pa vonesë të pajustifikueshme, maksimum 30 ditë\n\n9.3 E drejta e fshirjes / „E drejta për t'u harruar“ (Neni 17)\n\nKeni të drejtë të kërkoni fshirjen e të dhënave tuaja personale kur:\n\nTë dhënat nuk janë më të nevojshme për qëllimet origjinale\nE tërhiqni pëlqimin (ku pëlqimi ishte baza ligjore)\nI kundërshtoni përpunimit dhe nuk ka baza legjitime tejkaluese\nTë dhënat u përpunuan në mënyrë të paligjshme\nDetyrimi ligjor kërkon fshirje\n\nPërjashtimet: Mund të refuzojmë fshirjen kur kërkohet për:\n\nPajtueshmëri ligjore (p.sh., regjistrimet tatimore)\nMbrojtja e pretendimeve ligjore\nInteresi publik ose kërkimi shkencor\n\nSi ta ushtroni: Cilësimet e llogarisë > Fshij llogarinë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nKoha e përgjigjes: 30 ditë; të dhënat pastrohen brenda 90 ditësh duke përfshirë kopjet rezervë\n\n9.4 E drejta për kufizimin e përpunimit (Neni 18)\n\nKeni të drejtë të kufizoni përpunimin kur:\n\nKontestoni saktësinë e të dhënave (gjatë verifikimit)\nPërpunimi është i paligjshëm por i kundërshtoheni fshirjes\nNuk na nevojiten më të dhëna, por ju nevojiten për pretendime ligjore\nI kundërshtuat përpunimit (në pritje të verifikimit të bazave legjitime)\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kërkesë specifike kufizimi\nEfekti: Të dhënat shënohen dhe ruhen, por nuk përpunohen aktivisht\n\n9.5 E drejta e portabilitetit të të dhënave (Neni 20)\n\nKeni të drejtë të merrni të dhënat tuaja personale në një format të strukturuar, të përdorur zakonisht, të lexueshëm nga makina dhe t'i transmetoni te një kontrollues tjetër.\n\nAplikohet për:\n\nTë dhënat e ofruara nga ju\nPërpunimi bazuar në pëlqim ose kontratë\nPërpunimi i kryer me mjete të automatizuara\n\nSi ta ushtroni: Cilësimet e llogarisë > Eksporto të dhëna në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nFormati: JSON, CSV ose PDF\nKoha e përgjigjes: 30 ditë\n\n9.6 E drejta për t'u kundërshtuar (Neni 21)\n\n9.6.1 Marketingu\n\nKeni të drejtën absolute për t'u kundërshtuar marketingut të drejtpërdrejtë.\n\nSi ta ushtroni: Klikoni „Çregjistrohu“ në email, ose përditësoni preferencat në cilësimet e llogarisë në aplikacionet ku ofrohen\n\n9.6.2 Përpunimi i interesit legjitim\n\nKeni të drejtë për t'u kundërshtuar përpunimit bazuar në interesa legjitime.\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kundërshtim specifik\nEfekti: Do të ndalojmë përpunimin përveç nëse tregojmë baza legjitime bindëse\n\n9.6.3 Profilimi dhe vendimmarrja e automatizuar (Neni 22)\n\nAktualisht nuk angazhohemi në vendimmarrje të automatizuar me efekte ligjore ose të rëndësishme. Nëse kjo ndryshon, do të keni të drejtë:\n\nTë merrni ndërhyrje njerëzore\nTë shprehni pikëpamjen tuaj\nTë kontestoni vendimin\n\n9.7 E drejta për të tërhequr pëlqimin\n\nKu përpunimi bazohet në pëlqim, mund ta tërhiqni në çdo kohë pa prekur përpunimin e ligjshëm të mëparshëm.\n\nSi ta ushtroni: Cilësimet e llogarisë > Preferencat e privatësisë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\n\n9.8 E drejta për të paraqitur ankesë\n\nKeni të drejtë të paraqisni ankesë te autoriteti mbikëqyrës:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nAdresa: [SUPERVISORY_AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\nTelefon: [SUPERVISORY_AUTHORITY_PHONE]\n\nPër banorët e BE-së: Gjithashtu mund të paraqisni ankesë te autoriteti mbikëqyrës në shtetin tuaj anëtar të BE-së të rezidencës."
+      },
+      {
+        "title": "10. Siguria e të dhënave",
+        "body": "Zbatojmë masa teknike dhe organizative të përshtatshme me rrezikun, duke marrë parasysh natyrën e përpunimit dhe gjendjen e teknikës.\n\n10.1 Masa që mund të përdorim\n\nVarësisht nga hostimi dhe zhvillimi, masat mund të përfshijnë:\n\nEnkriptim të të dhënave personale gjatë tranzitit (p.sh. TLS)\nRuajtjen e fjalëkalimeve me hashing njëdrejtuesh të fortë\nKontroll aksesi për sisteme dhe llogari, përfshirë vërtetim shumëfaktor për akses administrativ ku e zbatojmë\nArna, monitorim dhe regjistrim për besueshmëri të shërbimit dhe zbulim abuzimi\nMbrojtje kundër rreziqeve të zakonshme të aplikacionit (p.sh. validim hyrjesh dhe mbrojtje kundër injeksionit dhe skriptimit cross-site ku zbatohet)\n\nI rishikojmë dhe përshtasim kontrollet ndërsa shërbimi evolon.\n\n10.2 Organizimi dhe ofruesit\n\nMbajmë praktika të përshtatshme me madhësinë dhe rrezikun tonë, përfshirë si punojmë me hostin dhe procesorët e tjerë që angazhojmë.\n\n10.3 Shkelje të të dhënave personale\n\nNëse mësojmë për një shkelje që me gjasa prek të drejtat dhe liritë tuaja, do ta njoftojmë autoritetin mbikëqyrës pa vonesë të pajustifikueshme dhe brenda 72 orëve ku GDPR ose ligji i zbatueshëm e kërkon, dhe do t'i informojmë përdoruesit e prekur kur ligji e kërkon edhe këtë.\n\n10.4 Roli juaj\n\nPërdorni një fjalëkalim të fortë dhe unik, aktivizoni vërtetimin me shumë faktorë në aplikacione nëse ofrohet, dilni nga pajisjet e ndara dhe na kontaktoni menjëherë nëse dyshoni për hyrje të paautorizuar në llogarinë tuaj."
+      },
+      {
+        "title": "11. Privatësia e fëmijëve",
+        "body": "11.1 Platforma nuk është e destinuar për fëmijë nën 18 vjeç.\n\n11.2 Nuk mblidhim me vetëdije të dhëna personale nga fëmijët nën 18 vjeç pa pëlqimin prindëror.\n\n11.3 Nëse vëmë re se kemi mbledhur të dhëna nga një fëmijë nën 18 vjeç pa pëlqim prindëror të verifikuar, do t'i fshijmë ato informacione sa më shpejt të jetë e mundur.\n\n11.4 Nëse jeni prind ose kujdestar dhe besoni se fëmija juaj na ka ofruar të dhëna personale, ju lutemi na kontaktoni në [PRIVACY_EMAIL].\n\n11.5 Prindërit mund të mbikëqyrin përdorimin e Platformës nga të miturit, por të miturit nuk mund të krijojnë llogari në mënyrë të pavarur."
+      },
+      {
+        "title": "12. Cookies dhe teknologjitë e gjurmimit",
+        "body": "Uebsajti publik përdor ruajtje striktisht të nevojshme plus Vercel Web Analytics opsionale nëse pranoni përmes banderolës sonë. Nuk operojmë sot komutatorë të veçantë cookies funksionalë ose marketingu në sajt. Detaji i plotë është në Politikën e cookies në [COOKIE_POLICY_URL].\n\nAplikacionet celulare përdorin ruajtje në pajisje, token push dhe cache harte siç përshkruhet në Seksionet 3 dhe 6, jo cookies shfletuesi."
+      },
+      {
+        "title": "13. Lidhjet dhe shërbimet e palëve të treta",
+        "body": "13.1 Uebsajti mund të lidhë profile sociale ose faqe partnerësh. Aplikacionet ngarkojnë pllaka harte dhe gjeokodim nga ofrues si Carto (të dhëna OpenStreetMap) ose Esri ku ofrohet.\n\n13.2 Ato shërbime kanë njoftime privatësie të veta. Ne nuk i kontrollojmë.\n\n13.3 Nuk integrujmë hyrje sociale në produktin celular aktual. Nëse shtojmë integrime, do t'i listojmë këtu."
+      },
+      {
+        "title": "14. Ndryshimet në këtë Politikë Privatësie",
+        "body": "14.1 Njoftimi i ndryshimeve\n\nMund ta përditësojmë këtë Politikë Privatësie nga koha në kohë. Kur bëjmë ndryshime materiale, do t'ju njoftojmë me:\n\nNjoftim me email te përdoruesit e regjistruar (të paktën 30 ditë përpara se ndryshimet të hyjnë në fuqi)\nNjoftim të dukshëm në Platformë\nNjoftim në aplikacion\nDatë të përditësuar „Përditësuar për herë të fundit“ në krye të kësaj Politike\n\n14.2 Pranimi juaj\n\nPërdorimi i vazhduar i Platformës pas hyrjes në fuqi të ndryshimeve përbën pranimin e Politikës së përditësuar. Nëse nuk pajtoheni me ndryshimet, duhet të ndaloni përdorimin e Platformës dhe mund ta mbyllni llogarinë tuaj.\n\n14.3 Historiku i versioneve\n\nMbajmë një histori versioni të kësaj Politike. Versionet e mëparshme janë të disponueshme me kërkesë në [PRIVACY_EMAIL]."
+      },
+      {
+        "title": "15. Dispozita specifike për përdoruesit maqedonas",
+        "body": "15.1 Gjuha\n\nKjo Politikë Privatësie ofrohet në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Republikën e Maqedonisë së Veriut.\n\n15.2 Autoriteti mbikëqyrës\n\nAutoriteti kompetent mbikëqyrës për çështjet e mbrojtjes së të dhënave në Maqedoninë e Veriut është:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nAdresa: [AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Baza ligjore\n\nPërpunimi i të dhënave personale kryhet në përputhje me:\n\nLigjin për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nParimet e GDPR të BE-së siç adoptohen në legjislacionin maqedonas"
+      },
+      {
+        "title": "16. Kontakt",
+        "body": "Për pyetje, shqetësime ose kërkesa në lidhje me këtë Politikë Privatësie ose të dhënat tuaja personale:\n\nPyetjet e privatësisë:\nEmail: [PRIVACY_EMAIL]\nTelefon: [CONTACT_PHONE]\nAdresa: [REGISTERED_ADDRESS]\nZyrtari për Mbrojtjen e të Dhënave (nëse aplikohet):\nEmail: [DPO_EMAIL]\nKontakti i përgjithshëm:\nEmail: [CONTACT_EMAIL]\nFaqja e internetit: [WEBSITE_URL]\nKoha e përgjigjes: Synojmë t'u përgjigjemi të gjitha pyetjeve të privatësisë brenda 48 orëve dhe të zgjidhim kërkesat brenda 30 ditësh.\n\nDUKE PËRDORUR PLATFORMËN, KONFIRMONI SE KENI LEXUAR KËTË POLITIKË PRIVATËSIE. NE I PËRPUNOJMË TË DHËNAT PERSONALE SIÇ PËRSHKRUHET KËTU, DUKE PËRFSHIRË PËRPUNIM QË NUK MBËSHTET NË PËLQIM KUR LIGJI LEJON BAZA TË TJERA LIGJORE."
+      }
+    ]
+  },
+  "cookiesPage": {
+    "badge": "Ligjore",
+    "title": "Politika e cookies",
+    "lastUpdatedLabel": "Përditësuar për herë të fundit",
+    "lastUpdated": "[DATE]",
+    "effectiveDateLabel": "",
+    "effectiveDate": "",
+    "noticeTitle": "Para se të mbështeteni në këtë politikë cookies",
+    "noticeBody": "Çfarë bën uebsajti i publikuar (ruajtje e pëlqimit, identifikues opsionalë analitike) duhet të përputhet me këtë tabelë dhe Politikën e privatësisë. Aplikacionet celulare përdorin ruajtje në pajisje dhe token push siç përshkruhet atje, jo këtë përmbledhje vetëm për shfletuesin. URL me kllapa konfigurohen përmes mjedisit të deployimit. Jo këshillë ligjore.",
+    "tableTitle": "8. Tabela e detajuar e cookies dhe ruajtjes (uebsajt)",
+    "tableIntro": "Kjo tabelë përshkruan teknologjitë në uebsajtin publik Chisto.mk. Aplikacionet përdorin ruajtje në pajisje dhe token Firebase Cloud Messaging në vend të kësaj; shihni Politikën e privatësisë.\n\nDUKE VAZHDUAR TË PËRDORNI FAQEN TONË, JU PRANONI SE KENI LEXUAR DHE KUPTUAR KËTË POLITIKË COOKIES.",
+    "colName": "Emri",
+    "colProvider": "Ofruesi",
+    "colPurpose": "Qëllimi",
+    "colDuration": "Kohëzgjatja",
+    "colType": "Lloji",
+    "sections": [
+      {
+        "title": "1. Hyrje",
+        "body": "Data e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.1 Rreth kësaj politike\n\nKjo Politikë Cookies shpjegon se si [LEGAL_ENTITY_NAME] („Chisto.mk“, „ne“, „na“ ose „tonë“) përdor cookies dhe ruajtje të ngjashme në uebsajtin marketing të Chisto.mk. Aplikacionet celulare ndjekin Politikën e privatësisë për ruajtje në pajisje, token push dhe cache harte.\n\nLexojeni këtë Politikë së bashku me:\n\n• Politikën e privatësisë: [PRIVACY_POLICY_URL]\n• Kushtet e përdorimit: [TERMS_URL]\n\n1.2 Kuadri ligjor\n\nPërputhemi me kornizën ePrivacy siç është transponuar në Maqedoninë e Veriut, GDPR ku zbatohet, Ligjin për mbrojtjen e të dhënave personale (Gazeta Zyrtare Nr. 42/2020) dhe Ligjin për komunikimet elektronike (Gazeta Zyrtare Nr. 39/2014).\n\n1.3 Pëlqimi në uebsajt\n\nRuajtja striktisht e nevojshme funksionon pa pëlqim. Vercel Web Analytics opsionale ngarkohet vetëm nëse pranoni analitikë në banderolën tonë. Mund të rihapni zgjedhjet përmes Cilësime cookies në fund të faqes ([COOKIE_PREFERENCES_URL])."
+      },
+      {
+        "title": "2. Çfarë janë cookies?",
+        "body": "2.1 Përkufizimi\n\nCookies janë skedarë të vegjël që një sajt ruan në shfletuesin tuaj. Ruajtja lokale është një veçori e ngjashme e shfletuesit që përdorim për të mbajtur mend zgjedhjen tuaj për analitikë.\n\n2.2 Kohëzgjatja dhe palë\n\n• Cookies sesioni skadojnë kur mbyllni shfletuesin.\n• Cookies ose hyrje ruajtjeje të qëndrueshme mbeten deri të skadojnë ose të pastroni të dhënat e sajtit.\n• Hyrjet e palës së parë vendosen nga sajti ynë. Skriptet e palës së tretë (Vercel Analytics, kur aktivizohet) mund të vendosin identifikuesit e tyre sipas politikave të Vercel.\n\n2.3 Aplikacionet celulare\n\nAplikacionet përdorin ruajtje të sigurt, SQLite ose cache skedarësh, token Firebase Cloud Messaging dhe mjete të ngjashme siç përshkruhet në Politikën e privatësisë, jo cookies shfletuesi."
+      },
+      {
+        "title": "3. Pse përdorim cookies",
+        "body": "Në uebsajt përdorim ruajtje për të:\n\n• Mbajtur mend nëse pranuat ose refuzuat analitikën opsionale\n• Mbajtur sajtin në punë (siguri, balancim ngarkese dhe bazat që i trajton hosti ynë)\n• Nëse pranoni, matur trafikun në agregat me Vercel Web Analytics\n\nNuk përdorim sot piksel marketingu ose reklamash sociale në këtë sajt."
+      },
+      {
+        "title": "4. Kategoritë që përdorim në uebsajt",
+        "body": "4.1 Ruajtje striktisht e nevojshme\n\nRuajmë zgjedhjen tuaj për analitikë në localStorage të shfletuesit (çelësi chisto_cookie_consent_v1) që banderola të mos rivendoset çdo vizitë dhe që të respektojmë refuzimet. Ofruesi i hostingut mund të vendosë gjithashtu cookies teknike të shkurtra për siguri ose dorëzim. Baza ligjore: interesa legjitime dhe, ku zbatohet, ofrimi i shërbimit që kërkoni.\n\n4.2 Analitikë opsionale (pëlqim)\n\nNëse pranoni, ngarkojmë Vercel Web Analytics për të mbledhur shikime faqesh në agregat dhe metrika performence. Baza ligjore: pëlqim. Mund ta tërhiqni pëlqimin në çdo kohë përmes Cilësime cookies ([COOKIE_PREFERENCES_URL]).\n\n4.3 Çfarë nuk përdorim këtu\n\nNuk operojmë piksel të veçantë marketingu, Facebook Pixel ose etiketa Google Ads në këtë sajt marketing në versionin aktual të produktit. Nëse kjo ndryshon, do ta përditësojmë këtë Politikë dhe banderolën para se t'i aktivizojmë."
+      },
+      {
+        "title": "5. Aplikacionet celulare",
+        "body": "5.1 Teknologjitë\n\nAplikacionet ruajnë token hyrjeje në mënyrë të sigurt, cache pllakash harte për performencë, preferenca lokalisht dhe regjistrojnë token Firebase Cloud Messaging kur aktivizoni njoftimet.\n\n5.2 Identifikuesit e reklamave\n\nNuk përdorim ID reklamues për të shërbyer reklama palësh të treta në produktin aktual. Cilësimet e reklamave në nivel OS vlejnë përgjithësisht në pajisjen tuaj.\n\n5.3 Lejet\n\nKërkojmë qasje në vendndodhje, kamerë, foto dhe njoftime vetëm kur një veçori i nevojitet. Mund t'i ndryshoni lejet në cilësimet e pajisjes."
+      },
+      {
+        "title": "6. Si të menaxhoni cookies",
+        "body": "6.1 Banderola dhe fundi i faqes\n\nNë vizitën e parë pyesim nëse të aktivizohet analitika opsionale. Mund ta rihapni zgjedhjen nga „Cilësimet e cookies“ në fund ([COOKIE_PREFERENCES_URL]). Sajti marketing nuk ekspozon menu cookies në nivel llogarie.\n\n6.2 Kontrollet e shfletuesit\n\nMund të pastroni ose bllokoni cookies dhe të dhëna sajti; bllokimi i gjithçkaje mund ta prishë sajtin.\n\n6.3 Do Not Track\n\nShfletuesit mund të dërgojnë sinjale DNT; nuk trajtojmë DNT sot si kërkesë ligjore të detyrueshme sepse praktika e industrisë është e papajtueshme."
+      },
+      {
+        "title": "7. Jetëgjatësia e cookies",
+        "body": "Regjistrat e pëlqimit në localStorage mbeten derisa të pastroni të dhënat e sajtit ose ne të ndryshojmë versionin e ruajtjes. Identifikuesit e Vercel Analytics ndjekin dokumentacionin e Vercel (shpesh shumë nën dy vjet). Cookies e hostingut janë zakonisht cookies sesioni të shkurtra."
+      },
+      {
+        "title": "8. Lidhje sociale",
+        "body": "Uebsajti mund të shfaqë lidhje të zakonshme me rrjete sociale. Thjesht vizitimi i faqeve tona nuk integron hyrje sociale. Nëse klikoni drejt një rrjeti, zbatohet politika e atij rrjeti."
+      },
+      {
+        "title": "9. Mbrojtja e të dhënave dhe siguria",
+        "body": "9.1 Siguria\n\nShërbejmë sajtin përmes HTTPS dhe kufizojmë qasjen në panelet e analitikës.\n\n9.2 Ruajtja\n\nTë dhënat e analitikës trajtohen sipas kushteve të Vercel. Kur tërhiqni pëlqimin, ndalojmë ngarkimin e skriptit të tyre në ngarkimet e ardhshme të faqes.\n\n9.3 Transferime\n\nVercel mund të përpunojë të dhëna në Shtetet e Bashkuara ose rajone të tjera. Mbështetemi në mbrojtje të përshtatshme siç përshkruhen në dokumentacionin e tyre dhe në Politikën tonë të privatësisë."
+      },
+      {
+        "title": "10. Të drejtat tuaja",
+        "body": "Sipas GDPR dhe ligjit vendor të zbatueshëm, keni të drejta për të dhënat e mbledhura përmes cookies, përfshirë:\n\n• E drejta e aksesit: informacion mbi të dhënat e lidhura me cookies që mbajmë\n• E drejta e fshirjes: fshirje e të dhënave cookies ku zbatohet\n• E drejta për t'u kundërshtuar: kundërshtim i përpunimit bazuar në interesa legjitime ku lejon ligji\n• E drejta për të tërhequr pëlqimin: në çdo kohë për cookies jo të nevojshme\n• E drejta për ankesë: te një autoritet mbikëqyrës\n\nSi t'i ushtroni:\n\n• Email: [PRIVACY_EMAIL]\n• Cilësimet e cookies: [COOKIE_PREFERENCES_URL]\n\nAutoriteti mbikëqyrës (Maqedonia e Veriut):\n\nAgjencia për Mbrojtjen e të Dhënave Personale. Faqja: https://www.dzlp.mk. Email: info@dzlp.mk"
+      },
+      {
+        "title": "11. Privatësia e fëmijëve",
+        "body": "11.1 Platforma jonë nuk drejtohet te fëmijët nën 18 vjeç.\n\n11.2 Nuk mbledhim me vetëdije të dhëna cookies nga fëmijët nën 18 vjeç.\n\n11.3 Nëse jeni prind ose kujdestar dhe besoni se fëmija juaj është gjurmuar përmes cookies pa pëlqim të përshtatshëm, na kontaktoni në [PRIVACY_EMAIL]."
+      },
+      {
+        "title": "12. Përditësimet e kësaj politike",
+        "body": "12.1 Ndryshimet e politikës\n\nMund ta përditësojmë këtë Politikë Cookies për të pasqyruar ndryshime në përdorimin e cookies, kërkesa të reja ligjore, përmirësime në Platformë ose reagime përdoruesish.\n\n12.2 Njoftimi\n\nMund t'ju njoftojmë për ndryshime materiale duke përditësuar datën „Përditësuar për herë të fundit“ në krye, me email (ku është e përshtatshme), njoftim të dukshëm në Platformë ose banderolë të përditësuar pëlqimi.\n\n12.3 Pranimi juaj\n\nPërdorimi i vazhdueshëm i Platformës pas hyrjes në fuqi të ndryshimeve përbën pranim të Politikës së përditësuar. Nëse nuk pajtoheni, rregulloni cilësimet e cookies ose ndaloni përdorimin e Platformës."
+      },
+      {
+        "title": "13. Informacioni i kontaktit",
+        "body": "Pyetje rreth cookies:\n\n• Email: [PRIVACY_EMAIL]\n• Telefon: [CONTACT_PHONE]\n• Adresa: [REGISTERED_ADDRESS]\n\nZyrtari për mbrojtjen e të dhënave (nëse aplikohet):\n\n• Email: [DPO_EMAIL]\n\nKontakti i përgjithshëm:\n\n• Email: [CONTACT_EMAIL]\n• Faqja e internetit: [WEBSITE_URL]"
+      }
+    ],
+    "cookieRows": [
+      {
+        "name": "chisto_cookie_consent_v1 (localStorage)",
+        "provider": "[LEGAL_ENTITY_NAME]",
+        "purpose": "Ruan hyrjen ose refuzimin tuaj për analitikë që banderola të mbetet në përputhje me zgjedhjen.",
+        "duration": "Derisa të pastroni të dhënat e sajtit ose ne të ndryshojmë çelësin e ruajtjes",
+        "type": "Striktisht i nevojshëm; palë e parë"
+      },
+      {
+        "name": "Identifikuesit e Vercel Web Analytics",
+        "provider": "Vercel Inc.",
+        "purpose": "Shikime faqesh në agregat dhe metrika performence kur pranoni analitikën.",
+        "duration": "Sipas dokumentacionit të Vercel",
+        "type": "Analitikë; palë e tretë (ngarkohet vetëm pas pëlqimit)"
+      },
+      {
+        "name": "Cookies hostingu dhe sigurie",
+        "provider": "[HOSTING_PROVIDER]",
+        "purpose": "Dorëzim, rrugëzim, mbrojtje nga robotët ose vazhdimësi sesioni TLS siç e zbaton hosti.",
+        "duration": "Sesion deri në disa ditë (parazgjedhja e hostit)",
+        "type": "Striktisht i nevojshëm; palë e tretë"
+      },
+      {
+        "name": "Cookies Next.js / aplikacioni (nëse ka)",
+        "provider": "[LEGAL_ENTITY_NAME]",
+        "purpose": "Cookies të shkurtra të palës së parë mund të përdoren kur nevojiten për forma, sesion ose rrugëzim në uebsajt.",
+        "duration": "Sesioni",
+        "type": "Striktisht i nevojshëm; palë e parë"
+      }
+    ]
+  },
+  "dataPage": {
+    "badge": "Privatësi",
+    "title": "Të dhënat tuaja dhe llogaria",
+    "lead": "Kjo faqe shpjegon si të menaxhoni llogarinë tuaj Chisto.mk dhe të ushtroni të drejtat e privatësisë. Punon së bashku me Politikën e privatësisë, Politikën e cookies dhe Kushtet e përdorimit.",
+    "requestTitle": "Kërkesa: akses, korrigjim, fshirje dhe portabilitet",
+    "requestIntro": "Përdorni kanalin më poshtë për të kërkuar një kopje të të dhënave tuaja personale, korrigjime, kufizim, kundërshtim ku zbatohet ose fshirje llogarie. Mund të kërkojmë provë të arsyeshme të identitetit (p.sh. email nga adresa juaj e regjistruar ose një hap verifikimi një herë) para se të veprojmë për kërkesa të ndjeshme.",
+    "requestCta": "Hap kanalin e kërkesave për të dhëna",
+    "requestMissing": "Vendosni NEXT_PUBLIC_DATA_REQUEST_URL në mjedisin e deployimit (adresë email ose URL HTTPS) që ky buton të funksionojë për vizitorët.",
+    "linkPrivacy": "Politika e privatësisë",
+    "linkTerms": "Kushtet e përdorimit",
+    "lastUpdatedLabel": "Përditësuar së fundmi",
+    "lastUpdated": "28 mars 2026",
+    "noticeTitle": "Para se të mbështeteni në këtë faqe",
+    "noticeBody": "Eksporti vetë-shërbimi, kontrollet e identitetit dhe afatet këtu duhet të përputhen me mënyrën se si funksionon produkti në praktikë. Plotësoni fushat në kllapa për organizatën tuaj. Jo këshillë ligjore.",
+    "sections": [
+      {
+        "title": "1. Llogaria dhe profili",
+        "body": "Llogaritë krijohen në aplikacionet celulare Chisto.mk me email, numër telefoni celular, fjalëkalim dhe verifikim telefoni me kode një herë. Mbajini kredencialet sekret.\n\nPërditësoni fushat e profilit brenda aplikacionit ku ofrohen. Përdorni një fjalëkalim të fortë dhe unik. Nëse aplikacioni ofron MFA me autentikator, aktivizimi i tij ul rrezikun e marrjes së llogarisë.\n\nUebsajti publik mund të mos ofrojë regjistrim të plotë; përdorni aplikacionet për veçoritë e llogarisë."
+      },
+      {
+        "title": "2. Shikimi dhe eksporti i të dhënave tuaja",
+        "body": "Mund të keni të drejtë të merrni konfirmim të përpunimit dhe një kopje të të dhënave tuaja personale (neni 15 i GDPR). Kur është e realizueshme teknike, ofrojmë pamje vetë-shërbimi në produkt; përndryshe parashtroni një kërkesë përmes kanalit të mësipërm.\n\nPër portabilitet të dhënash (neni 20 i GDPR) mund të kërkoni një eksport të strukturuar, të zakonshëm të përdorur dhe të lexueshëm nga makina (p.sh. JSON ose CSV) të të dhënave që keni dhënë dhe që i përpunojmë me mjete të automatizuara bazuar në kontratë ose pëlqim. Do ta ofrojmë brenda një afati të arsyeshëm, zakonisht brenda tridhjetë (30) ditëve nga verifikimi, përveçse kur ligji kërkon një afat tjetër."
+      },
+      {
+        "title": "3. Korrigjimet",
+        "body": "Nëse të dhënat personale janë të pasakta ose të paplota, mund të kërkoni korrigjim (neni 16 i GDPR) përmes të njëjtit kanal. Do të korrigjojmë gabimet e qarta shpejt; mosmarrëveshjet komplekse mund të kërkojnë verifikim shtesë."
+      },
+      {
+        "title": "4. Fshirja e llogarisë dhe çfarë mbajmë",
+        "body": "Mund të kërkoni fshirjen e Llogarisë suaj (neni 17 i GDPR) përmes kanalit të kërkesave për të dhëna ose cilësimeve të llogarisë në aplikacion nëse ofrohen. Pas fshirjes, heqim ose anonimizojmë të dhënat personale përveçse kur ruajtja është e nevojshme: p.sh. për përputhshmëri me ligjin e kontabilitetit ose tatimeve, për të krijuar ose mbrojtur kërkesa ligjore gjatë periudhave të parashkrimit të zbatueshme ose për të përmbushur një detyrim ligjor specifik. Do të shpjegojmë çdo ruajtje të kufizuar nëse ju përket.\n\nPjesë e përmbajtjes së raporteve mjedisore që keni publikuar mund të mbetet e dukshme pa identifikues personalë, siç përshkruhet në pjesët për ruajtje dhe fshirje të kësaj Politike të privatësisë (seksioni 8)."
+      },
+      {
+        "title": "5. Marketingu dhe preferencat e komunikimit",
+        "body": "Mesazhet që lidhen me shërbimin (siguri, raporte, ngjarje) mund të jenë të nevojshme.\n\nBuletini ose marketingu kërkon bazë ligjore, zakonisht pëlqim. Çabonoheni me lidhjen në çdo email ose na kontaktoni. Email-i nga formularët e uebsajtit shpesh dërgohet përmes ofruesish si Resend; përmendni ofruesin aktiv në listën tuaj të nënprocesorëve."
+      },
+      {
+        "title": "6. Cookies dhe teknologji të ngjashme",
+        "body": "Në uebsajt, përdorni „Cilësimet e cookies“ në fund të faqes për të lejuar ose refuzuar Vercel Web Analytics opsionale. Ruajtja striktisht e nevojshme vlen ende. Detaje në Politikën e cookies."
+      },
+      {
+        "title": "7. Kohët e përgjigjes, ankesat dhe kërkesat",
+        "body": "Synojmë t'iu përgjigjemi kërkesave të verifikuara pa vonesë të panevojshme dhe brenda çdo afati ligjor (p.sh. një muaj sipas GDPR, me zgjatime të mundshme për kërkesa komplekse).\n\nNëse nuk jeni të kënaqur me përgjigjen tonë, mund të parashtroni ankesë te [SUPERVISORY_AUTHORITY_NAME] ose autoriteti lokal i mbrojtjes së të dhënave. Mund të kërkoni gjithashtu mbrojtje gjyqësore ku lejon ligji i zbatueshëm."
+      }
+    ],
+    "linkCookies": "Politika e cookies"
+  },
+  "notFound": {
+    "title": "Faqja nuk u gjet",
+    "body": "Faqja që po kërkoni nuk ekziston ose është zhvendosur.",
+    "home": "Kthehu në ballinë"
+  }
+}

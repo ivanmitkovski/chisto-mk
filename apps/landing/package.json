@@ -7,12 +7,25 @@
     "build": "next build",
     "start": "next start -p 3002",
     "lint": "eslint .",
-    "test": "echo 'No tests yet'"
+    "test": "vitest run"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@vercel/analytics": "^2.0.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.5.2",
+    "framer-motion": "^12.34.3",
+    "lucide-react": "^0.575.0",
     "next": "^15.0.3",
+    "next-intl": "^4.8.3",
+    "postcss": "^8.5.8",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "resend": "^6.9.4",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.2.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -25,6 +38,7 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.3.0",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^4.1.2"
   }
 }
