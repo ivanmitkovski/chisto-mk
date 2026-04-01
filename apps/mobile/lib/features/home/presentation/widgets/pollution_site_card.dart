@@ -1135,6 +1135,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
   }
 
   void _trackFeedEvent(String eventType, {Map<String, dynamic>? metadata}) {
+    if (!ServiceLocator.instance.authState.isAuthenticated) return;
     unawaited(
       ServiceLocator.instance.sitesRepository.trackFeedEvent(
         site.id,

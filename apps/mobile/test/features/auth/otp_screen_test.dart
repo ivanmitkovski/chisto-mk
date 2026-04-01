@@ -1,11 +1,14 @@
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  const String testPhoneNumber = '+389 70 123 456';
+  /// E.164 as passed from sign-up navigation.
+  const String testPhoneE164 = '+38970123456';
 
   setUpAll(() async {
     await bootstrapWidgetTests();
@@ -13,8 +16,11 @@ void main() {
 
   Widget buildTestApp() {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
       onGenerateRoute: AppRouter.onGenerateRoute,
-      home: OtpScreen(phoneNumber: testPhoneNumber),
+      home: const OtpScreen(phoneNumber: testPhoneE164),
     );
   }
 
@@ -29,8 +35,10 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
+    final String formatted = formatPhoneForDisplay(testPhoneE164);
+    final BuildContext ctx = tester.element(find.byType(OtpScreen));
     expect(
-      find.text('We just sent a 4‑digit code to $testPhoneNumber'),
+      find.text(AppLocalizations.of(ctx)!.authOtpSubtitle(formatted)),
       findsOneWidget,
     );
   });
@@ -39,8 +47,8 @@ void main() {
     await tester.pumpWidget(buildTestApp());
     await tester.pumpAndSettle();
 
-    final otpRow = find.byWidgetPredicate(
-      (Widget w) => w is Row && (w as Row).children.length == 4,
+    final Finder otpRow = find.byWidgetPredicate(
+      (Widget w) => w is Row && w.children.length == 4,
     );
     expect(otpRow, findsOneWidget);
   });
@@ -52,10 +60,12 @@ void main() {
     await tester.pumpAndSettle();
 
     final ElevatedButton continueButton = tester.widget<ElevatedButton>(
-      find.ancestor(
-        of: find.text('Continue'),
-        matching: find.byType(ElevatedButton),
-      ).first,
+      find
+          .ancestor(
+            of: find.text('Continue'),
+            matching: find.byType(ElevatedButton),
+          )
+          .first,
     );
     expect(continueButton.onPressed, isNull);
   });
@@ -82,9 +92,9 @@ void main() {
     }
     await tester.pumpAndSettle();
 
-    final resendButton = find.byType(TextButton);
+    final Finder resendButton = find.byType(TextButton);
     expect(resendButton, findsOneWidget);
-    final button = tester.widget<TextButton>(resendButton);
+    final TextButton button = tester.widget<TextButton>(resendButton);
     expect(button.onPressed, isNotNull);
   });
 }

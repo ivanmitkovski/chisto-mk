@@ -363,4 +363,359 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get profileAvatarPeekSemantic => 'Profile photo';
+
+  @override
+  String get errorBannerDismiss => 'Dismiss';
+
+  @override
+  String get errorBannerTryAgain => 'Try again';
+
+  @override
+  String get authSemanticGoBack => 'Go back';
+
+  @override
+  String get authLoading => 'Loading';
+
+  @override
+  String get authSignInTitle => 'Sign in';
+
+  @override
+  String get authSignInSubtitle =>
+      'Welcome back. Enter your details to continue.';
+
+  @override
+  String get authFieldPhone => 'Phone number';
+
+  @override
+  String get authFieldPhoneHint => '70 123 456';
+
+  @override
+  String get authFieldPassword => 'Password';
+
+  @override
+  String get authFieldPasswordHint => 'Enter your password';
+
+  @override
+  String get authRememberMe => 'Remember me';
+
+  @override
+  String get authForgotPassword => 'Forgot password?';
+
+  @override
+  String get authSignInCta => 'Sign in';
+
+  @override
+  String get authValidationCheckPhonePassword =>
+      'Please check your phone number and password.';
+
+  @override
+  String get authSignUpPrompt => 'Don\'t have an account? ';
+
+  @override
+  String get authSignUpLink => 'Sign up';
+
+  @override
+  String get authSignUpTitle => 'Sign up';
+
+  @override
+  String get authSignUpSubtitle => 'Welcome! Please enter your details';
+
+  @override
+  String get authFieldFullName => 'Full name';
+
+  @override
+  String get authFieldFullNameHint => 'John Doe';
+
+  @override
+  String get authFieldEmail => 'Email';
+
+  @override
+  String get authFieldEmailHint => 'john@chisto.mk';
+
+  @override
+  String get authFieldPhoneNumber => 'Phone number';
+
+  @override
+  String get authPasswordRequirementsHint =>
+      'At least 8 characters, with letters and numbers';
+
+  @override
+  String get authTermsPrefix => 'By signing up you agree to our ';
+
+  @override
+  String get authTermsLink => 'terms and conditions';
+
+  @override
+  String get authValidationCheckFields =>
+      'Please check the highlighted fields above.';
+
+  @override
+  String get authSignUpCta => 'Sign up';
+
+  @override
+  String get authSignInPrompt => 'Already have an account? ';
+
+  @override
+  String get authSignInLink => 'Sign in';
+
+  @override
+  String authValidationFieldRequired(String fieldName) {
+    return '$fieldName is required';
+  }
+
+  @override
+  String get authValidationPhoneRequired => 'Phone number is required';
+
+  @override
+  String get authValidationPhoneDigits => 'Enter an 8-digit phone number';
+
+  @override
+  String get authValidationEmailRequired => 'Email is required';
+
+  @override
+  String get authValidationEmailInvalid => 'Enter a valid email';
+
+  @override
+  String get authValidationPasswordRequired => 'Password is required';
+
+  @override
+  String get authValidationPasswordMinLength =>
+      'Password must be at least 8 characters';
+
+  @override
+  String get authValidationPasswordNeedNumber =>
+      'Password must contain at least one number';
+
+  @override
+  String get authValidationPasswordNeedLetter =>
+      'Password must contain at least one letter';
+
+  @override
+  String get authValidationConfirmPasswordRequired =>
+      'Please confirm your password';
+
+  @override
+  String get authValidationConfirmPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get authErrorInvalidCredentials => 'Wrong phone number or password.';
+
+  @override
+  String get authErrorAccountSuspended => 'This account is not active.';
+
+  @override
+  String get authErrorPhoneNotRegistered =>
+      'No account found for this phone number.';
+
+  @override
+  String get authErrorEmailRegistered => 'This email is already registered.';
+
+  @override
+  String get authErrorPhoneRegistered =>
+      'This phone number is already registered.';
+
+  @override
+  String get authErrorOtpNotFound => 'No code was sent. Request a new code.';
+
+  @override
+  String get authErrorOtpExpired =>
+      'This code has expired. Request a new code.';
+
+  @override
+  String get authErrorOtpInvalid => 'Invalid code. Please try again.';
+
+  @override
+  String get authErrorOtpMaxAttempts =>
+      'Too many wrong codes. Request a new code.';
+
+  @override
+  String get authErrorCurrentPasswordInvalid =>
+      'Current password is incorrect.';
+
+  @override
+  String get authErrorTooManyAttempts =>
+      'Too many failed attempts. Try again later.';
+
+  @override
+  String get authErrorRateLimited =>
+      'Too many requests. Please wait a moment and try again.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'We could not find an account for this number. Please check and try again.';
+
+  @override
+  String get authOtpTitle => 'Enter code';
+
+  @override
+  String authOtpSubtitle(String phone) {
+    return 'We just sent a 4-digit code to $phone';
+  }
+
+  @override
+  String get authOtpContinue => 'Continue';
+
+  @override
+  String get authOtpResendPrefix => 'Didn\'t receive code? ';
+
+  @override
+  String get authOtpResendAction => 'Send again';
+
+  @override
+  String authOtpResendCountdown(int seconds) {
+    return 'Resend code in ${seconds}s';
+  }
+
+  @override
+  String authOtpResentMessage(String phone) {
+    return 'We\'ve sent a new code to $phone.';
+  }
+
+  @override
+  String get authForgotPasswordTitle => 'Reset password';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Enter your phone number and we\'ll send you a code to reset your password';
+
+  @override
+  String get authForgotPasswordSendCode => 'Send reset code';
+
+  @override
+  String get authForgotPasswordRequestSemantic => 'Send reset code';
+
+  @override
+  String get authForgotPasswordOtpTitle => 'Enter code';
+
+  @override
+  String authForgotPasswordOtpSubtitle(String phone) {
+    return 'We sent a 4-digit code to $phone';
+  }
+
+  @override
+  String get authNewPasswordTitle => 'Create new password';
+
+  @override
+  String get authNewPasswordSubtitle => 'Enter a new password for your account';
+
+  @override
+  String get authFieldNewPassword => 'New password';
+
+  @override
+  String get authFieldNewPasswordHint => 'At least 8 characters';
+
+  @override
+  String get authFieldConfirmPassword => 'Confirm password';
+
+  @override
+  String get authFieldConfirmPasswordHint => 'Re-enter your password';
+
+  @override
+  String get authResetPasswordCta => 'Reset password';
+
+  @override
+  String get authPasswordResetSuccessTitle => 'Password reset';
+
+  @override
+  String get authPasswordResetSuccessBody =>
+      'Your password has been reset successfully. You can now sign in with your new password.';
+
+  @override
+  String get authBackToSignIn => 'Back to sign in';
+
+  @override
+  String get authOnboardingWelcomeTo => 'Welcome to';
+
+  @override
+  String get authOnboardingBrandName => 'Chisto.mk';
+
+  @override
+  String get authOnboardingWelcomeDescription => 'See it. Report it. Clean it.';
+
+  @override
+  String get authOnboardingWelcomeSupporting =>
+      'A cleaner city starts with one tap.';
+
+  @override
+  String get authOnboardingSlide2Title => 'Report in seconds';
+
+  @override
+  String get authOnboardingSlide2Description =>
+      'Share a report with location in a few taps.';
+
+  @override
+  String get authOnboardingSlide2Supporting =>
+      'Fast flow, clear status updates.';
+
+  @override
+  String get authOnboardingSlide3Title => 'Join cleanup events';
+
+  @override
+  String get authOnboardingSlide3Description =>
+      'Track progress and community impact nearby.';
+
+  @override
+  String get authOnboardingSlide3Supporting =>
+      'Together we keep neighborhoods green.';
+
+  @override
+  String get authOnboardingContinue => 'Continue';
+
+  @override
+  String get authOnboardingGetStarted => 'Get started';
+
+  @override
+  String get authLocationTitle => 'Choose your location';
+
+  @override
+  String get authLocationSubtitle =>
+      'We use your location to show cleanups and reports near you.';
+
+  @override
+  String get authLocationMapPlaceholder =>
+      'Use current location to update this area';
+
+  @override
+  String get authLocationDetecting => 'Detecting location…';
+
+  @override
+  String get authLocationContinue => 'Continue';
+
+  @override
+  String get authLocationUseCurrent => 'Use current location';
+
+  @override
+  String get authLocationUseDifferent => 'Use a different location';
+
+  @override
+  String get authLocationPrivacyNote =>
+      'We only use your location to show nearby cleanups. We don\'t track you in the background.';
+
+  @override
+  String get authLocationServicesDisabled =>
+      'Location services are disabled. Please enable them in Settings.';
+
+  @override
+  String get authLocationPermissionDenied =>
+      'Location permission denied. You can enable it in Settings to use this feature.';
+
+  @override
+  String get authLocationPermissionForever =>
+      'Location permission is permanently denied. Opening Settings…';
+
+  @override
+  String get authLocationMacedoniaOnly =>
+      'Currently we only support locations in Macedonia.';
+
+  @override
+  String get authLocationResolveFailed =>
+      'Could not resolve your location. Please try again.';
+
+  @override
+  String get authOtpCodeSemantic => 'Verification code';
+
+  @override
+  String authOtpDigitSemantic(int index, int total) {
+    return 'Digit $index of $total';
+  }
 }

@@ -1,8 +1,21 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Tokens use platform secure storage with Apple keychain accessibility that
+/// avoids background access before first unlock; Android uses the package
+/// default AES-GCM + KeyStore (see [AndroidOptions]).
 class SecureTokenStorage {
   SecureTokenStorage({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+      : _storage = storage ?? _defaultStorage;
+
+  static final FlutterSecureStorage _defaultStorage = FlutterSecureStorage(
+    aOptions: const AndroidOptions(),
+    iOptions: const IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+    mOptions: const MacOsOptions(
+      accessibility: KeychainAccessibility.first_unlock_this_device,
+    ),
+  );
 
   final FlutterSecureStorage _storage;
 

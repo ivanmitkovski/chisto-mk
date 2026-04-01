@@ -638,15 +638,21 @@ class ApiSitesRepository implements SitesRepository {
     String? sessionId,
     Map<String, dynamic>? metadata,
   }) async {
-    await _client.post(
-      '/sites/feed/events',
-      body: <String, dynamic>{
-        'siteId': siteId,
-        'eventType': eventType,
-        if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
-        ...?metadata?.letMap('metadata'),
-      },
-    );
+    try {
+      await _client.post(
+        '/sites/feed/events',
+        body: <String, dynamic>{
+          'siteId': siteId,
+          'eventType': eventType,
+          if (sessionId != null && sessionId.isNotEmpty) 'sessionId': sessionId,
+          ...?metadata?.letMap('metadata'),
+        },
+      );
+    } on AppError {
+      // Fire-and-forget feed analytics; callers use unawaited. Ignore failures
+      // (logged out, expired token, offline, throttled) so they never surface
+      // as unhandled async exceptions.
+    }
   }
 
   @override

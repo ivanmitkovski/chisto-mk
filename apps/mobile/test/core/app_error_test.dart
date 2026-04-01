@@ -69,12 +69,20 @@ void main() {
         expect(err.code, equals('UNKNOWN'));
         expect(err.message, equals('An unexpected error occurred.'));
       });
+
+      test('tooManyRequests is retryable and carries retryAfterSeconds', () {
+        final err = AppError.tooManyRequests(retryAfterSeconds: 30);
+        expect(err.code, equals('TOO_MANY_REQUESTS'));
+        expect(err.retryable, isTrue);
+        expect(err.details, equals(<String, dynamic>{'retryAfterSeconds': 30}));
+      });
     });
 
     test('network errors are retryable', () {
       expect(AppError.network().retryable, isTrue);
       expect(AppError.timeout().retryable, isTrue);
       expect(AppError.server().retryable, isTrue);
+      expect(AppError.tooManyRequests().retryable, isTrue);
     });
 
     test('unauthorized errors are not retryable', () {

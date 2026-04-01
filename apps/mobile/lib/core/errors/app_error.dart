@@ -59,6 +59,21 @@ class AppError implements Exception {
         details: details,
       );
 
+  /// Rate limit / throttling (HTTP 429 or API `TOO_MANY_REQUESTS`).
+  factory AppError.tooManyRequests({
+    String? message,
+    int? retryAfterSeconds,
+  }) =>
+      AppError(
+        code: 'TOO_MANY_REQUESTS',
+        message:
+            message ?? 'Too many requests. Please wait and try again.',
+        retryable: true,
+        details: retryAfterSeconds != null
+            ? <String, dynamic>{'retryAfterSeconds': retryAfterSeconds}
+            : null,
+      );
+
   factory AppError.unknown({Object? cause}) => AppError(
         code: 'UNKNOWN',
         message: 'An unexpected error occurred.',

@@ -20,6 +20,10 @@ abstract class AuthRepository {
 
   Future<void> signOut();
 
+  /// Clears local tokens and auth UI state when the API reports an invalid session
+  /// (e.g. 401). Does not call the server logout endpoint.
+  Future<void> invalidateLocalSession();
+
   Future<void> restoreSession();
 
   /// Request OTP for the given (registered) phone number. Returns [SendOtpResult].

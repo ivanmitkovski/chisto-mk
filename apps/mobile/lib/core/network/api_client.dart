@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 
 /// HTTP client for Chisto API. Attaches base URL, auth token, maps errors to
 /// [AppError], and transparently retries once on 401 after refreshing the
 /// session (if a [refreshSession] callback is provided).
+///
+/// Parallel 401s: [_refreshing] allows only one refresh at a time; other
+/// requests may fail once before the retry path succeeds after refresh.
 class ApiClient {
   ApiClient({
     required AppConfig config,
@@ -152,6 +156,7 @@ class ApiClient {
     '/auth/logout',
     '/auth/otp/send',
     '/auth/otp/verify',
+    '/auth/password-reset/request',
     '/auth/password-reset/confirm',
   };
 
@@ -277,68 +282,25 @@ class ApiClient {
       );
     }
 
-    final AppError error = _errorFromResponse(response.statusCode, json, bodyStr);
-    throw error;
-  }
+    final String? retryAfterHeader = response.headers['retry-after'];
+    final AppError error = appErrorFromFailedResponse(
+      statusCode: response.statusCode,
+      json: json,
+      bodyStr: bodyStr,
+      retryAfterHeader: retryAfterHeader,
+    );
 
-  AppError _errorFromResponse(
-    int statusCode,
-    Map<String, dynamic>? json,
-    String? bodyStr,
-  ) {
-    final String code = json?['code'] is String
-        ? json!['code'] as String
-        : _codeForStatus(statusCode);
-    final String message = json?['message'] is String
-        ? json!['message'] as String
-        : (bodyStr ?? 'Request failed');
-    final dynamic details = json?['details'];
-
-    if (statusCode == 401) {
-      final String authCode = code;
+    if (response.statusCode == 401) {
+      final String authCode = error.code;
       // ACCOUNT_NOT_ACTIVE = soft-deleted/suspended; sign out like other auth failures
       if (authCode == 'UNAUTHORIZED' ||
           authCode == 'INVALID_TOKEN_USER' ||
           authCode == 'ACCOUNT_NOT_ACTIVE') {
         _onUnauthorized();
-        return AppError(code: authCode, message: message);
       }
-      return AppError(code: authCode, message: message);
     }
-    if (statusCode == 403) return AppError.forbidden(message: message);
-    if (statusCode == 404) return AppError.notFound(message: message);
-    if (statusCode == 422 || statusCode == 400 && code == 'VALIDATION_ERROR') {
-      return AppError.validation(message: message, details: details);
-    }
-    if (statusCode >= 500) {
-      return AppError.server(message: message);
-    }
-    if (statusCode == 408 || statusCode == 504) {
-      return AppError.timeout(message: message);
-    }
-    return AppError(
-      code: code,
-      message: message,
-      retryable: statusCode >= 500 || statusCode == 408 || statusCode == 504,
-      details: details,
-    );
-  }
 
-  static String _codeForStatus(int status) {
-    switch (status) {
-      case 400:
-        return 'BAD_REQUEST';
-      case 401:
-        return 'UNAUTHORIZED';
-      case 403:
-        return 'FORBIDDEN';
-      case 404:
-        return 'NOT_FOUND';
-      case 409:
-        return 'CONFLICT';
-      default:
-        return 'HTTP_ERROR';
-    }
+    throw error;
   }
 }
 

@@ -362,4 +362,362 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get profileAvatarPeekSemantic => 'Foto e profilit';
+
+  @override
+  String get errorBannerDismiss => 'Mbyll';
+
+  @override
+  String get errorBannerTryAgain => 'Provo përsëri';
+
+  @override
+  String get authSemanticGoBack => 'Kthehu';
+
+  @override
+  String get authLoading => 'Duke u ngarkuar';
+
+  @override
+  String get authSignInTitle => 'Hyr';
+
+  @override
+  String get authSignInSubtitle =>
+      'Mirë se erdhe përsëri. Plotëso të dhënat për të vazhduar.';
+
+  @override
+  String get authFieldPhone => 'Numri i telefonit';
+
+  @override
+  String get authFieldPhoneHint => '70 123 456';
+
+  @override
+  String get authFieldPassword => 'Fjalëkalimi';
+
+  @override
+  String get authFieldPasswordHint => 'Shkruaj fjalëkalimin';
+
+  @override
+  String get authRememberMe => 'Më mbaj mend';
+
+  @override
+  String get authForgotPassword => 'Harrove fjalëkalimin?';
+
+  @override
+  String get authSignInCta => 'Hyr';
+
+  @override
+  String get authValidationCheckPhonePassword =>
+      'Kontrollo numrin e telefonit dhe fjalëkalimin.';
+
+  @override
+  String get authSignUpPrompt => 'Nuk ke llogari? ';
+
+  @override
+  String get authSignUpLink => 'Regjistrohu';
+
+  @override
+  String get authSignUpTitle => 'Regjistrohu';
+
+  @override
+  String get authSignUpSubtitle => 'Mirë se erdhe! Plotëso të dhënat e tua';
+
+  @override
+  String get authFieldFullName => 'Emri i plotë';
+
+  @override
+  String get authFieldFullNameHint => 'Emër Mbiemër';
+
+  @override
+  String get authFieldEmail => 'Email';
+
+  @override
+  String get authFieldEmailHint => 'përdorues@chisto.mk';
+
+  @override
+  String get authFieldPhoneNumber => 'Numri i telefonit';
+
+  @override
+  String get authPasswordRequirementsHint =>
+      'Të paktën 8 karaktere, me shkronja dhe numra';
+
+  @override
+  String get authTermsPrefix => 'Duke u regjistruar pranon ';
+
+  @override
+  String get authTermsLink => 'kushtet';
+
+  @override
+  String get authValidationCheckFields =>
+      'Kontrollo fushat e theksuara më sipër.';
+
+  @override
+  String get authSignUpCta => 'Regjistrohu';
+
+  @override
+  String get authSignInPrompt => 'Ke tashmë llogari? ';
+
+  @override
+  String get authSignInLink => 'Hyr';
+
+  @override
+  String authValidationFieldRequired(String fieldName) {
+    return '$fieldName është i detyrueshëm';
+  }
+
+  @override
+  String get authValidationPhoneRequired =>
+      'Numri i telefonit është i detyrueshëm';
+
+  @override
+  String get authValidationPhoneDigits => 'Shkruaj numër telefoni me 8 shifra';
+
+  @override
+  String get authValidationEmailRequired => 'Email-i është i detyrueshëm';
+
+  @override
+  String get authValidationEmailInvalid => 'Shkruaj një email të vlefshëm';
+
+  @override
+  String get authValidationPasswordRequired =>
+      'Fjalëkalimi është i detyrueshëm';
+
+  @override
+  String get authValidationPasswordMinLength =>
+      'Fjalëkalimi duhet të ketë të paktën 8 karaktere';
+
+  @override
+  String get authValidationPasswordNeedNumber =>
+      'Fjalëkalimi duhet të përmbajë të paktën një numër';
+
+  @override
+  String get authValidationPasswordNeedLetter =>
+      'Fjalëkalimi duhet të përmbajë të paktën një shkronjë';
+
+  @override
+  String get authValidationConfirmPasswordRequired => 'Konfirmo fjalëkalimin';
+
+  @override
+  String get authValidationConfirmPasswordMismatch =>
+      'Fjalëkalimet nuk përputhen';
+
+  @override
+  String get authErrorInvalidCredentials =>
+      'Numër telefoni ose fjalëkalim i gabuar.';
+
+  @override
+  String get authErrorAccountSuspended => 'Kjo llogari nuk është aktive.';
+
+  @override
+  String get authErrorPhoneNotRegistered =>
+      'Nuk u gjet llogari për këtë numër.';
+
+  @override
+  String get authErrorEmailRegistered => 'Ky email është tashmë i regjistruar.';
+
+  @override
+  String get authErrorPhoneRegistered =>
+      'Ky numër telefoni është tashmë i regjistruar.';
+
+  @override
+  String get authErrorOtpNotFound => 'Nuk u dërgua kod. Kërko një të ri.';
+
+  @override
+  String get authErrorOtpExpired => 'Ky kod ka skaduar. Kërko një të ri.';
+
+  @override
+  String get authErrorOtpInvalid => 'Kod i pavlefshëm. Provo përsëri.';
+
+  @override
+  String get authErrorOtpMaxAttempts =>
+      'Shumë kode të gabuara. Kërko një kod të ri.';
+
+  @override
+  String get authErrorCurrentPasswordInvalid =>
+      'Fjalëkalimi aktual është i pasaktë.';
+
+  @override
+  String get authErrorTooManyAttempts =>
+      'Shumë përpjekje të dështuara. Provo më vonë.';
+
+  @override
+  String get authErrorRateLimited =>
+      'Shumë kërkesa. Prit pak dhe provo përsëri.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Nuk gjetëm llogari për këtë numër. Kontrollo dhe provo përsëri.';
+
+  @override
+  String get authOtpTitle => 'Shkruaj kodin';
+
+  @override
+  String authOtpSubtitle(String phone) {
+    return 'Dërguam një kod me 4 shifra te $phone';
+  }
+
+  @override
+  String get authOtpContinue => 'Vazhdo';
+
+  @override
+  String get authOtpResendPrefix => 'Nuk e morët kodin? ';
+
+  @override
+  String get authOtpResendAction => 'Dërgo përsëri';
+
+  @override
+  String authOtpResendCountdown(int seconds) {
+    return 'Ridërgo pas $seconds s';
+  }
+
+  @override
+  String authOtpResentMessage(String phone) {
+    return 'Dërguam një kod të ri te $phone.';
+  }
+
+  @override
+  String get authForgotPasswordTitle => 'Rivendos fjalëkalimin';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Shkruaj numrin e telefonit dhe do të të dërgojmë një kod';
+
+  @override
+  String get authForgotPasswordSendCode => 'Dërgo kodin';
+
+  @override
+  String get authForgotPasswordRequestSemantic => 'Dërgo kod për rivendosje';
+
+  @override
+  String get authForgotPasswordOtpTitle => 'Shkruaj kodin';
+
+  @override
+  String authForgotPasswordOtpSubtitle(String phone) {
+    return 'Dërguam një kod me 4 shifra te $phone';
+  }
+
+  @override
+  String get authNewPasswordTitle => 'Fjalëkalim i ri';
+
+  @override
+  String get authNewPasswordSubtitle =>
+      'Shkruaj një fjalëkalim të ri për llogarinë';
+
+  @override
+  String get authFieldNewPassword => 'Fjalëkalim i ri';
+
+  @override
+  String get authFieldNewPasswordHint => 'Të paktën 8 karaktere';
+
+  @override
+  String get authFieldConfirmPassword => 'Konfirmo fjalëkalimin';
+
+  @override
+  String get authFieldConfirmPasswordHint => 'Rishkruaj fjalëkalimin';
+
+  @override
+  String get authResetPasswordCta => 'Rivendos fjalëkalimin';
+
+  @override
+  String get authPasswordResetSuccessTitle => 'Fjalëkalimi u rivendos';
+
+  @override
+  String get authPasswordResetSuccessBody =>
+      'Fjalëkalimi u ndryshua me sukses. Tani mund të hysh me fjalëkalimin e ri.';
+
+  @override
+  String get authBackToSignIn => 'Kthehu te hyrja';
+
+  @override
+  String get authOnboardingWelcomeTo => 'Mirë se vini në';
+
+  @override
+  String get authOnboardingBrandName => 'Chisto.mk';
+
+  @override
+  String get authOnboardingWelcomeDescription => 'Shih. Raporto. Pastro.';
+
+  @override
+  String get authOnboardingWelcomeSupporting =>
+      'Një qytet më i pastër fillon me një prekje.';
+
+  @override
+  String get authOnboardingSlide2Title => 'Raporto në sekonda';
+
+  @override
+  String get authOnboardingSlide2Description =>
+      'Ndaj një raport me vendndodhje me pak prekje.';
+
+  @override
+  String get authOnboardingSlide2Supporting =>
+      'Rrjedhë e shpejtë, përditësime të qarta.';
+
+  @override
+  String get authOnboardingSlide3Title => 'Bashkohu në pastrime';
+
+  @override
+  String get authOnboardingSlide3Description =>
+      'Ndiq progresin dhe ndikimin në komunitet.';
+
+  @override
+  String get authOnboardingSlide3Supporting =>
+      'Së bashku i mbajmë lagjet të gjelbra.';
+
+  @override
+  String get authOnboardingContinue => 'Vazhdo';
+
+  @override
+  String get authOnboardingGetStarted => 'Fillo';
+
+  @override
+  String get authLocationTitle => 'Zgjidh vendndodhjen';
+
+  @override
+  String get authLocationSubtitle =>
+      'E përdorim për të treguar pastrime dhe raporte afër teje.';
+
+  @override
+  String get authLocationMapPlaceholder =>
+      'Përdor vendndodhjen aktuale për të përditësuar zonën';
+
+  @override
+  String get authLocationDetecting => 'Po zgjidhhet vendndodhja…';
+
+  @override
+  String get authLocationContinue => 'Vazhdo';
+
+  @override
+  String get authLocationUseCurrent => 'Përdor vendndodhjen aktuale';
+
+  @override
+  String get authLocationUseDifferent => 'Përdor vendndodhje tjetër';
+
+  @override
+  String get authLocationPrivacyNote =>
+      'Vendndodhjen e përdorim vetëm për përmbajtje afër. Nuk të ndjekim në sfond.';
+
+  @override
+  String get authLocationServicesDisabled =>
+      'Shërbimet e vendndodhjes janë të fikura. Aktivizoji te Cilësimet.';
+
+  @override
+  String get authLocationPermissionDenied =>
+      'Leja për vendndodhje u refuzua. Mund ta aktivizosh te Cilësimet.';
+
+  @override
+  String get authLocationPermissionForever =>
+      'Leja është refuzuar përgjithmonë. Po hapen Cilësimet…';
+
+  @override
+  String get authLocationMacedoniaOnly =>
+      'Momentalisht mbështetemi vetëm për vendndodhje në Maqedoni.';
+
+  @override
+  String get authLocationResolveFailed =>
+      'Nuk mund të përcaktohej vendndodhja. Provo përsëri.';
+
+  @override
+  String get authOtpCodeSemantic => 'Kod verifikimi';
+
+  @override
+  String authOtpDigitSemantic(int index, int total) {
+    return 'Shifra $index nga $total';
+  }
 }

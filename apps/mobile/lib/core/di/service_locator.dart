@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
@@ -34,6 +36,7 @@ class ServiceLocator {
   SharedPreferences? _preferences;
   ApiClient? _apiClient;
   AuthRepository? _authRepository;
+  AuthRepository? _authRepositoryForUnauthorized;
   EventsRepository? _eventsRepository;
   CheckInRepository? _checkInRepository;
   ProfileRepository? _profileRepository;
@@ -82,7 +85,12 @@ class ServiceLocator {
       config: _config!,
       accessToken: () => _authState!.accessToken,
       onUnauthorized: () {
-        _authState!.setUnauthenticated();
+        final AuthRepository? repo = _authRepositoryForUnauthorized;
+        if (repo != null) {
+          unawaited(repo.invalidateLocalSession());
+        } else {
+          _authState!.setUnauthenticated();
+        }
       },
     );
 
@@ -98,6 +106,7 @@ class ServiceLocator {
       preferences: prefs,
       pushService: _pushNotificationService,
     );
+    _authRepositoryForUnauthorized = _authRepository;
 
     _apiClient!.refreshSession = () async {
       try {
@@ -135,6 +144,7 @@ class ServiceLocator {
     _preferences = null;
     _apiClient = null;
     _authRepository = null;
+    _authRepositoryForUnauthorized = null;
     _eventsRepository = null;
     _checkInRepository = null;
     _profileRepository = null;

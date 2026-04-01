@@ -163,5 +163,154 @@
   "profileAvatarCameraUnavailable": "Камерата не е достапна сега. Обидете се повторно за момент.",
   "profileAvatarReadPhotoFailed": "Не можеше да се прочита фотографијата. Обидете се повторно.",
   "profileAvatarProcessPhotoFailed": "Не можеше да се обработи фотографијата. Обидете се повторно.",
-  "profileAvatarPeekSemantic": "Профилна фотографија"
+  "profileAvatarPeekSemantic": "Профилна фотографија",
+  "errorBannerDismiss": "Отфрли",
+  "errorBannerTryAgain": "Обиди се повторно",
+  "authSemanticGoBack": "Назад",
+  "authLoading": "Се вчитува",
+  "authSignInTitle": "Најава",
+  "authSignInSubtitle": "Добредојдовте повторно. Внесете ги податоците за да продолжите.",
+  "authFieldPhone": "Телефонски број",
+  "authFieldPhoneHint": "70 123 456",
+  "authFieldPassword": "Лозинка",
+  "authFieldPasswordHint": "Внесете ја лозинката",
+  "authRememberMe": "Запомни ме",
+  "authForgotPassword": "Заборавена лозинка?",
+  "authSignInCta": "Најави се",
+  "authValidationCheckPhonePassword": "Проверете го телефонот и лозинката.",
+  "authSignUpPrompt": "Немате сметка? ",
+  "authSignUpLink": "Регистрирај се",
+  "authSignUpTitle": "Регистрација",
+  "authSignUpSubtitle": "Добредојдовте! Внесете ги вашите податоци",
+  "authFieldFullName": "Име и презиме",
+  "authFieldFullNameHint": "Име Презиме",
+  "authFieldEmail": "Е-пошта",
+  "authFieldEmailHint": "korisnik@chisto.mk",
+  "authFieldPhoneNumber": "Телефонски број",
+  "authPasswordRequirementsHint": "Најмалку 8 знаци, со букви и бројки",
+  "authTermsPrefix": "Со регистрација се согласувате со ",
+  "authTermsLink": "условите",
+  "authValidationCheckFields": "Проверете ги полињата погоре.",
+  "authSignUpCta": "Регистрирај се",
+  "authSignInPrompt": "Веќе имате сметка? ",
+  "authSignInLink": "Најави се",
+  "authValidationFieldRequired": "{fieldName} е задолжително",
+  "@authValidationFieldRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "authValidationPhoneRequired": "Телефонскиот број е задолжителен",
+  "authValidationPhoneDigits": "Внесете 8-цифрен телефонски број",
+  "authValidationEmailRequired": "Е-поштата е задолжителна",
+  "authValidationEmailInvalid": "Внесете валидна е-пошта",
+  "authValidationPasswordRequired": "Лозинката е задолжителна",
+  "authValidationPasswordMinLength": "Лозинката мора да има најмалку 8 знаци",
+  "authValidationPasswordNeedNumber": "Лозинката мора да содржи барем една бројка",
+  "authValidationPasswordNeedLetter": "Лозинката мора да содржи барем една буква",
+  "authValidationConfirmPasswordRequired": "Потврдете ја лозинката",
+  "authValidationConfirmPasswordMismatch": "Лозинките не се совпаѓаат",
+  "authErrorInvalidCredentials": "Погрешен телефон или лозинка.",
+  "authErrorAccountSuspended": "Оваа сметка не е активна.",
+  "authErrorPhoneNotRegistered": "Нема сметка за овој телефонски број.",
+  "authErrorEmailRegistered": "Оваа е-пошта е веќе регистрирана.",
+  "authErrorPhoneRegistered": "Овој телефонски број е веќе регистриран.",
+  "authErrorOtpNotFound": "Нема испратен код. Побарајте нов.",
+  "authErrorOtpExpired": "Кодот е истечен. Побарајте нов.",
+  "authErrorOtpInvalid": "Невалиден код. Обидете се повторно.",
+  "authErrorOtpMaxAttempts": "Премногу погрешни обиди. Побарајте нов код.",
+  "authErrorCurrentPasswordInvalid": "Моменталната лозинка е неточна.",
+  "authErrorTooManyAttempts": "Премногу неуспешни обиди. Обидете се подоцна.",
+  "authErrorRateLimited": "Премногу барања. Почекајте малку и обидете се повторно.",
+  "authErrorUserNotFound": "Не најдовме сметка за овој број. Проверете и обидете се повторно.",
+  "authOtpTitle": "Внесете код",
+  "authOtpSubtitle": "Испративме 4-цифрен код на {phone}",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authOtpContinue": "Продолжи",
+  "authOtpResendPrefix": "Не добивте код? ",
+  "authOtpResendAction": "Испрати повторно",
+  "authOtpResendCountdown": "Повторно испраќање за {seconds} с",
+  "@authOtpResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResentMessage": "Испративме нов код на {phone}.",
+  "@authOtpResentMessage": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordTitle": "Ресетирај лозинка",
+  "authForgotPasswordSubtitle": "Внесете го телефонот и ќе ви испратиме код за нова лозинка",
+  "authForgotPasswordSendCode": "Испрати код",
+  "authForgotPasswordRequestSemantic": "Испрати код за ресет",
+  "authForgotPasswordOtpTitle": "Внесете код",
+  "authForgotPasswordOtpSubtitle": "Испративме 4-цифрен код на {phone}",
+  "@authForgotPasswordOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authNewPasswordTitle": "Нова лозинка",
+  "authNewPasswordSubtitle": "Внесете нова лозинка за вашата сметка",
+  "authFieldNewPassword": "Нова лозинка",
+  "authFieldNewPasswordHint": "Најмалку 8 знаци",
+  "authFieldConfirmPassword": "Потврди лозинка",
+  "authFieldConfirmPasswordHint": "Повторно внесете ја лозинката",
+  "authResetPasswordCta": "Ресетирај лозинка",
+  "authPasswordResetSuccessTitle": "Лозинката е сменета",
+  "authPasswordResetSuccessBody": "Лозинката е успешно ресетирана. Сега можете да се најавите со новата лозинка.",
+  "authBackToSignIn": "Назад на најава",
+  "authOnboardingWelcomeTo": "Добредојдовте на",
+  "authOnboardingBrandName": "Chisto.mk",
+  "authOnboardingWelcomeDescription": "Види. Пријави. Исчисти.",
+  "authOnboardingWelcomeSupporting": "Почнува со едно допирање.",
+  "authOnboardingSlide2Title": "Пријавете за секунди",
+  "authOnboardingSlide2Description": "Споделете пријава со локација со неколку допирања.",
+  "authOnboardingSlide2Supporting": "Брз тек, јасни ажурирања на статусот.",
+  "authOnboardingSlide3Title": "Придружете се на акции",
+  "authOnboardingSlide3Description": "Следете напредок и влијание во заедницата.",
+  "authOnboardingSlide3Supporting": "Заедно ги чуваме квартовите зелени.",
+  "authOnboardingContinue": "Продолжи",
+  "authOnboardingGetStarted": "Започни",
+  "authLocationTitle": "Одберете локација",
+  "authLocationSubtitle": "Ја користиме за да ви покажеме акции и пријави во близина.",
+  "authLocationMapPlaceholder": "Користете ја моменталната локација за да ја ажурирате областа",
+  "authLocationDetecting": "Се детектира локација…",
+  "authLocationContinue": "Продолжи",
+  "authLocationUseCurrent": "Користи моментална локација",
+  "authLocationUseDifferent": "Друга локација",
+  "authLocationPrivacyNote": "Локацијата ја користиме само за содржина во близина. Не ве следиме во позадина.",
+  "authLocationServicesDisabled": "Локациските услуги се исклучени. Вклучете ги во Поставки.",
+  "authLocationPermissionDenied": "Дозволата за локација е одбиена. Можете да ја вклучите во Поставки.",
+  "authLocationPermissionForever": "Дозволата е трајно одбиена. Се отвораат Поставки…",
+  "authLocationMacedoniaOnly": "Моментално поддржуваме само локации во Македонија.",
+  "authLocationResolveFailed": "Не можевме да ја одредиме локацијата. Обидете се повторно.",
+  "authOtpCodeSemantic": "Код за потврда",
+  "authOtpDigitSemantic": "Цифра {index} од {total}",
+  "@authOtpDigitSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }
