@@ -6,7 +6,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
-import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -14,6 +13,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/loading_overlay.dart';
@@ -82,14 +82,14 @@ class _OtpScreenState extends State<OtpScreen> {
       _apiError = null;
     });
     try {
-      final SendOtpResult result = await ServiceLocator.instance.authRepository
+      await ServiceLocator.instance.authRepository
           .requestOtp(widget.phoneNumber);
       if (!mounted) return;
       setState(() => _sendingOtp = false);
     } on AppError catch (e) {
       if (!mounted) return;
       setState(() {
-        _apiError = messageForAuthError(e);
+        _apiError = messageForAuthError(AppLocalizations.of(context)!, e);
         _sendingOtp = false;
       });
     }
@@ -113,7 +113,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   void _handleCodeChanged(String value) {
-    AppHaptics.tap();
+    AppHaptics.tap(context);
     setState(() {});
 
     if (_isComplete && !_isLoading && !_otpLocked) {
@@ -128,13 +128,14 @@ class _OtpScreenState extends State<OtpScreen> {
       _isLoading = true;
       _apiError = null;
     });
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     try {
       await ServiceLocator.instance.authRepository.verifyOtp(
         widget.phoneNumber,
         _codeController.text.trim(),
       );
       if (!mounted) return;
-      AppHaptics.success();
+      AppHaptics.success(context);
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.location,
         (Route<dynamic> route) => false,
@@ -147,15 +148,15 @@ class _OtpScreenState extends State<OtpScreen> {
           if (_verifyAttempts >= 3) {
             _otpLocked = true;
             _codeController.clear();
-            _apiError = 'Too many wrong codes. Request a new code.';
+            _apiError = l10n.authErrorOtpMaxAttempts;
           } else {
-            _apiError = messageForAuthError(e);
+            _apiError = messageForAuthError(l10n, e);
           }
         } else {
-          _apiError = messageForAuthError(e);
+          _apiError = messageForAuthError(l10n, e);
         }
       });
-      AppHaptics.warning();
+      AppHaptics.warning(context);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -163,10 +164,10 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Future<void> _handleResend() async {
     if (!_canResend) {
-      AppHaptics.tap();
+      AppHaptics.tap(context);
       return;
     }
-    AppHaptics.light();
+    AppHaptics.light(context);
     _codeController.clear();
     _codeFocusNode.requestFocus();
     setState(() {
@@ -181,6 +182,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Stack(
@@ -193,11 +195,14 @@ class _OtpScreenState extends State<OtpScreen> {
             behavior: HitTestBehavior.translucent,
             child: SafeArea(
               child: AnimatedPadding(
-                duration: AppMotion.medium,
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : AppMotion.medium,
                 curve: AppMotion.emphasized,
                 padding: EdgeInsets.only(bottom: keyboardInset),
                 child: SingleChildScrollView(
-                  keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                  keyboardDismissBehavior:
+                      ScrollViewKeyboardDismissBehavior.onDrag,
                   padding: const EdgeInsets.fromLTRB(
                     AppSpacing.lg,
                     AppSpacing.sm,
@@ -207,11 +212,9 @@ class _OtpScreenState extends State<OtpScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Tooltip(
-                        message: 'Go back',
-                        child: const AppBackButton(),
-                      ),
+                      const AppBackButton(),
                       if (_apiError != null) ...[
+                        const SizedBox(height: AppSpacing.sm),
                         ApiErrorBanner(
                           message: _apiError!,
                           onDismiss: () => setState(() => _apiError = null),
@@ -221,7 +224,8 @@ class _OtpScreenState extends State<OtpScreen> {
                       const SizedBox(height: AppSpacing.xxl),
                       Center(
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(AppSpacing.radius22),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radius22),
                           child: SizedBox(
                             width: 146,
                             height: 146,
@@ -233,16 +237,18 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radius22),
-                      const Center(
+                      Center(
                         child: Text(
-                          'Enter code',
+                          l10n.authOtpTitle,
                           style: AppTypography.authHeadline,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Center(
                         child: Text(
-                          'We just sent a 4‑digit code to ${_formatPhoneForDisplay(widget.phoneNumber)}',
+                          l10n.authOtpSubtitle(
+                            _formatPhoneForDisplay(widget.phoneNumber),
+                          ),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -253,48 +259,58 @@ class _OtpScreenState extends State<OtpScreen> {
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () => _codeFocusNode.requestFocus(),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List<Widget>.generate(
-                            _otpLength,
-                            (int index) {
-                              final String text = index < _codeController.text.length
-                                  ? _codeController.text[index]
-                                  : '';
-                              final bool isActive =
-                                  index == _codeController.text.length && !_isComplete;
+                        child: ExcludeSemantics(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: List<Widget>.generate(
+                              _otpLength,
+                              (int index) {
+                                final String text =
+                                    index < _codeController.text.length
+                                        ? _codeController.text[index]
+                                        : '';
+                                final bool isActive =
+                                    index == _codeController.text.length &&
+                                        !_isComplete;
 
-                              return _OtpDigitBox(
-                                value: text,
-                                isActive: isActive,
-                              );
-                            },
+                                return _OtpDigitBox(
+                                  value: text,
+                                  isActive: isActive,
+                                );
+                              },
+                            ),
                           ),
                         ),
                       ),
-                      // Hidden text field that owns the real input & keyboard.
+                      // Focus target for screen readers & keyboard (visually hidden).
                       SizedBox(
                         height: 0,
                         width: 0,
-                        child: TextField(
-                          controller: _codeController,
-                          focusNode: _codeFocusNode,
-                          keyboardType: TextInputType.number,
-                          textInputAction: TextInputAction.done,
-                          autofillHints: const <String>[AutofillHints.oneTimeCode],
-                          inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(_otpLength),
-                          ],
-                          onChanged: _handleCodeChanged,
+                        child: Semantics(
+                          label: l10n.authOtpCodeSemantic,
+                          textField: true,
+                          child: TextField(
+                            controller: _codeController,
+                            focusNode: _codeFocusNode,
+                            keyboardType: TextInputType.number,
+                            textInputAction: TextInputAction.done,
+                            autofillHints: const <String>[
+                              AutofillHints.oneTimeCode,
+                            ],
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.digitsOnly,
+                              LengthLimitingTextInputFormatter(_otpLength),
+                            ],
+                            onChanged: _handleCodeChanged,
+                          ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radiusPill),
                       Semantics(
                         button: true,
-                        label: 'Continue',
+                        label: l10n.authOtpContinue,
                         child: PrimaryButton(
-                          label: 'Continue',
+                          label: l10n.authOtpContinue,
                           enabled: _isComplete && !_isLoading,
                           onPressed: _canSubmit ? _onContinue : null,
                         ),
@@ -304,20 +320,22 @@ class _OtpScreenState extends State<OtpScreen> {
                         child: TextButton(
                           onPressed: _canResend ? _handleResend : null,
                           child: AnimatedSwitcher(
-                            duration: AppMotion.fast,
+                            duration: MediaQuery.disableAnimationsOf(context)
+                                ? Duration.zero
+                                : AppMotion.fast,
                             child: _canResend
-                                ? const Text.rich(
-                                    key: ValueKey('resend-active'),
+                                ? Text.rich(
+                                    key: const ValueKey<String>('resend-active'),
                                     TextSpan(
-                                      text: 'Didn’t receive code? ',
-                                      style: TextStyle(
+                                      text: l10n.authOtpResendPrefix,
+                                      style: const TextStyle(
                                         color: AppColors.textPrimary,
                                         fontSize: 17,
                                       ),
                                       children: [
                                         TextSpan(
-                                          text: 'Send again',
-                                          style: TextStyle(
+                                          text: l10n.authOtpResendAction,
+                                          style: const TextStyle(
                                             color: AppColors.primaryDark,
                                             fontWeight: FontWeight.w700,
                                           ),
@@ -326,8 +344,12 @@ class _OtpScreenState extends State<OtpScreen> {
                                     ),
                                   )
                                 : Text(
-                                    key: const ValueKey('resend-countdown'),
-                                    'Resend code in ${_secondsRemaining}s',
+                                    key: const ValueKey<String>(
+                                      'resend-countdown',
+                                    ),
+                                    l10n.authOtpResendCountdown(
+                                      _secondsRemaining,
+                                    ),
                                     style: AppTypography.authSubtitle,
                                   ),
                           ),
@@ -336,7 +358,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       if (_hasResentOnce) ...<Widget>[
                         const SizedBox(height: AppSpacing.radiusSm),
                         Text(
-                          'We’ve sent a new code to ${widget.phoneNumber}.',
+                          l10n.authOtpResentMessage(widget.phoneNumber),
                           textAlign: TextAlign.center,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -368,9 +390,12 @@ class _OtpDigitBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bool hasValue = value.isNotEmpty;
+    final Duration animDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : AppMotion.xFast;
 
     return AnimatedContainer(
-      duration: AppMotion.xFast,
+      duration: animDuration,
       curve: AppMotion.emphasized,
       width: 72,
       height: 56,

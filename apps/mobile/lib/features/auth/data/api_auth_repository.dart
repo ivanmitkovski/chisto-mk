@@ -10,6 +10,12 @@ import 'package:chisto_mobile/features/notifications/data/push_notification_serv
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// Citizen auth over HTTP — paths align with NestJS `AuthController` in `apps/api`:
+/// `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`;
+/// `POST /auth/otp/send`, `/auth/otp/verify`,
+/// `/auth/password-reset/request`, `/auth/password-reset/confirm`;
+/// `GET`/`PATCH` `/auth/me`, `PATCH /auth/me/password`, `DELETE /auth/me`;
+/// multipart `POST`/`DELETE` `/auth/me/avatar`.
 const String _keyUserId = 'chisto_user_id';
 const String _keyDisplayName = 'chisto_display_name';
 
@@ -129,7 +135,16 @@ class ApiAuthRepository implements AuthRepository {
 
   @override
   Future<SendOtpResult> requestPasswordReset(String phoneNumberE164) async {
-    return requestOtp(phoneNumberE164);
+    final ApiResponse response = await _client.post(
+      '/auth/password-reset/request',
+      body: <String, dynamic>{'phoneNumber': phoneNumberE164},
+    );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    final int expiresIn = json['expiresIn'] is int
+        ? json['expiresIn'] as int
+        : 600;
+    return SendOtpResult(expiresInSeconds: expiresIn);
   }
 
   @override
@@ -175,7 +190,7 @@ class ApiAuthRepository implements AuthRepository {
     }
   }
 
-  Future<void> _performLocalLogout() async {
+  Future<void> _clearLocalSessionCore() async {
     _cancelProactiveRefresh();
     unawaited(pushService?.unregisterCurrentToken() ?? Future<void>.value());
     _authState.setUnauthenticated();
@@ -183,6 +198,13 @@ class ApiAuthRepository implements AuthRepository {
     profileAvatarState.clearLocalPath();
     await _tokenStorage.clearTokens();
   }
+
+  Future<void> _performLocalLogout() async {
+    await _clearLocalSessionCore();
+  }
+
+  @override
+  Future<void> invalidateLocalSession() => _clearLocalSessionCore();
 
   @override
   Future<void> signOut() async {
@@ -356,10 +378,6 @@ class ApiAuthRepository implements AuthRepository {
   }
 
   Future<void> _clearLocalSession() async {
-    _cancelProactiveRefresh();
-    _authState.setUnauthenticated();
-    profileAvatarState.setRemoteUrl(null);
-    profileAvatarState.clearLocalPath();
-    await _tokenStorage.clearTokens();
+    await _clearLocalSessionCore();
   }
 }

@@ -366,4 +366,356 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get profileAvatarPeekSemantic => 'Профилна фотографија';
+
+  @override
+  String get errorBannerDismiss => 'Отфрли';
+
+  @override
+  String get errorBannerTryAgain => 'Обиди се повторно';
+
+  @override
+  String get authSemanticGoBack => 'Назад';
+
+  @override
+  String get authLoading => 'Се вчитува';
+
+  @override
+  String get authSignInTitle => 'Најава';
+
+  @override
+  String get authSignInSubtitle =>
+      'Добредојдовте повторно. Внесете ги податоците за да продолжите.';
+
+  @override
+  String get authFieldPhone => 'Телефонски број';
+
+  @override
+  String get authFieldPhoneHint => '70 123 456';
+
+  @override
+  String get authFieldPassword => 'Лозинка';
+
+  @override
+  String get authFieldPasswordHint => 'Внесете ја лозинката';
+
+  @override
+  String get authRememberMe => 'Запомни ме';
+
+  @override
+  String get authForgotPassword => 'Заборавена лозинка?';
+
+  @override
+  String get authSignInCta => 'Најави се';
+
+  @override
+  String get authValidationCheckPhonePassword =>
+      'Проверете го телефонот и лозинката.';
+
+  @override
+  String get authSignUpPrompt => 'Немате сметка? ';
+
+  @override
+  String get authSignUpLink => 'Регистрирај се';
+
+  @override
+  String get authSignUpTitle => 'Регистрација';
+
+  @override
+  String get authSignUpSubtitle => 'Добредојдовте! Внесете ги вашите податоци';
+
+  @override
+  String get authFieldFullName => 'Име и презиме';
+
+  @override
+  String get authFieldFullNameHint => 'Име Презиме';
+
+  @override
+  String get authFieldEmail => 'Е-пошта';
+
+  @override
+  String get authFieldEmailHint => 'korisnik@chisto.mk';
+
+  @override
+  String get authFieldPhoneNumber => 'Телефонски број';
+
+  @override
+  String get authPasswordRequirementsHint =>
+      'Најмалку 8 знаци, со букви и бројки';
+
+  @override
+  String get authTermsPrefix => 'Со регистрација се согласувате со ';
+
+  @override
+  String get authTermsLink => 'условите';
+
+  @override
+  String get authValidationCheckFields => 'Проверете ги полињата погоре.';
+
+  @override
+  String get authSignUpCta => 'Регистрирај се';
+
+  @override
+  String get authSignInPrompt => 'Веќе имате сметка? ';
+
+  @override
+  String get authSignInLink => 'Најави се';
+
+  @override
+  String authValidationFieldRequired(String fieldName) {
+    return '$fieldName е задолжително';
+  }
+
+  @override
+  String get authValidationPhoneRequired => 'Телефонскиот број е задолжителен';
+
+  @override
+  String get authValidationPhoneDigits => 'Внесете 8-цифрен телефонски број';
+
+  @override
+  String get authValidationEmailRequired => 'Е-поштата е задолжителна';
+
+  @override
+  String get authValidationEmailInvalid => 'Внесете валидна е-пошта';
+
+  @override
+  String get authValidationPasswordRequired => 'Лозинката е задолжителна';
+
+  @override
+  String get authValidationPasswordMinLength =>
+      'Лозинката мора да има најмалку 8 знаци';
+
+  @override
+  String get authValidationPasswordNeedNumber =>
+      'Лозинката мора да содржи барем една бројка';
+
+  @override
+  String get authValidationPasswordNeedLetter =>
+      'Лозинката мора да содржи барем една буква';
+
+  @override
+  String get authValidationConfirmPasswordRequired => 'Потврдете ја лозинката';
+
+  @override
+  String get authValidationConfirmPasswordMismatch =>
+      'Лозинките не се совпаѓаат';
+
+  @override
+  String get authErrorInvalidCredentials => 'Погрешен телефон или лозинка.';
+
+  @override
+  String get authErrorAccountSuspended => 'Оваа сметка не е активна.';
+
+  @override
+  String get authErrorPhoneNotRegistered =>
+      'Нема сметка за овој телефонски број.';
+
+  @override
+  String get authErrorEmailRegistered => 'Оваа е-пошта е веќе регистрирана.';
+
+  @override
+  String get authErrorPhoneRegistered =>
+      'Овој телефонски број е веќе регистриран.';
+
+  @override
+  String get authErrorOtpNotFound => 'Нема испратен код. Побарајте нов.';
+
+  @override
+  String get authErrorOtpExpired => 'Кодот е истечен. Побарајте нов.';
+
+  @override
+  String get authErrorOtpInvalid => 'Невалиден код. Обидете се повторно.';
+
+  @override
+  String get authErrorOtpMaxAttempts =>
+      'Премногу погрешни обиди. Побарајте нов код.';
+
+  @override
+  String get authErrorCurrentPasswordInvalid =>
+      'Моменталната лозинка е неточна.';
+
+  @override
+  String get authErrorTooManyAttempts =>
+      'Премногу неуспешни обиди. Обидете се подоцна.';
+
+  @override
+  String get authErrorRateLimited =>
+      'Премногу барања. Почекајте малку и обидете се повторно.';
+
+  @override
+  String get authErrorUserNotFound =>
+      'Не најдовме сметка за овој број. Проверете и обидете се повторно.';
+
+  @override
+  String get authOtpTitle => 'Внесете код';
+
+  @override
+  String authOtpSubtitle(String phone) {
+    return 'Испративме 4-цифрен код на $phone';
+  }
+
+  @override
+  String get authOtpContinue => 'Продолжи';
+
+  @override
+  String get authOtpResendPrefix => 'Не добивте код? ';
+
+  @override
+  String get authOtpResendAction => 'Испрати повторно';
+
+  @override
+  String authOtpResendCountdown(int seconds) {
+    return 'Повторно испраќање за $seconds с';
+  }
+
+  @override
+  String authOtpResentMessage(String phone) {
+    return 'Испративме нов код на $phone.';
+  }
+
+  @override
+  String get authForgotPasswordTitle => 'Ресетирај лозинка';
+
+  @override
+  String get authForgotPasswordSubtitle =>
+      'Внесете го телефонот и ќе ви испратиме код за нова лозинка';
+
+  @override
+  String get authForgotPasswordSendCode => 'Испрати код';
+
+  @override
+  String get authForgotPasswordRequestSemantic => 'Испрати код за ресет';
+
+  @override
+  String get authForgotPasswordOtpTitle => 'Внесете код';
+
+  @override
+  String authForgotPasswordOtpSubtitle(String phone) {
+    return 'Испративме 4-цифрен код на $phone';
+  }
+
+  @override
+  String get authNewPasswordTitle => 'Нова лозинка';
+
+  @override
+  String get authNewPasswordSubtitle => 'Внесете нова лозинка за вашата сметка';
+
+  @override
+  String get authFieldNewPassword => 'Нова лозинка';
+
+  @override
+  String get authFieldNewPasswordHint => 'Најмалку 8 знаци';
+
+  @override
+  String get authFieldConfirmPassword => 'Потврди лозинка';
+
+  @override
+  String get authFieldConfirmPasswordHint => 'Повторно внесете ја лозинката';
+
+  @override
+  String get authResetPasswordCta => 'Ресетирај лозинка';
+
+  @override
+  String get authPasswordResetSuccessTitle => 'Лозинката е сменета';
+
+  @override
+  String get authPasswordResetSuccessBody =>
+      'Лозинката е успешно ресетирана. Сега можете да се најавите со новата лозинка.';
+
+  @override
+  String get authBackToSignIn => 'Назад на најава';
+
+  @override
+  String get authOnboardingWelcomeTo => 'Добредојдовте на';
+
+  @override
+  String get authOnboardingBrandName => 'Chisto.mk';
+
+  @override
+  String get authOnboardingWelcomeDescription => 'Види. Пријави. Исчисти.';
+
+  @override
+  String get authOnboardingWelcomeSupporting => 'Почнува со едно допирање.';
+
+  @override
+  String get authOnboardingSlide2Title => 'Пријавете за секунди';
+
+  @override
+  String get authOnboardingSlide2Description =>
+      'Споделете пријава со локација со неколку допирања.';
+
+  @override
+  String get authOnboardingSlide2Supporting =>
+      'Брз тек, јасни ажурирања на статусот.';
+
+  @override
+  String get authOnboardingSlide3Title => 'Придружете се на акции';
+
+  @override
+  String get authOnboardingSlide3Description =>
+      'Следете напредок и влијание во заедницата.';
+
+  @override
+  String get authOnboardingSlide3Supporting =>
+      'Заедно ги чуваме квартовите зелени.';
+
+  @override
+  String get authOnboardingContinue => 'Продолжи';
+
+  @override
+  String get authOnboardingGetStarted => 'Започни';
+
+  @override
+  String get authLocationTitle => 'Одберете локација';
+
+  @override
+  String get authLocationSubtitle =>
+      'Ја користиме за да ви покажеме акции и пријави во близина.';
+
+  @override
+  String get authLocationMapPlaceholder =>
+      'Користете ја моменталната локација за да ја ажурирате областа';
+
+  @override
+  String get authLocationDetecting => 'Се детектира локација…';
+
+  @override
+  String get authLocationContinue => 'Продолжи';
+
+  @override
+  String get authLocationUseCurrent => 'Користи моментална локација';
+
+  @override
+  String get authLocationUseDifferent => 'Друга локација';
+
+  @override
+  String get authLocationPrivacyNote =>
+      'Локацијата ја користиме само за содржина во близина. Не ве следиме во позадина.';
+
+  @override
+  String get authLocationServicesDisabled =>
+      'Локациските услуги се исклучени. Вклучете ги во Поставки.';
+
+  @override
+  String get authLocationPermissionDenied =>
+      'Дозволата за локација е одбиена. Можете да ја вклучите во Поставки.';
+
+  @override
+  String get authLocationPermissionForever =>
+      'Дозволата е трајно одбиена. Се отвораат Поставки…';
+
+  @override
+  String get authLocationMacedoniaOnly =>
+      'Моментално поддржуваме само локации во Македонија.';
+
+  @override
+  String get authLocationResolveFailed =>
+      'Не можевме да ја одредиме локацијата. Обидете се повторно.';
+
+  @override
+  String get authOtpCodeSemantic => 'Код за потврда';
+
+  @override
+  String authOtpDigitSemantic(int index, int total) {
+    return 'Цифра $index од $total';
+  }
 }

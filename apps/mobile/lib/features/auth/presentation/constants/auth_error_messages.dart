@@ -1,35 +1,39 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 
-String messageForAuthError(AppError e) {
+/// Maps API [AppError.code] values to localized user-facing copy.
+String messageForAuthError(AppLocalizations l10n, AppError e) {
   switch (e.code) {
     case 'INVALID_CREDENTIALS':
-      return 'Wrong phone number or password.';
+      return l10n.authErrorInvalidCredentials;
     case 'ACCOUNT_SUSPENDED':
-      return 'This account is not active.';
+    case 'ACCOUNT_NOT_ACTIVE':
+      return l10n.authErrorAccountSuspended;
     case 'PHONE_NOT_REGISTERED':
-      return 'No account found for this phone number.';
+      return l10n.authErrorPhoneNotRegistered;
     case 'EMAIL_ALREADY_REGISTERED':
-      return 'This email is already registered.';
+      return l10n.authErrorEmailRegistered;
     case 'PHONE_ALREADY_REGISTERED':
-      return 'This phone number is already registered.';
+      return l10n.authErrorPhoneRegistered;
     case 'OTP_NOT_FOUND':
-      return 'No code was sent. Request a new code.';
+      return l10n.authErrorOtpNotFound;
     case 'OTP_EXPIRED':
-      return 'This code has expired. Request a new code.';
+      return l10n.authErrorOtpExpired;
     case 'OTP_INVALID':
-      return 'Invalid code. Please try again.';
+      return l10n.authErrorOtpInvalid;
     case 'OTP_MAX_ATTEMPTS':
-      return 'Too many wrong codes. Request a new code.';
+      return l10n.authErrorOtpMaxAttempts;
     case 'CURRENT_PASSWORD_INVALID':
-      return 'Current password is incorrect.';
+      return l10n.authErrorCurrentPasswordInvalid;
+    case 'USER_NOT_FOUND':
+      return l10n.authErrorUserNotFound;
+    case 'TOO_MANY_REQUESTS':
+      return l10n.authErrorRateLimited;
     case 'TOO_MANY_ATTEMPTS':
-      return 'Too many failed attempts. Try again later.';
+      return l10n.authErrorTooManyAttempts;
     case 'VALIDATION_ERROR':
-      return e.message;
     case 'BAD_REQUEST':
-      return e.message;
     case 'UNAUTHORIZED':
-      return e.message;
     case 'CONFLICT':
       return e.message;
     default:

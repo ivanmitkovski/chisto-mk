@@ -163,5 +163,154 @@
   "profileAvatarCameraUnavailable": "Unable to open the camera right now. Please try again in a moment.",
   "profileAvatarReadPhotoFailed": "Could not read the photo. Please try again.",
   "profileAvatarProcessPhotoFailed": "Could not process the photo. Please try again.",
-  "profileAvatarPeekSemantic": "Profile photo"
+  "profileAvatarPeekSemantic": "Profile photo",
+  "errorBannerDismiss": "Dismiss",
+  "errorBannerTryAgain": "Try again",
+  "authSemanticGoBack": "Go back",
+  "authLoading": "Loading",
+  "authSignInTitle": "Sign in",
+  "authSignInSubtitle": "Welcome back. Enter your details to continue.",
+  "authFieldPhone": "Phone number",
+  "authFieldPhoneHint": "70 123 456",
+  "authFieldPassword": "Password",
+  "authFieldPasswordHint": "Enter your password",
+  "authRememberMe": "Remember me",
+  "authForgotPassword": "Forgot password?",
+  "authSignInCta": "Sign in",
+  "authValidationCheckPhonePassword": "Please check your phone number and password.",
+  "authSignUpPrompt": "Don't have an account? ",
+  "authSignUpLink": "Sign up",
+  "authSignUpTitle": "Sign up",
+  "authSignUpSubtitle": "Welcome! Please enter your details",
+  "authFieldFullName": "Full name",
+  "authFieldFullNameHint": "John Doe",
+  "authFieldEmail": "Email",
+  "authFieldEmailHint": "john@chisto.mk",
+  "authFieldPhoneNumber": "Phone number",
+  "authPasswordRequirementsHint": "At least 8 characters, with letters and numbers",
+  "authTermsPrefix": "By signing up you agree to our ",
+  "authTermsLink": "terms and conditions",
+  "authValidationCheckFields": "Please check the highlighted fields above.",
+  "authSignUpCta": "Sign up",
+  "authSignInPrompt": "Already have an account? ",
+  "authSignInLink": "Sign in",
+  "authValidationFieldRequired": "{fieldName} is required",
+  "@authValidationFieldRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "authValidationPhoneRequired": "Phone number is required",
+  "authValidationPhoneDigits": "Enter an 8-digit phone number",
+  "authValidationEmailRequired": "Email is required",
+  "authValidationEmailInvalid": "Enter a valid email",
+  "authValidationPasswordRequired": "Password is required",
+  "authValidationPasswordMinLength": "Password must be at least 8 characters",
+  "authValidationPasswordNeedNumber": "Password must contain at least one number",
+  "authValidationPasswordNeedLetter": "Password must contain at least one letter",
+  "authValidationConfirmPasswordRequired": "Please confirm your password",
+  "authValidationConfirmPasswordMismatch": "Passwords do not match",
+  "authErrorInvalidCredentials": "Wrong phone number or password.",
+  "authErrorAccountSuspended": "This account is not active.",
+  "authErrorPhoneNotRegistered": "No account found for this phone number.",
+  "authErrorEmailRegistered": "This email is already registered.",
+  "authErrorPhoneRegistered": "This phone number is already registered.",
+  "authErrorOtpNotFound": "No code was sent. Request a new code.",
+  "authErrorOtpExpired": "This code has expired. Request a new code.",
+  "authErrorOtpInvalid": "Invalid code. Please try again.",
+  "authErrorOtpMaxAttempts": "Too many wrong codes. Request a new code.",
+  "authErrorCurrentPasswordInvalid": "Current password is incorrect.",
+  "authErrorTooManyAttempts": "Too many failed attempts. Try again later.",
+  "authErrorRateLimited": "Too many requests. Please wait a moment and try again.",
+  "authErrorUserNotFound": "We could not find an account for this number. Please check and try again.",
+  "authOtpTitle": "Enter code",
+  "authOtpSubtitle": "We just sent a 4-digit code to {phone}",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authOtpContinue": "Continue",
+  "authOtpResendPrefix": "Didn't receive code? ",
+  "authOtpResendAction": "Send again",
+  "authOtpResendCountdown": "Resend code in {seconds}s",
+  "@authOtpResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResentMessage": "We've sent a new code to {phone}.",
+  "@authOtpResentMessage": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordTitle": "Reset password",
+  "authForgotPasswordSubtitle": "Enter your phone number and we'll send you a code to reset your password",
+  "authForgotPasswordSendCode": "Send reset code",
+  "authForgotPasswordRequestSemantic": "Send reset code",
+  "authForgotPasswordOtpTitle": "Enter code",
+  "authForgotPasswordOtpSubtitle": "We sent a 4-digit code to {phone}",
+  "@authForgotPasswordOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authNewPasswordTitle": "Create new password",
+  "authNewPasswordSubtitle": "Enter a new password for your account",
+  "authFieldNewPassword": "New password",
+  "authFieldNewPasswordHint": "At least 8 characters",
+  "authFieldConfirmPassword": "Confirm password",
+  "authFieldConfirmPasswordHint": "Re-enter your password",
+  "authResetPasswordCta": "Reset password",
+  "authPasswordResetSuccessTitle": "Password reset",
+  "authPasswordResetSuccessBody": "Your password has been reset successfully. You can now sign in with your new password.",
+  "authBackToSignIn": "Back to sign in",
+  "authOnboardingWelcomeTo": "Welcome to",
+  "authOnboardingBrandName": "Chisto.mk",
+  "authOnboardingWelcomeDescription": "See it. Report it. Clean it.",
+  "authOnboardingWelcomeSupporting": "A cleaner city starts with one tap.",
+  "authOnboardingSlide2Title": "Report in seconds",
+  "authOnboardingSlide2Description": "Share a report with location in a few taps.",
+  "authOnboardingSlide2Supporting": "Fast flow, clear status updates.",
+  "authOnboardingSlide3Title": "Join cleanup events",
+  "authOnboardingSlide3Description": "Track progress and community impact nearby.",
+  "authOnboardingSlide3Supporting": "Together we keep neighborhoods green.",
+  "authOnboardingContinue": "Continue",
+  "authOnboardingGetStarted": "Get started",
+  "authLocationTitle": "Choose your location",
+  "authLocationSubtitle": "We use your location to show cleanups and reports near you.",
+  "authLocationMapPlaceholder": "Use current location to update this area",
+  "authLocationDetecting": "Detecting location…",
+  "authLocationContinue": "Continue",
+  "authLocationUseCurrent": "Use current location",
+  "authLocationUseDifferent": "Use a different location",
+  "authLocationPrivacyNote": "We only use your location to show nearby cleanups. We don't track you in the background.",
+  "authLocationServicesDisabled": "Location services are disabled. Please enable them in Settings.",
+  "authLocationPermissionDenied": "Location permission denied. You can enable it in Settings to use this feature.",
+  "authLocationPermissionForever": "Location permission is permanently denied. Opening Settings…",
+  "authLocationMacedoniaOnly": "Currently we only support locations in Macedonia.",
+  "authLocationResolveFailed": "Could not resolve your location. Please try again.",
+  "authOtpCodeSemantic": "Verification code",
+  "authOtpDigitSemantic": "Digit {index} of {total}",
+  "@authOtpDigitSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

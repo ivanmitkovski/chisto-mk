@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ThrottlerException } from '@nestjs/throttler';
 import { Prisma } from '../../prisma-client';
 import { ErrorResponse } from '../errors/error-response.type';
 
@@ -22,6 +23,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const context = host.switchToHttp();
     const response = context.getResponse();
     const request = context.getRequest<{ method?: string; url?: string; requestId?: string }>();
+
+    if (exception instanceof ThrottlerException) {
+      response.status(HttpStatus.TOO_MANY_REQUESTS).json({
+        code: 'TOO_MANY_REQUESTS',
+        message: 'Too many requests. Please wait and try again.',
+        retryable: true,
+        retryAfterSeconds: 60,
+      });
+      return;
+    }
 
     if (exception instanceof HttpException) {
       const status = exception.getStatus();
@@ -169,6 +180,8 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         return 'NOT_FOUND';
       case HttpStatus.CONFLICT:
         return 'CONFLICT';
+      case HttpStatus.TOO_MANY_REQUESTS:
+        return 'TOO_MANY_REQUESTS';
       default:
         return 'HTTP_ERROR';
     }

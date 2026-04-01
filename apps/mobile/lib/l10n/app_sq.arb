@@ -163,5 +163,154 @@
   "profileAvatarCameraUnavailable": "Kamera nuk hapet tani. Provoni përsëri pas pak.",
   "profileAvatarReadPhotoFailed": "Nuk lexohej fotoja. Provoni përsëri.",
   "profileAvatarProcessPhotoFailed": "Nuk përpunohej fotoja. Provoni përsëri.",
-  "profileAvatarPeekSemantic": "Foto e profilit"
+  "profileAvatarPeekSemantic": "Foto e profilit",
+  "errorBannerDismiss": "Mbyll",
+  "errorBannerTryAgain": "Provo përsëri",
+  "authSemanticGoBack": "Kthehu",
+  "authLoading": "Duke u ngarkuar",
+  "authSignInTitle": "Hyr",
+  "authSignInSubtitle": "Mirë se erdhe përsëri. Plotëso të dhënat për të vazhduar.",
+  "authFieldPhone": "Numri i telefonit",
+  "authFieldPhoneHint": "70 123 456",
+  "authFieldPassword": "Fjalëkalimi",
+  "authFieldPasswordHint": "Shkruaj fjalëkalimin",
+  "authRememberMe": "Më mbaj mend",
+  "authForgotPassword": "Harrove fjalëkalimin?",
+  "authSignInCta": "Hyr",
+  "authValidationCheckPhonePassword": "Kontrollo numrin e telefonit dhe fjalëkalimin.",
+  "authSignUpPrompt": "Nuk ke llogari? ",
+  "authSignUpLink": "Regjistrohu",
+  "authSignUpTitle": "Regjistrohu",
+  "authSignUpSubtitle": "Mirë se erdhe! Plotëso të dhënat e tua",
+  "authFieldFullName": "Emri i plotë",
+  "authFieldFullNameHint": "Emër Mbiemër",
+  "authFieldEmail": "Email",
+  "authFieldEmailHint": "përdorues@chisto.mk",
+  "authFieldPhoneNumber": "Numri i telefonit",
+  "authPasswordRequirementsHint": "Të paktën 8 karaktere, me shkronja dhe numra",
+  "authTermsPrefix": "Duke u regjistruar pranon ",
+  "authTermsLink": "kushtet",
+  "authValidationCheckFields": "Kontrollo fushat e theksuara më sipër.",
+  "authSignUpCta": "Regjistrohu",
+  "authSignInPrompt": "Ke tashmë llogari? ",
+  "authSignInLink": "Hyr",
+  "authValidationFieldRequired": "{fieldName} është i detyrueshëm",
+  "@authValidationFieldRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "authValidationPhoneRequired": "Numri i telefonit është i detyrueshëm",
+  "authValidationPhoneDigits": "Shkruaj numër telefoni me 8 shifra",
+  "authValidationEmailRequired": "Email-i është i detyrueshëm",
+  "authValidationEmailInvalid": "Shkruaj një email të vlefshëm",
+  "authValidationPasswordRequired": "Fjalëkalimi është i detyrueshëm",
+  "authValidationPasswordMinLength": "Fjalëkalimi duhet të ketë të paktën 8 karaktere",
+  "authValidationPasswordNeedNumber": "Fjalëkalimi duhet të përmbajë të paktën një numër",
+  "authValidationPasswordNeedLetter": "Fjalëkalimi duhet të përmbajë të paktën një shkronjë",
+  "authValidationConfirmPasswordRequired": "Konfirmo fjalëkalimin",
+  "authValidationConfirmPasswordMismatch": "Fjalëkalimet nuk përputhen",
+  "authErrorInvalidCredentials": "Numër telefoni ose fjalëkalim i gabuar.",
+  "authErrorAccountSuspended": "Kjo llogari nuk është aktive.",
+  "authErrorPhoneNotRegistered": "Nuk u gjet llogari për këtë numër.",
+  "authErrorEmailRegistered": "Ky email është tashmë i regjistruar.",
+  "authErrorPhoneRegistered": "Ky numër telefoni është tashmë i regjistruar.",
+  "authErrorOtpNotFound": "Nuk u dërgua kod. Kërko një të ri.",
+  "authErrorOtpExpired": "Ky kod ka skaduar. Kërko një të ri.",
+  "authErrorOtpInvalid": "Kod i pavlefshëm. Provo përsëri.",
+  "authErrorOtpMaxAttempts": "Shumë kode të gabuara. Kërko një kod të ri.",
+  "authErrorCurrentPasswordInvalid": "Fjalëkalimi aktual është i pasaktë.",
+  "authErrorTooManyAttempts": "Shumë përpjekje të dështuara. Provo më vonë.",
+  "authErrorRateLimited": "Shumë kërkesa. Prit pak dhe provo përsëri.",
+  "authErrorUserNotFound": "Nuk gjetëm llogari për këtë numër. Kontrollo dhe provo përsëri.",
+  "authOtpTitle": "Shkruaj kodin",
+  "authOtpSubtitle": "Dërguam një kod me 4 shifra te {phone}",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authOtpContinue": "Vazhdo",
+  "authOtpResendPrefix": "Nuk e morët kodin? ",
+  "authOtpResendAction": "Dërgo përsëri",
+  "authOtpResendCountdown": "Ridërgo pas {seconds} s",
+  "@authOtpResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResentMessage": "Dërguam një kod të ri te {phone}.",
+  "@authOtpResentMessage": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordTitle": "Rivendos fjalëkalimin",
+  "authForgotPasswordSubtitle": "Shkruaj numrin e telefonit dhe do të të dërgojmë një kod",
+  "authForgotPasswordSendCode": "Dërgo kodin",
+  "authForgotPasswordRequestSemantic": "Dërgo kod për rivendosje",
+  "authForgotPasswordOtpTitle": "Shkruaj kodin",
+  "authForgotPasswordOtpSubtitle": "Dërguam një kod me 4 shifra te {phone}",
+  "@authForgotPasswordOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authNewPasswordTitle": "Fjalëkalim i ri",
+  "authNewPasswordSubtitle": "Shkruaj një fjalëkalim të ri për llogarinë",
+  "authFieldNewPassword": "Fjalëkalim i ri",
+  "authFieldNewPasswordHint": "Të paktën 8 karaktere",
+  "authFieldConfirmPassword": "Konfirmo fjalëkalimin",
+  "authFieldConfirmPasswordHint": "Rishkruaj fjalëkalimin",
+  "authResetPasswordCta": "Rivendos fjalëkalimin",
+  "authPasswordResetSuccessTitle": "Fjalëkalimi u rivendos",
+  "authPasswordResetSuccessBody": "Fjalëkalimi u ndryshua me sukses. Tani mund të hysh me fjalëkalimin e ri.",
+  "authBackToSignIn": "Kthehu te hyrja",
+  "authOnboardingWelcomeTo": "Mirë se vini në",
+  "authOnboardingBrandName": "Chisto.mk",
+  "authOnboardingWelcomeDescription": "Shih. Raporto. Pastro.",
+  "authOnboardingWelcomeSupporting": "Një qytet më i pastër fillon me një prekje.",
+  "authOnboardingSlide2Title": "Raporto në sekonda",
+  "authOnboardingSlide2Description": "Ndaj një raport me vendndodhje me pak prekje.",
+  "authOnboardingSlide2Supporting": "Rrjedhë e shpejtë, përditësime të qarta.",
+  "authOnboardingSlide3Title": "Bashkohu në pastrime",
+  "authOnboardingSlide3Description": "Ndiq progresin dhe ndikimin në komunitet.",
+  "authOnboardingSlide3Supporting": "Së bashku i mbajmë lagjet të gjelbra.",
+  "authOnboardingContinue": "Vazhdo",
+  "authOnboardingGetStarted": "Fillo",
+  "authLocationTitle": "Zgjidh vendndodhjen",
+  "authLocationSubtitle": "E përdorim për të treguar pastrime dhe raporte afër teje.",
+  "authLocationMapPlaceholder": "Përdor vendndodhjen aktuale për të përditësuar zonën",
+  "authLocationDetecting": "Po zgjidhhet vendndodhja…",
+  "authLocationContinue": "Vazhdo",
+  "authLocationUseCurrent": "Përdor vendndodhjen aktuale",
+  "authLocationUseDifferent": "Përdor vendndodhje tjetër",
+  "authLocationPrivacyNote": "Vendndodhjen e përdorim vetëm për përmbajtje afër. Nuk të ndjekim në sfond.",
+  "authLocationServicesDisabled": "Shërbimet e vendndodhjes janë të fikura. Aktivizoji te Cilësimet.",
+  "authLocationPermissionDenied": "Leja për vendndodhje u refuzua. Mund ta aktivizosh te Cilësimet.",
+  "authLocationPermissionForever": "Leja është refuzuar përgjithmonë. Po hapen Cilësimet…",
+  "authLocationMacedoniaOnly": "Momentalisht mbështetemi vetëm për vendndodhje në Maqedoni.",
+  "authLocationResolveFailed": "Nuk mund të përcaktohej vendndodhja. Provo përsëri.",
+  "authOtpCodeSemantic": "Kod verifikimi",
+  "authOtpDigitSemantic": "Shifra {index} nga {total}",
+  "@authOtpDigitSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AppHaptics {
@@ -7,10 +8,32 @@ class AppHaptics {
   static const Duration _kDelay85 = Duration(milliseconds: 85);
   static const Duration _kDelay95 = Duration(milliseconds: 95);
 
-  static void tap() => HapticFeedback.selectionClick();
-  static void light() => HapticFeedback.lightImpact();
-  static void medium() => HapticFeedback.mediumImpact();
-  static void strong() => HapticFeedback.heavyImpact();
+  /// When [context] is non-null and reduce motion / disable animations is on,
+  /// haptics are skipped (aligned with system accessibility).
+  static bool _allowed([BuildContext? context]) {
+    if (context == null) return true;
+    return !MediaQuery.disableAnimationsOf(context);
+  }
+
+  static void tap([BuildContext? context]) {
+    if (!_allowed(context)) return;
+    HapticFeedback.selectionClick();
+  }
+
+  static void light([BuildContext? context]) {
+    if (!_allowed(context)) return;
+    HapticFeedback.lightImpact();
+  }
+
+  static void medium([BuildContext? context]) {
+    if (!_allowed(context)) return;
+    HapticFeedback.mediumImpact();
+  }
+
+  static void strong([BuildContext? context]) {
+    if (!_allowed(context)) return;
+    HapticFeedback.heavyImpact();
+  }
 
   /// Soft transition into a focused screen (e.g. detail, DM, fullscreen). Max premium feel.
   /// Three-step signature: crisp snap → soft land → subtle settle. ~70ms total.
@@ -102,28 +125,39 @@ class AppHaptics {
   }
 
   /// Generic success (e.g. form submitted, action completed).
-  static void success() {
+  static void success([BuildContext? context]) {
+    if (!_allowed(context)) return;
     HapticFeedback.mediumImpact();
     Future<void>.delayed(const Duration(milliseconds: 50), () {
+      if (context != null && !context.mounted) return;
+      if (!_allowed(context)) return;
       HapticFeedback.selectionClick();
     });
     Future<void>.delayed(const Duration(milliseconds: 60), () {
+      if (context != null && !context.mounted) return;
+      if (!_allowed(context)) return;
       HapticFeedback.lightImpact();
     });
   }
 
   /// Generic warning (e.g. validation, caution).
-  static void warning() {
+  static void warning([BuildContext? context]) {
+    if (!_allowed(context)) return;
     HapticFeedback.mediumImpact();
     Future<void>.delayed(const Duration(milliseconds: 80), () {
+      if (context != null && !context.mounted) return;
+      if (!_allowed(context)) return;
       HapticFeedback.lightImpact();
     });
   }
 
   /// Generic error (e.g. network failure, invalid action).
-  static void error() {
+  static void error([BuildContext? context]) {
+    if (!_allowed(context)) return;
     HapticFeedback.heavyImpact();
     Future<void>.delayed(const Duration(milliseconds: 100), () {
+      if (context != null && !context.mounted) return;
+      if (!_allowed(context)) return;
       HapticFeedback.mediumImpact();
     });
   }

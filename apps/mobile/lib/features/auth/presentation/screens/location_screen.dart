@@ -11,6 +11,7 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
@@ -56,7 +57,7 @@ class _LocationScreenState extends State<LocationScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Location services are disabled. Please enable them in Settings.',
+          message: AppLocalizations.of(context)!.authLocationServicesDisabled,
           type: AppSnackType.warning,
         );
       }
@@ -72,8 +73,7 @@ class _LocationScreenState extends State<LocationScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message:
-              'Location permission denied. You can enable it in Settings to use this feature.',
+          message: AppLocalizations.of(context)!.authLocationPermissionDenied,
           type: AppSnackType.warning,
         );
       }
@@ -84,7 +84,7 @@ class _LocationScreenState extends State<LocationScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Location permission is permanently denied. Opening Settings…',
+          message: AppLocalizations.of(context)!.authLocationPermissionForever,
           type: AppSnackType.warning,
           duration: const Duration(seconds: 3),
         );
@@ -100,7 +100,7 @@ class _LocationScreenState extends State<LocationScreen> {
     if (_resolvingLocation) {
       return;
     }
-    AppHaptics.light();
+    AppHaptics.light(context);
     setState(() => _resolvingLocation = true);
 
     try {
@@ -117,7 +117,7 @@ class _LocationScreenState extends State<LocationScreen> {
         if (mounted) {
           AppSnack.show(
             context,
-            message: 'Currently we only support locations in Macedonia.',
+            message: AppLocalizations.of(context)!.authLocationMacedoniaOnly,
             type: AppSnackType.info,
           );
         }
@@ -161,7 +161,7 @@ class _LocationScreenState extends State<LocationScreen> {
           _mapController.move(_selectedPosition!, 15);
         }
       });
-      AppHaptics.success();
+      AppHaptics.success(context);
     } catch (_) {
       if (!mounted) {
         return;
@@ -169,7 +169,7 @@ class _LocationScreenState extends State<LocationScreen> {
       setState(() => _resolvingLocation = false);
       AppSnack.show(
         context,
-        message: 'Could not resolve your location. Please try again.',
+        message: AppLocalizations.of(context)!.authLocationResolveFailed,
         type: AppSnackType.error,
       );
     }
@@ -177,7 +177,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void _confirmAndGoToFeed() {
     if (_selectedPosition == null) return;
-    AppHaptics.light();
+    AppHaptics.light(context);
     Navigator.of(context).pushNamedAndRemoveUntil(
       AppRoutes.home,
       (Route<dynamic> route) => false,
@@ -186,6 +186,7 @@ class _LocationScreenState extends State<LocationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return PopScope(
@@ -213,13 +214,13 @@ class _LocationScreenState extends State<LocationScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: AppSpacing.radiusSm),
-                    const Text(
-                      'Choose your location',
+                    Text(
+                      l10n.authLocationTitle,
                       style: AppTypography.authHeadline,
                     ),
                     const SizedBox(height: AppSpacing.radius10),
-                    const Text(
-                      'We use your location to show cleanups and reports near you.',
+                    Text(
+                      l10n.authLocationSubtitle,
                       style: AppTypography.authSubtitle,
                     ),
                     const SizedBox(height: AppSpacing.lg),
@@ -298,7 +299,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                 ),
                                 child: Text(
                                   _currentAddress ??
-                                      'Use current location to update this area',
+                                      l10n.authLocationMapPlaceholder,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   style: AppTypography.pillLabel,
@@ -313,16 +314,16 @@ class _LocationScreenState extends State<LocationScreen> {
                     Semantics(
                       button: true,
                       label: _resolvingLocation
-                          ? 'Detecting location…'
+                          ? l10n.authLocationDetecting
                           : _selectedPosition != null
-                              ? 'Continue'
-                              : 'Use current location',
+                              ? l10n.authLocationContinue
+                              : l10n.authLocationUseCurrent,
                       child: PrimaryButton(
                         label: _resolvingLocation
-                            ? 'Detecting location…'
+                            ? l10n.authLocationDetecting
                             : _selectedPosition != null
-                                ? 'Continue'
-                                : 'Use current location',
+                                ? l10n.authLocationContinue
+                                : l10n.authLocationUseCurrent,
                         enabled: !_resolvingLocation,
                         onPressed: _resolvingLocation
                             ? null
@@ -343,7 +344,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                 Center(
                                   child: Semantics(
                                     button: true,
-                                    label: 'Use a different location',
+                                    label: l10n.authLocationUseDifferent,
                                     child: CupertinoButton(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: AppSpacing.sm,
@@ -352,7 +353,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                       minimumSize: Size.zero,
                                       onPressed: _useCurrentLocation,
                                       child: Text(
-                                        'Use a different location',
+                                        l10n.authLocationUseDifferent,
                                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                         color: AppColors.primaryDark,
                                         fontWeight: FontWeight.w500,
@@ -367,7 +368,7 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Text(
-                      "We only use your location to show nearby cleanups. We don't track you in the background.",
+                      l10n.authLocationPrivacyNote,
                       style: AppTypography.cardSubtitle.copyWith(height: 1.35),
                     ),
                     const SizedBox(height: AppSpacing.md),
@@ -397,6 +398,7 @@ class _MapTileSkeletonState extends State<_MapTileSkeleton>
   static const double _radius = 8;
 
   late final AnimationController _shimmerController;
+  bool _didConfigureMotion = false;
 
   @override
   void initState() {
@@ -404,7 +406,19 @@ class _MapTileSkeletonState extends State<_MapTileSkeleton>
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1500),
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_didConfigureMotion) return;
+    _didConfigureMotion = true;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _shimmerController.value = 0;
+    } else {
+      _shimmerController.repeat();
+    }
   }
 
   @override

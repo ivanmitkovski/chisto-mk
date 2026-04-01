@@ -3,6 +3,7 @@ import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 /// Resolves session then navigates to home or onboarding.
 ///
@@ -54,7 +55,7 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Semantics(
-        label: 'Loading',
+        label: AppLocalizations.of(context)!.authLoading,
         child: const Center(
           child: CircularProgressIndicator(
             color: AppColors.white,

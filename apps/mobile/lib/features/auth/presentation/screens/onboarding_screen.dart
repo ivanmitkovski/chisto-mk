@@ -7,6 +7,8 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -20,23 +22,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late final PageController _pageController;
   int _activePage = 0;
 
-  static const List<_SlideData> _slides = <_SlideData>[
-    _SlideData(
-      title: 'Welcome',
-      description: 'See it. Report it. Clean it.',
-      supporting: 'A cleaner city starts with one tap.',
-    ),
-    _SlideData(
-      title: 'Report in Seconds',
-      description: 'Share a report with location in a few taps.',
-      supporting: 'Fast flow, clear status updates.',
-    ),
-    _SlideData(
-      title: 'Join Cleanup Events',
-      description: 'Track progress and community impact nearby.',
-      supporting: 'Together we keep neighborhoods green.',
-    ),
-  ];
+  List<_SlideData> _slides(AppLocalizations l10n) => <_SlideData>[
+        _SlideData(
+          title: '',
+          description: l10n.authOnboardingWelcomeDescription,
+          supporting: l10n.authOnboardingWelcomeSupporting,
+          isWelcome: true,
+        ),
+        _SlideData(
+          title: l10n.authOnboardingSlide2Title,
+          description: l10n.authOnboardingSlide2Description,
+          supporting: l10n.authOnboardingSlide2Supporting,
+          isWelcome: false,
+        ),
+        _SlideData(
+          title: l10n.authOnboardingSlide3Title,
+          description: l10n.authOnboardingSlide3Description,
+          supporting: l10n.authOnboardingSlide3Supporting,
+          isWelcome: false,
+        ),
+      ];
 
   @override
   void initState() {
@@ -50,11 +55,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _onContinueTap() {
-    HapticFeedback.lightImpact();
-    if (_activePage < _slides.length - 1) {
+  void _onContinueTap(AppLocalizations l10n) {
+    final List<_SlideData> slides = _slides(l10n);
+    AppHaptics.light(context);
+    if (_activePage < slides.length - 1) {
       _pageController.nextPage(
-        duration: AppMotion.standard,
+        duration: MediaQuery.disableAnimationsOf(context)
+            ? Duration.zero
+            : AppMotion.standard,
         curve: AppMotion.emphasized,
       );
       return;
@@ -65,6 +73,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final List<_SlideData> slides = _slides(l10n);
     final EdgeInsets systemPadding = MediaQuery.paddingOf(context);
 
     return Scaffold(
@@ -112,7 +122,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.radiusSm, AppSpacing.lg, (systemPadding.bottom + AppSpacing.radius10).clamp(AppSpacing.radius14, AppSpacing.radius22)),
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    AppSpacing.radiusSm,
+                    AppSpacing.lg,
+                    (systemPadding.bottom + AppSpacing.radius10)
+                        .clamp(AppSpacing.radius14, AppSpacing.radius22),
+                  ),
                   child: Column(
                     children: [
                       Container(
@@ -120,27 +136,26 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         height: AppSpacing.sheetHandleHeight,
                         decoration: BoxDecoration(
                           color: AppColors.divider,
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.radiusCircle),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radiusSm),
                       Expanded(
                         child: PageView.builder(
                           controller: _pageController,
-                          itemCount: _slides.length,
+                          itemCount: slides.length,
                           physics: const BouncingScrollPhysics(),
                           allowImplicitScrolling: true,
                           onPageChanged: (int index) {
-                            HapticFeedback.selectionClick();
+                            AppHaptics.tap(context);
                             setState(() => _activePage = index);
                           },
                           itemBuilder: (BuildContext context, int index) {
-                            final _SlideData slide = _slides[index];
+                            final _SlideData slide = slides[index];
                             return _OnboardingSlide(
-                              isWelcome: index == 0,
-                              title: slide.title,
-                              description: slide.description,
-                              supporting: slide.supporting,
+                              l10n: l10n,
+                              slide: slide,
                             );
                           },
                         ),
@@ -149,24 +164,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List<Widget>.generate(
-                          _slides.length,
+                          slides.length,
                           (int index) => AnimatedContainer(
-                            duration: AppMotion.medium,
+                            duration: MediaQuery.disableAnimationsOf(context)
+                                ? Duration.zero
+                                : AppMotion.medium,
                             curve: AppMotion.emphasized,
-                            margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
-                            width: _activePage == index ? AppSpacing.radius18 : AppSpacing.xs,
+                            margin: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.xxs,
+                            ),
+                            width: _activePage == index
+                                ? AppSpacing.radius18
+                                : AppSpacing.xs,
                             height: AppSpacing.xs,
                             decoration: BoxDecoration(
-                              color: _activePage == index ? AppColors.primary : AppColors.divider,
-                              borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
+                              color: _activePage == index
+                                  ? AppColors.primary
+                                  : AppColors.divider,
+                              borderRadius:
+                                  BorderRadius.circular(AppSpacing.radiusCircle),
                             ),
                           ),
                         ),
                       ),
                       const SizedBox(height: AppSpacing.radius14),
-                      PrimaryButton(
-                        label: _activePage == _slides.length - 1 ? 'Get Started' : 'Continue',
-                        onPressed: _onContinueTap,
+                      Semantics(
+                        button: true,
+                        label: _activePage == slides.length - 1
+                            ? l10n.authOnboardingGetStarted
+                            : l10n.authOnboardingContinue,
+                        child: PrimaryButton(
+                          label: _activePage == slides.length - 1
+                              ? l10n.authOnboardingGetStarted
+                              : l10n.authOnboardingContinue,
+                          onPressed: () => _onContinueTap(l10n),
+                        ),
                       ),
                     ],
                   ),
@@ -182,16 +214,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class _OnboardingSlide extends StatelessWidget {
   const _OnboardingSlide({
-    required this.isWelcome,
-    required this.title,
-    required this.description,
-    required this.supporting,
+    required this.l10n,
+    required this.slide,
   });
 
-  final bool isWelcome;
-  final String title;
-  final String description;
-  final String supporting;
+  final AppLocalizations l10n;
+  final _SlideData slide;
 
   @override
   Widget build(BuildContext context) {
@@ -203,13 +231,13 @@ class _OnboardingSlide extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (isWelcome)
+              if (slide.isWelcome)
                 FittedBox(
                   fit: BoxFit.scaleDown,
                   child: Row(
                     children: [
                       Text(
-                        'Welcome to',
+                        l10n.authOnboardingWelcomeTo,
                         style: AppTypography.authHeadline.copyWith(
                           fontSize: compact ? 20 : 22,
                         ),
@@ -222,7 +250,7 @@ class _OnboardingSlide extends StatelessWidget {
                         fit: BoxFit.contain,
                       ),
                       Text(
-                        ' Chisto.mk',
+                        ' ${l10n.authOnboardingBrandName}',
                         style: AppTypography.authHeadline.copyWith(
                           fontSize: 20,
                         ),
@@ -232,7 +260,7 @@ class _OnboardingSlide extends StatelessWidget {
                 )
               else
                 Text(
-                  title,
+                  slide.title,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -242,7 +270,7 @@ class _OnboardingSlide extends StatelessWidget {
                 ),
               SizedBox(height: compact ? 6 : 8),
               Text(
-                description,
+                slide.description,
                 textAlign: TextAlign.center,
                 maxLines: compact ? 1 : 2,
                 overflow: TextOverflow.ellipsis,
@@ -253,7 +281,7 @@ class _OnboardingSlide extends StatelessWidget {
               if (!compact) ...<Widget>[
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
-                  supporting,
+                  slide.supporting,
                   textAlign: TextAlign.center,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -275,9 +303,11 @@ class _SlideData {
     required this.title,
     required this.description,
     required this.supporting,
+    required this.isWelcome,
   });
 
   final String title;
   final String description;
   final String supporting;
+  final bool isWelcome;
 }
