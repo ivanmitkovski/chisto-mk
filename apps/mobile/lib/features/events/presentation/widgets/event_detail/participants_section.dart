@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -322,18 +323,18 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
                 groupValue: _sort,
                 thumbColor: AppColors.white,
                 backgroundColor: AppColors.inputFill,
-                children: const <AttendeeSort, Widget>{
+                children: <AttendeeSort, Widget>{
                   AttendeeSort.recent: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('Recent'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsRecent),
                   ),
                   AttendeeSort.alphabetical: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('A-Z'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsAz),
                   ),
                   AttendeeSort.checkedInFirst: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('Checked-in'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsCheckedIn),
                   ),
                 },
                 onValueChanged: (AttendeeSort? value) {

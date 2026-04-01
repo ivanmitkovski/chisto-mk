@@ -30,6 +30,8 @@ import {
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import { GamificationService } from '../gamification/gamification.service';
+import { RankingsService } from '../gamification/rankings.service';
 
 const OTP_EXPIRES_SECONDS = 600;
 const LOGIN_MAX_ATTEMPTS = 5;
@@ -66,6 +68,8 @@ export class AuthService {
     private readonly audit: AuditService,
     private readonly eventEmitter: EventEmitter2,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly gamificationService: GamificationService,
+    private readonly rankingsService: RankingsService,
   ) {
     const isProduction = configService.get<string>('NODE_ENV') === 'production';
     const smsProvider = configService.get<string>('SMS_PROVIDER')?.toLowerCase() ?? 'none';
@@ -483,6 +487,16 @@ export class AuthService {
     totalPointsSpent: number;
     mfaEnabled: boolean;
     avatarUrl: string | null;
+    level: number;
+    levelProgress: number;
+    pointsInLevel: number;
+    pointsToNextLevel: number;
+    levelTierKey: string;
+    levelDisplayName: string;
+    weeklyPoints: number;
+    weeklyRank: number | null;
+    weekStartsAt: string;
+    weekEndsAt: string;
   }> {
     const user = await this.prisma.user.findUnique({
       where: { id: authenticatedUser.userId },
@@ -512,7 +526,23 @@ export class AuthService {
 
     const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
     const { totpSecret: _, avatarObjectKey: __, ...rest } = user;
-    return { ...rest, mfaEnabled: !!user.totpSecret, avatarUrl };
+    const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned);
+    const weekly = await this.rankingsService.getUserWeeklySummary(authenticatedUser.userId);
+    return {
+      ...rest,
+      mfaEnabled: !!user.totpSecret,
+      avatarUrl,
+      level: levelState.level,
+      levelProgress: levelState.levelProgress,
+      pointsInLevel: levelState.pointsInLevel,
+      pointsToNextLevel: levelState.pointsToNextLevel,
+      levelTierKey: levelState.levelTierKey,
+      levelDisplayName: levelState.levelDisplayName,
+      weeklyPoints: weekly.weeklyPoints,
+      weeklyRank: weekly.weeklyRank,
+      weekStartsAt: weekly.weekStartsAt,
+      weekEndsAt: weekly.weekEndsAt,
+    };
   }
 
   async setupMfa(userId: string): Promise<{ uri: string; secret: string }> {

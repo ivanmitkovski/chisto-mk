@@ -1,4 +1,18 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Query,
+  UnauthorizedException,
+  UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
@@ -30,12 +44,19 @@ import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import { MeResponseDto } from './dto/me-response.dto';
+import { PointHistoryQueryDto } from './dto/point-history-query.dto';
+import { PointHistoryResponseDto } from './dto/point-history-response.dto';
+import { PointHistoryService } from '../gamification/point-history.service';
 
 @ApiTags('auth')
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly pointHistoryService: PointHistoryService,
+  ) {}
 
   @Post('register')
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
@@ -219,12 +240,30 @@ export class AuthController {
     await this.authService.disableMfa(user.userId, dto);
   }
 
+  @Get('me/point-history')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Paginated point awards history and level-up milestones' })
+  @ApiOkResponse({ description: 'Point transactions (newest first)', type: PointHistoryResponseDto })
+  async pointHistory(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Query() query: PointHistoryQueryDto,
+  ): Promise<PointHistoryResponseDto> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.pointHistoryService.listForUser(user.userId, query);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get authenticated user profile' })
-  @ApiOkResponse({ description: 'Authenticated user profile' })
-  me(@CurrentUser() user?: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Authenticated user profile', type: MeResponseDto })
+  me(@CurrentUser() user?: AuthenticatedUser): Promise<MeResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
         code: 'UNAUTHORIZED',

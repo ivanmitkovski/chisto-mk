@@ -118,11 +118,16 @@ class ApiReportsRepository implements ReportsApiRepository {
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
 
+    final String? nextAtStr =
+        (json['nextEmergencyReportAvailableAt'] as String?)?.trim();
     return ReportCapacity(
       creditsAvailable: (json['creditsAvailable'] as num?)?.toInt() ?? 0,
       emergencyAvailable: json['emergencyAvailable'] as bool? ?? false,
       emergencyWindowDays: (json['emergencyWindowDays'] as num?)?.toInt() ?? 7,
       retryAfterSeconds: (json['retryAfterSeconds'] as num?)?.toInt(),
+      nextEmergencyReportAvailableAt: nextAtStr != null && nextAtStr.isNotEmpty
+          ? DateTime.tryParse(nextAtStr)?.toUtc()
+          : null,
       unlockHint: json['unlockHint'] as String? ?? 'Join and verify attendance, or create an eco action to unlock more reports.',
     );
   }

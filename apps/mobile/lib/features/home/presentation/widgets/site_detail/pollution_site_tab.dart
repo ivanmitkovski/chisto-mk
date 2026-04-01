@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -131,7 +132,10 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
             ],
           ),
         ),
-        StickyBottomCTA(label: 'Take action', onPressed: widget.onTakeAction),
+        StickyBottomCTA(
+          label: context.l10n.pollutionSiteTabTakeAction,
+          onPressed: widget.onTakeAction,
+        ),
       ],
     );
   }

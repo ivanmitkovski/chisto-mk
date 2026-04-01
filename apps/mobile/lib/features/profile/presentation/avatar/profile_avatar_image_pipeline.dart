@@ -25,27 +25,38 @@ Future<String> materializePickForNativeCrop(XFile file) async {
   return File(target).absolute.path;
 }
 
-/// Brief settle after UIImagePicker / PHPicker before file work or presenting
-/// heavy UI (matches prior flow timing).
+/// Brief settle after UIImagePicker / PHPicker before file work (kept short;
+/// [SchedulerBinding.endOfFrame] handles most iOS teardown).
 Future<void> waitAfterProfileAvatarPicker() async {
   if (Platform.isIOS) {
-    await Future<void>.delayed(const Duration(milliseconds: 280));
+    await Future<void>.delayed(const Duration(milliseconds: 90));
     await SchedulerBinding.instance.endOfFrame;
   } else {
-    await Future<void>.delayed(const Duration(milliseconds: 120));
+    await Future<void>.delayed(const Duration(milliseconds: 50));
+    await SchedulerBinding.instance.endOfFrame;
   }
 }
 
+/// Upper bound for decode width passed to [loadAvatarImageBytesForCrop].
+const int kAvatarCropDecodeWidthMax = 1920;
+
 /// Decodes image from disk and downscales so the crop UI stays responsive and
 /// memory-safe. Output is PNG bytes for [Crop] in `crop_your_image`.
-Future<Uint8List?> loadAvatarImageBytesForCrop(String path) async {
+///
+/// [maxDecodeWidth] should reflect screen density (see crop screen); clamped
+/// internally so decode stays fast on large gallery originals.
+Future<Uint8List?> loadAvatarImageBytesForCrop(
+  String path, {
+  int maxDecodeWidth = 1536,
+}) async {
   try {
     final String absolute = resolvedPathForCrop(path);
     if (!File(absolute).existsSync()) return null;
+    final int targetW = maxDecodeWidth.clamp(1024, kAvatarCropDecodeWidthMax);
     final Uint8List raw = await File(absolute).readAsBytes();
     final ui.Codec codec = await ui.instantiateImageCodec(
       raw,
-      targetWidth: 2048,
+      targetWidth: targetW,
     );
     final ui.FrameInfo frame = await codec.getNextFrame();
     final ui.Image image = frame.image;

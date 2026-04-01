@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -309,7 +310,9 @@ class _AddPhotoTile extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  _isCompact ? 'Add' : 'Add a photo',
+                  _isCompact
+                      ? context.l10n.reportPhotoGridAddShort
+                      : context.l10n.reportPhotoGridAdd,
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
@@ -319,9 +322,9 @@ class _AddPhotoTile extends StatelessWidget {
                 ),
                 if (!_isCompact) ...<Widget>[
                   const SizedBox(height: AppSpacing.xxs),
-                  const Text(
-                    'Camera or library',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.reportPhotoGridSourceHint,
+                    style: const TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textMuted,

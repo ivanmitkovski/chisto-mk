@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
@@ -324,10 +325,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.appBackground,
           leading: const AppBackButton(),
-          title: const Text('Event not found'),
+          title: Text(context.l10n.eventsEventNotFoundTitle),
         ),
-        body: const Center(
-          child: Text('This event is no longer available.'),
+        body: Center(
+          child: Text(context.l10n.eventsEventNotFoundBody),
         ),
       );
     }

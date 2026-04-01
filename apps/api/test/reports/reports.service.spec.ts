@@ -103,6 +103,7 @@ describe('ReportsService capacity guards', () => {
     const result = await service.getCapacityForCurrentUser(user as never);
     expect(result.creditsAvailable).toBe(3);
     expect(result.emergencyAvailable).toBe(true);
+    expect(result.nextEmergencyReportAvailableAt).toBeNull();
     expect(result.unlockHint).toContain('unlock');
   });
 
@@ -117,6 +118,7 @@ describe('ReportsService capacity guards', () => {
     const result = await service.getCapacityForCurrentUser(user as never);
     expect(result.emergencyAvailable).toBe(false);
     expect((result.retryAfterSeconds ?? 0) > 0).toBe(true);
+    expect(result.nextEmergencyReportAvailableAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });
 

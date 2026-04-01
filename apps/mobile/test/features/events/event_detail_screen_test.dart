@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,10 +9,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   late InMemoryEventsStore store;
 
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     store = InMemoryEventsStore.instance;
     store.resetToSeed();
+    store.loadInitialIfNeeded();
+    await store.ready;
   });
 
   EcoEvent buildEvent({
@@ -61,6 +64,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: EventDetailScreen(eventId: event.id),
       ),
     );
@@ -84,6 +90,9 @@ void main() {
 
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
         home: EventDetailScreen(eventId: event.id),
       ),
     );

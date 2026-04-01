@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -187,7 +188,7 @@ class _EventCleanupEvidenceScreenState
             children: <Widget>[
               ListTile(
                 leading: const Icon(CupertinoIcons.star),
-                title: const Text('Set as cover'),
+                title: Text(context.l10n.eventsSetCover),
                 onTap: () {
                   Navigator.pop(context);
                   _setAsCover(index);
@@ -195,7 +196,7 @@ class _EventCleanupEvidenceScreenState
               ),
               ListTile(
                 leading: const Icon(CupertinoIcons.eye),
-                title: const Text('View fullscreen'),
+                title: Text(context.l10n.eventsViewFullscreen),
                 onTap: () {
                   Navigator.pop(context);
                   _openFullscreenGallery(index);
@@ -273,9 +274,9 @@ class _EventCleanupEvidenceScreenState
         appBar: AppBar(
           backgroundColor: AppColors.appBackground,
           leading: const AppBackButton(),
-          title: const Text('Photos'),
+          title: Text(context.l10n.eventsPhotosTitle),
         ),
-        body: const Center(child: Text('Event not found.')),
+        body: Center(child: Text(context.l10n.eventsEventNotFoundShort)),
       );
     }
 
@@ -329,14 +330,14 @@ class _EventCleanupEvidenceScreenState
                           horizontal: AppSpacing.radiusXl,
                           vertical: AppSpacing.radius10,
                         ),
-                        child: Text('Before'),
+                        child: Text(context.l10n.eventsBeforeLabel),
                       ),
                       'after': Padding(
                         padding: EdgeInsets.symmetric(
                           horizontal: AppSpacing.radiusXl,
                           vertical: AppSpacing.radius10,
                         ),
-                        child: Text('After'),
+                        child: Text(context.l10n.eventsAfterLabel),
                       ),
                     },
                     onValueChanged: (String? next) {
@@ -418,7 +419,7 @@ class _EventCleanupEvidenceScreenState
                       ),
                     )
                   : PrimaryButton(
-                      label: 'Save',
+                      label: context.l10n.commonSave,
                       enabled: canSave,
                       onPressed: canSave ? _save : null,
                     ),
@@ -435,12 +436,12 @@ class _EventCleanupEvidenceScreenState
       context: context,
       builder: (BuildContext ctx) {
         return CupertinoAlertDialog(
-          title: const Text('Discard changes?'),
-          content: const Text('You have unsaved photos. Are you sure you want to leave?'),
+          title: Text(context.l10n.eventsDiscardChangesTitle),
+          content: Text(context.l10n.eventsDiscardChangesBody),
           actions: <CupertinoDialogAction>[
             CupertinoDialogAction(
               onPressed: () => Navigator.of(ctx).pop(),
-              child: const Text('Keep editing'),
+              child: Text(context.l10n.commonKeepEditing),
             ),
             CupertinoDialogAction(
               isDestructiveAction: true,
@@ -448,7 +449,7 @@ class _EventCleanupEvidenceScreenState
                 Navigator.of(ctx).pop();
                 Navigator.of(context).pop();
               },
-              child: const Text('Discard'),
+              child: Text(context.l10n.commonDiscard),
             ),
           ],
         );

@@ -9,11 +9,13 @@ import { RolesGuard } from './roles.guard';
 import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
+import { GamificationModule } from '../gamification/gamification.module';
 
 @Module({
   imports: [
     AuditModule,
     ReportsUploadModule,
+    GamificationModule,
     OtpModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

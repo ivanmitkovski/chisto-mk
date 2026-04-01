@@ -1,63 +1,63 @@
 {
   "@@locale": "mk",
-  "reportFlowHelpHint": "Tap the info button for tips on this step.",
-  "reportHelpContextTitle": "Context",
-  "reportStageEvidenceEyebrow": "Report a pollution site",
-  "reportStageEvidenceTitle": "Evidence",
-  "reportStageEvidenceSubtitle": "Photos and framing",
-  "reportStageEvidenceShortLabel": "Evidence",
-  "reportStageEvidencePrimaryAction": "Next",
-  "reportStageEvidencePrimaryRequirement": "Photo",
-  "reportStageEvidenceSecondaryRequirement": "Up to 5",
-  "reportStageEvidenceInfoTitle": "Evidence",
-  "reportHelpEvidenceS0Title": "What to capture",
-  "reportHelpEvidenceS0Body": "Add up to five photos that show the polluted area clearly. Use a wide shot for context, then closer frames of what matters: waste piles, pipes, stains, debris, or anything that shows the problem.",
-  "reportHelpEvidenceS1Title": "Why it helps",
-  "reportHelpEvidenceS1Body": "Moderators rely on your images to confirm the report and prioritize follow-up. Daylight, a steady hand, and showing the whole site make verification much easier.",
-  "reportStageDetailsEyebrow": "Describe the issue",
-  "reportStageDetailsTitle": "Details",
-  "reportStageDetailsSubtitle": "Category, headline, and context",
-  "reportStageDetailsShortLabel": "Details",
-  "reportStageDetailsPrimaryAction": "Next",
-  "reportStageDetailsPrimaryRequirement": "Category & title",
-  "reportStageDetailsSecondaryRequirement": "Details optional",
-  "reportStageDetailsInfoTitle": "Details",
-  "reportHelpDetailsS0Title": "What to fill in",
-  "reportHelpDetailsS0Body": "Choose the category that best matches what you saw. Write a short headline anyone could understand at a glance, like a news title, not an essay.\n\nThen add severity if you’re unsure; use the description for anything that helps someone find or assess the site on the ground: access, timing, smell, color of water, or landmarks. Cleanup effort is optional and only useful if you have a rough sense of scale.",
-  "reportHelpDetailsS1Title": "Optional fields",
-  "reportHelpDetailsS1Body": "Nothing here blocks submission except category and title. Extra detail is for nuance. Use it when it genuinely helps.",
-  "reportStageLocationEyebrow": "Confirm the location",
-  "reportStageLocationTitle": "Location",
-  "reportStageLocationSubtitle": "Map pin",
-  "reportStageLocationShortLabel": "Location",
-  "reportStageLocationPrimaryAction": "Next",
-  "reportStageLocationPrimaryRequirement": "Pin",
-  "reportStageLocationSecondaryRequirement": "In Macedonia",
-  "reportStageLocationInfoTitle": "Location",
-  "reportHelpLocationS0Title": "How to place the pin",
-  "reportHelpLocationS0Body": "Drag the map to the exact spot where the pollution is, not the nearest town unless you’re reporting a whole area. Zoom in until the pin sits on the real site.",
-  "reportHelpLocationS1Title": "Coverage area",
-  "reportHelpLocationS1Body": "The pin must be inside Macedonia so your report can be routed and verified correctly. If you’re unsure, place it as accurately as you can.",
-  "reportHelpLocationS2Title": "Why it matters",
-  "reportHelpLocationS2Body": "Coordinates tie your photos and description to a real place for field teams and moderators.",
-  "reportStageReviewEyebrow": "Final review",
-  "reportStageReviewTitle": "Review",
-  "reportStageReviewSubtitle": "Before you send",
-  "reportStageReviewShortLabel": "Review",
-  "reportStageReviewPrimaryAction": "Submit",
-  "reportStageReviewPrimaryRequirement": "Ready",
-  "reportStageReviewInfoTitle": "Review",
-  "reportHelpReviewS0Title": "Double-check each section",
-  "reportHelpReviewS0Body": "Tap any row to jump back and edit. When photos, details, and location all match what you saw, you’re ready.",
-  "reportHelpReviewS1Title": "What happens next",
-  "reportHelpReviewS1Body": "Your report is reviewed before it appears publicly. In My reports, you can track status; updates appear there as the site moves through moderation.",
-  "newReportTitle": "New report",
-  "reportReviewBannerCreditsTitle": "Credits",
-  "reportReviewBannerAfterSubmitTitle": "After submit",
-  "reportReviewAfterSubmitReady": "Moderated before public. Status in My reports.",
-  "reportReviewAfterSubmitIncomplete": "Finish steps above.",
-  "semanticsClose": "Close",
-  "semanticsAboutStep": "About {title}",
+  "reportFlowHelpHint": "Допрете на иконата за информации за совети за овој чекор.",
+  "reportHelpContextTitle": "Контекст",
+  "reportStageEvidenceEyebrow": "Пријавете загадено место",
+  "reportStageEvidenceTitle": "Докази",
+  "reportStageEvidenceSubtitle": "Фотографии и кадрирање",
+  "reportStageEvidenceShortLabel": "Докази",
+  "reportStageEvidencePrimaryAction": "Следно",
+  "reportStageEvidencePrimaryRequirement": "Фото",
+  "reportStageEvidenceSecondaryRequirement": "До 5",
+  "reportStageEvidenceInfoTitle": "Докази",
+  "reportHelpEvidenceS0Title": "Што да снимите",
+  "reportHelpEvidenceS0Body": "Додајте до пет фотографии што јасно ја покажуваат загадената зона. Почнете со поширок кадар за контекст, потоа поблиску: купови отпад, цевки, дамки, шут, се што покажува проблемот.",
+  "reportHelpEvidenceS1Title": "Зошто помага",
+  "reportHelpEvidenceS1Body": "Модераторите се потпираат на сликите за да потврдат пријава и да приоритизираат следен чекор. Подобра дневна светлина, стабилна рака и цела локација го олеснуваат проверувањето.",
+  "reportStageDetailsEyebrow": "Опишете го проблемот",
+  "reportStageDetailsTitle": "Детали",
+  "reportStageDetailsSubtitle": "Категорија, наслов и контекст",
+  "reportStageDetailsShortLabel": "Детали",
+  "reportStageDetailsPrimaryAction": "Следно",
+  "reportStageDetailsPrimaryRequirement": "Категорија и наслов",
+  "reportStageDetailsSecondaryRequirement": "Детали опционално",
+  "reportStageDetailsInfoTitle": "Детали",
+  "reportHelpDetailsS0Title": "Што да пополните",
+  "reportHelpDetailsS0Body": "Одберете категорија што најдобро одговара на она што го видовте. Краток наслов што кој било би го разбрал на прв поглед, како наслов на вест, не есеј.\n\nАко не сте сигурни, додадете сериозност; во описот ставете сè што им помага на терен да ја најдат или оценат локацијата: пристап, време, мирис, боја на водата, ориентири. За чистење пополнете само ако имате приближна претстава за обем.",
+  "reportHelpDetailsS1Title": "Опционални полиња",
+  "reportHelpDetailsS1Body": "Ништо не го блокира испраќањето освен категорија и наслов. Дополнителни детали се за нијанси; користете ги кога вистински помагаат.",
+  "reportStageLocationEyebrow": "Потврдете ја локацијата",
+  "reportStageLocationTitle": "Локација",
+  "reportStageLocationSubtitle": "Игла на карта",
+  "reportStageLocationShortLabel": "Локација",
+  "reportStageLocationPrimaryAction": "Следно",
+  "reportStageLocationPrimaryRequirement": "Игла",
+  "reportStageLocationSecondaryRequirement": "Во Македонија",
+  "reportStageLocationInfoTitle": "Локација",
+  "reportHelpLocationS0Title": "Како да ја поставите иглата",
+  "reportHelpLocationS0Body": "Поместете ја картата точно каде е загадувањето, не на најблиското село освен ако пријавувате цела зона. Зумирајте додека иглата не стои на вистинското место.",
+  "reportHelpLocationS1Title": "Покриеност",
+  "reportHelpLocationS1Body": "Иглата мора да биде во Македонија за пријавата да се насочи и верифицира. Ако не сте сигурни, поставете ја што е можно попрецизно.",
+  "reportHelpLocationS2Title": "Зошто е важно",
+  "reportHelpLocationS2Body": "Координатите ги поврзуваат фотографиите и описот со вистинско место за тимови на терен и модератори.",
+  "reportStageReviewEyebrow": "Финален преглед",
+  "reportStageReviewTitle": "Преглед",
+  "reportStageReviewSubtitle": "Пред испраќање",
+  "reportStageReviewShortLabel": "Преглед",
+  "reportStageReviewPrimaryAction": "Испрати",
+  "reportStageReviewPrimaryRequirement": "Подготвено",
+  "reportStageReviewInfoTitle": "Преглед",
+  "reportHelpReviewS0Title": "Проверете секој дел",
+  "reportHelpReviewS0Body": "Допрете ред за враќање и уредување. Кога фото, детали и локација одговараат на она што го видовте, може да испратите.",
+  "reportHelpReviewS1Title": "Што следи",
+  "reportHelpReviewS1Body": "Пријавата се разгледува пред да биде јавна. Во Мои пријави следите статус; обновувањата се појавуваат додека локацијата поминува низ модерација.",
+  "newReportTitle": "Нова пријава",
+  "reportReviewBannerCreditsTitle": "Кредити",
+  "reportReviewBannerAfterSubmitTitle": "По испраќање",
+  "reportReviewAfterSubmitReady": "Модерација пред јавност. Статус во Мои пријави.",
+  "reportReviewAfterSubmitIncomplete": "Довршете ги чекорите погоре.",
+  "semanticsClose": "Затвори",
+  "semanticsAboutStep": "За {title}",
   "@semanticsAboutStep": {
     "placeholders": {
       "title": {
@@ -65,7 +65,7 @@
       }
     }
   },
-  "semanticsNextStep": "Next: {label}",
+  "semanticsNextStep": "Следно: {label}",
   "@semanticsNextStep": {
     "placeholders": {
       "label": {
@@ -85,7 +85,7 @@
       }
     }
   },
-  "errorBannerDraftSavedHint": "Нацртот е зачуван — обидете се повторно кога ќе бидете подготвени.",
+  "errorBannerDraftSavedHint": "Нацртот е зачуван, обидете се повторно кога ќе бидете подготвени.",
   "reportSubmittedTitle": "Пријавата е испратена",
   "reportSubmittedSavedAs": "Зачувано како пријава {number}",
   "@reportSubmittedSavedAs": {
@@ -152,7 +152,7 @@
   "profileAvatarRemoveFailed": "Не можеше да се отстрани фотографијата. Обидете се повторно.",
   "profileAvatarSourceRecommended": "Препорачано",
   "profileAvatarCropMoveAndScale": "Помести и размери",
-  "profileAvatarCropHint": "Зближете со стискање · повлечете за позиција",
+  "profileAvatarCropHint": "Зближете со стискање, повлечете за позиција",
   "profileAvatarCropLoading": "Се вчитува фотографијата…",
   "profileAvatarCropCancel": "Откажи",
   "profileAvatarCropDone": "Готово",
@@ -310,6 +310,864 @@
       },
       "total": {
         "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsTitle": "Неделна ранг-листа",
+  "profileWeeklyRankingsSubtitle": "Пријави, еко-акции и повеќе, оваа недела.",
+  "profileWeeklyRankingsTopSupporters": "Најактивни оваа недела",
+  "profileWeeklyRankingsEmptyTitle": "Сè уште нема ранг-листа",
+  "profileWeeklyRankingsEmptySubtitle": "Освојте поени оваа недела од која било активност што носи поени за да се појавите тука.",
+  "profileWeeklyRankingsRetry": "Обиди се повторно",
+  "profileWeeklyRankingsYouRank": "Оваа недела сте бр. {rank}",
+  "@profileWeeklyRankingsYouRank": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsPtsThisWeek": "{points} поени оваа недела",
+  "@profileWeeklyRankingsPtsThisWeek": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsYouBadge": "Вие",
+  "profileWeeklyRankingsScrollToYouHint": "Скролувај до вашата позиција на листата",
+  "profileWeeklyRankingsLoadingSemantic": "Се вчитува неделната ранг-листа",
+  "profileWeeklyRankingsRowSemantic": "Место {rank}, {name}, {points} поени",
+  "@profileWeeklyRankingsRowSemantic": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelLine": "Ниво {level}",
+  "@profileLevelLine": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "profileTierLegend": "Легенда на Chisto",
+  "profilePtsToNextLevel": "Уште {points} поени до следно ниво",
+  "@profilePtsToNextLevel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelXpSegment": "{current} / {total} XP",
+  "@profileLevelXpSegment": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLifetimeXpOnBar": "{xp} животни XP",
+  "@profileLifetimeXpOnBar": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsBalanceShort": "Салдо {balance}",
+  "@profilePointsBalanceShort": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankTitle": "Мојот неделен ранг",
+  "profileMyWeeklyRankDetailRanked": "бр.{rank}, {points} поени",
+  "@profileMyWeeklyRankDetailRanked": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankDetailPointsOnly": "{points} поени",
+  "@profileMyWeeklyRankDetailPointsOnly": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankNoPoints": "Сè уште нема поени оваа недела",
+  "profileViewRankings": "Види ранг-листа",
+  "profilePointsHistoryTitle": "Поени и нивоа",
+  "profilePointsHistorySubtitle": "Освоени XP и секое отклучено ниво.",
+  "profilePointsHistoryOpenSemantic": "Отвори историја на поени и нивоа",
+  "profilePointsHistoryLoadingSemantic": "Се вчитуваат поените и нивоата",
+  "profileLoadingSemantic": "Се вчитува профилот",
+  "profilePointsHistoryMilestonesSection": "Ново ниво",
+  "profilePointsHistoryActivitySection": "Активност",
+  "profilePointsHistoryDayToday": "Денес",
+  "profilePointsHistoryDayYesterday": "Вчера",
+  "profilePointsHistoryEmpty": "Сè уште нема поени. Кога пријавата што ја испрати ќе биде одобрена како прва на локацијата, тука ќе се појави XP.",
+  "profilePointsHistoryLevelUpBadge": "НОВО НИВО",
+  "profilePointsHistoryLoadMore": "Се вчитува…",
+  "profilePointsDeltaPositive": "+{points} XP",
+  "@profilePointsDeltaPositive": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsDeltaNegative": "{points} XP",
+  "@profilePointsDeltaNegative": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsReasonFirstReport": "Прва одобрена пријава на локација",
+  "profilePointsReasonEcoApproved": "Одобрена еко-акција",
+  "profilePointsReasonEcoRealized": "Завршена еко-акција",
+  "profilePointsReasonOther": "Промена на поени",
+  "profileReportCreditsTitle": "Кредити за пријави",
+  "profileAccountDetailsSection": "Детали за сметката",
+  "profileGeneralInfoTile": "Општи информации",
+  "profileLanguageTile": "Јазик",
+  "profileLanguageScreenTitle": "Јазик на апликацијата",
+  "profileLanguageSubtitleDevice": "Поставки на уредот",
+  "profileLanguageOptionSystem": "Следи јазик на уредот",
+  "profileLanguageNameEn": "English",
+  "profileLanguageNameMk": "Македонски",
+  "profileLanguageNameSq": "Shqip",
+  "profilePasswordTile": "Лозинка",
+  "profileSupportSection": "Поддршка",
+  "profileHelpCenterTile": "Центар за помош",
+  "profileAccountSection": "Сметка",
+  "profileSignOutTile": "Одјави се",
+  "profileDeleteAccountTile": "Избриши сметка",
+  "profileEmailLabel": "Е-пошта",
+  "profileEmailReadOnlyHint": "Само за читање. За промена контактирајте поддршка.",
+  "profileNoConnectionSnack": "Нема врска",
+  "profileRefreshFailedSnack": "Не можевме да го освежиме профилот. Обидете се повторно за момент.",
+  "profilePasswordScreenTitle": "Промени лозинка",
+  "profilePasswordScreenSubtitle": "Одберете силна, уникатна лозинка.",
+  "profilePasswordCurrentLabel": "Моментална лозинка",
+  "profilePasswordNewLabel": "Нова лозинка",
+  "profilePasswordConfirmLabel": "Потврди нова лозинка",
+  "profilePasswordNewHelper": "Најмалку 8 знаци, со бројка.",
+  "profilePasswordConfirmMismatchHelper": "Мора да се совпаѓа со новата лозинка погоре.",
+  "profilePasswordSecurityHint": "Од безбедносни причини не ја користете истата лозинка како на други апликации.",
+  "profilePasswordSubmit": "Ажурирај лозинка",
+  "profilePasswordSubmitting": "Се ажурира…",
+  "profilePasswordSuccess": "Лозинката е ажурирана",
+  "profilePasswordEnterCurrentWarning": "Внесете ја моменталната лозинка.",
+  "profilePasswordMismatchError": "Лозинките не се совпаѓаат.",
+  "profilePasswordSessionExpired": "Сесијата истече. Најавете се повторно.",
+  "profilePasswordCurrentSemantic": "Моментална лозинка",
+  "profilePasswordNewSemantic": "Нова лозинка",
+  "profilePasswordConfirmSemantic": "Потврда на нова лозинка",
+  "commonCancel": "Откажи",
+  "commonRetry": "Обиди повторно",
+  "commonTryAgain": "Обиди се повторно",
+  "commonDelete": "Избриши",
+  "commonSave": "Зачувај",
+  "commonSkip": "Прескокни",
+  "commonBack": "Назад",
+  "commonClose": "Затвори",
+  "commonGotIt": "Разбрано",
+  "commonKeepEditing": "Продолжи со уредување",
+  "commonDiscard": "Отфрли",
+  "profileSignOutDialogTitle": "Да се одјавите?",
+  "profileSignOutDialogBody": "Можете повторно да се најавите со вашата сметка.",
+  "profileDeleteAccountDialogTitle": "Да се избрише сметката?",
+  "profileDeleteAccountDialogBody": "Сите податоци трајно ќе бидат избришани. Ова не може да се врати.",
+  "profileDeleteAccountFinalDialogTitle": "Трајно бришење?",
+  "profileDeleteAccountFinalDialogBody": "Вашата сметка и сите поврзани податоци трајно ќе бидат избришани.",
+  "profileDeleteAccountTypeConfirmTitle": "Потврда со внес",
+  "profileDeleteAccountTypeConfirmBody": "Напишете го зборот подолу точно како што е прикажан. Ова спречува случајно бришење.",
+  "profileDeleteAccountConfirmPhrase": "ИЗБРИШИ",
+  "profileDeleteAccountTypeFieldPlaceholder": "Напишете овде",
+  "profileDeleteAccountTypeMismatchSnack": "Напишете го зборот за потврда точно како што е прикажан.",
+  "profileHelpCenterOpenFailedSnack": "Не можеше да се отвори центарот за помош",
+  "profileGeneralLoadFailedSnack": "Не можеше да се вчита профилот",
+  "profileGeneralNameRequiredSnack": "Името е задолжително",
+  "profileGeneralNameTooLongSnack": "Името е предолго",
+  "profileGeneralUpdatedSnack": "Профилот е ажуриран",
+  "profileGeneralPictureUpdatedSnack": "Профилната слика е ажурирана",
+  "profileGeneralInfoSubtitle": "Уредете ги податоците за профилот",
+  "profileGeneralNameLabel": "Име",
+  "profileGeneralNameHint": "Вашето име",
+  "profileGeneralMobileLabel": "Мобилен телефон",
+  "profileGeneralPhonePlaceholder": "70 123 456",
+  "profileGeneralLimitsNotice": "Промените на името се ограничени. Промената на телефонот бара верификација.",
+  "profileGeneralUpdateButton": "Ажурирај податоци",
+  "profileGeneralSaving": "Зачувување…",
+  "profileGeneralAvatarSemanticUpdating": "Се ажурира профилната фотографија",
+  "profileGeneralAvatarSemanticChange": "Профилна фотографија. Двоен допир за промена",
+  "profileGeneralEmptyValue": "—",
+  "profileGeneralDefaultDisplayName": "Корисник",
+  "reportListFabLabel": "Пријави загадување",
+  "reportListSearchSemantic": "Пребарај пријави",
+  "reportAvailabilityCheckFailedSnack": "Моментално не може да се провери достапноста за пријавување.",
+  "reportFinishStepsSnack": "Довршете ги недостасувачките чекори пред испраќање.",
+  "reportSubmittedPartialUploadSnack": "Пријавата е испратена. Фотографиите не се прикачени.",
+  "reportPhotoUploadFailedTitle": "Неуспешно прикачување на фотографии",
+  "reportPhotoUploadFailedBody": "Пријавата е испратена. Допрете Обиди повторно за да ги прикачите фотографиите или Прескокни за да продолжите.",
+  "reportReviewEvidenceTitle": "Докази",
+  "reportReviewPhotoCount": "{count, plural, one{{count} фотографија} other{{count} фотографии}}",
+  "@reportReviewPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportReviewAddPhoto": "Додај фотографија",
+  "reportReviewCategoryTitle": "Категорија",
+  "reportReviewChooseCategory": "Одбери категорија",
+  "reportReviewTitleLabel": "Наслов",
+  "reportReviewAddTitle": "Додај наслов",
+  "reportReviewSeverityTitle": "Сериозност",
+  "reportReviewLocationTitle": "Локација",
+  "reportReviewPinnedShort": "Закачено",
+  "reportReviewPinMacedonia": "Закачи во Македонија",
+  "reportReviewExtraContextTitle": "Дополнителен контекст",
+  "reportReviewCleanupEffortTitle": "Проценка за чистење",
+  "reportSelectCategorySemantic": "Одбери категорија на пријава",
+  "reportBackSemantic": "Назад",
+  "reportPreviousStepSemantic": "Претходен чекор",
+  "reportCleanupEffortChipHint": "Двојно допирање за проценка на напор за чистење.",
+  "reportCleanupEffortOneToTwo": "1–2 лица",
+  "reportCleanupEffortThreeToFive": "3–5 лица",
+  "reportCleanupEffortSixToTen": "6–10 лица",
+  "reportCleanupEffortTenPlus": "10+ лица",
+  "reportCleanupEffortNotSure": "Не сум сигурен/а",
+  "reportCooldownTitle": "Пауза за пријавување",
+  "reportCooldownBody": "Ги искористивте сите 10 кредити за пријави и вонредното олеснување.\n\nВонредното отклучување повторно за {retry}.\n\n{hint}",
+  "@reportCooldownBody": {
+    "placeholders": {
+      "retry": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCooldownModalIntro": "Ги искористивте сите 10 кредити за пријави и вонредното олеснување.",
+  "reportCooldownModalRetryLead": "Вонредното отклучување повторно за",
+  "reportCooldownDurationListSeparator": ", ",
+  "reportCooldownDurationDays": "{count, plural, one{{count} ден} other{{count} дена}}",
+  "@reportCooldownDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationHours": "{count, plural, one{{count} час} other{{count} часа}}",
+  "@reportCooldownDurationHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationMinutes": "{count, plural, one{{count} минута} other{{count} минути}}",
+  "@reportCooldownDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationSeconds": "{count, plural, one{{count} секунда} other{{count} секунди}}",
+  "@reportCooldownDurationSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetrySoon": "наскоро",
+  "reportCooldownRetrySeconds": "{seconds} с",
+  "@reportCooldownRetrySeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryMinutes": "{minutes} мин",
+  "@reportCooldownRetryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryHoursMinutes": "{hours} ч {minutes} мин",
+  "@reportCooldownRetryHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityUnlockHint": "На настани или еколошки акции за повеќе пријави (до 10).",
+  "reportCapacityPillHealthy": "{count, plural, one{{count} кредит} other{{count} кредити}}",
+  "@reportCapacityPillHealthy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerHealthyTitle": "Сè во ред",
+  "reportCapacityBannerHealthyBody": "{count, plural, one{{count} кредит достапен} other{{count} кредити достапни}}",
+  "@reportCapacityBannerHealthyBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityReviewHealthy": "Користи 1 кредит.",
+  "reportCapacityPillLow": "{count, plural, one{Уште {count} пријава} other{Уште {count} пријави}}",
+  "@reportCapacityPillLow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerLowTitle": "Малку кредити",
+  "reportCapacityBannerLowBody": "Скоро празно. {hint}",
+  "@reportCapacityBannerLowBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewLow": "Користи 1 кредит. {hint}",
+  "@reportCapacityReviewLow": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillEmergency": "Вонредна пријава",
+  "reportCapacityBannerEmergencyTitle": "Вонредна пријава",
+  "reportCapacityBannerEmergencyBody": "Имате уште една. {hint}",
+  "@reportCapacityBannerEmergencyBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewEmergency": "Ја користи вонредната пријава. {hint}",
+  "@reportCapacityReviewEmergency": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillCooldown": "Пауза",
+  "reportCapacityBannerCooldownTitle": "Пауза",
+  "reportCapacityCooldownRetryOnDate": "Следна вонредна: {date}.",
+  "@reportCapacityCooldownRetryOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownTryAgainInAbout": "Повторно за ~{duration}.",
+  "@reportCapacityCooldownTryAgainInAbout": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownStillWaiting": "Вонредната се лади.",
+  "reportCapacityBannerCooldownBody": "{retryLine} {hint}",
+  "@reportCapacityBannerCooldownBody": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewCooldown": "{retryLine} {hint}",
+  "@reportCapacityReviewCooldown": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacitySecondsRemaining": "(уште {seconds} с)",
+  "@reportCapacitySecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "feedRetryLoadingMore": "Обиди повторно да вчиташ повеќе",
+  "feedShowAllSites": "Прикажи ги сите локации",
+  "feedPullToRefreshSemantic": "Повлечи за освежување",
+  "feedLoadMoreFailedSnack": "Не можеше да се вчитаат повеќе објави. Допрете за обид.",
+  "feedScrollToTopSemantic": "Скролувај на врв на фидот",
+  "mapResetFiltersSemantic": "Ресетирај филтри",
+  "mapOpenMapsFailed": "Не можеше да се отвори Maps",
+  "locationRetryAddressSemantic": "Обиди повторно за адреса",
+  "photoReviewDiscardTitle": "Да се отфрли оваа фотографија?",
+  "photoReviewDiscardBody": "Можете повторно да снимите или да одберете друга од библиотеката.",
+  "reportPhotoReviewSheetTitle": "Преглед на докази",
+  "reportPhotoReviewSheetSubtitle": "Задржете го најјасниот кадар пред да го додадете во пријавата.",
+  "reportPhotoReviewSemantic": "Преглед и потврда на фотографија пред додавање во пријавата",
+  "reportPhotoReviewCloseSemantic": "Затвори без додавање фотографија",
+  "reportPhotoReviewRetake": "Сними повторно",
+  "reportPhotoReviewUsePhoto": "Користи ја оваа фотографија",
+  "reportPhotoReviewRetakeSemantic": "Сними повторно",
+  "reportPhotoReviewUseSemantic": "Користи ја оваа фотографија",
+  "reportPhotoReviewPreviewSemantic": "Преглед на фотографија",
+  "reportPhotoGridAddShort": "Додај",
+  "reportPhotoGridAdd": "Додај фотографија",
+  "reportPhotoGridSourceHint": "Камера или библиотека",
+  "notificationsTitle": "Известувања",
+  "notificationsMarkAllRead": "Означи сè прочитано",
+  "notificationsShowAll": "Прикажи ги сите известувања",
+  "notificationsPreferencesTooltip": "Поставки за известувања",
+  "notificationsScrollToTopSemantic": "Скролувај на врв на известувањата",
+  "notificationsRetryLoadingMore": "Обиди повторно да вчиташ повеќе",
+  "notificationsMarkAllReadFailed": "Не можеше да се означат сите како прочитани. Обидете се повторно.",
+  "notificationsAllMarkedReadSuccess": "Сите известувања се означени како прочитани",
+  "notificationsSiteUnavailable": "Оваа локација повеќе не е достапна.",
+  "notificationsReadStateUpdateFailed": "Не можеше да се ажурира статусот. Обидете се повторно.",
+  "notificationsMarkedUnreadLocal": "Означено како непрочитано (локално).",
+  "notificationsArchivedFromView": "Известувањето е архивирано од овој преглед",
+  "notificationsPrefsLoadFailed": "Не можеа да се вчитаат поставките за известувања.",
+  "notificationsPreferenceUpdateFailed": "Не можеше да се ажурира поставката. Обидете се повторно.",
+  "notificationsPrefsSheetTitle": "Поставки за известувања",
+  "notificationsPrefsSheetSubtitle": "Исклучете ги типовите известувања што не сакате да ги примате.",
+  "notificationsPrefMuted": "Исклучено",
+  "notificationsPrefEnabled": "Вклучено",
+  "notificationsTypeSiteUpdates": "Ажурирања за локации",
+  "notificationsTypeReportStatus": "Статус на пријава",
+  "notificationsTypeUpvotes": "Поддршки",
+  "notificationsTypeComments": "Коментари",
+  "notificationsTypeNearbyReports": "Пријави во близина",
+  "notificationsTypeCleanupEvents": "Акции за чистење",
+  "notificationsTypeSystem": "Системски",
+  "notificationsSwipeMarkUnread": "Означи непрочитано",
+  "notificationsSwipeMarkRead": "Означи прочитано",
+  "notificationsSwipeArchive": "Архивирај",
+  "notificationsDebugPreviewTriggered": "Локален преглед на известување",
+  "notificationsAllCaughtUp": "Сè е ажурирано",
+  "notificationsUnreadUpdatesCount": "{count, plural, =1{1 непрочитано ажурирање} other{{count} непрочитани ажурирања}}",
+  "@notificationsUnreadUpdatesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsUnreadBannerOne": "Имате 1 непрочитано известување",
+  "notificationsUnreadBannerMany": "Имате {count} непрочитани известувања",
+  "@notificationsUnreadBannerMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsSwipeHint": "Повлечи десно за прочитано/непрочитано · лево за архива",
+  "notificationsEmptyUnreadTitle": "Нема непрочитани известувања",
+  "notificationsEmptyAllTitle": "Сè уште нема известувања",
+  "notificationsEmptyUnreadBody": "Сè е ажурирано. Новите ажурирања ќе се појават тука.",
+  "notificationsEmptyAllBody": "Кога некој ќе реагира на локации и акции, ажурирањата ќе се појават тука.",
+  "notificationsErrorLoadTitle": "Не можеа да се вчитаат известувањата",
+  "notificationsErrorLoadFallback": "Проверете ја врската и обидете се повторно.",
+  "notificationsErrorNetwork": "Проблем со мрежата при вчитување на известувања.",
+  "notificationsErrorGeneric": "Нешто тргна наопаку при вчитување на известувања.",
+  "notificationsFilterAll": "Сите",
+  "notificationsFilterUnread": "Непрочитани",
+  "eventsEventNotFoundTitle": "Настанот не е пронајден",
+  "eventsEventNotFoundBody": "Овој настан повеќе не е достапен.",
+  "eventsManualCheckInAdd": "Додај",
+  "eventsManualCheckInTitle": "Рачен check-in",
+  "eventsCheckInTitle": "Check-in",
+  "eventsOrganizerMockAllCheckedIn": "Сите пробни учесници веќе се пријавени.",
+  "eventsOrganizerAttendeeNamePlaceholder": "Име на учесник",
+  "eventsOrganizerEnterNameFirst": "Прво внесете го името на учесникот.",
+  "eventsOrganizerNameAlreadyCheckedIn": "{name} веќе е пријавен/а.",
+  "@eventsOrganizerNameAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameAddedByOrganizer": "{name} е додаден/а од организаторот.",
+  "@eventsOrganizerNameAddedByOrganizer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerCouldNotRemoveName": "Не можеше да се отстрани {name}.",
+  "@eventsOrganizerCouldNotRemoveName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameRemovedFromCheckIn": "{name} е отстранет/а од пријавата.",
+  "@eventsOrganizerNameRemovedFromCheckIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerUnableCompleteEvent": "Не можеше да се заврши настанот.",
+  "eventsOrganizerEndedTitle": "Настанот заврши",
+  "eventsOrganizerThanksOrganizing": "Ви благодариме за организацијата!",
+  "eventsOrganizerEndSummaryOneAttendee": "1 учесник се пријави.",
+  "eventsOrganizerEndSummaryManyAttendees": "{count} учесници се пријавија.",
+  "@eventsOrganizerEndSummaryManyAttendees": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerUploadAfterPhotosHint": "Поставете ги фотографиите „после“ од деталите за настанот.",
+  "eventsOrganizerCheckInPausedSnack": "Пријавата е паузирана.",
+  "eventsOrganizerCheckInResumedSnack": "Пријавата е активна повторно.",
+  "eventsOrganizerUnableCancelEvent": "Не можеше да се откаже настанот.",
+  "eventsOrganizerEventCancelledSnack": "Настанот е откажан.",
+  "eventsOrganizerFeedbackCheckedIn": "{name} се пријави",
+  "@eventsOrganizerFeedbackCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerFeedbackInvalidQr": "Невалиден QR-код.",
+  "eventsOrganizerFeedbackWrongEvent": "Погрешен QR за настанот.",
+  "eventsOrganizerFeedbackPaused": "Пријавата моментално е паузирана.",
+  "eventsOrganizerFeedbackQrExpired": "QR-кодот истече. Генерирајте нов.",
+  "eventsOrganizerFeedbackQrReplay": "QR-кодот веќе е искористен. Се освежува…",
+  "eventsOrganizerFeedbackAlreadyCheckedIn": "{name} веќе е пријавен/а.",
+  "@eventsOrganizerFeedbackAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshHelp": "Учесниците секогаш треба да го скенираат најновиот QR. Кодот се освежува автоматски пред да истече.",
+  "eventsOrganizerHoldPhoneForScan": "Држете го телефонот за да можат да скенираат",
+  "eventsOrganizerPausedLabel": "Пријавата е паузирана",
+  "eventsOrganizerStatusOpen": "Отворено",
+  "eventsOrganizerStatusPaused": "Паузирано",
+  "eventsOrganizerRefreshInSeconds": "Освежување за {seconds} с",
+  "@eventsOrganizerRefreshInSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshesWhenOpen": "QR се освежува автоматски и по секое скенирање",
+  "eventsOrganizerResumeForFreshQr": "Продолжете со пријава за нов QR",
+  "eventsOrganizerManualOverride": "Рачно: означи учесник како присутен",
+  "eventsOrganizerCheckedInHeading": "Пријавени",
+  "eventsOrganizerEmptyListTitle": "Сè уште никој не се пријавил",
+  "eventsOrganizerEmptyListSubtitle": "Учесниците го скенираат вашиот QR за пријава",
+  "eventsOrganizerEndEvent": "Заврши настан",
+  "eventsOrganizerPauseCheckIn": "Паузирај пријава",
+  "eventsOrganizerResumeCheckIn": "Продолжи пријава",
+  "eventsOrganizerCancelEvent": "Откажи настан",
+  "eventsOrganizerSimulateCheckInDev": "Симулирај check-in (dev)",
+  "eventsPhotosTitle": "Фотографии",
+  "createEventDefaultDescription": "Заедничка акција за чистење организирана од локални волонтери.",
+  "createEventCategoryTitle": "Тип на настан",
+  "createEventCategorySubtitle": "Каква акција организирате?",
+  "createEventGearTitle": "Потребна опрема",
+  "createEventGearSubtitle": "Изберете што волонтерите треба да понесат.",
+  "createEventGearDoneSelectedCount": "Готово ({count} избрани)",
+  "@createEventGearDoneSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventGearMultiselectTitle": "Повеќекратен избор",
+  "createEventGearMultiselectMessage": "Допрете ги ставките што волонтерите треба да понесат. Може да изберете повеќе.",
+  "createEventTeamSizeTitle": "Големина на тим",
+  "createEventTeamSizeSubtitle": "Колку волонтери очекувате?",
+  "createEventDifficultyTitle": "Тешкотија",
+  "createEventDifficultySubtitle": "Поставете очекувања за волонтерите.",
+  "createEventStepProgress": "Чекор {step} од 5",
+  "@createEventStepProgress": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventEndTimeError": "Крајот мора да биде подоцна од почетокот.",
+  "createEventFieldType": "Тип на настан",
+  "createEventPlaceholderType": "Изберете тип",
+  "createEventFieldTeamSize": "Големина на тим",
+  "createEventPlaceholderTeamSize": "Колку луѓе?",
+  "createEventFieldDifficulty": "Тешкотија",
+  "createEventPlaceholderDifficulty": "Поставете ниво на тешкотија",
+  "createEventSubmitLabel": "Креирај еко-акција",
+  "createEventAppBarTitle": "Креирај настан",
+  "createEventLocalInfoSnack": "Засега настанот останува локален, но организаторскиот тек е веднаш подготвен.",
+  "createEventCleanupSiteTitle": "Локација за чистење",
+  "createEventSelectSiteSemantic": "Избери локација за чистење",
+  "createEventChooseSitePlaceholder": "Изберете локација со загадување",
+  "createEventSiteAnchorHint": "Секој настан треба да биде врзан за една локација за чистење.",
+  "createEventSiteDistanceAway": "{distanceKm} км надалеку · {description}",
+  "@createEventSiteDistanceAway": {
+    "placeholders": {
+      "distanceKm": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "createEventSiteRequiredError": "Изберете локација пред да креирате настан.",
+  "createEventTitleLabel": "Наслов на настанот",
+  "createEventTitleCounter": "{current} / {max}",
+  "@createEventTitleCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventTitleHint": "напр. Чистење на реката за викенд",
+  "createEventTitleRequired": "Насловот е задолжителен.",
+  "createEventTypeRequired": "Изберете тип на настан.",
+  "createEventGearPlaceholderQuestion": "Што треба да понесат волонтерите?",
+  "createEventGearLabel": "Потребна опрема",
+  "createEventSelectGearSemantic": "Избери потребна опрема",
+  "createEventDescriptionLabel": "Опис",
+  "createEventDescriptionSubtitle": "Незадолжително: повеќе контекст за волонтерите.",
+  "createEventDescriptionHint": "Опишете што да очекуваат, место на собирање итн.",
+  "eventsEventNotFoundShort": "Настанот не е пронајден.",
+  "eventsBeforeLabel": "Пред",
+  "eventsAfterLabel": "По",
+  "eventsDiscardChangesTitle": "Да се отфрлат промените?",
+  "eventsDiscardChangesBody": "Имате незачувани фотографии. Дали сигурно сакате да излезете?",
+  "eventsSetCover": "Постави како насловна",
+  "eventsViewFullscreen": "Цел екран",
+  "eventsAddToCalendar": "Додај во календар",
+  "eventsParticipantsRecent": "Неодамнешни",
+  "eventsParticipantsAz": "А-Ш",
+  "eventsParticipantsCheckedIn": "Пријавени",
+  "eventsSaveImpactSummary": "Зачувај преглед на ефект",
+  "eventsCheckedInBadge": "Пријавен/а",
+  "eventsCleanupPhotosCount": "{count} фотографии од чистење",
+  "@eventsCleanupPhotosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "qrScannerPointCameraHint": "Насочете ја камерата кон живиот QR код на организаторот",
+  "qrScannerEnterManually": "Не скенира? Внесете го кодот рачно",
+  "qrScannerRetryCamera": "Обиди повторно со камерата",
+  "qrScannerSubmitCode": "Испрати код",
+  "qrScannerHintFreshQr": "Ако организаторот го освежи QR-кодот, скенирајте го најновиот.",
+  "qrScannerHintCameraBlocked": "Ако пристапот до камерата е блокиран, внесете го кодот рачно или овозможете камера во Поставки.",
+  "qrScannerGenericEventTitle": "оваа акција за чистење",
+  "qrScannerErrorInvalidFormat": "Невалиден формат на QR.",
+  "qrScannerErrorWrongEvent": "Овој QR е за друг настан.",
+  "qrScannerErrorSessionClosed": "Организаторот ја паузираше пријавата.",
+  "qrScannerErrorSessionExpired": "QR-кодот истече. Побарајте нов од организаторот.",
+  "qrScannerErrorReplayDetected": "Овој QR веќе беше искористен.",
+  "qrScannerErrorAlreadyCheckedIn": "Веќе сте пријавени.",
+  "qrScannerCameraUnavailableFeedback": "Камерата е недостапна. Можете да го внесете кодот од организаторот или повторно да овозможите камера во Поставки.",
+  "qrScannerManualEntryTitle": "Внесете го кодот рачно",
+  "qrScannerPasteOrganizerQrHint": "Залепете го текстот од QR на организаторот",
+  "qrScannerPasteFromClipboardTooltip": "Залепи од привремена меморија",
+  "qrScannerEnterCodeFirst": "Прво внесете код.",
+  "qrScannerCheckedInTitle": "Успешно се пријавивте!",
+  "qrScannerWelcomeTo": "Добредојдовте на {eventTitle}",
+  "@qrScannerWelcomeTo": {
+    "placeholders": {
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerCheckedInAt": "Пријавени во {time}",
+  "@qrScannerCheckedInAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerDone": "Готово",
+  "qrScannerAppBarTitle": "Скенирај за пријава",
+  "qrScannerToggleFlashlightSemantic": "Вклучи или исклучи блиц",
+  "siteReportReasonFakeLabel": "Лажни или воведувачки податоци",
+  "siteReportReasonFakeSubtitle": "Информациите не одговараат на реалноста",
+  "siteReportReasonResolvedLabel": "Веќе решено",
+  "siteReportReasonResolvedSubtitle": "Проблемот е исчистен или поправен",
+  "siteReportReasonWrongLocationLabel": "Погрешна локација",
+  "siteReportReasonWrongLocationSubtitle": "Локацијата е погрешно на картата",
+  "siteReportReasonDuplicateLabel": "Дупликат пријава",
+  "siteReportReasonDuplicateSubtitle": "Иста локација пријавена повеќе пати",
+  "siteReportReasonSpamLabel": "Спам или злоупотреба",
+  "siteReportReasonSpamSubtitle": "Неприфатлива или штетна содржина",
+  "siteReportReasonOtherLabel": "Друго",
+  "siteReportReasonOtherSubtitle": "Нешто друго не е во ред",
+  "takeActionDonationOpenFailed": "Не можеше да се отвори страницата за донации",
+  "takeActionShareSiteTitle": "Сподели локација",
+  "takeActionShareSiteSubtitle": "Помогни други да ја откријат и поддржат",
+  "takeActionLinkCopied": "Линкот е копиран",
+  "takeActionSharedToProfile": "Споделено на вашиот профил",
+  "siteDetailThankYouReportSnack": "Ви благодариме. Вашата пријава ни помага.",
+  "siteDetailUpvoteFailedSnack": "Не можеше да се ажурира поддршката. Обидете се повторно.",
+  "siteDetailNoUpvotesSnack": "Сè уште нема поддршка. Бидете први!",
+  "siteDetailNoVolunteersSnack": "Сè уште нема волонтери за оваа локација.",
+  "siteDetailDirectionsUnavailableSnack": "Насоки не се достапни за оваа локација.",
+  "siteDetailOpenMapsFailedSnack": "Не можеше да се отвори Maps",
+  "siteCardUpvoteFailedSnack": "Не можеше да се ажурира поддршката. Обидете се повторно.",
+  "siteCardSavedFailedSnack": "Не можеше да се ажурира зачуваното. Обидете се повторно.",
+  "siteCardTakeActionSemantic": "Преземи акција",
+  "siteCardFeedOptionsSemantic": "Опции на фидот",
+  "siteCardCommentsLoadFailedSnack": "Не можеше да се вчитаат коментарите.",
+  "siteCardShareTrackFailedSnack": "Не можеше да се забележи споделувањето.",
+  "siteCardFeedbackSubmitFailedSnack": "Не можеше да се испрати повратната информација.",
+  "siteCardNotRelevantTitle": "Не е релевантно",
+  "siteCardShowLessTitle": "Покажи помалку вакви",
+  "siteCardDuplicateTitle": "Дупликат",
+  "siteCardMisleadingTitle": "Воведувачки",
+  "siteCardHidePostTitle": "Сокриј ја објавата",
+  "commentsSheetTitle": "Акции за коментар",
+  "commentsSheetSubtitle": "Управувај со коментарот",
+  "commentsEditTitle": "Уреди коментар",
+  "commentsEditSubtitle": "Ажурирај го текстот",
+  "commentsDeleteTitle": "Избриши коментар",
+  "commentsDeleteSubtitle": "Отстрани го од нишката",
+  "commentsEditFailedSnack": "Не можеше да се уреди коментарот.",
+  "commentsReplyFailedSnack": "Не можеше да се испрати одговорот.",
+  "commentsDeletedSnack": "Коментарот е избришан.",
+  "commentsDeleteFailedSnack": "Не можеше да се избрише коментарот.",
+  "commentsLikeFailedSnack": "Не можеше да се ажурира допаѓањето.",
+  "commentsCancelEditSemantic": "Откажи уредување и исчисти нацрт",
+  "commentsCancelReplySemantic": "Откажи одговор и исчисти нацрт",
+  "commentsReplyToSemantic": "Одговори на {name}",
+  "@commentsReplyToSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "searchModalCancel": "Откажи",
+  "appSmartImageRetry": "Обиди повторно",
+  "appSmartImageRetryIn": "Обид повторно за {seconds} с",
+  "@appSmartImageRetryIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticClose": "Затвори",
+  "pollutionSiteTabTakeAction": "Преземи акција",
+  "reportDescriptionHint": "Нешто друго",
+  "reportSubmittedFallbackCategory": "Пријава",
+  "reportSeverityLow": "Ниска",
+  "reportSeverityModerate": "Умерена",
+  "reportSeveritySignificant": "Значајна",
+  "reportSeverityHigh": "Висока",
+  "reportSeverityCritical": "Критична",
+  "reportListSearchPlaceholder": "Пребарај пријави",
+  "reportListSearchHintPrefix": "Пребарување по наслов, локација, категорија или статус.",
+  "reportListSearchNoMatches": "Нема совпаѓања",
+  "reportListSearchOneReport": "1 пријава",
+  "reportListSearchNReports": "{count} пријави",
+  "@reportListSearchNReports": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListEmptyTitle": "Сè уште нема пријави",
+  "reportListEmptySubtitle": "Вашите пријави ќе се појават тука откако ќе ги испратите.",
+  "appSmartImageUnavailable": "Сликата не е достапна",
+  "siteCardPollutionSiteSemantic": "Загадено место: {title}. Допри за детали.",
+  "@siteCardPollutionSiteSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardPhotoSemantic": "Фотографија на {title}",
+  "@siteCardPhotoSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
       }
     }
   }

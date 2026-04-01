@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
@@ -29,6 +29,11 @@ class ServiceLocator {
   ServiceLocator._();
 
   static final ServiceLocator instance = ServiceLocator._();
+
+  static const String _appLocaleCodeKey = 'app_locale_code';
+
+  /// Non-null: user chose a fixed app language. Null: follow device locale (with [supported] fallback).
+  final ValueNotifier<Locale?> appLocaleOverride = ValueNotifier<Locale?>(null);
 
   AppConfig? _config;
   AuthState? _authState;
@@ -131,7 +136,38 @@ class ServiceLocator {
     );
     _sitesRepository = ApiSitesRepository(client: _apiClient!);
 
+    _loadStoredAppLocale(prefs);
+
     _initialized = true;
+  }
+
+  void _loadStoredAppLocale(SharedPreferences prefs) {
+    final String? code = prefs.getString(_appLocaleCodeKey);
+    if (code == 'en') {
+      appLocaleOverride.value = const Locale('en');
+    } else if (code == 'mk') {
+      appLocaleOverride.value = const Locale('mk');
+    } else if (code == 'sq') {
+      appLocaleOverride.value = const Locale('sq');
+    } else {
+      appLocaleOverride.value = null;
+    }
+  }
+
+  /// Persists choice. Pass [null] to use device language.
+  Future<void> setAppLocale(Locale? locale) async {
+    final SharedPreferences prefs = _preferences!;
+    if (locale == null) {
+      await prefs.remove(_appLocaleCodeKey);
+      appLocaleOverride.value = null;
+      return;
+    }
+    final String code = locale.languageCode;
+    if (code != 'en' && code != 'mk' && code != 'sq') {
+      return;
+    }
+    await prefs.setString(_appLocaleCodeKey, code);
+    appLocaleOverride.value = Locale(code);
   }
 
   void reset() {
@@ -155,5 +191,6 @@ class ServiceLocator {
     _notificationsRepository = null;
     _pushNotificationService = null;
     _initialized = false;
+    appLocaleOverride.value = null;
   }
 }

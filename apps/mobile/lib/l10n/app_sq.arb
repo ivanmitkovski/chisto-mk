@@ -1,63 +1,63 @@
 {
   "@@locale": "sq",
-  "reportFlowHelpHint": "Tap the info button for tips on this step.",
-  "reportHelpContextTitle": "Context",
-  "reportStageEvidenceEyebrow": "Report a pollution site",
-  "reportStageEvidenceTitle": "Evidence",
-  "reportStageEvidenceSubtitle": "Photos and framing",
-  "reportStageEvidenceShortLabel": "Evidence",
-  "reportStageEvidencePrimaryAction": "Next",
-  "reportStageEvidencePrimaryRequirement": "Photo",
-  "reportStageEvidenceSecondaryRequirement": "Up to 5",
-  "reportStageEvidenceInfoTitle": "Evidence",
-  "reportHelpEvidenceS0Title": "What to capture",
-  "reportHelpEvidenceS0Body": "Add up to five photos that show the polluted area clearly. Use a wide shot for context, then closer frames of what matters: waste piles, pipes, stains, debris, or anything that shows the problem.",
-  "reportHelpEvidenceS1Title": "Why it helps",
-  "reportHelpEvidenceS1Body": "Moderators rely on your images to confirm the report and prioritize follow-up. Daylight, a steady hand, and showing the whole site make verification much easier.",
-  "reportStageDetailsEyebrow": "Describe the issue",
-  "reportStageDetailsTitle": "Details",
-  "reportStageDetailsSubtitle": "Category, headline, and context",
-  "reportStageDetailsShortLabel": "Details",
-  "reportStageDetailsPrimaryAction": "Next",
-  "reportStageDetailsPrimaryRequirement": "Category & title",
-  "reportStageDetailsSecondaryRequirement": "Details optional",
-  "reportStageDetailsInfoTitle": "Details",
-  "reportHelpDetailsS0Title": "What to fill in",
-  "reportHelpDetailsS0Body": "Choose the category that best matches what you saw. Write a short headline anyone could understand at a glance, like a news title, not an essay.\n\nThen add severity if you’re unsure; use the description for anything that helps someone find or assess the site on the ground: access, timing, smell, color of water, or landmarks. Cleanup effort is optional and only useful if you have a rough sense of scale.",
-  "reportHelpDetailsS1Title": "Optional fields",
-  "reportHelpDetailsS1Body": "Nothing here blocks submission except category and title. Extra detail is for nuance. Use it when it genuinely helps.",
-  "reportStageLocationEyebrow": "Confirm the location",
-  "reportStageLocationTitle": "Location",
-  "reportStageLocationSubtitle": "Map pin",
-  "reportStageLocationShortLabel": "Location",
-  "reportStageLocationPrimaryAction": "Next",
-  "reportStageLocationPrimaryRequirement": "Pin",
-  "reportStageLocationSecondaryRequirement": "In Macedonia",
-  "reportStageLocationInfoTitle": "Location",
-  "reportHelpLocationS0Title": "How to place the pin",
-  "reportHelpLocationS0Body": "Drag the map to the exact spot where the pollution is, not the nearest town unless you’re reporting a whole area. Zoom in until the pin sits on the real site.",
-  "reportHelpLocationS1Title": "Coverage area",
-  "reportHelpLocationS1Body": "The pin must be inside Macedonia so your report can be routed and verified correctly. If you’re unsure, place it as accurately as you can.",
-  "reportHelpLocationS2Title": "Why it matters",
-  "reportHelpLocationS2Body": "Coordinates tie your photos and description to a real place for field teams and moderators.",
-  "reportStageReviewEyebrow": "Final review",
-  "reportStageReviewTitle": "Review",
-  "reportStageReviewSubtitle": "Before you send",
-  "reportStageReviewShortLabel": "Review",
-  "reportStageReviewPrimaryAction": "Submit",
-  "reportStageReviewPrimaryRequirement": "Ready",
-  "reportStageReviewInfoTitle": "Review",
-  "reportHelpReviewS0Title": "Double-check each section",
-  "reportHelpReviewS0Body": "Tap any row to jump back and edit. When photos, details, and location all match what you saw, you’re ready.",
-  "reportHelpReviewS1Title": "What happens next",
-  "reportHelpReviewS1Body": "Your report is reviewed before it appears publicly. In My reports, you can track status; updates appear there as the site moves through moderation.",
-  "newReportTitle": "New report",
-  "reportReviewBannerCreditsTitle": "Credits",
-  "reportReviewBannerAfterSubmitTitle": "After submit",
-  "reportReviewAfterSubmitReady": "Moderated before public. Status in My reports.",
-  "reportReviewAfterSubmitIncomplete": "Finish steps above.",
-  "semanticsClose": "Close",
-  "semanticsAboutStep": "About {title}",
+  "reportFlowHelpHint": "Prekni butonin e informacionit për këshilla për këtë hap.",
+  "reportHelpContextTitle": "Konteksti",
+  "reportStageEvidenceEyebrow": "Raporto vend të ndotur",
+  "reportStageEvidenceTitle": "Provat",
+  "reportStageEvidenceSubtitle": "Foto dhe kornizë",
+  "reportStageEvidenceShortLabel": "Provat",
+  "reportStageEvidencePrimaryAction": "Vazhdo",
+  "reportStageEvidencePrimaryRequirement": "Foto",
+  "reportStageEvidenceSecondaryRequirement": "Deri në 5",
+  "reportStageEvidenceInfoTitle": "Provat",
+  "reportHelpEvidenceS0Title": "Çfarë të fotografosh",
+  "reportHelpEvidenceS0Body": "Shto deri në pesë foto që e tregojnë qartë zonën e ndotur. Fillo me një kornizë të gjerë për kontekst, pastaj më afër: grumbuj plehrash, tuba, njolla, inerte, çdo gjë që tregon problemin.",
+  "reportHelpEvidenceS1Title": "Pse ndihmon",
+  "reportHelpEvidenceS1Body": "Moderatorët mbështeten në imazhet për të konfirmuar raportin dhe për të përparësuar vazhdimin. Dritë e diellit, dorë e qëndrueshme dhe pamje e plotë e vendit e bëjnë verifikimin më të lehtë.",
+  "reportStageDetailsEyebrow": "Përshkruaje problemin",
+  "reportStageDetailsTitle": "Detajet",
+  "reportStageDetailsSubtitle": "Kategori, titull dhe kontekst",
+  "reportStageDetailsShortLabel": "Detajet",
+  "reportStageDetailsPrimaryAction": "Vazhdo",
+  "reportStageDetailsPrimaryRequirement": "Kategori dhe titull",
+  "reportStageDetailsSecondaryRequirement": "Detaje opsionale",
+  "reportStageDetailsInfoTitle": "Detajet",
+  "reportHelpDetailsS0Title": "Çfarë të plotësosh",
+  "reportHelpDetailsS0Body": "Zgjidh kategorinë që përputhet më së miri me atë që ke parë. Shkruaj një titull të shkurtër që kuptohet menjëherë, si titull lajmi, jo ese.\n\nNëse nuk je i sigurt, shto rëndësinë; në përshkrim vendos çdo gjë që ndihmon në terren: akses, kohë, erë, ngjyra e ujit, pika referimi. Për pastrimin plotëso vetëm nëse ke ide përafërsisht sa është madhësia.",
+  "reportHelpDetailsS1Title": "Fusha opsionale",
+  "reportHelpDetailsS1Body": "Asgjë këtu nuk bllokon dërgimin përveç kategorisë dhe titullit. Detajet ekstra janë për nuancë; përdoji kur vërtet ndihmojnë.",
+  "reportStageLocationEyebrow": "Konfirmo vendndodhjen",
+  "reportStageLocationTitle": "Vendndodhja",
+  "reportStageLocationSubtitle": "Kunji në hartë",
+  "reportStageLocationShortLabel": "Vendndodhja",
+  "reportStageLocationPrimaryAction": "Vazhdo",
+  "reportStageLocationPrimaryRequirement": "Kunji",
+  "reportStageLocationSecondaryRequirement": "Brenda Maqedonisë",
+  "reportStageLocationInfoTitle": "Vendndodhja",
+  "reportHelpLocationS0Title": "Si ta vendosësh kunjin",
+  "reportHelpLocationS0Body": "Tërhiq hartën te vendi ku është ndotja, jo te qyteti më i afërt përveç nëse raporton një zonë të tërë. Zmadho derisa kunji të bjerë në vendin e vërtetë.",
+  "reportHelpLocationS1Title": "Zona e mbulimit",
+  "reportHelpLocationS1Body": "Kunji duhet të jetë brenda Maqedonisë që raporti të orientohet dhe verifikohet saktë. Nëse nuk je i sigurt, vendose sa më saktë që të mundet.",
+  "reportHelpLocationS2Title": "Pse ka rëndësi",
+  "reportHelpLocationS2Body": "Koordinatat lidhin fotot dhe përshkrimin me një vend real për ekipet në terren dhe moderatorët.",
+  "reportStageReviewEyebrow": "Rishikim final",
+  "reportStageReviewTitle": "Rishikim",
+  "reportStageReviewSubtitle": "Para dërgimit",
+  "reportStageReviewShortLabel": "Rishikim",
+  "reportStageReviewPrimaryAction": "Dërgo",
+  "reportStageReviewPrimaryRequirement": "Gati",
+  "reportStageReviewInfoTitle": "Rishikim",
+  "reportHelpReviewS0Title": "Kontrollo çdo pjesë",
+  "reportHelpReviewS0Body": "Prek një rresht për të kthyer pas dhe përpunuar. Kur fotot, detajet dhe vendndodhja përputhen me atë që ke parë, je gati.",
+  "reportHelpReviewS1Title": "Çfarë vjen më pas",
+  "reportHelpReviewS1Body": "Raporti shqyrtohet para se të bëhet publik. Te Raportet e mia ndjek statusin; përditësimet shfaqen ndërsa vendi kalon nëpër moderim.",
+  "newReportTitle": "Raport i ri",
+  "reportReviewBannerCreditsTitle": "Kredite",
+  "reportReviewBannerAfterSubmitTitle": "Pas dërgimit",
+  "reportReviewAfterSubmitReady": "Moderim para publikimit. Status te Raportet e mia.",
+  "reportReviewAfterSubmitIncomplete": "Përfundo hapat më sipër.",
+  "semanticsClose": "Mbyll",
+  "semanticsAboutStep": "Rreth {title}",
   "@semanticsAboutStep": {
     "placeholders": {
       "title": {
@@ -65,7 +65,7 @@
       }
     }
   },
-  "semanticsNextStep": "Next: {label}",
+  "semanticsNextStep": "Tjetra: {label}",
   "@semanticsNextStep": {
     "placeholders": {
       "label": {
@@ -85,7 +85,7 @@
       }
     }
   },
-  "errorBannerDraftSavedHint": "Drafti juaj është ruajtur — mund të provoni përsëri kur të jeni gati.",
+  "errorBannerDraftSavedHint": "Drafti juaj është ruajtur, mund të provoni përsëri kur të jeni gati.",
   "reportSubmittedTitle": "Raporti u dërgua",
   "reportSubmittedSavedAs": "U ruajt si raport {number}",
   "@reportSubmittedSavedAs": {
@@ -95,7 +95,7 @@
       }
     }
   },
-  "reportSubmittedBodyWithAddress": "{category} near {address} është në radhë për shqyrtim.",
+  "reportSubmittedBodyWithAddress": "{category} pranë {address} është në radhë për shqyrtim.",
   "@reportSubmittedBodyWithAddress": {
     "placeholders": {
       "category": {
@@ -152,7 +152,7 @@
   "profileAvatarRemoveFailed": "Nuk hoqej fotoja. Provoni përsëri.",
   "profileAvatarSourceRecommended": "E rekomanduar",
   "profileAvatarCropMoveAndScale": "Lëviz dhe shkallëzo",
-  "profileAvatarCropHint": "Zmadhoj me dy gishta · zhvendos për pozicion",
+  "profileAvatarCropHint": "Zmadhoj me dy gishta, zhvendos për pozicion",
   "profileAvatarCropLoading": "Po ngarkohet fotoja…",
   "profileAvatarCropCancel": "Anulo",
   "profileAvatarCropDone": "Bërë",
@@ -310,6 +310,864 @@
       },
       "total": {
         "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsTitle": "Renditja javore",
+  "profileWeeklyRankingsSubtitle": "Raporte, veprime ekologjike e më shumë, këtë javë.",
+  "profileWeeklyRankingsTopSupporters": "Më të aktivët këtë javë",
+  "profileWeeklyRankingsEmptyTitle": "Ende pa renditje",
+  "profileWeeklyRankingsEmptySubtitle": "Fitoni pikë këtë javë nga çdo aktivitet që jep pikë për t’u shfaqur këtu.",
+  "profileWeeklyRankingsRetry": "Provo përsëri",
+  "profileWeeklyRankingsYouRank": "Këtë javë jeni nr. {rank}",
+  "@profileWeeklyRankingsYouRank": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsPtsThisWeek": "{points} pikë këtë javë",
+  "@profileWeeklyRankingsPtsThisWeek": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsYouBadge": "Ju",
+  "profileWeeklyRankingsScrollToYouHint": "Shkrollo te pozita juaj në listë",
+  "profileWeeklyRankingsLoadingSemantic": "Po ngarkohet renditja javore",
+  "profileWeeklyRankingsRowSemantic": "Renditja {rank}, {name}, {points} pikë",
+  "@profileWeeklyRankingsRowSemantic": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelLine": "Niveli {level}",
+  "@profileLevelLine": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "profileTierLegend": "Legjenda e Chisto",
+  "profilePtsToNextLevel": "Edhe {points} pikë deri në nivelin tjetër",
+  "@profilePtsToNextLevel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelXpSegment": "{current} / {total} XP",
+  "@profileLevelXpSegment": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLifetimeXpOnBar": "{xp} XP gjithë jetës",
+  "@profileLifetimeXpOnBar": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsBalanceShort": "Bilanci {balance}",
+  "@profilePointsBalanceShort": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankTitle": "Renditja ime javore",
+  "profileMyWeeklyRankDetailRanked": "Nr.{rank}, {points} pikë",
+  "@profileMyWeeklyRankDetailRanked": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankDetailPointsOnly": "{points} pikë",
+  "@profileMyWeeklyRankDetailPointsOnly": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankNoPoints": "Ende pa pikë këtë javë",
+  "profileViewRankings": "Shiko renditjen",
+  "profilePointsHistoryTitle": "Pikë dhe nivele",
+  "profilePointsHistorySubtitle": "XP që fitove dhe çdo nivel që zhbllokove.",
+  "profilePointsHistoryOpenSemantic": "Hap historikun e pikëve dhe niveleve",
+  "profilePointsHistoryLoadingSemantic": "Po ngarkohen pikët dhe nivelet",
+  "profileLoadingSemantic": "Po ngarkohet profili",
+  "profilePointsHistoryMilestonesSection": "Nivel i ri",
+  "profilePointsHistoryActivitySection": "Aktivitet",
+  "profilePointsHistoryDayToday": "Sot",
+  "profilePointsHistoryDayYesterday": "Dje",
+  "profilePointsHistoryEmpty": "Ende pa pikë. Kur një raport që dërgohet miratohet si i pari në një vend, fiton XP këtu.",
+  "profilePointsHistoryLevelUpBadge": "NIVEL I RI",
+  "profilePointsHistoryLoadMore": "Duke u ngarkuar…",
+  "profilePointsDeltaPositive": "+{points} XP",
+  "@profilePointsDeltaPositive": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsDeltaNegative": "{points} XP",
+  "@profilePointsDeltaNegative": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsReasonFirstReport": "Raporti i parë i miratuar në një vend",
+  "profilePointsReasonEcoApproved": "Veprim ekologjik i miratuar",
+  "profilePointsReasonEcoRealized": "Veprim ekologjik i përfunduar",
+  "profilePointsReasonOther": "Përditësim pikësh",
+  "profileReportCreditsTitle": "Kreditë e raportimit",
+  "profileAccountDetailsSection": "Detajet e llogarisë",
+  "profileGeneralInfoTile": "Informacione të përgjithshme",
+  "profileLanguageTile": "Gjuha",
+  "profileLanguageScreenTitle": "Gjuha e aplikacionit",
+  "profileLanguageSubtitleDevice": "Sipas pajisjes",
+  "profileLanguageOptionSystem": "Përdor gjuhën e pajisjes",
+  "profileLanguageNameEn": "English",
+  "profileLanguageNameMk": "Македонски",
+  "profileLanguageNameSq": "Shqip",
+  "profilePasswordTile": "Fjalëkalimi",
+  "profileSupportSection": "Mbështetje",
+  "profileHelpCenterTile": "Qendra e ndihmës",
+  "profileAccountSection": "Llogaria",
+  "profileSignOutTile": "Dil",
+  "profileDeleteAccountTile": "Fshi llogarinë",
+  "profileEmailLabel": "Email",
+  "profileEmailReadOnlyHint": "Vetëm për lexim. Për ndryshim kontaktoni mbështetjen.",
+  "profileNoConnectionSnack": "Nuk ka lidhje",
+  "profileRefreshFailedSnack": "Nuk e rifreskua profili. Provo përsëri pas pak.",
+  "profilePasswordScreenTitle": "Ndrysho fjalëkalimin",
+  "profilePasswordScreenSubtitle": "Zgjidh një fjalëkalim të fortë dhe unik.",
+  "profilePasswordCurrentLabel": "Fjalëkalimi aktual",
+  "profilePasswordNewLabel": "Fjalëkalim i ri",
+  "profilePasswordConfirmLabel": "Konfirmo fjalëkalimin e ri",
+  "profilePasswordNewHelper": "Të paktën 8 karaktere, me një numër.",
+  "profilePasswordConfirmMismatchHelper": "Duhet të përputhet me fjalëkalimin e ri më sipër.",
+  "profilePasswordSecurityHint": "Për siguri, mos ripërdor fjalëkalime nga aplikacione të tjera.",
+  "profilePasswordSubmit": "Përditëso fjalëkalimin",
+  "profilePasswordSubmitting": "Po përditësohet…",
+  "profilePasswordSuccess": "Fjalëkalimi u përditësua",
+  "profilePasswordEnterCurrentWarning": "Shkruaj fjalëkalimin aktual.",
+  "profilePasswordMismatchError": "Fjalëkalimet nuk përputhen.",
+  "profilePasswordSessionExpired": "Sesioni skadoi. Hyni përsëri.",
+  "profilePasswordCurrentSemantic": "Fjalëkalimi aktual",
+  "profilePasswordNewSemantic": "Fjalëkalim i ri",
+  "profilePasswordConfirmSemantic": "Konfirmo fjalëkalimin e ri",
+  "commonCancel": "Anulo",
+  "commonRetry": "Provo përsëri",
+  "commonTryAgain": "Provo përsëri",
+  "commonDelete": "Fshi",
+  "commonSave": "Ruaj",
+  "commonSkip": "Anashkalo",
+  "commonBack": "Kthehu",
+  "commonClose": "Mbyll",
+  "commonGotIt": "E kuptova",
+  "commonKeepEditing": "Vazhdo përpunimin",
+  "commonDiscard": "Hedh poshtë",
+  "profileSignOutDialogTitle": "Të dalësh?",
+  "profileSignOutDialogBody": "Mund të hysh përsëri me llogarinë tënde.",
+  "profileDeleteAccountDialogTitle": "Të fshihet llogaria?",
+  "profileDeleteAccountDialogBody": "Të gjitha të dhënat do të hiqen përgjithmonë. Ky veprim nuk kthehet mbrapsht.",
+  "profileDeleteAccountFinalDialogTitle": "Fshirje përfundimtare?",
+  "profileDeleteAccountFinalDialogBody": "Llogaria jote dhe të gjitha të dhënat e lidhura do të fshihen përgjithmonë.",
+  "profileDeleteAccountTypeConfirmTitle": "Konfirmo me shkrim",
+  "profileDeleteAccountTypeConfirmBody": "Shkruaj fjalën më poshtë saktësisht siç shfaqet. Kjo parandalon fshirjet aksidentale.",
+  "profileDeleteAccountConfirmPhrase": "FSHI",
+  "profileDeleteAccountTypeFieldPlaceholder": "Shkruaj këtu",
+  "profileDeleteAccountTypeMismatchSnack": "Shkruaj fjalën e konfirmimit saktësisht siç shfaqet.",
+  "profileHelpCenterOpenFailedSnack": "Nuk u hap qendra e ndihmës",
+  "profileGeneralLoadFailedSnack": "Nuk u ngarkua profili",
+  "profileGeneralNameRequiredSnack": "Emri është i detyrueshëm",
+  "profileGeneralNameTooLongSnack": "Emri është shumë i gjatë",
+  "profileGeneralUpdatedSnack": "Profili u përditësua",
+  "profileGeneralPictureUpdatedSnack": "Fotoja e profilit u përditësua",
+  "profileGeneralInfoSubtitle": "Ndrysho detajet e profilit",
+  "profileGeneralNameLabel": "Emri",
+  "profileGeneralNameHint": "Emri yt",
+  "profileGeneralMobileLabel": "Telefoni celular",
+  "profileGeneralPhonePlaceholder": "70 123 456",
+  "profileGeneralLimitsNotice": "Ndryshimet e emrit janë të kufizuara. Ndryshimi i numrit të telefonit kërkon verifikim.",
+  "profileGeneralUpdateButton": "Përditëso të dhënat",
+  "profileGeneralSaving": "Duke ruajtur…",
+  "profileGeneralAvatarSemanticUpdating": "Po përditësohet fotoja e profilit",
+  "profileGeneralAvatarSemanticChange": "Foto profili. Prek dy herë për ta ndryshuar",
+  "profileGeneralEmptyValue": "—",
+  "profileGeneralDefaultDisplayName": "Përdorues",
+  "reportListFabLabel": "Raporto ndotje",
+  "reportListSearchSemantic": "Kërko raporte",
+  "reportAvailabilityCheckFailedSnack": "Nuk mund të kontrollohet disponueshmëria e raportimit tani.",
+  "reportFinishStepsSnack": "Përfundo hapat që mungojnë para dërgimit.",
+  "reportSubmittedPartialUploadSnack": "Raporti u dërgua. Fotot nuk u ngarkuan.",
+  "reportPhotoUploadFailedTitle": "Ngarkimi i fotove dështoi",
+  "reportPhotoUploadFailedBody": "Raporti u dërgua. Prek Provo përsëri për të ngarkuar fotot ose Anashkalo për të vazhduar.",
+  "reportReviewEvidenceTitle": "Provat",
+  "reportReviewPhotoCount": "{count, plural, one{{count} foto} other{{count} foto}}",
+  "@reportReviewPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportReviewAddPhoto": "Shto një foto",
+  "reportReviewCategoryTitle": "Kategoria",
+  "reportReviewChooseCategory": "Zgjidh kategorinë",
+  "reportReviewTitleLabel": "Titulli",
+  "reportReviewAddTitle": "Shto titull",
+  "reportReviewSeverityTitle": "Rëndësia",
+  "reportReviewLocationTitle": "Vendndodhja",
+  "reportReviewPinnedShort": "Fiksuar",
+  "reportReviewPinMacedonia": "Vendose kunjin në Maqedoni",
+  "reportReviewExtraContextTitle": "Kontekst shtesë",
+  "reportReviewCleanupEffortTitle": "Përpjekja për pastrim",
+  "reportSelectCategorySemantic": "Zgjidh kategorinë e raportit",
+  "reportBackSemantic": "Kthehu",
+  "reportPreviousStepSemantic": "Hapi i mëparshëm",
+  "reportCleanupEffortChipHint": "Prek dy herë për të vendosur përpjekjen e vlerësuar të pastrimit.",
+  "reportCleanupEffortOneToTwo": "1–2 persona",
+  "reportCleanupEffortThreeToFive": "3–5 persona",
+  "reportCleanupEffortSixToTen": "6–10 persona",
+  "reportCleanupEffortTenPlus": "10+ persona",
+  "reportCleanupEffortNotSure": "Nuk jam i sigurt",
+  "reportCooldownTitle": "Pauzë raportimi",
+  "reportCooldownBody": "Ke përdorur të 10 kreditet e raportit dhe lejen e jashtëzakonshme.\n\nHapja e jashtëzakonshme përsëri pas {retry}.\n\n{hint}",
+  "@reportCooldownBody": {
+    "placeholders": {
+      "retry": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCooldownModalIntro": "Ke përdorur të 10 kreditet e raportit dhe lejen e jashtëzakonshme.",
+  "reportCooldownModalRetryLead": "Hapja e jashtëzakonshme përsëri pas",
+  "reportCooldownDurationListSeparator": ", ",
+  "reportCooldownDurationDays": "{count, plural, one{{count} ditë} other{{count} ditë}}",
+  "@reportCooldownDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationHours": "{count, plural, one{{count} orë} other{{count} orë}}",
+  "@reportCooldownDurationHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationMinutes": "{count, plural, one{{count} minutë} other{{count} minuta}}",
+  "@reportCooldownDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationSeconds": "{count, plural, one{{count} sekondë} other{{count} sekonda}}",
+  "@reportCooldownDurationSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetrySoon": "së shpejti",
+  "reportCooldownRetrySeconds": "{seconds} s",
+  "@reportCooldownRetrySeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryMinutes": "{minutes} min",
+  "@reportCooldownRetryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryHoursMinutes": "{hours} orë {minutes} min",
+  "@reportCooldownRetryHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityUnlockHint": "Merr më shumë në evente ose veprime ekologjike (deri në 10 raporte).",
+  "reportCapacityPillHealthy": "{count, plural, one{{count} kredit} other{{count} kredite}}",
+  "@reportCapacityPillHealthy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerHealthyTitle": "Gati",
+  "reportCapacityBannerHealthyBody": "{count, plural, one{{count} kredit i disponueshëm} other{{count} kredite të disponueshme}}",
+  "@reportCapacityBannerHealthyBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityReviewHealthy": "Përdor 1 kredit.",
+  "reportCapacityPillLow": "{count, plural, one{Edhe {count} raport} other{Edhe {count} raporte}}",
+  "@reportCapacityPillLow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerLowTitle": "Pak kredite",
+  "reportCapacityBannerLowBody": "Gati mbaruan. {hint}",
+  "@reportCapacityBannerLowBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewLow": "Përdor 1 kredit. {hint}",
+  "@reportCapacityReviewLow": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillEmergency": "Raport emergjence",
+  "reportCapacityBannerEmergencyTitle": "Raport emergjence",
+  "reportCapacityBannerEmergencyBody": "Ke edhe një. {hint}",
+  "@reportCapacityBannerEmergencyBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewEmergency": "Përdor raportin emergjence. {hint}",
+  "@reportCapacityReviewEmergency": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillCooldown": "Pauzë",
+  "reportCapacityBannerCooldownTitle": "Pauzë",
+  "reportCapacityCooldownRetryOnDate": "Emergjenca tjetër: {date}.",
+  "@reportCapacityCooldownRetryOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownTryAgainInAbout": "Provo përsëri pas ~{duration}.",
+  "@reportCapacityCooldownTryAgainInAbout": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownStillWaiting": "Raporti emergjence po freskohet.",
+  "reportCapacityBannerCooldownBody": "{retryLine} {hint}",
+  "@reportCapacityBannerCooldownBody": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewCooldown": "{retryLine} {hint}",
+  "@reportCapacityReviewCooldown": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacitySecondsRemaining": "(edhe {seconds} s)",
+  "@reportCapacitySecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "feedRetryLoadingMore": "Provo përsëri të ngarkosh më shumë",
+  "feedShowAllSites": "Shfaq të gjitha vendet",
+  "feedPullToRefreshSemantic": "Tërhiq për rifreskim",
+  "feedLoadMoreFailedSnack": "Nuk u ngarkuan më shumë postime. Prek për të provuar përsëri.",
+  "feedScrollToTopSemantic": "Shkrollo në krye të rrjedhës",
+  "mapResetFiltersSemantic": "Rivendos filtrat",
+  "mapOpenMapsFailed": "Nuk u hap Hartat",
+  "locationRetryAddressSemantic": "Provo përsëri adresën",
+  "photoReviewDiscardTitle": "Të hidhet poshtë kjo foto?",
+  "photoReviewDiscardBody": "Mund të rifotografosh ose të zgjedhësh një tjetër nga biblioteka.",
+  "reportPhotoReviewSheetTitle": "Rishiko provat",
+  "reportPhotoReviewSheetSubtitle": "Mbaj kornizën më të qartë para se ta shtosh në raport.",
+  "reportPhotoReviewSemantic": "Rishiko dhe konfirmo foton para se ta shtosh në raport",
+  "reportPhotoReviewCloseSemantic": "Mbyll pa shtuar foto",
+  "reportPhotoReviewRetake": "Rifoto",
+  "reportPhotoReviewUsePhoto": "Përdor këtë foto",
+  "reportPhotoReviewRetakeSemantic": "Rifoto",
+  "reportPhotoReviewUseSemantic": "Përdor këtë foto",
+  "reportPhotoReviewPreviewSemantic": "Parapamje fotoje",
+  "reportPhotoGridAddShort": "Shto",
+  "reportPhotoGridAdd": "Shto një foto",
+  "reportPhotoGridSourceHint": "Kamera ose bibliotekë",
+  "notificationsTitle": "Njoftimet",
+  "notificationsMarkAllRead": "Shëno të gjitha si të lexuara",
+  "notificationsShowAll": "Shfaq të gjitha njoftimet",
+  "notificationsPreferencesTooltip": "Preferencat e njoftimeve",
+  "notificationsScrollToTopSemantic": "Shkrollo njoftimet në krye",
+  "notificationsRetryLoadingMore": "Provo përsëri të ngarkosh më shumë",
+  "notificationsMarkAllReadFailed": "Nuk mund të shënohen të gjitha si të lexuara. Provo përsëri.",
+  "notificationsAllMarkedReadSuccess": "Të gjitha njoftimet u shënuan si të lexuara",
+  "notificationsSiteUnavailable": "Ky vend nuk është më i disponueshëm.",
+  "notificationsReadStateUpdateFailed": "Nuk mund të përditësohet statusi i leximit. Provo përsëri.",
+  "notificationsMarkedUnreadLocal": "Shënuar si i palexuar (lokal).",
+  "notificationsArchivedFromView": "Njoftimi u arkivua nga kjo pamje",
+  "notificationsPrefsLoadFailed": "Nuk u ngarkuan preferencat e njoftimeve.",
+  "notificationsPreferenceUpdateFailed": "Nuk mund të përditësohet preferenca. Provo përsëri.",
+  "notificationsPrefsSheetTitle": "Preferencat e njoftimeve",
+  "notificationsPrefsSheetSubtitle": "Çaktivizo llojet e njoftimeve që nuk dëshiron të marrësh.",
+  "notificationsPrefMuted": "I heshtur",
+  "notificationsPrefEnabled": "I aktivizuar",
+  "notificationsTypeSiteUpdates": "Përditësime vendesh",
+  "notificationsTypeReportStatus": "Status raporti",
+  "notificationsTypeUpvotes": "Vota mbështetëse",
+  "notificationsTypeComments": "Komente",
+  "notificationsTypeNearbyReports": "Raporte afër",
+  "notificationsTypeCleanupEvents": "Ngjarje pastrimi",
+  "notificationsTypeSystem": "Sistemi",
+  "notificationsSwipeMarkUnread": "Shëno si të palexuar",
+  "notificationsSwipeMarkRead": "Shëno si të lexuar",
+  "notificationsSwipeArchive": "Arkivo",
+  "notificationsDebugPreviewTriggered": "Parapamje lokale e njoftimit",
+  "notificationsAllCaughtUp": "Gjithçka në rregull",
+  "notificationsUnreadUpdatesCount": "{count, plural, =1{1 përditësim i palexuar} other{{count} përditësime të palexuara}}",
+  "@notificationsUnreadUpdatesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsUnreadBannerOne": "1 njoftim i palexuar kërkon vëmendjen tënde",
+  "notificationsUnreadBannerMany": "{count} njoftime të palexuara kërkojnë vëmendjen tënde",
+  "@notificationsUnreadBannerMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsSwipeHint": "Rrëshqit djathtas për lexuar/palexuar · majtas për arkiv",
+  "notificationsEmptyUnreadTitle": "Nuk ka njoftime të palexuara",
+  "notificationsEmptyAllTitle": "Ende nuk ka njoftime",
+  "notificationsEmptyUnreadBody": "Je në kohë. Përditësimet e reja do të shfaqen këtu.",
+  "notificationsEmptyAllBody": "Kur njerëzit reagojnë te vendet dhe veprimet, përditësimet do të shfaqen këtu.",
+  "notificationsErrorLoadTitle": "Nuk u ngarkuan njoftimet",
+  "notificationsErrorLoadFallback": "Kontrollo lidhjen dhe provo përsëri.",
+  "notificationsErrorNetwork": "Problem rrjeti gjatë ngarkimit të njoftimeve.",
+  "notificationsErrorGeneric": "Diçka shkoi keq gjatë ngarkimit të njoftimeve.",
+  "notificationsFilterAll": "Të gjitha",
+  "notificationsFilterUnread": "Të palexuara",
+  "eventsEventNotFoundTitle": "Ngjarja nuk u gjet",
+  "eventsEventNotFoundBody": "Kjo ngjarje nuk është më e disponueshme.",
+  "eventsManualCheckInAdd": "Shto",
+  "eventsManualCheckInTitle": "Check-in manual",
+  "eventsCheckInTitle": "Check-in",
+  "eventsOrganizerMockAllCheckedIn": "Të gjithë pjesëmarrësit simulues janë regjistruar tashmë.",
+  "eventsOrganizerAttendeeNamePlaceholder": "Emri i pjesëmarrësit",
+  "eventsOrganizerEnterNameFirst": "Së pari shkruaj emrin e pjesëmarrësit.",
+  "eventsOrganizerNameAlreadyCheckedIn": "{name} është regjistruar tashmë.",
+  "@eventsOrganizerNameAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameAddedByOrganizer": "{name} u shtua nga organizatori.",
+  "@eventsOrganizerNameAddedByOrganizer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerCouldNotRemoveName": "Nuk mund të hiqet {name}.",
+  "@eventsOrganizerCouldNotRemoveName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameRemovedFromCheckIn": "{name} u hoq nga regjistrimi.",
+  "@eventsOrganizerNameRemovedFromCheckIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerUnableCompleteEvent": "Nuk mund të përfundohet ngjarja.",
+  "eventsOrganizerEndedTitle": "Ngjarja përfundoi",
+  "eventsOrganizerThanksOrganizing": "Faleminderit për organizimin!",
+  "eventsOrganizerEndSummaryOneAttendee": "1 pjesëmarrës u regjistrua.",
+  "eventsOrganizerEndSummaryManyAttendees": "{count} pjesëmarrës u regjistruan.",
+  "@eventsOrganizerEndSummaryManyAttendees": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerUploadAfterPhotosHint": "Ngarko fotot \"pas\" nga detaji i ngjarjes.",
+  "eventsOrganizerCheckInPausedSnack": "Regjistrimi u ndal përkohësisht.",
+  "eventsOrganizerCheckInResumedSnack": "Regjistrimi u rifillua.",
+  "eventsOrganizerUnableCancelEvent": "Nuk mund të anulohet ngjarja.",
+  "eventsOrganizerEventCancelledSnack": "Ngjarja u anulua.",
+  "eventsOrganizerFeedbackCheckedIn": "{name} u regjistrua",
+  "@eventsOrganizerFeedbackCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerFeedbackInvalidQr": "Kod QR i pavlefshëm.",
+  "eventsOrganizerFeedbackWrongEvent": "QR për ngjarje tjetër.",
+  "eventsOrganizerFeedbackPaused": "Regjistrimi është ndalur përkohësisht.",
+  "eventsOrganizerFeedbackQrExpired": "QR skadoi. Gjenero një të ri.",
+  "eventsOrganizerFeedbackQrReplay": "QR u përdor tashmë. Po rifreskohet…",
+  "eventsOrganizerFeedbackAlreadyCheckedIn": "{name} është regjistruar tashmë.",
+  "@eventsOrganizerFeedbackAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshHelp": "Pjesëmarrësit duhet gjithmonë të skanojnë QR-në më të re. Kodi rifreskohet automatikisht para se të skadojë.",
+  "eventsOrganizerHoldPhoneForScan": "Mbaj telefonin që të mund të skanojnë",
+  "eventsOrganizerPausedLabel": "Regjistrimi i ndalur",
+  "eventsOrganizerStatusOpen": "Hapur",
+  "eventsOrganizerStatusPaused": "Ndalur",
+  "eventsOrganizerRefreshInSeconds": "Rifreskim për {seconds} s",
+  "@eventsOrganizerRefreshInSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshesWhenOpen": "QR rifreskohet automatikisht dhe pas çdo skanimi",
+  "eventsOrganizerResumeForFreshQr": "Rifillo regjistrimin për një QR të re",
+  "eventsOrganizerManualOverride": "Manualisht: shëno pjesëmarrës si i pranishëm",
+  "eventsOrganizerCheckedInHeading": "Të regjistruar",
+  "eventsOrganizerEmptyListTitle": "Ende askush nuk është regjistruar",
+  "eventsOrganizerEmptyListSubtitle": "Pjesëmarrësit skanojnë QR-në tënde për t'u regjistruar",
+  "eventsOrganizerEndEvent": "Përfundo ngjarjen",
+  "eventsOrganizerPauseCheckIn": "Ndalo regjistrimin",
+  "eventsOrganizerResumeCheckIn": "Rifillo regjistrimin",
+  "eventsOrganizerCancelEvent": "Anulo ngjarjen",
+  "eventsOrganizerSimulateCheckInDev": "Simulo regjistrimin (dev)",
+  "eventsPhotosTitle": "Foto",
+  "createEventDefaultDescription": "Aksion pastrimi komunitar i organizuar nga vullnetarët vendas.",
+  "createEventCategoryTitle": "Lloji i ngjarjes",
+  "createEventCategorySubtitle": "Çfarë lloj aksioni po organizon?",
+  "createEventGearTitle": "Mjetet e nevojshme",
+  "createEventGearSubtitle": "Zgjidh gjithçka që vullnetarët duhet të sjellin.",
+  "createEventGearDoneSelectedCount": "U krye ({count} të zgjedhura)",
+  "@createEventGearDoneSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventGearMultiselectTitle": "Zgjedhje shumëfishe",
+  "createEventGearMultiselectMessage": "Prek çdo artikull që vullnetarët duhet të sjellin. Mund të zgjedhësh sa të duash.",
+  "createEventTeamSizeTitle": "Madhësia e ekipit",
+  "createEventTeamSizeSubtitle": "Sa vullnetarë pret?",
+  "createEventDifficultyTitle": "Vështirësia",
+  "createEventDifficultySubtitle": "Vendos pritshmëritë për vullnetarët.",
+  "createEventStepProgress": "Hapi {step} nga 5",
+  "@createEventStepProgress": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventEndTimeError": "Koha e mbarimit duhet të jetë pas fillimit.",
+  "createEventFieldType": "Lloji i ngjarjes",
+  "createEventPlaceholderType": "Zgjidh llojin e ngjarjes",
+  "createEventFieldTeamSize": "Madhësia e ekipit",
+  "createEventPlaceholderTeamSize": "Sa njerëz?",
+  "createEventFieldDifficulty": "Vështirësia",
+  "createEventPlaceholderDifficulty": "Vendos nivelin e vështirësisë",
+  "createEventSubmitLabel": "Krijo aksionin ekologjik",
+  "createEventAppBarTitle": "Krijo ngjarjen",
+  "createEventLocalInfoSnack": "Për tani ngjarja mbetet lokale, por rrjedha e organizatorit është gati menjëherë.",
+  "createEventCleanupSiteTitle": "Vendi i pastrimit",
+  "createEventSelectSiteSemantic": "Zgjidh vendin e pastrimit",
+  "createEventChooseSitePlaceholder": "Zgjidh një vend me ndotje",
+  "createEventSiteAnchorHint": "Çdo ngjarje duhet lidhur me një vend pastrimi.",
+  "createEventSiteDistanceAway": "{distanceKm} km larg · {description}",
+  "@createEventSiteDistanceAway": {
+    "placeholders": {
+      "distanceKm": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "createEventSiteRequiredError": "Zgjidh vendin para se të krijosh ngjarjen.",
+  "createEventTitleLabel": "Titulli i ngjarjes",
+  "createEventTitleCounter": "{current} / {max}",
+  "@createEventTitleCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventTitleHint": "p.sh. Pastrimi i lumit në fundjavë",
+  "createEventTitleRequired": "Titulli është i detyrueshëm.",
+  "createEventTypeRequired": "Zgjidh një lloj ngjarjeje.",
+  "createEventGearPlaceholderQuestion": "Çfarë duhet të sjellin vullnetarët?",
+  "createEventGearLabel": "Mjetet e nevojshme",
+  "createEventSelectGearSemantic": "Zgjidh mjetet e nevojshme",
+  "createEventDescriptionLabel": "Përshkrimi",
+  "createEventDescriptionSubtitle": "Opsionale: më shumë kontekst për vullnetarët.",
+  "createEventDescriptionHint": "Përshkruaj çfarë të presin, pika e takimit, etj.",
+  "eventsEventNotFoundShort": "Ngjarja nuk u gjet.",
+  "eventsBeforeLabel": "Para",
+  "eventsAfterLabel": "Pas",
+  "eventsDiscardChangesTitle": "Të hidhen ndryshimet?",
+  "eventsDiscardChangesBody": "Ke foto të paruajtura. Je i sigurt që do të dalësh?",
+  "eventsSetCover": "Vendos si kopertinë",
+  "eventsViewFullscreen": "Ekran i plotë",
+  "eventsAddToCalendar": "Shto në kalendar",
+  "eventsParticipantsRecent": "Së fundmi",
+  "eventsParticipantsAz": "A-ZH",
+  "eventsParticipantsCheckedIn": "Të regjistruar",
+  "eventsSaveImpactSummary": "Ruaj përmbledhjen e ndikimit",
+  "eventsCheckedInBadge": "I regjistruar",
+  "eventsCleanupPhotosCount": "{count} foto pastrimi",
+  "@eventsCleanupPhotosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "qrScannerPointCameraHint": "Drejto kamerën te kodi QR i organizatorit",
+  "qrScannerEnterManually": "Nuk skanon? Shkruaje kodin manualisht",
+  "qrScannerRetryCamera": "Provo përsëri kamerën",
+  "qrScannerSubmitCode": "Dërgo kodin",
+  "qrScannerHintFreshQr": "Nëse organizatori rifreskon QR-në, skano më të renë.",
+  "qrScannerHintCameraBlocked": "Nëse kamera mbetet e bllokuar, ngjit kodin manualisht ose aktivizo kamerën te Cilësimet.",
+  "qrScannerGenericEventTitle": "ky pastrim",
+  "qrScannerErrorInvalidFormat": "Format i pavlefshëm i QR.",
+  "qrScannerErrorWrongEvent": "Ky QR i përket një ngjarje tjetër.",
+  "qrScannerErrorSessionClosed": "Organizatori e ndali regjistrimin.",
+  "qrScannerErrorSessionExpired": "QR skadoi. Kërko një kod të ri te organizatori.",
+  "qrScannerErrorReplayDetected": "Ky QR është përdorur tashmë.",
+  "qrScannerErrorAlreadyCheckedIn": "Je regjistruar tashmë.",
+  "qrScannerCameraUnavailableFeedback": "Kamera nuk është e disponueshme. Mund të ngjisësh kodin e organizatorit ose të riaktivizosh kamerën te Cilësimet.",
+  "qrScannerManualEntryTitle": "Shkruaje kodin manualisht",
+  "qrScannerPasteOrganizerQrHint": "Ngjit tekstin e QR të organizatorit",
+  "qrScannerPasteFromClipboardTooltip": "Ngjit nga clipboard-i",
+  "qrScannerEnterCodeFirst": "Së pari shkruaj një kod.",
+  "qrScannerCheckedInTitle": "U regjistrove!",
+  "qrScannerWelcomeTo": "Mirë se erdhe te {eventTitle}",
+  "@qrScannerWelcomeTo": {
+    "placeholders": {
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerCheckedInAt": "Regjistruar në {time}",
+  "@qrScannerCheckedInAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerDone": "U krye",
+  "qrScannerAppBarTitle": "Skano për t'u regjistruar",
+  "qrScannerToggleFlashlightSemantic": "Ndërro dritën e kamerës",
+  "siteReportReasonFakeLabel": "Të dhëna të rreme ose mashtruese",
+  "siteReportReasonFakeSubtitle": "Informacioni nuk pasqyron realitetin",
+  "siteReportReasonResolvedLabel": "Tashmë u zgjidh",
+  "siteReportReasonResolvedSubtitle": "Problemi u pastrua ose u rregullua",
+  "siteReportReasonWrongLocationLabel": "Vendndodhje e gabuar",
+  "siteReportReasonWrongLocationSubtitle": "Vendi është vendosur gabim në hartë",
+  "siteReportReasonDuplicateLabel": "Raport i dyfishtë",
+  "siteReportReasonDuplicateSubtitle": "I njëjti vend u raportua disa herë",
+  "siteReportReasonSpamLabel": "Spam ose abuzim",
+  "siteReportReasonSpamSubtitle": "Përmbajtje e papërshtatshme ose dashakeqe",
+  "siteReportReasonOtherLabel": "Tjetër",
+  "siteReportReasonOtherSubtitle": "Diçka tjetër nuk është në rregull",
+  "takeActionDonationOpenFailed": "Nuk u hap faqja e donacioneve",
+  "takeActionShareSiteTitle": "Ndaj vendin",
+  "takeActionShareSiteSubtitle": "Ndihmo të tjerët ta zbulojnë dhe ta mbështesin",
+  "takeActionLinkCopied": "Lidhja u kopjua",
+  "takeActionSharedToProfile": "U nda në profilin tënd",
+  "siteDetailThankYouReportSnack": "Faleminderit. Raporti yt na ndihmon.",
+  "siteDetailUpvoteFailedSnack": "Nuk u përditësua vota. Provo përsëri.",
+  "siteDetailNoUpvotesSnack": "Ende pa vota. Bëhu i pari që e mbështet!",
+  "siteDetailNoVolunteersSnack": "Ende pa vullnetarë për këtë vend.",
+  "siteDetailDirectionsUnavailableSnack": "Udhëzimet nuk janë të disponueshme për këtë vend.",
+  "siteDetailOpenMapsFailedSnack": "Nuk u hap Hartat",
+  "siteCardUpvoteFailedSnack": "Nuk u përditësua vota. Provo përsëri.",
+  "siteCardSavedFailedSnack": "Nuk u përditësua ruajtja. Provo përsëri.",
+  "siteCardTakeActionSemantic": "Ndërmerr veprim",
+  "siteCardFeedOptionsSemantic": "Opsione të rrjedhës",
+  "siteCardCommentsLoadFailedSnack": "Nuk u ngarkuan komentet.",
+  "siteCardShareTrackFailedSnack": "Nuk u regjistrua ndarja.",
+  "siteCardFeedbackSubmitFailedSnack": "Nuk u dërgua reagimi.",
+  "siteCardNotRelevantTitle": "Jo relevante",
+  "siteCardShowLessTitle": "Shfaq më pak të tilla",
+  "siteCardDuplicateTitle": "Dublikatë",
+  "siteCardMisleadingTitle": "Mashtruese",
+  "siteCardHidePostTitle": "Fshih këtë postim",
+  "commentsSheetTitle": "Veprime komenti",
+  "commentsSheetSubtitle": "Menaxho këtë koment",
+  "commentsEditTitle": "Përpuno komentin",
+  "commentsEditSubtitle": "Përditëso tekstin",
+  "commentsDeleteTitle": "Fshi komentin",
+  "commentsDeleteSubtitle": "Hiqe nga biseda",
+  "commentsEditFailedSnack": "Nuk u përpunua komenti.",
+  "commentsReplyFailedSnack": "Nuk u dërgua përgjigja.",
+  "commentsDeletedSnack": "Komenti u fshi.",
+  "commentsDeleteFailedSnack": "Nuk u fshi komenti.",
+  "commentsLikeFailedSnack": "Nuk u përditësua pëlqimi.",
+  "commentsCancelEditSemantic": "Anulo përpunimin dhe pastro draftin",
+  "commentsCancelReplySemantic": "Anulo përgjigjen dhe pastro draftin",
+  "commentsReplyToSemantic": "Përgjigju {name}",
+  "@commentsReplyToSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "searchModalCancel": "Anulo",
+  "appSmartImageRetry": "Provo përsëri",
+  "appSmartImageRetryIn": "Provo përsëri pas {seconds} s",
+  "@appSmartImageRetryIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticClose": "Mbyll",
+  "pollutionSiteTabTakeAction": "Ndërmerr veprim",
+  "reportDescriptionHint": "Diçka tjetër",
+  "reportSubmittedFallbackCategory": "Raport",
+  "reportSeverityLow": "E ulët",
+  "reportSeverityModerate": "E moderuar",
+  "reportSeveritySignificant": "E ndjeshme",
+  "reportSeverityHigh": "E lartë",
+  "reportSeverityCritical": "Kritike",
+  "reportListSearchPlaceholder": "Kërko raportet e tua",
+  "reportListSearchHintPrefix": "Kërko sipas titullit, vendndodhjes, kategorisë ose statusit.",
+  "reportListSearchNoMatches": "Nuk ka përputhje",
+  "reportListSearchOneReport": "1 raport",
+  "reportListSearchNReports": "{count} raporte",
+  "@reportListSearchNReports": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListEmptyTitle": "Ende pa raporte",
+  "reportListEmptySubtitle": "Raportet e tua do të shfaqen këtu pasi t’i dërgosh.",
+  "appSmartImageUnavailable": "Imazhi nuk është i disponueshëm",
+  "siteCardPollutionSiteSemantic": "Vend i ndotur: {title}. Prek për detaje.",
+  "@siteCardPollutionSiteSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardPhotoSemantic": "Foto e {title}",
+  "@siteCardPhotoSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
       }
     }
   }

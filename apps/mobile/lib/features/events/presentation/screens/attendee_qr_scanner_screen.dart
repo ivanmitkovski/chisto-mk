@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/check_in_repository_registry.dart';
@@ -14,6 +15,7 @@ import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dar
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
@@ -190,8 +192,6 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
 
   EcoEvent? get _event => _eventsRepository.findById(widget.eventId);
 
-  String get _eventTitle => _event?.title ?? 'this cleanup event';
-
   @override
   void initState() {
     super.initState();
@@ -223,6 +223,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     if (_scanned || _processing) {
       return;
     }
+    final AppLocalizations l10n = context.l10n;
     setState(() {
       _processing = true;
       _feedback = null;
@@ -253,12 +254,12 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     setState(() {
       _processing = false;
       _feedback = switch (result.status) {
-        CheckInSubmissionStatus.invalidFormat => 'Invalid QR format.',
-        CheckInSubmissionStatus.wrongEvent => 'This QR belongs to another event.',
-        CheckInSubmissionStatus.sessionClosed => 'Organizer paused check-in.',
-        CheckInSubmissionStatus.sessionExpired => 'QR expired. Ask organizer for a new code.',
-        CheckInSubmissionStatus.replayDetected => 'This QR was already used.',
-        CheckInSubmissionStatus.alreadyCheckedIn => 'You are already checked in.',
+        CheckInSubmissionStatus.invalidFormat => l10n.qrScannerErrorInvalidFormat,
+        CheckInSubmissionStatus.wrongEvent => l10n.qrScannerErrorWrongEvent,
+        CheckInSubmissionStatus.sessionClosed => l10n.qrScannerErrorSessionClosed,
+        CheckInSubmissionStatus.sessionExpired => l10n.qrScannerErrorSessionExpired,
+        CheckInSubmissionStatus.replayDetected => l10n.qrScannerErrorReplayDetected,
+        CheckInSubmissionStatus.alreadyCheckedIn => l10n.qrScannerErrorAlreadyCheckedIn,
         CheckInSubmissionStatus.success => null,
       };
     });
@@ -284,10 +285,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
       if (!mounted) {
         return;
       }
+      final AppLocalizations l10n = context.l10n;
       setState(() {
         _cameraReady = false;
-        _feedback =
-            'Camera access is unavailable. You can paste the organizer code or re-enable camera access in Settings.';
+        _feedback = l10n.qrScannerCameraUnavailableFeedback;
       });
     }
   }
@@ -316,7 +317,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   Text(
-                    'Enter code manually',
+                    context.l10n.qrScannerManualEntryTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -330,7 +331,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                           controller: _manualCodeController,
                           maxLines: 3,
                           decoration: InputDecoration(
-                            hintText: 'Paste organizer QR text',
+                            hintText: context.l10n.qrScannerPasteOrganizerQrHint,
                             filled: true,
                             fillColor: AppColors.inputFill,
                             border: OutlineInputBorder(
@@ -353,7 +354,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                           }
                         },
                         icon: const Icon(CupertinoIcons.doc_on_clipboard),
-                        tooltip: 'Paste from clipboard',
+                        tooltip: context.l10n.qrScannerPasteFromClipboardTooltip,
                       ),
                     ],
                   ),
@@ -363,14 +364,14 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () => Navigator.of(context).pop(false),
-                          child: const Text('Cancel'),
+                          child: Text(context.l10n.commonCancel),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.md),
                       Expanded(
                         flex: 2,
                         child: PrimaryButton(
-                          label: 'Submit code',
+                          label: context.l10n.qrScannerSubmitCode,
                           enabled: true,
                           onPressed: () => Navigator.of(context).pop(true),
                         ),
@@ -388,9 +389,12 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     if (submit != true) {
       return;
     }
+    if (!mounted) {
+      return;
+    }
     final String raw = _manualCodeController.text.trim();
     if (raw.isEmpty) {
-      setState(() => _feedback = 'Enter a code first.');
+      setState(() => _feedback = context.l10n.qrScannerEnterCodeFirst);
       return;
     }
     _submitRawCode(raw);
@@ -407,6 +411,12 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
 
     if (_scanned) {
+      final AppLocalizations l10n = context.l10n;
+      final String eventTitle = _event?.title ?? l10n.qrScannerGenericEventTitle;
+      final String? checkedInTime = _checkedInAt == null
+          ? null
+          : '${_checkedInAt!.hour.toString().padLeft(2, '0')}:'
+              '${_checkedInAt!.minute.toString().padLeft(2, '0')}';
       return Scaffold(
         backgroundColor: AppColors.appBackground,
         appBar: AppBar(
@@ -450,7 +460,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 Text(
-                  'You\'re checked in!',
+                  l10n.qrScannerCheckedInTitle,
                   style: textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -459,18 +469,16 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'Welcome to $_eventTitle',
+                  l10n.qrScannerWelcomeTo(eventTitle),
                   style: textTheme.bodyLarge?.copyWith(
                     color: AppColors.textSecondary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                if (_checkedInAt != null) ...<Widget>[
+                if (checkedInTime != null) ...<Widget>[
                   const SizedBox(height: AppSpacing.sm),
                   Text(
-                    'Checked in at '
-                    '${_checkedInAt!.hour.toString().padLeft(2, '0')}:'
-                    '${_checkedInAt!.minute.toString().padLeft(2, '0')}',
+                    l10n.qrScannerCheckedInAt(checkedInTime),
                     style: textTheme.bodySmall?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -478,7 +486,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 ],
                 const Spacer(),
                 PrimaryButton(
-                  label: 'Done',
+                  label: l10n.qrScannerDone,
                   enabled: true,
                   onPressed: _handleDone,
                 ),
@@ -498,7 +506,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
           child: Center(child: AppBackButton()),
         ),
         title: Text(
-          'Scan to check in',
+          context.l10n.qrScannerAppBarTitle,
           style: textTheme.titleLarge?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w600,
@@ -580,7 +588,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
             bottom: 100 + bottomSafe,
             child: Semantics(
               button: true,
-              label: 'Toggle flashlight',
+              label: context.l10n.qrScannerToggleFlashlightSemantic,
               child: Material(
                 color: AppColors.black.withValues(alpha: 0.45),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
@@ -608,7 +616,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
             child: Column(
               children: <Widget>[
                 Text(
-                  _feedback ?? 'Point your camera at the organizer\'s live QR code',
+                  _feedback ?? context.l10n.qrScannerPointCameraHint,
                   style: textTheme.bodyMedium?.copyWith(
                     color: _feedback == null ? AppColors.textOnDarkMuted : Colors.orange.shade200,
                     fontWeight: _feedback == null ? FontWeight.w400 : FontWeight.w600,
@@ -625,7 +633,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       onPressed: _openManualEntry,
                       padding: EdgeInsets.zero,
                       child: Text(
-                        "Can't scan? Enter code manually",
+                        context.l10n.qrScannerEnterManually,
                         style: textTheme.bodySmall?.copyWith(
                           color: AppColors.textOnDarkMuted,
                           fontWeight: FontWeight.w600,
@@ -636,7 +644,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       onPressed: _restartScanner,
                       padding: EdgeInsets.zero,
                       child: Text(
-                        'Retry camera',
+                        context.l10n.qrScannerRetryCamera,
                         style: textTheme.bodySmall?.copyWith(
                           color: AppColors.textOnDarkMuted,
                           fontWeight: FontWeight.w600,
@@ -648,8 +656,8 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   _cameraReady
-                      ? 'If the organizer refreshes their QR, scan the newest one.'
-                      : 'If camera access stays blocked, paste the code manually or enable camera access in Settings.',
+                      ? context.l10n.qrScannerHintFreshQr
+                      : context.l10n.qrScannerHintCameraBlocked,
                   style: textTheme.bodySmall?.copyWith(
                     color: AppColors.white.withValues(alpha: 0.54),
                   ),

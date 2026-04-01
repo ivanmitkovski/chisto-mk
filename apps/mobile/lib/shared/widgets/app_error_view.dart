@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -49,7 +50,7 @@ class AppErrorView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Try again'),
+                label: Text(context.l10n.commonTryAgain),
               ),
             ],
           ],

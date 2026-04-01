@@ -68,6 +68,10 @@ function makePrisma() {
       update: jest.fn(),
       create: jest.fn(),
     },
+    pointTransaction: {
+      aggregate: jest.fn().mockResolvedValue({ _sum: { delta: null } }),
+    },
+    $queryRaw: jest.fn(),
   };
 }
 
@@ -112,6 +116,30 @@ function makeReportsUploadService() {
   };
 }
 
+function makeGamificationService() {
+  return {
+    getLevelProgress: jest.fn().mockReturnValue({
+      level: 1,
+      pointsInLevel: 0,
+      pointsToNextLevel: 36,
+      levelProgress: 0,
+      levelTierKey: 'numeric_1',
+      levelDisplayName: 'Level 1',
+    }),
+  };
+}
+
+function makeRankingsService() {
+  return {
+    getUserWeeklySummary: jest.fn().mockResolvedValue({
+      weeklyPoints: 0,
+      weeklyRank: null,
+      weekStartsAt: '2026-03-30T22:00:00.000Z',
+      weekEndsAt: '2026-04-05T21:59:59.999Z',
+    }),
+  };
+}
+
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: ReturnType<typeof makePrisma>;
@@ -129,6 +157,8 @@ describe('AuthService', () => {
     const audit = makeAudit();
     const eventEmitter = makeEventEmitter();
     const reportsUploadService = makeReportsUploadService();
+    const gamificationService = makeGamificationService();
+    const rankingsService = makeRankingsService();
     service = new AuthService(
       prisma as any,
       jwt as unknown as JwtService,
@@ -138,6 +168,8 @@ describe('AuthService', () => {
       audit as any,
       eventEmitter as any,
       reportsUploadService as any,
+      gamificationService as any,
+      rankingsService as any,
     );
   });
 

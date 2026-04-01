@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -84,7 +85,7 @@ class DateTimeSection extends StatelessWidget {
                       onExportCalendar();
                     },
                     icon: const Icon(CupertinoIcons.calendar_badge_plus, size: 18),
-                    label: const Text('Add to calendar'),
+                    label: Text(ctx.l10n.eventsAddToCalendar),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.divider),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radius14)),

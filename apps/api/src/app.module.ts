@@ -21,6 +21,7 @@ import { PublicConfigModule } from './public-config/public-config.module';
 import { CleanupEventsModule } from './cleanup-events/cleanup-events.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ObservabilityModule } from './observability/observability.module';
+import { GamificationModule } from './gamification/gamification.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { ObservabilityModule } from './observability/observability.module';
     CleanupEventsModule,
     NotificationsModule,
     ObservabilityModule,
+    GamificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

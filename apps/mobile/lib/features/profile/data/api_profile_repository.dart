@@ -1,7 +1,11 @@
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
+import 'package:chisto_mobile/features/profile/data/points_history_json.dart';
+import 'package:chisto_mobile/features/profile/data/profile_me_json.dart';
+import 'package:chisto_mobile/features/profile/data/weekly_rankings_json.dart';
+import 'package:chisto_mobile/features/profile/domain/models/points_history_page.dart';
+import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
+import 'package:chisto_mobile/features/profile/domain/models/weekly_rankings_result.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
 
 class ApiProfileRepository implements ProfileRepository {
@@ -14,36 +18,30 @@ class ApiProfileRepository implements ProfileRepository {
     final ApiResponse response = await _client.get('/auth/me');
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
+    return profileUserFromMeJson(json);
+  }
 
-    final String id = json['id'] as String? ?? '';
-    final String firstName = (json['firstName'] as String?)?.trim() ?? '';
-    final String lastName = (json['lastName'] as String?)?.trim() ?? '';
-    final String name = '$firstName $lastName'.trim();
-    final String phoneNumber =
-        (json['phoneNumber'] as String?)?.trim().isNotEmpty == true
-        ? (json['phoneNumber'] as String)
-        : '—';
-    final int pointsBalance = (json['pointsBalance'] as num?)?.toInt() ?? 0;
-    final int totalPointsEarned =
-        (json['totalPointsEarned'] as num?)?.toInt() ?? 0;
-    final String? avatarUrl = (json['avatarUrl'] as String?)?.trim();
+  @override
+  Future<PointsHistoryPage> getPointsHistory({int limit = 30, String? cursor}) async {
+    final StringBuffer path = StringBuffer('/auth/me/point-history?limit=$limit');
+    final String? c = cursor?.trim();
+    if (c != null && c.isNotEmpty) {
+      path.write('&cursor=${Uri.encodeQueryComponent(c)}');
+    }
+    final ApiResponse response = await _client.get(path.toString());
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    return pointsHistoryFromJson(json);
+  }
 
-    final int level = (totalPointsEarned ~/ 100) + 1;
-    final int pointsToNextLevel = 100 - (totalPointsEarned % 100);
-
-    return ProfileUser(
-      id: id,
-      name: name.isEmpty ? 'User' : name,
-      firstName: firstName,
-      lastName: lastName,
-      phoneNumber: phoneNumber,
-      points: pointsBalance,
-      totalPointsEarned: totalPointsEarned,
-      level: level,
-      pointsToNextLevel: pointsToNextLevel,
-      avatarColor: AppColors.primary,
-      avatarUrl: (avatarUrl?.isNotEmpty ?? false) ? avatarUrl : null,
+  @override
+  Future<WeeklyRankingsResult> getWeeklyRankings({int limit = 50}) async {
+    final ApiResponse response = await _client.get(
+      '/rankings/weekly?limit=$limit',
     );
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) throw AppError.unknown();
+    return weeklyRankingsFromJson(json);
   }
 
   @override

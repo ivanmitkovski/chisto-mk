@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -18,6 +19,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
 import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
@@ -219,7 +221,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'No connection',
+          message: context.l10n.profileNoConnectionSnack,
           type: AppSnackType.warning,
         );
       }
@@ -518,7 +520,15 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                   Builder(
                     builder: (BuildContext context) {
                       final ReportCapacityUiState ui =
-                          mapReportCapacityToUiState(_reportCapacity!);
+                          mapReportCapacityToUiState(
+                        _reportCapacity!,
+                        l10n: context.l10n,
+                        nextEmergencyAvailableDescription:
+                            formatNextEmergencyUnlockLocal(
+                          context,
+                          _reportCapacity!.nextEmergencyReportAvailableAt,
+                        ),
+                      );
                       return ReportStatePill(
                         label: ui.pillLabel,
                         icon: ui.pillIcon,
@@ -536,13 +546,14 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
 
   Widget _buildSearchBar(BuildContext context) {
     final List<ReportListItem> filtered = _filteredReports;
+    final AppLocalizations l10n = context.l10n;
     final String resultLabel = _searchQuery.isEmpty
         ? ''
         : filtered.isEmpty
-            ? 'No matches'
+            ? l10n.reportListSearchNoMatches
             : filtered.length == 1
-                ? '1 report'
-                : '${filtered.length} reports';
+                ? l10n.reportListSearchOneReport
+                : l10n.reportListSearchNReports(filtered.length);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -552,12 +563,12 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         AppSpacing.md,
       ),
       child: Semantics(
-        label: 'Search reports',
-        hint: 'Search by title, location, category, or status. $resultLabel'.trim(),
+        label: l10n.reportListSearchSemantic,
+        hint: '${l10n.reportListSearchHintPrefix} $resultLabel'.trim(),
         child: CupertinoSearchTextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
-          placeholder: 'Search your reports',
+          placeholder: l10n.reportListSearchPlaceholder,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.textPrimary,
               ),
@@ -727,7 +738,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       if (!mounted) return false;
       AppSnack.show(
         context,
-        message: 'Could not check reporting availability right now.',
+        message: context.l10n.reportAvailabilityCheckFailedSnack,
         type: AppSnackType.warning,
       );
       return false;
@@ -735,11 +746,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final ReportCapacity? capacity = _reportCapacity;
-    final ui = capacity != null ? mapReportCapacityToUiState(capacity) : null;
-    final bool showCapacityBanner = ui != null &&
-        (ui.kind == ReportCapacityUiKind.emergency ||
-            ui.kind == ReportCapacityUiKind.cooldown);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Column(
@@ -761,34 +767,25 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'No reports yet',
+            context.l10n.reportListEmptyTitle,
             style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Your future reports will appear here after you submit them.',
+            context.l10n.reportListEmptySubtitle,
             textAlign: TextAlign.center,
             style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
           ),
-          if (showCapacityBanner) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            ReportInfoBanner(
-              title: ui!.bannerTitle,
-              message: ui.bannerMessage,
-              icon: ui.bannerIcon,
-              tone: ui.bannerTone,
-            ),
-          ],
           const SizedBox(height: AppSpacing.lg),
           Semantics(
             button: true,
-            label: 'Report pollution',
+            label: context.l10n.reportListFabLabel,
             child: SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: _startNewReport,
                 icon: const Icon(Icons.add_rounded, size: 20),
-                label: const Text('Report pollution'),
+                label: Text(context.l10n.reportListFabLabel),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,

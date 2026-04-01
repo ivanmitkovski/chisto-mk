@@ -19,6 +19,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/report_categ
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/cleanup_effort_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
@@ -251,7 +252,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
-        Text('Cleanup effort', style: labelStyle),
+        Text(context.l10n.reportReviewCleanupEffortTitle, style: labelStyle),
         const SizedBox(height: AppSpacing.sm),
         Wrap(
           spacing: AppSpacing.xs,
@@ -260,10 +261,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
             final bool selected = current == effort;
             return Semantics(
               button: true,
-              label: effort.label,
-              hint: 'Double-tap to set estimated cleanup effort.',
+              label: effort.localizedLabel(context.l10n),
+              hint: context.l10n.reportCleanupEffortChipHint,
               child: ChoiceChip(
-                label: Text(effort.label),
+                label: Text(effort.localizedLabel(context.l10n)),
                 selected: selected,
                 onSelected: (_) => _setCleanupEffort(effort),
                 selectedColor: AppColors.primary.withValues(alpha: 0.14),
@@ -432,11 +433,16 @@ class _NewReportScreenState extends State<NewReportScreen> {
     final int? retryAfterSeconds = (details['retryAfterSeconds'] as num?)?.toInt();
     final String unlockHint = details['unlockHint'] as String? ??
         'Join and verify attendance, or create an eco action to unlock more reports.';
+    final String? nextAtStr =
+        (details['nextEmergencyReportAvailableAt'] as String?)?.trim();
     return ReportCapacity(
       creditsAvailable: creditsAvailable,
       emergencyAvailable: emergencyAvailable,
       emergencyWindowDays: 7,
       retryAfterSeconds: retryAfterSeconds,
+      nextEmergencyReportAvailableAt: nextAtStr != null && nextAtStr.isNotEmpty
+          ? DateTime.tryParse(nextAtStr)?.toUtc()
+          : null,
       unlockHint: unlockHint,
     );
   }
@@ -451,7 +457,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
     if (!_canSubmit) {
       AppSnack.show(
         context,
-        message: 'Please finish the missing steps before submitting.',
+        message: context.l10n.reportFinishStepsSnack,
         type: AppSnackType.warning,
       );
       _goToFirstInvalidStage();
@@ -494,19 +500,17 @@ class _NewReportScreenState extends State<NewReportScreen> {
           final bool? retry = await showCupertinoDialog<bool>(
             context: context,
             builder: (BuildContext ctx) => CupertinoAlertDialog(
-              title: const Text('Photo upload failed'),
-              content: const Text(
-                'Report was submitted. Tap Retry to upload your photos, or Skip to continue.',
-              ),
+              title: Text(ctx.l10n.reportPhotoUploadFailedTitle),
+              content: Text(ctx.l10n.reportPhotoUploadFailedBody),
               actions: <CupertinoDialogAction>[
                 CupertinoDialogAction(
                   onPressed: () => Navigator.of(ctx).pop(false),
-                  child: const Text('Skip'),
+                  child: Text(ctx.l10n.commonSkip),
                 ),
                 CupertinoDialogAction(
                   isDefaultAction: true,
                   onPressed: () => Navigator.of(ctx).pop(true),
-                  child: const Text('Retry'),
+                  child: Text(ctx.l10n.commonRetry),
                 ),
               ],
             ),
@@ -522,7 +526,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
         if (!uploadSuccess && mounted) {
           AppSnack.show(
             context,
-            message: 'Report submitted. Photos could not be uploaded.',
+            message: context.l10n.reportSubmittedPartialUploadSnack,
             type: AppSnackType.warning,
           );
         }
@@ -539,7 +543,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
         barrierDismissible: false,
         builder: (BuildContext context) {
           return ReportSubmittedDialog(
-            categoryLabel: _draft.category?.label ?? 'Report',
+            categoryLabel:
+                _draft.category?.label ?? context.l10n.reportSubmittedFallbackCategory,
             reportNumber: result.reportNumber,
             reportId: result.reportId,
             address: _draft.address,
@@ -694,8 +699,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
             Semantics(
               button: true,
               label: _currentStage == ReportStage.evidence
-                  ? 'Back'
-                  : 'Previous step',
+                  ? context.l10n.reportBackSemantic
+                  : context.l10n.reportPreviousStepSemantic,
               child: AppBackButton(
                 backgroundColor: AppColors.inputFill,
                 onPressed: () {
@@ -865,10 +870,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
               children: <Widget>[
                 ReviewSummaryTile(
                   icon: Icons.photo_library_outlined,
-                  title: 'Evidence',
+                  title: context.l10n.reportReviewEvidenceTitle,
                   subtitle: _draft.hasPhotos
-                      ? '${_draft.photos.length} photo${_draft.photos.length == 1 ? '' : 's'}'
-                      : 'Add a photo',
+                      ? context.l10n.reportReviewPhotoCount(_draft.photos.length)
+                      : context.l10n.reportReviewAddPhoto,
                   isComplete: _draft.hasPhotos,
                   semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.evidence),
@@ -876,8 +881,9 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
                   icon: _draft.category?.icon ?? Icons.category_outlined,
-                  title: 'Category',
-                  subtitle: _draft.category?.label ?? 'Choose category',
+                  title: context.l10n.reportReviewCategoryTitle,
+                  subtitle: _draft.category?.label ??
+                      context.l10n.reportReviewChooseCategory,
                   isComplete: _draft.hasCategory,
                   semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.details),
@@ -885,10 +891,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
                   icon: Icons.title_rounded,
-                  title: 'Title',
+                  title: context.l10n.reportReviewTitleLabel,
                   subtitle: _draft.hasTitle
                       ? _draft.title.trim()
-                      : 'Add title',
+                      : context.l10n.reportReviewAddTitle,
                   isComplete: _draft.hasTitle,
                   semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.details),
@@ -896,8 +902,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
                   icon: Icons.signal_cellular_alt,
-                  title: 'Severity',
-                  subtitle: _severityLabel(_draft.severity),
+                  title: context.l10n.reportReviewSeverityTitle,
+                  subtitle: _severityLabel(context, _draft.severity),
                   isComplete: true,
                   isOptional: true,
                   semanticsHint: context.l10n.reviewTapToEdit,
@@ -906,10 +912,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 const SizedBox(height: AppSpacing.sm),
                 ReviewSummaryTile(
                   icon: Icons.location_on_outlined,
-                  title: 'Location',
+                  title: context.l10n.reportReviewLocationTitle,
                   subtitle: _hasValidLocation
-                      ? (_draft.address ?? 'Pinned')
-                      : 'Pin in Macedonia',
+                      ? (_draft.address ?? context.l10n.reportReviewPinnedShort)
+                      : context.l10n.reportReviewPinMacedonia,
                   isComplete: _hasValidLocation,
                   semanticsHint: context.l10n.reviewTapToEdit,
                   onTap: () => _goToStage(ReportStage.location),
@@ -918,7 +924,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   ReviewSummaryTile(
                     icon: Icons.notes_outlined,
-                    title: 'Extra context',
+                    title: context.l10n.reportReviewExtraContextTitle,
                     subtitle: _draft.description.trim(),
                     isComplete: true,
                     isOptional: true,
@@ -930,8 +936,9 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   ReviewSummaryTile(
                     icon: Icons.group_outlined,
-                    title: 'Cleanup effort',
-                    subtitle: _draft.cleanupEffort!.label,
+                    title: context.l10n.reportReviewCleanupEffortTitle,
+                    subtitle:
+                        _draft.cleanupEffort!.localizedLabel(context.l10n),
                     isComplete: true,
                     isOptional: true,
                     semanticsHint: context.l10n.reviewTapToEdit,
@@ -954,7 +961,15 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   Builder(
                     builder: (BuildContext context) {
                       final ReportCapacityUiState ui =
-                          mapReportCapacityToUiState(_reportCapacity!);
+                          mapReportCapacityToUiState(
+                        _reportCapacity!,
+                        l10n: context.l10n,
+                        nextEmergencyAvailableDescription:
+                            formatNextEmergencyUnlockLocal(
+                          context,
+                          _reportCapacity!.nextEmergencyReportAvailableAt,
+                        ),
+                      );
                       return ReportInfoBanner(
                         title: context.l10n.reportReviewBannerCreditsTitle,
                         emphasis: ReportInfoBannerEmphasis.secondary,
@@ -1165,16 +1180,17 @@ class _NewReportScreenState extends State<NewReportScreen> {
     );
   }
 
-  static const List<String> _severityLabels = <String>[
-    'Low',
-    'Moderate',
-    'Significant',
-    'High',
-    'Critical',
-  ];
-
-  String _severityLabel(int value) =>
-      '${value.clamp(1, 5)} – ${_severityLabels[(value.clamp(1, 5) - 1)]}';
+  String _severityLabel(BuildContext context, int value) {
+    final int v = value.clamp(1, 5);
+    final String word = switch (v) {
+      1 => context.l10n.reportSeverityLow,
+      2 => context.l10n.reportSeverityModerate,
+      3 => context.l10n.reportSeveritySignificant,
+      4 => context.l10n.reportSeverityHigh,
+      _ => context.l10n.reportSeverityCritical,
+    };
+    return '$v – $word';
+  }
 
   /// Keeps focused fields scrollable above the IME and bottom CTA bar.
   EdgeInsets _detailsFieldScrollPadding(BuildContext context) {
@@ -1188,7 +1204,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          'Severity',
+          context.l10n.reportReviewSeverityTitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: AppColors.textSecondary,
             fontWeight: FontWeight.w600,
@@ -1213,7 +1229,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                _severityLabel(_draft.severity),
+                _severityLabel(context, _draft.severity),
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   letterSpacing: -0.2,
@@ -1355,7 +1371,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       mainAxisSize: MainAxisSize.min,
       children: <Widget>[
         Text(
-          'Category',
+          context.l10n.reportReviewCategoryTitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: hasCategoryError
                 ? AppColors.accentDanger
@@ -1367,13 +1383,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
         const SizedBox(height: AppSpacing.sm),
         Semantics(
           button: true,
-          label: 'Select report category',
+          label: context.l10n.reportSelectCategorySemantic,
           value: _draft.category?.label,
           child: ReportActionTile(
             icon: _draft.category?.icon ?? Icons.category_outlined,
-            title: _draft.category?.label ?? 'Category',
+            title: _draft.category?.label ??
+                context.l10n.reportReviewCategoryTitle,
             subtitle: _draft.category == null
-                ? 'Choose'
+                ? context.l10n.reportReviewChooseCategory
                 : _draft.category!.description,
             tone: hasCategoryError
                 ? ReportSurfaceTone.danger
@@ -1402,7 +1419,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
           textBaseline: TextBaseline.alphabetic,
           children: <Widget>[
             Text(
-              'Details',
+              context.l10n.reportStageDetailsTitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textSecondary,
                 fontWeight: FontWeight.w600,
@@ -1439,7 +1456,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             letterSpacing: -0.2,
           ),
           decoration: InputDecoration(
-            hintText: 'Anything else',
+            hintText: context.l10n.reportDescriptionHint,
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.textMuted.withValues(alpha: 0.85),
               fontWeight: FontWeight.w400,
@@ -1487,8 +1504,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
             Expanded(
               child: Semantics(
                 button: true,
-                label: 'Back',
-                hint: 'Double-tap to go to previous step.',
+                label: context.l10n.commonBack,
                 child: OutlinedButton(
                   onPressed: _submitting
                       ? null
@@ -1507,7 +1523,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                     ),
                   ),
                   child: Text(
-                    'Back',
+                    context.l10n.commonBack,
                     style: Theme.of(context).textTheme.labelLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.2,

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
@@ -113,7 +114,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     final String eventId = 'evt-local-${DateTime.now().microsecondsSinceEpoch}';
     final String title = _titleController.text.trim();
     final String description = _descriptionController.text.trim().isEmpty
-        ? 'Community cleanup action organized by local volunteers.'
+        ? context.l10n.createEventDefaultDescription
         : _descriptionController.text.trim();
     final EcoEventCategory category =
         _selectedCategory ?? EcoEventCategory.generalCleanup;
@@ -186,11 +187,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Event type',
-          subtitle: 'What kind of action are you organizing?',
+          title: ctx.l10n.createEventCategoryTitle,
+          subtitle: ctx.l10n.createEventCategorySubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
           maxHeightFactor: 0.82,
@@ -241,11 +242,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
         return StatefulBuilder(
           builder: (BuildContext ctx, StateSetter setModalState) {
             return ReportSheetScaffold(
-              title: 'Gear needed',
-              subtitle: 'Select everything volunteers should bring.',
+              title: ctx.l10n.createEventGearTitle,
+              subtitle: ctx.l10n.createEventGearSubtitle,
               trailing: ReportCircleIconButton(
                 icon: CupertinoIcons.xmark,
-                semanticLabel: 'Close',
+                semanticLabel: ctx.l10n.commonClose,
                 onTap: () => Navigator.of(ctx).pop(),
               ),
               maxHeightFactor: 0.82,
@@ -267,8 +268,8 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   ),
                   child: Text(
                     _selectedGear.isEmpty
-                        ? 'Skip'
-                        : 'Done (${_selectedGear.length} selected)',
+                        ? ctx.l10n.commonSkip
+                        : ctx.l10n.createEventGearDoneSelectedCount(_selectedGear.length),
                     style: const TextStyle(
                       fontSize: 17,
                       fontWeight: FontWeight.w600,
@@ -280,10 +281,9 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                 shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
                 children: <Widget>[
-                  const ReportInfoBanner(
-                    title: 'Multi-select',
-                    message:
-                        'Tap each item volunteers should bring. You can select as many as needed.',
+                  ReportInfoBanner(
+                    title: ctx.l10n.createEventGearMultiselectTitle,
+                    message: ctx.l10n.createEventGearMultiselectMessage,
                     icon: CupertinoIcons.bag,
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -336,11 +336,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Team size',
-          subtitle: 'How many volunteers do you expect?',
+          title: ctx.l10n.createEventTeamSizeTitle,
+          subtitle: ctx.l10n.createEventTeamSizeSubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
           maxHeightFactor: 0.6,
@@ -389,11 +389,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Difficulty',
-          subtitle: 'Set expectations for volunteers.',
+          title: ctx.l10n.createEventDifficultyTitle,
+          subtitle: ctx.l10n.createEventDifficultySubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
           maxHeightFactor: 0.55,
@@ -454,7 +454,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
             child: Row(
               children: <Widget>[
                 Text(
-                  'Step $steps of 5',
+                  context.l10n.createEventStepProgress(steps),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 13,
@@ -520,7 +520,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   if (_showValidationErrors && !_isTimeRangeValid) ...<Widget>[
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'End time must be later than start time.',
+                      context.l10n.createEventEndTimeError,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.accentDanger,
                             fontWeight: FontWeight.w500,
@@ -532,30 +532,30 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   const SizedBox(height: AppSpacing.lg),
                   _buildPickerTile(
                     context,
-                    label: 'Event type',
+                    label: context.l10n.createEventFieldType,
                     value: _selectedCategory?.label,
                     icon: _selectedCategory?.icon,
-                    placeholder: 'Select event type',
+                    placeholder: context.l10n.createEventPlaceholderType,
                     onTap: _showCategoryPicker,
                     hasError: _showValidationErrors && _selectedCategory == null,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _buildPickerTile(
                     context,
-                    label: 'Team size',
+                    label: context.l10n.createEventFieldTeamSize,
                     value: _selectedScale?.label,
                     icon: Icons.groups_rounded,
-                    placeholder: 'How many people?',
+                    placeholder: context.l10n.createEventPlaceholderTeamSize,
                     onTap: _showScalePicker,
                   ),
                   const SizedBox(height: AppSpacing.md),
                   _buildPickerTile(
                     context,
-                    label: 'Difficulty',
+                    label: context.l10n.createEventFieldDifficulty,
                     value: _selectedDifficulty?.label,
                     icon: CupertinoIcons.shield,
                     trailingDot: _selectedDifficulty?.color,
-                    placeholder: 'Set difficulty level',
+                    placeholder: context.l10n.createEventPlaceholderDifficulty,
                     onTap: _showDifficultyPicker,
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -564,7 +564,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                   _buildDescriptionField(context),
                   const SizedBox(height: AppSpacing.xl),
                   PrimaryButton(
-                    label: 'Create eco action',
+                    label: context.l10n.createEventSubmitLabel,
                     enabled: true,
                     onPressed: _handleCreate,
                   ),
@@ -592,7 +592,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'Create event',
+              context.l10n.createEventAppBarTitle,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -609,8 +609,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                 AppHaptics.tap();
                 AppSnack.show(
                   context,
-                  message:
-                      'Creation keeps the event local for now, but the organizer flow is ready right away.',
+                  message: context.l10n.createEventLocalInfoSnack,
                   type: AppSnackType.info,
                 );
               },
@@ -633,7 +632,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Cleanup site',
+          context.l10n.createEventCleanupSiteTitle,
           style: Theme.of(context)
               .textTheme
               .bodyLarge
@@ -642,7 +641,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
         const SizedBox(height: 8),
         Semantics(
           button: true,
-          label: 'Select cleanup site',
+          label: context.l10n.createEventSelectSiteSemantic,
           child: GestureDetector(
             onTap: _showSitePicker,
             child: Container(
@@ -682,7 +681,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        site?.title ?? 'Choose a pollution site',
+                        site?.title ?? context.l10n.createEventChooseSitePlaceholder,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
                               color: site == null
@@ -693,8 +692,11 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
                         site == null
-                            ? 'Every event should be anchored to one cleanup location.'
-                            : '${site.distanceKm.toStringAsFixed(1)} km away · ${site.description}',
+                            ? context.l10n.createEventSiteAnchorHint
+                            : context.l10n.createEventSiteDistanceAway(
+                                site.distanceKm.toStringAsFixed(1),
+                                site.description,
+                              ),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               color: AppColors.textMuted,
                               height: 1.35,
@@ -720,7 +722,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              'Choose the site before creating the event.',
+              context.l10n.createEventSiteRequiredError,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.accentDanger,
                     fontWeight: FontWeight.w500,
@@ -738,7 +740,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Event title',
+          context.l10n.createEventTitleLabel,
           style: Theme.of(context)
               .textTheme
               .bodyLarge
@@ -756,7 +758,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
             int? maxLength,
           }) =>
               Text(
-            '$currentLength / ${maxLength ?? 60}',
+            context.l10n.createEventTitleCounter(currentLength, maxLength ?? 60),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: currentLength >= (maxLength ?? 60) * 0.9
                       ? AppColors.accentDanger
@@ -768,7 +770,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: 'e.g. Weekend river cleanup',
+            hintText: context.l10n.createEventTitleHint,
             hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.textMuted,
             ),
@@ -815,7 +817,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              'Event title is required.',
+              context.l10n.createEventTitleRequired,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.accentDanger,
                     fontWeight: FontWeight.w500,
@@ -915,7 +917,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              'Select an event type.',
+              context.l10n.createEventTypeRequired,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.accentDanger,
                     fontWeight: FontWeight.w500,
@@ -930,13 +932,13 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     final bool hasGear = _selectedGear.isNotEmpty;
     final String summary = hasGear
         ? _selectedGear.map((EventGear g) => g.label).join(', ')
-        : 'What should volunteers bring?';
+        : context.l10n.createEventGearPlaceholderQuestion;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Gear needed',
+          context.l10n.createEventGearLabel,
           style: Theme.of(context)
               .textTheme
               .bodyLarge
@@ -945,7 +947,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
         const SizedBox(height: 8),
         Semantics(
           button: true,
-          label: 'Select gear needed',
+          label: context.l10n.createEventSelectGearSemantic,
           child: GestureDetector(
             onTap: _showGearPicker,
             child: Container(
@@ -1024,7 +1026,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Description',
+          context.l10n.createEventDescriptionLabel,
           style: Theme.of(context)
               .textTheme
               .bodyLarge
@@ -1032,7 +1034,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
         ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
-          'Optional: give volunteers more context.',
+          context.l10n.createEventDescriptionSubtitle,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textMuted,
               ),
@@ -1047,7 +1049,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
             color: AppColors.textPrimary,
           ),
           decoration: InputDecoration(
-            hintText: 'Describe what to expect, meeting point, etc.',
+            hintText: context.l10n.createEventDescriptionHint,
             hintStyle:
                 Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.textMuted,

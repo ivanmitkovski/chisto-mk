@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -185,7 +186,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
           AppHaptics.medium();
           AppSnack.show(
             context,
-            message: 'Could not update upvote. Please try again.',
+            message: context.l10n.siteCardUpvoteFailedSnack,
             type: AppSnackType.warning,
           );
         })
@@ -240,7 +241,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
         setState(() => _isSaved = !nextSaved);
         AppSnack.show(
           context,
-          message: 'Could not update saved state. Please try again.',
+          message: context.l10n.siteCardSavedFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -326,7 +327,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       },
       child: Semantics(
         button: false,
-        label: 'Pollution site: ${site.title}. Tap to open details.',
+        label: context.l10n.siteCardPollutionSiteSemantic(site.title),
         child: Container(
           margin: const EdgeInsets.only(bottom: AppSpacing.lg),
           decoration: BoxDecoration(
@@ -465,7 +466,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
                           ),
                           const SizedBox(height: AppSpacing.md),
                           PrimaryButton(
-                            label: 'Take action',
+                            label: context.l10n.siteCardTakeActionSemantic,
                             onPressed: () => _openTakeActionSheet(),
                           ),
                         ],
@@ -486,7 +487,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
 
     return Semantics(
       image: true,
-      label: 'Photo of ${site.title}',
+      label: context.l10n.siteCardPhotoSemantic(site.title),
       child: AspectRatio(
         aspectRatio: 16 / 9,
         child: Stack(
@@ -566,7 +567,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
               right: AppSpacing.sm,
               child: Semantics(
                 button: true,
-                label: 'Feed options',
+                label: context.l10n.siteCardFeedOptionsSemantic,
                 child: InkWell(
                   onTap: _openFeedbackSheet,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
@@ -887,7 +888,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Could not load comments right now.',
+          message: context.l10n.siteCardCommentsLoadFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -1004,7 +1005,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Could not track share right now.',
+          message: context.l10n.siteCardShareTrackFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -1039,7 +1040,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Could not track share right now.',
+          message: context.l10n.siteCardShareTrackFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -1053,7 +1054,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
     if (count == 0) {
       AppSnack.show(
         context,
-        message: 'No upvotes yet. Be the first to support this site!',
+        message: context.l10n.siteDetailNoUpvotesSnack,
         type: AppSnackType.info,
       );
       return;
@@ -1179,7 +1180,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       if (!mounted) return;
       AppSnack.show(
         context,
-        message: 'Could not submit feedback right now.',
+        message: context.l10n.siteCardFeedbackSubmitFailedSnack,
         type: AppSnackType.warning,
       );
     }
@@ -1256,25 +1257,25 @@ class _FeedFeedbackSheet extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               _FeedbackTile(
                 icon: Icons.visibility_off_outlined,
-                title: 'Not relevant',
+                title: context.l10n.siteCardNotRelevantTitle,
                 onTap: () =>
                     Navigator.of(context).pop(_FeedFeedbackAction.notRelevant),
               ),
               _FeedbackTile(
                 icon: Icons.auto_awesome_outlined,
-                title: 'Show less like this',
+                title: context.l10n.siteCardShowLessTitle,
                 onTap: () =>
                     Navigator.of(context).pop(_FeedFeedbackAction.showLess),
               ),
               _FeedbackTile(
                 icon: Icons.copy_all_outlined,
-                title: 'Duplicate',
+                title: context.l10n.siteCardDuplicateTitle,
                 onTap: () =>
                     Navigator.of(context).pop(_FeedFeedbackAction.duplicate),
               ),
               _FeedbackTile(
                 icon: Icons.warning_amber_rounded,
-                title: 'Misleading',
+                title: context.l10n.siteCardMisleadingTitle,
                 onTap: () =>
                     Navigator.of(context).pop(_FeedFeedbackAction.misleading),
               ),
@@ -1284,7 +1285,7 @@ class _FeedFeedbackSheet extends StatelessWidget {
               ),
               _FeedbackTile(
                 icon: Icons.hide_source_rounded,
-                title: 'Hide this post',
+                title: context.l10n.siteCardHidePostTitle,
                 isDestructive: true,
                 onTap: () =>
                     Navigator.of(context).pop(_FeedFeedbackAction.hide),

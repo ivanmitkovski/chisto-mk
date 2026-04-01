@@ -13,6 +13,7 @@ import 'package:chisto_mobile/core/cache/site_image_prefetch_queue.dart';
 import 'package:chisto_mobile/core/cache/site_image_provider.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
@@ -1372,7 +1373,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   void _showDirectionsError() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: const Text('Could not open Maps'),
+        content: Text(context.l10n.mapOpenMapsFailed),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -1441,7 +1442,10 @@ class _MapInlineSyncNotice extends StatelessWidget {
                   ),
                 ),
               ),
-              TextButton(onPressed: onRetry, child: const Text('Retry')),
+              TextButton(
+                onPressed: onRetry,
+                child: Text(context.l10n.commonRetry),
+              ),
             ],
           ),
         ),

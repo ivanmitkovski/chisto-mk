@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -17,6 +18,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/organizer_checkin/organizer_checkin_widgets.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -127,7 +129,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     if (available.isEmpty) {
       AppSnack.show(
         context,
-        message: 'All mock attendees are already checked in.',
+        message: context.l10n.eventsOrganizerMockAllCheckedIn,
         type: AppSnackType.warning,
       );
       return;
@@ -153,24 +155,24 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: const Text('Manual check-in'),
+          title: Text(context.l10n.eventsManualCheckInTitle),
           content: Padding(
             padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: CupertinoTextField(
               controller: _manualNameController,
-              placeholder: 'Attendee name',
+              placeholder: context.l10n.eventsOrganizerAttendeeNamePlaceholder,
               autofocus: true,
             ),
           ),
           actions: <Widget>[
             CupertinoDialogAction(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancel'),
+              child: Text(context.l10n.commonCancel),
             ),
             CupertinoDialogAction(
               isDefaultAction: true,
               onPressed: () => Navigator.of(context).pop(true),
-              child: const Text('Add'),
+              child: Text(context.l10n.eventsManualCheckInAdd),
             ),
           ],
         );
@@ -186,7 +188,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     if (name.isEmpty) {
       AppSnack.show(
         context,
-        message: 'Enter attendee name first.',
+        message: context.l10n.eventsOrganizerEnterNameFirst,
         type: AppSnackType.warning,
       );
       return;
@@ -200,14 +202,14 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     if (!added) {
       AppSnack.show(
         context,
-        message: '$name is already checked in.',
+        message: context.l10n.eventsOrganizerNameAlreadyCheckedIn(name),
         type: AppSnackType.warning,
       );
       return;
     }
     AppSnack.show(
       context,
-      message: '$name added by organizer.',
+      message: context.l10n.eventsOrganizerNameAddedByOrganizer(name),
       type: AppSnackType.success,
     );
     _issueNewPayload();
@@ -222,14 +224,14 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       AppHaptics.warning();
       AppSnack.show(
         context,
-        message: 'Could not remove ${attendee.name}.',
+        message: context.l10n.eventsOrganizerCouldNotRemoveName(attendee.name),
         type: AppSnackType.warning,
       );
       return;
     }
     AppSnack.show(
       context,
-      message: '${attendee.name} removed from check-in.',
+      message: context.l10n.eventsOrganizerNameRemovedFromCheckIn(attendee.name),
       type: AppSnackType.warning,
     );
   }
@@ -243,7 +245,11 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     );
     if (!changed) {
       AppHaptics.warning();
-      AppSnack.show(context, message: 'Unable to complete the event.', type: AppSnackType.warning);
+      AppSnack.show(
+        context,
+        message: context.l10n.eventsOrganizerUnableCompleteEvent,
+        type: AppSnackType.warning,
+      );
       return;
     }
     final int count = _attendees.length;
@@ -299,7 +305,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'Event ended',
+                    context.l10n.eventsOrganizerEndedTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -308,8 +314,11 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     attendeeCount == 0
-                        ? 'Thanks for organizing!'
-                        : '$attendeeCount attendee${attendeeCount == 1 ? '' : 's'} checked in.',
+                        ? context.l10n.eventsOrganizerThanksOrganizing
+                        : attendeeCount == 1
+                            ? context.l10n.eventsOrganizerEndSummaryOneAttendee
+                            : context.l10n
+                                .eventsOrganizerEndSummaryManyAttendees(attendeeCount),
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -317,7 +326,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   ),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'Upload after photos from the event detail.',
+                    context.l10n.eventsOrganizerUploadAfterPhotosHint,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -327,7 +336,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: PrimaryButton(
-                      label: 'Done',
+                      label: context.l10n.qrScannerDone,
                       enabled: true,
                       onPressed: () => Navigator.of(context).pop(),
                     ),
@@ -356,7 +365,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     }
     AppSnack.show(
       context,
-      message: isOpen ? 'Check-in paused.' : 'Check-in resumed.',
+      message: isOpen
+          ? context.l10n.eventsOrganizerCheckInPausedSnack
+          : context.l10n.eventsOrganizerCheckInResumedSnack,
       type: AppSnackType.success,
     );
   }
@@ -369,26 +380,32 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       EcoEventStatus.cancelled,
     );
     if (!changed) {
-      AppSnack.show(context, message: 'Unable to cancel the event.', type: AppSnackType.warning);
+      AppSnack.show(
+        context,
+        message: context.l10n.eventsOrganizerUnableCancelEvent,
+        type: AppSnackType.warning,
+      );
       return;
     }
     AppSnack.show(
       context,
-      message: 'Event cancelled.',
+      message: context.l10n.eventsOrganizerEventCancelledSnack,
       type: AppSnackType.warning,
     );
     Navigator.of(context).pop();
   }
 
   void _showSubmissionFeedback(CheckInSubmissionResult result, String name) {
+    final AppLocalizations l10n = context.l10n;
     final String message = switch (result.status) {
-      CheckInSubmissionStatus.success => '$name checked in',
-      CheckInSubmissionStatus.invalidFormat => 'Invalid QR code.',
-      CheckInSubmissionStatus.wrongEvent => 'Wrong event QR.',
-      CheckInSubmissionStatus.sessionClosed => 'Check-in is currently paused.',
-      CheckInSubmissionStatus.sessionExpired => 'QR expired. Generate a new one.',
-      CheckInSubmissionStatus.replayDetected => 'QR already used. Regenerating...',
-      CheckInSubmissionStatus.alreadyCheckedIn => '$name is already checked in.',
+      CheckInSubmissionStatus.success => l10n.eventsOrganizerFeedbackCheckedIn(name),
+      CheckInSubmissionStatus.invalidFormat => l10n.eventsOrganizerFeedbackInvalidQr,
+      CheckInSubmissionStatus.wrongEvent => l10n.eventsOrganizerFeedbackWrongEvent,
+      CheckInSubmissionStatus.sessionClosed => l10n.eventsOrganizerFeedbackPaused,
+      CheckInSubmissionStatus.sessionExpired => l10n.eventsOrganizerFeedbackQrExpired,
+      CheckInSubmissionStatus.replayDetected => l10n.eventsOrganizerFeedbackQrReplay,
+      CheckInSubmissionStatus.alreadyCheckedIn =>
+        l10n.eventsOrganizerFeedbackAlreadyCheckedIn(name),
     };
     if (result.isSuccess) {
       AppHaptics.success();
@@ -447,10 +464,10 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         appBar: AppBar(
           backgroundColor: AppColors.appBackground,
           leading: const AppBackButton(),
-          title: const Text('Check-in'),
+          title: Text(context.l10n.eventsCheckInTitle),
         ),
-        body: const Center(
-          child: Text('This event is no longer available.'),
+        body: Center(
+          child: Text(context.l10n.eventsEventNotFoundBody),
         ),
       );
     }
@@ -465,7 +482,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         backgroundColor: AppColors.appBackground,
         leading: const AppBackButton(),
         title: Text(
-          'Check-in',
+          context.l10n.eventsCheckInTitle,
           style: textTheme.titleLarge?.copyWith(
             fontWeight: FontWeight.w600,
             color: AppColors.textPrimary,
@@ -501,7 +518,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                           ),
                           const SizedBox(height: AppSpacing.xs),
                           Text(
-                            'Attendees should always scan the newest QR. The code refreshes automatically before it expires.',
+                            context.l10n.eventsOrganizerQrRefreshHelp,
                             style: textTheme.bodySmall?.copyWith(
                               color: AppColors.textMuted,
                               height: 1.4,
@@ -512,7 +529,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     Text(
-                      'Hold your phone so attendees can scan',
+                      context.l10n.eventsOrganizerHoldPhoneForScan,
                       style: textTheme.bodyLarge?.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -582,7 +599,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                   ),
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
-                                    'Check-in paused',
+                                    context.l10n.eventsOrganizerPausedLabel,
                                     style: textTheme.bodyMedium?.copyWith(
                                       color: AppColors.textMuted,
                                       fontWeight: FontWeight.w600,
@@ -599,13 +616,16 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
                         StatusPill(
-                          label: isOpen ? 'Open' : 'Paused',
+                          label: isOpen
+                              ? context.l10n.eventsOrganizerStatusOpen
+                              : context.l10n.eventsOrganizerStatusPaused,
                           color: isOpen ? AppColors.primaryDark : AppColors.textMuted,
                         ),
                         const SizedBox(width: AppSpacing.sm),
                         if (isOpen && _payload != null) ...<Widget>[
                           StatusPill(
-                            label: 'Refresh in ${_remainingPayloadSeconds}s',
+                            label: context.l10n
+                                .eventsOrganizerRefreshInSeconds(_remainingPayloadSeconds),
                             color: _remainingPayloadSeconds <= 10
                                 ? AppColors.accentDanger
                                 : AppColors.textPrimary,
@@ -615,8 +635,8 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                         Flexible(
                           child: Text(
                             isOpen
-                                ? 'QR refreshes automatically and after each scan'
-                                : 'Resume check-in to issue a fresh QR',
+                                ? context.l10n.eventsOrganizerQrRefreshesWhenOpen
+                                : context.l10n.eventsOrganizerResumeForFreshQr,
                             style: textTheme.bodySmall?.copyWith(
                               color: AppColors.textMuted,
                             ),
@@ -627,13 +647,13 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     ),
                     const SizedBox(height: AppSpacing.sm),
                     Semantics(
-                      label: 'Manual override: mark attendee present',
+                      label: context.l10n.eventsOrganizerManualOverride,
                       button: true,
                       child: CupertinoButton(
                         padding: EdgeInsets.zero,
                         onPressed: _addManualAttendee,
                         child: Text(
-                          'Manual override: mark attendee present',
+                          context.l10n.eventsOrganizerManualOverride,
                           style: textTheme.bodySmall?.copyWith(
                             color: AppColors.primaryDark,
                             fontWeight: FontWeight.w600,
@@ -653,7 +673,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Text(
-                      'Checked in',
+                      context.l10n.eventsOrganizerCheckedInHeading,
                       style: textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -695,14 +715,14 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                         ),
                         const SizedBox(height: AppSpacing.md),
                         Text(
-                          'No one checked in yet',
+                          context.l10n.eventsOrganizerEmptyListTitle,
                           style: textTheme.bodyLarge?.copyWith(
                             color: AppColors.textMuted,
                           ),
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          'Attendees scan your QR to check in',
+                          context.l10n.eventsOrganizerEmptyListSubtitle,
                           style: textTheme.bodySmall?.copyWith(
                             color: AppColors.textMuted,
                           ),
@@ -743,7 +763,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                 child: Column(
                   children: <Widget>[
                     PrimaryButton(
-                      label: 'End event',
+                      label: context.l10n.eventsOrganizerEndEvent,
                       enabled: true,
                       onPressed: _handleEndEvent,
                     ),
@@ -760,7 +780,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                           ),
                         ),
                         child: Text(
-                          isOpen ? 'Pause check-in' : 'Resume check-in',
+                          isOpen
+                              ? context.l10n.eventsOrganizerPauseCheckIn
+                              : context.l10n.eventsOrganizerResumeCheckIn,
                           style: textTheme.titleMedium?.copyWith(
                             color: AppColors.primaryDark,
                             fontWeight: FontWeight.w600,
@@ -772,7 +794,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     CupertinoButton(
                       onPressed: _handleCancelEvent,
                       child: Text(
-                        'Cancel event',
+                        context.l10n.eventsOrganizerCancelEvent,
                         style: textTheme.bodyMedium?.copyWith(
                           color: AppColors.accentDanger,
                           fontWeight: FontWeight.w600,
@@ -784,7 +806,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                       CupertinoButton(
                         onPressed: _simulateCheckIn,
                         child: Text(
-                          'Simulate check-in (dev)',
+                          context.l10n.eventsOrganizerSimulateCheckInDev,
                           style: TextStyle(
                             fontSize: 14,
                             color: AppColors.textMuted,

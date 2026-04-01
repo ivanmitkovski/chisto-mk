@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -151,7 +152,14 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       children: <Widget>[
                         const Icon(CupertinoIcons.checkmark_circle_fill, size: 14, color: AppColors.primaryDark),
                         const SizedBox(width: AppSpacing.xxs),
-                        Text('Checked in', style: textTheme.bodySmall?.copyWith(color: AppColors.primaryDark, fontWeight: FontWeight.w600, fontSize: 12)),
+                        Text(
+                          context.l10n.eventsCheckedInBadge,
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.primaryDark,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -161,7 +169,16 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       children: <Widget>[
                         const Icon(CupertinoIcons.camera_fill, size: 13, color: AppColors.textMuted),
                         const SizedBox(width: AppSpacing.xxs),
-                        Text('${event.afterImagePaths.length} cleanup photos', style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted, fontWeight: FontWeight.w500, fontSize: 12)),
+                        Text(
+                          context.l10n.eventsCleanupPhotosCount(
+                            event.afterImagePaths.length,
+                          ),
+                          style: textTheme.bodySmall?.copyWith(
+                            color: AppColors.textMuted,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12,
+                          ),
+                        ),
                       ],
                     ),
                   ],

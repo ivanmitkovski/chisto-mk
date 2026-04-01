@@ -39,9 +39,7 @@ class SettingsListTile extends StatelessWidget {
                 vertical: AppSpacing.sm,
               ),
               child: Row(
-                crossAxisAlignment: subtitle == null
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Container(
                     width: 32,

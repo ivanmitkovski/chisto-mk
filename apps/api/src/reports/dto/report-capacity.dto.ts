@@ -16,6 +16,12 @@ export class ReportCapacityDto {
   })
   retryAfterSeconds!: number | null;
 
+  @ApiProperty({
+    description: 'UTC instant (ISO-8601) when emergency reporting becomes available again; null when not on cooldown',
+    nullable: true,
+  })
+  nextEmergencyReportAvailableAt!: string | null;
+
   @ApiProperty({ description: 'Human guidance on how to unlock more reports' })
   unlockHint!: string;
 }

@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -182,7 +183,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
       setState(() => _hasReportedIssue = true);
       AppSnack.show(
         context,
-        message: 'Thank you. Your report helps us improve.',
+        message: context.l10n.siteDetailThankYouReportSnack,
         type: AppSnackType.success,
       );
     }
@@ -245,7 +246,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
       if (!context.mounted) return;
       AppSnack.show(
         context,
-        message: 'Could not update upvote. Please try again.',
+        message: context.l10n.siteDetailUpvoteFailedSnack,
         type: AppSnackType.warning,
       );
     } finally {
@@ -379,7 +380,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
     if (count == 0) {
       AppSnack.show(
         context,
-        message: 'No upvotes yet. Be the first to support this site!',
+        message: context.l10n.siteDetailNoUpvotesSnack,
         type: AppSnackType.info,
       );
       return;
@@ -429,7 +430,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
     if (count == 0) {
       AppSnack.show(
         context,
-        message: 'No volunteers yet for this site.',
+        message: context.l10n.siteDetailNoVolunteersSnack,
         type: AppSnackType.info,
       );
       return;
@@ -477,7 +478,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
     if (point == null) {
       AppSnack.show(
         context,
-        message: 'Directions not available for this site.',
+        message: context.l10n.siteDetailDirectionsUnavailableSnack,
         type: AppSnackType.warning,
       );
       return;
@@ -517,7 +518,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
       } else if (mounted) {
         AppSnack.show(
           context,
-          message: 'Could not open Maps',
+          message: context.l10n.siteDetailOpenMapsFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -525,7 +526,7 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'Could not open Maps',
+          message: context.l10n.siteDetailOpenMapsFailedSnack,
           type: AppSnackType.warning,
         );
       }

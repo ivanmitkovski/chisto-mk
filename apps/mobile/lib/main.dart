@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/app_theme.dart';
@@ -61,15 +60,35 @@ class _ChistoAppState extends State<ChistoApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      navigatorKey: _navigatorKey,
-      title: 'Chisto.mk',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      initialRoute: AppRoutes.splash,
-      onGenerateRoute: AppRouter.onGenerateRoute,
+    return ValueListenableBuilder<Locale?>(
+      valueListenable: ServiceLocator.instance.appLocaleOverride,
+      builder: (BuildContext context, Locale? override, _) {
+        return MaterialApp(
+          navigatorKey: _navigatorKey,
+          title: 'Chisto.mk',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          locale: override,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          localeListResolutionCallback:
+              (List<Locale>? locales, Iterable<Locale> supported) {
+            if (override != null) {
+              return override;
+            }
+            for (final Locale device in locales ?? <Locale>[]) {
+              for (final Locale s in supported) {
+                if (s.languageCode == device.languageCode) {
+                  return s;
+                }
+              }
+            }
+            return const Locale('en');
+          },
+          initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRouter.onGenerateRoute,
+        );
+      },
     );
   }
 }

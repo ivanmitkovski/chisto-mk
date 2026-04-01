@@ -80,6 +80,15 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
   }
 
   Future<void> _prepareImage() async {
+    if (!mounted) return;
+    final MediaQueryData mq = MediaQuery.of(context);
+    // Enough resolution for pinch-zoom in the crop card without decoding
+    // full 12MP+ originals.
+    final int maxDecodeWidth =
+        (mq.size.shortestSide * mq.devicePixelRatio * 2.2)
+            .round()
+            .clamp(1024, kAvatarCropDecodeWidthMax);
+
     try {
       await waitAfterProfileAvatarPicker();
       if (!mounted) return;
@@ -98,7 +107,10 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
         return;
       }
 
-      final Uint8List? bytes = await loadAvatarImageBytesForCrop(pathForCrop);
+      final Uint8List? bytes = await loadAvatarImageBytesForCrop(
+        pathForCrop,
+        maxDecodeWidth: maxDecodeWidth,
+      );
       if (!mounted) return;
       if (bytes == null) {
         AppSnack.show(
@@ -222,7 +234,7 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
           cornerDotBuilder: (double size, EdgeAlignment edge) =>
               const SizedBox.shrink(),
           clipBehavior: Clip.hardEdge,
-          filterQuality: FilterQuality.high,
+          filterQuality: FilterQuality.medium,
           progressIndicator: const Center(
             child: SizedBox(
               width: 36,
@@ -254,16 +266,16 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.xs,
                   AppSpacing.sm,
+                  AppSpacing.xs,
                   AppSpacing.sm,
-                  AppSpacing.sm,
-                  AppSpacing.md,
                 ),
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(
-                      width: 92,
+                      width: 88,
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton(
@@ -272,16 +284,19 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                             foregroundColor: AppColors.textSecondary,
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.xs,
+                              vertical: AppSpacing.sm,
                             ),
-                            minimumSize: Size.zero,
+                            minimumSize: const Size(44, 44),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
                             l10n.profileAvatarCropCancel,
                             style: AppTypography.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 17,
+                              height: 1.2,
+                              letterSpacing: -0.41,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                         ),
@@ -294,15 +309,21 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                         ),
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
                             Text(
                               l10n.profileAvatarCropMoveAndScale,
                               textAlign: TextAlign.center,
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
-                              style: AppTypography.sectionHeader.copyWith(
-                                fontSize: 18,
-                                height: 1.2,
+                              style: AppTypography.textTheme.titleMedium
+                                  ?.copyWith(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 17,
+                                height: 1.18,
+                                letterSpacing: -0.41,
+                                color: AppColors.textPrimary,
                               ),
                             ),
                             AnimatedSwitcher(
@@ -315,7 +336,7 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                                         'avatar_crop_hint',
                                       ),
                                       padding: const EdgeInsets.only(
-                                        top: 6,
+                                        top: 4,
                                       ),
                                       child: Text(
                                         l10n.profileAvatarCropHint,
@@ -326,10 +347,10 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                                             .textTheme.bodySmall
                                             ?.copyWith(
                                           color: AppColors.textMuted,
-                                          fontSize: 12.5,
-                                          height: 1.35,
-                                          fontWeight: FontWeight.w500,
-                                          letterSpacing: -0.05,
+                                          fontSize: 13,
+                                          height: 1.22,
+                                          fontWeight: FontWeight.w400,
+                                          letterSpacing: -0.08,
                                         ),
                                       ),
                                     )
@@ -345,7 +366,7 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                       ),
                     ),
                     SizedBox(
-                      width: 92,
+                      width: 88,
                       child: Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -354,15 +375,18 @@ class _ProfileAvatarCropScreenState extends State<ProfileAvatarCropScreen> {
                             foregroundColor: AppColors.primaryDark,
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.sm,
-                              vertical: AppSpacing.xs,
+                              vertical: AppSpacing.sm,
                             ),
-                            minimumSize: Size.zero,
+                            minimumSize: const Size(44, 44),
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
                             l10n.profileAvatarCropDone,
                             style: AppTypography.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w700,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 17,
+                              height: 1.2,
+                              letterSpacing: -0.41,
                               color: (_cropping || !canAct)
                                   ? AppColors.textMuted
                                   : AppColors.primaryDark,

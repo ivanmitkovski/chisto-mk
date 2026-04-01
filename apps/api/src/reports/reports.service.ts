@@ -49,6 +49,7 @@ import { SiteEventsService } from '../admin-events/site-events.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
 import { parseReportCleanupEffort, reportCleanupEffortLabel } from './report-cleanup-effort';
 import { stripCategoryLabelPrefix } from './report-category-narrative';
+import { POINTS_FIRST_REPORT } from '../gamification/gamification.constants';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -59,8 +60,6 @@ const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = 
 
 const DUPLICATE_RADIUS_METERS = 30;
 const SITE_NEARBY_RADIUS_METERS = 50;
-const POINTS_FIRST_REPORT = 100;
-const POINTS_CO_REPORT = 50;
 const INITIAL_REPORT_CREDITS = 10;
 const DEFAULT_EMERGENCY_WINDOW_DAYS = 7;
 
@@ -291,12 +290,14 @@ export class ReportsService {
 
     let emergencyAvailable = true;
     let retryAfterSeconds: number | null = null;
+    let nextEmergencyReportAvailableAt: string | null = null;
     if (user.reportEmergencyUsedAt) {
       const windowMs = windowDays * 24 * 60 * 60 * 1000;
       const unlockAtMs = user.reportEmergencyUsedAt.getTime() + windowMs;
       if (unlockAtMs > now.getTime()) {
         emergencyAvailable = false;
         retryAfterSeconds = this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now);
+        nextEmergencyReportAvailableAt = new Date(unlockAtMs).toISOString();
       }
     }
 
@@ -305,6 +306,7 @@ export class ReportsService {
       emergencyAvailable,
       emergencyWindowDays: windowDays,
       retryAfterSeconds,
+      nextEmergencyReportAvailableAt,
       unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
     };
   }
@@ -1270,31 +1272,33 @@ export class ReportsService {
             },
           });
           const isFirstApproved = otherApprovedCount === 0;
-          const points = isFirstApproved ? POINTS_FIRST_REPORT : POINTS_CO_REPORT;
-          const user = await tx.user.findUnique({
-            where: { id: updatedReport.reporterId },
-            select: { pointsBalance: true, totalPointsEarned: true },
-          });
-          if (user) {
-            const balanceAfter = user.pointsBalance + points;
-            const totalEarnedAfter = user.totalPointsEarned + points;
-            await tx.pointTransaction.create({
-              data: {
-                userId: updatedReport.reporterId,
-                delta: points,
-                balanceAfter,
-                reasonCode: isFirstApproved ? 'FIRST_REPORT' : 'CO_REPORT',
-                referenceType: 'Report',
-                referenceId: reportId,
-              },
-            });
-            await tx.user.update({
+          if (isFirstApproved) {
+            const points = POINTS_FIRST_REPORT;
+            const user = await tx.user.findUnique({
               where: { id: updatedReport.reporterId },
-              data: {
-                pointsBalance: balanceAfter,
-                totalPointsEarned: totalEarnedAfter,
-              },
+              select: { pointsBalance: true, totalPointsEarned: true },
             });
+            if (user) {
+              const balanceAfter = user.pointsBalance + points;
+              const totalEarnedAfter = user.totalPointsEarned + points;
+              await tx.pointTransaction.create({
+                data: {
+                  userId: updatedReport.reporterId,
+                  delta: points,
+                  balanceAfter,
+                  reasonCode: 'FIRST_REPORT',
+                  referenceType: 'Report',
+                  referenceId: reportId,
+                },
+              });
+              await tx.user.update({
+                where: { id: updatedReport.reporterId },
+                data: {
+                  pointsBalance: balanceAfter,
+                  totalPointsEarned: totalEarnedAfter,
+                },
+              });
+            }
           }
         }
       }
