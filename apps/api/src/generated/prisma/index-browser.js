@@ -298,11 +298,104 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   siteId: 'siteId',
+  title: 'title',
+  description: 'description',
+  category: 'category',
   scheduledAt: 'scheduledAt',
+  endAt: 'endAt',
   completedAt: 'completedAt',
   status: 'status',
+  lifecycleStatus: 'lifecycleStatus',
   organizerId: 'organizerId',
-  participantCount: 'participantCount'
+  participantCount: 'participantCount',
+  gear: 'gear',
+  scale: 'scale',
+  difficulty: 'difficulty',
+  afterImageKeys: 'afterImageKeys',
+  maxParticipants: 'maxParticipants',
+  checkInSessionId: 'checkInSessionId',
+  checkInOpen: 'checkInOpen',
+  checkedInCount: 'checkedInCount',
+  recurrenceRule: 'recurrenceRule',
+  parentEventId: 'parentEventId',
+  recurrenceIndex: 'recurrenceIndex'
+};
+
+exports.Prisma.EventParticipantScalarFieldEnum = {
+  id: 'id',
+  joinedAt: 'joinedAt',
+  eventId: 'eventId',
+  userId: 'userId',
+  reminderEnabled: 'reminderEnabled',
+  reminderAt: 'reminderAt'
+};
+
+exports.Prisma.EventChatMessageScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  eventId: 'eventId',
+  authorId: 'authorId',
+  body: 'body',
+  replyToId: 'replyToId',
+  deletedAt: 'deletedAt',
+  editedAt: 'editedAt',
+  isPinned: 'isPinned',
+  pinnedAt: 'pinnedAt',
+  pinnedById: 'pinnedById',
+  messageType: 'messageType',
+  systemPayload: 'systemPayload',
+  locationLat: 'locationLat',
+  locationLng: 'locationLng',
+  locationLabel: 'locationLabel',
+  bodyEncrypted: 'bodyEncrypted',
+  clientMessageId: 'clientMessageId'
+};
+
+exports.Prisma.EventChatAttachmentScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  messageId: 'messageId',
+  url: 'url',
+  mimeType: 'mimeType',
+  fileName: 'fileName',
+  sizeBytes: 'sizeBytes',
+  width: 'width',
+  height: 'height',
+  duration: 'duration',
+  thumbnailUrl: 'thumbnailUrl'
+};
+
+exports.Prisma.EventChatMuteScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  eventId: 'eventId',
+  userId: 'userId'
+};
+
+exports.Prisma.EventChatReadCursorScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  userId: 'userId',
+  lastReadMessageId: 'lastReadMessageId'
+};
+
+exports.Prisma.EventCheckInScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  eventId: 'eventId',
+  dedupeKey: 'dedupeKey',
+  userId: 'userId',
+  guestDisplayName: 'guestDisplayName',
+  checkedInAt: 'checkedInAt'
+};
+
+exports.Prisma.EventCheckInRedemptionScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  eventId: 'eventId',
+  jti: 'jti'
 };
 
 exports.Prisma.SiteVoteScalarFieldEnum = {
@@ -485,10 +578,50 @@ exports.ReportStatus = exports.$Enums.ReportStatus = {
   DELETED: 'DELETED'
 };
 
+exports.EcoEventCategory = exports.$Enums.EcoEventCategory = {
+  GENERAL_CLEANUP: 'GENERAL_CLEANUP',
+  RIVER_AND_LAKE: 'RIVER_AND_LAKE',
+  TREE_AND_GREEN: 'TREE_AND_GREEN',
+  RECYCLING_DRIVE: 'RECYCLING_DRIVE',
+  HAZARDOUS_REMOVAL: 'HAZARDOUS_REMOVAL',
+  AWARENESS_AND_EDUCATION: 'AWARENESS_AND_EDUCATION',
+  OTHER: 'OTHER'
+};
+
 exports.CleanupEventStatus = exports.$Enums.CleanupEventStatus = {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
   DECLINED: 'DECLINED'
+};
+
+exports.EcoEventLifecycleStatus = exports.$Enums.EcoEventLifecycleStatus = {
+  UPCOMING: 'UPCOMING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+exports.EcoCleanupScale = exports.$Enums.EcoCleanupScale = {
+  SMALL: 'SMALL',
+  MEDIUM: 'MEDIUM',
+  LARGE: 'LARGE',
+  MASSIVE: 'MASSIVE'
+};
+
+exports.EcoEventDifficulty = exports.$Enums.EcoEventDifficulty = {
+  EASY: 'EASY',
+  MODERATE: 'MODERATE',
+  HARD: 'HARD'
+};
+
+exports.EventChatMessageType = exports.$Enums.EventChatMessageType = {
+  TEXT: 'TEXT',
+  SYSTEM: 'SYSTEM',
+  IMAGE: 'IMAGE',
+  LOCATION: 'LOCATION',
+  VIDEO: 'VIDEO',
+  AUDIO: 'AUDIO',
+  FILE: 'FILE'
 };
 
 exports.SiteShareChannel = exports.$Enums.SiteShareChannel = {
@@ -512,6 +645,7 @@ exports.NotificationType = exports.$Enums.NotificationType = {
   COMMENT: 'COMMENT',
   NEARBY_REPORT: 'NEARBY_REPORT',
   CLEANUP_EVENT: 'CLEANUP_EVENT',
+  EVENT_CHAT: 'EVENT_CHAT',
   SYSTEM: 'SYSTEM'
 };
 
@@ -532,6 +666,13 @@ exports.Prisma.ModelName = {
   FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',
   CleanupEvent: 'CleanupEvent',
+  EventParticipant: 'EventParticipant',
+  EventChatMessage: 'EventChatMessage',
+  EventChatAttachment: 'EventChatAttachment',
+  EventChatMute: 'EventChatMute',
+  EventChatReadCursor: 'EventChatReadCursor',
+  EventCheckIn: 'EventCheckIn',
+  EventCheckInRedemption: 'EventCheckInRedemption',
   SiteVote: 'SiteVote',
   SiteSave: 'SiteSave',
   SiteComment: 'SiteComment',

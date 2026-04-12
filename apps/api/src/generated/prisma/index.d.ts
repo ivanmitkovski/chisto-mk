@@ -94,6 +94,41 @@ export type AuditLog = $Result.DefaultSelection<Prisma.$AuditLogPayload>
  */
 export type CleanupEvent = $Result.DefaultSelection<Prisma.$CleanupEventPayload>
 /**
+ * Model EventParticipant
+ * 
+ */
+export type EventParticipant = $Result.DefaultSelection<Prisma.$EventParticipantPayload>
+/**
+ * Model EventChatMessage
+ * Text or system message in an event participant chat (organizer + joiners).
+ */
+export type EventChatMessage = $Result.DefaultSelection<Prisma.$EventChatMessagePayload>
+/**
+ * Model EventChatAttachment
+ * 
+ */
+export type EventChatAttachment = $Result.DefaultSelection<Prisma.$EventChatAttachmentPayload>
+/**
+ * Model EventChatMute
+ * Per-user mute for event chat push notifications (SSE still delivers).
+ */
+export type EventChatMute = $Result.DefaultSelection<Prisma.$EventChatMutePayload>
+/**
+ * Model EventChatReadCursor
+ * Per-user read position for event chat unread counts.
+ */
+export type EventChatReadCursor = $Result.DefaultSelection<Prisma.$EventChatReadCursorPayload>
+/**
+ * Model EventCheckIn
+ * Attendee check-in at an event (registered user or manual guest list).
+ */
+export type EventCheckIn = $Result.DefaultSelection<Prisma.$EventCheckInPayload>
+/**
+ * Model EventCheckInRedemption
+ * Single-use QR token ids (jti) — prevents screenshot replay across different users.
+ */
+export type EventCheckInRedemption = $Result.DefaultSelection<Prisma.$EventCheckInRedemptionPayload>
+/**
  * Model SiteVote
  * 
  */
@@ -223,6 +258,61 @@ export const CleanupEventStatus: {
 export type CleanupEventStatus = (typeof CleanupEventStatus)[keyof typeof CleanupEventStatus]
 
 
+export const EcoEventLifecycleStatus: {
+  UPCOMING: 'UPCOMING',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED'
+};
+
+export type EcoEventLifecycleStatus = (typeof EcoEventLifecycleStatus)[keyof typeof EcoEventLifecycleStatus]
+
+
+export const EcoEventCategory: {
+  GENERAL_CLEANUP: 'GENERAL_CLEANUP',
+  RIVER_AND_LAKE: 'RIVER_AND_LAKE',
+  TREE_AND_GREEN: 'TREE_AND_GREEN',
+  RECYCLING_DRIVE: 'RECYCLING_DRIVE',
+  HAZARDOUS_REMOVAL: 'HAZARDOUS_REMOVAL',
+  AWARENESS_AND_EDUCATION: 'AWARENESS_AND_EDUCATION',
+  OTHER: 'OTHER'
+};
+
+export type EcoEventCategory = (typeof EcoEventCategory)[keyof typeof EcoEventCategory]
+
+
+export const EcoCleanupScale: {
+  SMALL: 'SMALL',
+  MEDIUM: 'MEDIUM',
+  LARGE: 'LARGE',
+  MASSIVE: 'MASSIVE'
+};
+
+export type EcoCleanupScale = (typeof EcoCleanupScale)[keyof typeof EcoCleanupScale]
+
+
+export const EcoEventDifficulty: {
+  EASY: 'EASY',
+  MODERATE: 'MODERATE',
+  HARD: 'HARD'
+};
+
+export type EcoEventDifficulty = (typeof EcoEventDifficulty)[keyof typeof EcoEventDifficulty]
+
+
+export const EventChatMessageType: {
+  TEXT: 'TEXT',
+  SYSTEM: 'SYSTEM',
+  IMAGE: 'IMAGE',
+  LOCATION: 'LOCATION',
+  VIDEO: 'VIDEO',
+  AUDIO: 'AUDIO',
+  FILE: 'FILE'
+};
+
+export type EventChatMessageType = (typeof EventChatMessageType)[keyof typeof EventChatMessageType]
+
+
 export const SiteShareChannel: {
   native: 'native',
   link: 'link',
@@ -250,6 +340,7 @@ export const NotificationType: {
   COMMENT: 'COMMENT',
   NEARBY_REPORT: 'NEARBY_REPORT',
   CLEANUP_EVENT: 'CLEANUP_EVENT',
+  EVENT_CHAT: 'EVENT_CHAT',
   SYSTEM: 'SYSTEM'
 };
 
@@ -288,6 +379,26 @@ export const ReportStatus: typeof $Enums.ReportStatus
 export type CleanupEventStatus = $Enums.CleanupEventStatus
 
 export const CleanupEventStatus: typeof $Enums.CleanupEventStatus
+
+export type EcoEventLifecycleStatus = $Enums.EcoEventLifecycleStatus
+
+export const EcoEventLifecycleStatus: typeof $Enums.EcoEventLifecycleStatus
+
+export type EcoEventCategory = $Enums.EcoEventCategory
+
+export const EcoEventCategory: typeof $Enums.EcoEventCategory
+
+export type EcoCleanupScale = $Enums.EcoCleanupScale
+
+export const EcoCleanupScale: typeof $Enums.EcoCleanupScale
+
+export type EcoEventDifficulty = $Enums.EcoEventDifficulty
+
+export const EcoEventDifficulty: typeof $Enums.EcoEventDifficulty
+
+export type EventChatMessageType = $Enums.EventChatMessageType
+
+export const EventChatMessageType: typeof $Enums.EventChatMessageType
 
 export type SiteShareChannel = $Enums.SiteShareChannel
 
@@ -581,6 +692,76 @@ export class PrismaClient<
     * ```
     */
   get cleanupEvent(): Prisma.CleanupEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventParticipant`: Exposes CRUD operations for the **EventParticipant** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventParticipants
+    * const eventParticipants = await prisma.eventParticipant.findMany()
+    * ```
+    */
+  get eventParticipant(): Prisma.EventParticipantDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventChatMessage`: Exposes CRUD operations for the **EventChatMessage** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventChatMessages
+    * const eventChatMessages = await prisma.eventChatMessage.findMany()
+    * ```
+    */
+  get eventChatMessage(): Prisma.EventChatMessageDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventChatAttachment`: Exposes CRUD operations for the **EventChatAttachment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventChatAttachments
+    * const eventChatAttachments = await prisma.eventChatAttachment.findMany()
+    * ```
+    */
+  get eventChatAttachment(): Prisma.EventChatAttachmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventChatMute`: Exposes CRUD operations for the **EventChatMute** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventChatMutes
+    * const eventChatMutes = await prisma.eventChatMute.findMany()
+    * ```
+    */
+  get eventChatMute(): Prisma.EventChatMuteDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventChatReadCursor`: Exposes CRUD operations for the **EventChatReadCursor** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventChatReadCursors
+    * const eventChatReadCursors = await prisma.eventChatReadCursor.findMany()
+    * ```
+    */
+  get eventChatReadCursor(): Prisma.EventChatReadCursorDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventCheckIn`: Exposes CRUD operations for the **EventCheckIn** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventCheckIns
+    * const eventCheckIns = await prisma.eventCheckIn.findMany()
+    * ```
+    */
+  get eventCheckIn(): Prisma.EventCheckInDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventCheckInRedemption`: Exposes CRUD operations for the **EventCheckInRedemption** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventCheckInRedemptions
+    * const eventCheckInRedemptions = await prisma.eventCheckInRedemption.findMany()
+    * ```
+    */
+  get eventCheckInRedemption(): Prisma.EventCheckInRedemptionDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.siteVote`: Exposes CRUD operations for the **SiteVote** model.
@@ -1121,6 +1302,13 @@ export namespace Prisma {
     FeatureFlag: 'FeatureFlag',
     AuditLog: 'AuditLog',
     CleanupEvent: 'CleanupEvent',
+    EventParticipant: 'EventParticipant',
+    EventChatMessage: 'EventChatMessage',
+    EventChatAttachment: 'EventChatAttachment',
+    EventChatMute: 'EventChatMute',
+    EventChatReadCursor: 'EventChatReadCursor',
+    EventCheckIn: 'EventCheckIn',
+    EventCheckInRedemption: 'EventCheckInRedemption',
     SiteVote: 'SiteVote',
     SiteSave: 'SiteSave',
     SiteComment: 'SiteComment',
@@ -1145,7 +1333,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2333,6 +2521,524 @@ export namespace Prisma {
           }
         }
       }
+      EventParticipant: {
+        payload: Prisma.$EventParticipantPayload<ExtArgs>
+        fields: Prisma.EventParticipantFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventParticipantFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventParticipantFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          findFirst: {
+            args: Prisma.EventParticipantFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventParticipantFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          findMany: {
+            args: Prisma.EventParticipantFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>[]
+          }
+          create: {
+            args: Prisma.EventParticipantCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          createMany: {
+            args: Prisma.EventParticipantCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventParticipantCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>[]
+          }
+          delete: {
+            args: Prisma.EventParticipantDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          update: {
+            args: Prisma.EventParticipantUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventParticipantDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventParticipantUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventParticipantUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventParticipantUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventParticipantPayload>
+          }
+          aggregate: {
+            args: Prisma.EventParticipantAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventParticipant>
+          }
+          groupBy: {
+            args: Prisma.EventParticipantGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventParticipantGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventParticipantCountArgs<ExtArgs>
+            result: $Utils.Optional<EventParticipantCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventChatMessage: {
+        payload: Prisma.$EventChatMessagePayload<ExtArgs>
+        fields: Prisma.EventChatMessageFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventChatMessageFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventChatMessageFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          findFirst: {
+            args: Prisma.EventChatMessageFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventChatMessageFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          findMany: {
+            args: Prisma.EventChatMessageFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>[]
+          }
+          create: {
+            args: Prisma.EventChatMessageCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          createMany: {
+            args: Prisma.EventChatMessageCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventChatMessageCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>[]
+          }
+          delete: {
+            args: Prisma.EventChatMessageDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          update: {
+            args: Prisma.EventChatMessageUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          deleteMany: {
+            args: Prisma.EventChatMessageDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventChatMessageUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventChatMessageUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>[]
+          }
+          upsert: {
+            args: Prisma.EventChatMessageUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMessagePayload>
+          }
+          aggregate: {
+            args: Prisma.EventChatMessageAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventChatMessage>
+          }
+          groupBy: {
+            args: Prisma.EventChatMessageGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventChatMessageGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventChatMessageCountArgs<ExtArgs>
+            result: $Utils.Optional<EventChatMessageCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventChatAttachment: {
+        payload: Prisma.$EventChatAttachmentPayload<ExtArgs>
+        fields: Prisma.EventChatAttachmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventChatAttachmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventChatAttachmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          findFirst: {
+            args: Prisma.EventChatAttachmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventChatAttachmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          findMany: {
+            args: Prisma.EventChatAttachmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>[]
+          }
+          create: {
+            args: Prisma.EventChatAttachmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          createMany: {
+            args: Prisma.EventChatAttachmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventChatAttachmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>[]
+          }
+          delete: {
+            args: Prisma.EventChatAttachmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          update: {
+            args: Prisma.EventChatAttachmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventChatAttachmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventChatAttachmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventChatAttachmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventChatAttachmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatAttachmentPayload>
+          }
+          aggregate: {
+            args: Prisma.EventChatAttachmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventChatAttachment>
+          }
+          groupBy: {
+            args: Prisma.EventChatAttachmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventChatAttachmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventChatAttachmentCountArgs<ExtArgs>
+            result: $Utils.Optional<EventChatAttachmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventChatMute: {
+        payload: Prisma.$EventChatMutePayload<ExtArgs>
+        fields: Prisma.EventChatMuteFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventChatMuteFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventChatMuteFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          findFirst: {
+            args: Prisma.EventChatMuteFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventChatMuteFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          findMany: {
+            args: Prisma.EventChatMuteFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>[]
+          }
+          create: {
+            args: Prisma.EventChatMuteCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          createMany: {
+            args: Prisma.EventChatMuteCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventChatMuteCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>[]
+          }
+          delete: {
+            args: Prisma.EventChatMuteDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          update: {
+            args: Prisma.EventChatMuteUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          deleteMany: {
+            args: Prisma.EventChatMuteDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventChatMuteUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventChatMuteUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>[]
+          }
+          upsert: {
+            args: Prisma.EventChatMuteUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatMutePayload>
+          }
+          aggregate: {
+            args: Prisma.EventChatMuteAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventChatMute>
+          }
+          groupBy: {
+            args: Prisma.EventChatMuteGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventChatMuteGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventChatMuteCountArgs<ExtArgs>
+            result: $Utils.Optional<EventChatMuteCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventChatReadCursor: {
+        payload: Prisma.$EventChatReadCursorPayload<ExtArgs>
+        fields: Prisma.EventChatReadCursorFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventChatReadCursorFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventChatReadCursorFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          findFirst: {
+            args: Prisma.EventChatReadCursorFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventChatReadCursorFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          findMany: {
+            args: Prisma.EventChatReadCursorFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>[]
+          }
+          create: {
+            args: Prisma.EventChatReadCursorCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          createMany: {
+            args: Prisma.EventChatReadCursorCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventChatReadCursorCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>[]
+          }
+          delete: {
+            args: Prisma.EventChatReadCursorDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          update: {
+            args: Prisma.EventChatReadCursorUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventChatReadCursorDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventChatReadCursorUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventChatReadCursorUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventChatReadCursorUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventChatReadCursorPayload>
+          }
+          aggregate: {
+            args: Prisma.EventChatReadCursorAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventChatReadCursor>
+          }
+          groupBy: {
+            args: Prisma.EventChatReadCursorGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventChatReadCursorGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventChatReadCursorCountArgs<ExtArgs>
+            result: $Utils.Optional<EventChatReadCursorCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventCheckIn: {
+        payload: Prisma.$EventCheckInPayload<ExtArgs>
+        fields: Prisma.EventCheckInFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventCheckInFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventCheckInFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          findFirst: {
+            args: Prisma.EventCheckInFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventCheckInFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          findMany: {
+            args: Prisma.EventCheckInFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>[]
+          }
+          create: {
+            args: Prisma.EventCheckInCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          createMany: {
+            args: Prisma.EventCheckInCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventCheckInCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>[]
+          }
+          delete: {
+            args: Prisma.EventCheckInDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          update: {
+            args: Prisma.EventCheckInUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventCheckInDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventCheckInUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventCheckInUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventCheckInUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInPayload>
+          }
+          aggregate: {
+            args: Prisma.EventCheckInAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventCheckIn>
+          }
+          groupBy: {
+            args: Prisma.EventCheckInGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventCheckInGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventCheckInCountArgs<ExtArgs>
+            result: $Utils.Optional<EventCheckInCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventCheckInRedemption: {
+        payload: Prisma.$EventCheckInRedemptionPayload<ExtArgs>
+        fields: Prisma.EventCheckInRedemptionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventCheckInRedemptionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventCheckInRedemptionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          findFirst: {
+            args: Prisma.EventCheckInRedemptionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventCheckInRedemptionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          findMany: {
+            args: Prisma.EventCheckInRedemptionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>[]
+          }
+          create: {
+            args: Prisma.EventCheckInRedemptionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          createMany: {
+            args: Prisma.EventCheckInRedemptionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventCheckInRedemptionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>[]
+          }
+          delete: {
+            args: Prisma.EventCheckInRedemptionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          update: {
+            args: Prisma.EventCheckInRedemptionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventCheckInRedemptionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventCheckInRedemptionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventCheckInRedemptionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventCheckInRedemptionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventCheckInRedemptionPayload>
+          }
+          aggregate: {
+            args: Prisma.EventCheckInRedemptionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventCheckInRedemption>
+          }
+          groupBy: {
+            args: Prisma.EventCheckInRedemptionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventCheckInRedemptionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventCheckInRedemptionCountArgs<ExtArgs>
+            result: $Utils.Optional<EventCheckInRedemptionCountAggregateOutputType> | number
+          }
+        }
+      }
       SiteVote: {
         payload: Prisma.$SiteVotePayload<ExtArgs>
         fields: Prisma.SiteVoteFieldRefs
@@ -3123,6 +3829,13 @@ export namespace Prisma {
     featureFlag?: FeatureFlagOmit
     auditLog?: AuditLogOmit
     cleanupEvent?: CleanupEventOmit
+    eventParticipant?: EventParticipantOmit
+    eventChatMessage?: EventChatMessageOmit
+    eventChatAttachment?: EventChatAttachmentOmit
+    eventChatMute?: EventChatMuteOmit
+    eventChatReadCursor?: EventChatReadCursorOmit
+    eventCheckIn?: EventCheckInOmit
+    eventCheckInRedemption?: EventCheckInRedemptionOmit
     siteVote?: SiteVoteOmit
     siteSave?: SiteSaveOmit
     siteComment?: SiteCommentOmit
@@ -3228,6 +3941,13 @@ export namespace Prisma {
     deviceTokens: number
     userNotifications: number
     notificationPreferences: number
+    organizedCleanupEvents: number
+    eventParticipations: number
+    eventCheckIns: number
+    eventChatMessages: number
+    eventChatReadCursors: number
+    eventChatPinnedMessages: number
+    eventChatMutes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3247,6 +3967,13 @@ export namespace Prisma {
     deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
     userNotifications?: boolean | UserCountOutputTypeCountUserNotificationsArgs
     notificationPreferences?: boolean | UserCountOutputTypeCountNotificationPreferencesArgs
+    organizedCleanupEvents?: boolean | UserCountOutputTypeCountOrganizedCleanupEventsArgs
+    eventParticipations?: boolean | UserCountOutputTypeCountEventParticipationsArgs
+    eventCheckIns?: boolean | UserCountOutputTypeCountEventCheckInsArgs
+    eventChatMessages?: boolean | UserCountOutputTypeCountEventChatMessagesArgs
+    eventChatReadCursors?: boolean | UserCountOutputTypeCountEventChatReadCursorsArgs
+    eventChatPinnedMessages?: boolean | UserCountOutputTypeCountEventChatPinnedMessagesArgs
+    eventChatMutes?: boolean | UserCountOutputTypeCountEventChatMutesArgs
   }
 
   // Custom InputTypes
@@ -3372,6 +4099,55 @@ export namespace Prisma {
     where?: UserNotificationPreferenceWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountOrganizedCleanupEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CleanupEventWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventParticipationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventParticipantWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventCheckInsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventCheckInWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventChatMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventChatReadCursorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatReadCursorWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventChatPinnedMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMessageWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventChatMutesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMuteWhereInput
+  }
+
 
   /**
    * Count Type SiteCountOutputType
@@ -3486,6 +4262,131 @@ export namespace Prisma {
    */
   export type ReportCountOutputTypeCountCoReportersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReportCoReporterWhereInput
+  }
+
+
+  /**
+   * Count Type CleanupEventCountOutputType
+   */
+
+  export type CleanupEventCountOutputType = {
+    participants: number
+    checkIns: number
+    checkInRedemptions: number
+    chatMessages: number
+    chatReadCursors: number
+    chatMutes: number
+    seriesChildren: number
+  }
+
+  export type CleanupEventCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    participants?: boolean | CleanupEventCountOutputTypeCountParticipantsArgs
+    checkIns?: boolean | CleanupEventCountOutputTypeCountCheckInsArgs
+    checkInRedemptions?: boolean | CleanupEventCountOutputTypeCountCheckInRedemptionsArgs
+    chatMessages?: boolean | CleanupEventCountOutputTypeCountChatMessagesArgs
+    chatReadCursors?: boolean | CleanupEventCountOutputTypeCountChatReadCursorsArgs
+    chatMutes?: boolean | CleanupEventCountOutputTypeCountChatMutesArgs
+    seriesChildren?: boolean | CleanupEventCountOutputTypeCountSeriesChildrenArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CleanupEventCountOutputType
+     */
+    select?: CleanupEventCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountParticipantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventParticipantWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountCheckInsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventCheckInWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountCheckInRedemptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventCheckInRedemptionWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountChatMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMessageWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountChatReadCursorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatReadCursorWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountChatMutesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMuteWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountSeriesChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CleanupEventWhereInput
+  }
+
+
+  /**
+   * Count Type EventChatMessageCountOutputType
+   */
+
+  export type EventChatMessageCountOutputType = {
+    replies: number
+    attachments: number
+  }
+
+  export type EventChatMessageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    replies?: boolean | EventChatMessageCountOutputTypeCountRepliesArgs
+    attachments?: boolean | EventChatMessageCountOutputTypeCountAttachmentsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * EventChatMessageCountOutputType without action
+   */
+  export type EventChatMessageCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessageCountOutputType
+     */
+    select?: EventChatMessageCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * EventChatMessageCountOutputType without action
+   */
+  export type EventChatMessageCountOutputTypeCountRepliesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMessageWhereInput
+  }
+
+  /**
+   * EventChatMessageCountOutputType without action
+   */
+  export type EventChatMessageCountOutputTypeCountAttachmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatAttachmentWhereInput
   }
 
 
@@ -3908,6 +4809,13 @@ export namespace Prisma {
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
+    organizedCleanupEvents?: boolean | User$organizedCleanupEventsArgs<ExtArgs>
+    eventParticipations?: boolean | User$eventParticipationsArgs<ExtArgs>
+    eventCheckIns?: boolean | User$eventCheckInsArgs<ExtArgs>
+    eventChatMessages?: boolean | User$eventChatMessagesArgs<ExtArgs>
+    eventChatReadCursors?: boolean | User$eventChatReadCursorsArgs<ExtArgs>
+    eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
+    eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4008,6 +4916,13 @@ export namespace Prisma {
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
+    organizedCleanupEvents?: boolean | User$organizedCleanupEventsArgs<ExtArgs>
+    eventParticipations?: boolean | User$eventParticipationsArgs<ExtArgs>
+    eventCheckIns?: boolean | User$eventCheckInsArgs<ExtArgs>
+    eventChatMessages?: boolean | User$eventChatMessagesArgs<ExtArgs>
+    eventChatReadCursors?: boolean | User$eventChatReadCursorsArgs<ExtArgs>
+    eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
+    eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4033,6 +4948,13 @@ export namespace Prisma {
       deviceTokens: Prisma.$UserDeviceTokenPayload<ExtArgs>[]
       userNotifications: Prisma.$UserNotificationPayload<ExtArgs>[]
       notificationPreferences: Prisma.$UserNotificationPreferencePayload<ExtArgs>[]
+      organizedCleanupEvents: Prisma.$CleanupEventPayload<ExtArgs>[]
+      eventParticipations: Prisma.$EventParticipantPayload<ExtArgs>[]
+      eventCheckIns: Prisma.$EventCheckInPayload<ExtArgs>[]
+      eventChatMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
+      eventChatReadCursors: Prisma.$EventChatReadCursorPayload<ExtArgs>[]
+      eventChatPinnedMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
+      eventChatMutes: Prisma.$EventChatMutePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4469,6 +5391,13 @@ export namespace Prisma {
     deviceTokens<T extends User$deviceTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserDeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     userNotifications<T extends User$userNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$userNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notificationPreferences<T extends User$notificationPreferencesArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationPreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserNotificationPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    organizedCleanupEvents<T extends User$organizedCleanupEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$organizedCleanupEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventParticipations<T extends User$eventParticipationsArgs<ExtArgs> = {}>(args?: Subset<T, User$eventParticipationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventCheckIns<T extends User$eventCheckInsArgs<ExtArgs> = {}>(args?: Subset<T, User$eventCheckInsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventChatMessages<T extends User$eventChatMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventChatReadCursors<T extends User$eventChatReadCursorsArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatReadCursorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventChatPinnedMessages<T extends User$eventChatPinnedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatPinnedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventChatMutes<T extends User$eventChatMutesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatMutesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5314,6 +6243,174 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserNotificationPreferenceScalarFieldEnum | UserNotificationPreferenceScalarFieldEnum[]
+  }
+
+  /**
+   * User.organizedCleanupEvents
+   */
+  export type User$organizedCleanupEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CleanupEvent
+     */
+    select?: CleanupEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CleanupEvent
+     */
+    omit?: CleanupEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CleanupEventInclude<ExtArgs> | null
+    where?: CleanupEventWhereInput
+    orderBy?: CleanupEventOrderByWithRelationInput | CleanupEventOrderByWithRelationInput[]
+    cursor?: CleanupEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CleanupEventScalarFieldEnum | CleanupEventScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventParticipations
+   */
+  export type User$eventParticipationsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    where?: EventParticipantWhereInput
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    cursor?: EventParticipantWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventParticipantScalarFieldEnum | EventParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventCheckIns
+   */
+  export type User$eventCheckInsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    where?: EventCheckInWhereInput
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    cursor?: EventCheckInWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventCheckInScalarFieldEnum | EventCheckInScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventChatMessages
+   */
+  export type User$eventChatMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    cursor?: EventChatMessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventChatReadCursors
+   */
+  export type User$eventChatReadCursorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    where?: EventChatReadCursorWhereInput
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    cursor?: EventChatReadCursorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventChatPinnedMessages
+   */
+  export type User$eventChatPinnedMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    cursor?: EventChatMessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventChatMutes
+   */
+  export type User$eventChatMutesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    where?: EventChatMuteWhereInput
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    cursor?: EventChatMuteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
   }
 
   /**
@@ -20926,10 +22023,16 @@ export namespace Prisma {
 
   export type CleanupEventAvgAggregateOutputType = {
     participantCount: number | null
+    maxParticipants: number | null
+    checkedInCount: number | null
+    recurrenceIndex: number | null
   }
 
   export type CleanupEventSumAggregateOutputType = {
     participantCount: number | null
+    maxParticipants: number | null
+    checkedInCount: number | null
+    recurrenceIndex: number | null
   }
 
   export type CleanupEventMinAggregateOutputType = {
@@ -20937,11 +22040,25 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     siteId: string | null
+    title: string | null
+    description: string | null
+    category: $Enums.EcoEventCategory | null
     scheduledAt: Date | null
+    endAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus | null
+    lifecycleStatus: $Enums.EcoEventLifecycleStatus | null
     organizerId: string | null
     participantCount: number | null
+    scale: $Enums.EcoCleanupScale | null
+    difficulty: $Enums.EcoEventDifficulty | null
+    maxParticipants: number | null
+    checkInSessionId: string | null
+    checkInOpen: boolean | null
+    checkedInCount: number | null
+    recurrenceRule: string | null
+    parentEventId: string | null
+    recurrenceIndex: number | null
   }
 
   export type CleanupEventMaxAggregateOutputType = {
@@ -20949,11 +22066,25 @@ export namespace Prisma {
     createdAt: Date | null
     updatedAt: Date | null
     siteId: string | null
+    title: string | null
+    description: string | null
+    category: $Enums.EcoEventCategory | null
     scheduledAt: Date | null
+    endAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus | null
+    lifecycleStatus: $Enums.EcoEventLifecycleStatus | null
     organizerId: string | null
     participantCount: number | null
+    scale: $Enums.EcoCleanupScale | null
+    difficulty: $Enums.EcoEventDifficulty | null
+    maxParticipants: number | null
+    checkInSessionId: string | null
+    checkInOpen: boolean | null
+    checkedInCount: number | null
+    recurrenceRule: string | null
+    parentEventId: string | null
+    recurrenceIndex: number | null
   }
 
   export type CleanupEventCountAggregateOutputType = {
@@ -20961,21 +22092,43 @@ export namespace Prisma {
     createdAt: number
     updatedAt: number
     siteId: number
+    title: number
+    description: number
+    category: number
     scheduledAt: number
+    endAt: number
     completedAt: number
     status: number
+    lifecycleStatus: number
     organizerId: number
     participantCount: number
+    gear: number
+    scale: number
+    difficulty: number
+    afterImageKeys: number
+    maxParticipants: number
+    checkInSessionId: number
+    checkInOpen: number
+    checkedInCount: number
+    recurrenceRule: number
+    parentEventId: number
+    recurrenceIndex: number
     _all: number
   }
 
 
   export type CleanupEventAvgAggregateInputType = {
     participantCount?: true
+    maxParticipants?: true
+    checkedInCount?: true
+    recurrenceIndex?: true
   }
 
   export type CleanupEventSumAggregateInputType = {
     participantCount?: true
+    maxParticipants?: true
+    checkedInCount?: true
+    recurrenceIndex?: true
   }
 
   export type CleanupEventMinAggregateInputType = {
@@ -20983,11 +22136,25 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     siteId?: true
+    title?: true
+    description?: true
+    category?: true
     scheduledAt?: true
+    endAt?: true
     completedAt?: true
     status?: true
+    lifecycleStatus?: true
     organizerId?: true
     participantCount?: true
+    scale?: true
+    difficulty?: true
+    maxParticipants?: true
+    checkInSessionId?: true
+    checkInOpen?: true
+    checkedInCount?: true
+    recurrenceRule?: true
+    parentEventId?: true
+    recurrenceIndex?: true
   }
 
   export type CleanupEventMaxAggregateInputType = {
@@ -20995,11 +22162,25 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     siteId?: true
+    title?: true
+    description?: true
+    category?: true
     scheduledAt?: true
+    endAt?: true
     completedAt?: true
     status?: true
+    lifecycleStatus?: true
     organizerId?: true
     participantCount?: true
+    scale?: true
+    difficulty?: true
+    maxParticipants?: true
+    checkInSessionId?: true
+    checkInOpen?: true
+    checkedInCount?: true
+    recurrenceRule?: true
+    parentEventId?: true
+    recurrenceIndex?: true
   }
 
   export type CleanupEventCountAggregateInputType = {
@@ -21007,11 +22188,27 @@ export namespace Prisma {
     createdAt?: true
     updatedAt?: true
     siteId?: true
+    title?: true
+    description?: true
+    category?: true
     scheduledAt?: true
+    endAt?: true
     completedAt?: true
     status?: true
+    lifecycleStatus?: true
     organizerId?: true
     participantCount?: true
+    gear?: true
+    scale?: true
+    difficulty?: true
+    afterImageKeys?: true
+    maxParticipants?: true
+    checkInSessionId?: true
+    checkInOpen?: true
+    checkedInCount?: true
+    recurrenceRule?: true
+    parentEventId?: true
+    recurrenceIndex?: true
     _all?: true
   }
 
@@ -21106,11 +22303,27 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     siteId: string
+    title: string
+    description: string
+    category: $Enums.EcoEventCategory
     scheduledAt: Date
+    endAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus
+    lifecycleStatus: $Enums.EcoEventLifecycleStatus
     organizerId: string | null
     participantCount: number
+    gear: string[]
+    scale: $Enums.EcoCleanupScale | null
+    difficulty: $Enums.EcoEventDifficulty | null
+    afterImageKeys: string[]
+    maxParticipants: number | null
+    checkInSessionId: string | null
+    checkInOpen: boolean
+    checkedInCount: number
+    recurrenceRule: string | null
+    parentEventId: string | null
+    recurrenceIndex: number | null
     _count: CleanupEventCountAggregateOutputType | null
     _avg: CleanupEventAvgAggregateOutputType | null
     _sum: CleanupEventSumAggregateOutputType | null
@@ -21137,12 +22350,38 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     siteId?: boolean
+    title?: boolean
+    description?: boolean
+    category?: boolean
     scheduledAt?: boolean
+    endAt?: boolean
     completedAt?: boolean
     status?: boolean
+    lifecycleStatus?: boolean
     organizerId?: boolean
     participantCount?: boolean
+    gear?: boolean
+    scale?: boolean
+    difficulty?: boolean
+    afterImageKeys?: boolean
+    maxParticipants?: boolean
+    checkInSessionId?: boolean
+    checkInOpen?: boolean
+    checkedInCount?: boolean
+    recurrenceRule?: boolean
+    parentEventId?: boolean
+    recurrenceIndex?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    participants?: boolean | CleanupEvent$participantsArgs<ExtArgs>
+    checkIns?: boolean | CleanupEvent$checkInsArgs<ExtArgs>
+    checkInRedemptions?: boolean | CleanupEvent$checkInRedemptionsArgs<ExtArgs>
+    chatMessages?: boolean | CleanupEvent$chatMessagesArgs<ExtArgs>
+    chatReadCursors?: boolean | CleanupEvent$chatReadCursorsArgs<ExtArgs>
+    chatMutes?: boolean | CleanupEvent$chatMutesArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
+    seriesChildren?: boolean | CleanupEvent$seriesChildrenArgs<ExtArgs>
+    _count?: boolean | CleanupEventCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["cleanupEvent"]>
 
   export type CleanupEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -21150,12 +22389,30 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     siteId?: boolean
+    title?: boolean
+    description?: boolean
+    category?: boolean
     scheduledAt?: boolean
+    endAt?: boolean
     completedAt?: boolean
     status?: boolean
+    lifecycleStatus?: boolean
     organizerId?: boolean
     participantCount?: boolean
+    gear?: boolean
+    scale?: boolean
+    difficulty?: boolean
+    afterImageKeys?: boolean
+    maxParticipants?: boolean
+    checkInSessionId?: boolean
+    checkInOpen?: boolean
+    checkedInCount?: boolean
+    recurrenceRule?: boolean
+    parentEventId?: boolean
+    recurrenceIndex?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
   }, ExtArgs["result"]["cleanupEvent"]>
 
   export type CleanupEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -21163,12 +22420,30 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     siteId?: boolean
+    title?: boolean
+    description?: boolean
+    category?: boolean
     scheduledAt?: boolean
+    endAt?: boolean
     completedAt?: boolean
     status?: boolean
+    lifecycleStatus?: boolean
     organizerId?: boolean
     participantCount?: boolean
+    gear?: boolean
+    scale?: boolean
+    difficulty?: boolean
+    afterImageKeys?: boolean
+    maxParticipants?: boolean
+    checkInSessionId?: boolean
+    checkInOpen?: boolean
+    checkedInCount?: boolean
+    recurrenceRule?: boolean
+    parentEventId?: boolean
+    recurrenceIndex?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
   }, ExtArgs["result"]["cleanupEvent"]>
 
   export type CleanupEventSelectScalar = {
@@ -21176,39 +22451,116 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     siteId?: boolean
+    title?: boolean
+    description?: boolean
+    category?: boolean
     scheduledAt?: boolean
+    endAt?: boolean
     completedAt?: boolean
     status?: boolean
+    lifecycleStatus?: boolean
     organizerId?: boolean
     participantCount?: boolean
+    gear?: boolean
+    scale?: boolean
+    difficulty?: boolean
+    afterImageKeys?: boolean
+    maxParticipants?: boolean
+    checkInSessionId?: boolean
+    checkInOpen?: boolean
+    checkedInCount?: boolean
+    recurrenceRule?: boolean
+    parentEventId?: boolean
+    recurrenceIndex?: boolean
   }
 
-  export type CleanupEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "scheduledAt" | "completedAt" | "status" | "organizerId" | "participantCount", ExtArgs["result"]["cleanupEvent"]>
+  export type CleanupEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "title" | "description" | "category" | "scheduledAt" | "endAt" | "completedAt" | "status" | "lifecycleStatus" | "organizerId" | "participantCount" | "gear" | "scale" | "difficulty" | "afterImageKeys" | "maxParticipants" | "checkInSessionId" | "checkInOpen" | "checkedInCount" | "recurrenceRule" | "parentEventId" | "recurrenceIndex", ExtArgs["result"]["cleanupEvent"]>
   export type CleanupEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    participants?: boolean | CleanupEvent$participantsArgs<ExtArgs>
+    checkIns?: boolean | CleanupEvent$checkInsArgs<ExtArgs>
+    checkInRedemptions?: boolean | CleanupEvent$checkInRedemptionsArgs<ExtArgs>
+    chatMessages?: boolean | CleanupEvent$chatMessagesArgs<ExtArgs>
+    chatReadCursors?: boolean | CleanupEvent$chatReadCursorsArgs<ExtArgs>
+    chatMutes?: boolean | CleanupEvent$chatMutesArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
+    seriesChildren?: boolean | CleanupEvent$seriesChildrenArgs<ExtArgs>
+    _count?: boolean | CleanupEventCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type CleanupEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
   }
   export type CleanupEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
+    organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
+    parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
   }
 
   export type $CleanupEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "CleanupEvent"
     objects: {
       site: Prisma.$SitePayload<ExtArgs>
+      organizer: Prisma.$UserPayload<ExtArgs> | null
+      participants: Prisma.$EventParticipantPayload<ExtArgs>[]
+      checkIns: Prisma.$EventCheckInPayload<ExtArgs>[]
+      checkInRedemptions: Prisma.$EventCheckInRedemptionPayload<ExtArgs>[]
+      chatMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
+      chatReadCursors: Prisma.$EventChatReadCursorPayload<ExtArgs>[]
+      chatMutes: Prisma.$EventChatMutePayload<ExtArgs>[]
+      parentEvent: Prisma.$CleanupEventPayload<ExtArgs> | null
+      seriesChildren: Prisma.$CleanupEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       createdAt: Date
       updatedAt: Date
       siteId: string
+      title: string
+      description: string
+      category: $Enums.EcoEventCategory
       scheduledAt: Date
+      endAt: Date | null
       completedAt: Date | null
+      /**
+       * Moderation (admin approval for user-created events).
+       */
       status: $Enums.CleanupEventStatus
+      /**
+       * Lifecycle shown in the mobile app when event is APPROVED.
+       */
+      lifecycleStatus: $Enums.EcoEventLifecycleStatus
       organizerId: string | null
       participantCount: number
+      gear: string[]
+      scale: $Enums.EcoCleanupScale | null
+      difficulty: $Enums.EcoEventDifficulty | null
+      afterImageKeys: string[]
+      maxParticipants: number | null
+      /**
+       * Rotates when organizer opens check-in or taps rotate; invalidates old QR tokens.
+       */
+      checkInSessionId: string | null
+      checkInOpen: boolean
+      /**
+       * Denormalized count of [EventCheckIn] rows for this event.
+       */
+      checkedInCount: number
+      /**
+       * RFC 5545 RRULE string (e.g. FREQ=WEEKLY;COUNT=8;BYDAY=SA).
+       * Null for non-recurring events.
+       */
+      recurrenceRule: string | null
+      /**
+       * References the first event in a recurring series. Null for standalone/parent events.
+       */
+      parentEventId: string | null
+      /**
+       * 0-based index within its series (0 = original/parent). Null for non-recurring.
+       */
+      recurrenceIndex: number | null
     }, ExtArgs["result"]["cleanupEvent"]>
     composites: {}
   }
@@ -21604,6 +22956,15 @@ export namespace Prisma {
   export interface Prisma__CleanupEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    organizer<T extends CleanupEvent$organizerArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$organizerArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    participants<T extends CleanupEvent$participantsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$participantsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkIns<T extends CleanupEvent$checkInsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$checkInsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkInRedemptions<T extends CleanupEvent$checkInRedemptionsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$checkInRedemptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    chatMessages<T extends CleanupEvent$chatMessagesArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    chatReadCursors<T extends CleanupEvent$chatReadCursorsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatReadCursorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    chatMutes<T extends CleanupEvent$chatMutesArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatMutesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    parentEvent<T extends CleanupEvent$parentEventArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$parentEventArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    seriesChildren<T extends CleanupEvent$seriesChildrenArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$seriesChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -21637,11 +22998,27 @@ export namespace Prisma {
     readonly createdAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly updatedAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly siteId: FieldRef<"CleanupEvent", 'String'>
+    readonly title: FieldRef<"CleanupEvent", 'String'>
+    readonly description: FieldRef<"CleanupEvent", 'String'>
+    readonly category: FieldRef<"CleanupEvent", 'EcoEventCategory'>
     readonly scheduledAt: FieldRef<"CleanupEvent", 'DateTime'>
+    readonly endAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly completedAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly status: FieldRef<"CleanupEvent", 'CleanupEventStatus'>
+    readonly lifecycleStatus: FieldRef<"CleanupEvent", 'EcoEventLifecycleStatus'>
     readonly organizerId: FieldRef<"CleanupEvent", 'String'>
     readonly participantCount: FieldRef<"CleanupEvent", 'Int'>
+    readonly gear: FieldRef<"CleanupEvent", 'String[]'>
+    readonly scale: FieldRef<"CleanupEvent", 'EcoCleanupScale'>
+    readonly difficulty: FieldRef<"CleanupEvent", 'EcoEventDifficulty'>
+    readonly afterImageKeys: FieldRef<"CleanupEvent", 'String[]'>
+    readonly maxParticipants: FieldRef<"CleanupEvent", 'Int'>
+    readonly checkInSessionId: FieldRef<"CleanupEvent", 'String'>
+    readonly checkInOpen: FieldRef<"CleanupEvent", 'Boolean'>
+    readonly checkedInCount: FieldRef<"CleanupEvent", 'Int'>
+    readonly recurrenceRule: FieldRef<"CleanupEvent", 'String'>
+    readonly parentEventId: FieldRef<"CleanupEvent", 'String'>
+    readonly recurrenceIndex: FieldRef<"CleanupEvent", 'Int'>
   }
     
 
@@ -22043,6 +23420,212 @@ export namespace Prisma {
   }
 
   /**
+   * CleanupEvent.organizer
+   */
+  export type CleanupEvent$organizerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * CleanupEvent.participants
+   */
+  export type CleanupEvent$participantsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    where?: EventParticipantWhereInput
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    cursor?: EventParticipantWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventParticipantScalarFieldEnum | EventParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.checkIns
+   */
+  export type CleanupEvent$checkInsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    where?: EventCheckInWhereInput
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    cursor?: EventCheckInWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventCheckInScalarFieldEnum | EventCheckInScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.checkInRedemptions
+   */
+  export type CleanupEvent$checkInRedemptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    where?: EventCheckInRedemptionWhereInput
+    orderBy?: EventCheckInRedemptionOrderByWithRelationInput | EventCheckInRedemptionOrderByWithRelationInput[]
+    cursor?: EventCheckInRedemptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventCheckInRedemptionScalarFieldEnum | EventCheckInRedemptionScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.chatMessages
+   */
+  export type CleanupEvent$chatMessagesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    cursor?: EventChatMessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.chatReadCursors
+   */
+  export type CleanupEvent$chatReadCursorsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    where?: EventChatReadCursorWhereInput
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    cursor?: EventChatReadCursorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.chatMutes
+   */
+  export type CleanupEvent$chatMutesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    where?: EventChatMuteWhereInput
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    cursor?: EventChatMuteWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.parentEvent
+   */
+  export type CleanupEvent$parentEventArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CleanupEvent
+     */
+    select?: CleanupEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CleanupEvent
+     */
+    omit?: CleanupEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CleanupEventInclude<ExtArgs> | null
+    where?: CleanupEventWhereInput
+  }
+
+  /**
+   * CleanupEvent.seriesChildren
+   */
+  export type CleanupEvent$seriesChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CleanupEvent
+     */
+    select?: CleanupEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CleanupEvent
+     */
+    omit?: CleanupEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CleanupEventInclude<ExtArgs> | null
+    where?: CleanupEventWhereInput
+    orderBy?: CleanupEventOrderByWithRelationInput | CleanupEventOrderByWithRelationInput[]
+    cursor?: CleanupEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CleanupEventScalarFieldEnum | CleanupEventScalarFieldEnum[]
+  }
+
+  /**
    * CleanupEvent without action
    */
   export type CleanupEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -22058,6 +23641,7977 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: CleanupEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventParticipant
+   */
+
+  export type AggregateEventParticipant = {
+    _count: EventParticipantCountAggregateOutputType | null
+    _min: EventParticipantMinAggregateOutputType | null
+    _max: EventParticipantMaxAggregateOutputType | null
+  }
+
+  export type EventParticipantMinAggregateOutputType = {
+    id: string | null
+    joinedAt: Date | null
+    eventId: string | null
+    userId: string | null
+    reminderEnabled: boolean | null
+    reminderAt: Date | null
+  }
+
+  export type EventParticipantMaxAggregateOutputType = {
+    id: string | null
+    joinedAt: Date | null
+    eventId: string | null
+    userId: string | null
+    reminderEnabled: boolean | null
+    reminderAt: Date | null
+  }
+
+  export type EventParticipantCountAggregateOutputType = {
+    id: number
+    joinedAt: number
+    eventId: number
+    userId: number
+    reminderEnabled: number
+    reminderAt: number
+    _all: number
+  }
+
+
+  export type EventParticipantMinAggregateInputType = {
+    id?: true
+    joinedAt?: true
+    eventId?: true
+    userId?: true
+    reminderEnabled?: true
+    reminderAt?: true
+  }
+
+  export type EventParticipantMaxAggregateInputType = {
+    id?: true
+    joinedAt?: true
+    eventId?: true
+    userId?: true
+    reminderEnabled?: true
+    reminderAt?: true
+  }
+
+  export type EventParticipantCountAggregateInputType = {
+    id?: true
+    joinedAt?: true
+    eventId?: true
+    userId?: true
+    reminderEnabled?: true
+    reminderAt?: true
+    _all?: true
+  }
+
+  export type EventParticipantAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventParticipant to aggregate.
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventParticipants to fetch.
+     */
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventParticipants
+    **/
+    _count?: true | EventParticipantCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventParticipantMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventParticipantMaxAggregateInputType
+  }
+
+  export type GetEventParticipantAggregateType<T extends EventParticipantAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventParticipant]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventParticipant[P]>
+      : GetScalarType<T[P], AggregateEventParticipant[P]>
+  }
+
+
+
+
+  export type EventParticipantGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventParticipantWhereInput
+    orderBy?: EventParticipantOrderByWithAggregationInput | EventParticipantOrderByWithAggregationInput[]
+    by: EventParticipantScalarFieldEnum[] | EventParticipantScalarFieldEnum
+    having?: EventParticipantScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventParticipantCountAggregateInputType | true
+    _min?: EventParticipantMinAggregateInputType
+    _max?: EventParticipantMaxAggregateInputType
+  }
+
+  export type EventParticipantGroupByOutputType = {
+    id: string
+    joinedAt: Date
+    eventId: string
+    userId: string
+    reminderEnabled: boolean
+    reminderAt: Date | null
+    _count: EventParticipantCountAggregateOutputType | null
+    _min: EventParticipantMinAggregateOutputType | null
+    _max: EventParticipantMaxAggregateOutputType | null
+  }
+
+  type GetEventParticipantGroupByPayload<T extends EventParticipantGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventParticipantGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventParticipantGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventParticipantGroupByOutputType[P]>
+            : GetScalarType<T[P], EventParticipantGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventParticipantSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    joinedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    reminderEnabled?: boolean
+    reminderAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventParticipant"]>
+
+  export type EventParticipantSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    joinedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    reminderEnabled?: boolean
+    reminderAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventParticipant"]>
+
+  export type EventParticipantSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    joinedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    reminderEnabled?: boolean
+    reminderAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventParticipant"]>
+
+  export type EventParticipantSelectScalar = {
+    id?: boolean
+    joinedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    reminderEnabled?: boolean
+    reminderAt?: boolean
+  }
+
+  export type EventParticipantOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "joinedAt" | "eventId" | "userId" | "reminderEnabled" | "reminderAt", ExtArgs["result"]["eventParticipant"]>
+  export type EventParticipantInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventParticipantIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventParticipantIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $EventParticipantPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventParticipant"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      joinedAt: Date
+      eventId: string
+      userId: string
+      reminderEnabled: boolean
+      reminderAt: Date | null
+    }, ExtArgs["result"]["eventParticipant"]>
+    composites: {}
+  }
+
+  type EventParticipantGetPayload<S extends boolean | null | undefined | EventParticipantDefaultArgs> = $Result.GetResult<Prisma.$EventParticipantPayload, S>
+
+  type EventParticipantCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventParticipantFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventParticipantCountAggregateInputType | true
+    }
+
+  export interface EventParticipantDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventParticipant'], meta: { name: 'EventParticipant' } }
+    /**
+     * Find zero or one EventParticipant that matches the filter.
+     * @param {EventParticipantFindUniqueArgs} args - Arguments to find a EventParticipant
+     * @example
+     * // Get one EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventParticipantFindUniqueArgs>(args: SelectSubset<T, EventParticipantFindUniqueArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventParticipant that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventParticipantFindUniqueOrThrowArgs} args - Arguments to find a EventParticipant
+     * @example
+     * // Get one EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventParticipantFindUniqueOrThrowArgs>(args: SelectSubset<T, EventParticipantFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventParticipant that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantFindFirstArgs} args - Arguments to find a EventParticipant
+     * @example
+     * // Get one EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventParticipantFindFirstArgs>(args?: SelectSubset<T, EventParticipantFindFirstArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventParticipant that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantFindFirstOrThrowArgs} args - Arguments to find a EventParticipant
+     * @example
+     * // Get one EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventParticipantFindFirstOrThrowArgs>(args?: SelectSubset<T, EventParticipantFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventParticipants that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventParticipants
+     * const eventParticipants = await prisma.eventParticipant.findMany()
+     * 
+     * // Get first 10 EventParticipants
+     * const eventParticipants = await prisma.eventParticipant.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventParticipantWithIdOnly = await prisma.eventParticipant.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventParticipantFindManyArgs>(args?: SelectSubset<T, EventParticipantFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventParticipant.
+     * @param {EventParticipantCreateArgs} args - Arguments to create a EventParticipant.
+     * @example
+     * // Create one EventParticipant
+     * const EventParticipant = await prisma.eventParticipant.create({
+     *   data: {
+     *     // ... data to create a EventParticipant
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventParticipantCreateArgs>(args: SelectSubset<T, EventParticipantCreateArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventParticipants.
+     * @param {EventParticipantCreateManyArgs} args - Arguments to create many EventParticipants.
+     * @example
+     * // Create many EventParticipants
+     * const eventParticipant = await prisma.eventParticipant.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventParticipantCreateManyArgs>(args?: SelectSubset<T, EventParticipantCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventParticipants and returns the data saved in the database.
+     * @param {EventParticipantCreateManyAndReturnArgs} args - Arguments to create many EventParticipants.
+     * @example
+     * // Create many EventParticipants
+     * const eventParticipant = await prisma.eventParticipant.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventParticipants and only return the `id`
+     * const eventParticipantWithIdOnly = await prisma.eventParticipant.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventParticipantCreateManyAndReturnArgs>(args?: SelectSubset<T, EventParticipantCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventParticipant.
+     * @param {EventParticipantDeleteArgs} args - Arguments to delete one EventParticipant.
+     * @example
+     * // Delete one EventParticipant
+     * const EventParticipant = await prisma.eventParticipant.delete({
+     *   where: {
+     *     // ... filter to delete one EventParticipant
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventParticipantDeleteArgs>(args: SelectSubset<T, EventParticipantDeleteArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventParticipant.
+     * @param {EventParticipantUpdateArgs} args - Arguments to update one EventParticipant.
+     * @example
+     * // Update one EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventParticipantUpdateArgs>(args: SelectSubset<T, EventParticipantUpdateArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventParticipants.
+     * @param {EventParticipantDeleteManyArgs} args - Arguments to filter EventParticipants to delete.
+     * @example
+     * // Delete a few EventParticipants
+     * const { count } = await prisma.eventParticipant.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventParticipantDeleteManyArgs>(args?: SelectSubset<T, EventParticipantDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventParticipants.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventParticipants
+     * const eventParticipant = await prisma.eventParticipant.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventParticipantUpdateManyArgs>(args: SelectSubset<T, EventParticipantUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventParticipants and returns the data updated in the database.
+     * @param {EventParticipantUpdateManyAndReturnArgs} args - Arguments to update many EventParticipants.
+     * @example
+     * // Update many EventParticipants
+     * const eventParticipant = await prisma.eventParticipant.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventParticipants and only return the `id`
+     * const eventParticipantWithIdOnly = await prisma.eventParticipant.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventParticipantUpdateManyAndReturnArgs>(args: SelectSubset<T, EventParticipantUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventParticipant.
+     * @param {EventParticipantUpsertArgs} args - Arguments to update or create a EventParticipant.
+     * @example
+     * // Update or create a EventParticipant
+     * const eventParticipant = await prisma.eventParticipant.upsert({
+     *   create: {
+     *     // ... data to create a EventParticipant
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventParticipant we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventParticipantUpsertArgs>(args: SelectSubset<T, EventParticipantUpsertArgs<ExtArgs>>): Prisma__EventParticipantClient<$Result.GetResult<Prisma.$EventParticipantPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventParticipants.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantCountArgs} args - Arguments to filter EventParticipants to count.
+     * @example
+     * // Count the number of EventParticipants
+     * const count = await prisma.eventParticipant.count({
+     *   where: {
+     *     // ... the filter for the EventParticipants we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventParticipantCountArgs>(
+      args?: Subset<T, EventParticipantCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventParticipantCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventParticipant.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventParticipantAggregateArgs>(args: Subset<T, EventParticipantAggregateArgs>): Prisma.PrismaPromise<GetEventParticipantAggregateType<T>>
+
+    /**
+     * Group by EventParticipant.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventParticipantGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventParticipantGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventParticipantGroupByArgs['orderBy'] }
+        : { orderBy?: EventParticipantGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventParticipantGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventParticipantGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventParticipant model
+   */
+  readonly fields: EventParticipantFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventParticipant.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventParticipantClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventParticipant model
+   */
+  interface EventParticipantFieldRefs {
+    readonly id: FieldRef<"EventParticipant", 'String'>
+    readonly joinedAt: FieldRef<"EventParticipant", 'DateTime'>
+    readonly eventId: FieldRef<"EventParticipant", 'String'>
+    readonly userId: FieldRef<"EventParticipant", 'String'>
+    readonly reminderEnabled: FieldRef<"EventParticipant", 'Boolean'>
+    readonly reminderAt: FieldRef<"EventParticipant", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventParticipant findUnique
+   */
+  export type EventParticipantFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which EventParticipant to fetch.
+     */
+    where: EventParticipantWhereUniqueInput
+  }
+
+  /**
+   * EventParticipant findUniqueOrThrow
+   */
+  export type EventParticipantFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which EventParticipant to fetch.
+     */
+    where: EventParticipantWhereUniqueInput
+  }
+
+  /**
+   * EventParticipant findFirst
+   */
+  export type EventParticipantFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which EventParticipant to fetch.
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventParticipants to fetch.
+     */
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventParticipants.
+     */
+    cursor?: EventParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventParticipants.
+     */
+    distinct?: EventParticipantScalarFieldEnum | EventParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * EventParticipant findFirstOrThrow
+   */
+  export type EventParticipantFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which EventParticipant to fetch.
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventParticipants to fetch.
+     */
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventParticipants.
+     */
+    cursor?: EventParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventParticipants.
+     */
+    distinct?: EventParticipantScalarFieldEnum | EventParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * EventParticipant findMany
+   */
+  export type EventParticipantFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter, which EventParticipants to fetch.
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventParticipants to fetch.
+     */
+    orderBy?: EventParticipantOrderByWithRelationInput | EventParticipantOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventParticipants.
+     */
+    cursor?: EventParticipantWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventParticipants from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventParticipants.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventParticipants.
+     */
+    distinct?: EventParticipantScalarFieldEnum | EventParticipantScalarFieldEnum[]
+  }
+
+  /**
+   * EventParticipant create
+   */
+  export type EventParticipantCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventParticipant.
+     */
+    data: XOR<EventParticipantCreateInput, EventParticipantUncheckedCreateInput>
+  }
+
+  /**
+   * EventParticipant createMany
+   */
+  export type EventParticipantCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventParticipants.
+     */
+    data: EventParticipantCreateManyInput | EventParticipantCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventParticipant createManyAndReturn
+   */
+  export type EventParticipantCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventParticipants.
+     */
+    data: EventParticipantCreateManyInput | EventParticipantCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventParticipant update
+   */
+  export type EventParticipantUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventParticipant.
+     */
+    data: XOR<EventParticipantUpdateInput, EventParticipantUncheckedUpdateInput>
+    /**
+     * Choose, which EventParticipant to update.
+     */
+    where: EventParticipantWhereUniqueInput
+  }
+
+  /**
+   * EventParticipant updateMany
+   */
+  export type EventParticipantUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventParticipants.
+     */
+    data: XOR<EventParticipantUpdateManyMutationInput, EventParticipantUncheckedUpdateManyInput>
+    /**
+     * Filter which EventParticipants to update
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * Limit how many EventParticipants to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventParticipant updateManyAndReturn
+   */
+  export type EventParticipantUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * The data used to update EventParticipants.
+     */
+    data: XOR<EventParticipantUpdateManyMutationInput, EventParticipantUncheckedUpdateManyInput>
+    /**
+     * Filter which EventParticipants to update
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * Limit how many EventParticipants to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventParticipant upsert
+   */
+  export type EventParticipantUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventParticipant to update in case it exists.
+     */
+    where: EventParticipantWhereUniqueInput
+    /**
+     * In case the EventParticipant found by the `where` argument doesn't exist, create a new EventParticipant with this data.
+     */
+    create: XOR<EventParticipantCreateInput, EventParticipantUncheckedCreateInput>
+    /**
+     * In case the EventParticipant was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventParticipantUpdateInput, EventParticipantUncheckedUpdateInput>
+  }
+
+  /**
+   * EventParticipant delete
+   */
+  export type EventParticipantDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+    /**
+     * Filter which EventParticipant to delete.
+     */
+    where: EventParticipantWhereUniqueInput
+  }
+
+  /**
+   * EventParticipant deleteMany
+   */
+  export type EventParticipantDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventParticipants to delete
+     */
+    where?: EventParticipantWhereInput
+    /**
+     * Limit how many EventParticipants to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventParticipant without action
+   */
+  export type EventParticipantDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventParticipant
+     */
+    select?: EventParticipantSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventParticipant
+     */
+    omit?: EventParticipantOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventParticipantInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventChatMessage
+   */
+
+  export type AggregateEventChatMessage = {
+    _count: EventChatMessageCountAggregateOutputType | null
+    _avg: EventChatMessageAvgAggregateOutputType | null
+    _sum: EventChatMessageSumAggregateOutputType | null
+    _min: EventChatMessageMinAggregateOutputType | null
+    _max: EventChatMessageMaxAggregateOutputType | null
+  }
+
+  export type EventChatMessageAvgAggregateOutputType = {
+    locationLat: number | null
+    locationLng: number | null
+  }
+
+  export type EventChatMessageSumAggregateOutputType = {
+    locationLat: number | null
+    locationLng: number | null
+  }
+
+  export type EventChatMessageMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    authorId: string | null
+    body: string | null
+    replyToId: string | null
+    deletedAt: Date | null
+    editedAt: Date | null
+    isPinned: boolean | null
+    pinnedAt: Date | null
+    pinnedById: string | null
+    messageType: $Enums.EventChatMessageType | null
+    locationLat: number | null
+    locationLng: number | null
+    locationLabel: string | null
+    bodyEncrypted: boolean | null
+    clientMessageId: string | null
+  }
+
+  export type EventChatMessageMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    authorId: string | null
+    body: string | null
+    replyToId: string | null
+    deletedAt: Date | null
+    editedAt: Date | null
+    isPinned: boolean | null
+    pinnedAt: Date | null
+    pinnedById: string | null
+    messageType: $Enums.EventChatMessageType | null
+    locationLat: number | null
+    locationLng: number | null
+    locationLabel: string | null
+    bodyEncrypted: boolean | null
+    clientMessageId: string | null
+  }
+
+  export type EventChatMessageCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    eventId: number
+    authorId: number
+    body: number
+    replyToId: number
+    deletedAt: number
+    editedAt: number
+    isPinned: number
+    pinnedAt: number
+    pinnedById: number
+    messageType: number
+    systemPayload: number
+    locationLat: number
+    locationLng: number
+    locationLabel: number
+    bodyEncrypted: number
+    clientMessageId: number
+    _all: number
+  }
+
+
+  export type EventChatMessageAvgAggregateInputType = {
+    locationLat?: true
+    locationLng?: true
+  }
+
+  export type EventChatMessageSumAggregateInputType = {
+    locationLat?: true
+    locationLng?: true
+  }
+
+  export type EventChatMessageMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    authorId?: true
+    body?: true
+    replyToId?: true
+    deletedAt?: true
+    editedAt?: true
+    isPinned?: true
+    pinnedAt?: true
+    pinnedById?: true
+    messageType?: true
+    locationLat?: true
+    locationLng?: true
+    locationLabel?: true
+    bodyEncrypted?: true
+    clientMessageId?: true
+  }
+
+  export type EventChatMessageMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    authorId?: true
+    body?: true
+    replyToId?: true
+    deletedAt?: true
+    editedAt?: true
+    isPinned?: true
+    pinnedAt?: true
+    pinnedById?: true
+    messageType?: true
+    locationLat?: true
+    locationLng?: true
+    locationLabel?: true
+    bodyEncrypted?: true
+    clientMessageId?: true
+  }
+
+  export type EventChatMessageCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    authorId?: true
+    body?: true
+    replyToId?: true
+    deletedAt?: true
+    editedAt?: true
+    isPinned?: true
+    pinnedAt?: true
+    pinnedById?: true
+    messageType?: true
+    systemPayload?: true
+    locationLat?: true
+    locationLng?: true
+    locationLabel?: true
+    bodyEncrypted?: true
+    clientMessageId?: true
+    _all?: true
+  }
+
+  export type EventChatMessageAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatMessage to aggregate.
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMessages to fetch.
+     */
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventChatMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventChatMessages
+    **/
+    _count?: true | EventChatMessageCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EventChatMessageAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EventChatMessageSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventChatMessageMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventChatMessageMaxAggregateInputType
+  }
+
+  export type GetEventChatMessageAggregateType<T extends EventChatMessageAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventChatMessage]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventChatMessage[P]>
+      : GetScalarType<T[P], AggregateEventChatMessage[P]>
+  }
+
+
+
+
+  export type EventChatMessageGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMessageWhereInput
+    orderBy?: EventChatMessageOrderByWithAggregationInput | EventChatMessageOrderByWithAggregationInput[]
+    by: EventChatMessageScalarFieldEnum[] | EventChatMessageScalarFieldEnum
+    having?: EventChatMessageScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventChatMessageCountAggregateInputType | true
+    _avg?: EventChatMessageAvgAggregateInputType
+    _sum?: EventChatMessageSumAggregateInputType
+    _min?: EventChatMessageMinAggregateInputType
+    _max?: EventChatMessageMaxAggregateInputType
+  }
+
+  export type EventChatMessageGroupByOutputType = {
+    id: string
+    createdAt: Date
+    eventId: string
+    authorId: string
+    body: string
+    replyToId: string | null
+    deletedAt: Date | null
+    editedAt: Date | null
+    isPinned: boolean
+    pinnedAt: Date | null
+    pinnedById: string | null
+    messageType: $Enums.EventChatMessageType
+    systemPayload: JsonValue | null
+    locationLat: number | null
+    locationLng: number | null
+    locationLabel: string | null
+    bodyEncrypted: boolean
+    clientMessageId: string | null
+    _count: EventChatMessageCountAggregateOutputType | null
+    _avg: EventChatMessageAvgAggregateOutputType | null
+    _sum: EventChatMessageSumAggregateOutputType | null
+    _min: EventChatMessageMinAggregateOutputType | null
+    _max: EventChatMessageMaxAggregateOutputType | null
+  }
+
+  type GetEventChatMessageGroupByPayload<T extends EventChatMessageGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventChatMessageGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventChatMessageGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventChatMessageGroupByOutputType[P]>
+            : GetScalarType<T[P], EventChatMessageGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventChatMessageSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    authorId?: boolean
+    body?: boolean
+    replyToId?: boolean
+    deletedAt?: boolean
+    editedAt?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
+    pinnedById?: boolean
+    messageType?: boolean
+    systemPayload?: boolean
+    locationLat?: boolean
+    locationLng?: boolean
+    locationLabel?: boolean
+    bodyEncrypted?: boolean
+    clientMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    replies?: boolean | EventChatMessage$repliesArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+    attachments?: boolean | EventChatMessage$attachmentsArgs<ExtArgs>
+    _count?: boolean | EventChatMessageCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMessage"]>
+
+  export type EventChatMessageSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    authorId?: boolean
+    body?: boolean
+    replyToId?: boolean
+    deletedAt?: boolean
+    editedAt?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
+    pinnedById?: boolean
+    messageType?: boolean
+    systemPayload?: boolean
+    locationLat?: boolean
+    locationLng?: boolean
+    locationLabel?: boolean
+    bodyEncrypted?: boolean
+    clientMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMessage"]>
+
+  export type EventChatMessageSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    authorId?: boolean
+    body?: boolean
+    replyToId?: boolean
+    deletedAt?: boolean
+    editedAt?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
+    pinnedById?: boolean
+    messageType?: boolean
+    systemPayload?: boolean
+    locationLat?: boolean
+    locationLng?: boolean
+    locationLabel?: boolean
+    bodyEncrypted?: boolean
+    clientMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMessage"]>
+
+  export type EventChatMessageSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    authorId?: boolean
+    body?: boolean
+    replyToId?: boolean
+    deletedAt?: boolean
+    editedAt?: boolean
+    isPinned?: boolean
+    pinnedAt?: boolean
+    pinnedById?: boolean
+    messageType?: boolean
+    systemPayload?: boolean
+    locationLat?: boolean
+    locationLng?: boolean
+    locationLabel?: boolean
+    bodyEncrypted?: boolean
+    clientMessageId?: boolean
+  }
+
+  export type EventChatMessageOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "eventId" | "authorId" | "body" | "replyToId" | "deletedAt" | "editedAt" | "isPinned" | "pinnedAt" | "pinnedById" | "messageType" | "systemPayload" | "locationLat" | "locationLng" | "locationLabel" | "bodyEncrypted" | "clientMessageId", ExtArgs["result"]["eventChatMessage"]>
+  export type EventChatMessageInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    replies?: boolean | EventChatMessage$repliesArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+    attachments?: boolean | EventChatMessage$attachmentsArgs<ExtArgs>
+    _count?: boolean | EventChatMessageCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type EventChatMessageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+  }
+  export type EventChatMessageIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    author?: boolean | UserDefaultArgs<ExtArgs>
+    replyTo?: boolean | EventChatMessage$replyToArgs<ExtArgs>
+    pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
+  }
+
+  export type $EventChatMessagePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventChatMessage"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      author: Prisma.$UserPayload<ExtArgs>
+      replyTo: Prisma.$EventChatMessagePayload<ExtArgs> | null
+      replies: Prisma.$EventChatMessagePayload<ExtArgs>[]
+      pinnedBy: Prisma.$UserPayload<ExtArgs> | null
+      attachments: Prisma.$EventChatAttachmentPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      eventId: string
+      authorId: string
+      body: string
+      replyToId: string | null
+      deletedAt: Date | null
+      editedAt: Date | null
+      isPinned: boolean
+      pinnedAt: Date | null
+      pinnedById: string | null
+      messageType: $Enums.EventChatMessageType
+      systemPayload: Prisma.JsonValue | null
+      locationLat: number | null
+      locationLng: number | null
+      locationLabel: string | null
+      bodyEncrypted: boolean
+      /**
+       * Client-generated UUID for idempotent sends (POST retry / offline flush).
+       */
+      clientMessageId: string | null
+    }, ExtArgs["result"]["eventChatMessage"]>
+    composites: {}
+  }
+
+  type EventChatMessageGetPayload<S extends boolean | null | undefined | EventChatMessageDefaultArgs> = $Result.GetResult<Prisma.$EventChatMessagePayload, S>
+
+  type EventChatMessageCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventChatMessageFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventChatMessageCountAggregateInputType | true
+    }
+
+  export interface EventChatMessageDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventChatMessage'], meta: { name: 'EventChatMessage' } }
+    /**
+     * Find zero or one EventChatMessage that matches the filter.
+     * @param {EventChatMessageFindUniqueArgs} args - Arguments to find a EventChatMessage
+     * @example
+     * // Get one EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventChatMessageFindUniqueArgs>(args: SelectSubset<T, EventChatMessageFindUniqueArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventChatMessage that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventChatMessageFindUniqueOrThrowArgs} args - Arguments to find a EventChatMessage
+     * @example
+     * // Get one EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventChatMessageFindUniqueOrThrowArgs>(args: SelectSubset<T, EventChatMessageFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatMessage that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageFindFirstArgs} args - Arguments to find a EventChatMessage
+     * @example
+     * // Get one EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventChatMessageFindFirstArgs>(args?: SelectSubset<T, EventChatMessageFindFirstArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatMessage that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageFindFirstOrThrowArgs} args - Arguments to find a EventChatMessage
+     * @example
+     * // Get one EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventChatMessageFindFirstOrThrowArgs>(args?: SelectSubset<T, EventChatMessageFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventChatMessages that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventChatMessages
+     * const eventChatMessages = await prisma.eventChatMessage.findMany()
+     * 
+     * // Get first 10 EventChatMessages
+     * const eventChatMessages = await prisma.eventChatMessage.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventChatMessageWithIdOnly = await prisma.eventChatMessage.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventChatMessageFindManyArgs>(args?: SelectSubset<T, EventChatMessageFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventChatMessage.
+     * @param {EventChatMessageCreateArgs} args - Arguments to create a EventChatMessage.
+     * @example
+     * // Create one EventChatMessage
+     * const EventChatMessage = await prisma.eventChatMessage.create({
+     *   data: {
+     *     // ... data to create a EventChatMessage
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventChatMessageCreateArgs>(args: SelectSubset<T, EventChatMessageCreateArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventChatMessages.
+     * @param {EventChatMessageCreateManyArgs} args - Arguments to create many EventChatMessages.
+     * @example
+     * // Create many EventChatMessages
+     * const eventChatMessage = await prisma.eventChatMessage.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventChatMessageCreateManyArgs>(args?: SelectSubset<T, EventChatMessageCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventChatMessages and returns the data saved in the database.
+     * @param {EventChatMessageCreateManyAndReturnArgs} args - Arguments to create many EventChatMessages.
+     * @example
+     * // Create many EventChatMessages
+     * const eventChatMessage = await prisma.eventChatMessage.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventChatMessages and only return the `id`
+     * const eventChatMessageWithIdOnly = await prisma.eventChatMessage.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventChatMessageCreateManyAndReturnArgs>(args?: SelectSubset<T, EventChatMessageCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventChatMessage.
+     * @param {EventChatMessageDeleteArgs} args - Arguments to delete one EventChatMessage.
+     * @example
+     * // Delete one EventChatMessage
+     * const EventChatMessage = await prisma.eventChatMessage.delete({
+     *   where: {
+     *     // ... filter to delete one EventChatMessage
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventChatMessageDeleteArgs>(args: SelectSubset<T, EventChatMessageDeleteArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventChatMessage.
+     * @param {EventChatMessageUpdateArgs} args - Arguments to update one EventChatMessage.
+     * @example
+     * // Update one EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventChatMessageUpdateArgs>(args: SelectSubset<T, EventChatMessageUpdateArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventChatMessages.
+     * @param {EventChatMessageDeleteManyArgs} args - Arguments to filter EventChatMessages to delete.
+     * @example
+     * // Delete a few EventChatMessages
+     * const { count } = await prisma.eventChatMessage.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventChatMessageDeleteManyArgs>(args?: SelectSubset<T, EventChatMessageDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventChatMessages
+     * const eventChatMessage = await prisma.eventChatMessage.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventChatMessageUpdateManyArgs>(args: SelectSubset<T, EventChatMessageUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatMessages and returns the data updated in the database.
+     * @param {EventChatMessageUpdateManyAndReturnArgs} args - Arguments to update many EventChatMessages.
+     * @example
+     * // Update many EventChatMessages
+     * const eventChatMessage = await prisma.eventChatMessage.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventChatMessages and only return the `id`
+     * const eventChatMessageWithIdOnly = await prisma.eventChatMessage.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventChatMessageUpdateManyAndReturnArgs>(args: SelectSubset<T, EventChatMessageUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventChatMessage.
+     * @param {EventChatMessageUpsertArgs} args - Arguments to update or create a EventChatMessage.
+     * @example
+     * // Update or create a EventChatMessage
+     * const eventChatMessage = await prisma.eventChatMessage.upsert({
+     *   create: {
+     *     // ... data to create a EventChatMessage
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventChatMessage we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventChatMessageUpsertArgs>(args: SelectSubset<T, EventChatMessageUpsertArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventChatMessages.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageCountArgs} args - Arguments to filter EventChatMessages to count.
+     * @example
+     * // Count the number of EventChatMessages
+     * const count = await prisma.eventChatMessage.count({
+     *   where: {
+     *     // ... the filter for the EventChatMessages we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventChatMessageCountArgs>(
+      args?: Subset<T, EventChatMessageCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventChatMessageCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventChatMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventChatMessageAggregateArgs>(args: Subset<T, EventChatMessageAggregateArgs>): Prisma.PrismaPromise<GetEventChatMessageAggregateType<T>>
+
+    /**
+     * Group by EventChatMessage.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMessageGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventChatMessageGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventChatMessageGroupByArgs['orderBy'] }
+        : { orderBy?: EventChatMessageGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventChatMessageGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventChatMessageGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventChatMessage model
+   */
+  readonly fields: EventChatMessageFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventChatMessage.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventChatMessageClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    author<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    replyTo<T extends EventChatMessage$replyToArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$replyToArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    replies<T extends EventChatMessage$repliesArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    pinnedBy<T extends EventChatMessage$pinnedByArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$pinnedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    attachments<T extends EventChatMessage$attachmentsArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventChatMessage model
+   */
+  interface EventChatMessageFieldRefs {
+    readonly id: FieldRef<"EventChatMessage", 'String'>
+    readonly createdAt: FieldRef<"EventChatMessage", 'DateTime'>
+    readonly eventId: FieldRef<"EventChatMessage", 'String'>
+    readonly authorId: FieldRef<"EventChatMessage", 'String'>
+    readonly body: FieldRef<"EventChatMessage", 'String'>
+    readonly replyToId: FieldRef<"EventChatMessage", 'String'>
+    readonly deletedAt: FieldRef<"EventChatMessage", 'DateTime'>
+    readonly editedAt: FieldRef<"EventChatMessage", 'DateTime'>
+    readonly isPinned: FieldRef<"EventChatMessage", 'Boolean'>
+    readonly pinnedAt: FieldRef<"EventChatMessage", 'DateTime'>
+    readonly pinnedById: FieldRef<"EventChatMessage", 'String'>
+    readonly messageType: FieldRef<"EventChatMessage", 'EventChatMessageType'>
+    readonly systemPayload: FieldRef<"EventChatMessage", 'Json'>
+    readonly locationLat: FieldRef<"EventChatMessage", 'Float'>
+    readonly locationLng: FieldRef<"EventChatMessage", 'Float'>
+    readonly locationLabel: FieldRef<"EventChatMessage", 'String'>
+    readonly bodyEncrypted: FieldRef<"EventChatMessage", 'Boolean'>
+    readonly clientMessageId: FieldRef<"EventChatMessage", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventChatMessage findUnique
+   */
+  export type EventChatMessageFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMessage to fetch.
+     */
+    where: EventChatMessageWhereUniqueInput
+  }
+
+  /**
+   * EventChatMessage findUniqueOrThrow
+   */
+  export type EventChatMessageFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMessage to fetch.
+     */
+    where: EventChatMessageWhereUniqueInput
+  }
+
+  /**
+   * EventChatMessage findFirst
+   */
+  export type EventChatMessageFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMessage to fetch.
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMessages to fetch.
+     */
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatMessages.
+     */
+    cursor?: EventChatMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMessages.
+     */
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage findFirstOrThrow
+   */
+  export type EventChatMessageFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMessage to fetch.
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMessages to fetch.
+     */
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatMessages.
+     */
+    cursor?: EventChatMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMessages.
+     */
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage findMany
+   */
+  export type EventChatMessageFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMessages to fetch.
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMessages to fetch.
+     */
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventChatMessages.
+     */
+    cursor?: EventChatMessageWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMessages from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMessages.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMessages.
+     */
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage create
+   */
+  export type EventChatMessageCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventChatMessage.
+     */
+    data: XOR<EventChatMessageCreateInput, EventChatMessageUncheckedCreateInput>
+  }
+
+  /**
+   * EventChatMessage createMany
+   */
+  export type EventChatMessageCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventChatMessages.
+     */
+    data: EventChatMessageCreateManyInput | EventChatMessageCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventChatMessage createManyAndReturn
+   */
+  export type EventChatMessageCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventChatMessages.
+     */
+    data: EventChatMessageCreateManyInput | EventChatMessageCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatMessage update
+   */
+  export type EventChatMessageUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventChatMessage.
+     */
+    data: XOR<EventChatMessageUpdateInput, EventChatMessageUncheckedUpdateInput>
+    /**
+     * Choose, which EventChatMessage to update.
+     */
+    where: EventChatMessageWhereUniqueInput
+  }
+
+  /**
+   * EventChatMessage updateMany
+   */
+  export type EventChatMessageUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventChatMessages.
+     */
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatMessages to update
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * Limit how many EventChatMessages to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatMessage updateManyAndReturn
+   */
+  export type EventChatMessageUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * The data used to update EventChatMessages.
+     */
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatMessages to update
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * Limit how many EventChatMessages to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatMessage upsert
+   */
+  export type EventChatMessageUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventChatMessage to update in case it exists.
+     */
+    where: EventChatMessageWhereUniqueInput
+    /**
+     * In case the EventChatMessage found by the `where` argument doesn't exist, create a new EventChatMessage with this data.
+     */
+    create: XOR<EventChatMessageCreateInput, EventChatMessageUncheckedCreateInput>
+    /**
+     * In case the EventChatMessage was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventChatMessageUpdateInput, EventChatMessageUncheckedUpdateInput>
+  }
+
+  /**
+   * EventChatMessage delete
+   */
+  export type EventChatMessageDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    /**
+     * Filter which EventChatMessage to delete.
+     */
+    where: EventChatMessageWhereUniqueInput
+  }
+
+  /**
+   * EventChatMessage deleteMany
+   */
+  export type EventChatMessageDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatMessages to delete
+     */
+    where?: EventChatMessageWhereInput
+    /**
+     * Limit how many EventChatMessages to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatMessage.replyTo
+   */
+  export type EventChatMessage$replyToArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
+  }
+
+  /**
+   * EventChatMessage.replies
+   */
+  export type EventChatMessage$repliesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
+    orderBy?: EventChatMessageOrderByWithRelationInput | EventChatMessageOrderByWithRelationInput[]
+    cursor?: EventChatMessageWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatMessageScalarFieldEnum | EventChatMessageScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage.pinnedBy
+   */
+  export type EventChatMessage$pinnedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * EventChatMessage.attachments
+   */
+  export type EventChatMessage$attachmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    where?: EventChatAttachmentWhereInput
+    orderBy?: EventChatAttachmentOrderByWithRelationInput | EventChatAttachmentOrderByWithRelationInput[]
+    cursor?: EventChatAttachmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatAttachmentScalarFieldEnum | EventChatAttachmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage without action
+   */
+  export type EventChatMessageDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventChatAttachment
+   */
+
+  export type AggregateEventChatAttachment = {
+    _count: EventChatAttachmentCountAggregateOutputType | null
+    _avg: EventChatAttachmentAvgAggregateOutputType | null
+    _sum: EventChatAttachmentSumAggregateOutputType | null
+    _min: EventChatAttachmentMinAggregateOutputType | null
+    _max: EventChatAttachmentMaxAggregateOutputType | null
+  }
+
+  export type EventChatAttachmentAvgAggregateOutputType = {
+    sizeBytes: number | null
+    width: number | null
+    height: number | null
+    duration: number | null
+  }
+
+  export type EventChatAttachmentSumAggregateOutputType = {
+    sizeBytes: number | null
+    width: number | null
+    height: number | null
+    duration: number | null
+  }
+
+  export type EventChatAttachmentMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    messageId: string | null
+    url: string | null
+    mimeType: string | null
+    fileName: string | null
+    sizeBytes: number | null
+    width: number | null
+    height: number | null
+    duration: number | null
+    thumbnailUrl: string | null
+  }
+
+  export type EventChatAttachmentMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    messageId: string | null
+    url: string | null
+    mimeType: string | null
+    fileName: string | null
+    sizeBytes: number | null
+    width: number | null
+    height: number | null
+    duration: number | null
+    thumbnailUrl: string | null
+  }
+
+  export type EventChatAttachmentCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    messageId: number
+    url: number
+    mimeType: number
+    fileName: number
+    sizeBytes: number
+    width: number
+    height: number
+    duration: number
+    thumbnailUrl: number
+    _all: number
+  }
+
+
+  export type EventChatAttachmentAvgAggregateInputType = {
+    sizeBytes?: true
+    width?: true
+    height?: true
+    duration?: true
+  }
+
+  export type EventChatAttachmentSumAggregateInputType = {
+    sizeBytes?: true
+    width?: true
+    height?: true
+    duration?: true
+  }
+
+  export type EventChatAttachmentMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    messageId?: true
+    url?: true
+    mimeType?: true
+    fileName?: true
+    sizeBytes?: true
+    width?: true
+    height?: true
+    duration?: true
+    thumbnailUrl?: true
+  }
+
+  export type EventChatAttachmentMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    messageId?: true
+    url?: true
+    mimeType?: true
+    fileName?: true
+    sizeBytes?: true
+    width?: true
+    height?: true
+    duration?: true
+    thumbnailUrl?: true
+  }
+
+  export type EventChatAttachmentCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    messageId?: true
+    url?: true
+    mimeType?: true
+    fileName?: true
+    sizeBytes?: true
+    width?: true
+    height?: true
+    duration?: true
+    thumbnailUrl?: true
+    _all?: true
+  }
+
+  export type EventChatAttachmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatAttachment to aggregate.
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatAttachments to fetch.
+     */
+    orderBy?: EventChatAttachmentOrderByWithRelationInput | EventChatAttachmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventChatAttachmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatAttachments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatAttachments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventChatAttachments
+    **/
+    _count?: true | EventChatAttachmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EventChatAttachmentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EventChatAttachmentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventChatAttachmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventChatAttachmentMaxAggregateInputType
+  }
+
+  export type GetEventChatAttachmentAggregateType<T extends EventChatAttachmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventChatAttachment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventChatAttachment[P]>
+      : GetScalarType<T[P], AggregateEventChatAttachment[P]>
+  }
+
+
+
+
+  export type EventChatAttachmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatAttachmentWhereInput
+    orderBy?: EventChatAttachmentOrderByWithAggregationInput | EventChatAttachmentOrderByWithAggregationInput[]
+    by: EventChatAttachmentScalarFieldEnum[] | EventChatAttachmentScalarFieldEnum
+    having?: EventChatAttachmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventChatAttachmentCountAggregateInputType | true
+    _avg?: EventChatAttachmentAvgAggregateInputType
+    _sum?: EventChatAttachmentSumAggregateInputType
+    _min?: EventChatAttachmentMinAggregateInputType
+    _max?: EventChatAttachmentMaxAggregateInputType
+  }
+
+  export type EventChatAttachmentGroupByOutputType = {
+    id: string
+    createdAt: Date
+    messageId: string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width: number | null
+    height: number | null
+    duration: number | null
+    thumbnailUrl: string | null
+    _count: EventChatAttachmentCountAggregateOutputType | null
+    _avg: EventChatAttachmentAvgAggregateOutputType | null
+    _sum: EventChatAttachmentSumAggregateOutputType | null
+    _min: EventChatAttachmentMinAggregateOutputType | null
+    _max: EventChatAttachmentMaxAggregateOutputType | null
+  }
+
+  type GetEventChatAttachmentGroupByPayload<T extends EventChatAttachmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventChatAttachmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventChatAttachmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventChatAttachmentGroupByOutputType[P]>
+            : GetScalarType<T[P], EventChatAttachmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventChatAttachmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    messageId?: boolean
+    url?: boolean
+    mimeType?: boolean
+    fileName?: boolean
+    sizeBytes?: boolean
+    width?: boolean
+    height?: boolean
+    duration?: boolean
+    thumbnailUrl?: boolean
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatAttachment"]>
+
+  export type EventChatAttachmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    messageId?: boolean
+    url?: boolean
+    mimeType?: boolean
+    fileName?: boolean
+    sizeBytes?: boolean
+    width?: boolean
+    height?: boolean
+    duration?: boolean
+    thumbnailUrl?: boolean
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatAttachment"]>
+
+  export type EventChatAttachmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    messageId?: boolean
+    url?: boolean
+    mimeType?: boolean
+    fileName?: boolean
+    sizeBytes?: boolean
+    width?: boolean
+    height?: boolean
+    duration?: boolean
+    thumbnailUrl?: boolean
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatAttachment"]>
+
+  export type EventChatAttachmentSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    messageId?: boolean
+    url?: boolean
+    mimeType?: boolean
+    fileName?: boolean
+    sizeBytes?: boolean
+    width?: boolean
+    height?: boolean
+    duration?: boolean
+    thumbnailUrl?: boolean
+  }
+
+  export type EventChatAttachmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "messageId" | "url" | "mimeType" | "fileName" | "sizeBytes" | "width" | "height" | "duration" | "thumbnailUrl", ExtArgs["result"]["eventChatAttachment"]>
+  export type EventChatAttachmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }
+  export type EventChatAttachmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }
+  export type EventChatAttachmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    message?: boolean | EventChatMessageDefaultArgs<ExtArgs>
+  }
+
+  export type $EventChatAttachmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventChatAttachment"
+    objects: {
+      message: Prisma.$EventChatMessagePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      messageId: string
+      url: string
+      mimeType: string
+      fileName: string
+      sizeBytes: number
+      width: number | null
+      height: number | null
+      duration: number | null
+      thumbnailUrl: string | null
+    }, ExtArgs["result"]["eventChatAttachment"]>
+    composites: {}
+  }
+
+  type EventChatAttachmentGetPayload<S extends boolean | null | undefined | EventChatAttachmentDefaultArgs> = $Result.GetResult<Prisma.$EventChatAttachmentPayload, S>
+
+  type EventChatAttachmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventChatAttachmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventChatAttachmentCountAggregateInputType | true
+    }
+
+  export interface EventChatAttachmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventChatAttachment'], meta: { name: 'EventChatAttachment' } }
+    /**
+     * Find zero or one EventChatAttachment that matches the filter.
+     * @param {EventChatAttachmentFindUniqueArgs} args - Arguments to find a EventChatAttachment
+     * @example
+     * // Get one EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventChatAttachmentFindUniqueArgs>(args: SelectSubset<T, EventChatAttachmentFindUniqueArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventChatAttachment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventChatAttachmentFindUniqueOrThrowArgs} args - Arguments to find a EventChatAttachment
+     * @example
+     * // Get one EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventChatAttachmentFindUniqueOrThrowArgs>(args: SelectSubset<T, EventChatAttachmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatAttachment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentFindFirstArgs} args - Arguments to find a EventChatAttachment
+     * @example
+     * // Get one EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventChatAttachmentFindFirstArgs>(args?: SelectSubset<T, EventChatAttachmentFindFirstArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatAttachment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentFindFirstOrThrowArgs} args - Arguments to find a EventChatAttachment
+     * @example
+     * // Get one EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventChatAttachmentFindFirstOrThrowArgs>(args?: SelectSubset<T, EventChatAttachmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventChatAttachments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventChatAttachments
+     * const eventChatAttachments = await prisma.eventChatAttachment.findMany()
+     * 
+     * // Get first 10 EventChatAttachments
+     * const eventChatAttachments = await prisma.eventChatAttachment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventChatAttachmentWithIdOnly = await prisma.eventChatAttachment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventChatAttachmentFindManyArgs>(args?: SelectSubset<T, EventChatAttachmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventChatAttachment.
+     * @param {EventChatAttachmentCreateArgs} args - Arguments to create a EventChatAttachment.
+     * @example
+     * // Create one EventChatAttachment
+     * const EventChatAttachment = await prisma.eventChatAttachment.create({
+     *   data: {
+     *     // ... data to create a EventChatAttachment
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventChatAttachmentCreateArgs>(args: SelectSubset<T, EventChatAttachmentCreateArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventChatAttachments.
+     * @param {EventChatAttachmentCreateManyArgs} args - Arguments to create many EventChatAttachments.
+     * @example
+     * // Create many EventChatAttachments
+     * const eventChatAttachment = await prisma.eventChatAttachment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventChatAttachmentCreateManyArgs>(args?: SelectSubset<T, EventChatAttachmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventChatAttachments and returns the data saved in the database.
+     * @param {EventChatAttachmentCreateManyAndReturnArgs} args - Arguments to create many EventChatAttachments.
+     * @example
+     * // Create many EventChatAttachments
+     * const eventChatAttachment = await prisma.eventChatAttachment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventChatAttachments and only return the `id`
+     * const eventChatAttachmentWithIdOnly = await prisma.eventChatAttachment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventChatAttachmentCreateManyAndReturnArgs>(args?: SelectSubset<T, EventChatAttachmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventChatAttachment.
+     * @param {EventChatAttachmentDeleteArgs} args - Arguments to delete one EventChatAttachment.
+     * @example
+     * // Delete one EventChatAttachment
+     * const EventChatAttachment = await prisma.eventChatAttachment.delete({
+     *   where: {
+     *     // ... filter to delete one EventChatAttachment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventChatAttachmentDeleteArgs>(args: SelectSubset<T, EventChatAttachmentDeleteArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventChatAttachment.
+     * @param {EventChatAttachmentUpdateArgs} args - Arguments to update one EventChatAttachment.
+     * @example
+     * // Update one EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventChatAttachmentUpdateArgs>(args: SelectSubset<T, EventChatAttachmentUpdateArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventChatAttachments.
+     * @param {EventChatAttachmentDeleteManyArgs} args - Arguments to filter EventChatAttachments to delete.
+     * @example
+     * // Delete a few EventChatAttachments
+     * const { count } = await prisma.eventChatAttachment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventChatAttachmentDeleteManyArgs>(args?: SelectSubset<T, EventChatAttachmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatAttachments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventChatAttachments
+     * const eventChatAttachment = await prisma.eventChatAttachment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventChatAttachmentUpdateManyArgs>(args: SelectSubset<T, EventChatAttachmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatAttachments and returns the data updated in the database.
+     * @param {EventChatAttachmentUpdateManyAndReturnArgs} args - Arguments to update many EventChatAttachments.
+     * @example
+     * // Update many EventChatAttachments
+     * const eventChatAttachment = await prisma.eventChatAttachment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventChatAttachments and only return the `id`
+     * const eventChatAttachmentWithIdOnly = await prisma.eventChatAttachment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventChatAttachmentUpdateManyAndReturnArgs>(args: SelectSubset<T, EventChatAttachmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventChatAttachment.
+     * @param {EventChatAttachmentUpsertArgs} args - Arguments to update or create a EventChatAttachment.
+     * @example
+     * // Update or create a EventChatAttachment
+     * const eventChatAttachment = await prisma.eventChatAttachment.upsert({
+     *   create: {
+     *     // ... data to create a EventChatAttachment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventChatAttachment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventChatAttachmentUpsertArgs>(args: SelectSubset<T, EventChatAttachmentUpsertArgs<ExtArgs>>): Prisma__EventChatAttachmentClient<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventChatAttachments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentCountArgs} args - Arguments to filter EventChatAttachments to count.
+     * @example
+     * // Count the number of EventChatAttachments
+     * const count = await prisma.eventChatAttachment.count({
+     *   where: {
+     *     // ... the filter for the EventChatAttachments we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventChatAttachmentCountArgs>(
+      args?: Subset<T, EventChatAttachmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventChatAttachmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventChatAttachment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventChatAttachmentAggregateArgs>(args: Subset<T, EventChatAttachmentAggregateArgs>): Prisma.PrismaPromise<GetEventChatAttachmentAggregateType<T>>
+
+    /**
+     * Group by EventChatAttachment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatAttachmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventChatAttachmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventChatAttachmentGroupByArgs['orderBy'] }
+        : { orderBy?: EventChatAttachmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventChatAttachmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventChatAttachmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventChatAttachment model
+   */
+  readonly fields: EventChatAttachmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventChatAttachment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventChatAttachmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    message<T extends EventChatMessageDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessageDefaultArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventChatAttachment model
+   */
+  interface EventChatAttachmentFieldRefs {
+    readonly id: FieldRef<"EventChatAttachment", 'String'>
+    readonly createdAt: FieldRef<"EventChatAttachment", 'DateTime'>
+    readonly messageId: FieldRef<"EventChatAttachment", 'String'>
+    readonly url: FieldRef<"EventChatAttachment", 'String'>
+    readonly mimeType: FieldRef<"EventChatAttachment", 'String'>
+    readonly fileName: FieldRef<"EventChatAttachment", 'String'>
+    readonly sizeBytes: FieldRef<"EventChatAttachment", 'Int'>
+    readonly width: FieldRef<"EventChatAttachment", 'Int'>
+    readonly height: FieldRef<"EventChatAttachment", 'Int'>
+    readonly duration: FieldRef<"EventChatAttachment", 'Int'>
+    readonly thumbnailUrl: FieldRef<"EventChatAttachment", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventChatAttachment findUnique
+   */
+  export type EventChatAttachmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatAttachment to fetch.
+     */
+    where: EventChatAttachmentWhereUniqueInput
+  }
+
+  /**
+   * EventChatAttachment findUniqueOrThrow
+   */
+  export type EventChatAttachmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatAttachment to fetch.
+     */
+    where: EventChatAttachmentWhereUniqueInput
+  }
+
+  /**
+   * EventChatAttachment findFirst
+   */
+  export type EventChatAttachmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatAttachment to fetch.
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatAttachments to fetch.
+     */
+    orderBy?: EventChatAttachmentOrderByWithRelationInput | EventChatAttachmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatAttachments.
+     */
+    cursor?: EventChatAttachmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatAttachments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatAttachments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatAttachments.
+     */
+    distinct?: EventChatAttachmentScalarFieldEnum | EventChatAttachmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatAttachment findFirstOrThrow
+   */
+  export type EventChatAttachmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatAttachment to fetch.
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatAttachments to fetch.
+     */
+    orderBy?: EventChatAttachmentOrderByWithRelationInput | EventChatAttachmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatAttachments.
+     */
+    cursor?: EventChatAttachmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatAttachments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatAttachments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatAttachments.
+     */
+    distinct?: EventChatAttachmentScalarFieldEnum | EventChatAttachmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatAttachment findMany
+   */
+  export type EventChatAttachmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatAttachments to fetch.
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatAttachments to fetch.
+     */
+    orderBy?: EventChatAttachmentOrderByWithRelationInput | EventChatAttachmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventChatAttachments.
+     */
+    cursor?: EventChatAttachmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatAttachments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatAttachments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatAttachments.
+     */
+    distinct?: EventChatAttachmentScalarFieldEnum | EventChatAttachmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatAttachment create
+   */
+  export type EventChatAttachmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventChatAttachment.
+     */
+    data: XOR<EventChatAttachmentCreateInput, EventChatAttachmentUncheckedCreateInput>
+  }
+
+  /**
+   * EventChatAttachment createMany
+   */
+  export type EventChatAttachmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventChatAttachments.
+     */
+    data: EventChatAttachmentCreateManyInput | EventChatAttachmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventChatAttachment createManyAndReturn
+   */
+  export type EventChatAttachmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventChatAttachments.
+     */
+    data: EventChatAttachmentCreateManyInput | EventChatAttachmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatAttachment update
+   */
+  export type EventChatAttachmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventChatAttachment.
+     */
+    data: XOR<EventChatAttachmentUpdateInput, EventChatAttachmentUncheckedUpdateInput>
+    /**
+     * Choose, which EventChatAttachment to update.
+     */
+    where: EventChatAttachmentWhereUniqueInput
+  }
+
+  /**
+   * EventChatAttachment updateMany
+   */
+  export type EventChatAttachmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventChatAttachments.
+     */
+    data: XOR<EventChatAttachmentUpdateManyMutationInput, EventChatAttachmentUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatAttachments to update
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * Limit how many EventChatAttachments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatAttachment updateManyAndReturn
+   */
+  export type EventChatAttachmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * The data used to update EventChatAttachments.
+     */
+    data: XOR<EventChatAttachmentUpdateManyMutationInput, EventChatAttachmentUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatAttachments to update
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * Limit how many EventChatAttachments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatAttachment upsert
+   */
+  export type EventChatAttachmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventChatAttachment to update in case it exists.
+     */
+    where: EventChatAttachmentWhereUniqueInput
+    /**
+     * In case the EventChatAttachment found by the `where` argument doesn't exist, create a new EventChatAttachment with this data.
+     */
+    create: XOR<EventChatAttachmentCreateInput, EventChatAttachmentUncheckedCreateInput>
+    /**
+     * In case the EventChatAttachment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventChatAttachmentUpdateInput, EventChatAttachmentUncheckedUpdateInput>
+  }
+
+  /**
+   * EventChatAttachment delete
+   */
+  export type EventChatAttachmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+    /**
+     * Filter which EventChatAttachment to delete.
+     */
+    where: EventChatAttachmentWhereUniqueInput
+  }
+
+  /**
+   * EventChatAttachment deleteMany
+   */
+  export type EventChatAttachmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatAttachments to delete
+     */
+    where?: EventChatAttachmentWhereInput
+    /**
+     * Limit how many EventChatAttachments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatAttachment without action
+   */
+  export type EventChatAttachmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatAttachment
+     */
+    select?: EventChatAttachmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatAttachment
+     */
+    omit?: EventChatAttachmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatAttachmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventChatMute
+   */
+
+  export type AggregateEventChatMute = {
+    _count: EventChatMuteCountAggregateOutputType | null
+    _min: EventChatMuteMinAggregateOutputType | null
+    _max: EventChatMuteMaxAggregateOutputType | null
+  }
+
+  export type EventChatMuteMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    userId: string | null
+  }
+
+  export type EventChatMuteMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    userId: string | null
+  }
+
+  export type EventChatMuteCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    eventId: number
+    userId: number
+    _all: number
+  }
+
+
+  export type EventChatMuteMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    userId?: true
+  }
+
+  export type EventChatMuteMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    userId?: true
+  }
+
+  export type EventChatMuteCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    userId?: true
+    _all?: true
+  }
+
+  export type EventChatMuteAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatMute to aggregate.
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMutes to fetch.
+     */
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventChatMuteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMutes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMutes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventChatMutes
+    **/
+    _count?: true | EventChatMuteCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventChatMuteMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventChatMuteMaxAggregateInputType
+  }
+
+  export type GetEventChatMuteAggregateType<T extends EventChatMuteAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventChatMute]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventChatMute[P]>
+      : GetScalarType<T[P], AggregateEventChatMute[P]>
+  }
+
+
+
+
+  export type EventChatMuteGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatMuteWhereInput
+    orderBy?: EventChatMuteOrderByWithAggregationInput | EventChatMuteOrderByWithAggregationInput[]
+    by: EventChatMuteScalarFieldEnum[] | EventChatMuteScalarFieldEnum
+    having?: EventChatMuteScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventChatMuteCountAggregateInputType | true
+    _min?: EventChatMuteMinAggregateInputType
+    _max?: EventChatMuteMaxAggregateInputType
+  }
+
+  export type EventChatMuteGroupByOutputType = {
+    id: string
+    createdAt: Date
+    eventId: string
+    userId: string
+    _count: EventChatMuteCountAggregateOutputType | null
+    _min: EventChatMuteMinAggregateOutputType | null
+    _max: EventChatMuteMaxAggregateOutputType | null
+  }
+
+  type GetEventChatMuteGroupByPayload<T extends EventChatMuteGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventChatMuteGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventChatMuteGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventChatMuteGroupByOutputType[P]>
+            : GetScalarType<T[P], EventChatMuteGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventChatMuteSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMute"]>
+
+  export type EventChatMuteSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMute"]>
+
+  export type EventChatMuteSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatMute"]>
+
+  export type EventChatMuteSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+  }
+
+  export type EventChatMuteOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "eventId" | "userId", ExtArgs["result"]["eventChatMute"]>
+  export type EventChatMuteInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventChatMuteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventChatMuteIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $EventChatMutePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventChatMute"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      eventId: string
+      userId: string
+    }, ExtArgs["result"]["eventChatMute"]>
+    composites: {}
+  }
+
+  type EventChatMuteGetPayload<S extends boolean | null | undefined | EventChatMuteDefaultArgs> = $Result.GetResult<Prisma.$EventChatMutePayload, S>
+
+  type EventChatMuteCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventChatMuteFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventChatMuteCountAggregateInputType | true
+    }
+
+  export interface EventChatMuteDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventChatMute'], meta: { name: 'EventChatMute' } }
+    /**
+     * Find zero or one EventChatMute that matches the filter.
+     * @param {EventChatMuteFindUniqueArgs} args - Arguments to find a EventChatMute
+     * @example
+     * // Get one EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventChatMuteFindUniqueArgs>(args: SelectSubset<T, EventChatMuteFindUniqueArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventChatMute that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventChatMuteFindUniqueOrThrowArgs} args - Arguments to find a EventChatMute
+     * @example
+     * // Get one EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventChatMuteFindUniqueOrThrowArgs>(args: SelectSubset<T, EventChatMuteFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatMute that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteFindFirstArgs} args - Arguments to find a EventChatMute
+     * @example
+     * // Get one EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventChatMuteFindFirstArgs>(args?: SelectSubset<T, EventChatMuteFindFirstArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatMute that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteFindFirstOrThrowArgs} args - Arguments to find a EventChatMute
+     * @example
+     * // Get one EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventChatMuteFindFirstOrThrowArgs>(args?: SelectSubset<T, EventChatMuteFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventChatMutes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventChatMutes
+     * const eventChatMutes = await prisma.eventChatMute.findMany()
+     * 
+     * // Get first 10 EventChatMutes
+     * const eventChatMutes = await prisma.eventChatMute.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventChatMuteWithIdOnly = await prisma.eventChatMute.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventChatMuteFindManyArgs>(args?: SelectSubset<T, EventChatMuteFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventChatMute.
+     * @param {EventChatMuteCreateArgs} args - Arguments to create a EventChatMute.
+     * @example
+     * // Create one EventChatMute
+     * const EventChatMute = await prisma.eventChatMute.create({
+     *   data: {
+     *     // ... data to create a EventChatMute
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventChatMuteCreateArgs>(args: SelectSubset<T, EventChatMuteCreateArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventChatMutes.
+     * @param {EventChatMuteCreateManyArgs} args - Arguments to create many EventChatMutes.
+     * @example
+     * // Create many EventChatMutes
+     * const eventChatMute = await prisma.eventChatMute.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventChatMuteCreateManyArgs>(args?: SelectSubset<T, EventChatMuteCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventChatMutes and returns the data saved in the database.
+     * @param {EventChatMuteCreateManyAndReturnArgs} args - Arguments to create many EventChatMutes.
+     * @example
+     * // Create many EventChatMutes
+     * const eventChatMute = await prisma.eventChatMute.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventChatMutes and only return the `id`
+     * const eventChatMuteWithIdOnly = await prisma.eventChatMute.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventChatMuteCreateManyAndReturnArgs>(args?: SelectSubset<T, EventChatMuteCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventChatMute.
+     * @param {EventChatMuteDeleteArgs} args - Arguments to delete one EventChatMute.
+     * @example
+     * // Delete one EventChatMute
+     * const EventChatMute = await prisma.eventChatMute.delete({
+     *   where: {
+     *     // ... filter to delete one EventChatMute
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventChatMuteDeleteArgs>(args: SelectSubset<T, EventChatMuteDeleteArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventChatMute.
+     * @param {EventChatMuteUpdateArgs} args - Arguments to update one EventChatMute.
+     * @example
+     * // Update one EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventChatMuteUpdateArgs>(args: SelectSubset<T, EventChatMuteUpdateArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventChatMutes.
+     * @param {EventChatMuteDeleteManyArgs} args - Arguments to filter EventChatMutes to delete.
+     * @example
+     * // Delete a few EventChatMutes
+     * const { count } = await prisma.eventChatMute.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventChatMuteDeleteManyArgs>(args?: SelectSubset<T, EventChatMuteDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatMutes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventChatMutes
+     * const eventChatMute = await prisma.eventChatMute.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventChatMuteUpdateManyArgs>(args: SelectSubset<T, EventChatMuteUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatMutes and returns the data updated in the database.
+     * @param {EventChatMuteUpdateManyAndReturnArgs} args - Arguments to update many EventChatMutes.
+     * @example
+     * // Update many EventChatMutes
+     * const eventChatMute = await prisma.eventChatMute.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventChatMutes and only return the `id`
+     * const eventChatMuteWithIdOnly = await prisma.eventChatMute.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventChatMuteUpdateManyAndReturnArgs>(args: SelectSubset<T, EventChatMuteUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventChatMute.
+     * @param {EventChatMuteUpsertArgs} args - Arguments to update or create a EventChatMute.
+     * @example
+     * // Update or create a EventChatMute
+     * const eventChatMute = await prisma.eventChatMute.upsert({
+     *   create: {
+     *     // ... data to create a EventChatMute
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventChatMute we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventChatMuteUpsertArgs>(args: SelectSubset<T, EventChatMuteUpsertArgs<ExtArgs>>): Prisma__EventChatMuteClient<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventChatMutes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteCountArgs} args - Arguments to filter EventChatMutes to count.
+     * @example
+     * // Count the number of EventChatMutes
+     * const count = await prisma.eventChatMute.count({
+     *   where: {
+     *     // ... the filter for the EventChatMutes we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventChatMuteCountArgs>(
+      args?: Subset<T, EventChatMuteCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventChatMuteCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventChatMute.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventChatMuteAggregateArgs>(args: Subset<T, EventChatMuteAggregateArgs>): Prisma.PrismaPromise<GetEventChatMuteAggregateType<T>>
+
+    /**
+     * Group by EventChatMute.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatMuteGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventChatMuteGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventChatMuteGroupByArgs['orderBy'] }
+        : { orderBy?: EventChatMuteGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventChatMuteGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventChatMuteGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventChatMute model
+   */
+  readonly fields: EventChatMuteFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventChatMute.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventChatMuteClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventChatMute model
+   */
+  interface EventChatMuteFieldRefs {
+    readonly id: FieldRef<"EventChatMute", 'String'>
+    readonly createdAt: FieldRef<"EventChatMute", 'DateTime'>
+    readonly eventId: FieldRef<"EventChatMute", 'String'>
+    readonly userId: FieldRef<"EventChatMute", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventChatMute findUnique
+   */
+  export type EventChatMuteFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMute to fetch.
+     */
+    where: EventChatMuteWhereUniqueInput
+  }
+
+  /**
+   * EventChatMute findUniqueOrThrow
+   */
+  export type EventChatMuteFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMute to fetch.
+     */
+    where: EventChatMuteWhereUniqueInput
+  }
+
+  /**
+   * EventChatMute findFirst
+   */
+  export type EventChatMuteFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMute to fetch.
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMutes to fetch.
+     */
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatMutes.
+     */
+    cursor?: EventChatMuteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMutes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMutes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMutes.
+     */
+    distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMute findFirstOrThrow
+   */
+  export type EventChatMuteFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMute to fetch.
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMutes to fetch.
+     */
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatMutes.
+     */
+    cursor?: EventChatMuteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMutes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMutes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMutes.
+     */
+    distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMute findMany
+   */
+  export type EventChatMuteFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatMutes to fetch.
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatMutes to fetch.
+     */
+    orderBy?: EventChatMuteOrderByWithRelationInput | EventChatMuteOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventChatMutes.
+     */
+    cursor?: EventChatMuteWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatMutes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatMutes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatMutes.
+     */
+    distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMute create
+   */
+  export type EventChatMuteCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventChatMute.
+     */
+    data: XOR<EventChatMuteCreateInput, EventChatMuteUncheckedCreateInput>
+  }
+
+  /**
+   * EventChatMute createMany
+   */
+  export type EventChatMuteCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventChatMutes.
+     */
+    data: EventChatMuteCreateManyInput | EventChatMuteCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventChatMute createManyAndReturn
+   */
+  export type EventChatMuteCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventChatMutes.
+     */
+    data: EventChatMuteCreateManyInput | EventChatMuteCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatMute update
+   */
+  export type EventChatMuteUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventChatMute.
+     */
+    data: XOR<EventChatMuteUpdateInput, EventChatMuteUncheckedUpdateInput>
+    /**
+     * Choose, which EventChatMute to update.
+     */
+    where: EventChatMuteWhereUniqueInput
+  }
+
+  /**
+   * EventChatMute updateMany
+   */
+  export type EventChatMuteUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventChatMutes.
+     */
+    data: XOR<EventChatMuteUpdateManyMutationInput, EventChatMuteUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatMutes to update
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * Limit how many EventChatMutes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatMute updateManyAndReturn
+   */
+  export type EventChatMuteUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * The data used to update EventChatMutes.
+     */
+    data: XOR<EventChatMuteUpdateManyMutationInput, EventChatMuteUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatMutes to update
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * Limit how many EventChatMutes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatMute upsert
+   */
+  export type EventChatMuteUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventChatMute to update in case it exists.
+     */
+    where: EventChatMuteWhereUniqueInput
+    /**
+     * In case the EventChatMute found by the `where` argument doesn't exist, create a new EventChatMute with this data.
+     */
+    create: XOR<EventChatMuteCreateInput, EventChatMuteUncheckedCreateInput>
+    /**
+     * In case the EventChatMute was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventChatMuteUpdateInput, EventChatMuteUncheckedUpdateInput>
+  }
+
+  /**
+   * EventChatMute delete
+   */
+  export type EventChatMuteDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+    /**
+     * Filter which EventChatMute to delete.
+     */
+    where: EventChatMuteWhereUniqueInput
+  }
+
+  /**
+   * EventChatMute deleteMany
+   */
+  export type EventChatMuteDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatMutes to delete
+     */
+    where?: EventChatMuteWhereInput
+    /**
+     * Limit how many EventChatMutes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatMute without action
+   */
+  export type EventChatMuteDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMute
+     */
+    select?: EventChatMuteSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMute
+     */
+    omit?: EventChatMuteOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMuteInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventChatReadCursor
+   */
+
+  export type AggregateEventChatReadCursor = {
+    _count: EventChatReadCursorCountAggregateOutputType | null
+    _min: EventChatReadCursorMinAggregateOutputType | null
+    _max: EventChatReadCursorMaxAggregateOutputType | null
+  }
+
+  export type EventChatReadCursorMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    userId: string | null
+    lastReadMessageId: string | null
+  }
+
+  export type EventChatReadCursorMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    userId: string | null
+    lastReadMessageId: string | null
+  }
+
+  export type EventChatReadCursorCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    eventId: number
+    userId: number
+    lastReadMessageId: number
+    _all: number
+  }
+
+
+  export type EventChatReadCursorMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    userId?: true
+    lastReadMessageId?: true
+  }
+
+  export type EventChatReadCursorMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    userId?: true
+    lastReadMessageId?: true
+  }
+
+  export type EventChatReadCursorCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    userId?: true
+    lastReadMessageId?: true
+    _all?: true
+  }
+
+  export type EventChatReadCursorAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatReadCursor to aggregate.
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatReadCursors to fetch.
+     */
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventChatReadCursorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatReadCursors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatReadCursors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventChatReadCursors
+    **/
+    _count?: true | EventChatReadCursorCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventChatReadCursorMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventChatReadCursorMaxAggregateInputType
+  }
+
+  export type GetEventChatReadCursorAggregateType<T extends EventChatReadCursorAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventChatReadCursor]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventChatReadCursor[P]>
+      : GetScalarType<T[P], AggregateEventChatReadCursor[P]>
+  }
+
+
+
+
+  export type EventChatReadCursorGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatReadCursorWhereInput
+    orderBy?: EventChatReadCursorOrderByWithAggregationInput | EventChatReadCursorOrderByWithAggregationInput[]
+    by: EventChatReadCursorScalarFieldEnum[] | EventChatReadCursorScalarFieldEnum
+    having?: EventChatReadCursorScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventChatReadCursorCountAggregateInputType | true
+    _min?: EventChatReadCursorMinAggregateInputType
+    _max?: EventChatReadCursorMaxAggregateInputType
+  }
+
+  export type EventChatReadCursorGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    eventId: string
+    userId: string
+    lastReadMessageId: string | null
+    _count: EventChatReadCursorCountAggregateOutputType | null
+    _min: EventChatReadCursorMinAggregateOutputType | null
+    _max: EventChatReadCursorMaxAggregateOutputType | null
+  }
+
+  type GetEventChatReadCursorGroupByPayload<T extends EventChatReadCursorGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventChatReadCursorGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventChatReadCursorGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventChatReadCursorGroupByOutputType[P]>
+            : GetScalarType<T[P], EventChatReadCursorGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventChatReadCursorSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    lastReadMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatReadCursor"]>
+
+  export type EventChatReadCursorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    lastReadMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatReadCursor"]>
+
+  export type EventChatReadCursorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    lastReadMessageId?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventChatReadCursor"]>
+
+  export type EventChatReadCursorSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    lastReadMessageId?: boolean
+  }
+
+  export type EventChatReadCursorOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "eventId" | "userId" | "lastReadMessageId", ExtArgs["result"]["eventChatReadCursor"]>
+  export type EventChatReadCursorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventChatReadCursorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventChatReadCursorIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $EventChatReadCursorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventChatReadCursor"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      eventId: string
+      userId: string
+      lastReadMessageId: string | null
+    }, ExtArgs["result"]["eventChatReadCursor"]>
+    composites: {}
+  }
+
+  type EventChatReadCursorGetPayload<S extends boolean | null | undefined | EventChatReadCursorDefaultArgs> = $Result.GetResult<Prisma.$EventChatReadCursorPayload, S>
+
+  type EventChatReadCursorCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventChatReadCursorFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventChatReadCursorCountAggregateInputType | true
+    }
+
+  export interface EventChatReadCursorDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventChatReadCursor'], meta: { name: 'EventChatReadCursor' } }
+    /**
+     * Find zero or one EventChatReadCursor that matches the filter.
+     * @param {EventChatReadCursorFindUniqueArgs} args - Arguments to find a EventChatReadCursor
+     * @example
+     * // Get one EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventChatReadCursorFindUniqueArgs>(args: SelectSubset<T, EventChatReadCursorFindUniqueArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventChatReadCursor that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventChatReadCursorFindUniqueOrThrowArgs} args - Arguments to find a EventChatReadCursor
+     * @example
+     * // Get one EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventChatReadCursorFindUniqueOrThrowArgs>(args: SelectSubset<T, EventChatReadCursorFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatReadCursor that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorFindFirstArgs} args - Arguments to find a EventChatReadCursor
+     * @example
+     * // Get one EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventChatReadCursorFindFirstArgs>(args?: SelectSubset<T, EventChatReadCursorFindFirstArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventChatReadCursor that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorFindFirstOrThrowArgs} args - Arguments to find a EventChatReadCursor
+     * @example
+     * // Get one EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventChatReadCursorFindFirstOrThrowArgs>(args?: SelectSubset<T, EventChatReadCursorFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventChatReadCursors that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventChatReadCursors
+     * const eventChatReadCursors = await prisma.eventChatReadCursor.findMany()
+     * 
+     * // Get first 10 EventChatReadCursors
+     * const eventChatReadCursors = await prisma.eventChatReadCursor.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventChatReadCursorWithIdOnly = await prisma.eventChatReadCursor.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventChatReadCursorFindManyArgs>(args?: SelectSubset<T, EventChatReadCursorFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventChatReadCursor.
+     * @param {EventChatReadCursorCreateArgs} args - Arguments to create a EventChatReadCursor.
+     * @example
+     * // Create one EventChatReadCursor
+     * const EventChatReadCursor = await prisma.eventChatReadCursor.create({
+     *   data: {
+     *     // ... data to create a EventChatReadCursor
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventChatReadCursorCreateArgs>(args: SelectSubset<T, EventChatReadCursorCreateArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventChatReadCursors.
+     * @param {EventChatReadCursorCreateManyArgs} args - Arguments to create many EventChatReadCursors.
+     * @example
+     * // Create many EventChatReadCursors
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventChatReadCursorCreateManyArgs>(args?: SelectSubset<T, EventChatReadCursorCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventChatReadCursors and returns the data saved in the database.
+     * @param {EventChatReadCursorCreateManyAndReturnArgs} args - Arguments to create many EventChatReadCursors.
+     * @example
+     * // Create many EventChatReadCursors
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventChatReadCursors and only return the `id`
+     * const eventChatReadCursorWithIdOnly = await prisma.eventChatReadCursor.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventChatReadCursorCreateManyAndReturnArgs>(args?: SelectSubset<T, EventChatReadCursorCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventChatReadCursor.
+     * @param {EventChatReadCursorDeleteArgs} args - Arguments to delete one EventChatReadCursor.
+     * @example
+     * // Delete one EventChatReadCursor
+     * const EventChatReadCursor = await prisma.eventChatReadCursor.delete({
+     *   where: {
+     *     // ... filter to delete one EventChatReadCursor
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventChatReadCursorDeleteArgs>(args: SelectSubset<T, EventChatReadCursorDeleteArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventChatReadCursor.
+     * @param {EventChatReadCursorUpdateArgs} args - Arguments to update one EventChatReadCursor.
+     * @example
+     * // Update one EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventChatReadCursorUpdateArgs>(args: SelectSubset<T, EventChatReadCursorUpdateArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventChatReadCursors.
+     * @param {EventChatReadCursorDeleteManyArgs} args - Arguments to filter EventChatReadCursors to delete.
+     * @example
+     * // Delete a few EventChatReadCursors
+     * const { count } = await prisma.eventChatReadCursor.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventChatReadCursorDeleteManyArgs>(args?: SelectSubset<T, EventChatReadCursorDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatReadCursors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventChatReadCursors
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventChatReadCursorUpdateManyArgs>(args: SelectSubset<T, EventChatReadCursorUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventChatReadCursors and returns the data updated in the database.
+     * @param {EventChatReadCursorUpdateManyAndReturnArgs} args - Arguments to update many EventChatReadCursors.
+     * @example
+     * // Update many EventChatReadCursors
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventChatReadCursors and only return the `id`
+     * const eventChatReadCursorWithIdOnly = await prisma.eventChatReadCursor.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventChatReadCursorUpdateManyAndReturnArgs>(args: SelectSubset<T, EventChatReadCursorUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventChatReadCursor.
+     * @param {EventChatReadCursorUpsertArgs} args - Arguments to update or create a EventChatReadCursor.
+     * @example
+     * // Update or create a EventChatReadCursor
+     * const eventChatReadCursor = await prisma.eventChatReadCursor.upsert({
+     *   create: {
+     *     // ... data to create a EventChatReadCursor
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventChatReadCursor we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventChatReadCursorUpsertArgs>(args: SelectSubset<T, EventChatReadCursorUpsertArgs<ExtArgs>>): Prisma__EventChatReadCursorClient<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventChatReadCursors.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorCountArgs} args - Arguments to filter EventChatReadCursors to count.
+     * @example
+     * // Count the number of EventChatReadCursors
+     * const count = await prisma.eventChatReadCursor.count({
+     *   where: {
+     *     // ... the filter for the EventChatReadCursors we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventChatReadCursorCountArgs>(
+      args?: Subset<T, EventChatReadCursorCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventChatReadCursorCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventChatReadCursor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventChatReadCursorAggregateArgs>(args: Subset<T, EventChatReadCursorAggregateArgs>): Prisma.PrismaPromise<GetEventChatReadCursorAggregateType<T>>
+
+    /**
+     * Group by EventChatReadCursor.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventChatReadCursorGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventChatReadCursorGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventChatReadCursorGroupByArgs['orderBy'] }
+        : { orderBy?: EventChatReadCursorGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventChatReadCursorGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventChatReadCursorGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventChatReadCursor model
+   */
+  readonly fields: EventChatReadCursorFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventChatReadCursor.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventChatReadCursorClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventChatReadCursor model
+   */
+  interface EventChatReadCursorFieldRefs {
+    readonly id: FieldRef<"EventChatReadCursor", 'String'>
+    readonly createdAt: FieldRef<"EventChatReadCursor", 'DateTime'>
+    readonly updatedAt: FieldRef<"EventChatReadCursor", 'DateTime'>
+    readonly eventId: FieldRef<"EventChatReadCursor", 'String'>
+    readonly userId: FieldRef<"EventChatReadCursor", 'String'>
+    readonly lastReadMessageId: FieldRef<"EventChatReadCursor", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventChatReadCursor findUnique
+   */
+  export type EventChatReadCursorFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatReadCursor to fetch.
+     */
+    where: EventChatReadCursorWhereUniqueInput
+  }
+
+  /**
+   * EventChatReadCursor findUniqueOrThrow
+   */
+  export type EventChatReadCursorFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatReadCursor to fetch.
+     */
+    where: EventChatReadCursorWhereUniqueInput
+  }
+
+  /**
+   * EventChatReadCursor findFirst
+   */
+  export type EventChatReadCursorFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatReadCursor to fetch.
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatReadCursors to fetch.
+     */
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatReadCursors.
+     */
+    cursor?: EventChatReadCursorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatReadCursors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatReadCursors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatReadCursors.
+     */
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatReadCursor findFirstOrThrow
+   */
+  export type EventChatReadCursorFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatReadCursor to fetch.
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatReadCursors to fetch.
+     */
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventChatReadCursors.
+     */
+    cursor?: EventChatReadCursorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatReadCursors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatReadCursors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatReadCursors.
+     */
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatReadCursor findMany
+   */
+  export type EventChatReadCursorFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter, which EventChatReadCursors to fetch.
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventChatReadCursors to fetch.
+     */
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventChatReadCursors.
+     */
+    cursor?: EventChatReadCursorWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventChatReadCursors from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventChatReadCursors.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventChatReadCursors.
+     */
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatReadCursor create
+   */
+  export type EventChatReadCursorCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventChatReadCursor.
+     */
+    data: XOR<EventChatReadCursorCreateInput, EventChatReadCursorUncheckedCreateInput>
+  }
+
+  /**
+   * EventChatReadCursor createMany
+   */
+  export type EventChatReadCursorCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventChatReadCursors.
+     */
+    data: EventChatReadCursorCreateManyInput | EventChatReadCursorCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventChatReadCursor createManyAndReturn
+   */
+  export type EventChatReadCursorCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventChatReadCursors.
+     */
+    data: EventChatReadCursorCreateManyInput | EventChatReadCursorCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatReadCursor update
+   */
+  export type EventChatReadCursorUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventChatReadCursor.
+     */
+    data: XOR<EventChatReadCursorUpdateInput, EventChatReadCursorUncheckedUpdateInput>
+    /**
+     * Choose, which EventChatReadCursor to update.
+     */
+    where: EventChatReadCursorWhereUniqueInput
+  }
+
+  /**
+   * EventChatReadCursor updateMany
+   */
+  export type EventChatReadCursorUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventChatReadCursors.
+     */
+    data: XOR<EventChatReadCursorUpdateManyMutationInput, EventChatReadCursorUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatReadCursors to update
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * Limit how many EventChatReadCursors to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatReadCursor updateManyAndReturn
+   */
+  export type EventChatReadCursorUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * The data used to update EventChatReadCursors.
+     */
+    data: XOR<EventChatReadCursorUpdateManyMutationInput, EventChatReadCursorUncheckedUpdateManyInput>
+    /**
+     * Filter which EventChatReadCursors to update
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * Limit how many EventChatReadCursors to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventChatReadCursor upsert
+   */
+  export type EventChatReadCursorUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventChatReadCursor to update in case it exists.
+     */
+    where: EventChatReadCursorWhereUniqueInput
+    /**
+     * In case the EventChatReadCursor found by the `where` argument doesn't exist, create a new EventChatReadCursor with this data.
+     */
+    create: XOR<EventChatReadCursorCreateInput, EventChatReadCursorUncheckedCreateInput>
+    /**
+     * In case the EventChatReadCursor was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventChatReadCursorUpdateInput, EventChatReadCursorUncheckedUpdateInput>
+  }
+
+  /**
+   * EventChatReadCursor delete
+   */
+  export type EventChatReadCursorDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    /**
+     * Filter which EventChatReadCursor to delete.
+     */
+    where: EventChatReadCursorWhereUniqueInput
+  }
+
+  /**
+   * EventChatReadCursor deleteMany
+   */
+  export type EventChatReadCursorDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventChatReadCursors to delete
+     */
+    where?: EventChatReadCursorWhereInput
+    /**
+     * Limit how many EventChatReadCursors to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventChatReadCursor without action
+   */
+  export type EventChatReadCursorDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventCheckIn
+   */
+
+  export type AggregateEventCheckIn = {
+    _count: EventCheckInCountAggregateOutputType | null
+    _min: EventCheckInMinAggregateOutputType | null
+    _max: EventCheckInMaxAggregateOutputType | null
+  }
+
+  export type EventCheckInMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    dedupeKey: string | null
+    userId: string | null
+    guestDisplayName: string | null
+    checkedInAt: Date | null
+  }
+
+  export type EventCheckInMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    dedupeKey: string | null
+    userId: string | null
+    guestDisplayName: string | null
+    checkedInAt: Date | null
+  }
+
+  export type EventCheckInCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    eventId: number
+    dedupeKey: number
+    userId: number
+    guestDisplayName: number
+    checkedInAt: number
+    _all: number
+  }
+
+
+  export type EventCheckInMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    dedupeKey?: true
+    userId?: true
+    guestDisplayName?: true
+    checkedInAt?: true
+  }
+
+  export type EventCheckInMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    dedupeKey?: true
+    userId?: true
+    guestDisplayName?: true
+    checkedInAt?: true
+  }
+
+  export type EventCheckInCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    dedupeKey?: true
+    userId?: true
+    guestDisplayName?: true
+    checkedInAt?: true
+    _all?: true
+  }
+
+  export type EventCheckInAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventCheckIn to aggregate.
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckIns to fetch.
+     */
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventCheckInWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckIns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckIns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventCheckIns
+    **/
+    _count?: true | EventCheckInCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventCheckInMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventCheckInMaxAggregateInputType
+  }
+
+  export type GetEventCheckInAggregateType<T extends EventCheckInAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventCheckIn]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventCheckIn[P]>
+      : GetScalarType<T[P], AggregateEventCheckIn[P]>
+  }
+
+
+
+
+  export type EventCheckInGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventCheckInWhereInput
+    orderBy?: EventCheckInOrderByWithAggregationInput | EventCheckInOrderByWithAggregationInput[]
+    by: EventCheckInScalarFieldEnum[] | EventCheckInScalarFieldEnum
+    having?: EventCheckInScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventCheckInCountAggregateInputType | true
+    _min?: EventCheckInMinAggregateInputType
+    _max?: EventCheckInMaxAggregateInputType
+  }
+
+  export type EventCheckInGroupByOutputType = {
+    id: string
+    createdAt: Date
+    eventId: string
+    dedupeKey: string
+    userId: string | null
+    guestDisplayName: string | null
+    checkedInAt: Date
+    _count: EventCheckInCountAggregateOutputType | null
+    _min: EventCheckInMinAggregateOutputType | null
+    _max: EventCheckInMaxAggregateOutputType | null
+  }
+
+  type GetEventCheckInGroupByPayload<T extends EventCheckInGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventCheckInGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventCheckInGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventCheckInGroupByOutputType[P]>
+            : GetScalarType<T[P], EventCheckInGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventCheckInSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    dedupeKey?: boolean
+    userId?: boolean
+    guestDisplayName?: boolean
+    checkedInAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckIn"]>
+
+  export type EventCheckInSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    dedupeKey?: boolean
+    userId?: boolean
+    guestDisplayName?: boolean
+    checkedInAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckIn"]>
+
+  export type EventCheckInSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    dedupeKey?: boolean
+    userId?: boolean
+    guestDisplayName?: boolean
+    checkedInAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckIn"]>
+
+  export type EventCheckInSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    dedupeKey?: boolean
+    userId?: boolean
+    guestDisplayName?: boolean
+    checkedInAt?: boolean
+  }
+
+  export type EventCheckInOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "eventId" | "dedupeKey" | "userId" | "guestDisplayName" | "checkedInAt", ExtArgs["result"]["eventCheckIn"]>
+  export type EventCheckInInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }
+  export type EventCheckInIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }
+  export type EventCheckInIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | EventCheckIn$userArgs<ExtArgs>
+  }
+
+  export type $EventCheckInPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventCheckIn"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      eventId: string
+      /**
+       * `u:<userId>` for app users, `g:<slug>` for manual guest rows (normalized name).
+       */
+      dedupeKey: string
+      userId: string | null
+      guestDisplayName: string | null
+      checkedInAt: Date
+    }, ExtArgs["result"]["eventCheckIn"]>
+    composites: {}
+  }
+
+  type EventCheckInGetPayload<S extends boolean | null | undefined | EventCheckInDefaultArgs> = $Result.GetResult<Prisma.$EventCheckInPayload, S>
+
+  type EventCheckInCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventCheckInFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventCheckInCountAggregateInputType | true
+    }
+
+  export interface EventCheckInDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventCheckIn'], meta: { name: 'EventCheckIn' } }
+    /**
+     * Find zero or one EventCheckIn that matches the filter.
+     * @param {EventCheckInFindUniqueArgs} args - Arguments to find a EventCheckIn
+     * @example
+     * // Get one EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventCheckInFindUniqueArgs>(args: SelectSubset<T, EventCheckInFindUniqueArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventCheckIn that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventCheckInFindUniqueOrThrowArgs} args - Arguments to find a EventCheckIn
+     * @example
+     * // Get one EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventCheckInFindUniqueOrThrowArgs>(args: SelectSubset<T, EventCheckInFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventCheckIn that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInFindFirstArgs} args - Arguments to find a EventCheckIn
+     * @example
+     * // Get one EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventCheckInFindFirstArgs>(args?: SelectSubset<T, EventCheckInFindFirstArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventCheckIn that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInFindFirstOrThrowArgs} args - Arguments to find a EventCheckIn
+     * @example
+     * // Get one EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventCheckInFindFirstOrThrowArgs>(args?: SelectSubset<T, EventCheckInFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventCheckIns that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventCheckIns
+     * const eventCheckIns = await prisma.eventCheckIn.findMany()
+     * 
+     * // Get first 10 EventCheckIns
+     * const eventCheckIns = await prisma.eventCheckIn.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventCheckInWithIdOnly = await prisma.eventCheckIn.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventCheckInFindManyArgs>(args?: SelectSubset<T, EventCheckInFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventCheckIn.
+     * @param {EventCheckInCreateArgs} args - Arguments to create a EventCheckIn.
+     * @example
+     * // Create one EventCheckIn
+     * const EventCheckIn = await prisma.eventCheckIn.create({
+     *   data: {
+     *     // ... data to create a EventCheckIn
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventCheckInCreateArgs>(args: SelectSubset<T, EventCheckInCreateArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventCheckIns.
+     * @param {EventCheckInCreateManyArgs} args - Arguments to create many EventCheckIns.
+     * @example
+     * // Create many EventCheckIns
+     * const eventCheckIn = await prisma.eventCheckIn.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventCheckInCreateManyArgs>(args?: SelectSubset<T, EventCheckInCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventCheckIns and returns the data saved in the database.
+     * @param {EventCheckInCreateManyAndReturnArgs} args - Arguments to create many EventCheckIns.
+     * @example
+     * // Create many EventCheckIns
+     * const eventCheckIn = await prisma.eventCheckIn.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventCheckIns and only return the `id`
+     * const eventCheckInWithIdOnly = await prisma.eventCheckIn.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventCheckInCreateManyAndReturnArgs>(args?: SelectSubset<T, EventCheckInCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventCheckIn.
+     * @param {EventCheckInDeleteArgs} args - Arguments to delete one EventCheckIn.
+     * @example
+     * // Delete one EventCheckIn
+     * const EventCheckIn = await prisma.eventCheckIn.delete({
+     *   where: {
+     *     // ... filter to delete one EventCheckIn
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventCheckInDeleteArgs>(args: SelectSubset<T, EventCheckInDeleteArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventCheckIn.
+     * @param {EventCheckInUpdateArgs} args - Arguments to update one EventCheckIn.
+     * @example
+     * // Update one EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventCheckInUpdateArgs>(args: SelectSubset<T, EventCheckInUpdateArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventCheckIns.
+     * @param {EventCheckInDeleteManyArgs} args - Arguments to filter EventCheckIns to delete.
+     * @example
+     * // Delete a few EventCheckIns
+     * const { count } = await prisma.eventCheckIn.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventCheckInDeleteManyArgs>(args?: SelectSubset<T, EventCheckInDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventCheckIns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventCheckIns
+     * const eventCheckIn = await prisma.eventCheckIn.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventCheckInUpdateManyArgs>(args: SelectSubset<T, EventCheckInUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventCheckIns and returns the data updated in the database.
+     * @param {EventCheckInUpdateManyAndReturnArgs} args - Arguments to update many EventCheckIns.
+     * @example
+     * // Update many EventCheckIns
+     * const eventCheckIn = await prisma.eventCheckIn.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventCheckIns and only return the `id`
+     * const eventCheckInWithIdOnly = await prisma.eventCheckIn.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventCheckInUpdateManyAndReturnArgs>(args: SelectSubset<T, EventCheckInUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventCheckIn.
+     * @param {EventCheckInUpsertArgs} args - Arguments to update or create a EventCheckIn.
+     * @example
+     * // Update or create a EventCheckIn
+     * const eventCheckIn = await prisma.eventCheckIn.upsert({
+     *   create: {
+     *     // ... data to create a EventCheckIn
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventCheckIn we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventCheckInUpsertArgs>(args: SelectSubset<T, EventCheckInUpsertArgs<ExtArgs>>): Prisma__EventCheckInClient<$Result.GetResult<Prisma.$EventCheckInPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventCheckIns.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInCountArgs} args - Arguments to filter EventCheckIns to count.
+     * @example
+     * // Count the number of EventCheckIns
+     * const count = await prisma.eventCheckIn.count({
+     *   where: {
+     *     // ... the filter for the EventCheckIns we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventCheckInCountArgs>(
+      args?: Subset<T, EventCheckInCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventCheckInCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventCheckIn.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventCheckInAggregateArgs>(args: Subset<T, EventCheckInAggregateArgs>): Prisma.PrismaPromise<GetEventCheckInAggregateType<T>>
+
+    /**
+     * Group by EventCheckIn.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventCheckInGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventCheckInGroupByArgs['orderBy'] }
+        : { orderBy?: EventCheckInGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventCheckInGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventCheckInGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventCheckIn model
+   */
+  readonly fields: EventCheckInFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventCheckIn.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventCheckInClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends EventCheckIn$userArgs<ExtArgs> = {}>(args?: Subset<T, EventCheckIn$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventCheckIn model
+   */
+  interface EventCheckInFieldRefs {
+    readonly id: FieldRef<"EventCheckIn", 'String'>
+    readonly createdAt: FieldRef<"EventCheckIn", 'DateTime'>
+    readonly eventId: FieldRef<"EventCheckIn", 'String'>
+    readonly dedupeKey: FieldRef<"EventCheckIn", 'String'>
+    readonly userId: FieldRef<"EventCheckIn", 'String'>
+    readonly guestDisplayName: FieldRef<"EventCheckIn", 'String'>
+    readonly checkedInAt: FieldRef<"EventCheckIn", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventCheckIn findUnique
+   */
+  export type EventCheckInFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckIn to fetch.
+     */
+    where: EventCheckInWhereUniqueInput
+  }
+
+  /**
+   * EventCheckIn findUniqueOrThrow
+   */
+  export type EventCheckInFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckIn to fetch.
+     */
+    where: EventCheckInWhereUniqueInput
+  }
+
+  /**
+   * EventCheckIn findFirst
+   */
+  export type EventCheckInFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckIn to fetch.
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckIns to fetch.
+     */
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventCheckIns.
+     */
+    cursor?: EventCheckInWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckIns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckIns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckIns.
+     */
+    distinct?: EventCheckInScalarFieldEnum | EventCheckInScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckIn findFirstOrThrow
+   */
+  export type EventCheckInFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckIn to fetch.
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckIns to fetch.
+     */
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventCheckIns.
+     */
+    cursor?: EventCheckInWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckIns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckIns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckIns.
+     */
+    distinct?: EventCheckInScalarFieldEnum | EventCheckInScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckIn findMany
+   */
+  export type EventCheckInFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckIns to fetch.
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckIns to fetch.
+     */
+    orderBy?: EventCheckInOrderByWithRelationInput | EventCheckInOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventCheckIns.
+     */
+    cursor?: EventCheckInWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckIns from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckIns.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckIns.
+     */
+    distinct?: EventCheckInScalarFieldEnum | EventCheckInScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckIn create
+   */
+  export type EventCheckInCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventCheckIn.
+     */
+    data: XOR<EventCheckInCreateInput, EventCheckInUncheckedCreateInput>
+  }
+
+  /**
+   * EventCheckIn createMany
+   */
+  export type EventCheckInCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventCheckIns.
+     */
+    data: EventCheckInCreateManyInput | EventCheckInCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventCheckIn createManyAndReturn
+   */
+  export type EventCheckInCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventCheckIns.
+     */
+    data: EventCheckInCreateManyInput | EventCheckInCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventCheckIn update
+   */
+  export type EventCheckInUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventCheckIn.
+     */
+    data: XOR<EventCheckInUpdateInput, EventCheckInUncheckedUpdateInput>
+    /**
+     * Choose, which EventCheckIn to update.
+     */
+    where: EventCheckInWhereUniqueInput
+  }
+
+  /**
+   * EventCheckIn updateMany
+   */
+  export type EventCheckInUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventCheckIns.
+     */
+    data: XOR<EventCheckInUpdateManyMutationInput, EventCheckInUncheckedUpdateManyInput>
+    /**
+     * Filter which EventCheckIns to update
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * Limit how many EventCheckIns to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventCheckIn updateManyAndReturn
+   */
+  export type EventCheckInUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * The data used to update EventCheckIns.
+     */
+    data: XOR<EventCheckInUpdateManyMutationInput, EventCheckInUncheckedUpdateManyInput>
+    /**
+     * Filter which EventCheckIns to update
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * Limit how many EventCheckIns to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventCheckIn upsert
+   */
+  export type EventCheckInUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventCheckIn to update in case it exists.
+     */
+    where: EventCheckInWhereUniqueInput
+    /**
+     * In case the EventCheckIn found by the `where` argument doesn't exist, create a new EventCheckIn with this data.
+     */
+    create: XOR<EventCheckInCreateInput, EventCheckInUncheckedCreateInput>
+    /**
+     * In case the EventCheckIn was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventCheckInUpdateInput, EventCheckInUncheckedUpdateInput>
+  }
+
+  /**
+   * EventCheckIn delete
+   */
+  export type EventCheckInDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+    /**
+     * Filter which EventCheckIn to delete.
+     */
+    where: EventCheckInWhereUniqueInput
+  }
+
+  /**
+   * EventCheckIn deleteMany
+   */
+  export type EventCheckInDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventCheckIns to delete
+     */
+    where?: EventCheckInWhereInput
+    /**
+     * Limit how many EventCheckIns to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventCheckIn.user
+   */
+  export type EventCheckIn$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * EventCheckIn without action
+   */
+  export type EventCheckInDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckIn
+     */
+    select?: EventCheckInSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckIn
+     */
+    omit?: EventCheckInOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventCheckInRedemption
+   */
+
+  export type AggregateEventCheckInRedemption = {
+    _count: EventCheckInRedemptionCountAggregateOutputType | null
+    _min: EventCheckInRedemptionMinAggregateOutputType | null
+    _max: EventCheckInRedemptionMaxAggregateOutputType | null
+  }
+
+  export type EventCheckInRedemptionMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    jti: string | null
+  }
+
+  export type EventCheckInRedemptionMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    eventId: string | null
+    jti: string | null
+  }
+
+  export type EventCheckInRedemptionCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    eventId: number
+    jti: number
+    _all: number
+  }
+
+
+  export type EventCheckInRedemptionMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    jti?: true
+  }
+
+  export type EventCheckInRedemptionMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    jti?: true
+  }
+
+  export type EventCheckInRedemptionCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    eventId?: true
+    jti?: true
+    _all?: true
+  }
+
+  export type EventCheckInRedemptionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventCheckInRedemption to aggregate.
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckInRedemptions to fetch.
+     */
+    orderBy?: EventCheckInRedemptionOrderByWithRelationInput | EventCheckInRedemptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventCheckInRedemptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckInRedemptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckInRedemptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventCheckInRedemptions
+    **/
+    _count?: true | EventCheckInRedemptionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventCheckInRedemptionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventCheckInRedemptionMaxAggregateInputType
+  }
+
+  export type GetEventCheckInRedemptionAggregateType<T extends EventCheckInRedemptionAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventCheckInRedemption]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventCheckInRedemption[P]>
+      : GetScalarType<T[P], AggregateEventCheckInRedemption[P]>
+  }
+
+
+
+
+  export type EventCheckInRedemptionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventCheckInRedemptionWhereInput
+    orderBy?: EventCheckInRedemptionOrderByWithAggregationInput | EventCheckInRedemptionOrderByWithAggregationInput[]
+    by: EventCheckInRedemptionScalarFieldEnum[] | EventCheckInRedemptionScalarFieldEnum
+    having?: EventCheckInRedemptionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventCheckInRedemptionCountAggregateInputType | true
+    _min?: EventCheckInRedemptionMinAggregateInputType
+    _max?: EventCheckInRedemptionMaxAggregateInputType
+  }
+
+  export type EventCheckInRedemptionGroupByOutputType = {
+    id: string
+    createdAt: Date
+    eventId: string
+    jti: string
+    _count: EventCheckInRedemptionCountAggregateOutputType | null
+    _min: EventCheckInRedemptionMinAggregateOutputType | null
+    _max: EventCheckInRedemptionMaxAggregateOutputType | null
+  }
+
+  type GetEventCheckInRedemptionGroupByPayload<T extends EventCheckInRedemptionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventCheckInRedemptionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventCheckInRedemptionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventCheckInRedemptionGroupByOutputType[P]>
+            : GetScalarType<T[P], EventCheckInRedemptionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventCheckInRedemptionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    jti?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckInRedemption"]>
+
+  export type EventCheckInRedemptionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    jti?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckInRedemption"]>
+
+  export type EventCheckInRedemptionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    jti?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventCheckInRedemption"]>
+
+  export type EventCheckInRedemptionSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    eventId?: boolean
+    jti?: boolean
+  }
+
+  export type EventCheckInRedemptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "eventId" | "jti", ExtArgs["result"]["eventCheckInRedemption"]>
+  export type EventCheckInRedemptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+  export type EventCheckInRedemptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+  export type EventCheckInRedemptionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+
+  export type $EventCheckInRedemptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventCheckInRedemption"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      eventId: string
+      jti: string
+    }, ExtArgs["result"]["eventCheckInRedemption"]>
+    composites: {}
+  }
+
+  type EventCheckInRedemptionGetPayload<S extends boolean | null | undefined | EventCheckInRedemptionDefaultArgs> = $Result.GetResult<Prisma.$EventCheckInRedemptionPayload, S>
+
+  type EventCheckInRedemptionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventCheckInRedemptionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventCheckInRedemptionCountAggregateInputType | true
+    }
+
+  export interface EventCheckInRedemptionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventCheckInRedemption'], meta: { name: 'EventCheckInRedemption' } }
+    /**
+     * Find zero or one EventCheckInRedemption that matches the filter.
+     * @param {EventCheckInRedemptionFindUniqueArgs} args - Arguments to find a EventCheckInRedemption
+     * @example
+     * // Get one EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventCheckInRedemptionFindUniqueArgs>(args: SelectSubset<T, EventCheckInRedemptionFindUniqueArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventCheckInRedemption that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventCheckInRedemptionFindUniqueOrThrowArgs} args - Arguments to find a EventCheckInRedemption
+     * @example
+     * // Get one EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventCheckInRedemptionFindUniqueOrThrowArgs>(args: SelectSubset<T, EventCheckInRedemptionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventCheckInRedemption that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionFindFirstArgs} args - Arguments to find a EventCheckInRedemption
+     * @example
+     * // Get one EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventCheckInRedemptionFindFirstArgs>(args?: SelectSubset<T, EventCheckInRedemptionFindFirstArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventCheckInRedemption that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionFindFirstOrThrowArgs} args - Arguments to find a EventCheckInRedemption
+     * @example
+     * // Get one EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventCheckInRedemptionFindFirstOrThrowArgs>(args?: SelectSubset<T, EventCheckInRedemptionFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventCheckInRedemptions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventCheckInRedemptions
+     * const eventCheckInRedemptions = await prisma.eventCheckInRedemption.findMany()
+     * 
+     * // Get first 10 EventCheckInRedemptions
+     * const eventCheckInRedemptions = await prisma.eventCheckInRedemption.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventCheckInRedemptionWithIdOnly = await prisma.eventCheckInRedemption.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventCheckInRedemptionFindManyArgs>(args?: SelectSubset<T, EventCheckInRedemptionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventCheckInRedemption.
+     * @param {EventCheckInRedemptionCreateArgs} args - Arguments to create a EventCheckInRedemption.
+     * @example
+     * // Create one EventCheckInRedemption
+     * const EventCheckInRedemption = await prisma.eventCheckInRedemption.create({
+     *   data: {
+     *     // ... data to create a EventCheckInRedemption
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventCheckInRedemptionCreateArgs>(args: SelectSubset<T, EventCheckInRedemptionCreateArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventCheckInRedemptions.
+     * @param {EventCheckInRedemptionCreateManyArgs} args - Arguments to create many EventCheckInRedemptions.
+     * @example
+     * // Create many EventCheckInRedemptions
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventCheckInRedemptionCreateManyArgs>(args?: SelectSubset<T, EventCheckInRedemptionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventCheckInRedemptions and returns the data saved in the database.
+     * @param {EventCheckInRedemptionCreateManyAndReturnArgs} args - Arguments to create many EventCheckInRedemptions.
+     * @example
+     * // Create many EventCheckInRedemptions
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventCheckInRedemptions and only return the `id`
+     * const eventCheckInRedemptionWithIdOnly = await prisma.eventCheckInRedemption.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventCheckInRedemptionCreateManyAndReturnArgs>(args?: SelectSubset<T, EventCheckInRedemptionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventCheckInRedemption.
+     * @param {EventCheckInRedemptionDeleteArgs} args - Arguments to delete one EventCheckInRedemption.
+     * @example
+     * // Delete one EventCheckInRedemption
+     * const EventCheckInRedemption = await prisma.eventCheckInRedemption.delete({
+     *   where: {
+     *     // ... filter to delete one EventCheckInRedemption
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventCheckInRedemptionDeleteArgs>(args: SelectSubset<T, EventCheckInRedemptionDeleteArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventCheckInRedemption.
+     * @param {EventCheckInRedemptionUpdateArgs} args - Arguments to update one EventCheckInRedemption.
+     * @example
+     * // Update one EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventCheckInRedemptionUpdateArgs>(args: SelectSubset<T, EventCheckInRedemptionUpdateArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventCheckInRedemptions.
+     * @param {EventCheckInRedemptionDeleteManyArgs} args - Arguments to filter EventCheckInRedemptions to delete.
+     * @example
+     * // Delete a few EventCheckInRedemptions
+     * const { count } = await prisma.eventCheckInRedemption.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventCheckInRedemptionDeleteManyArgs>(args?: SelectSubset<T, EventCheckInRedemptionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventCheckInRedemptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventCheckInRedemptions
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventCheckInRedemptionUpdateManyArgs>(args: SelectSubset<T, EventCheckInRedemptionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventCheckInRedemptions and returns the data updated in the database.
+     * @param {EventCheckInRedemptionUpdateManyAndReturnArgs} args - Arguments to update many EventCheckInRedemptions.
+     * @example
+     * // Update many EventCheckInRedemptions
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventCheckInRedemptions and only return the `id`
+     * const eventCheckInRedemptionWithIdOnly = await prisma.eventCheckInRedemption.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventCheckInRedemptionUpdateManyAndReturnArgs>(args: SelectSubset<T, EventCheckInRedemptionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventCheckInRedemption.
+     * @param {EventCheckInRedemptionUpsertArgs} args - Arguments to update or create a EventCheckInRedemption.
+     * @example
+     * // Update or create a EventCheckInRedemption
+     * const eventCheckInRedemption = await prisma.eventCheckInRedemption.upsert({
+     *   create: {
+     *     // ... data to create a EventCheckInRedemption
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventCheckInRedemption we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventCheckInRedemptionUpsertArgs>(args: SelectSubset<T, EventCheckInRedemptionUpsertArgs<ExtArgs>>): Prisma__EventCheckInRedemptionClient<$Result.GetResult<Prisma.$EventCheckInRedemptionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventCheckInRedemptions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionCountArgs} args - Arguments to filter EventCheckInRedemptions to count.
+     * @example
+     * // Count the number of EventCheckInRedemptions
+     * const count = await prisma.eventCheckInRedemption.count({
+     *   where: {
+     *     // ... the filter for the EventCheckInRedemptions we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventCheckInRedemptionCountArgs>(
+      args?: Subset<T, EventCheckInRedemptionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventCheckInRedemptionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventCheckInRedemption.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventCheckInRedemptionAggregateArgs>(args: Subset<T, EventCheckInRedemptionAggregateArgs>): Prisma.PrismaPromise<GetEventCheckInRedemptionAggregateType<T>>
+
+    /**
+     * Group by EventCheckInRedemption.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventCheckInRedemptionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventCheckInRedemptionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventCheckInRedemptionGroupByArgs['orderBy'] }
+        : { orderBy?: EventCheckInRedemptionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventCheckInRedemptionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventCheckInRedemptionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventCheckInRedemption model
+   */
+  readonly fields: EventCheckInRedemptionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventCheckInRedemption.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventCheckInRedemptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventCheckInRedemption model
+   */
+  interface EventCheckInRedemptionFieldRefs {
+    readonly id: FieldRef<"EventCheckInRedemption", 'String'>
+    readonly createdAt: FieldRef<"EventCheckInRedemption", 'DateTime'>
+    readonly eventId: FieldRef<"EventCheckInRedemption", 'String'>
+    readonly jti: FieldRef<"EventCheckInRedemption", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventCheckInRedemption findUnique
+   */
+  export type EventCheckInRedemptionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckInRedemption to fetch.
+     */
+    where: EventCheckInRedemptionWhereUniqueInput
+  }
+
+  /**
+   * EventCheckInRedemption findUniqueOrThrow
+   */
+  export type EventCheckInRedemptionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckInRedemption to fetch.
+     */
+    where: EventCheckInRedemptionWhereUniqueInput
+  }
+
+  /**
+   * EventCheckInRedemption findFirst
+   */
+  export type EventCheckInRedemptionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckInRedemption to fetch.
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckInRedemptions to fetch.
+     */
+    orderBy?: EventCheckInRedemptionOrderByWithRelationInput | EventCheckInRedemptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventCheckInRedemptions.
+     */
+    cursor?: EventCheckInRedemptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckInRedemptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckInRedemptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckInRedemptions.
+     */
+    distinct?: EventCheckInRedemptionScalarFieldEnum | EventCheckInRedemptionScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckInRedemption findFirstOrThrow
+   */
+  export type EventCheckInRedemptionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckInRedemption to fetch.
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckInRedemptions to fetch.
+     */
+    orderBy?: EventCheckInRedemptionOrderByWithRelationInput | EventCheckInRedemptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventCheckInRedemptions.
+     */
+    cursor?: EventCheckInRedemptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckInRedemptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckInRedemptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckInRedemptions.
+     */
+    distinct?: EventCheckInRedemptionScalarFieldEnum | EventCheckInRedemptionScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckInRedemption findMany
+   */
+  export type EventCheckInRedemptionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter, which EventCheckInRedemptions to fetch.
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventCheckInRedemptions to fetch.
+     */
+    orderBy?: EventCheckInRedemptionOrderByWithRelationInput | EventCheckInRedemptionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventCheckInRedemptions.
+     */
+    cursor?: EventCheckInRedemptionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventCheckInRedemptions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventCheckInRedemptions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventCheckInRedemptions.
+     */
+    distinct?: EventCheckInRedemptionScalarFieldEnum | EventCheckInRedemptionScalarFieldEnum[]
+  }
+
+  /**
+   * EventCheckInRedemption create
+   */
+  export type EventCheckInRedemptionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventCheckInRedemption.
+     */
+    data: XOR<EventCheckInRedemptionCreateInput, EventCheckInRedemptionUncheckedCreateInput>
+  }
+
+  /**
+   * EventCheckInRedemption createMany
+   */
+  export type EventCheckInRedemptionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventCheckInRedemptions.
+     */
+    data: EventCheckInRedemptionCreateManyInput | EventCheckInRedemptionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventCheckInRedemption createManyAndReturn
+   */
+  export type EventCheckInRedemptionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventCheckInRedemptions.
+     */
+    data: EventCheckInRedemptionCreateManyInput | EventCheckInRedemptionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventCheckInRedemption update
+   */
+  export type EventCheckInRedemptionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventCheckInRedemption.
+     */
+    data: XOR<EventCheckInRedemptionUpdateInput, EventCheckInRedemptionUncheckedUpdateInput>
+    /**
+     * Choose, which EventCheckInRedemption to update.
+     */
+    where: EventCheckInRedemptionWhereUniqueInput
+  }
+
+  /**
+   * EventCheckInRedemption updateMany
+   */
+  export type EventCheckInRedemptionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventCheckInRedemptions.
+     */
+    data: XOR<EventCheckInRedemptionUpdateManyMutationInput, EventCheckInRedemptionUncheckedUpdateManyInput>
+    /**
+     * Filter which EventCheckInRedemptions to update
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * Limit how many EventCheckInRedemptions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventCheckInRedemption updateManyAndReturn
+   */
+  export type EventCheckInRedemptionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * The data used to update EventCheckInRedemptions.
+     */
+    data: XOR<EventCheckInRedemptionUpdateManyMutationInput, EventCheckInRedemptionUncheckedUpdateManyInput>
+    /**
+     * Filter which EventCheckInRedemptions to update
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * Limit how many EventCheckInRedemptions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventCheckInRedemption upsert
+   */
+  export type EventCheckInRedemptionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventCheckInRedemption to update in case it exists.
+     */
+    where: EventCheckInRedemptionWhereUniqueInput
+    /**
+     * In case the EventCheckInRedemption found by the `where` argument doesn't exist, create a new EventCheckInRedemption with this data.
+     */
+    create: XOR<EventCheckInRedemptionCreateInput, EventCheckInRedemptionUncheckedCreateInput>
+    /**
+     * In case the EventCheckInRedemption was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventCheckInRedemptionUpdateInput, EventCheckInRedemptionUncheckedUpdateInput>
+  }
+
+  /**
+   * EventCheckInRedemption delete
+   */
+  export type EventCheckInRedemptionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
+    /**
+     * Filter which EventCheckInRedemption to delete.
+     */
+    where: EventCheckInRedemptionWhereUniqueInput
+  }
+
+  /**
+   * EventCheckInRedemption deleteMany
+   */
+  export type EventCheckInRedemptionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventCheckInRedemptions to delete
+     */
+    where?: EventCheckInRedemptionWhereInput
+    /**
+     * Limit how many EventCheckInRedemptions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventCheckInRedemption without action
+   */
+  export type EventCheckInRedemptionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventCheckInRedemption
+     */
+    select?: EventCheckInRedemptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventCheckInRedemption
+     */
+    omit?: EventCheckInRedemptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventCheckInRedemptionInclude<ExtArgs> | null
   }
 
 
@@ -32398,14 +41952,128 @@ export namespace Prisma {
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
     siteId: 'siteId',
+    title: 'title',
+    description: 'description',
+    category: 'category',
     scheduledAt: 'scheduledAt',
+    endAt: 'endAt',
     completedAt: 'completedAt',
     status: 'status',
+    lifecycleStatus: 'lifecycleStatus',
     organizerId: 'organizerId',
-    participantCount: 'participantCount'
+    participantCount: 'participantCount',
+    gear: 'gear',
+    scale: 'scale',
+    difficulty: 'difficulty',
+    afterImageKeys: 'afterImageKeys',
+    maxParticipants: 'maxParticipants',
+    checkInSessionId: 'checkInSessionId',
+    checkInOpen: 'checkInOpen',
+    checkedInCount: 'checkedInCount',
+    recurrenceRule: 'recurrenceRule',
+    parentEventId: 'parentEventId',
+    recurrenceIndex: 'recurrenceIndex'
   };
 
   export type CleanupEventScalarFieldEnum = (typeof CleanupEventScalarFieldEnum)[keyof typeof CleanupEventScalarFieldEnum]
+
+
+  export const EventParticipantScalarFieldEnum: {
+    id: 'id',
+    joinedAt: 'joinedAt',
+    eventId: 'eventId',
+    userId: 'userId',
+    reminderEnabled: 'reminderEnabled',
+    reminderAt: 'reminderAt'
+  };
+
+  export type EventParticipantScalarFieldEnum = (typeof EventParticipantScalarFieldEnum)[keyof typeof EventParticipantScalarFieldEnum]
+
+
+  export const EventChatMessageScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    eventId: 'eventId',
+    authorId: 'authorId',
+    body: 'body',
+    replyToId: 'replyToId',
+    deletedAt: 'deletedAt',
+    editedAt: 'editedAt',
+    isPinned: 'isPinned',
+    pinnedAt: 'pinnedAt',
+    pinnedById: 'pinnedById',
+    messageType: 'messageType',
+    systemPayload: 'systemPayload',
+    locationLat: 'locationLat',
+    locationLng: 'locationLng',
+    locationLabel: 'locationLabel',
+    bodyEncrypted: 'bodyEncrypted',
+    clientMessageId: 'clientMessageId'
+  };
+
+  export type EventChatMessageScalarFieldEnum = (typeof EventChatMessageScalarFieldEnum)[keyof typeof EventChatMessageScalarFieldEnum]
+
+
+  export const EventChatAttachmentScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    messageId: 'messageId',
+    url: 'url',
+    mimeType: 'mimeType',
+    fileName: 'fileName',
+    sizeBytes: 'sizeBytes',
+    width: 'width',
+    height: 'height',
+    duration: 'duration',
+    thumbnailUrl: 'thumbnailUrl'
+  };
+
+  export type EventChatAttachmentScalarFieldEnum = (typeof EventChatAttachmentScalarFieldEnum)[keyof typeof EventChatAttachmentScalarFieldEnum]
+
+
+  export const EventChatMuteScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    eventId: 'eventId',
+    userId: 'userId'
+  };
+
+  export type EventChatMuteScalarFieldEnum = (typeof EventChatMuteScalarFieldEnum)[keyof typeof EventChatMuteScalarFieldEnum]
+
+
+  export const EventChatReadCursorScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    eventId: 'eventId',
+    userId: 'userId',
+    lastReadMessageId: 'lastReadMessageId'
+  };
+
+  export type EventChatReadCursorScalarFieldEnum = (typeof EventChatReadCursorScalarFieldEnum)[keyof typeof EventChatReadCursorScalarFieldEnum]
+
+
+  export const EventCheckInScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    eventId: 'eventId',
+    dedupeKey: 'dedupeKey',
+    userId: 'userId',
+    guestDisplayName: 'guestDisplayName',
+    checkedInAt: 'checkedInAt'
+  };
+
+  export type EventCheckInScalarFieldEnum = (typeof EventCheckInScalarFieldEnum)[keyof typeof EventCheckInScalarFieldEnum]
+
+
+  export const EventCheckInRedemptionScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    eventId: 'eventId',
+    jti: 'jti'
+  };
+
+  export type EventCheckInRedemptionScalarFieldEnum = (typeof EventCheckInRedemptionScalarFieldEnum)[keyof typeof EventCheckInRedemptionScalarFieldEnum]
 
 
   export const SiteVoteScalarFieldEnum: {
@@ -32765,6 +42433,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'EcoEventCategory'
+   */
+  export type EnumEcoEventCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoEventCategory[]'
+   */
+  export type ListEnumEcoEventCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventCategory[]'>
+    
+
+
+  /**
    * Reference to a field of type 'CleanupEventStatus'
    */
   export type EnumCleanupEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CleanupEventStatus'>
@@ -32775,6 +42457,62 @@ export namespace Prisma {
    * Reference to a field of type 'CleanupEventStatus[]'
    */
   export type ListEnumCleanupEventStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CleanupEventStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoEventLifecycleStatus'
+   */
+  export type EnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventLifecycleStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoEventLifecycleStatus[]'
+   */
+  export type ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventLifecycleStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoCleanupScale'
+   */
+  export type EnumEcoCleanupScaleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoCleanupScale'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoCleanupScale[]'
+   */
+  export type ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoCleanupScale[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoEventDifficulty'
+   */
+  export type EnumEcoEventDifficultyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventDifficulty'>
+    
+
+
+  /**
+   * Reference to a field of type 'EcoEventDifficulty[]'
+   */
+  export type ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EcoEventDifficulty[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EventChatMessageType'
+   */
+  export type EnumEventChatMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventChatMessageType'>
+    
+
+
+  /**
+   * Reference to a field of type 'EventChatMessageType[]'
+   */
+  export type ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventChatMessageType[]'>
     
 
 
@@ -32867,6 +42605,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
     notificationPreferences?: UserNotificationPreferenceListRelationFilter
+    organizedCleanupEvents?: CleanupEventListRelationFilter
+    eventParticipations?: EventParticipantListRelationFilter
+    eventCheckIns?: EventCheckInListRelationFilter
+    eventChatMessages?: EventChatMessageListRelationFilter
+    eventChatReadCursors?: EventChatReadCursorListRelationFilter
+    eventChatPinnedMessages?: EventChatMessageListRelationFilter
+    eventChatMutes?: EventChatMuteListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -32910,6 +42655,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenOrderByRelationAggregateInput
     userNotifications?: UserNotificationOrderByRelationAggregateInput
     notificationPreferences?: UserNotificationPreferenceOrderByRelationAggregateInput
+    organizedCleanupEvents?: CleanupEventOrderByRelationAggregateInput
+    eventParticipations?: EventParticipantOrderByRelationAggregateInput
+    eventCheckIns?: EventCheckInOrderByRelationAggregateInput
+    eventChatMessages?: EventChatMessageOrderByRelationAggregateInput
+    eventChatReadCursors?: EventChatReadCursorOrderByRelationAggregateInput
+    eventChatPinnedMessages?: EventChatMessageOrderByRelationAggregateInput
+    eventChatMutes?: EventChatMuteOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -32956,6 +42708,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
     notificationPreferences?: UserNotificationPreferenceListRelationFilter
+    organizedCleanupEvents?: CleanupEventListRelationFilter
+    eventParticipations?: EventParticipantListRelationFilter
+    eventCheckIns?: EventCheckInListRelationFilter
+    eventChatMessages?: EventChatMessageListRelationFilter
+    eventChatReadCursors?: EventChatReadCursorListRelationFilter
+    eventChatPinnedMessages?: EventChatMessageListRelationFilter
+    eventChatMutes?: EventChatMuteListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -34002,12 +43761,37 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     updatedAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     siteId?: StringFilter<"CleanupEvent"> | string
+    title?: StringFilter<"CleanupEvent"> | string
+    description?: StringFilter<"CleanupEvent"> | string
+    category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
+    endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
     organizerId?: StringNullableFilter<"CleanupEvent"> | string | null
     participantCount?: IntFilter<"CleanupEvent"> | number
+    gear?: StringNullableListFilter<"CleanupEvent">
+    scale?: EnumEcoCleanupScaleNullableFilter<"CleanupEvent"> | $Enums.EcoCleanupScale | null
+    difficulty?: EnumEcoEventDifficultyNullableFilter<"CleanupEvent"> | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: StringNullableListFilter<"CleanupEvent">
+    maxParticipants?: IntNullableFilter<"CleanupEvent"> | number | null
+    checkInSessionId?: StringNullableFilter<"CleanupEvent"> | string | null
+    checkInOpen?: BoolFilter<"CleanupEvent"> | boolean
+    checkedInCount?: IntFilter<"CleanupEvent"> | number
+    recurrenceRule?: StringNullableFilter<"CleanupEvent"> | string | null
+    parentEventId?: StringNullableFilter<"CleanupEvent"> | string | null
+    recurrenceIndex?: IntNullableFilter<"CleanupEvent"> | number | null
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    participants?: EventParticipantListRelationFilter
+    checkIns?: EventCheckInListRelationFilter
+    checkInRedemptions?: EventCheckInRedemptionListRelationFilter
+    chatMessages?: EventChatMessageListRelationFilter
+    chatReadCursors?: EventChatReadCursorListRelationFilter
+    chatMutes?: EventChatMuteListRelationFilter
+    parentEvent?: XOR<CleanupEventNullableScalarRelationFilter, CleanupEventWhereInput> | null
+    seriesChildren?: CleanupEventListRelationFilter
   }
 
   export type CleanupEventOrderByWithRelationInput = {
@@ -34015,12 +43799,37 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     siteId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
     scheduledAt?: SortOrder
+    endAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     status?: SortOrder
+    lifecycleStatus?: SortOrder
     organizerId?: SortOrderInput | SortOrder
     participantCount?: SortOrder
+    gear?: SortOrder
+    scale?: SortOrderInput | SortOrder
+    difficulty?: SortOrderInput | SortOrder
+    afterImageKeys?: SortOrder
+    maxParticipants?: SortOrderInput | SortOrder
+    checkInSessionId?: SortOrderInput | SortOrder
+    checkInOpen?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceRule?: SortOrderInput | SortOrder
+    parentEventId?: SortOrderInput | SortOrder
+    recurrenceIndex?: SortOrderInput | SortOrder
     site?: SiteOrderByWithRelationInput
+    organizer?: UserOrderByWithRelationInput
+    participants?: EventParticipantOrderByRelationAggregateInput
+    checkIns?: EventCheckInOrderByRelationAggregateInput
+    checkInRedemptions?: EventCheckInRedemptionOrderByRelationAggregateInput
+    chatMessages?: EventChatMessageOrderByRelationAggregateInput
+    chatReadCursors?: EventChatReadCursorOrderByRelationAggregateInput
+    chatMutes?: EventChatMuteOrderByRelationAggregateInput
+    parentEvent?: CleanupEventOrderByWithRelationInput
+    seriesChildren?: CleanupEventOrderByRelationAggregateInput
   }
 
   export type CleanupEventWhereUniqueInput = Prisma.AtLeast<{
@@ -34031,12 +43840,37 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     updatedAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     siteId?: StringFilter<"CleanupEvent"> | string
+    title?: StringFilter<"CleanupEvent"> | string
+    description?: StringFilter<"CleanupEvent"> | string
+    category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
+    endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
     organizerId?: StringNullableFilter<"CleanupEvent"> | string | null
     participantCount?: IntFilter<"CleanupEvent"> | number
+    gear?: StringNullableListFilter<"CleanupEvent">
+    scale?: EnumEcoCleanupScaleNullableFilter<"CleanupEvent"> | $Enums.EcoCleanupScale | null
+    difficulty?: EnumEcoEventDifficultyNullableFilter<"CleanupEvent"> | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: StringNullableListFilter<"CleanupEvent">
+    maxParticipants?: IntNullableFilter<"CleanupEvent"> | number | null
+    checkInSessionId?: StringNullableFilter<"CleanupEvent"> | string | null
+    checkInOpen?: BoolFilter<"CleanupEvent"> | boolean
+    checkedInCount?: IntFilter<"CleanupEvent"> | number
+    recurrenceRule?: StringNullableFilter<"CleanupEvent"> | string | null
+    parentEventId?: StringNullableFilter<"CleanupEvent"> | string | null
+    recurrenceIndex?: IntNullableFilter<"CleanupEvent"> | number | null
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    organizer?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    participants?: EventParticipantListRelationFilter
+    checkIns?: EventCheckInListRelationFilter
+    checkInRedemptions?: EventCheckInRedemptionListRelationFilter
+    chatMessages?: EventChatMessageListRelationFilter
+    chatReadCursors?: EventChatReadCursorListRelationFilter
+    chatMutes?: EventChatMuteListRelationFilter
+    parentEvent?: XOR<CleanupEventNullableScalarRelationFilter, CleanupEventWhereInput> | null
+    seriesChildren?: CleanupEventListRelationFilter
   }, "id">
 
   export type CleanupEventOrderByWithAggregationInput = {
@@ -34044,11 +43878,27 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     siteId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
     scheduledAt?: SortOrder
+    endAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     status?: SortOrder
+    lifecycleStatus?: SortOrder
     organizerId?: SortOrderInput | SortOrder
     participantCount?: SortOrder
+    gear?: SortOrder
+    scale?: SortOrderInput | SortOrder
+    difficulty?: SortOrderInput | SortOrder
+    afterImageKeys?: SortOrder
+    maxParticipants?: SortOrderInput | SortOrder
+    checkInSessionId?: SortOrderInput | SortOrder
+    checkInOpen?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceRule?: SortOrderInput | SortOrder
+    parentEventId?: SortOrderInput | SortOrder
+    recurrenceIndex?: SortOrderInput | SortOrder
     _count?: CleanupEventCountOrderByAggregateInput
     _avg?: CleanupEventAvgOrderByAggregateInput
     _max?: CleanupEventMaxOrderByAggregateInput
@@ -34064,11 +43914,553 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"CleanupEvent"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"CleanupEvent"> | Date | string
     siteId?: StringWithAggregatesFilter<"CleanupEvent"> | string
+    title?: StringWithAggregatesFilter<"CleanupEvent"> | string
+    description?: StringWithAggregatesFilter<"CleanupEvent"> | string
+    category?: EnumEcoEventCategoryWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeWithAggregatesFilter<"CleanupEvent"> | Date | string
+    endAt?: DateTimeNullableWithAggregatesFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusWithAggregatesFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
     organizerId?: StringNullableWithAggregatesFilter<"CleanupEvent"> | string | null
     participantCount?: IntWithAggregatesFilter<"CleanupEvent"> | number
+    gear?: StringNullableListFilter<"CleanupEvent">
+    scale?: EnumEcoCleanupScaleNullableWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoCleanupScale | null
+    difficulty?: EnumEcoEventDifficultyNullableWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: StringNullableListFilter<"CleanupEvent">
+    maxParticipants?: IntNullableWithAggregatesFilter<"CleanupEvent"> | number | null
+    checkInSessionId?: StringNullableWithAggregatesFilter<"CleanupEvent"> | string | null
+    checkInOpen?: BoolWithAggregatesFilter<"CleanupEvent"> | boolean
+    checkedInCount?: IntWithAggregatesFilter<"CleanupEvent"> | number
+    recurrenceRule?: StringNullableWithAggregatesFilter<"CleanupEvent"> | string | null
+    parentEventId?: StringNullableWithAggregatesFilter<"CleanupEvent"> | string | null
+    recurrenceIndex?: IntNullableWithAggregatesFilter<"CleanupEvent"> | number | null
+  }
+
+  export type EventParticipantWhereInput = {
+    AND?: EventParticipantWhereInput | EventParticipantWhereInput[]
+    OR?: EventParticipantWhereInput[]
+    NOT?: EventParticipantWhereInput | EventParticipantWhereInput[]
+    id?: StringFilter<"EventParticipant"> | string
+    joinedAt?: DateTimeFilter<"EventParticipant"> | Date | string
+    eventId?: StringFilter<"EventParticipant"> | string
+    userId?: StringFilter<"EventParticipant"> | string
+    reminderEnabled?: BoolFilter<"EventParticipant"> | boolean
+    reminderAt?: DateTimeNullableFilter<"EventParticipant"> | Date | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type EventParticipantOrderByWithRelationInput = {
+    id?: SortOrder
+    joinedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    reminderEnabled?: SortOrder
+    reminderAt?: SortOrderInput | SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type EventParticipantWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId_userId?: EventParticipantEventIdUserIdCompoundUniqueInput
+    AND?: EventParticipantWhereInput | EventParticipantWhereInput[]
+    OR?: EventParticipantWhereInput[]
+    NOT?: EventParticipantWhereInput | EventParticipantWhereInput[]
+    joinedAt?: DateTimeFilter<"EventParticipant"> | Date | string
+    eventId?: StringFilter<"EventParticipant"> | string
+    userId?: StringFilter<"EventParticipant"> | string
+    reminderEnabled?: BoolFilter<"EventParticipant"> | boolean
+    reminderAt?: DateTimeNullableFilter<"EventParticipant"> | Date | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "eventId_userId">
+
+  export type EventParticipantOrderByWithAggregationInput = {
+    id?: SortOrder
+    joinedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    reminderEnabled?: SortOrder
+    reminderAt?: SortOrderInput | SortOrder
+    _count?: EventParticipantCountOrderByAggregateInput
+    _max?: EventParticipantMaxOrderByAggregateInput
+    _min?: EventParticipantMinOrderByAggregateInput
+  }
+
+  export type EventParticipantScalarWhereWithAggregatesInput = {
+    AND?: EventParticipantScalarWhereWithAggregatesInput | EventParticipantScalarWhereWithAggregatesInput[]
+    OR?: EventParticipantScalarWhereWithAggregatesInput[]
+    NOT?: EventParticipantScalarWhereWithAggregatesInput | EventParticipantScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventParticipant"> | string
+    joinedAt?: DateTimeWithAggregatesFilter<"EventParticipant"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventParticipant"> | string
+    userId?: StringWithAggregatesFilter<"EventParticipant"> | string
+    reminderEnabled?: BoolWithAggregatesFilter<"EventParticipant"> | boolean
+    reminderAt?: DateTimeNullableWithAggregatesFilter<"EventParticipant"> | Date | string | null
+  }
+
+  export type EventChatMessageWhereInput = {
+    AND?: EventChatMessageWhereInput | EventChatMessageWhereInput[]
+    OR?: EventChatMessageWhereInput[]
+    NOT?: EventChatMessageWhereInput | EventChatMessageWhereInput[]
+    id?: StringFilter<"EventChatMessage"> | string
+    createdAt?: DateTimeFilter<"EventChatMessage"> | Date | string
+    eventId?: StringFilter<"EventChatMessage"> | string
+    authorId?: StringFilter<"EventChatMessage"> | string
+    body?: StringFilter<"EventChatMessage"> | string
+    replyToId?: StringNullableFilter<"EventChatMessage"> | string | null
+    deletedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    editedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    isPinned?: BoolFilter<"EventChatMessage"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    pinnedById?: StringNullableFilter<"EventChatMessage"> | string | null
+    messageType?: EnumEventChatMessageTypeFilter<"EventChatMessage"> | $Enums.EventChatMessageType
+    systemPayload?: JsonNullableFilter<"EventChatMessage">
+    locationLat?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLng?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLabel?: StringNullableFilter<"EventChatMessage"> | string | null
+    bodyEncrypted?: BoolFilter<"EventChatMessage"> | boolean
+    clientMessageId?: StringNullableFilter<"EventChatMessage"> | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    replyTo?: XOR<EventChatMessageNullableScalarRelationFilter, EventChatMessageWhereInput> | null
+    replies?: EventChatMessageListRelationFilter
+    pinnedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    attachments?: EventChatAttachmentListRelationFilter
+  }
+
+  export type EventChatMessageOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    authorId?: SortOrder
+    body?: SortOrder
+    replyToId?: SortOrderInput | SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    editedAt?: SortOrderInput | SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrderInput | SortOrder
+    pinnedById?: SortOrderInput | SortOrder
+    messageType?: SortOrder
+    systemPayload?: SortOrderInput | SortOrder
+    locationLat?: SortOrderInput | SortOrder
+    locationLng?: SortOrderInput | SortOrder
+    locationLabel?: SortOrderInput | SortOrder
+    bodyEncrypted?: SortOrder
+    clientMessageId?: SortOrderInput | SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    author?: UserOrderByWithRelationInput
+    replyTo?: EventChatMessageOrderByWithRelationInput
+    replies?: EventChatMessageOrderByRelationAggregateInput
+    pinnedBy?: UserOrderByWithRelationInput
+    attachments?: EventChatAttachmentOrderByRelationAggregateInput
+  }
+
+  export type EventChatMessageWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId_clientMessageId?: EventChatMessageEventIdClientMessageIdCompoundUniqueInput
+    AND?: EventChatMessageWhereInput | EventChatMessageWhereInput[]
+    OR?: EventChatMessageWhereInput[]
+    NOT?: EventChatMessageWhereInput | EventChatMessageWhereInput[]
+    createdAt?: DateTimeFilter<"EventChatMessage"> | Date | string
+    eventId?: StringFilter<"EventChatMessage"> | string
+    authorId?: StringFilter<"EventChatMessage"> | string
+    body?: StringFilter<"EventChatMessage"> | string
+    replyToId?: StringNullableFilter<"EventChatMessage"> | string | null
+    deletedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    editedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    isPinned?: BoolFilter<"EventChatMessage"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    pinnedById?: StringNullableFilter<"EventChatMessage"> | string | null
+    messageType?: EnumEventChatMessageTypeFilter<"EventChatMessage"> | $Enums.EventChatMessageType
+    systemPayload?: JsonNullableFilter<"EventChatMessage">
+    locationLat?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLng?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLabel?: StringNullableFilter<"EventChatMessage"> | string | null
+    bodyEncrypted?: BoolFilter<"EventChatMessage"> | boolean
+    clientMessageId?: StringNullableFilter<"EventChatMessage"> | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    author?: XOR<UserScalarRelationFilter, UserWhereInput>
+    replyTo?: XOR<EventChatMessageNullableScalarRelationFilter, EventChatMessageWhereInput> | null
+    replies?: EventChatMessageListRelationFilter
+    pinnedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    attachments?: EventChatAttachmentListRelationFilter
+  }, "id" | "eventId_clientMessageId">
+
+  export type EventChatMessageOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    authorId?: SortOrder
+    body?: SortOrder
+    replyToId?: SortOrderInput | SortOrder
+    deletedAt?: SortOrderInput | SortOrder
+    editedAt?: SortOrderInput | SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrderInput | SortOrder
+    pinnedById?: SortOrderInput | SortOrder
+    messageType?: SortOrder
+    systemPayload?: SortOrderInput | SortOrder
+    locationLat?: SortOrderInput | SortOrder
+    locationLng?: SortOrderInput | SortOrder
+    locationLabel?: SortOrderInput | SortOrder
+    bodyEncrypted?: SortOrder
+    clientMessageId?: SortOrderInput | SortOrder
+    _count?: EventChatMessageCountOrderByAggregateInput
+    _avg?: EventChatMessageAvgOrderByAggregateInput
+    _max?: EventChatMessageMaxOrderByAggregateInput
+    _min?: EventChatMessageMinOrderByAggregateInput
+    _sum?: EventChatMessageSumOrderByAggregateInput
+  }
+
+  export type EventChatMessageScalarWhereWithAggregatesInput = {
+    AND?: EventChatMessageScalarWhereWithAggregatesInput | EventChatMessageScalarWhereWithAggregatesInput[]
+    OR?: EventChatMessageScalarWhereWithAggregatesInput[]
+    NOT?: EventChatMessageScalarWhereWithAggregatesInput | EventChatMessageScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventChatMessage"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventChatMessage"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventChatMessage"> | string
+    authorId?: StringWithAggregatesFilter<"EventChatMessage"> | string
+    body?: StringWithAggregatesFilter<"EventChatMessage"> | string
+    replyToId?: StringNullableWithAggregatesFilter<"EventChatMessage"> | string | null
+    deletedAt?: DateTimeNullableWithAggregatesFilter<"EventChatMessage"> | Date | string | null
+    editedAt?: DateTimeNullableWithAggregatesFilter<"EventChatMessage"> | Date | string | null
+    isPinned?: BoolWithAggregatesFilter<"EventChatMessage"> | boolean
+    pinnedAt?: DateTimeNullableWithAggregatesFilter<"EventChatMessage"> | Date | string | null
+    pinnedById?: StringNullableWithAggregatesFilter<"EventChatMessage"> | string | null
+    messageType?: EnumEventChatMessageTypeWithAggregatesFilter<"EventChatMessage"> | $Enums.EventChatMessageType
+    systemPayload?: JsonNullableWithAggregatesFilter<"EventChatMessage">
+    locationLat?: FloatNullableWithAggregatesFilter<"EventChatMessage"> | number | null
+    locationLng?: FloatNullableWithAggregatesFilter<"EventChatMessage"> | number | null
+    locationLabel?: StringNullableWithAggregatesFilter<"EventChatMessage"> | string | null
+    bodyEncrypted?: BoolWithAggregatesFilter<"EventChatMessage"> | boolean
+    clientMessageId?: StringNullableWithAggregatesFilter<"EventChatMessage"> | string | null
+  }
+
+  export type EventChatAttachmentWhereInput = {
+    AND?: EventChatAttachmentWhereInput | EventChatAttachmentWhereInput[]
+    OR?: EventChatAttachmentWhereInput[]
+    NOT?: EventChatAttachmentWhereInput | EventChatAttachmentWhereInput[]
+    id?: StringFilter<"EventChatAttachment"> | string
+    createdAt?: DateTimeFilter<"EventChatAttachment"> | Date | string
+    messageId?: StringFilter<"EventChatAttachment"> | string
+    url?: StringFilter<"EventChatAttachment"> | string
+    mimeType?: StringFilter<"EventChatAttachment"> | string
+    fileName?: StringFilter<"EventChatAttachment"> | string
+    sizeBytes?: IntFilter<"EventChatAttachment"> | number
+    width?: IntNullableFilter<"EventChatAttachment"> | number | null
+    height?: IntNullableFilter<"EventChatAttachment"> | number | null
+    duration?: IntNullableFilter<"EventChatAttachment"> | number | null
+    thumbnailUrl?: StringNullableFilter<"EventChatAttachment"> | string | null
+    message?: XOR<EventChatMessageScalarRelationFilter, EventChatMessageWhereInput>
+  }
+
+  export type EventChatAttachmentOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    messageId?: SortOrder
+    url?: SortOrder
+    mimeType?: SortOrder
+    fileName?: SortOrder
+    sizeBytes?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
+    duration?: SortOrderInput | SortOrder
+    thumbnailUrl?: SortOrderInput | SortOrder
+    message?: EventChatMessageOrderByWithRelationInput
+  }
+
+  export type EventChatAttachmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EventChatAttachmentWhereInput | EventChatAttachmentWhereInput[]
+    OR?: EventChatAttachmentWhereInput[]
+    NOT?: EventChatAttachmentWhereInput | EventChatAttachmentWhereInput[]
+    createdAt?: DateTimeFilter<"EventChatAttachment"> | Date | string
+    messageId?: StringFilter<"EventChatAttachment"> | string
+    url?: StringFilter<"EventChatAttachment"> | string
+    mimeType?: StringFilter<"EventChatAttachment"> | string
+    fileName?: StringFilter<"EventChatAttachment"> | string
+    sizeBytes?: IntFilter<"EventChatAttachment"> | number
+    width?: IntNullableFilter<"EventChatAttachment"> | number | null
+    height?: IntNullableFilter<"EventChatAttachment"> | number | null
+    duration?: IntNullableFilter<"EventChatAttachment"> | number | null
+    thumbnailUrl?: StringNullableFilter<"EventChatAttachment"> | string | null
+    message?: XOR<EventChatMessageScalarRelationFilter, EventChatMessageWhereInput>
+  }, "id">
+
+  export type EventChatAttachmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    messageId?: SortOrder
+    url?: SortOrder
+    mimeType?: SortOrder
+    fileName?: SortOrder
+    sizeBytes?: SortOrder
+    width?: SortOrderInput | SortOrder
+    height?: SortOrderInput | SortOrder
+    duration?: SortOrderInput | SortOrder
+    thumbnailUrl?: SortOrderInput | SortOrder
+    _count?: EventChatAttachmentCountOrderByAggregateInput
+    _avg?: EventChatAttachmentAvgOrderByAggregateInput
+    _max?: EventChatAttachmentMaxOrderByAggregateInput
+    _min?: EventChatAttachmentMinOrderByAggregateInput
+    _sum?: EventChatAttachmentSumOrderByAggregateInput
+  }
+
+  export type EventChatAttachmentScalarWhereWithAggregatesInput = {
+    AND?: EventChatAttachmentScalarWhereWithAggregatesInput | EventChatAttachmentScalarWhereWithAggregatesInput[]
+    OR?: EventChatAttachmentScalarWhereWithAggregatesInput[]
+    NOT?: EventChatAttachmentScalarWhereWithAggregatesInput | EventChatAttachmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventChatAttachment"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventChatAttachment"> | Date | string
+    messageId?: StringWithAggregatesFilter<"EventChatAttachment"> | string
+    url?: StringWithAggregatesFilter<"EventChatAttachment"> | string
+    mimeType?: StringWithAggregatesFilter<"EventChatAttachment"> | string
+    fileName?: StringWithAggregatesFilter<"EventChatAttachment"> | string
+    sizeBytes?: IntWithAggregatesFilter<"EventChatAttachment"> | number
+    width?: IntNullableWithAggregatesFilter<"EventChatAttachment"> | number | null
+    height?: IntNullableWithAggregatesFilter<"EventChatAttachment"> | number | null
+    duration?: IntNullableWithAggregatesFilter<"EventChatAttachment"> | number | null
+    thumbnailUrl?: StringNullableWithAggregatesFilter<"EventChatAttachment"> | string | null
+  }
+
+  export type EventChatMuteWhereInput = {
+    AND?: EventChatMuteWhereInput | EventChatMuteWhereInput[]
+    OR?: EventChatMuteWhereInput[]
+    NOT?: EventChatMuteWhereInput | EventChatMuteWhereInput[]
+    id?: StringFilter<"EventChatMute"> | string
+    createdAt?: DateTimeFilter<"EventChatMute"> | Date | string
+    eventId?: StringFilter<"EventChatMute"> | string
+    userId?: StringFilter<"EventChatMute"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type EventChatMuteOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type EventChatMuteWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId_userId?: EventChatMuteEventIdUserIdCompoundUniqueInput
+    AND?: EventChatMuteWhereInput | EventChatMuteWhereInput[]
+    OR?: EventChatMuteWhereInput[]
+    NOT?: EventChatMuteWhereInput | EventChatMuteWhereInput[]
+    createdAt?: DateTimeFilter<"EventChatMute"> | Date | string
+    eventId?: StringFilter<"EventChatMute"> | string
+    userId?: StringFilter<"EventChatMute"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "eventId_userId">
+
+  export type EventChatMuteOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    _count?: EventChatMuteCountOrderByAggregateInput
+    _max?: EventChatMuteMaxOrderByAggregateInput
+    _min?: EventChatMuteMinOrderByAggregateInput
+  }
+
+  export type EventChatMuteScalarWhereWithAggregatesInput = {
+    AND?: EventChatMuteScalarWhereWithAggregatesInput | EventChatMuteScalarWhereWithAggregatesInput[]
+    OR?: EventChatMuteScalarWhereWithAggregatesInput[]
+    NOT?: EventChatMuteScalarWhereWithAggregatesInput | EventChatMuteScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventChatMute"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventChatMute"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventChatMute"> | string
+    userId?: StringWithAggregatesFilter<"EventChatMute"> | string
+  }
+
+  export type EventChatReadCursorWhereInput = {
+    AND?: EventChatReadCursorWhereInput | EventChatReadCursorWhereInput[]
+    OR?: EventChatReadCursorWhereInput[]
+    NOT?: EventChatReadCursorWhereInput | EventChatReadCursorWhereInput[]
+    id?: StringFilter<"EventChatReadCursor"> | string
+    createdAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    updatedAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    eventId?: StringFilter<"EventChatReadCursor"> | string
+    userId?: StringFilter<"EventChatReadCursor"> | string
+    lastReadMessageId?: StringNullableFilter<"EventChatReadCursor"> | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type EventChatReadCursorOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    lastReadMessageId?: SortOrderInput | SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type EventChatReadCursorWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId_userId?: EventChatReadCursorEventIdUserIdCompoundUniqueInput
+    AND?: EventChatReadCursorWhereInput | EventChatReadCursorWhereInput[]
+    OR?: EventChatReadCursorWhereInput[]
+    NOT?: EventChatReadCursorWhereInput | EventChatReadCursorWhereInput[]
+    createdAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    updatedAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    eventId?: StringFilter<"EventChatReadCursor"> | string
+    userId?: StringFilter<"EventChatReadCursor"> | string
+    lastReadMessageId?: StringNullableFilter<"EventChatReadCursor"> | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "eventId_userId">
+
+  export type EventChatReadCursorOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    lastReadMessageId?: SortOrderInput | SortOrder
+    _count?: EventChatReadCursorCountOrderByAggregateInput
+    _max?: EventChatReadCursorMaxOrderByAggregateInput
+    _min?: EventChatReadCursorMinOrderByAggregateInput
+  }
+
+  export type EventChatReadCursorScalarWhereWithAggregatesInput = {
+    AND?: EventChatReadCursorScalarWhereWithAggregatesInput | EventChatReadCursorScalarWhereWithAggregatesInput[]
+    OR?: EventChatReadCursorScalarWhereWithAggregatesInput[]
+    NOT?: EventChatReadCursorScalarWhereWithAggregatesInput | EventChatReadCursorScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventChatReadCursor"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventChatReadCursor"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EventChatReadCursor"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventChatReadCursor"> | string
+    userId?: StringWithAggregatesFilter<"EventChatReadCursor"> | string
+    lastReadMessageId?: StringNullableWithAggregatesFilter<"EventChatReadCursor"> | string | null
+  }
+
+  export type EventCheckInWhereInput = {
+    AND?: EventCheckInWhereInput | EventCheckInWhereInput[]
+    OR?: EventCheckInWhereInput[]
+    NOT?: EventCheckInWhereInput | EventCheckInWhereInput[]
+    id?: StringFilter<"EventCheckIn"> | string
+    createdAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+    eventId?: StringFilter<"EventCheckIn"> | string
+    dedupeKey?: StringFilter<"EventCheckIn"> | string
+    userId?: StringNullableFilter<"EventCheckIn"> | string | null
+    guestDisplayName?: StringNullableFilter<"EventCheckIn"> | string | null
+    checkedInAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type EventCheckInOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    dedupeKey?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    guestDisplayName?: SortOrderInput | SortOrder
+    checkedInAt?: SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type EventCheckInWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId_dedupeKey?: EventCheckInEventIdDedupeKeyCompoundUniqueInput
+    AND?: EventCheckInWhereInput | EventCheckInWhereInput[]
+    OR?: EventCheckInWhereInput[]
+    NOT?: EventCheckInWhereInput | EventCheckInWhereInput[]
+    createdAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+    eventId?: StringFilter<"EventCheckIn"> | string
+    dedupeKey?: StringFilter<"EventCheckIn"> | string
+    userId?: StringNullableFilter<"EventCheckIn"> | string | null
+    guestDisplayName?: StringNullableFilter<"EventCheckIn"> | string | null
+    checkedInAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "eventId_dedupeKey">
+
+  export type EventCheckInOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    dedupeKey?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    guestDisplayName?: SortOrderInput | SortOrder
+    checkedInAt?: SortOrder
+    _count?: EventCheckInCountOrderByAggregateInput
+    _max?: EventCheckInMaxOrderByAggregateInput
+    _min?: EventCheckInMinOrderByAggregateInput
+  }
+
+  export type EventCheckInScalarWhereWithAggregatesInput = {
+    AND?: EventCheckInScalarWhereWithAggregatesInput | EventCheckInScalarWhereWithAggregatesInput[]
+    OR?: EventCheckInScalarWhereWithAggregatesInput[]
+    NOT?: EventCheckInScalarWhereWithAggregatesInput | EventCheckInScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventCheckIn"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventCheckIn"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventCheckIn"> | string
+    dedupeKey?: StringWithAggregatesFilter<"EventCheckIn"> | string
+    userId?: StringNullableWithAggregatesFilter<"EventCheckIn"> | string | null
+    guestDisplayName?: StringNullableWithAggregatesFilter<"EventCheckIn"> | string | null
+    checkedInAt?: DateTimeWithAggregatesFilter<"EventCheckIn"> | Date | string
+  }
+
+  export type EventCheckInRedemptionWhereInput = {
+    AND?: EventCheckInRedemptionWhereInput | EventCheckInRedemptionWhereInput[]
+    OR?: EventCheckInRedemptionWhereInput[]
+    NOT?: EventCheckInRedemptionWhereInput | EventCheckInRedemptionWhereInput[]
+    id?: StringFilter<"EventCheckInRedemption"> | string
+    createdAt?: DateTimeFilter<"EventCheckInRedemption"> | Date | string
+    eventId?: StringFilter<"EventCheckInRedemption"> | string
+    jti?: StringFilter<"EventCheckInRedemption"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+  }
+
+  export type EventCheckInRedemptionOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    jti?: SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+  }
+
+  export type EventCheckInRedemptionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    jti?: string
+    AND?: EventCheckInRedemptionWhereInput | EventCheckInRedemptionWhereInput[]
+    OR?: EventCheckInRedemptionWhereInput[]
+    NOT?: EventCheckInRedemptionWhereInput | EventCheckInRedemptionWhereInput[]
+    createdAt?: DateTimeFilter<"EventCheckInRedemption"> | Date | string
+    eventId?: StringFilter<"EventCheckInRedemption"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+  }, "id" | "jti">
+
+  export type EventCheckInRedemptionOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    jti?: SortOrder
+    _count?: EventCheckInRedemptionCountOrderByAggregateInput
+    _max?: EventCheckInRedemptionMaxOrderByAggregateInput
+    _min?: EventCheckInRedemptionMinOrderByAggregateInput
+  }
+
+  export type EventCheckInRedemptionScalarWhereWithAggregatesInput = {
+    AND?: EventCheckInRedemptionScalarWhereWithAggregatesInput | EventCheckInRedemptionScalarWhereWithAggregatesInput[]
+    OR?: EventCheckInRedemptionScalarWhereWithAggregatesInput[]
+    NOT?: EventCheckInRedemptionScalarWhereWithAggregatesInput | EventCheckInRedemptionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventCheckInRedemption"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventCheckInRedemption"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventCheckInRedemption"> | string
+    jti?: StringWithAggregatesFilter<"EventCheckInRedemption"> | string
   }
 
   export type SiteVoteWhereInput = {
@@ -34783,6 +45175,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -34826,6 +45225,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -34869,6 +45275,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -34912,6 +45325,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -36045,12 +46465,35 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
-    organizerId?: string | null
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
     site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
 
   export type CleanupEventUncheckedCreateInput = {
@@ -36058,23 +46501,69 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     organizerId?: string | null
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
   export type CleanupEventUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
-    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
     site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
 
   export type CleanupEventUncheckedUpdateInput = {
@@ -36082,11 +46571,34 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
   export type CleanupEventCreateManyInput = {
@@ -36094,22 +46606,52 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     organizerId?: string | null
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
   }
 
   export type CleanupEventUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
-    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type CleanupEventUncheckedUpdateManyInput = {
@@ -36117,11 +46659,560 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type EventParticipantCreateInput = {
+    id?: string
+    joinedAt?: Date | string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+    event: CleanupEventCreateNestedOneWithoutParticipantsInput
+    user: UserCreateNestedOneWithoutEventParticipationsInput
+  }
+
+  export type EventParticipantUncheckedCreateInput = {
+    id?: string
+    joinedAt?: Date | string
+    eventId: string
+    userId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventParticipantUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutParticipantsNestedInput
+    user?: UserUpdateOneRequiredWithoutEventParticipationsNestedInput
+  }
+
+  export type EventParticipantUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventParticipantCreateManyInput = {
+    id?: string
+    joinedAt?: Date | string
+    eventId: string
+    userId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventParticipantUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventParticipantUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventChatMessageCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+  }
+
+  export type EventChatMessageUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatMessageUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+    message: EventChatMessageCreateNestedOneWithoutAttachmentsInput
+  }
+
+  export type EventChatAttachmentUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    messageId: string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+  }
+
+  export type EventChatAttachmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    message?: EventChatMessageUpdateOneRequiredWithoutAttachmentsNestedInput
+  }
+
+  export type EventChatAttachmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageId?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    messageId: string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+  }
+
+  export type EventChatAttachmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    messageId?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatMuteCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    event: CleanupEventCreateNestedOneWithoutChatMutesInput
+    user: UserCreateNestedOneWithoutEventChatMutesInput
+  }
+
+  export type EventChatMuteUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    userId: string
+  }
+
+  export type EventChatMuteUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    event?: CleanupEventUpdateOneRequiredWithoutChatMutesNestedInput
+    user?: UserUpdateOneRequiredWithoutEventChatMutesNestedInput
+  }
+
+  export type EventChatMuteUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatMuteCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    userId: string
+  }
+
+  export type EventChatMuteUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventChatMuteUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatReadCursorCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lastReadMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatReadCursorsInput
+    user: UserCreateNestedOneWithoutEventChatReadCursorsInput
+  }
+
+  export type EventChatReadCursorUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    userId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatReadCursorUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput
+    user?: UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput
+  }
+
+  export type EventChatReadCursorUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    userId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatReadCursorUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventCheckInCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    dedupeKey: string
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+    event: CleanupEventCreateNestedOneWithoutCheckInsInput
+    user?: UserCreateNestedOneWithoutEventCheckInsInput
+  }
+
+  export type EventCheckInUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    dedupeKey: string
+    userId?: string | null
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventCheckInUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    event?: CleanupEventUpdateOneRequiredWithoutCheckInsNestedInput
+    user?: UserUpdateOneWithoutEventCheckInsNestedInput
+  }
+
+  export type EventCheckInUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    dedupeKey: string
+    userId?: string | null
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventCheckInUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInRedemptionCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    jti: string
+    event: CleanupEventCreateNestedOneWithoutCheckInRedemptionsInput
+  }
+
+  export type EventCheckInRedemptionUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    jti: string
+  }
+
+  export type EventCheckInRedemptionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jti?: StringFieldUpdateOperationsInput | string
+    event?: CleanupEventUpdateOneRequiredWithoutCheckInRedemptionsNestedInput
+  }
+
+  export type EventCheckInRedemptionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventCheckInRedemptionCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    jti: string
+  }
+
+  export type EventCheckInRedemptionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventCheckInRedemptionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
   }
 
   export type SiteVoteCreateInput = {
@@ -37010,6 +48101,42 @@ export namespace Prisma {
     none?: UserNotificationPreferenceWhereInput
   }
 
+  export type CleanupEventListRelationFilter = {
+    every?: CleanupEventWhereInput
+    some?: CleanupEventWhereInput
+    none?: CleanupEventWhereInput
+  }
+
+  export type EventParticipantListRelationFilter = {
+    every?: EventParticipantWhereInput
+    some?: EventParticipantWhereInput
+    none?: EventParticipantWhereInput
+  }
+
+  export type EventCheckInListRelationFilter = {
+    every?: EventCheckInWhereInput
+    some?: EventCheckInWhereInput
+    none?: EventCheckInWhereInput
+  }
+
+  export type EventChatMessageListRelationFilter = {
+    every?: EventChatMessageWhereInput
+    some?: EventChatMessageWhereInput
+    none?: EventChatMessageWhereInput
+  }
+
+  export type EventChatReadCursorListRelationFilter = {
+    every?: EventChatReadCursorWhereInput
+    some?: EventChatReadCursorWhereInput
+    none?: EventChatReadCursorWhereInput
+  }
+
+  export type EventChatMuteListRelationFilter = {
+    every?: EventChatMuteWhereInput
+    some?: EventChatMuteWhereInput
+    none?: EventChatMuteWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -37072,6 +48199,30 @@ export namespace Prisma {
   }
 
   export type UserNotificationPreferenceOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CleanupEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventParticipantOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventCheckInOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventChatMessageOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventChatReadCursorOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventChatMuteOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -37654,16 +48805,6 @@ export namespace Prisma {
     not?: NestedEnumSiteStatusFilter<$PrismaModel> | $Enums.SiteStatus
   }
 
-  export type CleanupEventListRelationFilter = {
-    every?: CleanupEventWhereInput
-    some?: CleanupEventWhereInput
-    none?: CleanupEventWhereInput
-  }
-
-  export type CleanupEventOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type SiteCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
@@ -37998,6 +49139,13 @@ export namespace Prisma {
     ipAddress?: SortOrder
   }
 
+  export type EnumEcoEventCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventCategory | EnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventCategoryFilter<$PrismaModel> | $Enums.EcoEventCategory
+  }
+
   export type EnumCleanupEventStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CleanupEventStatus | EnumCleanupEventStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CleanupEventStatus[] | ListEnumCleanupEventStatusFieldRefInput<$PrismaModel>
@@ -38005,20 +49153,75 @@ export namespace Prisma {
     not?: NestedEnumCleanupEventStatusFilter<$PrismaModel> | $Enums.CleanupEventStatus
   }
 
+  export type EnumEcoEventLifecycleStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventLifecycleStatus | EnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel> | $Enums.EcoEventLifecycleStatus
+  }
+
+  export type EnumEcoCleanupScaleNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoCleanupScale | EnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel> | $Enums.EcoCleanupScale | null
+  }
+
+  export type EnumEcoEventDifficultyNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventDifficulty | EnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel> | $Enums.EcoEventDifficulty | null
+  }
+
+  export type EventCheckInRedemptionListRelationFilter = {
+    every?: EventCheckInRedemptionWhereInput
+    some?: EventCheckInRedemptionWhereInput
+    none?: EventCheckInRedemptionWhereInput
+  }
+
+  export type CleanupEventNullableScalarRelationFilter = {
+    is?: CleanupEventWhereInput | null
+    isNot?: CleanupEventWhereInput | null
+  }
+
+  export type EventCheckInRedemptionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type CleanupEventCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     siteId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
     scheduledAt?: SortOrder
+    endAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
+    lifecycleStatus?: SortOrder
     organizerId?: SortOrder
     participantCount?: SortOrder
+    gear?: SortOrder
+    scale?: SortOrder
+    difficulty?: SortOrder
+    afterImageKeys?: SortOrder
+    maxParticipants?: SortOrder
+    checkInSessionId?: SortOrder
+    checkInOpen?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceRule?: SortOrder
+    parentEventId?: SortOrder
+    recurrenceIndex?: SortOrder
   }
 
   export type CleanupEventAvgOrderByAggregateInput = {
     participantCount?: SortOrder
+    maxParticipants?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceIndex?: SortOrder
   }
 
   export type CleanupEventMaxOrderByAggregateInput = {
@@ -38026,11 +49229,25 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     siteId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
     scheduledAt?: SortOrder
+    endAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
+    lifecycleStatus?: SortOrder
     organizerId?: SortOrder
     participantCount?: SortOrder
+    scale?: SortOrder
+    difficulty?: SortOrder
+    maxParticipants?: SortOrder
+    checkInSessionId?: SortOrder
+    checkInOpen?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceRule?: SortOrder
+    parentEventId?: SortOrder
+    recurrenceIndex?: SortOrder
   }
 
   export type CleanupEventMinOrderByAggregateInput = {
@@ -38038,15 +49255,42 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     siteId?: SortOrder
+    title?: SortOrder
+    description?: SortOrder
+    category?: SortOrder
     scheduledAt?: SortOrder
+    endAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
+    lifecycleStatus?: SortOrder
     organizerId?: SortOrder
     participantCount?: SortOrder
+    scale?: SortOrder
+    difficulty?: SortOrder
+    maxParticipants?: SortOrder
+    checkInSessionId?: SortOrder
+    checkInOpen?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceRule?: SortOrder
+    parentEventId?: SortOrder
+    recurrenceIndex?: SortOrder
   }
 
   export type CleanupEventSumOrderByAggregateInput = {
     participantCount?: SortOrder
+    maxParticipants?: SortOrder
+    checkedInCount?: SortOrder
+    recurrenceIndex?: SortOrder
+  }
+
+  export type EnumEcoEventCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventCategory | EnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventCategoryWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventCategoryFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventCategoryFilter<$PrismaModel>
   }
 
   export type EnumCleanupEventStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -38057,6 +49301,383 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
     _max?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
+  }
+
+  export type EnumEcoEventLifecycleStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventLifecycleStatus | EnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventLifecycleStatusWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventLifecycleStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel>
+  }
+
+  export type EnumEcoCleanupScaleNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoCleanupScale | EnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoCleanupScaleNullableWithAggregatesFilter<$PrismaModel> | $Enums.EcoCleanupScale | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel>
+    _max?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel>
+  }
+
+  export type EnumEcoEventDifficultyNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventDifficulty | EnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoEventDifficultyNullableWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventDifficulty | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel>
+  }
+
+  export type CleanupEventScalarRelationFilter = {
+    is?: CleanupEventWhereInput
+    isNot?: CleanupEventWhereInput
+  }
+
+  export type EventParticipantEventIdUserIdCompoundUniqueInput = {
+    eventId: string
+    userId: string
+  }
+
+  export type EventParticipantCountOrderByAggregateInput = {
+    id?: SortOrder
+    joinedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    reminderEnabled?: SortOrder
+    reminderAt?: SortOrder
+  }
+
+  export type EventParticipantMaxOrderByAggregateInput = {
+    id?: SortOrder
+    joinedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    reminderEnabled?: SortOrder
+    reminderAt?: SortOrder
+  }
+
+  export type EventParticipantMinOrderByAggregateInput = {
+    id?: SortOrder
+    joinedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    reminderEnabled?: SortOrder
+    reminderAt?: SortOrder
+  }
+
+  export type EnumEventChatMessageTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventChatMessageType | EnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventChatMessageTypeFilter<$PrismaModel> | $Enums.EventChatMessageType
+  }
+
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EventChatMessageNullableScalarRelationFilter = {
+    is?: EventChatMessageWhereInput | null
+    isNot?: EventChatMessageWhereInput | null
+  }
+
+  export type EventChatAttachmentListRelationFilter = {
+    every?: EventChatAttachmentWhereInput
+    some?: EventChatAttachmentWhereInput
+    none?: EventChatAttachmentWhereInput
+  }
+
+  export type EventChatAttachmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventChatMessageEventIdClientMessageIdCompoundUniqueInput = {
+    eventId: string
+    clientMessageId: string
+  }
+
+  export type EventChatMessageCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    authorId?: SortOrder
+    body?: SortOrder
+    replyToId?: SortOrder
+    deletedAt?: SortOrder
+    editedAt?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
+    pinnedById?: SortOrder
+    messageType?: SortOrder
+    systemPayload?: SortOrder
+    locationLat?: SortOrder
+    locationLng?: SortOrder
+    locationLabel?: SortOrder
+    bodyEncrypted?: SortOrder
+    clientMessageId?: SortOrder
+  }
+
+  export type EventChatMessageAvgOrderByAggregateInput = {
+    locationLat?: SortOrder
+    locationLng?: SortOrder
+  }
+
+  export type EventChatMessageMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    authorId?: SortOrder
+    body?: SortOrder
+    replyToId?: SortOrder
+    deletedAt?: SortOrder
+    editedAt?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
+    pinnedById?: SortOrder
+    messageType?: SortOrder
+    locationLat?: SortOrder
+    locationLng?: SortOrder
+    locationLabel?: SortOrder
+    bodyEncrypted?: SortOrder
+    clientMessageId?: SortOrder
+  }
+
+  export type EventChatMessageMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    authorId?: SortOrder
+    body?: SortOrder
+    replyToId?: SortOrder
+    deletedAt?: SortOrder
+    editedAt?: SortOrder
+    isPinned?: SortOrder
+    pinnedAt?: SortOrder
+    pinnedById?: SortOrder
+    messageType?: SortOrder
+    locationLat?: SortOrder
+    locationLng?: SortOrder
+    locationLabel?: SortOrder
+    bodyEncrypted?: SortOrder
+    clientMessageId?: SortOrder
+  }
+
+  export type EventChatMessageSumOrderByAggregateInput = {
+    locationLat?: SortOrder
+    locationLng?: SortOrder
+  }
+
+  export type EnumEventChatMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventChatMessageType | EnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventChatMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventChatMessageType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventChatMessageTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventChatMessageTypeFilter<$PrismaModel>
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
+  export type EventChatMessageScalarRelationFilter = {
+    is?: EventChatMessageWhereInput
+    isNot?: EventChatMessageWhereInput
+  }
+
+  export type EventChatAttachmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    messageId?: SortOrder
+    url?: SortOrder
+    mimeType?: SortOrder
+    fileName?: SortOrder
+    sizeBytes?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    duration?: SortOrder
+    thumbnailUrl?: SortOrder
+  }
+
+  export type EventChatAttachmentAvgOrderByAggregateInput = {
+    sizeBytes?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    duration?: SortOrder
+  }
+
+  export type EventChatAttachmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    messageId?: SortOrder
+    url?: SortOrder
+    mimeType?: SortOrder
+    fileName?: SortOrder
+    sizeBytes?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    duration?: SortOrder
+    thumbnailUrl?: SortOrder
+  }
+
+  export type EventChatAttachmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    messageId?: SortOrder
+    url?: SortOrder
+    mimeType?: SortOrder
+    fileName?: SortOrder
+    sizeBytes?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    duration?: SortOrder
+    thumbnailUrl?: SortOrder
+  }
+
+  export type EventChatAttachmentSumOrderByAggregateInput = {
+    sizeBytes?: SortOrder
+    width?: SortOrder
+    height?: SortOrder
+    duration?: SortOrder
+  }
+
+  export type EventChatMuteEventIdUserIdCompoundUniqueInput = {
+    eventId: string
+    userId: string
+  }
+
+  export type EventChatMuteCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type EventChatMuteMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type EventChatMuteMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+  }
+
+  export type EventChatReadCursorEventIdUserIdCompoundUniqueInput = {
+    eventId: string
+    userId: string
+  }
+
+  export type EventChatReadCursorCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    lastReadMessageId?: SortOrder
+  }
+
+  export type EventChatReadCursorMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    lastReadMessageId?: SortOrder
+  }
+
+  export type EventChatReadCursorMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    lastReadMessageId?: SortOrder
+  }
+
+  export type EventCheckInEventIdDedupeKeyCompoundUniqueInput = {
+    eventId: string
+    dedupeKey: string
+  }
+
+  export type EventCheckInCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    dedupeKey?: SortOrder
+    userId?: SortOrder
+    guestDisplayName?: SortOrder
+    checkedInAt?: SortOrder
+  }
+
+  export type EventCheckInMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    dedupeKey?: SortOrder
+    userId?: SortOrder
+    guestDisplayName?: SortOrder
+    checkedInAt?: SortOrder
+  }
+
+  export type EventCheckInMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    dedupeKey?: SortOrder
+    userId?: SortOrder
+    guestDisplayName?: SortOrder
+    checkedInAt?: SortOrder
+  }
+
+  export type EventCheckInRedemptionCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    jti?: SortOrder
+  }
+
+  export type EventCheckInRedemptionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    jti?: SortOrder
+  }
+
+  export type EventCheckInRedemptionMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    eventId?: SortOrder
+    jti?: SortOrder
   }
 
   export type SiteVoteSiteIdUserIdCompoundUniqueInput = {
@@ -38634,6 +50255,55 @@ export namespace Prisma {
     connect?: UserNotificationPreferenceWhereUniqueInput | UserNotificationPreferenceWhereUniqueInput[]
   }
 
+  export type CleanupEventCreateNestedManyWithoutOrganizerInput = {
+    create?: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput> | CleanupEventCreateWithoutOrganizerInput[] | CleanupEventUncheckedCreateWithoutOrganizerInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutOrganizerInput | CleanupEventCreateOrConnectWithoutOrganizerInput[]
+    createMany?: CleanupEventCreateManyOrganizerInputEnvelope
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+  }
+
+  export type EventParticipantCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput> | EventParticipantCreateWithoutUserInput[] | EventParticipantUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutUserInput | EventParticipantCreateOrConnectWithoutUserInput[]
+    createMany?: EventParticipantCreateManyUserInputEnvelope
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+  }
+
+  export type EventCheckInCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput> | EventCheckInCreateWithoutUserInput[] | EventCheckInUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutUserInput | EventCheckInCreateOrConnectWithoutUserInput[]
+    createMany?: EventCheckInCreateManyUserInputEnvelope
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+  }
+
+  export type EventChatMessageCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput> | EventChatMessageCreateWithoutAuthorInput[] | EventChatMessageUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAuthorInput | EventChatMessageCreateOrConnectWithoutAuthorInput[]
+    createMany?: EventChatMessageCreateManyAuthorInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatReadCursorCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput> | EventChatReadCursorCreateWithoutUserInput[] | EventChatReadCursorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutUserInput | EventChatReadCursorCreateOrConnectWithoutUserInput[]
+    createMany?: EventChatReadCursorCreateManyUserInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+  }
+
+  export type EventChatMessageCreateNestedManyWithoutPinnedByInput = {
+    create?: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput> | EventChatMessageCreateWithoutPinnedByInput[] | EventChatMessageUncheckedCreateWithoutPinnedByInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutPinnedByInput | EventChatMessageCreateOrConnectWithoutPinnedByInput[]
+    createMany?: EventChatMessageCreateManyPinnedByInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatMuteCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput> | EventChatMuteCreateWithoutUserInput[] | EventChatMuteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutUserInput | EventChatMuteCreateOrConnectWithoutUserInput[]
+    createMany?: EventChatMuteCreateManyUserInputEnvelope
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -38750,6 +50420,55 @@ export namespace Prisma {
     connectOrCreate?: UserNotificationPreferenceCreateOrConnectWithoutUserInput | UserNotificationPreferenceCreateOrConnectWithoutUserInput[]
     createMany?: UserNotificationPreferenceCreateManyUserInputEnvelope
     connect?: UserNotificationPreferenceWhereUniqueInput | UserNotificationPreferenceWhereUniqueInput[]
+  }
+
+  export type CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput = {
+    create?: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput> | CleanupEventCreateWithoutOrganizerInput[] | CleanupEventUncheckedCreateWithoutOrganizerInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutOrganizerInput | CleanupEventCreateOrConnectWithoutOrganizerInput[]
+    createMany?: CleanupEventCreateManyOrganizerInputEnvelope
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+  }
+
+  export type EventParticipantUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput> | EventParticipantCreateWithoutUserInput[] | EventParticipantUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutUserInput | EventParticipantCreateOrConnectWithoutUserInput[]
+    createMany?: EventParticipantCreateManyUserInputEnvelope
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+  }
+
+  export type EventCheckInUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput> | EventCheckInCreateWithoutUserInput[] | EventCheckInUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutUserInput | EventCheckInCreateOrConnectWithoutUserInput[]
+    createMany?: EventCheckInCreateManyUserInputEnvelope
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+  }
+
+  export type EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput = {
+    create?: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput> | EventChatMessageCreateWithoutAuthorInput[] | EventChatMessageUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAuthorInput | EventChatMessageCreateOrConnectWithoutAuthorInput[]
+    createMany?: EventChatMessageCreateManyAuthorInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput> | EventChatReadCursorCreateWithoutUserInput[] | EventChatReadCursorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutUserInput | EventChatReadCursorCreateOrConnectWithoutUserInput[]
+    createMany?: EventChatReadCursorCreateManyUserInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+  }
+
+  export type EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput = {
+    create?: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput> | EventChatMessageCreateWithoutPinnedByInput[] | EventChatMessageUncheckedCreateWithoutPinnedByInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutPinnedByInput | EventChatMessageCreateOrConnectWithoutPinnedByInput[]
+    createMany?: EventChatMessageCreateManyPinnedByInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatMuteUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput> | EventChatMuteCreateWithoutUserInput[] | EventChatMuteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutUserInput | EventChatMuteCreateOrConnectWithoutUserInput[]
+    createMany?: EventChatMuteCreateManyUserInputEnvelope
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -39027,6 +50746,104 @@ export namespace Prisma {
     deleteMany?: UserNotificationPreferenceScalarWhereInput | UserNotificationPreferenceScalarWhereInput[]
   }
 
+  export type CleanupEventUpdateManyWithoutOrganizerNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput> | CleanupEventCreateWithoutOrganizerInput[] | CleanupEventUncheckedCreateWithoutOrganizerInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutOrganizerInput | CleanupEventCreateOrConnectWithoutOrganizerInput[]
+    upsert?: CleanupEventUpsertWithWhereUniqueWithoutOrganizerInput | CleanupEventUpsertWithWhereUniqueWithoutOrganizerInput[]
+    createMany?: CleanupEventCreateManyOrganizerInputEnvelope
+    set?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    disconnect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    delete?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    update?: CleanupEventUpdateWithWhereUniqueWithoutOrganizerInput | CleanupEventUpdateWithWhereUniqueWithoutOrganizerInput[]
+    updateMany?: CleanupEventUpdateManyWithWhereWithoutOrganizerInput | CleanupEventUpdateManyWithWhereWithoutOrganizerInput[]
+    deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+  }
+
+  export type EventParticipantUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput> | EventParticipantCreateWithoutUserInput[] | EventParticipantUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutUserInput | EventParticipantCreateOrConnectWithoutUserInput[]
+    upsert?: EventParticipantUpsertWithWhereUniqueWithoutUserInput | EventParticipantUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventParticipantCreateManyUserInputEnvelope
+    set?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    disconnect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    delete?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    update?: EventParticipantUpdateWithWhereUniqueWithoutUserInput | EventParticipantUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventParticipantUpdateManyWithWhereWithoutUserInput | EventParticipantUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+  }
+
+  export type EventCheckInUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput> | EventCheckInCreateWithoutUserInput[] | EventCheckInUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutUserInput | EventCheckInCreateOrConnectWithoutUserInput[]
+    upsert?: EventCheckInUpsertWithWhereUniqueWithoutUserInput | EventCheckInUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventCheckInCreateManyUserInputEnvelope
+    set?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    disconnect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    delete?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    update?: EventCheckInUpdateWithWhereUniqueWithoutUserInput | EventCheckInUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventCheckInUpdateManyWithWhereWithoutUserInput | EventCheckInUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+  }
+
+  export type EventChatMessageUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput> | EventChatMessageCreateWithoutAuthorInput[] | EventChatMessageUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAuthorInput | EventChatMessageCreateOrConnectWithoutAuthorInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutAuthorInput | EventChatMessageUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: EventChatMessageCreateManyAuthorInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutAuthorInput | EventChatMessageUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutAuthorInput | EventChatMessageUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatReadCursorUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput> | EventChatReadCursorCreateWithoutUserInput[] | EventChatReadCursorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutUserInput | EventChatReadCursorCreateOrConnectWithoutUserInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutUserInput | EventChatReadCursorUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventChatReadCursorCreateManyUserInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutUserInput | EventChatReadCursorUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutUserInput | EventChatReadCursorUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+  }
+
+  export type EventChatMessageUpdateManyWithoutPinnedByNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput> | EventChatMessageCreateWithoutPinnedByInput[] | EventChatMessageUncheckedCreateWithoutPinnedByInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutPinnedByInput | EventChatMessageCreateOrConnectWithoutPinnedByInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutPinnedByInput | EventChatMessageUpsertWithWhereUniqueWithoutPinnedByInput[]
+    createMany?: EventChatMessageCreateManyPinnedByInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutPinnedByInput | EventChatMessageUpdateWithWhereUniqueWithoutPinnedByInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutPinnedByInput | EventChatMessageUpdateManyWithWhereWithoutPinnedByInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatMuteUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput> | EventChatMuteCreateWithoutUserInput[] | EventChatMuteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutUserInput | EventChatMuteCreateOrConnectWithoutUserInput[]
+    upsert?: EventChatMuteUpsertWithWhereUniqueWithoutUserInput | EventChatMuteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventChatMuteCreateManyUserInputEnvelope
+    set?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    disconnect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    delete?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    update?: EventChatMuteUpdateWithWhereUniqueWithoutUserInput | EventChatMuteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventChatMuteUpdateManyWithWhereWithoutUserInput | EventChatMuteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -39259,6 +51076,104 @@ export namespace Prisma {
     update?: UserNotificationPreferenceUpdateWithWhereUniqueWithoutUserInput | UserNotificationPreferenceUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: UserNotificationPreferenceUpdateManyWithWhereWithoutUserInput | UserNotificationPreferenceUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: UserNotificationPreferenceScalarWhereInput | UserNotificationPreferenceScalarWhereInput[]
+  }
+
+  export type CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput> | CleanupEventCreateWithoutOrganizerInput[] | CleanupEventUncheckedCreateWithoutOrganizerInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutOrganizerInput | CleanupEventCreateOrConnectWithoutOrganizerInput[]
+    upsert?: CleanupEventUpsertWithWhereUniqueWithoutOrganizerInput | CleanupEventUpsertWithWhereUniqueWithoutOrganizerInput[]
+    createMany?: CleanupEventCreateManyOrganizerInputEnvelope
+    set?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    disconnect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    delete?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    update?: CleanupEventUpdateWithWhereUniqueWithoutOrganizerInput | CleanupEventUpdateWithWhereUniqueWithoutOrganizerInput[]
+    updateMany?: CleanupEventUpdateManyWithWhereWithoutOrganizerInput | CleanupEventUpdateManyWithWhereWithoutOrganizerInput[]
+    deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+  }
+
+  export type EventParticipantUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput> | EventParticipantCreateWithoutUserInput[] | EventParticipantUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutUserInput | EventParticipantCreateOrConnectWithoutUserInput[]
+    upsert?: EventParticipantUpsertWithWhereUniqueWithoutUserInput | EventParticipantUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventParticipantCreateManyUserInputEnvelope
+    set?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    disconnect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    delete?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    update?: EventParticipantUpdateWithWhereUniqueWithoutUserInput | EventParticipantUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventParticipantUpdateManyWithWhereWithoutUserInput | EventParticipantUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+  }
+
+  export type EventCheckInUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput> | EventCheckInCreateWithoutUserInput[] | EventCheckInUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutUserInput | EventCheckInCreateOrConnectWithoutUserInput[]
+    upsert?: EventCheckInUpsertWithWhereUniqueWithoutUserInput | EventCheckInUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventCheckInCreateManyUserInputEnvelope
+    set?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    disconnect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    delete?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    update?: EventCheckInUpdateWithWhereUniqueWithoutUserInput | EventCheckInUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventCheckInUpdateManyWithWhereWithoutUserInput | EventCheckInUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput> | EventChatMessageCreateWithoutAuthorInput[] | EventChatMessageUncheckedCreateWithoutAuthorInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAuthorInput | EventChatMessageCreateOrConnectWithoutAuthorInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutAuthorInput | EventChatMessageUpsertWithWhereUniqueWithoutAuthorInput[]
+    createMany?: EventChatMessageCreateManyAuthorInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutAuthorInput | EventChatMessageUpdateWithWhereUniqueWithoutAuthorInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutAuthorInput | EventChatMessageUpdateManyWithWhereWithoutAuthorInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput> | EventChatReadCursorCreateWithoutUserInput[] | EventChatReadCursorUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutUserInput | EventChatReadCursorCreateOrConnectWithoutUserInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutUserInput | EventChatReadCursorUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventChatReadCursorCreateManyUserInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutUserInput | EventChatReadCursorUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutUserInput | EventChatReadCursorUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput> | EventChatMessageCreateWithoutPinnedByInput[] | EventChatMessageUncheckedCreateWithoutPinnedByInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutPinnedByInput | EventChatMessageCreateOrConnectWithoutPinnedByInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutPinnedByInput | EventChatMessageUpsertWithWhereUniqueWithoutPinnedByInput[]
+    createMany?: EventChatMessageCreateManyPinnedByInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutPinnedByInput | EventChatMessageUpdateWithWhereUniqueWithoutPinnedByInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutPinnedByInput | EventChatMessageUpdateManyWithWhereWithoutPinnedByInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatMuteUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput> | EventChatMuteCreateWithoutUserInput[] | EventChatMuteUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutUserInput | EventChatMuteCreateOrConnectWithoutUserInput[]
+    upsert?: EventChatMuteUpsertWithWhereUniqueWithoutUserInput | EventChatMuteUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: EventChatMuteCreateManyUserInputEnvelope
+    set?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    disconnect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    delete?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    update?: EventChatMuteUpdateWithWhereUniqueWithoutUserInput | EventChatMuteUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: EventChatMuteUpdateManyWithWhereWithoutUserInput | EventChatMuteUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -39820,14 +51735,158 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAuditLogsInput, UserUpdateWithoutAuditLogsInput>, UserUncheckedUpdateWithoutAuditLogsInput>
   }
 
+  export type CleanupEventCreategearInput = {
+    set: string[]
+  }
+
+  export type CleanupEventCreateafterImageKeysInput = {
+    set: string[]
+  }
+
   export type SiteCreateNestedOneWithoutEventsInput = {
     create?: XOR<SiteCreateWithoutEventsInput, SiteUncheckedCreateWithoutEventsInput>
     connectOrCreate?: SiteCreateOrConnectWithoutEventsInput
     connect?: SiteWhereUniqueInput
   }
 
+  export type UserCreateNestedOneWithoutOrganizedCleanupEventsInput = {
+    create?: XOR<UserCreateWithoutOrganizedCleanupEventsInput, UserUncheckedCreateWithoutOrganizedCleanupEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOrganizedCleanupEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EventParticipantCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput> | EventParticipantCreateWithoutEventInput[] | EventParticipantUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutEventInput | EventParticipantCreateOrConnectWithoutEventInput[]
+    createMany?: EventParticipantCreateManyEventInputEnvelope
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+  }
+
+  export type EventCheckInCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput> | EventCheckInCreateWithoutEventInput[] | EventCheckInUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutEventInput | EventCheckInCreateOrConnectWithoutEventInput[]
+    createMany?: EventCheckInCreateManyEventInputEnvelope
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+  }
+
+  export type EventCheckInRedemptionCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput> | EventCheckInRedemptionCreateWithoutEventInput[] | EventCheckInRedemptionUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInRedemptionCreateOrConnectWithoutEventInput | EventCheckInRedemptionCreateOrConnectWithoutEventInput[]
+    createMany?: EventCheckInRedemptionCreateManyEventInputEnvelope
+    connect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+  }
+
+  export type EventChatMessageCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput> | EventChatMessageCreateWithoutEventInput[] | EventChatMessageUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutEventInput | EventChatMessageCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatMessageCreateManyEventInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatReadCursorCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput> | EventChatReadCursorCreateWithoutEventInput[] | EventChatReadCursorUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutEventInput | EventChatReadCursorCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatReadCursorCreateManyEventInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+  }
+
+  export type EventChatMuteCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput> | EventChatMuteCreateWithoutEventInput[] | EventChatMuteUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutEventInput | EventChatMuteCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatMuteCreateManyEventInputEnvelope
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+  }
+
+  export type CleanupEventCreateNestedOneWithoutSeriesChildrenInput = {
+    create?: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutSeriesChildrenInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type CleanupEventCreateNestedManyWithoutParentEventInput = {
+    create?: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput> | CleanupEventCreateWithoutParentEventInput[] | CleanupEventUncheckedCreateWithoutParentEventInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParentEventInput | CleanupEventCreateOrConnectWithoutParentEventInput[]
+    createMany?: CleanupEventCreateManyParentEventInputEnvelope
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+  }
+
+  export type EventParticipantUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput> | EventParticipantCreateWithoutEventInput[] | EventParticipantUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutEventInput | EventParticipantCreateOrConnectWithoutEventInput[]
+    createMany?: EventParticipantCreateManyEventInputEnvelope
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+  }
+
+  export type EventCheckInUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput> | EventCheckInCreateWithoutEventInput[] | EventCheckInUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutEventInput | EventCheckInCreateOrConnectWithoutEventInput[]
+    createMany?: EventCheckInCreateManyEventInputEnvelope
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+  }
+
+  export type EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput> | EventCheckInRedemptionCreateWithoutEventInput[] | EventCheckInRedemptionUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInRedemptionCreateOrConnectWithoutEventInput | EventCheckInRedemptionCreateOrConnectWithoutEventInput[]
+    createMany?: EventCheckInRedemptionCreateManyEventInputEnvelope
+    connect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+  }
+
+  export type EventChatMessageUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput> | EventChatMessageCreateWithoutEventInput[] | EventChatMessageUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutEventInput | EventChatMessageCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatMessageCreateManyEventInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput> | EventChatReadCursorCreateWithoutEventInput[] | EventChatReadCursorUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutEventInput | EventChatReadCursorCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatReadCursorCreateManyEventInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+  }
+
+  export type EventChatMuteUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput> | EventChatMuteCreateWithoutEventInput[] | EventChatMuteUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutEventInput | EventChatMuteCreateOrConnectWithoutEventInput[]
+    createMany?: EventChatMuteCreateManyEventInputEnvelope
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+  }
+
+  export type CleanupEventUncheckedCreateNestedManyWithoutParentEventInput = {
+    create?: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput> | CleanupEventCreateWithoutParentEventInput[] | CleanupEventUncheckedCreateWithoutParentEventInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParentEventInput | CleanupEventCreateOrConnectWithoutParentEventInput[]
+    createMany?: CleanupEventCreateManyParentEventInputEnvelope
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+  }
+
+  export type EnumEcoEventCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.EcoEventCategory
+  }
+
   export type EnumCleanupEventStatusFieldUpdateOperationsInput = {
     set?: $Enums.CleanupEventStatus
+  }
+
+  export type EnumEcoEventLifecycleStatusFieldUpdateOperationsInput = {
+    set?: $Enums.EcoEventLifecycleStatus
+  }
+
+  export type CleanupEventUpdategearInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type NullableEnumEcoCleanupScaleFieldUpdateOperationsInput = {
+    set?: $Enums.EcoCleanupScale | null
+  }
+
+  export type NullableEnumEcoEventDifficultyFieldUpdateOperationsInput = {
+    set?: $Enums.EcoEventDifficulty | null
+  }
+
+  export type CleanupEventUpdateafterImageKeysInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type SiteUpdateOneRequiredWithoutEventsNestedInput = {
@@ -39836,6 +51895,520 @@ export namespace Prisma {
     upsert?: SiteUpsertWithoutEventsInput
     connect?: SiteWhereUniqueInput
     update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutEventsInput, SiteUpdateWithoutEventsInput>, SiteUncheckedUpdateWithoutEventsInput>
+  }
+
+  export type UserUpdateOneWithoutOrganizedCleanupEventsNestedInput = {
+    create?: XOR<UserCreateWithoutOrganizedCleanupEventsInput, UserUncheckedCreateWithoutOrganizedCleanupEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOrganizedCleanupEventsInput
+    upsert?: UserUpsertWithoutOrganizedCleanupEventsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOrganizedCleanupEventsInput, UserUpdateWithoutOrganizedCleanupEventsInput>, UserUncheckedUpdateWithoutOrganizedCleanupEventsInput>
+  }
+
+  export type EventParticipantUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput> | EventParticipantCreateWithoutEventInput[] | EventParticipantUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutEventInput | EventParticipantCreateOrConnectWithoutEventInput[]
+    upsert?: EventParticipantUpsertWithWhereUniqueWithoutEventInput | EventParticipantUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventParticipantCreateManyEventInputEnvelope
+    set?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    disconnect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    delete?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    update?: EventParticipantUpdateWithWhereUniqueWithoutEventInput | EventParticipantUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventParticipantUpdateManyWithWhereWithoutEventInput | EventParticipantUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+  }
+
+  export type EventCheckInUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput> | EventCheckInCreateWithoutEventInput[] | EventCheckInUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutEventInput | EventCheckInCreateOrConnectWithoutEventInput[]
+    upsert?: EventCheckInUpsertWithWhereUniqueWithoutEventInput | EventCheckInUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventCheckInCreateManyEventInputEnvelope
+    set?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    disconnect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    delete?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    update?: EventCheckInUpdateWithWhereUniqueWithoutEventInput | EventCheckInUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventCheckInUpdateManyWithWhereWithoutEventInput | EventCheckInUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+  }
+
+  export type EventCheckInRedemptionUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput> | EventCheckInRedemptionCreateWithoutEventInput[] | EventCheckInRedemptionUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInRedemptionCreateOrConnectWithoutEventInput | EventCheckInRedemptionCreateOrConnectWithoutEventInput[]
+    upsert?: EventCheckInRedemptionUpsertWithWhereUniqueWithoutEventInput | EventCheckInRedemptionUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventCheckInRedemptionCreateManyEventInputEnvelope
+    set?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    disconnect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    delete?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    connect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    update?: EventCheckInRedemptionUpdateWithWhereUniqueWithoutEventInput | EventCheckInRedemptionUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventCheckInRedemptionUpdateManyWithWhereWithoutEventInput | EventCheckInRedemptionUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventCheckInRedemptionScalarWhereInput | EventCheckInRedemptionScalarWhereInput[]
+  }
+
+  export type EventChatMessageUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput> | EventChatMessageCreateWithoutEventInput[] | EventChatMessageUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutEventInput | EventChatMessageCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutEventInput | EventChatMessageUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatMessageCreateManyEventInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutEventInput | EventChatMessageUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutEventInput | EventChatMessageUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatReadCursorUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput> | EventChatReadCursorCreateWithoutEventInput[] | EventChatReadCursorUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutEventInput | EventChatReadCursorCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutEventInput | EventChatReadCursorUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatReadCursorCreateManyEventInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutEventInput | EventChatReadCursorUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutEventInput | EventChatReadCursorUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+  }
+
+  export type EventChatMuteUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput> | EventChatMuteCreateWithoutEventInput[] | EventChatMuteUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutEventInput | EventChatMuteCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatMuteUpsertWithWhereUniqueWithoutEventInput | EventChatMuteUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatMuteCreateManyEventInputEnvelope
+    set?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    disconnect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    delete?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    update?: EventChatMuteUpdateWithWhereUniqueWithoutEventInput | EventChatMuteUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatMuteUpdateManyWithWhereWithoutEventInput | EventChatMuteUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+  }
+
+  export type CleanupEventUpdateOneWithoutSeriesChildrenNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutSeriesChildrenInput
+    upsert?: CleanupEventUpsertWithoutSeriesChildrenInput
+    disconnect?: CleanupEventWhereInput | boolean
+    delete?: CleanupEventWhereInput | boolean
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutSeriesChildrenInput, CleanupEventUpdateWithoutSeriesChildrenInput>, CleanupEventUncheckedUpdateWithoutSeriesChildrenInput>
+  }
+
+  export type CleanupEventUpdateManyWithoutParentEventNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput> | CleanupEventCreateWithoutParentEventInput[] | CleanupEventUncheckedCreateWithoutParentEventInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParentEventInput | CleanupEventCreateOrConnectWithoutParentEventInput[]
+    upsert?: CleanupEventUpsertWithWhereUniqueWithoutParentEventInput | CleanupEventUpsertWithWhereUniqueWithoutParentEventInput[]
+    createMany?: CleanupEventCreateManyParentEventInputEnvelope
+    set?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    disconnect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    delete?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    update?: CleanupEventUpdateWithWhereUniqueWithoutParentEventInput | CleanupEventUpdateWithWhereUniqueWithoutParentEventInput[]
+    updateMany?: CleanupEventUpdateManyWithWhereWithoutParentEventInput | CleanupEventUpdateManyWithWhereWithoutParentEventInput[]
+    deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+  }
+
+  export type EventParticipantUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput> | EventParticipantCreateWithoutEventInput[] | EventParticipantUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventParticipantCreateOrConnectWithoutEventInput | EventParticipantCreateOrConnectWithoutEventInput[]
+    upsert?: EventParticipantUpsertWithWhereUniqueWithoutEventInput | EventParticipantUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventParticipantCreateManyEventInputEnvelope
+    set?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    disconnect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    delete?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    connect?: EventParticipantWhereUniqueInput | EventParticipantWhereUniqueInput[]
+    update?: EventParticipantUpdateWithWhereUniqueWithoutEventInput | EventParticipantUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventParticipantUpdateManyWithWhereWithoutEventInput | EventParticipantUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+  }
+
+  export type EventCheckInUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput> | EventCheckInCreateWithoutEventInput[] | EventCheckInUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInCreateOrConnectWithoutEventInput | EventCheckInCreateOrConnectWithoutEventInput[]
+    upsert?: EventCheckInUpsertWithWhereUniqueWithoutEventInput | EventCheckInUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventCheckInCreateManyEventInputEnvelope
+    set?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    disconnect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    delete?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    connect?: EventCheckInWhereUniqueInput | EventCheckInWhereUniqueInput[]
+    update?: EventCheckInUpdateWithWhereUniqueWithoutEventInput | EventCheckInUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventCheckInUpdateManyWithWhereWithoutEventInput | EventCheckInUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+  }
+
+  export type EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput> | EventCheckInRedemptionCreateWithoutEventInput[] | EventCheckInRedemptionUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventCheckInRedemptionCreateOrConnectWithoutEventInput | EventCheckInRedemptionCreateOrConnectWithoutEventInput[]
+    upsert?: EventCheckInRedemptionUpsertWithWhereUniqueWithoutEventInput | EventCheckInRedemptionUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventCheckInRedemptionCreateManyEventInputEnvelope
+    set?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    disconnect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    delete?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    connect?: EventCheckInRedemptionWhereUniqueInput | EventCheckInRedemptionWhereUniqueInput[]
+    update?: EventCheckInRedemptionUpdateWithWhereUniqueWithoutEventInput | EventCheckInRedemptionUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventCheckInRedemptionUpdateManyWithWhereWithoutEventInput | EventCheckInRedemptionUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventCheckInRedemptionScalarWhereInput | EventCheckInRedemptionScalarWhereInput[]
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput> | EventChatMessageCreateWithoutEventInput[] | EventChatMessageUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutEventInput | EventChatMessageCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutEventInput | EventChatMessageUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatMessageCreateManyEventInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutEventInput | EventChatMessageUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutEventInput | EventChatMessageUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput> | EventChatReadCursorCreateWithoutEventInput[] | EventChatReadCursorUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutEventInput | EventChatReadCursorCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutEventInput | EventChatReadCursorUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatReadCursorCreateManyEventInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutEventInput | EventChatReadCursorUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutEventInput | EventChatReadCursorUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+  }
+
+  export type EventChatMuteUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput> | EventChatMuteCreateWithoutEventInput[] | EventChatMuteUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventChatMuteCreateOrConnectWithoutEventInput | EventChatMuteCreateOrConnectWithoutEventInput[]
+    upsert?: EventChatMuteUpsertWithWhereUniqueWithoutEventInput | EventChatMuteUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventChatMuteCreateManyEventInputEnvelope
+    set?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    disconnect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    delete?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+    update?: EventChatMuteUpdateWithWhereUniqueWithoutEventInput | EventChatMuteUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventChatMuteUpdateManyWithWhereWithoutEventInput | EventChatMuteUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+  }
+
+  export type CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput> | CleanupEventCreateWithoutParentEventInput[] | CleanupEventUncheckedCreateWithoutParentEventInput[]
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParentEventInput | CleanupEventCreateOrConnectWithoutParentEventInput[]
+    upsert?: CleanupEventUpsertWithWhereUniqueWithoutParentEventInput | CleanupEventUpsertWithWhereUniqueWithoutParentEventInput[]
+    createMany?: CleanupEventCreateManyParentEventInputEnvelope
+    set?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    disconnect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    delete?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    connect?: CleanupEventWhereUniqueInput | CleanupEventWhereUniqueInput[]
+    update?: CleanupEventUpdateWithWhereUniqueWithoutParentEventInput | CleanupEventUpdateWithWhereUniqueWithoutParentEventInput[]
+    updateMany?: CleanupEventUpdateManyWithWhereWithoutParentEventInput | CleanupEventUpdateManyWithWhereWithoutParentEventInput[]
+    deleteMany?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+  }
+
+  export type CleanupEventCreateNestedOneWithoutParticipantsInput = {
+    create?: XOR<CleanupEventCreateWithoutParticipantsInput, CleanupEventUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParticipantsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventParticipationsInput = {
+    create?: XOR<UserCreateWithoutEventParticipationsInput, UserUncheckedCreateWithoutEventParticipationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventParticipationsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutParticipantsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutParticipantsInput, CleanupEventUncheckedCreateWithoutParticipantsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutParticipantsInput
+    upsert?: CleanupEventUpsertWithoutParticipantsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutParticipantsInput, CleanupEventUpdateWithoutParticipantsInput>, CleanupEventUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutEventParticipationsNestedInput = {
+    create?: XOR<UserCreateWithoutEventParticipationsInput, UserUncheckedCreateWithoutEventParticipationsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventParticipationsInput
+    upsert?: UserUpsertWithoutEventParticipationsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventParticipationsInput, UserUpdateWithoutEventParticipationsInput>, UserUncheckedUpdateWithoutEventParticipationsInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutChatMessagesInput = {
+    create?: XOR<CleanupEventCreateWithoutChatMessagesInput, CleanupEventUncheckedCreateWithoutChatMessagesInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatMessagesInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventChatMessagesInput = {
+    create?: XOR<UserCreateWithoutEventChatMessagesInput, UserUncheckedCreateWithoutEventChatMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatMessagesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EventChatMessageCreateNestedOneWithoutRepliesInput = {
+    create?: XOR<EventChatMessageCreateWithoutRepliesInput, EventChatMessageUncheckedCreateWithoutRepliesInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutRepliesInput
+    connect?: EventChatMessageWhereUniqueInput
+  }
+
+  export type EventChatMessageCreateNestedManyWithoutReplyToInput = {
+    create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
+    createMany?: EventChatMessageCreateManyReplyToInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type UserCreateNestedOneWithoutEventChatPinnedMessagesInput = {
+    create?: XOR<UserCreateWithoutEventChatPinnedMessagesInput, UserUncheckedCreateWithoutEventChatPinnedMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatPinnedMessagesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EventChatAttachmentCreateNestedManyWithoutMessageInput = {
+    create?: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput> | EventChatAttachmentCreateWithoutMessageInput[] | EventChatAttachmentUncheckedCreateWithoutMessageInput[]
+    connectOrCreate?: EventChatAttachmentCreateOrConnectWithoutMessageInput | EventChatAttachmentCreateOrConnectWithoutMessageInput[]
+    createMany?: EventChatAttachmentCreateManyMessageInputEnvelope
+    connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+  }
+
+  export type EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput = {
+    create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
+    createMany?: EventChatMessageCreateManyReplyToInputEnvelope
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+  }
+
+  export type EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput = {
+    create?: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput> | EventChatAttachmentCreateWithoutMessageInput[] | EventChatAttachmentUncheckedCreateWithoutMessageInput[]
+    connectOrCreate?: EventChatAttachmentCreateOrConnectWithoutMessageInput | EventChatAttachmentCreateOrConnectWithoutMessageInput[]
+    createMany?: EventChatAttachmentCreateManyMessageInputEnvelope
+    connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+  }
+
+  export type EnumEventChatMessageTypeFieldUpdateOperationsInput = {
+    set?: $Enums.EventChatMessageType
+  }
+
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutChatMessagesInput, CleanupEventUncheckedCreateWithoutChatMessagesInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatMessagesInput
+    upsert?: CleanupEventUpsertWithoutChatMessagesInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutChatMessagesInput, CleanupEventUpdateWithoutChatMessagesInput>, CleanupEventUncheckedUpdateWithoutChatMessagesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutEventChatMessagesNestedInput = {
+    create?: XOR<UserCreateWithoutEventChatMessagesInput, UserUncheckedCreateWithoutEventChatMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatMessagesInput
+    upsert?: UserUpsertWithoutEventChatMessagesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventChatMessagesInput, UserUpdateWithoutEventChatMessagesInput>, UserUncheckedUpdateWithoutEventChatMessagesInput>
+  }
+
+  export type EventChatMessageUpdateOneWithoutRepliesNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutRepliesInput, EventChatMessageUncheckedCreateWithoutRepliesInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutRepliesInput
+    upsert?: EventChatMessageUpsertWithoutRepliesInput
+    disconnect?: EventChatMessageWhereInput | boolean
+    delete?: EventChatMessageWhereInput | boolean
+    connect?: EventChatMessageWhereUniqueInput
+    update?: XOR<XOR<EventChatMessageUpdateToOneWithWhereWithoutRepliesInput, EventChatMessageUpdateWithoutRepliesInput>, EventChatMessageUncheckedUpdateWithoutRepliesInput>
+  }
+
+  export type EventChatMessageUpdateManyWithoutReplyToNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput | EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput[]
+    createMany?: EventChatMessageCreateManyReplyToInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutReplyToInput | EventChatMessageUpdateWithWhereUniqueWithoutReplyToInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutReplyToInput | EventChatMessageUpdateManyWithWhereWithoutReplyToInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type UserUpdateOneWithoutEventChatPinnedMessagesNestedInput = {
+    create?: XOR<UserCreateWithoutEventChatPinnedMessagesInput, UserUncheckedCreateWithoutEventChatPinnedMessagesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatPinnedMessagesInput
+    upsert?: UserUpsertWithoutEventChatPinnedMessagesInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventChatPinnedMessagesInput, UserUpdateWithoutEventChatPinnedMessagesInput>, UserUncheckedUpdateWithoutEventChatPinnedMessagesInput>
+  }
+
+  export type EventChatAttachmentUpdateManyWithoutMessageNestedInput = {
+    create?: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput> | EventChatAttachmentCreateWithoutMessageInput[] | EventChatAttachmentUncheckedCreateWithoutMessageInput[]
+    connectOrCreate?: EventChatAttachmentCreateOrConnectWithoutMessageInput | EventChatAttachmentCreateOrConnectWithoutMessageInput[]
+    upsert?: EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput | EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput[]
+    createMany?: EventChatAttachmentCreateManyMessageInputEnvelope
+    set?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    disconnect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    delete?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    update?: EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput | EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput[]
+    updateMany?: EventChatAttachmentUpdateManyWithWhereWithoutMessageInput | EventChatAttachmentUpdateManyWithWhereWithoutMessageInput[]
+    deleteMany?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
+    upsert?: EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput | EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput[]
+    createMany?: EventChatMessageCreateManyReplyToInputEnvelope
+    set?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    disconnect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    delete?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    connect?: EventChatMessageWhereUniqueInput | EventChatMessageWhereUniqueInput[]
+    update?: EventChatMessageUpdateWithWhereUniqueWithoutReplyToInput | EventChatMessageUpdateWithWhereUniqueWithoutReplyToInput[]
+    updateMany?: EventChatMessageUpdateManyWithWhereWithoutReplyToInput | EventChatMessageUpdateManyWithWhereWithoutReplyToInput[]
+    deleteMany?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+  }
+
+  export type EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput = {
+    create?: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput> | EventChatAttachmentCreateWithoutMessageInput[] | EventChatAttachmentUncheckedCreateWithoutMessageInput[]
+    connectOrCreate?: EventChatAttachmentCreateOrConnectWithoutMessageInput | EventChatAttachmentCreateOrConnectWithoutMessageInput[]
+    upsert?: EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput | EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput[]
+    createMany?: EventChatAttachmentCreateManyMessageInputEnvelope
+    set?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    disconnect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    delete?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+    update?: EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput | EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput[]
+    updateMany?: EventChatAttachmentUpdateManyWithWhereWithoutMessageInput | EventChatAttachmentUpdateManyWithWhereWithoutMessageInput[]
+    deleteMany?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
+  }
+
+  export type EventChatMessageCreateNestedOneWithoutAttachmentsInput = {
+    create?: XOR<EventChatMessageCreateWithoutAttachmentsInput, EventChatMessageUncheckedCreateWithoutAttachmentsInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAttachmentsInput
+    connect?: EventChatMessageWhereUniqueInput
+  }
+
+  export type EventChatMessageUpdateOneRequiredWithoutAttachmentsNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutAttachmentsInput, EventChatMessageUncheckedCreateWithoutAttachmentsInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutAttachmentsInput
+    upsert?: EventChatMessageUpsertWithoutAttachmentsInput
+    connect?: EventChatMessageWhereUniqueInput
+    update?: XOR<XOR<EventChatMessageUpdateToOneWithWhereWithoutAttachmentsInput, EventChatMessageUpdateWithoutAttachmentsInput>, EventChatMessageUncheckedUpdateWithoutAttachmentsInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutChatMutesInput = {
+    create?: XOR<CleanupEventCreateWithoutChatMutesInput, CleanupEventUncheckedCreateWithoutChatMutesInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatMutesInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventChatMutesInput = {
+    create?: XOR<UserCreateWithoutEventChatMutesInput, UserUncheckedCreateWithoutEventChatMutesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatMutesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutChatMutesNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutChatMutesInput, CleanupEventUncheckedCreateWithoutChatMutesInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatMutesInput
+    upsert?: CleanupEventUpsertWithoutChatMutesInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutChatMutesInput, CleanupEventUpdateWithoutChatMutesInput>, CleanupEventUncheckedUpdateWithoutChatMutesInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutEventChatMutesNestedInput = {
+    create?: XOR<UserCreateWithoutEventChatMutesInput, UserUncheckedCreateWithoutEventChatMutesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatMutesInput
+    upsert?: UserUpsertWithoutEventChatMutesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventChatMutesInput, UserUpdateWithoutEventChatMutesInput>, UserUncheckedUpdateWithoutEventChatMutesInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutChatReadCursorsInput = {
+    create?: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatReadCursorsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventChatReadCursorsInput = {
+    create?: XOR<UserCreateWithoutEventChatReadCursorsInput, UserUncheckedCreateWithoutEventChatReadCursorsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatReadCursorsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutChatReadCursorsInput
+    upsert?: CleanupEventUpsertWithoutChatReadCursorsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutChatReadCursorsInput, CleanupEventUpdateWithoutChatReadCursorsInput>, CleanupEventUncheckedUpdateWithoutChatReadCursorsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput = {
+    create?: XOR<UserCreateWithoutEventChatReadCursorsInput, UserUncheckedCreateWithoutEventChatReadCursorsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventChatReadCursorsInput
+    upsert?: UserUpsertWithoutEventChatReadCursorsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventChatReadCursorsInput, UserUpdateWithoutEventChatReadCursorsInput>, UserUncheckedUpdateWithoutEventChatReadCursorsInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutCheckInsInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInsInput, CleanupEventUncheckedCreateWithoutCheckInsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventCheckInsInput = {
+    create?: XOR<UserCreateWithoutEventCheckInsInput, UserUncheckedCreateWithoutEventCheckInsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventCheckInsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutCheckInsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInsInput, CleanupEventUncheckedCreateWithoutCheckInsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInsInput
+    upsert?: CleanupEventUpsertWithoutCheckInsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutCheckInsInput, CleanupEventUpdateWithoutCheckInsInput>, CleanupEventUncheckedUpdateWithoutCheckInsInput>
+  }
+
+  export type UserUpdateOneWithoutEventCheckInsNestedInput = {
+    create?: XOR<UserCreateWithoutEventCheckInsInput, UserUncheckedCreateWithoutEventCheckInsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventCheckInsInput
+    upsert?: UserUpsertWithoutEventCheckInsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventCheckInsInput, UserUpdateWithoutEventCheckInsInput>, UserUncheckedUpdateWithoutEventCheckInsInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutCheckInRedemptionsInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInRedemptionsInput, CleanupEventUncheckedCreateWithoutCheckInRedemptionsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInRedemptionsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutCheckInRedemptionsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInRedemptionsInput, CleanupEventUncheckedCreateWithoutCheckInRedemptionsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInRedemptionsInput
+    upsert?: CleanupEventUpsertWithoutCheckInRedemptionsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutCheckInRedemptionsInput, CleanupEventUpdateWithoutCheckInRedemptionsInput>, CleanupEventUncheckedUpdateWithoutCheckInRedemptionsInput>
   }
 
   export type SiteCreateNestedOneWithoutVotesInput = {
@@ -40491,11 +53064,49 @@ export namespace Prisma {
     _max?: NestedEnumReportStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumEcoEventCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventCategory | EnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventCategoryFilter<$PrismaModel> | $Enums.EcoEventCategory
+  }
+
   export type NestedEnumCleanupEventStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.CleanupEventStatus | EnumCleanupEventStatusFieldRefInput<$PrismaModel>
     in?: $Enums.CleanupEventStatus[] | ListEnumCleanupEventStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.CleanupEventStatus[] | ListEnumCleanupEventStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumCleanupEventStatusFilter<$PrismaModel> | $Enums.CleanupEventStatus
+  }
+
+  export type NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventLifecycleStatus | EnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel> | $Enums.EcoEventLifecycleStatus
+  }
+
+  export type NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoCleanupScale | EnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel> | $Enums.EcoCleanupScale | null
+  }
+
+  export type NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventDifficulty | EnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel> | $Enums.EcoEventDifficulty | null
+  }
+
+  export type NestedEnumEcoEventCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventCategory | EnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventCategoryWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventCategoryFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventCategoryFilter<$PrismaModel>
   }
 
   export type NestedEnumCleanupEventStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -40506,6 +53117,69 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
     _max?: NestedEnumCleanupEventStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEcoEventLifecycleStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventLifecycleStatus | EnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EcoEventLifecycleStatus[] | ListEnumEcoEventLifecycleStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEcoEventLifecycleStatusWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventLifecycleStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventLifecycleStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEcoCleanupScaleNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoCleanupScale | EnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoCleanupScale[] | ListEnumEcoCleanupScaleFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoCleanupScaleNullableWithAggregatesFilter<$PrismaModel> | $Enums.EcoCleanupScale | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel>
+    _max?: NestedEnumEcoCleanupScaleNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEcoEventDifficultyNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EcoEventDifficulty | EnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.EcoEventDifficulty[] | ListEnumEcoEventDifficultyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumEcoEventDifficultyNullableWithAggregatesFilter<$PrismaModel> | $Enums.EcoEventDifficulty | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel>
+    _max?: NestedEnumEcoEventDifficultyNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEventChatMessageTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventChatMessageType | EnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventChatMessageTypeFilter<$PrismaModel> | $Enums.EventChatMessageType
+  }
+
+  export type NestedEnumEventChatMessageTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventChatMessageType | EnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventChatMessageType[] | ListEnumEventChatMessageTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventChatMessageTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventChatMessageType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventChatMessageTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventChatMessageTypeFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type NestedEnumSiteShareChannelFilter<$PrismaModel = never> = {
@@ -41111,6 +53785,294 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type CleanupEventCreateWithoutOrganizerInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutOrganizerInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutOrganizerInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput>
+  }
+
+  export type CleanupEventCreateManyOrganizerInputEnvelope = {
+    data: CleanupEventCreateManyOrganizerInput | CleanupEventCreateManyOrganizerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventParticipantCreateWithoutUserInput = {
+    id?: string
+    joinedAt?: Date | string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+    event: CleanupEventCreateNestedOneWithoutParticipantsInput
+  }
+
+  export type EventParticipantUncheckedCreateWithoutUserInput = {
+    id?: string
+    joinedAt?: Date | string
+    eventId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventParticipantCreateOrConnectWithoutUserInput = {
+    where: EventParticipantWhereUniqueInput
+    create: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventParticipantCreateManyUserInputEnvelope = {
+    data: EventParticipantCreateManyUserInput | EventParticipantCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventCheckInCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    dedupeKey: string
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+    event: CleanupEventCreateNestedOneWithoutCheckInsInput
+  }
+
+  export type EventCheckInUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    dedupeKey: string
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventCheckInCreateOrConnectWithoutUserInput = {
+    where: EventCheckInWhereUniqueInput
+    create: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventCheckInCreateManyUserInputEnvelope = {
+    data: EventCheckInCreateManyUserInput | EventCheckInCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatMessageCreateWithoutAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutAuthorInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type EventChatMessageCreateManyAuthorInputEnvelope = {
+    data: EventChatMessageCreateManyAuthorInput | EventChatMessageCreateManyAuthorInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatReadCursorCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lastReadMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatReadCursorsInput
+  }
+
+  export type EventChatReadCursorUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatReadCursorCreateOrConnectWithoutUserInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    create: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventChatReadCursorCreateManyUserInputEnvelope = {
+    data: EventChatReadCursorCreateManyUserInput | EventChatReadCursorCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatMessageCreateWithoutPinnedByInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutPinnedByInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutPinnedByInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput>
+  }
+
+  export type EventChatMessageCreateManyPinnedByInputEnvelope = {
+    data: EventChatMessageCreateManyPinnedByInput | EventChatMessageCreateManyPinnedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatMuteCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    event: CleanupEventCreateNestedOneWithoutChatMutesInput
+  }
+
+  export type EventChatMuteUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+  }
+
+  export type EventChatMuteCreateOrConnectWithoutUserInput = {
+    where: EventChatMuteWhereUniqueInput
+    create: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventChatMuteCreateManyUserInputEnvelope = {
+    data: EventChatMuteCreateManyUserInput | EventChatMuteCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutReporterInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
@@ -41603,6 +54565,220 @@ export namespace Prisma {
     mutedUntil?: DateTimeNullableFilter<"UserNotificationPreference"> | Date | string | null
   }
 
+  export type CleanupEventUpsertWithWhereUniqueWithoutOrganizerInput = {
+    where: CleanupEventWhereUniqueInput
+    update: XOR<CleanupEventUpdateWithoutOrganizerInput, CleanupEventUncheckedUpdateWithoutOrganizerInput>
+    create: XOR<CleanupEventCreateWithoutOrganizerInput, CleanupEventUncheckedCreateWithoutOrganizerInput>
+  }
+
+  export type CleanupEventUpdateWithWhereUniqueWithoutOrganizerInput = {
+    where: CleanupEventWhereUniqueInput
+    data: XOR<CleanupEventUpdateWithoutOrganizerInput, CleanupEventUncheckedUpdateWithoutOrganizerInput>
+  }
+
+  export type CleanupEventUpdateManyWithWhereWithoutOrganizerInput = {
+    where: CleanupEventScalarWhereInput
+    data: XOR<CleanupEventUpdateManyMutationInput, CleanupEventUncheckedUpdateManyWithoutOrganizerInput>
+  }
+
+  export type CleanupEventScalarWhereInput = {
+    AND?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+    OR?: CleanupEventScalarWhereInput[]
+    NOT?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
+    id?: StringFilter<"CleanupEvent"> | string
+    createdAt?: DateTimeFilter<"CleanupEvent"> | Date | string
+    updatedAt?: DateTimeFilter<"CleanupEvent"> | Date | string
+    siteId?: StringFilter<"CleanupEvent"> | string
+    title?: StringFilter<"CleanupEvent"> | string
+    description?: StringFilter<"CleanupEvent"> | string
+    category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
+    endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
+    status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
+    organizerId?: StringNullableFilter<"CleanupEvent"> | string | null
+    participantCount?: IntFilter<"CleanupEvent"> | number
+    gear?: StringNullableListFilter<"CleanupEvent">
+    scale?: EnumEcoCleanupScaleNullableFilter<"CleanupEvent"> | $Enums.EcoCleanupScale | null
+    difficulty?: EnumEcoEventDifficultyNullableFilter<"CleanupEvent"> | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: StringNullableListFilter<"CleanupEvent">
+    maxParticipants?: IntNullableFilter<"CleanupEvent"> | number | null
+    checkInSessionId?: StringNullableFilter<"CleanupEvent"> | string | null
+    checkInOpen?: BoolFilter<"CleanupEvent"> | boolean
+    checkedInCount?: IntFilter<"CleanupEvent"> | number
+    recurrenceRule?: StringNullableFilter<"CleanupEvent"> | string | null
+    parentEventId?: StringNullableFilter<"CleanupEvent"> | string | null
+    recurrenceIndex?: IntNullableFilter<"CleanupEvent"> | number | null
+  }
+
+  export type EventParticipantUpsertWithWhereUniqueWithoutUserInput = {
+    where: EventParticipantWhereUniqueInput
+    update: XOR<EventParticipantUpdateWithoutUserInput, EventParticipantUncheckedUpdateWithoutUserInput>
+    create: XOR<EventParticipantCreateWithoutUserInput, EventParticipantUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventParticipantUpdateWithWhereUniqueWithoutUserInput = {
+    where: EventParticipantWhereUniqueInput
+    data: XOR<EventParticipantUpdateWithoutUserInput, EventParticipantUncheckedUpdateWithoutUserInput>
+  }
+
+  export type EventParticipantUpdateManyWithWhereWithoutUserInput = {
+    where: EventParticipantScalarWhereInput
+    data: XOR<EventParticipantUpdateManyMutationInput, EventParticipantUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type EventParticipantScalarWhereInput = {
+    AND?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+    OR?: EventParticipantScalarWhereInput[]
+    NOT?: EventParticipantScalarWhereInput | EventParticipantScalarWhereInput[]
+    id?: StringFilter<"EventParticipant"> | string
+    joinedAt?: DateTimeFilter<"EventParticipant"> | Date | string
+    eventId?: StringFilter<"EventParticipant"> | string
+    userId?: StringFilter<"EventParticipant"> | string
+    reminderEnabled?: BoolFilter<"EventParticipant"> | boolean
+    reminderAt?: DateTimeNullableFilter<"EventParticipant"> | Date | string | null
+  }
+
+  export type EventCheckInUpsertWithWhereUniqueWithoutUserInput = {
+    where: EventCheckInWhereUniqueInput
+    update: XOR<EventCheckInUpdateWithoutUserInput, EventCheckInUncheckedUpdateWithoutUserInput>
+    create: XOR<EventCheckInCreateWithoutUserInput, EventCheckInUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventCheckInUpdateWithWhereUniqueWithoutUserInput = {
+    where: EventCheckInWhereUniqueInput
+    data: XOR<EventCheckInUpdateWithoutUserInput, EventCheckInUncheckedUpdateWithoutUserInput>
+  }
+
+  export type EventCheckInUpdateManyWithWhereWithoutUserInput = {
+    where: EventCheckInScalarWhereInput
+    data: XOR<EventCheckInUpdateManyMutationInput, EventCheckInUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type EventCheckInScalarWhereInput = {
+    AND?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+    OR?: EventCheckInScalarWhereInput[]
+    NOT?: EventCheckInScalarWhereInput | EventCheckInScalarWhereInput[]
+    id?: StringFilter<"EventCheckIn"> | string
+    createdAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+    eventId?: StringFilter<"EventCheckIn"> | string
+    dedupeKey?: StringFilter<"EventCheckIn"> | string
+    userId?: StringNullableFilter<"EventCheckIn"> | string | null
+    guestDisplayName?: StringNullableFilter<"EventCheckIn"> | string | null
+    checkedInAt?: DateTimeFilter<"EventCheckIn"> | Date | string
+  }
+
+  export type EventChatMessageUpsertWithWhereUniqueWithoutAuthorInput = {
+    where: EventChatMessageWhereUniqueInput
+    update: XOR<EventChatMessageUpdateWithoutAuthorInput, EventChatMessageUncheckedUpdateWithoutAuthorInput>
+    create: XOR<EventChatMessageCreateWithoutAuthorInput, EventChatMessageUncheckedCreateWithoutAuthorInput>
+  }
+
+  export type EventChatMessageUpdateWithWhereUniqueWithoutAuthorInput = {
+    where: EventChatMessageWhereUniqueInput
+    data: XOR<EventChatMessageUpdateWithoutAuthorInput, EventChatMessageUncheckedUpdateWithoutAuthorInput>
+  }
+
+  export type EventChatMessageUpdateManyWithWhereWithoutAuthorInput = {
+    where: EventChatMessageScalarWhereInput
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyWithoutAuthorInput>
+  }
+
+  export type EventChatMessageScalarWhereInput = {
+    AND?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+    OR?: EventChatMessageScalarWhereInput[]
+    NOT?: EventChatMessageScalarWhereInput | EventChatMessageScalarWhereInput[]
+    id?: StringFilter<"EventChatMessage"> | string
+    createdAt?: DateTimeFilter<"EventChatMessage"> | Date | string
+    eventId?: StringFilter<"EventChatMessage"> | string
+    authorId?: StringFilter<"EventChatMessage"> | string
+    body?: StringFilter<"EventChatMessage"> | string
+    replyToId?: StringNullableFilter<"EventChatMessage"> | string | null
+    deletedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    editedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    isPinned?: BoolFilter<"EventChatMessage"> | boolean
+    pinnedAt?: DateTimeNullableFilter<"EventChatMessage"> | Date | string | null
+    pinnedById?: StringNullableFilter<"EventChatMessage"> | string | null
+    messageType?: EnumEventChatMessageTypeFilter<"EventChatMessage"> | $Enums.EventChatMessageType
+    systemPayload?: JsonNullableFilter<"EventChatMessage">
+    locationLat?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLng?: FloatNullableFilter<"EventChatMessage"> | number | null
+    locationLabel?: StringNullableFilter<"EventChatMessage"> | string | null
+    bodyEncrypted?: BoolFilter<"EventChatMessage"> | boolean
+    clientMessageId?: StringNullableFilter<"EventChatMessage"> | string | null
+  }
+
+  export type EventChatReadCursorUpsertWithWhereUniqueWithoutUserInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    update: XOR<EventChatReadCursorUpdateWithoutUserInput, EventChatReadCursorUncheckedUpdateWithoutUserInput>
+    create: XOR<EventChatReadCursorCreateWithoutUserInput, EventChatReadCursorUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventChatReadCursorUpdateWithWhereUniqueWithoutUserInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    data: XOR<EventChatReadCursorUpdateWithoutUserInput, EventChatReadCursorUncheckedUpdateWithoutUserInput>
+  }
+
+  export type EventChatReadCursorUpdateManyWithWhereWithoutUserInput = {
+    where: EventChatReadCursorScalarWhereInput
+    data: XOR<EventChatReadCursorUpdateManyMutationInput, EventChatReadCursorUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type EventChatReadCursorScalarWhereInput = {
+    AND?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+    OR?: EventChatReadCursorScalarWhereInput[]
+    NOT?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+    id?: StringFilter<"EventChatReadCursor"> | string
+    createdAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    updatedAt?: DateTimeFilter<"EventChatReadCursor"> | Date | string
+    eventId?: StringFilter<"EventChatReadCursor"> | string
+    userId?: StringFilter<"EventChatReadCursor"> | string
+    lastReadMessageId?: StringNullableFilter<"EventChatReadCursor"> | string | null
+  }
+
+  export type EventChatMessageUpsertWithWhereUniqueWithoutPinnedByInput = {
+    where: EventChatMessageWhereUniqueInput
+    update: XOR<EventChatMessageUpdateWithoutPinnedByInput, EventChatMessageUncheckedUpdateWithoutPinnedByInput>
+    create: XOR<EventChatMessageCreateWithoutPinnedByInput, EventChatMessageUncheckedCreateWithoutPinnedByInput>
+  }
+
+  export type EventChatMessageUpdateWithWhereUniqueWithoutPinnedByInput = {
+    where: EventChatMessageWhereUniqueInput
+    data: XOR<EventChatMessageUpdateWithoutPinnedByInput, EventChatMessageUncheckedUpdateWithoutPinnedByInput>
+  }
+
+  export type EventChatMessageUpdateManyWithWhereWithoutPinnedByInput = {
+    where: EventChatMessageScalarWhereInput
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyWithoutPinnedByInput>
+  }
+
+  export type EventChatMuteUpsertWithWhereUniqueWithoutUserInput = {
+    where: EventChatMuteWhereUniqueInput
+    update: XOR<EventChatMuteUpdateWithoutUserInput, EventChatMuteUncheckedUpdateWithoutUserInput>
+    create: XOR<EventChatMuteCreateWithoutUserInput, EventChatMuteUncheckedCreateWithoutUserInput>
+  }
+
+  export type EventChatMuteUpdateWithWhereUniqueWithoutUserInput = {
+    where: EventChatMuteWhereUniqueInput
+    data: XOR<EventChatMuteUpdateWithoutUserInput, EventChatMuteUncheckedUpdateWithoutUserInput>
+  }
+
+  export type EventChatMuteUpdateManyWithWhereWithoutUserInput = {
+    where: EventChatMuteScalarWhereInput
+    data: XOR<EventChatMuteUpdateManyMutationInput, EventChatMuteUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type EventChatMuteScalarWhereInput = {
+    AND?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+    OR?: EventChatMuteScalarWhereInput[]
+    NOT?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+    id?: StringFilter<"EventChatMute"> | string
+    createdAt?: DateTimeFilter<"EventChatMute"> | Date | string
+    eventId?: StringFilter<"EventChatMute"> | string
+    userId?: StringFilter<"EventChatMute"> | string
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     createdAt?: Date | string
@@ -41643,6 +54819,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -41685,6 +54868,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -41743,6 +54933,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -41785,6 +54982,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminTempTokensInput = {
@@ -41827,6 +55031,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminTempTokensInput = {
@@ -41869,6 +55080,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminTempTokensInput = {
@@ -41927,6 +55145,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminTempTokensInput = {
@@ -41969,6 +55194,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminPendingMfaInput = {
@@ -42011,6 +55243,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminPendingMfaInput = {
@@ -42053,6 +55292,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminPendingMfaInput = {
@@ -42111,6 +55357,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminPendingMfaInput = {
@@ -42153,6 +55406,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminNotificationsInput = {
@@ -42195,6 +55455,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminNotificationsInput = {
@@ -42237,6 +55504,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminNotificationsInput = {
@@ -42295,6 +55569,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
@@ -42337,6 +55618,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPointTransactionsInput = {
@@ -42379,6 +55667,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -42421,6 +55716,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -42479,6 +55781,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -42521,6 +55830,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateWithoutSiteInput = {
@@ -42577,22 +55893,68 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
-    organizerId?: string | null
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
 
   export type CleanupEventUncheckedCreateWithoutSiteInput = {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     organizerId?: string | null
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
   export type CleanupEventCreateOrConnectWithoutSiteInput = {
@@ -42745,21 +56107,6 @@ export namespace Prisma {
     data: XOR<CleanupEventUpdateManyMutationInput, CleanupEventUncheckedUpdateManyWithoutSiteInput>
   }
 
-  export type CleanupEventScalarWhereInput = {
-    AND?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
-    OR?: CleanupEventScalarWhereInput[]
-    NOT?: CleanupEventScalarWhereInput | CleanupEventScalarWhereInput[]
-    id?: StringFilter<"CleanupEvent"> | string
-    createdAt?: DateTimeFilter<"CleanupEvent"> | Date | string
-    updatedAt?: DateTimeFilter<"CleanupEvent"> | Date | string
-    siteId?: StringFilter<"CleanupEvent"> | string
-    scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
-    completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
-    status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
-    organizerId?: StringNullableFilter<"CleanupEvent"> | string | null
-    participantCount?: IntFilter<"CleanupEvent"> | number
-  }
-
   export type SiteVoteUpsertWithWhereUniqueWithoutSiteInput = {
     where: SiteVoteWhereUniqueInput
     update: XOR<SiteVoteUpdateWithoutSiteInput, SiteVoteUncheckedUpdateWithoutSiteInput>
@@ -42909,6 +56256,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -42951,6 +56305,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -42998,6 +56359,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutModeratedReportsInput = {
@@ -43040,6 +56408,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutModeratedReportsInput = {
@@ -43266,6 +56641,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -43308,6 +56690,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutModeratedReportsInput = {
@@ -43361,6 +56750,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutModeratedReportsInput = {
@@ -43403,6 +56799,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithoutPotentialDuplicatesInput = {
@@ -43573,6 +56976,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCoReportedReportsInput = {
@@ -43615,6 +57025,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCoReportedReportsInput = {
@@ -43724,6 +57141,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoReportedReportsInput = {
@@ -43766,6 +57190,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -43808,6 +57239,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -43850,6 +57288,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -43908,6 +57353,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -43950,6 +57402,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutEventsInput = {
@@ -43995,6 +57454,438 @@ export namespace Prisma {
   export type SiteCreateOrConnectWithoutEventsInput = {
     where: SiteWhereUniqueInput
     create: XOR<SiteCreateWithoutEventsInput, SiteUncheckedCreateWithoutEventsInput>
+  }
+
+  export type UserCreateWithoutOrganizedCleanupEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutOrganizedCleanupEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutOrganizedCleanupEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOrganizedCleanupEventsInput, UserUncheckedCreateWithoutOrganizedCleanupEventsInput>
+  }
+
+  export type EventParticipantCreateWithoutEventInput = {
+    id?: string
+    joinedAt?: Date | string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+    user: UserCreateNestedOneWithoutEventParticipationsInput
+  }
+
+  export type EventParticipantUncheckedCreateWithoutEventInput = {
+    id?: string
+    joinedAt?: Date | string
+    userId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventParticipantCreateOrConnectWithoutEventInput = {
+    where: EventParticipantWhereUniqueInput
+    create: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventParticipantCreateManyEventInputEnvelope = {
+    data: EventParticipantCreateManyEventInput | EventParticipantCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventCheckInCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    dedupeKey: string
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+    user?: UserCreateNestedOneWithoutEventCheckInsInput
+  }
+
+  export type EventCheckInUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    dedupeKey: string
+    userId?: string | null
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventCheckInCreateOrConnectWithoutEventInput = {
+    where: EventCheckInWhereUniqueInput
+    create: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventCheckInCreateManyEventInputEnvelope = {
+    data: EventCheckInCreateManyEventInput | EventCheckInCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventCheckInRedemptionCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    jti: string
+  }
+
+  export type EventCheckInRedemptionUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    jti: string
+  }
+
+  export type EventCheckInRedemptionCreateOrConnectWithoutEventInput = {
+    where: EventCheckInRedemptionWhereUniqueInput
+    create: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventCheckInRedemptionCreateManyEventInputEnvelope = {
+    data: EventCheckInRedemptionCreateManyEventInput | EventCheckInRedemptionCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatMessageCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutEventInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatMessageCreateManyEventInputEnvelope = {
+    data: EventChatMessageCreateManyEventInput | EventChatMessageCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatReadCursorCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    lastReadMessageId?: string | null
+    user: UserCreateNestedOneWithoutEventChatReadCursorsInput
+  }
+
+  export type EventChatReadCursorUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatReadCursorCreateOrConnectWithoutEventInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    create: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatReadCursorCreateManyEventInputEnvelope = {
+    data: EventChatReadCursorCreateManyEventInput | EventChatReadCursorCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatMuteCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutEventChatMutesInput
+  }
+
+  export type EventChatMuteUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type EventChatMuteCreateOrConnectWithoutEventInput = {
+    where: EventChatMuteWhereUniqueInput
+    create: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatMuteCreateManyEventInputEnvelope = {
+    data: EventChatMuteCreateManyEventInput | EventChatMuteCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CleanupEventCreateWithoutSeriesChildrenInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutSeriesChildrenInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutSeriesChildrenInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
+  }
+
+  export type CleanupEventCreateWithoutParentEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutParentEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutParentEventInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput>
+  }
+
+  export type CleanupEventCreateManyParentEventInputEnvelope = {
+    data: CleanupEventCreateManyParentEventInput | CleanupEventCreateManyParentEventInput[]
+    skipDuplicates?: boolean
   }
 
   export type SiteUpsertWithoutEventsInput = {
@@ -44046,6 +57937,2847 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutOrganizedCleanupEventsInput = {
+    update: XOR<UserUpdateWithoutOrganizedCleanupEventsInput, UserUncheckedUpdateWithoutOrganizedCleanupEventsInput>
+    create: XOR<UserCreateWithoutOrganizedCleanupEventsInput, UserUncheckedCreateWithoutOrganizedCleanupEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutOrganizedCleanupEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutOrganizedCleanupEventsInput, UserUncheckedUpdateWithoutOrganizedCleanupEventsInput>
+  }
+
+  export type UserUpdateWithoutOrganizedCleanupEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutOrganizedCleanupEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type EventParticipantUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventParticipantWhereUniqueInput
+    update: XOR<EventParticipantUpdateWithoutEventInput, EventParticipantUncheckedUpdateWithoutEventInput>
+    create: XOR<EventParticipantCreateWithoutEventInput, EventParticipantUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventParticipantUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventParticipantWhereUniqueInput
+    data: XOR<EventParticipantUpdateWithoutEventInput, EventParticipantUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventParticipantUpdateManyWithWhereWithoutEventInput = {
+    where: EventParticipantScalarWhereInput
+    data: XOR<EventParticipantUpdateManyMutationInput, EventParticipantUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventCheckInUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventCheckInWhereUniqueInput
+    update: XOR<EventCheckInUpdateWithoutEventInput, EventCheckInUncheckedUpdateWithoutEventInput>
+    create: XOR<EventCheckInCreateWithoutEventInput, EventCheckInUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventCheckInUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventCheckInWhereUniqueInput
+    data: XOR<EventCheckInUpdateWithoutEventInput, EventCheckInUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventCheckInUpdateManyWithWhereWithoutEventInput = {
+    where: EventCheckInScalarWhereInput
+    data: XOR<EventCheckInUpdateManyMutationInput, EventCheckInUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventCheckInRedemptionUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventCheckInRedemptionWhereUniqueInput
+    update: XOR<EventCheckInRedemptionUpdateWithoutEventInput, EventCheckInRedemptionUncheckedUpdateWithoutEventInput>
+    create: XOR<EventCheckInRedemptionCreateWithoutEventInput, EventCheckInRedemptionUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventCheckInRedemptionUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventCheckInRedemptionWhereUniqueInput
+    data: XOR<EventCheckInRedemptionUpdateWithoutEventInput, EventCheckInRedemptionUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventCheckInRedemptionUpdateManyWithWhereWithoutEventInput = {
+    where: EventCheckInRedemptionScalarWhereInput
+    data: XOR<EventCheckInRedemptionUpdateManyMutationInput, EventCheckInRedemptionUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventCheckInRedemptionScalarWhereInput = {
+    AND?: EventCheckInRedemptionScalarWhereInput | EventCheckInRedemptionScalarWhereInput[]
+    OR?: EventCheckInRedemptionScalarWhereInput[]
+    NOT?: EventCheckInRedemptionScalarWhereInput | EventCheckInRedemptionScalarWhereInput[]
+    id?: StringFilter<"EventCheckInRedemption"> | string
+    createdAt?: DateTimeFilter<"EventCheckInRedemption"> | Date | string
+    eventId?: StringFilter<"EventCheckInRedemption"> | string
+    jti?: StringFilter<"EventCheckInRedemption"> | string
+  }
+
+  export type EventChatMessageUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventChatMessageWhereUniqueInput
+    update: XOR<EventChatMessageUpdateWithoutEventInput, EventChatMessageUncheckedUpdateWithoutEventInput>
+    create: XOR<EventChatMessageCreateWithoutEventInput, EventChatMessageUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatMessageUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventChatMessageWhereUniqueInput
+    data: XOR<EventChatMessageUpdateWithoutEventInput, EventChatMessageUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventChatMessageUpdateManyWithWhereWithoutEventInput = {
+    where: EventChatMessageScalarWhereInput
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventChatReadCursorUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    update: XOR<EventChatReadCursorUpdateWithoutEventInput, EventChatReadCursorUncheckedUpdateWithoutEventInput>
+    create: XOR<EventChatReadCursorCreateWithoutEventInput, EventChatReadCursorUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatReadCursorUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    data: XOR<EventChatReadCursorUpdateWithoutEventInput, EventChatReadCursorUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventChatReadCursorUpdateManyWithWhereWithoutEventInput = {
+    where: EventChatReadCursorScalarWhereInput
+    data: XOR<EventChatReadCursorUpdateManyMutationInput, EventChatReadCursorUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventChatMuteUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventChatMuteWhereUniqueInput
+    update: XOR<EventChatMuteUpdateWithoutEventInput, EventChatMuteUncheckedUpdateWithoutEventInput>
+    create: XOR<EventChatMuteCreateWithoutEventInput, EventChatMuteUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventChatMuteUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventChatMuteWhereUniqueInput
+    data: XOR<EventChatMuteUpdateWithoutEventInput, EventChatMuteUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventChatMuteUpdateManyWithWhereWithoutEventInput = {
+    where: EventChatMuteScalarWhereInput
+    data: XOR<EventChatMuteUpdateManyMutationInput, EventChatMuteUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type CleanupEventUpsertWithoutSeriesChildrenInput = {
+    update: XOR<CleanupEventUpdateWithoutSeriesChildrenInput, CleanupEventUncheckedUpdateWithoutSeriesChildrenInput>
+    create: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutSeriesChildrenInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutSeriesChildrenInput, CleanupEventUncheckedUpdateWithoutSeriesChildrenInput>
+  }
+
+  export type CleanupEventUpdateWithoutSeriesChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutSeriesChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+  }
+
+  export type CleanupEventUpsertWithWhereUniqueWithoutParentEventInput = {
+    where: CleanupEventWhereUniqueInput
+    update: XOR<CleanupEventUpdateWithoutParentEventInput, CleanupEventUncheckedUpdateWithoutParentEventInput>
+    create: XOR<CleanupEventCreateWithoutParentEventInput, CleanupEventUncheckedCreateWithoutParentEventInput>
+  }
+
+  export type CleanupEventUpdateWithWhereUniqueWithoutParentEventInput = {
+    where: CleanupEventWhereUniqueInput
+    data: XOR<CleanupEventUpdateWithoutParentEventInput, CleanupEventUncheckedUpdateWithoutParentEventInput>
+  }
+
+  export type CleanupEventUpdateManyWithWhereWithoutParentEventInput = {
+    where: CleanupEventScalarWhereInput
+    data: XOR<CleanupEventUpdateManyMutationInput, CleanupEventUncheckedUpdateManyWithoutParentEventInput>
+  }
+
+  export type CleanupEventCreateWithoutParticipantsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutParticipantsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutParticipantsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutParticipantsInput, CleanupEventUncheckedCreateWithoutParticipantsInput>
+  }
+
+  export type UserCreateWithoutEventParticipationsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventParticipationsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventParticipationsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventParticipationsInput, UserUncheckedCreateWithoutEventParticipationsInput>
+  }
+
+  export type CleanupEventUpsertWithoutParticipantsInput = {
+    update: XOR<CleanupEventUpdateWithoutParticipantsInput, CleanupEventUncheckedUpdateWithoutParticipantsInput>
+    create: XOR<CleanupEventCreateWithoutParticipantsInput, CleanupEventUncheckedCreateWithoutParticipantsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutParticipantsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutParticipantsInput, CleanupEventUncheckedUpdateWithoutParticipantsInput>
+  }
+
+  export type CleanupEventUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutParticipantsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventParticipationsInput = {
+    update: XOR<UserUpdateWithoutEventParticipationsInput, UserUncheckedUpdateWithoutEventParticipationsInput>
+    create: XOR<UserCreateWithoutEventParticipationsInput, UserUncheckedCreateWithoutEventParticipationsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventParticipationsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventParticipationsInput, UserUncheckedUpdateWithoutEventParticipationsInput>
+  }
+
+  export type UserUpdateWithoutEventParticipationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventParticipationsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CleanupEventCreateWithoutChatMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutChatMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutChatMessagesInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutChatMessagesInput, CleanupEventUncheckedCreateWithoutChatMessagesInput>
+  }
+
+  export type UserCreateWithoutEventChatMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventChatMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventChatMessagesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventChatMessagesInput, UserUncheckedCreateWithoutEventChatMessagesInput>
+  }
+
+  export type EventChatMessageCreateWithoutRepliesInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutRepliesInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutRepliesInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutRepliesInput, EventChatMessageUncheckedCreateWithoutRepliesInput>
+  }
+
+  export type EventChatMessageCreateWithoutReplyToInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutReplyToInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutReplyToInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput>
+  }
+
+  export type EventChatMessageCreateManyReplyToInputEnvelope = {
+    data: EventChatMessageCreateManyReplyToInput | EventChatMessageCreateManyReplyToInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserCreateWithoutEventChatPinnedMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventChatPinnedMessagesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventChatPinnedMessagesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventChatPinnedMessagesInput, UserUncheckedCreateWithoutEventChatPinnedMessagesInput>
+  }
+
+  export type EventChatAttachmentCreateWithoutMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+  }
+
+  export type EventChatAttachmentUncheckedCreateWithoutMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+  }
+
+  export type EventChatAttachmentCreateOrConnectWithoutMessageInput = {
+    where: EventChatAttachmentWhereUniqueInput
+    create: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput>
+  }
+
+  export type EventChatAttachmentCreateManyMessageInputEnvelope = {
+    data: EventChatAttachmentCreateManyMessageInput | EventChatAttachmentCreateManyMessageInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CleanupEventUpsertWithoutChatMessagesInput = {
+    update: XOR<CleanupEventUpdateWithoutChatMessagesInput, CleanupEventUncheckedUpdateWithoutChatMessagesInput>
+    create: XOR<CleanupEventCreateWithoutChatMessagesInput, CleanupEventUncheckedCreateWithoutChatMessagesInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutChatMessagesInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutChatMessagesInput, CleanupEventUncheckedUpdateWithoutChatMessagesInput>
+  }
+
+  export type CleanupEventUpdateWithoutChatMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutChatMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventChatMessagesInput = {
+    update: XOR<UserUpdateWithoutEventChatMessagesInput, UserUncheckedUpdateWithoutEventChatMessagesInput>
+    create: XOR<UserCreateWithoutEventChatMessagesInput, UserUncheckedCreateWithoutEventChatMessagesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventChatMessagesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventChatMessagesInput, UserUncheckedUpdateWithoutEventChatMessagesInput>
+  }
+
+  export type UserUpdateWithoutEventChatMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventChatMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type EventChatMessageUpsertWithoutRepliesInput = {
+    update: XOR<EventChatMessageUpdateWithoutRepliesInput, EventChatMessageUncheckedUpdateWithoutRepliesInput>
+    create: XOR<EventChatMessageCreateWithoutRepliesInput, EventChatMessageUncheckedCreateWithoutRepliesInput>
+    where?: EventChatMessageWhereInput
+  }
+
+  export type EventChatMessageUpdateToOneWithWhereWithoutRepliesInput = {
+    where?: EventChatMessageWhereInput
+    data: XOR<EventChatMessageUpdateWithoutRepliesInput, EventChatMessageUncheckedUpdateWithoutRepliesInput>
+  }
+
+  export type EventChatMessageUpdateWithoutRepliesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutRepliesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput = {
+    where: EventChatMessageWhereUniqueInput
+    update: XOR<EventChatMessageUpdateWithoutReplyToInput, EventChatMessageUncheckedUpdateWithoutReplyToInput>
+    create: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput>
+  }
+
+  export type EventChatMessageUpdateWithWhereUniqueWithoutReplyToInput = {
+    where: EventChatMessageWhereUniqueInput
+    data: XOR<EventChatMessageUpdateWithoutReplyToInput, EventChatMessageUncheckedUpdateWithoutReplyToInput>
+  }
+
+  export type EventChatMessageUpdateManyWithWhereWithoutReplyToInput = {
+    where: EventChatMessageScalarWhereInput
+    data: XOR<EventChatMessageUpdateManyMutationInput, EventChatMessageUncheckedUpdateManyWithoutReplyToInput>
+  }
+
+  export type UserUpsertWithoutEventChatPinnedMessagesInput = {
+    update: XOR<UserUpdateWithoutEventChatPinnedMessagesInput, UserUncheckedUpdateWithoutEventChatPinnedMessagesInput>
+    create: XOR<UserCreateWithoutEventChatPinnedMessagesInput, UserUncheckedCreateWithoutEventChatPinnedMessagesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventChatPinnedMessagesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventChatPinnedMessagesInput, UserUncheckedUpdateWithoutEventChatPinnedMessagesInput>
+  }
+
+  export type UserUpdateWithoutEventChatPinnedMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventChatPinnedMessagesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput = {
+    where: EventChatAttachmentWhereUniqueInput
+    update: XOR<EventChatAttachmentUpdateWithoutMessageInput, EventChatAttachmentUncheckedUpdateWithoutMessageInput>
+    create: XOR<EventChatAttachmentCreateWithoutMessageInput, EventChatAttachmentUncheckedCreateWithoutMessageInput>
+  }
+
+  export type EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput = {
+    where: EventChatAttachmentWhereUniqueInput
+    data: XOR<EventChatAttachmentUpdateWithoutMessageInput, EventChatAttachmentUncheckedUpdateWithoutMessageInput>
+  }
+
+  export type EventChatAttachmentUpdateManyWithWhereWithoutMessageInput = {
+    where: EventChatAttachmentScalarWhereInput
+    data: XOR<EventChatAttachmentUpdateManyMutationInput, EventChatAttachmentUncheckedUpdateManyWithoutMessageInput>
+  }
+
+  export type EventChatAttachmentScalarWhereInput = {
+    AND?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
+    OR?: EventChatAttachmentScalarWhereInput[]
+    NOT?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
+    id?: StringFilter<"EventChatAttachment"> | string
+    createdAt?: DateTimeFilter<"EventChatAttachment"> | Date | string
+    messageId?: StringFilter<"EventChatAttachment"> | string
+    url?: StringFilter<"EventChatAttachment"> | string
+    mimeType?: StringFilter<"EventChatAttachment"> | string
+    fileName?: StringFilter<"EventChatAttachment"> | string
+    sizeBytes?: IntFilter<"EventChatAttachment"> | number
+    width?: IntNullableFilter<"EventChatAttachment"> | number | null
+    height?: IntNullableFilter<"EventChatAttachment"> | number | null
+    duration?: IntNullableFilter<"EventChatAttachment"> | number | null
+    thumbnailUrl?: StringNullableFilter<"EventChatAttachment"> | string | null
+  }
+
+  export type EventChatMessageCreateWithoutAttachmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutAttachmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutAttachmentsInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutAttachmentsInput, EventChatMessageUncheckedCreateWithoutAttachmentsInput>
+  }
+
+  export type EventChatMessageUpsertWithoutAttachmentsInput = {
+    update: XOR<EventChatMessageUpdateWithoutAttachmentsInput, EventChatMessageUncheckedUpdateWithoutAttachmentsInput>
+    create: XOR<EventChatMessageCreateWithoutAttachmentsInput, EventChatMessageUncheckedCreateWithoutAttachmentsInput>
+    where?: EventChatMessageWhereInput
+  }
+
+  export type EventChatMessageUpdateToOneWithWhereWithoutAttachmentsInput = {
+    where?: EventChatMessageWhereInput
+    data: XOR<EventChatMessageUpdateWithoutAttachmentsInput, EventChatMessageUncheckedUpdateWithoutAttachmentsInput>
+  }
+
+  export type EventChatMessageUpdateWithoutAttachmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutAttachmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+  }
+
+  export type CleanupEventCreateWithoutChatMutesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutChatMutesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutChatMutesInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutChatMutesInput, CleanupEventUncheckedCreateWithoutChatMutesInput>
+  }
+
+  export type UserCreateWithoutEventChatMutesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+  }
+
+  export type UserUncheckedCreateWithoutEventChatMutesInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+  }
+
+  export type UserCreateOrConnectWithoutEventChatMutesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventChatMutesInput, UserUncheckedCreateWithoutEventChatMutesInput>
+  }
+
+  export type CleanupEventUpsertWithoutChatMutesInput = {
+    update: XOR<CleanupEventUpdateWithoutChatMutesInput, CleanupEventUncheckedUpdateWithoutChatMutesInput>
+    create: XOR<CleanupEventCreateWithoutChatMutesInput, CleanupEventUncheckedCreateWithoutChatMutesInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutChatMutesInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutChatMutesInput, CleanupEventUncheckedUpdateWithoutChatMutesInput>
+  }
+
+  export type CleanupEventUpdateWithoutChatMutesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutChatMutesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventChatMutesInput = {
+    update: XOR<UserUpdateWithoutEventChatMutesInput, UserUncheckedUpdateWithoutEventChatMutesInput>
+    create: XOR<UserCreateWithoutEventChatMutesInput, UserUncheckedCreateWithoutEventChatMutesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventChatMutesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventChatMutesInput, UserUncheckedUpdateWithoutEventChatMutesInput>
+  }
+
+  export type UserUpdateWithoutEventChatMutesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventChatMutesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+  }
+
+  export type CleanupEventCreateWithoutChatReadCursorsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutChatReadCursorsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutChatReadCursorsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
+  }
+
+  export type UserCreateWithoutEventChatReadCursorsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventChatReadCursorsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventChatReadCursorsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventChatReadCursorsInput, UserUncheckedCreateWithoutEventChatReadCursorsInput>
+  }
+
+  export type CleanupEventUpsertWithoutChatReadCursorsInput = {
+    update: XOR<CleanupEventUpdateWithoutChatReadCursorsInput, CleanupEventUncheckedUpdateWithoutChatReadCursorsInput>
+    create: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutChatReadCursorsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutChatReadCursorsInput, CleanupEventUncheckedUpdateWithoutChatReadCursorsInput>
+  }
+
+  export type CleanupEventUpdateWithoutChatReadCursorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutChatReadCursorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventChatReadCursorsInput = {
+    update: XOR<UserUpdateWithoutEventChatReadCursorsInput, UserUncheckedUpdateWithoutEventChatReadCursorsInput>
+    create: XOR<UserCreateWithoutEventChatReadCursorsInput, UserUncheckedCreateWithoutEventChatReadCursorsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventChatReadCursorsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventChatReadCursorsInput, UserUncheckedUpdateWithoutEventChatReadCursorsInput>
+  }
+
+  export type UserUpdateWithoutEventChatReadCursorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventChatReadCursorsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CleanupEventCreateWithoutCheckInsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutCheckInsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutCheckInsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutCheckInsInput, CleanupEventUncheckedCreateWithoutCheckInsInput>
+  }
+
+  export type UserCreateWithoutEventCheckInsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventCheckInsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventCheckInsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventCheckInsInput, UserUncheckedCreateWithoutEventCheckInsInput>
+  }
+
+  export type CleanupEventUpsertWithoutCheckInsInput = {
+    update: XOR<CleanupEventUpdateWithoutCheckInsInput, CleanupEventUncheckedUpdateWithoutCheckInsInput>
+    create: XOR<CleanupEventCreateWithoutCheckInsInput, CleanupEventUncheckedCreateWithoutCheckInsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutCheckInsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutCheckInsInput, CleanupEventUncheckedUpdateWithoutCheckInsInput>
+  }
+
+  export type CleanupEventUpdateWithoutCheckInsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutCheckInsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventCheckInsInput = {
+    update: XOR<UserUpdateWithoutEventCheckInsInput, UserUncheckedUpdateWithoutEventCheckInsInput>
+    create: XOR<UserCreateWithoutEventCheckInsInput, UserUncheckedCreateWithoutEventCheckInsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventCheckInsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventCheckInsInput, UserUncheckedUpdateWithoutEventCheckInsInput>
+  }
+
+  export type UserUpdateWithoutEventCheckInsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventCheckInsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CleanupEventCreateWithoutCheckInRedemptionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutCheckInRedemptionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutCheckInRedemptionsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutCheckInRedemptionsInput, CleanupEventUncheckedCreateWithoutCheckInRedemptionsInput>
+  }
+
+  export type CleanupEventUpsertWithoutCheckInRedemptionsInput = {
+    update: XOR<CleanupEventUpdateWithoutCheckInRedemptionsInput, CleanupEventUncheckedUpdateWithoutCheckInRedemptionsInput>
+    create: XOR<CleanupEventCreateWithoutCheckInRedemptionsInput, CleanupEventUncheckedCreateWithoutCheckInRedemptionsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutCheckInRedemptionsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutCheckInRedemptionsInput, CleanupEventUncheckedUpdateWithoutCheckInRedemptionsInput>
+  }
+
+  export type CleanupEventUpdateWithoutCheckInRedemptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutCheckInRedemptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
   export type SiteCreateWithoutVotesInput = {
@@ -44133,6 +60865,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteVotesInput = {
@@ -44175,6 +60914,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteVotesInput = {
@@ -44284,6 +61030,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteVotesInput = {
@@ -44326,6 +61079,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutSavesInput = {
@@ -44413,6 +61173,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteSavesInput = {
@@ -44455,6 +61222,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteSavesInput = {
@@ -44564,6 +61338,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteSavesInput = {
@@ -44606,6 +61387,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutCommentsInput = {
@@ -44693,6 +61481,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentsInput = {
@@ -44735,6 +61530,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentsInput = {
@@ -44933,6 +61735,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentsInput = {
@@ -44975,6 +61784,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCommentUpsertWithoutRepliesInput = {
@@ -45117,6 +61933,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentLikesInput = {
@@ -45159,6 +61982,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentLikesInput = {
@@ -45254,6 +62084,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentLikesInput = {
@@ -45296,6 +62133,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutShareEventsInput = {
@@ -45383,6 +62227,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteShareEventsInput = {
@@ -45425,6 +62276,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteShareEventsInput = {
@@ -45534,6 +62392,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteShareEventsInput = {
@@ -45576,6 +62441,13 @@ export namespace Prisma {
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutDeviceTokensInput = {
@@ -45618,6 +62490,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -45660,6 +62539,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -45718,6 +62604,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -45760,6 +62653,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutUserNotificationsInput = {
@@ -45802,6 +62702,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutUserNotificationsInput = {
@@ -45844,6 +62751,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutUserNotificationsInput = {
@@ -45902,6 +62816,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserNotificationsInput = {
@@ -45944,6 +62865,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutNotificationPreferencesInput = {
@@ -45986,6 +62914,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -46028,6 +62963,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -46086,6 +63028,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -46128,6 +63077,13 @@ export namespace Prisma {
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateManyReporterInput = {
@@ -46297,6 +63253,104 @@ export namespace Prisma {
     type: $Enums.NotificationType
     muted?: boolean
     mutedUntil?: Date | string | null
+  }
+
+  export type CleanupEventCreateManyOrganizerInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+  }
+
+  export type EventParticipantCreateManyUserInput = {
+    id?: string
+    joinedAt?: Date | string
+    eventId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventCheckInCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    dedupeKey: string
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventChatMessageCreateManyAuthorInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+  }
+
+  export type EventChatReadCursorCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatMessageCreateManyPinnedByInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+  }
+
+  export type EventChatMuteCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
   }
 
   export type ReportUpdateWithoutReporterInput = {
@@ -46818,6 +63872,322 @@ export namespace Prisma {
     mutedUntil?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
+  export type CleanupEventUpdateWithoutOrganizerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutOrganizerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateManyWithoutOrganizerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type EventParticipantUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutParticipantsNestedInput
+  }
+
+  export type EventParticipantUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventParticipantUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventCheckInUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    event?: CleanupEventUpdateOneRequiredWithoutCheckInsNestedInput
+  }
+
+  export type EventCheckInUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventChatMessageUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutAuthorInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput
+  }
+
+  export type EventChatReadCursorUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatMessageUpdateWithoutPinnedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutPinnedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutPinnedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatMuteUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    event?: CleanupEventUpdateOneRequiredWithoutChatMutesNestedInput
+  }
+
+  export type EventChatMuteUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatMuteUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type ReportCreateManySiteInput = {
     id?: string
     createdAt?: Date | string
@@ -46840,11 +64210,27 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
+    endAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
     organizerId?: string | null
     participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
   }
 
   export type SiteVoteCreateManySiteInput = {
@@ -46941,33 +64327,95 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
-    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
 
   export type CleanupEventUncheckedUpdateWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
   export type CleanupEventUncheckedUpdateManyWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
     organizerId?: NullableStringFieldUpdateOperationsInput | string | null
     participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
   }
 
   export type SiteVoteUpdateWithoutSiteInput = {
@@ -47168,6 +64616,496 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventParticipantCreateManyEventInput = {
+    id?: string
+    joinedAt?: Date | string
+    userId: string
+    reminderEnabled?: boolean
+    reminderAt?: Date | string | null
+  }
+
+  export type EventCheckInCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    dedupeKey: string
+    userId?: string | null
+    guestDisplayName?: string | null
+    checkedInAt?: Date | string
+  }
+
+  export type EventCheckInRedemptionCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    jti: string
+  }
+
+  export type EventChatMessageCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+  }
+
+  export type EventChatReadCursorCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    userId: string
+    lastReadMessageId?: string | null
+  }
+
+  export type EventChatMuteCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+  }
+
+  export type CleanupEventCreateManyParentEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+  }
+
+  export type EventParticipantUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutEventParticipationsNestedInput
+  }
+
+  export type EventParticipantUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventParticipantUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    joinedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    reminderEnabled?: BoolFieldUpdateOperationsInput | boolean
+    reminderAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventCheckInUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutEventCheckInsNestedInput
+  }
+
+  export type EventCheckInUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    guestDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    checkedInAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type EventCheckInRedemptionUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventCheckInRedemptionUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventCheckInRedemptionUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatMessageUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput
+  }
+
+  export type EventChatReadCursorUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatMuteUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutEventChatMutesNestedInput
+  }
+
+  export type EventChatMuteUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatMuteUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type CleanupEventUpdateWithoutParentEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutParentEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateManyWithoutParentEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+  }
+
+  export type EventChatMessageCreateManyReplyToInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+  }
+
+  export type EventChatAttachmentCreateManyMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    url: string
+    mimeType: string
+    fileName: string
+    sizeBytes: number
+    width?: number | null
+    height?: number | null
+    duration?: number | null
+    thumbnailUrl?: string | null
+  }
+
+  export type EventChatMessageUpdateWithoutReplyToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutReplyToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateManyWithoutReplyToInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentUncheckedUpdateWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatAttachmentUncheckedUpdateManyWithoutMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    url?: StringFieldUpdateOperationsInput | string
+    mimeType?: StringFieldUpdateOperationsInput | string
+    fileName?: StringFieldUpdateOperationsInput | string
+    sizeBytes?: IntFieldUpdateOperationsInput | number
+    width?: NullableIntFieldUpdateOperationsInput | number | null
+    height?: NullableIntFieldUpdateOperationsInput | number | null
+    duration?: NullableIntFieldUpdateOperationsInput | number | null
+    thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SiteCommentCreateManyParentInput = {
