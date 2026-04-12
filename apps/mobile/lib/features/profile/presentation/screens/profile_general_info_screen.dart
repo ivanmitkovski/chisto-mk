@@ -178,27 +178,12 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     if (!mounted || !_phoneFocus.hasFocus) return;
     final BuildContext? ctx = _phoneFieldKey.currentContext;
     if (ctx == null) return;
-    final RenderObject? renderObject = ctx.findRenderObject();
-    if (renderObject is! RenderBox) return;
-    final RenderBox box = renderObject;
-    final Rect rect = box.localToGlobal(Offset.zero, ancestor: null) & box.size;
-    final double keyboardInset = MediaQuery.viewInsetsOf(ctx).bottom;
-    if (keyboardInset <= 0) return;
-    final double screenHeight = MediaQuery.sizeOf(ctx).height;
-    const double paddingAboveKeyboard = 24;
-    final double safeY = screenHeight - keyboardInset - paddingAboveKeyboard;
-    if (rect.bottom <= safeY) return;
-    final double delta = rect.bottom - safeY;
-    final ScrollPosition position = _scrollController.position;
-    final double targetOffset = (position.pixels + delta).clamp(
-      0.0,
-      position.maxScrollExtent,
-    );
-    if ((targetOffset - position.pixels).abs() < 1) return;
-    _scrollController.animateTo(
-      targetOffset,
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.25,
       duration: AppMotion.medium,
       curve: AppMotion.smooth,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
     );
   }
 
@@ -435,8 +420,9 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     final bool canPeekAvatar = _canPeekGeneralInfoAvatar();
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       bottomNavigationBar: ProfilePrimaryActionBar(
+        padForKeyboard: false,
         child: PrimaryButton(
           label: _isSaving
               ? context.l10n.profileGeneralSaving

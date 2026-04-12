@@ -28,8 +28,34 @@ class NotificationOpenRouter {
         NotificationOpenDiagnostics.recordOpenSuccess('push_home');
         return;
       case 'CLEANUP_EVENT':
+        final String? eventId = data['eventId'] as String?;
+        if (eventId != null && eventId.isNotEmpty) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.eventsDetail,
+            arguments: EventRouteArguments(eventId: eventId),
+          );
+          NotificationOpenDiagnostics.recordOpenSuccess('push_event_detail');
+          return;
+        }
         Navigator.of(context).pushNamed(AppRoutes.homeEvents);
         NotificationOpenDiagnostics.recordOpenSuccess('push_events');
+        return;
+      case 'EVENT_CHAT':
+        final String? chatEventId = data['eventId'] as String?;
+        if (chatEventId != null && chatEventId.isNotEmpty) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.eventChat,
+            arguments: EventChatRouteArguments(
+              eventId: chatEventId,
+              eventTitle: '',
+              isOrganizer: false,
+            ),
+          );
+          NotificationOpenDiagnostics.recordOpenSuccess('push_event_chat');
+          return;
+        }
+        Navigator.of(context).pushNamed(AppRoutes.homeEvents);
+        NotificationOpenDiagnostics.recordOpenSuccess('push_events_fallback');
         return;
       default:
         Navigator.of(context).pushNamed(AppRoutes.home, arguments: 0);
@@ -46,8 +72,34 @@ class NotificationOpenRouter {
 
     switch (type) {
       case 'CLEANUP_EVENT':
+        final String? eventId = data['eventId'] as String?;
+        if (eventId != null && eventId.isNotEmpty) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.eventsDetail,
+            arguments: EventRouteArguments(eventId: eventId),
+          );
+          NotificationOpenDiagnostics.recordOpenSuccess('data_event_detail');
+          return;
+        }
         Navigator.of(context).pushNamed(AppRoutes.homeEvents);
         NotificationOpenDiagnostics.recordOpenSuccess('data_events');
+        return;
+      case 'EVENT_CHAT':
+        final String? chatEventId = data['eventId'] as String?;
+        if (chatEventId != null && chatEventId.isNotEmpty) {
+          Navigator.of(context).pushNamed(
+            AppRoutes.eventChat,
+            arguments: EventChatRouteArguments(
+              eventId: chatEventId,
+              eventTitle: '',
+              isOrganizer: false,
+            ),
+          );
+          NotificationOpenDiagnostics.recordOpenSuccess('data_event_chat');
+          return;
+        }
+        Navigator.of(context).pushNamed(AppRoutes.homeEvents);
+        NotificationOpenDiagnostics.recordOpenSuccess('data_events_fallback');
         return;
       default:
         Navigator.of(context).pushNamed(AppRoutes.home, arguments: 0);

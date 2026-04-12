@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show min;
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -51,6 +52,14 @@ class ApiClient {
     Object? body,
   }) async {
     return _requestWithRetry('PATCH', path, headers: headers, body: body);
+  }
+
+  Future<ApiResponse> put(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return _requestWithRetry('PUT', path, headers: headers, body: body);
   }
 
   Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
@@ -113,6 +122,89 @@ class ApiClient {
           'files',
           filePath,
           contentType: contentType,
+        ),
+      );
+    }
+
+    try {
+      final http.StreamedResponse streamed =
+          await request.send().timeout(_timeout);
+      final http.Response response = await http.Response.fromStream(streamed);
+      return _handleResponse(response);
+    } on TimeoutException catch (e) {
+      throw AppError.timeout(
+          message: e.message?.isEmpty ?? true ? null : e.message);
+    } on SocketException catch (e) {
+      throw AppError.network(message: e.message, cause: e);
+    } on AppError {
+      rethrow;
+    } on Exception catch (e) {
+      if (e is http.ClientException) {
+        throw AppError.network(message: e.message, cause: e);
+      }
+      rethrow;
+    }
+  }
+
+  Stream<List<int>> _chunkedByteStream(
+    List<int> bytes, {
+    required void Function(int chunkLength) onChunk,
+    bool Function()? isCancelled,
+  }) async* {
+    const int chunkSize = 64 * 1024;
+    int offset = 0;
+    while (offset < bytes.length) {
+      if (isCancelled?.call() == true) {
+        throw AppError.cancelled(message: 'Upload cancelled');
+      }
+      final int end = min(offset + chunkSize, bytes.length);
+      final List<int> slice = bytes.sublist(offset, end);
+      yield slice;
+      onChunk(slice.length);
+      offset = end;
+    }
+  }
+
+  Future<ApiResponse> multipartPost(
+    String path, {
+    required List<MultipartFileData> files,
+    Map<String, String>? fields,
+    void Function(int sent, int total)? onSendProgress,
+    bool Function()? isCancelled,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl$path');
+    final http.MultipartRequest request = http.MultipartRequest('POST', url);
+
+    final String? token = _accessToken();
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.headers['Accept'] = 'application/json';
+
+    if (fields != null) {
+      request.fields.addAll(fields);
+    }
+
+    final int totalBytes =
+        files.fold<int>(0, (int a, MultipartFileData f) => a + f.bytes.length);
+    int sentTotal = 0;
+    for (final MultipartFileData f in files) {
+      final int fileLen = f.bytes.length;
+      final Stream<List<int>> stream = _chunkedByteStream(
+        f.bytes,
+        onChunk: (int n) {
+          sentTotal += n;
+          onSendProgress?.call(sentTotal, totalBytes);
+        },
+        isCancelled: isCancelled,
+      );
+      request.files.add(
+        http.MultipartFile(
+          f.field,
+          http.ByteStream(stream),
+          fileLen,
+          filename: f.fileName,
+          contentType: MediaType.parse(f.mimeType),
         ),
       );
     }
@@ -238,6 +330,13 @@ class ApiClient {
             body: bodyStr,
           );
           break;
+        case 'PUT':
+          request = http.put(
+            url,
+            headers: requestHeaders,
+            body: bodyStr,
+          );
+          break;
         case 'DELETE':
           request = http.delete(url, headers: requestHeaders);
           break;
@@ -315,4 +414,19 @@ class ApiResponse {
   final int statusCode;
   final String? body;
   final Map<String, dynamic>? json;
+}
+
+/// Represents a single file to include in a multipart upload.
+class MultipartFileData {
+  const MultipartFileData({
+    required this.field,
+    required this.bytes,
+    required this.fileName,
+    required this.mimeType,
+  });
+
+  final String field;
+  final List<int> bytes;
+  final String fileName;
+  final String mimeType;
 }

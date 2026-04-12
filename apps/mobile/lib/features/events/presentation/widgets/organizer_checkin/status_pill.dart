@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class StatusPill extends StatelessWidget {
   const StatusPill({
@@ -16,18 +17,23 @@ class StatusPill extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.radius10,
+        horizontal: AppSpacing.sm,
         vertical: AppSpacing.xxs,
       ),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        color: color.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+        border: Border.all(
+          color: color.withValues(alpha: 0.22),
+          width: 0.5,
+        ),
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        style: AppTypography.badgeLabel.copyWith(
           color: color,
           fontWeight: FontWeight.w700,
+          fontSize: 12,
         ),
       ),
     );

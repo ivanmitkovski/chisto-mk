@@ -1,8 +1,14 @@
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_detail_cta_presentation.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 class StickyBottomCTA extends StatelessWidget {
@@ -15,6 +21,7 @@ class StickyBottomCTA extends StatelessWidget {
     required this.onManageCheckIn,
     required this.onOpenAttendeeCheckIn,
     required this.onOpenCleanupEvidence,
+    this.isPrimaryLoading = false,
   });
 
   final EcoEvent event;
@@ -25,123 +32,189 @@ class StickyBottomCTA extends StatelessWidget {
   final VoidCallback onOpenAttendeeCheckIn;
   final VoidCallback onOpenCleanupEvidence;
 
+  /// Primary action is awaiting a network mutation (join, reminder, start, …).
+  final bool isPrimaryLoading;
+
   @override
   Widget build(BuildContext context) {
-    final double bottomSafe = MediaQuery.of(context).padding.bottom;
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final String label;
-    final bool enabled;
-    final VoidCallback? onPressed;
-    String? secondaryLabel;
-    VoidCallback? onSecondaryPressed;
-
-    if (event.isOrganizer) {
-      if (event.status == EcoEventStatus.upcoming) {
-        label = 'Start event';
-        enabled = true;
-        onPressed = onStartEvent;
-      } else if (event.status == EcoEventStatus.inProgress) {
-        label = 'Manage check-in';
-        enabled = true;
-        onPressed = onManageCheckIn;
-      } else if (event.status == EcoEventStatus.completed) {
-        label = event.hasAfterImages ? 'Edit after photos' : 'Upload after photos';
-        enabled = true;
-        onPressed = onOpenCleanupEvidence;
-      } else {
-        label = event.status.label;
-        enabled = false;
-        onPressed = null;
-      }
-    } else if (event.status == EcoEventStatus.inProgress && event.isJoined) {
-      if (event.isCheckedIn) {
-        label = 'Checked in';
-        enabled = false;
-        onPressed = null;
-      } else if (event.canOpenAttendeeCheckIn) {
-        label = 'Scan to check in';
-        enabled = true;
-        onPressed = onOpenAttendeeCheckIn;
-      } else {
-        label = 'Check-in paused';
-        enabled = false;
-        onPressed = null;
-      }
-    } else if (event.isJoined) {
-      label = event.reminderEnabled ? 'Turn reminder off' : 'Set reminder';
-      enabled = true;
-      onPressed = onToggleReminder;
-      secondaryLabel = 'Leave event';
-      onSecondaryPressed = onToggleJoin;
-    } else if (!event.isJoinable) {
-      label = event.status.label;
-      enabled = false;
-      onPressed = null;
-    } else {
-      label = 'Join eco action';
-      enabled = true;
-      onPressed = onToggleJoin;
-    }
+    final Widget panel = DecoratedBox(
+      decoration: BoxDecoration(
+        color: AppColors.panelBackground.withValues(
+          alpha: reduceMotion ? 1.0 : kEventDetailStickyCtaPanelAlpha,
+        ),
+        border: const Border(
+          top: BorderSide(color: AppColors.divider, width: 0.5),
+        ),
+        boxShadow: reduceMotion
+            ? null
+            : <BoxShadow>[
+                BoxShadow(
+                  color: AppColors.black.withValues(
+                    alpha: kEventDetailStickyCtaShadowAlpha,
+                  ),
+                  blurRadius: kEventDetailStickyCtaShadowBlurRadius,
+                  offset: const Offset(0, kEventDetailStickyCtaShadowOffsetY),
+                ),
+              ],
+      ),
+      child: ProfilePrimaryActionBar(
+        padForKeyboard: true,
+        child: _CtaContent(
+          event: event,
+          isPrimaryLoading: isPrimaryLoading,
+          onToggleJoin: onToggleJoin,
+          onToggleReminder: onToggleReminder,
+          onStartEvent: onStartEvent,
+          onManageCheckIn: onManageCheckIn,
+          onOpenAttendeeCheckIn: onOpenAttendeeCheckIn,
+          onOpenCleanupEvidence: onOpenCleanupEvidence,
+        ),
+      ),
+    );
 
     return Positioned(
       left: 0,
       right: 0,
       bottom: 0,
-      child: Container(
-        padding: EdgeInsets.fromLTRB(
-          AppSpacing.lg,
-          AppSpacing.md,
-          AppSpacing.lg,
-          AppSpacing.md + bottomSafe,
-        ),
-        decoration: BoxDecoration(
-          color: AppColors.panelBackground,
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
-        child: secondaryLabel == null
-            ? PrimaryButton(
-                label: label,
-                enabled: enabled,
-                onPressed: enabled ? (onPressed ?? onToggleJoin) : null,
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  PrimaryButton(
-                    label: label,
-                    enabled: enabled,
-                    onPressed: enabled ? onPressed : null,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 54,
-                    child: OutlinedButton(
-                      onPressed: onSecondaryPressed,
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.divider),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                      ),
-                      child: Text(
-                        secondaryLabel,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w600,
-                            ),
-                      ),
-                    ),
-                  ),
-                ],
+      child: reduceMotion
+          ? panel
+          : ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(
+                  sigmaX: kEventDetailStickyCtaBlurSigma,
+                  sigmaY: kEventDetailStickyCtaBlurSigma,
+                ),
+                child: panel,
               ),
-      ),
+            ),
     );
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// Private state machine — one place to read the CTA logic.
+// ────────────────────────────────────────────────────────────────────────────
+
+class _CtaContent extends StatelessWidget {
+  const _CtaContent({
+    required this.event,
+    required this.isPrimaryLoading,
+    required this.onToggleJoin,
+    required this.onToggleReminder,
+    required this.onStartEvent,
+    required this.onManageCheckIn,
+    required this.onOpenAttendeeCheckIn,
+    required this.onOpenCleanupEvidence,
+  });
+
+  final EcoEvent event;
+  final bool isPrimaryLoading;
+  final VoidCallback onToggleJoin;
+  final VoidCallback onToggleReminder;
+  final VoidCallback onStartEvent;
+  final VoidCallback onManageCheckIn;
+  final VoidCallback onOpenAttendeeCheckIn;
+  final VoidCallback onOpenCleanupEvidence;
+
+  @override
+  Widget build(BuildContext context) {
+    final EventDetailCtaPresentation presentation =
+        resolveEventDetailCtaPresentation(event: event, l10n: context.l10n);
+    final _CtaState state = _callbacksForPresentation(
+      presentation: presentation,
+    );
+
+    if (state.secondaryLabel != null) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          PrimaryButton(
+            label: state.primaryLabel,
+            enabled: state.enabled,
+            isLoading: isPrimaryLoading,
+            onPressed: state.enabled ? state.onPrimaryPressed : null,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          SizedBox(
+            width: double.infinity,
+            height: kEventDetailCtaSecondaryButtonHeight,
+            child: OutlinedButton(
+              onPressed: isPrimaryLoading ? null : state.onSecondaryPressed,
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: AppColors.divider),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                ),
+              ),
+              child: Text(
+                state.secondaryLabel!,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return PrimaryButton(
+      label: state.primaryLabel,
+      enabled: state.enabled,
+      isLoading: isPrimaryLoading,
+      onPressed: state.enabled ? state.onPrimaryPressed : null,
+    );
+  }
+
+  _CtaState _callbacksForPresentation({
+    required EventDetailCtaPresentation presentation,
+  }) {
+    VoidCallback? onPrimary;
+    VoidCallback? onSecondary;
+
+    if (event.isOrganizer) {
+      onPrimary = switch (event.status) {
+        EcoEventStatus.upcoming when event.moderationApproved => onStartEvent,
+        EcoEventStatus.inProgress => onManageCheckIn,
+        EcoEventStatus.completed => onOpenCleanupEvidence,
+        _ => null,
+      };
+    } else if (event.status == EcoEventStatus.inProgress && event.isJoined) {
+      if (event.canOpenAttendeeCheckIn && !event.isCheckedIn) {
+        onPrimary = onOpenAttendeeCheckIn;
+      }
+    } else if (event.isJoined) {
+      onPrimary = onToggleReminder;
+      onSecondary = onToggleJoin;
+    } else if (event.moderationApproved && event.isJoinable) {
+      onPrimary = onToggleJoin;
+    }
+
+    return _CtaState(
+      primaryLabel: presentation.primaryLabel,
+      enabled: presentation.primaryEnabled,
+      onPrimaryPressed: onPrimary,
+      secondaryLabel: presentation.secondaryLabel,
+      onSecondaryPressed: onSecondary,
+    );
+  }
+}
+
+class _CtaState {
+  const _CtaState({
+    required this.primaryLabel,
+    required this.enabled,
+    this.onPrimaryPressed,
+    this.secondaryLabel,
+    this.onSecondaryPressed,
+  });
+
+  final String primaryLabel;
+  final bool enabled;
+  final VoidCallback? onPrimaryPressed;
+  final String? secondaryLabel;
+  final VoidCallback? onSecondaryPressed;
 }

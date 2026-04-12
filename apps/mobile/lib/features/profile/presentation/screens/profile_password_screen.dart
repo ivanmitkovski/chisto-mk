@@ -23,8 +23,6 @@ class ProfilePasswordScreen extends StatefulWidget {
 }
 
 class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
-  static const double _keyboardExtraScrollBottom = 280;
-
   final TextEditingController _oldPasswordController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
@@ -166,8 +164,9 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       bottomNavigationBar: ProfilePrimaryActionBar(
+        padForKeyboard: false,
         child: PrimaryButton(
           label: _isSubmitting
               ? context.l10n.profilePasswordSubmitting
@@ -176,6 +175,7 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
         ),
       ),
       body: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -220,26 +220,15 @@ class _ProfilePasswordScreenState extends State<ProfilePasswordScreen> {
                   controller: _scrollController,
                   keyboardDismissBehavior:
                       ScrollViewKeyboardDismissBehavior.onDrag,
-                  physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics(),
-                  ),
+                  physics: const ClampingScrollPhysics(),
                   slivers: <Widget>[
                     SliverPadding(
-                      padding:
-                          const EdgeInsets.fromLTRB(
-                            AppSpacing.lg,
-                            0,
-                            AppSpacing.lg,
-                            AppSpacing.lg,
-                          ).add(
-                            EdgeInsets.only(
-                              bottom:
-                                  MediaQuery.viewInsetsOf(context).bottom > 0
-                                  ? MediaQuery.viewInsetsOf(context).bottom +
-                                        _keyboardExtraScrollBottom
-                                  : 0,
-                            ),
-                          ),
+                      padding: const EdgeInsets.fromLTRB(
+                        AppSpacing.lg,
+                        0,
+                        AppSpacing.lg,
+                        AppSpacing.lg,
+                      ),
                       sliver: SliverToBoxAdapter(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,

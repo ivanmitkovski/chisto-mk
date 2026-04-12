@@ -5,36 +5,45 @@ import 'package:flutter/foundation.dart';
 abstract class CheckInRepository implements Listenable {
   Duration get payloadTtl;
 
-  String ensureSession({
+  /// Dev-only organizer “simulate scan” uses local fake attendees; API mode has no equivalent.
+  bool get supportsOrganizerSimulate;
+
+  /// Refetch attendee list from the server (no-op for in-memory dev repo).
+  Future<void> refreshAttendees(String eventId);
+
+  Future<String> ensureSession({
     required EcoEvent event,
     bool openIfNeeded = true,
   });
 
-  CheckInQrPayload issuePayload({
+  Future<CheckInQrPayload> issuePayload({
     required String eventId,
   });
 
-  CheckInSubmissionResult submitScan({
+  Future<CheckInSubmissionResult> submitScan({
     required String rawPayload,
     required String expectedEventId,
     required String attendeeId,
     required String attendeeName,
   });
 
-  bool markAttendeeCheckedIn({
+  Future<ManualCheckInResult> markAttendeeCheckedIn({
     required String eventId,
     required String attendeeId,
     required String attendeeName,
   });
 
-  bool removeCheckedInAttendee({
+  Future<bool> removeCheckedInAttendee({
     required String eventId,
     required String attendeeId,
   });
 
-  bool pauseSession(String eventId);
-  bool resumeSession(String eventId);
-  bool closeSession(String eventId);
+  Future<bool> pauseSession(String eventId);
+  Future<bool> resumeSession(String eventId);
+  Future<bool> closeSession(String eventId);
+
+  /// Server: `POST /events/:id/check-in/session/rotate`. No-op for in-memory when not implemented.
+  Future<void> rotateSession(String eventId);
 
   List<CheckedInAttendee> checkedInAttendees(String eventId);
   int checkedInCount(String eventId);

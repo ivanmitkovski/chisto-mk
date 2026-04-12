@@ -875,6 +875,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePointsReasonOther => 'Points update';
 
   @override
+  String get profilePointsReasonEventOrganizerApproved =>
+      'Your cleanup event was approved';
+
+  @override
+  String get profilePointsReasonEventJoined => 'Joined a cleanup event';
+
+  @override
+  String get profilePointsReasonEventJoinNoShow =>
+      'Join bonus adjusted — no check-in';
+
+  @override
+  String get profilePointsReasonEventCheckIn => 'Event check-in';
+
+  @override
+  String get profilePointsReasonEventCompleted => 'Cleanup event completed';
+
+  @override
   String get profileReportCreditsTitle => 'Report credits';
 
   @override
@@ -1641,6 +1658,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsEventNotFoundBody => 'This event is no longer available.';
 
   @override
+  String get eventsDetailBrowseEvents => 'Browse events';
+
+  @override
+  String get eventsDetailCouldNotRefresh =>
+      'Couldn’t refresh. Showing saved details.';
+
+  @override
+  String get eventsDetailRetryRefresh => 'Retry';
+
+  @override
+  String get eventsDetailLocationTitle => 'Location';
+
+  @override
+  String get eventsDetailCopyAddress => 'Copy address';
+
+  @override
+  String get eventsDetailAddressCopied => 'Address copied';
+
+  @override
+  String get eventsDetailLocationLongPressHint =>
+      'Long-press for full address and actions';
+
+  @override
+  String get eventsDetailCoverImageUnavailable => 'Image unavailable';
+
+  @override
+  String get eventsWeatherUnavailableBody =>
+      'Forecast isn’t available right now.';
+
+  @override
+  String get eventsWeatherRetry => 'Try again';
+
+  @override
+  String get eventsUnableToStartEventGeneric =>
+      'Could not start the event. Check your connection and try again.';
+
+  @override
+  String get eventsStartEventTooEarly =>
+      'You can start this eco action once the scheduled start time arrives.';
+
+  @override
+  String get eventsAwaitingModerationCta => 'Awaiting approval';
+
+  @override
+  String get eventsModerationBannerTitle => 'Awaiting approval';
+
+  @override
+  String get eventsModerationBannerBody =>
+      'This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.';
+
+  @override
+  String get eventsEventPendingPublicCta => 'Not open for joining yet';
+
+  @override
+  String get eventsFeedOfflineStaleBanner =>
+      'Showing saved events — couldn’t refresh. Pull down to retry.';
+
+  @override
+  String get eventsFeedInitialLoadFailed =>
+      'We couldn’t load events. Check your connection and try again.';
+
+  @override
+  String get eventsOrganizerInvalidateQrTitle => 'Invalidate previous QR codes';
+
+  @override
+  String get eventsOrganizerInvalidateQrSubtitle =>
+      'Use if a code was shared or photographed. Already scanned codes stay valid until they expire; this rotates the session so new scans need a fresh QR.';
+
+  @override
+  String get eventsOrganizerQrSessionRotated =>
+      'QR session updated. Show the new code to attendees.';
+
+  @override
+  String get eventsOrganizerQrRotateFailed =>
+      'Could not invalidate codes. Try again.';
+
+  @override
+  String get eventsEditEventTitle => 'Edit event';
+
+  @override
+  String get eventsEditEventSave => 'Save changes';
+
+  @override
+  String get eventsEventUpdated => 'Event updated';
+
+  @override
+  String get eventsMutationFailedGeneric =>
+      'Something went wrong. Please try again.';
+
+  @override
   String get eventsManualCheckInAdd => 'Add';
 
   @override
@@ -1655,6 +1762,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsOrganizerAttendeeNamePlaceholder => 'Attendee name';
+
+  @override
+  String get eventsOrganizerManualCheckInSubtitle =>
+      'Search volunteers who joined this event, then check them in.';
+
+  @override
+  String get eventsOrganizerManualCheckInNoJoiners =>
+      'No volunteers have joined this event yet.';
+
+  @override
+  String get eventsOrganizerManualCheckInSelectParticipant =>
+      'Select a volunteer from the list.';
+
+  @override
+  String get eventsOrganizerManualCheckInNotParticipant =>
+      'This person is not on the participant list.';
 
   @override
   String get eventsOrganizerEnterNameFirst => 'Enter attendee name first.';
@@ -1700,6 +1823,91 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventsOrganizerUploadAfterPhotosHint =>
       'Upload after photos from the event detail.';
+
+  @override
+  String get eventsOrganizerCompletionCheckedInNone =>
+      'No attendees checked in.';
+
+  @override
+  String eventsOrganizerCompletionJoinedLine(int count) {
+    return '$count volunteers joined';
+  }
+
+  @override
+  String eventsOrganizerCompletionJoinedOfCap(int joined, int cap) {
+    return '$joined of $cap spots filled';
+  }
+
+  @override
+  String get eventsOrganizerCompletionSheetSemantic =>
+      'Event completed. Review next steps.';
+
+  @override
+  String get eventsOrganizerCompletionBackToEvent => 'Back to event';
+
+  @override
+  String get eventsOrganizerCompletionAddPhotosNow => 'Add cleanup photos now';
+
+  @override
+  String get eventsOrganizerCompletionWhatNextIntro =>
+      'Wrap up on the event page: document results and share the impact you made together.';
+
+  @override
+  String get eventsOrganizerCompletionNextStepsHeading => 'NEXT STEPS';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosTitle => 'Add after photos';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosBody =>
+      'Show the difference you made. They appear on the event page for everyone.';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactTitle => 'Log your impact';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactBody =>
+      'Record bags collected, time volunteered, and estimates from the event page.';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityTitle => 'Build trust';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityBody =>
+      'Photos help moderators verify the cleanup and inspire future actions in your community.';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosTitle => 'After photos';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosMessage =>
+      'Upload photos after cleanup so volunteers and moderators can see your results. Use the button below when you are ready.';
+
+  @override
+  String get eventsAttendeeCompletedTitle => 'Thank you';
+
+  @override
+  String get eventsAttendeeCompletedBody =>
+      'This eco action is complete. Thanks for showing up for your community.';
+
+  @override
+  String get eventsAfterPhotosOrganizerEmptyHint =>
+      'No after photos yet. Use the button below to add them.';
+
+  @override
+  String get eventsEvidenceScreenSubtitle =>
+      'After photos document your results and appear on the event page.';
+
+  @override
+  String eventsEvidencePhotoCountChip(int current, int max) {
+    return '$current of $max photos';
+  }
+
+  @override
+  String get eventsEvidenceBeforeAfterTabsSemantic => 'Before and after photos';
+
+  @override
+  String get eventsEvidenceSavingSemantic => 'Saving after photos';
 
   @override
   String get eventsOrganizerCheckInPausedSnack => 'Check-in paused.';
@@ -1771,6 +1979,60 @@ class AppLocalizationsEn extends AppLocalizations {
       'Resume check-in to issue a fresh QR';
 
   @override
+  String get eventsOrganizerQrLoadFailedGeneric =>
+      'Could not load a check-in code. Check your connection and try again.';
+
+  @override
+  String get eventsOrganizerQrRateLimited =>
+      'Too many refresh attempts. Wait a moment and try again.';
+
+  @override
+  String get eventsOrganizerSessionSetupFailed =>
+      'Could not start check-in. Confirm the event is in progress and try again.';
+
+  @override
+  String get eventsOrganizerQrRetry => 'Try again';
+
+  @override
+  String get eventsOrganizerQrBrightnessHint =>
+      'Tip: turn up screen brightness so the code is easier to scan.';
+
+  @override
+  String eventsOrganizerQrSemantics(int seconds) {
+    return 'Check-in QR code. Refreshes in about $seconds seconds.';
+  }
+
+  @override
+  String get eventsOrganizerQrEncodeError =>
+      'This code could not be drawn. Tap try again.';
+
+  @override
+  String get eventsOrganizerFeedbackInvalidQrStrict =>
+      'That QR is not valid for check-in.';
+
+  @override
+  String get eventsOrganizerFeedbackRequiresJoin =>
+      'Join the event in the app before checking in.';
+
+  @override
+  String get eventsOrganizerFeedbackCheckInUnavailable =>
+      'Check-in is not available for this event right now.';
+
+  @override
+  String get eventsOrganizerFeedbackRateLimited =>
+      'Too many attempts. Wait briefly and try again.';
+
+  @override
+  String get eventsOrganizerCopyQrText => 'Copy QR code text';
+
+  @override
+  String get eventsOrganizerQrTextCopied =>
+      'QR code text copied — paste it in a message to attendees who can\'t scan.';
+
+  @override
+  String get eventsOrganizerNoQrToCopy => 'No active QR code to copy yet.';
+
+  @override
   String get eventsOrganizerManualOverride =>
       'Manual override: mark attendee present';
 
@@ -1795,6 +2057,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsOrganizerCancelEvent => 'Cancel event';
+
+  @override
+  String get eventsOrganizerMoreActionsSemantic => 'More event actions';
+
+  @override
+  String get eventsOrganizerMoreSheetTitle => 'Event actions';
+
+  @override
+  String get eventsOrganizerEndEventConfirmTitle => 'End this event?';
+
+  @override
+  String get eventsOrganizerEndEventConfirmMessage =>
+      'Check-in will close and the event will be marked completed. You can upload after photos from the event detail.';
+
+  @override
+  String get eventsOrganizerEndEventKeepManaging => 'Keep managing';
+
+  @override
+  String get eventsOrganizerEndEventConfirmAction => 'End event';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmTitle => 'Cancel this event?';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmMessage =>
+      'Volunteers will see the event as cancelled. This cannot be undone from the app.';
+
+  @override
+  String get eventsOrganizerCancelEventKeepEvent => 'Keep event';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmAction => 'Cancel event';
+
+  @override
+  String eventsOrganizerRemoveAttendeeSemantic(String name) {
+    return 'Remove $name from check-in';
+  }
 
   @override
   String get eventsOrganizerSimulateCheckInDev => 'Simulate check-in (dev)';
@@ -1880,8 +2179,103 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createEventAppBarTitle => 'Create event';
 
   @override
-  String get createEventLocalInfoSnack =>
-      'Creation keeps the event local for now, but the organizer flow is ready right away.';
+  String get createEventHelpTitle => 'Creating an event';
+
+  @override
+  String get createEventHelpSubtitle => 'Quick guide for organizers';
+
+  @override
+  String get createEventHelpBulletModeration =>
+      'Events are reviewed so the community sees accurate, safe cleanups.';
+
+  @override
+  String get createEventHelpBulletVolunteers =>
+      'Volunteers see your title, schedule, site, gear list, and description once the event is live.';
+
+  @override
+  String get createEventHelpBulletSite =>
+      'Pick a pollution site on the list or map so everyone knows where to meet.';
+
+  @override
+  String get createEventHelpBulletSchedule =>
+      'Set the date and time span so calendars and reminders stay clear.';
+
+  @override
+  String get createEventHelpBulletSubmit =>
+      'When everything required is filled in, use Create eco action to publish.';
+
+  @override
+  String get createEventFieldVolunteerCap => 'Volunteer cap';
+
+  @override
+  String get createEventVolunteerCapPlaceholderNoLimit => 'No limit';
+
+  @override
+  String createEventVolunteerCapUpTo(int count) {
+    return 'Up to $count volunteers';
+  }
+
+  @override
+  String get createEventVolunteerCapSheetTitle => 'Volunteer cap';
+
+  @override
+  String get createEventVolunteerCapSheetSubtitle =>
+      'Optional. You can cap sign-ups between 2 and 5000.';
+
+  @override
+  String get createEventVolunteerCapNoLimit => 'No limit';
+
+  @override
+  String get createEventVolunteerCapCustomLabel => 'Custom';
+
+  @override
+  String get createEventVolunteerCapCustomHint => 'Number (2–5000)';
+
+  @override
+  String get createEventVolunteerCapApply => 'Apply';
+
+  @override
+  String get createEventVolunteerCapInvalid =>
+      'Enter a whole number between 2 and 5000.';
+
+  @override
+  String get createEventSitePickerLoading => 'Loading sites…';
+
+  @override
+  String get createEventSitePickerOfflineTitle => 'Offline list';
+
+  @override
+  String get createEventSitePickerOfflineMessage =>
+      'Showing built-in sites because the live list was empty or unavailable.';
+
+  @override
+  String get createEventSitePickerLoadFailedTitle => 'Could not refresh';
+
+  @override
+  String get createEventSitePickerLoadFailedMessage =>
+      'You can still pick from the offline site list. Try again to load live sites.';
+
+  @override
+  String get createEventSitePickerRetry => 'Try again';
+
+  @override
+  String get createEventDiscardTitle => 'Discard event?';
+
+  @override
+  String get createEventDiscardBody =>
+      'You will lose what you entered on this screen.';
+
+  @override
+  String get createEventDiscardKeepEditing => 'Keep editing';
+
+  @override
+  String get createEventLoadingSemantic => 'Loading create event form';
+
+  @override
+  String get createEventSectionScheduleCaption => 'Schedule';
+
+  @override
+  String get createEventSectionDetailsCaption => 'Event details';
 
   @override
   String get createEventCleanupSiteTitle => 'Cleanup site';
@@ -1918,6 +2312,29 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createEventTitleRequired => 'Event title is required.';
+
+  @override
+  String get createEventTitleMinLength =>
+      'Use at least 3 characters for the title.';
+
+  @override
+  String get createEventSitePickerTabList => 'List';
+
+  @override
+  String get createEventSitePickerTabMap => 'Map';
+
+  @override
+  String get createEventSitePickerMapEmpty =>
+      'No sites on the map match this search, or locations are not available yet.';
+
+  @override
+  String get createEventSitePickerMapSemanticLabel => 'Map of pollution sites';
+
+  @override
+  String get createEventSitePickerMapHint => 'Tap a pin to select a site.';
+
+  @override
+  String get createEventSiteMapPreviewSemantic => 'Open site map picker';
 
   @override
   String get createEventTypeRequired => 'Select an event type.';
@@ -1989,6 +2406,359 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get eventsCtaStartEvent => 'Start event';
+
+  @override
+  String get eventsCtaManageCheckIn => 'Manage check-in';
+
+  @override
+  String get eventsCtaEditAfterPhotos => 'Edit after photos';
+
+  @override
+  String get eventsCtaUploadAfterPhotos => 'Upload after photos';
+
+  @override
+  String get eventsCtaCheckedIn => 'Checked in';
+
+  @override
+  String get eventsCtaScanToCheckIn => 'Scan to check in';
+
+  @override
+  String get eventsCtaCheckInPaused => 'Check-in paused';
+
+  @override
+  String get eventsCtaTurnReminderOff => 'Turn reminder off';
+
+  @override
+  String get eventsCtaSetReminder => 'Set reminder';
+
+  @override
+  String get eventsCtaLeaveEvent => 'Leave event';
+
+  @override
+  String get eventsCtaJoinEcoAction => 'Join eco action';
+
+  @override
+  String get eventsStatusUpcoming => 'Upcoming';
+
+  @override
+  String get eventsStatusInProgress => 'In progress';
+
+  @override
+  String get eventsStatusCompleted => 'Completed';
+
+  @override
+  String get eventsStatusCancelled => 'Cancelled';
+
+  @override
+  String get eventsCardActionsSheetTitle => 'Event actions';
+
+  @override
+  String get eventsCardCopyTitle => 'Copy event details';
+
+  @override
+  String get eventsCardCopySubtitle => 'Copy title, date and location';
+
+  @override
+  String get eventsCardCopiedSnack => 'Event details copied.';
+
+  @override
+  String get eventsCardShareTitle => 'Share event';
+
+  @override
+  String get eventsCardShareSubtitle => 'Share with friends';
+
+  @override
+  String get eventsCardOpenTitle => 'Open event';
+
+  @override
+  String get eventsCardOpenSubtitle => 'View full event details';
+
+  @override
+  String get eventsCardMoreActionsSemantic => 'More event actions';
+
+  @override
+  String get eventsCardSoonLabel => 'Soon';
+
+  @override
+  String get eventsFeedUpNext => 'Up next';
+
+  @override
+  String get eventsCountdownStarted => 'Started';
+
+  @override
+  String eventsCountdownDaysHours(int days, int hours) {
+    return 'Starts in ${days}d ${hours}h';
+  }
+
+  @override
+  String eventsCountdownHoursMinutes(int hours, int minutes) {
+    return 'Starts in ${hours}h ${minutes}m';
+  }
+
+  @override
+  String eventsCountdownMinutes(int minutes) {
+    return 'Starts in ${minutes}m';
+  }
+
+  @override
+  String get eventsShareEventTooltip => 'Share event';
+
+  @override
+  String get eventsAttendeeCheckInSemantic => 'Scan to check in at event';
+
+  @override
+  String get eventsAttendeeAlreadyCheckedInSnack =>
+      'You are already checked in.';
+
+  @override
+  String get eventsAttendeeCheckInPausedSnack =>
+      'Organizer has paused check-in for now.';
+
+  @override
+  String get eventsAttendeeCheckInCompleteSnack => 'Check-in complete.';
+
+  @override
+  String get eventsAttendeeBannerTitleCheckedIn => 'You are checked in';
+
+  @override
+  String get eventsAttendeeBannerTitleInProgress => 'Event is in progress';
+
+  @override
+  String get eventsAttendeeBannerSubtitleAttendanceConfirmed =>
+      'Attendance confirmed';
+
+  @override
+  String eventsAttendeeBannerSubtitleCheckedInAt(String time) {
+    return 'Checked in at $time';
+  }
+
+  @override
+  String get eventsAttendeeBannerSubtitleScanQr =>
+      'Scan the organizer\'s QR to check in';
+
+  @override
+  String get eventsAttendeeBannerSubtitlePaused =>
+      'Check-in is temporarily paused';
+
+  @override
+  String get eventsDetailShareSuccess => 'Event shared.';
+
+  @override
+  String get eventsDetailCalendarAdded => 'Event added to your calendar.';
+
+  @override
+  String get eventsDetailCalendarFailed =>
+      'Could not add to calendar. Try again.';
+
+  @override
+  String get eventsDetailRefreshFailed =>
+      'Could not refresh this event. Try again.';
+
+  @override
+  String get eventsDetailCancelledCallout => 'This event has been cancelled.';
+
+  @override
+  String get eventsDetailOpenInMaps => 'Open in Maps';
+
+  @override
+  String eventsDetailCoverSemantic(String title) {
+    return 'Cover image for $title';
+  }
+
+  @override
+  String get eventsDetailGroupedPanelSemantic =>
+      'Location, schedule, and details';
+
+  @override
+  String get eventsDetailParticipationSemantic => 'Your participation';
+
+  @override
+  String get eventsAnalyticsLoadFailed => 'Could not load analytics.';
+
+  @override
+  String get eventsAnalyticsRetry => 'Retry';
+
+  @override
+  String get eventsRecurrenceDaily => 'Every day';
+
+  @override
+  String get eventsRecurrenceNavigatePrevious =>
+      'Previous occurrence in series';
+
+  @override
+  String get eventsRecurrenceNavigateNext => 'Next occurrence in series';
+
+  @override
+  String get eventsImpactSummarySaved => 'Impact summary saved.';
+
+  @override
+  String get eventsImpactSummaryUpdated => 'Impact summary updated.';
+
+  @override
+  String eventsReminderSetSnack(String when) {
+    return 'Reminder set for $when.';
+  }
+
+  @override
+  String get eventsFeedbackSheetTitle => 'Post-event feedback';
+
+  @override
+  String get eventsFeedbackHowWasEvent => 'How was the event?';
+
+  @override
+  String get eventsFeedbackBagsCollected => 'Bags collected';
+
+  @override
+  String eventsFeedbackVolunteerHours(String hours) {
+    return 'Volunteer hours: ${hours}h';
+  }
+
+  @override
+  String get eventsFeedbackNotesHint =>
+      'What worked well? Any notes for next time?';
+
+  @override
+  String eventsEvidenceMaxPhotosSnack(int max) {
+    return 'Maximum $max photos reached.';
+  }
+
+  @override
+  String get eventsEvidencePickFailedSnack =>
+      'Could not pick photos. Check permissions.';
+
+  @override
+  String get eventsEvidenceRemoveAction => 'Remove';
+
+  @override
+  String get eventsEvidenceAppBarTitle => 'Cleanup evidence';
+
+  @override
+  String get eventsEvidenceSaving => 'Saving...';
+
+  @override
+  String get eventsEvidenceAfterPhotosSaved => 'After photos saved.';
+
+  @override
+  String get eventsEvidenceNoChanges => 'No changes to save.';
+
+  @override
+  String get eventsSiteReferencePhotoTitle => 'Site reference photo';
+
+  @override
+  String get eventsSiteReferencePhotoBody =>
+      'Reference taken before cleanup. Use the After tab to add photos of the cleaned site.';
+
+  @override
+  String get eventsManageCheckInOnlyInProgress =>
+      'Check-in is available only while the event is in progress.';
+
+  @override
+  String get eventsEventFull => 'This event is full.';
+
+  @override
+  String get eventsParticipationUpdateFailed =>
+      'Could not update participation. Try again.';
+
+  @override
+  String get eventsJoinedEcoAction => 'You joined this eco action.';
+
+  @override
+  String eventsJoinPointsEarned(int points) {
+    return '+$points points — you\'re in!';
+  }
+
+  @override
+  String get eventsLeftEcoAction => 'You left this eco action.';
+
+  @override
+  String eventsCheckInPointsEarned(int points) {
+    return '+$points points — checked in!';
+  }
+
+  @override
+  String eventsManualCheckInWithPoints(String name, int points) {
+    return '$name checked in · +$points pts for them';
+  }
+
+  @override
+  String get eventsJoinFirstForReminders =>
+      'Join the event first to set reminders.';
+
+  @override
+  String get eventsReminderDisabled => 'Reminder disabled.';
+
+  @override
+  String get eventsReminderSheetTitle => 'Choose reminder time';
+
+  @override
+  String eventsReminderSheetSubtitle(String timeRange, String date) {
+    return 'Event starts at $timeRange on $date.';
+  }
+
+  @override
+  String get eventsReminderPreset1Day => '1 day before';
+
+  @override
+  String get eventsReminderPreset3Hours => '3 hours before';
+
+  @override
+  String get eventsReminderPreset1Hour => '1 hour before';
+
+  @override
+  String get eventsReminderPreset30Mins => '30 minutes before';
+
+  @override
+  String get eventsReminderUnavailableSubtitle =>
+      'Unavailable for this event time';
+
+  @override
+  String get eventsReminderCustomTitle => 'Custom date and time';
+
+  @override
+  String get eventsReminderCustomSubtitle => 'Pick a specific reminder moment';
+
+  @override
+  String get eventsReminderPickTitle => 'Pick reminder';
+
+  @override
+  String get eventsReminderDone => 'Done';
+
+  @override
+  String eventsCardParticipantsMore(int count) {
+    return '+$count more';
+  }
+
+  @override
+  String eventsCardParticipantsCountMax(int count, int max) {
+    return '$count / $max';
+  }
+
+  @override
+  String eventsCardParticipantsJoined(int count) {
+    return '$count joined';
+  }
+
+  @override
+  String eventsDetailSemanticsLabel(String title) {
+    return 'Event detail: $title';
+  }
+
+  @override
+  String eventsCountdownBadgeSemantic(String label) {
+    return 'Time until event starts: $label';
+  }
+
+  @override
+  String get eventsEvidenceThumbnailMenuTitle => 'Photo';
+
+  @override
+  String get eventsFeedRefreshFailed => 'Could not refresh events.';
+
+  @override
+  String get eventsCreateGenericError => 'Could not create event. Try again.';
+
+  @override
   String get qrScannerPointCameraHint =>
       'Point your camera at the organizer\'s live QR code';
 
@@ -2016,6 +2786,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrScannerErrorInvalidFormat => 'Invalid QR format.';
 
   @override
+  String get qrScannerErrorInvalidQr => 'This QR is not valid for check-in.';
+
+  @override
   String get qrScannerErrorWrongEvent => 'This QR belongs to another event.';
 
   @override
@@ -2030,6 +2803,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrScannerErrorAlreadyCheckedIn => 'You are already checked in.';
+
+  @override
+  String get qrScannerErrorRequiresJoin =>
+      'Join this event in the app before checking in.';
+
+  @override
+  String get qrScannerErrorCheckInUnavailable =>
+      'Check-in is not open for this event right now.';
+
+  @override
+  String get qrScannerErrorRateLimited =>
+      'Too many attempts. Wait a moment and try again.';
 
   @override
   String get qrScannerCameraUnavailableFeedback =>
@@ -2068,6 +2853,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrScannerToggleFlashlightSemantic => 'Toggle flashlight';
+
+  @override
+  String get qrScannerCameraStarting => 'Starting camera…';
+
+  @override
+  String get qrScannerCheckingIn => 'Verifying check-in…';
+
+  @override
+  String get qrScannerCameraErrorTitle => 'Camera unavailable';
+
+  @override
+  String get qrScannerManualEntrySubtitle =>
+      'Paste the full text the organizer shared (copy from their screen or a message).';
+
+  @override
+  String get qrScannerPasteButton => 'Paste';
 
   @override
   String get siteReportReasonFakeLabel => 'Fake or misleading data';
@@ -2300,6 +3101,409 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appSmartImageUnavailable => 'Image unavailable';
 
   @override
+  String get eventsReminderSectionTitle => 'Event reminder';
+
+  @override
+  String get eventsReminderSectionEnabled => 'Reminder is on';
+
+  @override
+  String eventsReminderSectionSetFor(String time) {
+    return 'Set for $time';
+  }
+
+  @override
+  String get eventsReminderSectionDisabled =>
+      'Get notified before event starts';
+
+  @override
+  String get eventsReminderSectionDisable => 'Disable';
+
+  @override
+  String get eventsReminderSectionEnable => 'Enable';
+
+  @override
+  String get eventsDescriptionTitle => 'About';
+
+  @override
+  String get eventsDescriptionShowLess => 'Show less';
+
+  @override
+  String get eventsDescriptionReadMore => 'Read more';
+
+  @override
+  String get eventsAfterCleanupTitle => 'After cleanup';
+
+  @override
+  String eventsAfterPhotoSemantic(int index, int total) {
+    return 'View after cleanup photo $index of $total';
+  }
+
+  @override
+  String get eventsFilterAll => 'All';
+
+  @override
+  String get eventsFilterUpcoming => 'Upcoming';
+
+  @override
+  String get eventsFilterNearby => 'Nearby';
+
+  @override
+  String get eventsFilterPast => 'Past';
+
+  @override
+  String get eventsFilterMyEvents => 'My events';
+
+  @override
+  String get eventsFilterSemanticPrefix => 'Events';
+
+  @override
+  String get eventsParticipantsTitle => 'Attendees';
+
+  @override
+  String eventsParticipantsViewSemantic(int count) {
+    return 'View $count attendees';
+  }
+
+  @override
+  String eventsParticipantsYouAndOthers(int count) {
+    return 'You and $count others joined';
+  }
+
+  @override
+  String eventsParticipantsVolunteersJoined(int count) {
+    return '$count volunteers joined';
+  }
+
+  @override
+  String eventsParticipantsSpotsLeft(int count) {
+    return '$count spots left';
+  }
+
+  @override
+  String eventsParticipantsCheckedInCount(int checkedIn, int total) {
+    return '$checkedIn of $total checked in';
+  }
+
+  @override
+  String get eventsParticipantsSearchPlaceholder => 'Search attendee';
+
+  @override
+  String get eventsParticipantsNoSearchResults =>
+      'No attendee matches your search.';
+
+  @override
+  String get eventsParticipantsYouOrganizer => 'You · Organizer';
+
+  @override
+  String get eventsParticipantsOrganizer => 'Organizer';
+
+  @override
+  String get eventsParticipantsYou => 'You';
+
+  @override
+  String get eventsParticipantsLoadFailed =>
+      'Couldn\'t load attendees. Check your connection and try again.';
+
+  @override
+  String get eventsParticipantsRetry => 'Retry';
+
+  @override
+  String get eventsParticipantsViewRosterSemantic => 'View attendee list';
+
+  @override
+  String get eventsGearSectionTitle => 'Gear to bring';
+
+  @override
+  String get eventsGearNoneNeeded => 'No special gear needed';
+
+  @override
+  String get eventsImpactSummaryTitle => 'Impact summary';
+
+  @override
+  String get eventsImpactSummaryAdd => 'Add';
+
+  @override
+  String get eventsImpactSummaryEdit => 'Edit';
+
+  @override
+  String get eventsImpactSummaryEmptyHint =>
+      'Capture cleanup outcomes, effort, and lessons learned.';
+
+  @override
+  String eventsImpactBadgeRating(int rating) {
+    return '$rating★ rating';
+  }
+
+  @override
+  String eventsImpactBadgeBags(int count) {
+    return '$count bags';
+  }
+
+  @override
+  String eventsImpactBadgeHours(String hours) {
+    return '${hours}h';
+  }
+
+  @override
+  String eventsImpactEstimatedLine(String kg, String co2) {
+    return '$kg kg removed · $co2 kg CO2e avoided';
+  }
+
+  @override
+  String eventsLocationSiteSemantic(String distanceKm) {
+    return 'View pollution site, $distanceKm km away';
+  }
+
+  @override
+  String eventsLocationDotKm(String distanceKm) {
+    return '· $distanceKm km';
+  }
+
+  @override
+  String get eventsEmptyAllTitle => 'No eco events yet';
+
+  @override
+  String get eventsEmptyAllSubtitle =>
+      'Be the first to create one! Tap + above to get started.';
+
+  @override
+  String get eventsEmptyUpcomingTitle => 'No upcoming events';
+
+  @override
+  String get eventsEmptyUpcomingSubtitle =>
+      'Create one to get volunteers together.';
+
+  @override
+  String get eventsEmptyNearbyTitle => 'No nearby events';
+
+  @override
+  String get eventsEmptyNearbySubtitle =>
+      'Try a different filter or create an event in your area.';
+
+  @override
+  String get eventsEmptyPastTitle => 'No past events';
+
+  @override
+  String get eventsEmptyPastSubtitle => 'Completed events will show here.';
+
+  @override
+  String get eventsEmptyMyEventsTitle => 'No events yet';
+
+  @override
+  String get eventsEmptyMyEventsSubtitle =>
+      'Join or create an event to see it here.';
+
+  @override
+  String eventsSearchEmptyTitle(String query) {
+    return 'No results for \"$query\"';
+  }
+
+  @override
+  String get eventsSearchEmptySubtitle =>
+      'Try a different search term or check your spelling.';
+
+  @override
+  String get eventsSitePickerTitle => 'Choose site';
+
+  @override
+  String get eventsSitePickerSubtitle =>
+      'Anchor this event to one cleanup location.';
+
+  @override
+  String get eventsSitePickerSearchPlaceholder =>
+      'Search by name or description';
+
+  @override
+  String eventsSitePickerNoMatch(String query) {
+    return 'No sites match \"$query\"';
+  }
+
+  @override
+  String eventsSitePickerRowKmDesc(String km, String desc) {
+    return '$km km away · $desc';
+  }
+
+  @override
+  String get eventsSuccessDialogTitle => 'Event created';
+
+  @override
+  String eventsSuccessDialogBody(String title, String siteName) {
+    return '$title at $siteName is ready. Share it with your community to get volunteers on board.';
+  }
+
+  @override
+  String get eventsSuccessDialogOpenEvent => 'Open event';
+
+  @override
+  String get eventsTimePickerSelectTime => 'Select time';
+
+  @override
+  String get eventsTimePickerConfirm => 'Confirm';
+
+  @override
+  String get eventsTimePickerFrom => 'From';
+
+  @override
+  String get eventsTimePickerTo => 'To';
+
+  @override
+  String eventsTimePickerTimeBlockSemantic(String role, String time) {
+    return '$role, $time';
+  }
+
+  @override
+  String eventsFeedbackRatingStars(int rating) {
+    return '$rating★';
+  }
+
+  @override
+  String get eventsFeedRecentSearches => 'Recent searches';
+
+  @override
+  String get eventsCleanupAfterUploadSemantic => 'Upload after photos';
+
+  @override
+  String get eventsCleanupAfterViewFullscreenSemantic =>
+      'View photo fullscreen';
+
+  @override
+  String get eventsCleanupAfterUploadMoreTitle => 'Upload more photos';
+
+  @override
+  String eventsCleanupAfterUploadedCount(int count) {
+    return '$count uploaded';
+  }
+
+  @override
+  String eventsCleanupAfterSlotsRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count more slots available',
+      one: '1 more slot available',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventsCleanupAfterAddMoreSemantic => 'Add more photos';
+
+  @override
+  String get eventsCleanupAfterRemoveSemantic => 'Remove photo';
+
+  @override
+  String get eventsCleanupAfterEmptyTitle => 'Add photos of the cleaned site';
+
+  @override
+  String eventsCleanupAfterEmptyMaxPhotos(int max) {
+    return 'Up to $max photos';
+  }
+
+  @override
+  String get eventsCleanupAfterEmptyTapGallery => 'Tap to select from gallery';
+
+  @override
+  String get eventsCleanupEvidencePhotoSemantic => 'Cleanup evidence photo';
+
+  @override
+  String get eventsDateRelativeEarlierToday => 'Earlier today';
+
+  @override
+  String eventsDateRelativeDaysAgo(int days) {
+    return '$days days ago';
+  }
+
+  @override
+  String get eventsDateRelativeToday => 'Today';
+
+  @override
+  String get eventsDateRelativeTomorrow => 'Tomorrow';
+
+  @override
+  String eventsDateRelativeInDays(int days) {
+    return 'In $days days';
+  }
+
+  @override
+  String get eventsDateInfoSheetTitle => 'Date and time';
+
+  @override
+  String eventsDateInfoSemantic(String date, String timeRange) {
+    return '$date, $timeRange';
+  }
+
+  @override
+  String get eventsCategorySheetTitle => 'Category';
+
+  @override
+  String eventsCategorySemantic(String label) {
+    return 'Event category: $label';
+  }
+
+  @override
+  String get eventsOrganizerSheetTitle => 'Organizer';
+
+  @override
+  String get eventsOrganizerYouOwnThis => 'This is your event';
+
+  @override
+  String get eventsOrganizerRoleLabel => 'Event organizer';
+
+  @override
+  String eventsOrganizerCreatedOn(int day, int month, int year) {
+    return 'Event created on $day/$month/$year';
+  }
+
+  @override
+  String eventsOrganizerSemantic(String name) {
+    return 'Organizer: $name';
+  }
+
+  @override
+  String get eventsOrganizedByLabel => 'Organized by';
+
+  @override
+  String get eventsFeedSemantic => 'Events feed';
+
+  @override
+  String get eventsFeedTitle => 'Events';
+
+  @override
+  String get eventsFeedCreateSemantic => 'Create event';
+
+  @override
+  String get eventsFeedSearchPlaceholder => 'Search events';
+
+  @override
+  String get eventsFeedHappeningNow => 'Happening now';
+
+  @override
+  String get eventsFeedComingUp => 'Coming up';
+
+  @override
+  String get eventsFeedRecentlyCompleted => 'Recently completed';
+
+  @override
+  String get eventsFeedViewListToggle => 'List view';
+
+  @override
+  String get eventsFeedViewCalendarToggle => 'Calendar view';
+
+  @override
+  String get eventsCalendarPreviousMonth => 'Previous month';
+
+  @override
+  String get eventsCalendarNextMonth => 'Next month';
+
+  @override
+  String eventsCalendarDaySemantic(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String get eventsCalendarNoEventsThisDay => 'No events on this day';
+
+  @override
   String siteCardPollutionSiteSemantic(String title) {
     return 'Pollution site: $title. Tap to open details.';
   }
@@ -2308,4 +3512,647 @@ class AppLocalizationsEn extends AppLocalizations {
   String siteCardPhotoSemantic(String title) {
     return 'Photo of $title';
   }
+
+  @override
+  String get eventsFilterSheetTitle => 'Filter events';
+
+  @override
+  String get eventsFilterSheetCategory => 'Category';
+
+  @override
+  String get eventsFilterSheetStatus => 'Status';
+
+  @override
+  String get eventsFilterSheetDateRange => 'Date range';
+
+  @override
+  String get eventsFilterSheetDateFrom => 'From';
+
+  @override
+  String get eventsFilterSheetDateTo => 'To';
+
+  @override
+  String get eventsFilterSheetShowResults => 'Show results';
+
+  @override
+  String get eventsFilterSheetClearAll => 'Clear all';
+
+  @override
+  String eventsFilterSheetActiveCount(int count) {
+    return '$count active';
+  }
+
+  @override
+  String get eventsOrganizerDashboardTitle => 'My events';
+
+  @override
+  String get eventsOrganizerDashboardEmpty =>
+      'You haven\'t organised any events yet.';
+
+  @override
+  String get eventsOrganizerDashboardEmptyAction => 'Create first event';
+
+  @override
+  String get eventsOrganizerDashboardSectionUpcoming => 'Upcoming';
+
+  @override
+  String get eventsOrganizerDashboardSectionInProgress => 'In progress';
+
+  @override
+  String get eventsOrganizerDashboardSectionCompleted => 'Completed';
+
+  @override
+  String get eventsOrganizerDashboardSectionCancelled => 'Cancelled';
+
+  @override
+  String eventsOrganizerDashboardParticipants(int count, String max) {
+    return '$count/$max participants';
+  }
+
+  @override
+  String eventsOrganizerDashboardParticipantsUnlimited(int count) {
+    return '$count participants';
+  }
+
+  @override
+  String get eventsOrganizerDashboardEvidenceAction => 'Evidence';
+
+  @override
+  String get eventsAnalyticsTitle => 'Analytics';
+
+  @override
+  String get eventsAnalyticsAttendanceRate => 'Attendance rate';
+
+  @override
+  String get eventsAnalyticsJoiners => 'Joiners over time';
+
+  @override
+  String get eventsAnalyticsCheckInsByHour => 'Check-ins by hour';
+
+  @override
+  String get eventsAnalyticsNoData => 'No data yet';
+
+  @override
+  String get eventsOfflineSyncQueued => 'Saved. Will sync when back online.';
+
+  @override
+  String get eventsOfflineSyncFailed =>
+      'Sync failed. Will retry automatically.';
+
+  @override
+  String get eventsWeatherForecast => 'Weather forecast';
+
+  @override
+  String get eventsWeatherLoadFailed => 'Weather unavailable';
+
+  @override
+  String eventsWeatherPrecipitationMm(String amount) {
+    return '$amount mm precipitation';
+  }
+
+  @override
+  String get eventsWeatherNoPrecipitation => 'No measurable precipitation';
+
+  @override
+  String eventsWeatherPrecipChance(int percent) {
+    return '$percent% chance of precipitation';
+  }
+
+  @override
+  String get eventsWeatherIndicativeNote =>
+      'Indicative forecast from Open-Meteo; actual conditions may differ.';
+
+  @override
+  String get eventsWeatherIndicativeInfoTitle => 'About this forecast';
+
+  @override
+  String get eventsWeatherIndicativeInfoSemantic =>
+      'Information about the weather forecast source';
+
+  @override
+  String get eventsRecurrenceNone => 'Does not repeat';
+
+  @override
+  String get eventsRecurrenceWeekly => 'Every week';
+
+  @override
+  String get eventsRecurrenceBiweekly => 'Every 2 weeks';
+
+  @override
+  String get eventsRecurrenceMonthly => 'Every month';
+
+  @override
+  String eventsRecurrenceOccurrences(int count) {
+    return '$count occurrences';
+  }
+
+  @override
+  String get eventsRecurrencePartOfSeries => 'Part of a series';
+
+  @override
+  String eventsRecurrenceSeriesLabel(int index, int total) {
+    return 'Event $index of $total';
+  }
+
+  @override
+  String get eventsRecurrenceDone => 'Done';
+
+  @override
+  String get eventsCategoryGeneralCleanup => 'General cleanup';
+
+  @override
+  String get eventsCategoryGeneralCleanupDescription =>
+      'Pick up litter, sweep debris, and restore the area.';
+
+  @override
+  String get eventsCategoryRiverAndLake => 'River & lake cleanup';
+
+  @override
+  String get eventsCategoryRiverAndLakeDescription =>
+      'Remove waste from waterways, shores, and drainage channels.';
+
+  @override
+  String get eventsCategoryTreeAndGreen => 'Tree planting & greening';
+
+  @override
+  String get eventsCategoryTreeAndGreenDescription =>
+      'Plant trees, restore green spaces, and build garden beds.';
+
+  @override
+  String get eventsCategoryRecyclingDrive => 'Recycling drive';
+
+  @override
+  String get eventsCategoryRecyclingDriveDescription =>
+      'Sort, collect, and transport recyclables to processing centers.';
+
+  @override
+  String get eventsCategoryHazardousRemoval => 'Hazardous waste removal';
+
+  @override
+  String get eventsCategoryHazardousRemovalDescription =>
+      'Safely collect chemicals, tires, batteries, or asbestos.';
+
+  @override
+  String get eventsCategoryAwarenessAndEducation => 'Awareness & education';
+
+  @override
+  String get eventsCategoryAwarenessAndEducationDescription =>
+      'Workshops, talks, or community engagement on eco practices.';
+
+  @override
+  String get eventsCategoryOther => 'Other';
+
+  @override
+  String get eventsCategoryOtherDescription =>
+      'Custom event that doesn\'t match the categories above.';
+
+  @override
+  String get eventsGearTrashBags => 'Trash bags';
+
+  @override
+  String get eventsGearGloves => 'Gloves';
+
+  @override
+  String get eventsGearRakes => 'Rakes & shovels';
+
+  @override
+  String get eventsGearWheelbarrow => 'Wheelbarrow';
+
+  @override
+  String get eventsGearWaterBoots => 'Water boots';
+
+  @override
+  String get eventsGearSafetyVest => 'Safety vest';
+
+  @override
+  String get eventsGearFirstAid => 'First aid kit';
+
+  @override
+  String get eventsGearSunscreen => 'Sunscreen & water';
+
+  @override
+  String get eventsScaleSmall => 'Small (1–5 people)';
+
+  @override
+  String get eventsScaleSmallDescription =>
+      'Quick spot cleanup, one bag or two.';
+
+  @override
+  String get eventsScaleMedium => 'Medium (6–15 people)';
+
+  @override
+  String get eventsScaleMediumDescription =>
+      'Half-day effort, several areas covered.';
+
+  @override
+  String get eventsScaleLarge => 'Large (16–40 people)';
+
+  @override
+  String get eventsScaleLargeDescription =>
+      'Organized group, heavy waste removal.';
+
+  @override
+  String get eventsScaleMassive => 'Massive (40+ people)';
+
+  @override
+  String get eventsScaleMassiveDescription => 'City-wide or multi-site event.';
+
+  @override
+  String get eventsDifficultyEasy => 'Easy';
+
+  @override
+  String get eventsDifficultyEasyDescription =>
+      'Flat terrain, light waste, family-friendly.';
+
+  @override
+  String get eventsDifficultyModerate => 'Moderate';
+
+  @override
+  String get eventsDifficultyModerateDescription =>
+      'Mixed terrain or bulky items, some effort.';
+
+  @override
+  String get eventsDifficultyHard => 'Hard';
+
+  @override
+  String get eventsDifficultyHardDescription =>
+      'Steep slopes, heavy debris, or hazardous materials.';
+
+  @override
+  String get eventsSiteCoercedDescription => 'Community cleanup site';
+
+  @override
+  String get homeSiteCleaningEmptyTitle => 'No cleaning events yet';
+
+  @override
+  String get homeSiteCleaningEmptyBody =>
+      'Be the first to organize an eco action and rally volunteers for this site.';
+
+  @override
+  String get homeSiteCleaningTapToCreate => 'Tap to create';
+
+  @override
+  String get homeSiteCleaningCtaCreateFirst => 'Create eco action';
+
+  @override
+  String get homeSiteCleaningCtaScheduleAnother => 'Schedule another action';
+
+  @override
+  String homeSiteCleaningVolunteersJoined(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count volunteers joined',
+      one: '1 volunteer joined',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSiteCleaningOrganizerHint =>
+      'You\'re organizing this action. Upload \"after\" photos once it\'s completed.';
+
+  @override
+  String get homeSiteCleaningVolunteerHint =>
+      'Join the action to help clean this site.';
+
+  @override
+  String get homeSiteCleaningJoinAction => 'Join action';
+
+  @override
+  String get homeSiteCleaningEventUnavailable =>
+      'Event details are unavailable right now.';
+
+  @override
+  String get errorUserNetwork => 'Check your connection and try again.';
+
+  @override
+  String get errorUserTimeout => 'That took too long. Please try again.';
+
+  @override
+  String get errorUserUnauthorized => 'Please sign in again to continue.';
+
+  @override
+  String get errorUserForbidden => 'You don’t have permission to do that.';
+
+  @override
+  String get errorUserNotFound => 'We couldn’t find that.';
+
+  @override
+  String get errorUserServer =>
+      'The service is busy. Please try again shortly.';
+
+  @override
+  String get errorUserTooManyRequests =>
+      'Too many attempts. Please wait a moment.';
+
+  @override
+  String get errorUserUnknown => 'Something went wrong. Please try again.';
+
+  @override
+  String get eventsFilterSheetSemantic => 'Filter events';
+
+  @override
+  String get eventChatTitle => 'Chat';
+
+  @override
+  String get eventChatRowTitle => 'Group chat';
+
+  @override
+  String get eventChatInputHint => 'Message';
+
+  @override
+  String get eventChatSend => 'Send';
+
+  @override
+  String get eventChatEmptyTitle => 'Start the conversation';
+
+  @override
+  String get eventChatEmptyBody =>
+      'Coordinate with other volunteers before and during the event.';
+
+  @override
+  String get eventChatMessageRemoved => 'This message was removed';
+
+  @override
+  String get eventChatNewMessages => 'New messages';
+
+  @override
+  String get eventChatToday => 'Today';
+
+  @override
+  String get eventChatYesterday => 'Yesterday';
+
+  @override
+  String get eventChatReply => 'Reply';
+
+  @override
+  String get eventChatDelete => 'Delete';
+
+  @override
+  String get eventChatLoadError => 'Could not load messages';
+
+  @override
+  String get eventChatSendFailed => 'Message not sent. Tap to retry.';
+
+  @override
+  String get eventChatOpenMapsFailed => 'Couldn’t open Maps. Try again.';
+
+  @override
+  String get eventChatAttachPhotoLibrary => 'Photo Library';
+
+  @override
+  String get eventChatAttachCamera => 'Camera';
+
+  @override
+  String get eventChatAttachVideo => 'Video';
+
+  @override
+  String get eventChatAttachDocument => 'Document';
+
+  @override
+  String get eventChatAttachAudio => 'Audio';
+
+  @override
+  String get eventChatVoiceDiscard => 'Discard recording';
+
+  @override
+  String get eventChatVoiceSend => 'Send voice message';
+
+  @override
+  String get eventChatVoicePreviewHint => 'Voice preview';
+
+  @override
+  String get eventChatAttachLocation => 'Share Location';
+
+  @override
+  String get eventChatSendLocation => 'Send Location';
+
+  @override
+  String get eventChatSending => 'Sending…';
+
+  @override
+  String eventChatReplyingTo(String name) {
+    return 'Replying to $name';
+  }
+
+  @override
+  String eventChatCharCountHint(int count) {
+    return '$count / 2000';
+  }
+
+  @override
+  String eventChatSemanticsBubble(String author, String time, String body) {
+    return '$author, $time. $body';
+  }
+
+  @override
+  String get eventChatInputSemantics => 'Chat message';
+
+  @override
+  String get eventChatPushChannelName => 'Event chat';
+
+  @override
+  String get eventChatEdited => '(edited)';
+
+  @override
+  String get eventChatEditMessage => 'Edit';
+
+  @override
+  String get eventChatEditing => 'Editing message';
+
+  @override
+  String get eventChatEditHint => 'Edit your message';
+
+  @override
+  String get eventChatSaveEdit => 'Save';
+
+  @override
+  String get eventChatPinMessage => 'Pin';
+
+  @override
+  String get eventChatUnpinMessage => 'Unpin';
+
+  @override
+  String eventChatPinnedBy(String name) {
+    return 'Pinned by $name';
+  }
+
+  @override
+  String get eventChatPinnedMessagesTitle => 'Pinned messages';
+
+  @override
+  String get eventChatPinnedBarHint => 'Pinned';
+
+  @override
+  String get eventChatNoPinnedMessages => 'No pinned messages';
+
+  @override
+  String get eventChatMuted => 'Notifications muted';
+
+  @override
+  String get eventChatUnmuted => 'Notifications unmuted';
+
+  @override
+  String get eventChatCopied => 'Message copied';
+
+  @override
+  String get eventChatReconnecting => 'Reconnecting…';
+
+  @override
+  String get eventChatConnected => 'Connected';
+
+  @override
+  String get eventChatSearchHint => 'Search messages';
+
+  @override
+  String get eventChatSearchNoResults => 'No messages found';
+
+  @override
+  String get eventChatSearchAction => 'Search';
+
+  @override
+  String eventChatParticipantsCount(int count) {
+    return '$count participants';
+  }
+
+  @override
+  String get eventChatParticipantsSheetTitle => 'People in this chat';
+
+  @override
+  String eventChatParticipantsTitleSemantic(String eventTitle, int count) {
+    return '$eventTitle, $count participants';
+  }
+
+  @override
+  String get eventChatParticipantsLoadError => 'Couldn’t load participants.';
+
+  @override
+  String get eventChatParticipantsYouBadge => 'You';
+
+  @override
+  String get eventChatParticipantsEmpty => 'No participants loaded yet.';
+
+  @override
+  String eventChatSystemUserJoined(String name) {
+    return '$name joined the event';
+  }
+
+  @override
+  String eventChatSystemUserLeft(String name) {
+    return '$name left the event';
+  }
+
+  @override
+  String get eventChatSystemEventUpdated => 'Event details were updated';
+
+  @override
+  String get eventChatSwipeReplySemantic => 'Swipe to reply to this message';
+
+  @override
+  String get eventChatVoiceLevelSemantic => 'Voice level meter';
+
+  @override
+  String get eventChatMessageOptions => 'Message options';
+
+  @override
+  String get eventChatTypingUnknownParticipant => 'Someone';
+
+  @override
+  String get eventChatCopy => 'Copy';
+
+  @override
+  String get eventChatUnpinConfirm => 'Message unpinned';
+
+  @override
+  String get eventChatMaxPinnedReached => 'Maximum pinned messages reached';
+
+  @override
+  String get eventChatMessageNotInView =>
+      'That message isn’t loaded. Scroll up for older messages.';
+
+  @override
+  String get eventChatMuteNotifications => 'Mute notifications';
+
+  @override
+  String get eventChatUnmuteNotifications => 'Unmute notifications';
+
+  @override
+  String eventChatSeenBy(String names) {
+    return 'Seen by $names';
+  }
+
+  @override
+  String eventChatSeenByTruncated(String names, int count) {
+    return 'Seen by $names +$count';
+  }
+
+  @override
+  String eventChatTypingOne(String name) {
+    return '$name is typing…';
+  }
+
+  @override
+  String eventChatTypingTwo(String first, String second) {
+    return '$first and $second are typing…';
+  }
+
+  @override
+  String eventChatTypingMany(String name, int count) {
+    return '$name and $count others are typing…';
+  }
+
+  @override
+  String get eventChatImageViewerTitle => 'Photo';
+
+  @override
+  String eventChatImageViewerPage(int current, int total) {
+    return '$current of $total';
+  }
+
+  @override
+  String get eventChatVideoViewerTitle => 'Video';
+
+  @override
+  String get eventChatOpenFile => 'Open file';
+
+  @override
+  String get eventChatDownloadFailed => 'Couldn’t download the file';
+
+  @override
+  String get eventChatPdfOpenFailed => 'Couldn’t open the PDF';
+
+  @override
+  String get eventChatShareFile => 'Share';
+
+  @override
+  String get eventChatLocationMapTitle => 'Location';
+
+  @override
+  String get eventChatCopyCoordinates => 'Copy coordinates';
+
+  @override
+  String get eventChatDirections => 'Directions';
+
+  @override
+  String get eventChatAudioExpandedTitle => 'Voice message';
+
+  @override
+  String get eventChatHoldToRecord => 'Hold to record';
+
+  @override
+  String get eventChatReleaseToSend => 'Release to send';
+
+  @override
+  String get eventChatSlideToCancel => 'Slide left to cancel';
+
+  @override
+  String get eventChatReleaseToCancel => 'Release to cancel';
+
+  @override
+  String get eventChatRecording => 'Recording…';
+
+  @override
+  String get eventChatMicPermissionDenied =>
+      'Microphone access is required to send voice messages.';
 }

@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -13,11 +17,24 @@ import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/sti
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
-class CleaningEventsTab extends StatelessWidget {
+class CleaningEventsTab extends StatefulWidget {
   const CleaningEventsTab({super.key, required this.site, required this.onCreateEvent});
 
   final PollutionSite site;
   final VoidCallback onCreateEvent;
+
+  @override
+  State<CleaningEventsTab> createState() => _CleaningEventsTabState();
+}
+
+class _CleaningEventsTabState extends State<CleaningEventsTab> {
+  @override
+  void initState() {
+    super.initState();
+    final EventsRepository store = EventsRepositoryRegistry.instance;
+    store.loadInitialIfNeeded();
+    unawaited(store.prefetchEventsForSite(widget.site.id));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +47,9 @@ class CleaningEventsTab extends StatelessWidget {
       listenable: store,
       builder: (BuildContext context, Widget? child) {
         final List<CleaningEvent> events = EventSiteResolver.cleaningEventsForSite(
-          siteId: site.id,
+          siteId: widget.site.id,
           events: store.events,
+          statusLabelFor: (EcoEventStatus s) => s.localizedLabel(context.l10n),
         );
         return Stack(
           children: <Widget>[
@@ -57,9 +75,9 @@ class CleaningEventsTab extends StatelessWidget {
             ),
             StickyBottomCTA(
               label: events.isEmpty
-                  ? 'Create eco action'
-                  : 'Schedule another action',
-              onPressed: onCreateEvent,
+                  ? context.l10n.homeSiteCleaningCtaCreateFirst
+                  : context.l10n.homeSiteCleaningCtaScheduleAnother,
+              onPressed: widget.onCreateEvent,
             ),
           ],
         );
@@ -73,7 +91,7 @@ class CleaningEventsTab extends StatelessWidget {
       child: InkWell(
         onTap: () {
           AppHaptics.tap();
-          onCreateEvent();
+          widget.onCreateEvent();
         },
         borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
         child: Padding(
@@ -96,7 +114,7 @@ class CleaningEventsTab extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
                   Text(
-                'No cleaning events yet',
+                context.l10n.homeSiteCleaningEmptyTitle,
                 style: Theme.of(context)
                     .textTheme
                     .bodyLarge
@@ -104,7 +122,7 @@ class CleaningEventsTab extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Be the first to organize an eco action\nand rally volunteers for this site.',
+                context.l10n.homeSiteCleaningEmptyBody,
                 textAlign: TextAlign.center,
                 style: Theme.of(context)
                     .textTheme
@@ -113,7 +131,7 @@ class CleaningEventsTab extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'Tap to create',
+                context.l10n.homeSiteCleaningTapToCreate,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.primaryDark,
                       fontWeight: FontWeight.w600,
@@ -138,7 +156,7 @@ class CleaningEventsTab extends StatelessWidget {
     AppHaptics.warning();
     AppSnack.show(
       context,
-      message: 'Event details are unavailable right now.',
+      message: context.l10n.homeSiteCleaningEventUnavailable,
       type: AppSnackType.warning,
     );
   }
@@ -240,7 +258,7 @@ class CleaningEventsTab extends StatelessWidget {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  '${event.participantCount} volunteers joined',
+                  context.l10n.homeSiteCleaningVolunteersJoined(event.participantCount),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
@@ -253,8 +271,8 @@ class CleaningEventsTab extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             event.isOrganizer
-                ? 'You\'re organizing this action. Upload "after" photos once it\'s completed.'
-                : 'Join the action to help clean this site.',
+                ? context.l10n.homeSiteCleaningOrganizerHint
+                : context.l10n.homeSiteCleaningVolunteerHint,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
               height: 1.35,
@@ -276,7 +294,7 @@ class CleaningEventsTab extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Join action',
+                  context.l10n.homeSiteCleaningJoinAction,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),

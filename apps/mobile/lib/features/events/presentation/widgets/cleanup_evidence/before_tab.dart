@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -35,13 +36,13 @@ class BeforeTab extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Site reference photo',
+            context.l10n.eventsSiteReferencePhotoTitle,
             style:
                 textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Reference taken before cleanup. Use the After tab to add photos of the cleaned site.',
+            context.l10n.eventsSiteReferencePhotoBody,
             style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
           ),
         ],

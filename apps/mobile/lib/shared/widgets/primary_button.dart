@@ -10,11 +10,15 @@ class PrimaryButton extends StatefulWidget {
     required this.label,
     required this.onPressed,
     this.enabled = true,
+    this.isLoading = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool enabled;
+
+  /// When true, shows a spinner and ignores presses (unless [enabled] is false).
+  final bool isLoading;
 
   @override
   State<PrimaryButton> createState() => _PrimaryButtonState();
@@ -25,32 +29,51 @@ class _PrimaryButtonState extends State<PrimaryButton> {
 
   @override
   Widget build(BuildContext context) {
+    final bool busy = widget.isLoading && widget.enabled;
+    final bool canPress = widget.enabled && !busy && widget.onPressed != null;
+
     return AnimatedScale(
-      scale: _pressed ? 0.985 : 1,
+      scale: _pressed && canPress ? 0.985 : 1,
       duration: AppMotion.xFast,
       curve: AppMotion.emphasized,
       child: SizedBox(
         width: double.infinity,
         height: 56,
         child: Listener(
-          onPointerDown: (_) => setState(() => _pressed = true),
+          onPointerDown: (_) {
+            if (canPress) {
+              setState(() => _pressed = true);
+            }
+          },
           onPointerUp: (_) => setState(() => _pressed = false),
           onPointerCancel: (_) => setState(() => _pressed = false),
           child: ElevatedButton(
-            onPressed: widget.enabled ? widget.onPressed : null,
+            onPressed: canPress ? widget.onPressed : null,
             style: ElevatedButton.styleFrom(
               elevation: 0,
-              backgroundColor:
-                  widget.enabled ? AppColors.primary : AppColors.primary.withValues(alpha: 0.42),
+              alignment: Alignment.center,
+              backgroundColor: widget.enabled
+                  ? AppColors.primary
+                  : AppColors.primary.withValues(alpha: 0.42),
               foregroundColor: AppColors.textPrimary,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               ),
             ),
-            child: Text(
-              widget.label,
-              style: AppTypography.buttonLabel,
-            ),
+            child: busy
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2.5,
+                      color: AppColors.textPrimary,
+                    ),
+                  )
+                : Text(
+                    widget.label,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.buttonLabel,
+                  ),
           ),
         ),
       ),

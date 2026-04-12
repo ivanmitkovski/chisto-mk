@@ -32,7 +32,9 @@ AppError appErrorFromFailedResponse({
   if (statusCode == 401) {
     return AppError(code: code, message: message);
   }
-  if (statusCode == 403) return AppError.forbidden(message: message);
+  if (statusCode == 403) {
+    return AppError(code: code, message: message, retryable: false);
+  }
   if (statusCode == 404) return AppError.notFound(message: message);
   if (statusCode == 422 ||
       (statusCode == 400 && code == 'VALIDATION_ERROR')) {

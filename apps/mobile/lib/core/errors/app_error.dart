@@ -59,6 +59,12 @@ class AppError implements Exception {
         details: details,
       );
 
+  factory AppError.cancelled({String? message}) => AppError(
+        code: 'CANCELLED',
+        message: message ?? 'Cancelled.',
+        retryable: false,
+      );
+
   /// Rate limit / throttling (HTTP 429 or API `TOO_MANY_REQUESTS`).
   factory AppError.tooManyRequests({
     String? message,

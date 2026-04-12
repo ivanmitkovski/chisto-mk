@@ -6,10 +6,17 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 class AppBackButton extends StatelessWidget {
-  const AppBackButton({super.key, this.onPressed, this.backgroundColor});
+  const AppBackButton({
+    super.key,
+    this.onPressed,
+    this.backgroundColor,
+    this.iconColor,
+  });
 
   final VoidCallback? onPressed;
   final Color? backgroundColor;
+  /// When null, uses [AppColors.textPrimary] (light surfaces).
+  final Color? iconColor;
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +33,18 @@ class AppBackButton extends StatelessWidget {
           child: IconButton(
             tooltip: backLabel,
             iconSize: AppSpacing.iconSm,
+            style: IconButton.styleFrom(
+              minimumSize: const Size(44, 44),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              padding: EdgeInsets.zero,
+            ),
             onPressed: onPressed ?? () => Navigator.of(context).maybePop(),
             icon: SvgPicture.asset(
               AppAssets.arrowLeft,
               width: AppSpacing.iconSm,
               height: AppSpacing.iconSm,
-              colorFilter: const ColorFilter.mode(
-                AppColors.textPrimary,
+              colorFilter: ColorFilter.mode(
+                iconColor ?? AppColors.textPrimary,
                 BlendMode.srcIn,
               ),
             ),

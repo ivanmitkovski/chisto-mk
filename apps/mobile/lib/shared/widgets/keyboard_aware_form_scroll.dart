@@ -13,6 +13,10 @@ class KeyboardAwareFormScroll extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final ScrollController? controller;
 
+  /// Extra scroll extent when the parent scaffold keeps [resizeToAvoidBottomInset]
+  /// false and the keyboard is shown via [MediaQuery.viewInsets] (see profile
+  /// primary action bar). When the scaffold resizes for the keyboard, inset is
+  /// usually zero here and this adds nothing.
   static const double _extraPaddingAboveKeyboard = 280;
 
   @override

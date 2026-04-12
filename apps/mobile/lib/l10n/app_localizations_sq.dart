@@ -879,6 +879,25 @@ class AppLocalizationsSq extends AppLocalizations {
   String get profilePointsReasonOther => 'Përditësim pikësh';
 
   @override
+  String get profilePointsReasonEventOrganizerApproved =>
+      'Ngjarja juaj e pastrimit u miratua';
+
+  @override
+  String get profilePointsReasonEventJoined =>
+      'U bashkove me një ngjarje pastrimi';
+
+  @override
+  String get profilePointsReasonEventJoinNoShow =>
+      'Bonusi i bashkimit u rregullua — pa regjistrim';
+
+  @override
+  String get profilePointsReasonEventCheckIn => 'Regjistrim në ngjarje';
+
+  @override
+  String get profilePointsReasonEventCompleted =>
+      'Ngjarja e pastrimit u përfundua';
+
+  @override
   String get profileReportCreditsTitle => 'Kreditë e raportimit';
 
   @override
@@ -1649,6 +1668,97 @@ class AppLocalizationsSq extends AppLocalizations {
       'Kjo ngjarje nuk është më e disponueshme.';
 
   @override
+  String get eventsDetailBrowseEvents => 'Shfleto ngjarjet';
+
+  @override
+  String get eventsDetailCouldNotRefresh =>
+      'Nuk u rifreskua. Po shfaqen detajet e ruajtura.';
+
+  @override
+  String get eventsDetailRetryRefresh => 'Provo përsëri';
+
+  @override
+  String get eventsDetailLocationTitle => 'Vendndodhja';
+
+  @override
+  String get eventsDetailCopyAddress => 'Kopjo adresën';
+
+  @override
+  String get eventsDetailAddressCopied => 'Adresa u kopjua';
+
+  @override
+  String get eventsDetailLocationLongPressHint =>
+      'Shtyp gjatë për adresë të plotë dhe veprime';
+
+  @override
+  String get eventsDetailCoverImageUnavailable =>
+      'Imazhi nuk është i disponueshëm';
+
+  @override
+  String get eventsWeatherUnavailableBody =>
+      'Parashikimi i motit nuk është i disponueshëm për momentin.';
+
+  @override
+  String get eventsWeatherRetry => 'Provo përsëri';
+
+  @override
+  String get eventsUnableToStartEventGeneric =>
+      'Nuk mund të nisej ngjarja. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get eventsStartEventTooEarly =>
+      'Mund ta nisni këtë veprim ekologjik pasi të arrijë koha e planifikuar e fillimit.';
+
+  @override
+  String get eventsAwaitingModerationCta => 'Në pritje të aprovimit';
+
+  @override
+  String get eventsModerationBannerTitle => 'Në pritje të aprovimit';
+
+  @override
+  String get eventsModerationBannerBody =>
+      'Ky veprim është i dukshëm për ju si organizator. Vullnetarët mund të bashkohen pasi moderatorët ta aprovojnë.';
+
+  @override
+  String get eventsEventPendingPublicCta =>
+      'Ende nuk është hapur për t\'u bashkuar';
+
+  @override
+  String get eventsFeedOfflineStaleBanner =>
+      'Po shfaqen ngjarje të ruajtura — rifreskimi dështoi. Tërhiq poshtë për të provuar përsëri.';
+
+  @override
+  String get eventsFeedInitialLoadFailed =>
+      'Nuk mundëm të ngarkojmë ngjarjet. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get eventsOrganizerInvalidateQrTitle => 'Anulo kodet e mëparshme QR';
+
+  @override
+  String get eventsOrganizerInvalidateQrSubtitle =>
+      'Përdore nëse një kod është ndarë ose fotografuar. Kodet e skanuara mbeten të vlefshme deri në skadim; kjo rrotullon sesionin që skanimet e reja të kërkojnë QR të ri.';
+
+  @override
+  String get eventsOrganizerQrSessionRotated =>
+      'Sesioni QR u përditësua. Trego kodin e ri pjesëmarrësve.';
+
+  @override
+  String get eventsOrganizerQrRotateFailed =>
+      'Nuk mundëm t\'i anulojmë kodet. Provo përsëri.';
+
+  @override
+  String get eventsEditEventTitle => 'Ndrysho ngjarjen';
+
+  @override
+  String get eventsEditEventSave => 'Ruaj ndryshimet';
+
+  @override
+  String get eventsEventUpdated => 'Ngjarja u përditësua';
+
+  @override
+  String get eventsMutationFailedGeneric => 'Diçka shkoi keq. Provo përsëri.';
+
+  @override
   String get eventsManualCheckInAdd => 'Shto';
 
   @override
@@ -1663,6 +1773,22 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsOrganizerAttendeeNamePlaceholder => 'Emri i pjesëmarrësit';
+
+  @override
+  String get eventsOrganizerManualCheckInSubtitle =>
+      'Kërko vullnetarët që u bashkuan me këtë ngjarje, pastaj regjistroji.';
+
+  @override
+  String get eventsOrganizerManualCheckInNoJoiners =>
+      'Ende nuk ka vullnetarë të bashkuar me këtë ngjarje.';
+
+  @override
+  String get eventsOrganizerManualCheckInSelectParticipant =>
+      'Zgjidh një vullnetar nga lista.';
+
+  @override
+  String get eventsOrganizerManualCheckInNotParticipant =>
+      'Ky person nuk është në listën e pjesëmarrësve.';
 
   @override
   String get eventsOrganizerEnterNameFirst =>
@@ -1710,6 +1836,92 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventsOrganizerUploadAfterPhotosHint =>
       'Ngarko fotot \"pas\" nga detaji i ngjarjes.';
+
+  @override
+  String get eventsOrganizerCompletionCheckedInNone =>
+      'Asnjë pjesëmarrës nuk u regjistrua.';
+
+  @override
+  String eventsOrganizerCompletionJoinedLine(int count) {
+    return '$count vullnetarë u bashkuan';
+  }
+
+  @override
+  String eventsOrganizerCompletionJoinedOfCap(int joined, int cap) {
+    return '$joined nga $cap vende të mbushura';
+  }
+
+  @override
+  String get eventsOrganizerCompletionSheetSemantic =>
+      'Ngjarja përfundoi. Shiko hapat e ardhshëm.';
+
+  @override
+  String get eventsOrganizerCompletionBackToEvent => 'Kthehu te ngjarja';
+
+  @override
+  String get eventsOrganizerCompletionAddPhotosNow =>
+      'Shto foto pastrimit tani';
+
+  @override
+  String get eventsOrganizerCompletionWhatNextIntro =>
+      'Përfundo në faqen e ngjarjes: dokumento rezultatet dhe nda ndikimin që patët së bashku.';
+
+  @override
+  String get eventsOrganizerCompletionNextStepsHeading => 'HAPAT E ARDHSHËM';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosTitle => 'Shto foto \"pas\"';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosBody =>
+      'Trego dallimin që bëtë. Shfaqen në faqen e ngjarjes për të gjithë.';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactTitle => 'Regjistro ndikimin';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactBody =>
+      'Shëno çanta, orë vullnetare dhe vlerësime nga faqja e ngjarjes.';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityTitle => 'Ndërto besim';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityBody =>
+      'Fotot ndihmojnë moderatorët të verifikojnë pastrimin dhe frymëzojnë veprime të ardhshme.';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosTitle => 'Foto \"pas\"';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosMessage =>
+      'Ngarko foto pas pastrimit që vullnetarët dhe moderatorët të shohin rezultatet. Përdor butonin më poshtë.';
+
+  @override
+  String get eventsAttendeeCompletedTitle => 'Faleminderit';
+
+  @override
+  String get eventsAttendeeCompletedBody =>
+      'Ky veprim ekologjik ka përfunduar. Faleminderit që erdhe.';
+
+  @override
+  String get eventsAfterPhotosOrganizerEmptyHint =>
+      'Ende pa foto \"pas\". Përdor butonin më poshtë për t\'i shtuar.';
+
+  @override
+  String get eventsEvidenceScreenSubtitle =>
+      'Fotot \"pas\" dokumentojnë rezultatet dhe shfaqen në faqen e ngjarjes.';
+
+  @override
+  String eventsEvidencePhotoCountChip(int current, int max) {
+    return '$current nga $max foto';
+  }
+
+  @override
+  String get eventsEvidenceBeforeAfterTabsSemantic => 'Foto para dhe pas';
+
+  @override
+  String get eventsEvidenceSavingSemantic => 'Duke ruajtur fotot \"pas\"';
 
   @override
   String get eventsOrganizerCheckInPausedSnack =>
@@ -1784,6 +1996,61 @@ class AppLocalizationsSq extends AppLocalizations {
       'Rifillo regjistrimin për një QR të re';
 
   @override
+  String get eventsOrganizerQrLoadFailedGeneric =>
+      'Nuk u ngarkua kodi i regjistrimit. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get eventsOrganizerQrRateLimited =>
+      'Shumë përpjekje rifreskimi. Prit pak dhe provo përsëri.';
+
+  @override
+  String get eventsOrganizerSessionSetupFailed =>
+      'Nuk mund të nisej regjistrimi. Sigurohu që ngjarja është në vazhdim dhe provo përsëri.';
+
+  @override
+  String get eventsOrganizerQrRetry => 'Provo përsëri';
+
+  @override
+  String get eventsOrganizerQrBrightnessHint =>
+      'Këshillë: rrit ndriçimin e ekranit që skanimi të jetë më i lehtë.';
+
+  @override
+  String eventsOrganizerQrSemantics(int seconds) {
+    return 'Kod QR për regjistrim. Rifreskohet për rreth $seconds sekonda.';
+  }
+
+  @override
+  String get eventsOrganizerQrEncodeError =>
+      'Ky kod nuk mund të vizatohej. Prek provo përsëri.';
+
+  @override
+  String get eventsOrganizerFeedbackInvalidQrStrict =>
+      'Ky QR nuk vlen për regjistrim.';
+
+  @override
+  String get eventsOrganizerFeedbackRequiresJoin =>
+      'Bashkohu me ngjarjen në aplikacion para regjistrimit.';
+
+  @override
+  String get eventsOrganizerFeedbackCheckInUnavailable =>
+      'Regjistrimi nuk është i disponueshëm për këtë ngjarje tani.';
+
+  @override
+  String get eventsOrganizerFeedbackRateLimited =>
+      'Shumë përpjekje. Prit pak dhe provo përsëri.';
+
+  @override
+  String get eventsOrganizerCopyQrText => 'Kopjo tekstin e kodit QR';
+
+  @override
+  String get eventsOrganizerQrTextCopied =>
+      'Teksti i kodit QR u kopjua — ngjite në mesazh për pjesëmarrësit që nuk mund të skanojnë.';
+
+  @override
+  String get eventsOrganizerNoQrToCopy =>
+      'Ende nuk ka kod QR aktiv për të kopjuar.';
+
+  @override
   String get eventsOrganizerManualOverride =>
       'Manualisht: shëno pjesëmarrës si i pranishëm';
 
@@ -1809,6 +2076,44 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsOrganizerCancelEvent => 'Anulo ngjarjen';
+
+  @override
+  String get eventsOrganizerMoreActionsSemantic =>
+      'Më shumë veprime për ngjarjen';
+
+  @override
+  String get eventsOrganizerMoreSheetTitle => 'Veprimet e ngjarjes';
+
+  @override
+  String get eventsOrganizerEndEventConfirmTitle => 'Të përfundohet ngjarja?';
+
+  @override
+  String get eventsOrganizerEndEventConfirmMessage =>
+      'Regjistrimi do të mbyllet dhe ngjarja do të shënohet si e përfunduar. Mund të ngarkosh foto pas ngjarjes nga detajet e ngjarjes.';
+
+  @override
+  String get eventsOrganizerEndEventKeepManaging => 'Vazhdo menaxhimin';
+
+  @override
+  String get eventsOrganizerEndEventConfirmAction => 'Përfundo ngjarjen';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmTitle => 'Të anulohet ngjarja?';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmMessage =>
+      'Vullnetarët do ta shohin ngjarjen si të anuluar. Kjo nuk zhbëhet nga aplikacioni.';
+
+  @override
+  String get eventsOrganizerCancelEventKeepEvent => 'Mbaje ngjarjen';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmAction => 'Anulo ngjarjen';
+
+  @override
+  String eventsOrganizerRemoveAttendeeSemantic(String name) {
+    return 'Hiq $name nga regjistrimi';
+  }
 
   @override
   String get eventsOrganizerSimulateCheckInDev => 'Simulo regjistrimin (dev)';
@@ -1893,8 +2198,104 @@ class AppLocalizationsSq extends AppLocalizations {
   String get createEventAppBarTitle => 'Krijo ngjarjen';
 
   @override
-  String get createEventLocalInfoSnack =>
-      'Për tani ngjarja mbetet lokale, por rrjedha e organizatorit është gati menjëherë.';
+  String get createEventHelpTitle => 'Krijimi i një ngjarjeje';
+
+  @override
+  String get createEventHelpSubtitle => 'Udhëzim i shkurtër për organizatorët';
+
+  @override
+  String get createEventHelpBulletModeration =>
+      'Ngjarjet shqyrtohen që komuniteti të shohë pastrime të sakta dhe të sigurta.';
+
+  @override
+  String get createEventHelpBulletVolunteers =>
+      'Vullnetarët shohin titullin, orarin, vendin, pajisjet dhe përshkrimin kur ngjarja është aktive.';
+
+  @override
+  String get createEventHelpBulletSite =>
+      'Zgjidh një vend ndotjeje nga lista ose harta që të dinë të gjithë ku të takohen.';
+
+  @override
+  String get createEventHelpBulletSchedule =>
+      'Cakto datën dhe intervalin kohor që kalendarët dhe kujtuesit të jenë të qartë.';
+
+  @override
+  String get createEventHelpBulletSubmit =>
+      'Kur janë plotësuar fushat e detyrueshme, përdor „Krijo aksionin ekologjik“ për publikim.';
+
+  @override
+  String get createEventFieldVolunteerCap => 'Kufiri i vullnetarëve';
+
+  @override
+  String get createEventVolunteerCapPlaceholderNoLimit => 'Pa kufi';
+
+  @override
+  String createEventVolunteerCapUpTo(int count) {
+    return 'Deri në $count vullnetarë';
+  }
+
+  @override
+  String get createEventVolunteerCapSheetTitle => 'Kufiri i vullnetarëve';
+
+  @override
+  String get createEventVolunteerCapSheetSubtitle =>
+      'Opsionale. Kufiri është midis 2 dhe 5000.';
+
+  @override
+  String get createEventVolunteerCapNoLimit => 'Pa kufi';
+
+  @override
+  String get createEventVolunteerCapCustomLabel => 'Numër i personalizuar';
+
+  @override
+  String get createEventVolunteerCapCustomHint => 'Numri (2–5000)';
+
+  @override
+  String get createEventVolunteerCapApply => 'Apliko';
+
+  @override
+  String get createEventVolunteerCapInvalid =>
+      'Shkruaj një numër të plotë midis 2 dhe 5000.';
+
+  @override
+  String get createEventSitePickerLoading => 'Po ngarkohen vendet…';
+
+  @override
+  String get createEventSitePickerOfflineTitle => 'Lista jashtë linje';
+
+  @override
+  String get createEventSitePickerOfflineMessage =>
+      'Po shfaqen vende të integruara sepse lista e drejtpërdrejtë është bosh ose e padisponueshme.';
+
+  @override
+  String get createEventSitePickerLoadFailedTitle => 'Nuk u rifreskua';
+
+  @override
+  String get createEventSitePickerLoadFailedMessage =>
+      'Mund të zgjedhësh ende nga lista jashtë linje. Provo përsëri për listën e drejtpërdrejtë.';
+
+  @override
+  String get createEventSitePickerRetry => 'Provo përsëri';
+
+  @override
+  String get createEventDiscardTitle => 'Hidh poshtë ngjarjen?';
+
+  @override
+  String get createEventDiscardBody =>
+      'Do të humbasësh çfarë ke futur në këtë ekran.';
+
+  @override
+  String get createEventDiscardKeepEditing => 'Vazhdo redaktimin';
+
+  @override
+  String get createEventLoadingSemantic =>
+      'Po ngarkohet forma për krijimin e ngjarjes';
+
+  @override
+  String get createEventSectionScheduleCaption => 'Orari';
+
+  @override
+  String get createEventSectionDetailsCaption => 'Detajet e ngjarjes';
 
   @override
   String get createEventCleanupSiteTitle => 'Vendi i pastrimit';
@@ -1931,6 +2332,32 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get createEventTitleRequired => 'Titulli është i detyrueshëm.';
+
+  @override
+  String get createEventTitleMinLength =>
+      'Përdorni të paktën 3 karaktere për titullin.';
+
+  @override
+  String get createEventSitePickerTabList => 'Lista';
+
+  @override
+  String get createEventSitePickerTabMap => 'Harta';
+
+  @override
+  String get createEventSitePickerMapEmpty =>
+      'Asnjë vend në hartë nuk përputhet me këtë kërkim, ose vendndodhjet ende nuk janë të disponueshme.';
+
+  @override
+  String get createEventSitePickerMapSemanticLabel =>
+      'Harta e vendeve të ndotjes';
+
+  @override
+  String get createEventSitePickerMapHint =>
+      'Prek një shënues për të zgjedhur një vend.';
+
+  @override
+  String get createEventSiteMapPreviewSemantic =>
+      'Hap zgjedhjen e vendit në hartë';
 
   @override
   String get createEventTypeRequired => 'Zgjidh një lloj ngjarjeje.';
@@ -2002,6 +2429,361 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
+  String get eventsCtaStartEvent => 'Fillo ngjarjen';
+
+  @override
+  String get eventsCtaManageCheckIn => 'Menaxho regjistrimin';
+
+  @override
+  String get eventsCtaEditAfterPhotos => 'Ndrysho fotot pas';
+
+  @override
+  String get eventsCtaUploadAfterPhotos => 'Ngarko fotot pas';
+
+  @override
+  String get eventsCtaCheckedIn => 'I regjistruar';
+
+  @override
+  String get eventsCtaScanToCheckIn => 'Skano për t\'u regjistruar';
+
+  @override
+  String get eventsCtaCheckInPaused => 'Regjistrimi u ndal';
+
+  @override
+  String get eventsCtaTurnReminderOff => 'Fike rikujtuesin';
+
+  @override
+  String get eventsCtaSetReminder => 'Vendos rikujtues';
+
+  @override
+  String get eventsCtaLeaveEvent => 'Largohu nga ngjarja';
+
+  @override
+  String get eventsCtaJoinEcoAction => 'Bashkohu me aksionin';
+
+  @override
+  String get eventsStatusUpcoming => 'Në pritje';
+
+  @override
+  String get eventsStatusInProgress => 'Në progres';
+
+  @override
+  String get eventsStatusCompleted => 'E përfunduar';
+
+  @override
+  String get eventsStatusCancelled => 'E anuluar';
+
+  @override
+  String get eventsCardActionsSheetTitle => 'Veprime për ngjarjen';
+
+  @override
+  String get eventsCardCopyTitle => 'Kopjo detajet e ngjarjes';
+
+  @override
+  String get eventsCardCopySubtitle => 'Titulli, data dhe vendndodhja';
+
+  @override
+  String get eventsCardCopiedSnack => 'Detajet u kopjuan.';
+
+  @override
+  String get eventsCardShareTitle => 'Ndaj ngjarjen';
+
+  @override
+  String get eventsCardShareSubtitle => 'Ndaj me miqtë';
+
+  @override
+  String get eventsCardOpenTitle => 'Hap ngjarjen';
+
+  @override
+  String get eventsCardOpenSubtitle => 'Shiko detajet e plota';
+
+  @override
+  String get eventsCardMoreActionsSemantic => 'Më shumë veprime për ngjarjen';
+
+  @override
+  String get eventsCardSoonLabel => 'Së shpejti';
+
+  @override
+  String get eventsFeedUpNext => 'Më pas';
+
+  @override
+  String get eventsCountdownStarted => 'Filloi';
+
+  @override
+  String eventsCountdownDaysHours(int days, int hours) {
+    return 'Fillon për ${days}d ${hours}o';
+  }
+
+  @override
+  String eventsCountdownHoursMinutes(int hours, int minutes) {
+    return 'Fillon për ${hours}o ${minutes}m';
+  }
+
+  @override
+  String eventsCountdownMinutes(int minutes) {
+    return 'Fillon për ${minutes}m';
+  }
+
+  @override
+  String get eventsShareEventTooltip => 'Ndaj ngjarjen';
+
+  @override
+  String get eventsAttendeeCheckInSemantic =>
+      'Skano për t\'u regjistruar në ngjarje';
+
+  @override
+  String get eventsAttendeeAlreadyCheckedInSnack => 'Je regjistruar tashmë.';
+
+  @override
+  String get eventsAttendeeCheckInPausedSnack =>
+      'Organizatori e ndali regjistrimin për tani.';
+
+  @override
+  String get eventsAttendeeCheckInCompleteSnack => 'Regjistrimi u krye.';
+
+  @override
+  String get eventsAttendeeBannerTitleCheckedIn => 'Je i regjistruar';
+
+  @override
+  String get eventsAttendeeBannerTitleInProgress => 'Ngjarja është në progres';
+
+  @override
+  String get eventsAttendeeBannerSubtitleAttendanceConfirmed =>
+      'Pjesëmarrja u konfirmua';
+
+  @override
+  String eventsAttendeeBannerSubtitleCheckedInAt(String time) {
+    return 'Regjistruar në $time';
+  }
+
+  @override
+  String get eventsAttendeeBannerSubtitleScanQr =>
+      'Skano QR-në e organizatorit për t\'u regjistruar';
+
+  @override
+  String get eventsAttendeeBannerSubtitlePaused =>
+      'Regjistrimi është pezulluar përkohësisht';
+
+  @override
+  String get eventsDetailShareSuccess => 'Ngjarja u nda.';
+
+  @override
+  String get eventsDetailCalendarAdded => 'Ngjarja u shtua në kalendar.';
+
+  @override
+  String get eventsDetailCalendarFailed =>
+      'Nuk u shtua në kalendar. Provo përsëri.';
+
+  @override
+  String get eventsDetailRefreshFailed =>
+      'Nuk u rifreskua ngjarja. Provo përsëri.';
+
+  @override
+  String get eventsDetailCancelledCallout => 'Kjo ngjarje është anuluar.';
+
+  @override
+  String get eventsDetailOpenInMaps => 'Hape në Hartat';
+
+  @override
+  String eventsDetailCoverSemantic(String title) {
+    return 'Imazh kopertine për $title';
+  }
+
+  @override
+  String get eventsDetailGroupedPanelSemantic =>
+      'Vendndodhja, orari dhe detajet';
+
+  @override
+  String get eventsDetailParticipationSemantic => 'Pjesëmarrja juaj';
+
+  @override
+  String get eventsAnalyticsLoadFailed => 'Nuk u ngarkuan analitikat.';
+
+  @override
+  String get eventsAnalyticsRetry => 'Riprovo';
+
+  @override
+  String get eventsRecurrenceDaily => 'Çdo ditë';
+
+  @override
+  String get eventsRecurrenceNavigatePrevious => 'Ngjarja e mëparshme në seri';
+
+  @override
+  String get eventsRecurrenceNavigateNext => 'Ngjarja tjetër në seri';
+
+  @override
+  String get eventsImpactSummarySaved => 'Përmbledhja e ndikimit u ruajt.';
+
+  @override
+  String get eventsImpactSummaryUpdated =>
+      'Përmbledhja e ndikimit u përditësua.';
+
+  @override
+  String eventsReminderSetSnack(String when) {
+    return 'Rikujtuesi u vendos për $when.';
+  }
+
+  @override
+  String get eventsFeedbackSheetTitle => 'Feedback pas ngjarjes';
+
+  @override
+  String get eventsFeedbackHowWasEvent => 'Si shkoi ngjarja?';
+
+  @override
+  String get eventsFeedbackBagsCollected => 'Çanta të mbledhura';
+
+  @override
+  String eventsFeedbackVolunteerHours(String hours) {
+    return 'Orë vullnetarësh: ${hours}o';
+  }
+
+  @override
+  String get eventsFeedbackNotesHint =>
+      'Çfarë funksionoi mirë? Shënime për herën tjetër?';
+
+  @override
+  String eventsEvidenceMaxPhotosSnack(int max) {
+    return 'Maksimumi $max foto.';
+  }
+
+  @override
+  String get eventsEvidencePickFailedSnack =>
+      'Nuk mund të zgjidhen foto. Kontrollo lejet.';
+
+  @override
+  String get eventsEvidenceRemoveAction => 'Hiq';
+
+  @override
+  String get eventsEvidenceAppBarTitle => 'Dëshmi pastrimi';
+
+  @override
+  String get eventsEvidenceSaving => 'Duke u ruajtur...';
+
+  @override
+  String get eventsEvidenceAfterPhotosSaved => 'Fotot pas u ruajtën.';
+
+  @override
+  String get eventsEvidenceNoChanges => 'Nuk ka ndryshime për të ruajtur.';
+
+  @override
+  String get eventsSiteReferencePhotoTitle => 'Foto referencë e vendit';
+
+  @override
+  String get eventsSiteReferencePhotoBody =>
+      'Referencë para pastrimit. Përdor skedën Pas për foto të vendit të pastruar.';
+
+  @override
+  String get eventsManageCheckInOnlyInProgress =>
+      'Regjistrimi ofrohet vetëm gjatë ngjarjes.';
+
+  @override
+  String get eventsEventFull => 'Kjo ngjarje është plot.';
+
+  @override
+  String get eventsParticipationUpdateFailed =>
+      'Nuk mund të përditësojmë pjesëmarrjen. Provo përsëri.';
+
+  @override
+  String get eventsJoinedEcoAction => 'U bashkove me këtë aksion ekologjik.';
+
+  @override
+  String eventsJoinPointsEarned(int points) {
+    return '+$points pikë — mirë se erdhe!';
+  }
+
+  @override
+  String get eventsLeftEcoAction => 'U largove nga ky aksion ekologjik.';
+
+  @override
+  String eventsCheckInPointsEarned(int points) {
+    return '+$points pikë — u regjistrove!';
+  }
+
+  @override
+  String eventsManualCheckInWithPoints(String name, int points) {
+    return '$name u regjistrua · +$points pikë për ta';
+  }
+
+  @override
+  String get eventsJoinFirstForReminders =>
+      'Së pari bashkohu me ngjarjen për të vendosur rikujtues.';
+
+  @override
+  String get eventsReminderDisabled => 'Rikujtuesi u fik.';
+
+  @override
+  String get eventsReminderSheetTitle => 'Zgjidh kohën e rikujtuesit';
+
+  @override
+  String eventsReminderSheetSubtitle(String timeRange, String date) {
+    return 'Ngjarja fillon në $timeRange më $date.';
+  }
+
+  @override
+  String get eventsReminderPreset1Day => '1 ditë para';
+
+  @override
+  String get eventsReminderPreset3Hours => '3 orë para';
+
+  @override
+  String get eventsReminderPreset1Hour => '1 orë para';
+
+  @override
+  String get eventsReminderPreset30Mins => '30 minuta para';
+
+  @override
+  String get eventsReminderUnavailableSubtitle =>
+      'Jo e disponueshme për këtë orar ngjarjeje';
+
+  @override
+  String get eventsReminderCustomTitle => 'Datë dhe orë të personalizuara';
+
+  @override
+  String get eventsReminderCustomSubtitle =>
+      'Zgjidh një moment specifik për rikujtuesin';
+
+  @override
+  String get eventsReminderPickTitle => 'Zgjidh rikujtuesin';
+
+  @override
+  String get eventsReminderDone => 'Gati';
+
+  @override
+  String eventsCardParticipantsMore(int count) {
+    return '+$count të tjerë';
+  }
+
+  @override
+  String eventsCardParticipantsCountMax(int count, int max) {
+    return '$count / $max';
+  }
+
+  @override
+  String eventsCardParticipantsJoined(int count) {
+    return '$count të bashkuar';
+  }
+
+  @override
+  String eventsDetailSemanticsLabel(String title) {
+    return 'Detaje ngjarjeje: $title';
+  }
+
+  @override
+  String eventsCountdownBadgeSemantic(String label) {
+    return 'Kohë deri në fillim të ngjarjes: $label';
+  }
+
+  @override
+  String get eventsEvidenceThumbnailMenuTitle => 'Foto';
+
+  @override
+  String get eventsFeedRefreshFailed => 'Nuk mund të rifreskojmë ngjarjet.';
+
+  @override
+  String get eventsCreateGenericError =>
+      'Nuk mund të krijojmë ngjarjen. Provo përsëri.';
+
+  @override
   String get qrScannerPointCameraHint =>
       'Drejto kamerën te kodi QR i organizatorit';
 
@@ -2029,6 +2811,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get qrScannerErrorInvalidFormat => 'Format i pavlefshëm i QR.';
 
   @override
+  String get qrScannerErrorInvalidQr => 'Ky QR nuk vlen për regjistrim.';
+
+  @override
   String get qrScannerErrorWrongEvent => 'Ky QR i përket një ngjarje tjetër.';
 
   @override
@@ -2044,6 +2829,18 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get qrScannerErrorAlreadyCheckedIn => 'Je regjistruar tashmë.';
+
+  @override
+  String get qrScannerErrorRequiresJoin =>
+      'Bashkohu me këtë ngjarje në aplikacion para se të regjistrohesh.';
+
+  @override
+  String get qrScannerErrorCheckInUnavailable =>
+      'Regjistrimi nuk është i hapur për këtë ngjarje tani.';
+
+  @override
+  String get qrScannerErrorRateLimited =>
+      'Shumë përpjekje. Prit pak dhe provo përsëri.';
 
   @override
   String get qrScannerCameraUnavailableFeedback =>
@@ -2083,6 +2880,22 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get qrScannerToggleFlashlightSemantic => 'Ndërro dritën e kamerës';
+
+  @override
+  String get qrScannerCameraStarting => 'Po niset kamera…';
+
+  @override
+  String get qrScannerCheckingIn => 'Po verifikohet regjistrimi…';
+
+  @override
+  String get qrScannerCameraErrorTitle => 'Kamera jo e disponueshme';
+
+  @override
+  String get qrScannerManualEntrySubtitle =>
+      'Ngjit të gjithë tekstin që ndau organizatori (kopjo nga ekrani ose mesazhi i tyre).';
+
+  @override
+  String get qrScannerPasteButton => 'Ngjit';
 
   @override
   String get siteReportReasonFakeLabel => 'Të dhëna të rreme ose mashtruese';
@@ -2315,6 +3128,412 @@ class AppLocalizationsSq extends AppLocalizations {
   String get appSmartImageUnavailable => 'Imazhi nuk është i disponueshëm';
 
   @override
+  String get eventsReminderSectionTitle => 'Kujtues për ngjarjen';
+
+  @override
+  String get eventsReminderSectionEnabled => 'Kujtuesi është aktiv';
+
+  @override
+  String eventsReminderSectionSetFor(String time) {
+    return 'Vendosur për $time';
+  }
+
+  @override
+  String get eventsReminderSectionDisabled =>
+      'Njoftohu para se të fillojë ngjarja';
+
+  @override
+  String get eventsReminderSectionDisable => 'Çaktivizo';
+
+  @override
+  String get eventsReminderSectionEnable => 'Aktivizo';
+
+  @override
+  String get eventsDescriptionTitle => 'Rreth ngjarjes';
+
+  @override
+  String get eventsDescriptionShowLess => 'Shfaq më pak';
+
+  @override
+  String get eventsDescriptionReadMore => 'Lexo më shumë';
+
+  @override
+  String get eventsAfterCleanupTitle => 'Pas pastrimit';
+
+  @override
+  String eventsAfterPhotoSemantic(int index, int total) {
+    return 'Shfaq foton pas pastrimit $index nga $total';
+  }
+
+  @override
+  String get eventsFilterAll => 'Të gjitha';
+
+  @override
+  String get eventsFilterUpcoming => 'Në pritje';
+
+  @override
+  String get eventsFilterNearby => 'Afër';
+
+  @override
+  String get eventsFilterPast => 'Të kaluara';
+
+  @override
+  String get eventsFilterMyEvents => 'Ngjarjet e mia';
+
+  @override
+  String get eventsFilterSemanticPrefix => 'Ngjarje';
+
+  @override
+  String get eventsParticipantsTitle => 'Pjesëmarrësit';
+
+  @override
+  String eventsParticipantsViewSemantic(int count) {
+    return 'Shfaq $count pjesëmarrës';
+  }
+
+  @override
+  String eventsParticipantsYouAndOthers(int count) {
+    return 'Ti dhe edhe $count të tjerë u bashkuat';
+  }
+
+  @override
+  String eventsParticipantsVolunteersJoined(int count) {
+    return '$count vullnetarë u bashkuan';
+  }
+
+  @override
+  String eventsParticipantsSpotsLeft(int count) {
+    return '$count vende të lira';
+  }
+
+  @override
+  String eventsParticipantsCheckedInCount(int checkedIn, int total) {
+    return '$checkedIn nga $total të regjistruar';
+  }
+
+  @override
+  String get eventsParticipantsSearchPlaceholder => 'Kërko pjesëmarrës';
+
+  @override
+  String get eventsParticipantsNoSearchResults =>
+      'Nuk ka përputhje me kërkimin.';
+
+  @override
+  String get eventsParticipantsYouOrganizer => 'Ti · Organizator';
+
+  @override
+  String get eventsParticipantsOrganizer => 'Organizator';
+
+  @override
+  String get eventsParticipantsYou => 'Ti';
+
+  @override
+  String get eventsParticipantsLoadFailed =>
+      'Nuk u ngarkua lista e pjesëmarrësve. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get eventsParticipantsRetry => 'Provo përsëri';
+
+  @override
+  String get eventsParticipantsViewRosterSemantic =>
+      'Shfaq listën e pjesëmarrësve';
+
+  @override
+  String get eventsGearSectionTitle => 'Pajisje për t\'u marrë me vete';
+
+  @override
+  String get eventsGearNoneNeeded => 'Nuk nevojitet pajisje e veçantë';
+
+  @override
+  String get eventsImpactSummaryTitle => 'Përmbledhje e ndikimit';
+
+  @override
+  String get eventsImpactSummaryAdd => 'Shto';
+
+  @override
+  String get eventsImpactSummaryEdit => 'Ndrysho';
+
+  @override
+  String get eventsImpactSummaryEmptyHint =>
+      'Regjistroni rezultatet, përpjekjen dhe mësimet nga pastrimi.';
+
+  @override
+  String eventsImpactBadgeRating(int rating) {
+    return '$rating★ vlerësim';
+  }
+
+  @override
+  String eventsImpactBadgeBags(int count) {
+    return '$count thesa';
+  }
+
+  @override
+  String eventsImpactBadgeHours(String hours) {
+    return '${hours}orë';
+  }
+
+  @override
+  String eventsImpactEstimatedLine(String kg, String co2) {
+    return '$kg kg hequr · $co2 kg CO2e të shmangura';
+  }
+
+  @override
+  String eventsLocationSiteSemantic(String distanceKm) {
+    return 'Shfaq vendndodhjen e ndotjes, $distanceKm km larg';
+  }
+
+  @override
+  String eventsLocationDotKm(String distanceKm) {
+    return '· $distanceKm km';
+  }
+
+  @override
+  String get eventsEmptyAllTitle => 'Ende nuk ka ngjarje mjedisore';
+
+  @override
+  String get eventsEmptyAllSubtitle =>
+      'Bëhu i pari që krijon një! Prek + sipër për të filluar.';
+
+  @override
+  String get eventsEmptyUpcomingTitle => 'Nuk ka ngjarje të ardhshme';
+
+  @override
+  String get eventsEmptyUpcomingSubtitle =>
+      'Krijo një për të mbledhur vullnetarët.';
+
+  @override
+  String get eventsEmptyNearbyTitle => 'Nuk ka ngjarje afër';
+
+  @override
+  String get eventsEmptyNearbySubtitle =>
+      'Provo një filtër tjetër ose krijo një ngjarje në zonën tënde.';
+
+  @override
+  String get eventsEmptyPastTitle => 'Nuk ka ngjarje të kaluara';
+
+  @override
+  String get eventsEmptyPastSubtitle =>
+      'Ngjarjet e përfunduara do të shfaqen këtu.';
+
+  @override
+  String get eventsEmptyMyEventsTitle => 'Ende nuk ka ngjarje';
+
+  @override
+  String get eventsEmptyMyEventsSubtitle =>
+      'Bashkohu ose krijo një ngjarje për ta parë këtu.';
+
+  @override
+  String eventsSearchEmptyTitle(String query) {
+    return 'Nuk ka rezultate për \"$query\"';
+  }
+
+  @override
+  String get eventsSearchEmptySubtitle =>
+      'Provo një fjalë tjetër kërkimi ose kontrollo drejtshkrimin.';
+
+  @override
+  String get eventsSitePickerTitle => 'Zgjidh vendndodhjen';
+
+  @override
+  String get eventsSitePickerSubtitle =>
+      'Lidhe këtë ngjarje me një vend pastrimi.';
+
+  @override
+  String get eventsSitePickerSearchPlaceholder =>
+      'Kërko sipas emrit ose përshkrimit';
+
+  @override
+  String eventsSitePickerNoMatch(String query) {
+    return 'Nuk ka vende që përputhen me \"$query\"';
+  }
+
+  @override
+  String eventsSitePickerRowKmDesc(String km, String desc) {
+    return '$km km larg · $desc';
+  }
+
+  @override
+  String get eventsSuccessDialogTitle => 'Ngjarja u krijua';
+
+  @override
+  String eventsSuccessDialogBody(String title, String siteName) {
+    return '$title në $siteName është gati. Ndaje me komunitetin për të mbledhur vullnetarë.';
+  }
+
+  @override
+  String get eventsSuccessDialogOpenEvent => 'Hap ngjarjen';
+
+  @override
+  String get eventsTimePickerSelectTime => 'Zgjidh orën';
+
+  @override
+  String get eventsTimePickerConfirm => 'Konfirmo';
+
+  @override
+  String get eventsTimePickerFrom => 'Nga';
+
+  @override
+  String get eventsTimePickerTo => 'Deri';
+
+  @override
+  String eventsTimePickerTimeBlockSemantic(String role, String time) {
+    return '$role, $time';
+  }
+
+  @override
+  String eventsFeedbackRatingStars(int rating) {
+    return '$rating★';
+  }
+
+  @override
+  String get eventsFeedRecentSearches => 'Kërkimet e fundit';
+
+  @override
+  String get eventsCleanupAfterUploadSemantic => 'Ngarko foto pas pastrimit';
+
+  @override
+  String get eventsCleanupAfterViewFullscreenSemantic =>
+      'Shfaq foton në ekran të plotë';
+
+  @override
+  String get eventsCleanupAfterUploadMoreTitle => 'Ngarko më shumë foto';
+
+  @override
+  String eventsCleanupAfterUploadedCount(int count) {
+    return '$count të ngarkuara';
+  }
+
+  @override
+  String eventsCleanupAfterSlotsRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Edhe $count vende të lira',
+      one: 'Edhe 1 vend i lirë',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventsCleanupAfterAddMoreSemantic => 'Shto më shumë foto';
+
+  @override
+  String get eventsCleanupAfterRemoveSemantic => 'Hiq foton';
+
+  @override
+  String get eventsCleanupAfterEmptyTitle => 'Shto foto të vendit të pastruar';
+
+  @override
+  String eventsCleanupAfterEmptyMaxPhotos(int max) {
+    return 'Deri në $max foto';
+  }
+
+  @override
+  String get eventsCleanupAfterEmptyTapGallery =>
+      'Prek për të zgjedhur nga galeria';
+
+  @override
+  String get eventsCleanupEvidencePhotoSemantic => 'Foto e provës së pastrimit';
+
+  @override
+  String get eventsDateRelativeEarlierToday => 'Më herët sot';
+
+  @override
+  String eventsDateRelativeDaysAgo(int days) {
+    return '$days ditë më parë';
+  }
+
+  @override
+  String get eventsDateRelativeToday => 'Sot';
+
+  @override
+  String get eventsDateRelativeTomorrow => 'Nesër';
+
+  @override
+  String eventsDateRelativeInDays(int days) {
+    return 'Pas $days ditësh';
+  }
+
+  @override
+  String get eventsDateInfoSheetTitle => 'Data dhe ora';
+
+  @override
+  String eventsDateInfoSemantic(String date, String timeRange) {
+    return '$date, $timeRange';
+  }
+
+  @override
+  String get eventsCategorySheetTitle => 'Kategoria';
+
+  @override
+  String eventsCategorySemantic(String label) {
+    return 'Kategoria e ngjarjes: $label';
+  }
+
+  @override
+  String get eventsOrganizerSheetTitle => 'Organizatori';
+
+  @override
+  String get eventsOrganizerYouOwnThis => 'Kjo është ngjarja jote';
+
+  @override
+  String get eventsOrganizerRoleLabel => 'Organizator i ngjarjes';
+
+  @override
+  String eventsOrganizerCreatedOn(int day, int month, int year) {
+    return 'Ngjarja u krijua më $day/$month/$year';
+  }
+
+  @override
+  String eventsOrganizerSemantic(String name) {
+    return 'Organizatori: $name';
+  }
+
+  @override
+  String get eventsOrganizedByLabel => 'Organizuar nga';
+
+  @override
+  String get eventsFeedSemantic => 'Lista e ngjarjeve';
+
+  @override
+  String get eventsFeedTitle => 'Ngjarje';
+
+  @override
+  String get eventsFeedCreateSemantic => 'Krijo ngjarje';
+
+  @override
+  String get eventsFeedSearchPlaceholder => 'Kërko ngjarje';
+
+  @override
+  String get eventsFeedHappeningNow => 'Në zhvillim';
+
+  @override
+  String get eventsFeedComingUp => 'Në vijim';
+
+  @override
+  String get eventsFeedRecentlyCompleted => 'Përfunduar së fundmi';
+
+  @override
+  String get eventsFeedViewListToggle => 'Pamje listë';
+
+  @override
+  String get eventsFeedViewCalendarToggle => 'Pamje kalendar';
+
+  @override
+  String get eventsCalendarPreviousMonth => 'Muaji i kaluar';
+
+  @override
+  String get eventsCalendarNextMonth => 'Muaji tjetër';
+
+  @override
+  String eventsCalendarDaySemantic(int day) {
+    return 'Dita $day';
+  }
+
+  @override
+  String get eventsCalendarNoEventsThisDay => 'Nuk ka ngjarje këtë ditë';
+
+  @override
   String siteCardPollutionSiteSemantic(String title) {
     return 'Vend i ndotur: $title. Prek për detaje.';
   }
@@ -2323,4 +3542,655 @@ class AppLocalizationsSq extends AppLocalizations {
   String siteCardPhotoSemantic(String title) {
     return 'Foto e $title';
   }
+
+  @override
+  String get eventsFilterSheetTitle => 'Filtro ngjarjet';
+
+  @override
+  String get eventsFilterSheetCategory => 'Kategoria';
+
+  @override
+  String get eventsFilterSheetStatus => 'Statusi';
+
+  @override
+  String get eventsFilterSheetDateRange => 'Periudha e datës';
+
+  @override
+  String get eventsFilterSheetDateFrom => 'Nga';
+
+  @override
+  String get eventsFilterSheetDateTo => 'Deri';
+
+  @override
+  String get eventsFilterSheetShowResults => 'Shfaq rezultatet';
+
+  @override
+  String get eventsFilterSheetClearAll => 'Fshi të gjitha';
+
+  @override
+  String eventsFilterSheetActiveCount(int count) {
+    return '$count aktive';
+  }
+
+  @override
+  String get eventsOrganizerDashboardTitle => 'Ngjarjet e mia';
+
+  @override
+  String get eventsOrganizerDashboardEmpty =>
+      'Nuk keni organizuar asnjë ngjarje ende.';
+
+  @override
+  String get eventsOrganizerDashboardEmptyAction => 'Krijo ngjarjen e parë';
+
+  @override
+  String get eventsOrganizerDashboardSectionUpcoming => 'Të ardhshme';
+
+  @override
+  String get eventsOrganizerDashboardSectionInProgress => 'Në progres';
+
+  @override
+  String get eventsOrganizerDashboardSectionCompleted => 'Të përfunduara';
+
+  @override
+  String get eventsOrganizerDashboardSectionCancelled => 'Të anuluara';
+
+  @override
+  String eventsOrganizerDashboardParticipants(int count, String max) {
+    return '$count/$max pjesëmarrës';
+  }
+
+  @override
+  String eventsOrganizerDashboardParticipantsUnlimited(int count) {
+    return '$count pjesëmarrës';
+  }
+
+  @override
+  String get eventsOrganizerDashboardEvidenceAction => 'Provat';
+
+  @override
+  String get eventsAnalyticsTitle => 'Analitika';
+
+  @override
+  String get eventsAnalyticsAttendanceRate => 'Shkalla e prezencës';
+
+  @override
+  String get eventsAnalyticsJoiners => 'Pjesëmarrësit me kalimin e kohës';
+
+  @override
+  String get eventsAnalyticsCheckInsByHour => 'Regjistrimet sipas orës';
+
+  @override
+  String get eventsAnalyticsNoData => 'Nuk ka të dhëna ende';
+
+  @override
+  String get eventsOfflineSyncQueued =>
+      'Ruajtur. Do të sinkronizohet kur të lidheni.';
+
+  @override
+  String get eventsOfflineSyncFailed =>
+      'Sinkronizimi dështoi. Do të provohet automatikisht.';
+
+  @override
+  String get eventsWeatherForecast => 'Parashikimi i motit';
+
+  @override
+  String get eventsWeatherLoadFailed => 'Moti nuk është i disponueshëm';
+
+  @override
+  String eventsWeatherPrecipitationMm(String amount) {
+    return '$amount mm reshje';
+  }
+
+  @override
+  String get eventsWeatherNoPrecipitation => 'Pa reshje të matshme';
+
+  @override
+  String eventsWeatherPrecipChance(int percent) {
+    return '$percent% mundësi reshjeje';
+  }
+
+  @override
+  String get eventsWeatherIndicativeNote =>
+      'Parashikim orientues nga Open-Meteo; kushtet reale mund të ndryshojnë.';
+
+  @override
+  String get eventsWeatherIndicativeInfoTitle => 'Rreth parashikimit';
+
+  @override
+  String get eventsWeatherIndicativeInfoSemantic =>
+      'Informacion mbi burimin e parashikimit të motit';
+
+  @override
+  String get eventsRecurrenceNone => 'Nuk përsëritet';
+
+  @override
+  String get eventsRecurrenceWeekly => 'Çdo javë';
+
+  @override
+  String get eventsRecurrenceBiweekly => 'Çdo 2 javë';
+
+  @override
+  String get eventsRecurrenceMonthly => 'Çdo muaj';
+
+  @override
+  String eventsRecurrenceOccurrences(int count) {
+    return '$count ndodhje';
+  }
+
+  @override
+  String get eventsRecurrencePartOfSeries => 'Pjesë e serisë';
+
+  @override
+  String eventsRecurrenceSeriesLabel(int index, int total) {
+    return 'Ngjarje $index nga $total';
+  }
+
+  @override
+  String get eventsRecurrenceDone => 'Në rregull';
+
+  @override
+  String get eventsCategoryGeneralCleanup => 'Pastrim i përgjithshëm';
+
+  @override
+  String get eventsCategoryGeneralCleanupDescription =>
+      'Mbledhje mbeturinash, fshesë dhe rikthim i zonës në rregull.';
+
+  @override
+  String get eventsCategoryRiverAndLake => 'Pastrim lumenjsh dhe liqenesh';
+
+  @override
+  String get eventsCategoryRiverAndLakeDescription =>
+      'Heqje mbeturinash nga uji, brigjet dhe kanalet.';
+
+  @override
+  String get eventsCategoryTreeAndGreen => 'Mbjellje pemësh dhe gjelbërim';
+
+  @override
+  String get eventsCategoryTreeAndGreenDescription =>
+      'Mbjellje pemësh, rikthim hapësirash të gjelbra dhe kopshte.';
+
+  @override
+  String get eventsCategoryRecyclingDrive => 'Fushatë riciklimi';
+
+  @override
+  String get eventsCategoryRecyclingDriveDescription =>
+      'Ndaj, mblidh dhe transporto riciklim në përpunim.';
+
+  @override
+  String get eventsCategoryHazardousRemoval =>
+      'Heqje mbeturinash të rrezikshme';
+
+  @override
+  String get eventsCategoryHazardousRemovalDescription =>
+      'Mbledhje e sigurt e kimikateve, gomave, baterive ose azbestit.';
+
+  @override
+  String get eventsCategoryAwarenessAndEducation => 'Ndërgjegjësim dhe edukim';
+
+  @override
+  String get eventsCategoryAwarenessAndEducationDescription =>
+      'Workshop-e, biseda ose angazhim komuniteti mbi praktika ekologjike.';
+
+  @override
+  String get eventsCategoryOther => 'Tjetër';
+
+  @override
+  String get eventsCategoryOtherDescription =>
+      'Ngjarje e personalizuar që nuk përputhet me kategoritë e mësipërme.';
+
+  @override
+  String get eventsGearTrashBags => 'Thesa mbeturinash';
+
+  @override
+  String get eventsGearGloves => 'Doreza';
+
+  @override
+  String get eventsGearRakes => 'Kratre dhe lopata';
+
+  @override
+  String get eventsGearWheelbarrow => 'Karrocë';
+
+  @override
+  String get eventsGearWaterBoots => 'Çizme uji';
+
+  @override
+  String get eventsGearSafetyVest => 'Jelek reflektues';
+
+  @override
+  String get eventsGearFirstAid => 'Kit i ndihmës së parë';
+
+  @override
+  String get eventsGearSunscreen => 'Krem dielli dhe ujë';
+
+  @override
+  String get eventsScaleSmall => 'E vogël (1–5 vetë)';
+
+  @override
+  String get eventsScaleSmallDescription =>
+      'Pastrim i shpejtë në një vend, një ose dy thesa.';
+
+  @override
+  String get eventsScaleMedium => 'E mesme (6–15 vetë)';
+
+  @override
+  String get eventsScaleMediumDescription =>
+      'Përpjekje gjysmë-ditore, disa zona.';
+
+  @override
+  String get eventsScaleLarge => 'E madhe (16–40 vetë)';
+
+  @override
+  String get eventsScaleLargeDescription =>
+      'Grup i organizuar, mbeturina të rënda.';
+
+  @override
+  String get eventsScaleMassive => 'Masive (40+ vetë)';
+
+  @override
+  String get eventsScaleMassiveDescription =>
+      'Aksion në shkallë qyteti ose shumë vendndodhje.';
+
+  @override
+  String get eventsDifficultyEasy => 'E lehtë';
+
+  @override
+  String get eventsDifficultyEasyDescription =>
+      'Terren i sheshtë, pak mbeturina, miqësore për familje.';
+
+  @override
+  String get eventsDifficultyModerate => 'E mesme';
+
+  @override
+  String get eventsDifficultyModerateDescription =>
+      'Terren i përzier ose objekte të mëdha, pak më shumë përpjekje.';
+
+  @override
+  String get eventsDifficultyHard => 'E vështirë';
+
+  @override
+  String get eventsDifficultyHardDescription =>
+      'Përrua të pjerrëta, mbeturina të rënda ose materiale të rrezikshme.';
+
+  @override
+  String get eventsSiteCoercedDescription => 'Vend i pastrimit komunitar';
+
+  @override
+  String get homeSiteCleaningEmptyTitle => 'Ende nuk ka ngjarje pastrimi';
+
+  @override
+  String get homeSiteCleaningEmptyBody =>
+      'Jini i pari që organizoni një veprim ekologjik dhe mblidhni vullnetarë për këtë vend.';
+
+  @override
+  String get homeSiteCleaningTapToCreate => 'Prekni për të krijuar';
+
+  @override
+  String get homeSiteCleaningCtaCreateFirst => 'Krijo veprim ekologjik';
+
+  @override
+  String get homeSiteCleaningCtaScheduleAnother =>
+      'Planifiko një veprim tjetër';
+
+  @override
+  String homeSiteCleaningVolunteersJoined(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vullnetarë u bashkuan',
+      one: '1 vullnetar u bashkua',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSiteCleaningOrganizerHint =>
+      'Ju e organizoni këtë veprim. Ngarkoni foto \"pas\" sapo të përfundojë.';
+
+  @override
+  String get homeSiteCleaningVolunteerHint =>
+      'Bashkohuni me veprimin për të ndihmuar në pastrimin e këtij vendi.';
+
+  @override
+  String get homeSiteCleaningJoinAction => 'Bashkohu';
+
+  @override
+  String get homeSiteCleaningEventUnavailable =>
+      'Detajet e ngjarjes nuk janë të disponueshme për momentin.';
+
+  @override
+  String get errorUserNetwork => 'Kontrolloni lidhjen dhe provoni përsëri.';
+
+  @override
+  String get errorUserTimeout => 'Zgjati shumë. Provoni përsëri.';
+
+  @override
+  String get errorUserUnauthorized => 'Hyni përsëri për të vazhduar.';
+
+  @override
+  String get errorUserForbidden => 'Nuk keni leje për këtë veprim.';
+
+  @override
+  String get errorUserNotFound => 'Nuk e gjetëm.';
+
+  @override
+  String get errorUserServer =>
+      'Shërbimi është i ngarkuar. Provoni së shpejti.';
+
+  @override
+  String get errorUserTooManyRequests => 'Shumë përpjekje. Prisni pak.';
+
+  @override
+  String get errorUserUnknown => 'Diçka shkoi keq. Provoni përsëri.';
+
+  @override
+  String get eventsFilterSheetSemantic => 'Filtro ngjarjet';
+
+  @override
+  String get eventChatTitle => 'Biseda';
+
+  @override
+  String get eventChatRowTitle => 'Bisedë në grup';
+
+  @override
+  String get eventChatInputHint => 'Mesazh';
+
+  @override
+  String get eventChatSend => 'Dërgo';
+
+  @override
+  String get eventChatEmptyTitle => 'Filloni bisedën';
+
+  @override
+  String get eventChatEmptyBody =>
+      'Koordinohuni me vullnetarët e tjerë para dhe gjatë ngjarjes.';
+
+  @override
+  String get eventChatMessageRemoved => 'Ky mesazh u hoq';
+
+  @override
+  String get eventChatNewMessages => 'Mesazhe të reja';
+
+  @override
+  String get eventChatToday => 'Sot';
+
+  @override
+  String get eventChatYesterday => 'Dje';
+
+  @override
+  String get eventChatReply => 'Përgjigju';
+
+  @override
+  String get eventChatDelete => 'Fshi';
+
+  @override
+  String get eventChatLoadError => 'Nuk u ngarkuan mesazhet';
+
+  @override
+  String get eventChatSendFailed =>
+      'Mesazhi nuk u dërgua. Prekni për të riprovuar.';
+
+  @override
+  String get eventChatOpenMapsFailed =>
+      'Nuk mund të hapja Hartat. Provo përsëri.';
+
+  @override
+  String get eventChatAttachPhotoLibrary => 'Biblioteka e fotove';
+
+  @override
+  String get eventChatAttachCamera => 'Kamera';
+
+  @override
+  String get eventChatAttachVideo => 'Video';
+
+  @override
+  String get eventChatAttachDocument => 'Dokument';
+
+  @override
+  String get eventChatAttachAudio => 'Audio';
+
+  @override
+  String get eventChatVoiceDiscard => 'Hidh regjistrimin';
+
+  @override
+  String get eventChatVoiceSend => 'Dërgo mesazh zanor';
+
+  @override
+  String get eventChatVoicePreviewHint => 'Parapamje zanore';
+
+  @override
+  String get eventChatAttachLocation => 'Ndaj vendndodhjen';
+
+  @override
+  String get eventChatSendLocation => 'Dërgo vendndodhjen';
+
+  @override
+  String get eventChatSending => 'Po dërgohet…';
+
+  @override
+  String eventChatReplyingTo(String name) {
+    return 'Duke iu përgjigjur $name';
+  }
+
+  @override
+  String eventChatCharCountHint(int count) {
+    return '$count / 2000';
+  }
+
+  @override
+  String eventChatSemanticsBubble(String author, String time, String body) {
+    return '$author, $time. $body';
+  }
+
+  @override
+  String get eventChatInputSemantics => 'Mesazh në bisedë';
+
+  @override
+  String get eventChatPushChannelName => 'Bisedë e ngjarjes';
+
+  @override
+  String get eventChatEdited => '(e redaktuar)';
+
+  @override
+  String get eventChatEditMessage => 'Redakto';
+
+  @override
+  String get eventChatEditing => 'Duke redaktuar mesazhin';
+
+  @override
+  String get eventChatEditHint => 'Redaktoni mesazhin tuaj';
+
+  @override
+  String get eventChatSaveEdit => 'Ruaj';
+
+  @override
+  String get eventChatPinMessage => 'Fikso';
+
+  @override
+  String get eventChatUnpinMessage => 'Hiq fiksimin';
+
+  @override
+  String eventChatPinnedBy(String name) {
+    return 'Fiksuar nga $name';
+  }
+
+  @override
+  String get eventChatPinnedMessagesTitle => 'Mesazhe të fiksuar';
+
+  @override
+  String get eventChatPinnedBarHint => 'Fiksuar';
+
+  @override
+  String get eventChatNoPinnedMessages => 'Nuk ka mesazhe të fiksuar';
+
+  @override
+  String get eventChatMuted => 'Njoftimet janë çaktivizuar';
+
+  @override
+  String get eventChatUnmuted => 'Njoftimet janë aktivizuar';
+
+  @override
+  String get eventChatCopied => 'Mesazhi u kopjua';
+
+  @override
+  String get eventChatReconnecting => 'Duke u rilidhur…';
+
+  @override
+  String get eventChatConnected => 'I lidhur';
+
+  @override
+  String get eventChatSearchHint => 'Kërko mesazhe';
+
+  @override
+  String get eventChatSearchNoResults => 'Nuk u gjetën mesazhe';
+
+  @override
+  String get eventChatSearchAction => 'Kërko';
+
+  @override
+  String eventChatParticipantsCount(int count) {
+    return '$count pjesëmarrës';
+  }
+
+  @override
+  String get eventChatParticipantsSheetTitle => 'Persona në këtë bisedë';
+
+  @override
+  String eventChatParticipantsTitleSemantic(String eventTitle, int count) {
+    return '$eventTitle, $count pjesëmarrës';
+  }
+
+  @override
+  String get eventChatParticipantsLoadError => 'Nuk u ngarkuan pjesëmarrësit.';
+
+  @override
+  String get eventChatParticipantsYouBadge => 'Ju';
+
+  @override
+  String get eventChatParticipantsEmpty =>
+      'Ende nuk ka pjesëmarrës të ngarkuar.';
+
+  @override
+  String eventChatSystemUserJoined(String name) {
+    return '$name u bashkua me ngjarjen';
+  }
+
+  @override
+  String eventChatSystemUserLeft(String name) {
+    return '$name e la ngjarjen';
+  }
+
+  @override
+  String get eventChatSystemEventUpdated => 'Detajet e ngjarjes u përditësuan';
+
+  @override
+  String get eventChatSwipeReplySemantic =>
+      'Rrëshqit për t’iu përgjigjur mesazhit';
+
+  @override
+  String get eventChatVoiceLevelSemantic => 'Niveli i zërit';
+
+  @override
+  String get eventChatMessageOptions => 'Opsionet e mesazhit';
+
+  @override
+  String get eventChatTypingUnknownParticipant => 'Dikush';
+
+  @override
+  String get eventChatCopy => 'Kopjo';
+
+  @override
+  String get eventChatUnpinConfirm => 'Mesazhi u hoq nga fiksimet';
+
+  @override
+  String get eventChatMaxPinnedReached =>
+      'U arrit numri maksimal i mesazheve të fiksuar';
+
+  @override
+  String get eventChatMessageNotInView =>
+      'Ky mesazh nuk është ngarkuar. Rrëshqitni lart për mesazhe më të vjetra.';
+
+  @override
+  String get eventChatMuteNotifications => 'Çaktivizo njoftimet';
+
+  @override
+  String get eventChatUnmuteNotifications => 'Aktivizo njoftimet';
+
+  @override
+  String eventChatSeenBy(String names) {
+    return 'Parë nga $names';
+  }
+
+  @override
+  String eventChatSeenByTruncated(String names, int count) {
+    return 'Parë nga $names +$count';
+  }
+
+  @override
+  String eventChatTypingOne(String name) {
+    return '$name po shkruan…';
+  }
+
+  @override
+  String eventChatTypingTwo(String first, String second) {
+    return '$first dhe $second po shkruajnë…';
+  }
+
+  @override
+  String eventChatTypingMany(String name, int count) {
+    return '$name dhe $count të tjerë po shkruajnë…';
+  }
+
+  @override
+  String get eventChatImageViewerTitle => 'Foto';
+
+  @override
+  String eventChatImageViewerPage(int current, int total) {
+    return '$current nga $total';
+  }
+
+  @override
+  String get eventChatVideoViewerTitle => 'Video';
+
+  @override
+  String get eventChatOpenFile => 'Hap skedarin';
+
+  @override
+  String get eventChatDownloadFailed => 'Shkarkimi i skedarit dështoi';
+
+  @override
+  String get eventChatPdfOpenFailed => 'Nuk mund të hapet PDF-ja';
+
+  @override
+  String get eventChatShareFile => 'Ndaj';
+
+  @override
+  String get eventChatLocationMapTitle => 'Vendndodhja';
+
+  @override
+  String get eventChatCopyCoordinates => 'Kopjo koordinatat';
+
+  @override
+  String get eventChatDirections => 'Drejtime';
+
+  @override
+  String get eventChatAudioExpandedTitle => 'Mesazh zanor';
+
+  @override
+  String get eventChatHoldToRecord => 'Mbaj shtypur për të regjistruar';
+
+  @override
+  String get eventChatReleaseToSend => 'Lësho për të dërguar';
+
+  @override
+  String get eventChatSlideToCancel => 'Tërhiqe majtas për të anuluar';
+
+  @override
+  String get eventChatReleaseToCancel => 'Lësho për të anuluar';
+
+  @override
+  String get eventChatRecording => 'Duke regjistruar…';
+
+  @override
+  String get eventChatMicPermissionDenied =>
+      'Nevojitet qasja në mikrofon për mesazhet zanore.';
 }

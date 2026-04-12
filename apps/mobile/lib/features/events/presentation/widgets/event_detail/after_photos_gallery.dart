@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class AfterPhotosGallery extends StatelessWidget {
@@ -18,24 +20,27 @@ class AfterPhotosGallery extends StatelessWidget {
   final EcoEvent event;
   final ValueChanged<int> onImageTap;
 
+  static const double _thumbSize = 96;
+
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
+    // No images: nothing to show — EventCompletedDetailCallouts handles the
+    // organizer's "add photos" prompt separately.
+    if (event.afterImagePaths.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'After cleanup',
-          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.sm),
+        DetailSectionHeader(context.l10n.eventsAfterCleanupTitle),
         SizedBox(
-          height: 80,
+          height: _thumbSize,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: event.afterImagePaths.length,
-            separatorBuilder: (BuildContext context, int index) => const SizedBox(width: 8),
+            separatorBuilder: (BuildContext context, int index) =>
+                const SizedBox(width: AppSpacing.xs),
             itemBuilder: (BuildContext context, int index) {
               final String path = event.afterImagePaths[index];
               final bool isAsset = path.startsWith('assets/');
@@ -44,27 +49,34 @@ class AfterPhotosGallery extends StatelessWidget {
 
               return Semantics(
                 button: true,
-                label: 'View after cleanup photo ${index + 1} of ${event.afterImagePaths.length}',
+                label: context.l10n.eventsAfterPhotoSemantic(
+                  index + 1,
+                  event.afterImagePaths.length,
+                ),
                 child: GestureDetector(
-                  onTap: () => onImageTap(index),
+                  onTap: () {
+                    AppHaptics.tap();
+                    onImageTap(index);
+                  },
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     child: Image(
                       image: provider,
-                      width: 80,
-                      height: 80,
+                      width: _thumbSize,
+                      height: _thumbSize,
                       fit: BoxFit.cover,
-                      errorBuilder: (BuildContext context, Object error, StackTrace? stack) {
+                      errorBuilder:
+                          (BuildContext context, Object error, StackTrace? stack) {
                         return Container(
-                          width: 80,
-                          height: 80,
+                          width: _thumbSize,
+                          height: _thumbSize,
                           decoration: BoxDecoration(
                             color: AppColors.inputFill,
                             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                           ),
                           child: const Icon(
                             CupertinoIcons.photo,
-                            size: 24,
+                            size: 28,
                             color: AppColors.textMuted,
                           ),
                         );
@@ -152,7 +164,7 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
               child: Row(
                 children: <Widget>[
                   IconButton(
-                    tooltip: 'Close',
+                    tooltip: context.l10n.commonClose,
                     onPressed: () {
                       AppHaptics.tap();
                       Navigator.of(context).pop();

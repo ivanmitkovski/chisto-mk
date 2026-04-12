@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -54,11 +55,14 @@ class AfterTab extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
         child: Semantics(
           button: true,
-          label: 'Upload after photos',
+          label: context.l10n.eventsCleanupAfterUploadSemantic,
           child: AddPhotosEmptyState(
             maxImages: maxImages,
             onTap: onPick,
             textTheme: textTheme,
+            emptyTitle: context.l10n.eventsCleanupAfterEmptyTitle,
+            emptyMaxPhotosLine: context.l10n.eventsCleanupAfterEmptyMaxPhotos(maxImages),
+            emptyTapHint: context.l10n.eventsCleanupAfterEmptyTapGallery,
           ),
         ),
       );
@@ -77,7 +81,7 @@ class AfterTab extends StatelessWidget {
             children: <Widget>[
               Semantics(
                 button: true,
-                label: 'View photo fullscreen',
+                label: context.l10n.eventsCleanupAfterViewFullscreenSemantic,
                 child: GestureDetector(
                   onTap: () => onImageTap(selectedIndex.clamp(0, afterImages.length - 1)),
                   child: ClipRRect(
@@ -120,13 +124,13 @@ class AfterTab extends StatelessWidget {
             children: <Widget>[
               Expanded(
                 child: Text(
-                  'Upload more photos',
+                  context.l10n.eventsCleanupAfterUploadMoreTitle,
                   style: textTheme.bodyLarge
                       ?.copyWith(fontWeight: FontWeight.w700),
                 ),
               ),
               Text(
-                '${afterImages.length} uploaded',
+                context.l10n.eventsCleanupAfterUploadedCount(afterImages.length),
                 style: textTheme.bodySmall
                     ?.copyWith(color: AppColors.textMuted),
               ),
@@ -136,7 +140,7 @@ class AfterTab extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(top: AppSpacing.xxs / 2),
               child: Text(
-                '$remaining more slot${remaining == 1 ? '' : 's'} available',
+                context.l10n.eventsCleanupAfterSlotsRemaining(remaining),
                 style: textTheme.bodySmall
                     ?.copyWith(color: AppColors.textMuted),
               ),
@@ -144,7 +148,11 @@ class AfterTab extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           SizedBox(
             height: thumbStripHeight,
-            child: ListView.separated(
+            child: Semantics(
+              container: true,
+              label: context.l10n.eventsCleanupEvidencePhotoSemantic,
+              explicitChildNodes: true,
+              child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: afterImages.length + (remaining > 0 ? 1 : 0),
               separatorBuilder: (BuildContext context, int index) =>
@@ -153,7 +161,7 @@ class AfterTab extends StatelessWidget {
                 if (index == 0 && remaining > 0) {
                   return Semantics(
                     button: true,
-                    label: 'Add more photos',
+                    label: context.l10n.eventsCleanupAfterAddMoreSemantic,
                     child: GestureDetector(
                       onTap: onPick,
                       child: Container(
@@ -220,7 +228,7 @@ class AfterTab extends StatelessWidget {
                         top: -4,
                         child: Semantics(
                           button: true,
-                          label: 'Remove photo',
+                          label: context.l10n.eventsCleanupAfterRemoveSemantic,
                           child: CupertinoButton(
                             padding: EdgeInsets.zero,
                             minimumSize: const Size(24, 24),
@@ -253,6 +261,7 @@ class AfterTab extends StatelessWidget {
                 );
               },
             ),
+            ),
           ),
         ],
       ),
@@ -266,11 +275,17 @@ class AddPhotosEmptyState extends StatefulWidget {
     required this.maxImages,
     required this.onTap,
     required this.textTheme,
+    required this.emptyTitle,
+    required this.emptyMaxPhotosLine,
+    required this.emptyTapHint,
   });
 
   final int maxImages;
   final VoidCallback onTap;
   final TextTheme textTheme;
+  final String emptyTitle;
+  final String emptyMaxPhotosLine;
+  final String emptyTapHint;
 
   @override
   State<AddPhotosEmptyState> createState() => _AddPhotosEmptyStateState();
@@ -288,10 +303,20 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
-    )..repeat(reverse: true);
+    );
     _pulseAnimation = Tween<double>(begin: 0.6, end: 1.0).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) {
+        return;
+      }
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _pulseController.value = 1.0;
+      } else {
+        _pulseController.repeat(reverse: true);
+      }
+    });
   }
 
   @override
@@ -353,7 +378,7 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
                   ),
                   const SizedBox(height: AppSpacing.lg),
                   Text(
-                    'Add photos of the cleaned site',
+                    widget.emptyTitle,
                     style: textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -363,7 +388,7 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
-                    'Up to ${widget.maxImages} photos',
+                    widget.emptyMaxPhotosLine,
                     style: textTheme.bodySmall?.copyWith(
                       color: AppColors.textMuted,
                       height: 1.4,
@@ -381,7 +406,7 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
                       ),
                       const SizedBox(width: AppSpacing.xs),
                       Text(
-                        'Tap to select from gallery',
+                        widget.emptyTapHint,
                         style: textTheme.bodySmall?.copyWith(
                           color: AppColors.primaryDark,
                           fontWeight: FontWeight.w600,

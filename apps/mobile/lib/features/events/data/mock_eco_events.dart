@@ -7,6 +7,9 @@ List<EcoEvent> buildMockEcoEvents() {
 
 List<EcoEvent> buildMockEcoEventsSeed() {
   final DateTime now = DateTime.now();
+  // Past start so organizer can transition to in-progress in dev/tests (still "upcoming" until they tap Start).
+  final DateTime startedAt = now.subtract(const Duration(hours: 2));
+  final DateTime endLocal = startedAt.add(const Duration(hours: 3));
 
   return <EcoEvent>[
     EcoEvent(
@@ -21,9 +24,10 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       siteDistanceKm: 15,
       organizerId: CurrentUser.id,
       organizerName: CurrentUser.displayName,
-      date: DateTime(now.year, now.month, now.day + 2),
-      startTime: const EventTime(hour: 10, minute: 0),
-      endTime: const EventTime(hour: 13, minute: 0),
+      date: DateTime(startedAt.year, startedAt.month, startedAt.day),
+      startTime: EventTime(hour: startedAt.hour, minute: startedAt.minute),
+      endTime: EventTime(hour: endLocal.hour, minute: endLocal.minute),
+      scheduledAtUtc: startedAt.toUtc(),
       participantCount: 18,
       maxParticipants: 30,
       status: EcoEventStatus.upcoming,

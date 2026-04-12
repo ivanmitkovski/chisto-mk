@@ -65,6 +65,7 @@ class ReportSheetScaffold extends StatelessWidget {
     final MediaQueryData media = MediaQuery.of(context);
     final double topPadding = media.padding.top;
     final double bottomPadding = media.padding.bottom;
+    final double sheetBottomInset = addBottomInset ? bottomPadding : 0.0;
     final double heightCap = media.size.height * maxHeightFactor;
 
     return LayoutBuilder(
@@ -156,7 +157,7 @@ class ReportSheetScaffold extends StatelessWidget {
                         const SizedBox(height: AppSpacing.lg),
                         footer!,
                       ],
-                      if (addBottomInset) SizedBox(height: bottomPadding),
+                      if (addBottomInset) SizedBox(height: sheetBottomInset),
                     ],
                   ),
                 ),
@@ -242,16 +243,26 @@ class ReportSheetScaffold extends StatelessWidget {
                         ] else
                           const SizedBox(height: AppSpacing.sm),
                         Expanded(
-                          child: ColoredBox(
-                            color: AppColors.panelBackground,
-                            child: child,
+                          child: Padding(
+                            padding: EdgeInsets.only(
+                              bottom: footer == null ? sheetBottomInset : 0,
+                            ),
+                            child: ColoredBox(
+                              color: AppColors.panelBackground,
+                              // [child] is often a ListView with shrinkWrap; without
+                              // [SizedBox.expand] the list only sizes to content and
+                              // the ColoredBox leaves a white band that covers the
+                              // bottom rows visually on modals.
+                              child: SizedBox.expand(child: child),
+                            ),
                           ),
                         ),
                         if (footer != null) ...<Widget>[
                           const SizedBox(height: AppSpacing.lg),
                           footer!,
                         ],
-                        if (addBottomInset) SizedBox(height: bottomPadding),
+                        if (addBottomInset && footer != null)
+                          SizedBox(height: sheetBottomInset),
                       ],
                     ),
                   ),

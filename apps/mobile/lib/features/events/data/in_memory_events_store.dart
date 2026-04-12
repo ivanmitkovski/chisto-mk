@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
 import 'package:chisto_mobile/features/events/data/mock_eco_events.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
+import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:flutter/foundation.dart';
 
@@ -28,6 +33,15 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   List<EcoEvent> get events => List<EcoEvent>.unmodifiable(_events);
 
   @override
+  bool get hasMoreEvents => false;
+
+  @override
+  bool get lastGlobalListLoadFailed => false;
+
+  @override
+  bool get isShowingStaleCachedEvents => false;
+
+  @override
   void loadInitialIfNeeded() {
     if (_didStartLoad) {
       return;
@@ -45,6 +59,27 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
     notifyListeners();
     _persistSnapshot();
   }
+
+  @override
+  Future<void> refreshEvents({EcoEventSearchParams? params}) async {}
+
+  /// When true (tests only), [prefetchEvent] with `force: true` returns false so
+  /// detail screens can exercise stale-cache banners while the event remains in memory.
+  bool simulateDetailPrefetchFailureOnForce = false;
+
+  @override
+  Future<bool> prefetchEvent(String id, {bool force = false}) async {
+    if (simulateDetailPrefetchFailureOnForce && force) {
+      return false;
+    }
+    return findById(id) != null;
+  }
+
+  @override
+  Future<void> prefetchEventsForSite(String siteId) async {}
+
+  @override
+  Future<void> loadMore() async {}
 
   @override
   EcoEvent? findById(String id) {
@@ -72,20 +107,105 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   @override
-  void create(EcoEvent event) {
+  Future<EcoEvent> create(EcoEvent event) async {
     _events = <EcoEvent>[event, ..._events];
     notifyListeners();
     _persistSnapshot();
+    return event;
   }
 
   @override
-  bool updateStatus(String id, EcoEventStatus status) {
+  Future<EcoEvent> updateEventDetails(
+    String eventId,
+    EventUpdatePayload payload,
+  ) async {
+    final EcoEvent? current = findById(eventId);
+    if (current == null) {
+      throw AppError.notFound();
+    }
+    final Map<String, dynamic> patch = payload.toPatchJson();
+    EcoEvent next = current;
+    if (patch.containsKey('title')) {
+      next = next.copyWith(title: patch['title'] as String);
+    }
+    if (patch.containsKey('description')) {
+      next = next.copyWith(description: patch['description'] as String);
+    }
+    if (patch.containsKey('category')) {
+      final String name = patch['category'] as String;
+      final EcoEventCategory cat = EcoEventCategory.values.firstWhere(
+        (EcoEventCategory c) => c.name == name,
+        orElse: () => next.category,
+      );
+      next = next.copyWith(category: cat);
+    }
+    if (patch.containsKey('scheduledAt')) {
+      final DateTime start =
+          DateTime.parse(patch['scheduledAt'] as String).toLocal();
+      next = next.copyWith(
+        date: DateTime(start.year, start.month, start.day),
+        startTime: EventTime(hour: start.hour, minute: start.minute),
+      );
+    }
+    if (patch.containsKey('endAt') && patch['endAt'] != null) {
+      final DateTime end = DateTime.parse(patch['endAt'] as String).toLocal();
+      next = next.copyWith(
+        endTime: EventTime(hour: end.hour, minute: end.minute),
+      );
+    }
+    if (patch.containsKey('maxParticipants')) {
+      next = next.copyWith(
+        maxParticipants: patch['maxParticipants'] as int?,
+      );
+    }
+    if (patch.containsKey('gear')) {
+      final List<dynamic> raw = patch['gear'] as List<dynamic>;
+      final List<EventGear> gear = raw
+          .map((dynamic g) => EventGear.values.firstWhere(
+                (EventGear x) => x.name == g,
+                orElse: () => EventGear.trashBags,
+              ))
+          .toSet()
+          .toList(growable: false);
+      next = next.copyWith(gear: gear);
+    }
+    if (patch.containsKey('scale')) {
+      final String name = patch['scale'] as String;
+      next = next.copyWith(
+        scale: CleanupScale.values.firstWhere(
+          (CleanupScale s) => s.name == name,
+          orElse: () => next.scale ?? CleanupScale.small,
+        ),
+      );
+    }
+    if (patch.containsKey('difficulty')) {
+      final String name = patch['difficulty'] as String;
+      next = next.copyWith(
+        difficulty: EventDifficulty.values.firstWhere(
+          (EventDifficulty d) => d.name == name,
+          orElse: () => next.difficulty ?? EventDifficulty.easy,
+        ),
+      );
+    }
+    _events = _events
+        .map((EcoEvent e) => e.id == eventId ? next : e)
+        .toList(growable: false);
+    notifyListeners();
+    _persistSnapshot();
+    return next;
+  }
+
+  @override
+  Future<bool> updateStatus(String id, EcoEventStatus status) async {
     bool changed = false;
     _events = _events.map((EcoEvent event) {
       if (event.id != id) {
         return event;
       }
       if (!event.canTransitionTo(status)) {
+        return event;
+      }
+      if (status == EcoEventStatus.inProgress && event.isBeforeScheduledStart) {
         return event;
       }
 
@@ -116,7 +236,7 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   @override
-  bool toggleJoin(String id) {
+  Future<EcoEventJoinToggleResult> toggleJoin(String id) async {
     bool changed = false;
     _events = _events.map((EcoEvent event) {
       if (event.id != id || !event.isJoinable) {
@@ -140,7 +260,7 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
       notifyListeners();
       _persistSnapshot();
     }
-    return changed;
+    return EcoEventJoinToggleResult(changed: changed);
   }
 
   @override
@@ -246,11 +366,11 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   @override
-  bool setReminder({
+  Future<bool> setReminder({
     required String eventId,
     required bool enabled,
     DateTime? reminderAt,
-  }) {
+  }) async {
     bool changed = false;
     _events = _events.map((EcoEvent event) {
       if (event.id != eventId) {
@@ -274,10 +394,10 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   @override
-  bool setAfterImages({
+  Future<bool> setAfterImages({
     required String eventId,
     required List<String> imagePaths,
-  }) {
+  }) async {
     bool changed = false;
     final List<String> normalized = LinkedHashSet<String>.from(imagePaths).toList(growable: false);
     _events = _events.map((EcoEvent event) {
@@ -296,6 +416,26 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
       _persistSnapshot();
     }
     return changed;
+  }
+
+  @override
+  Future<EventParticipantsPage> fetchParticipants(String eventId, {String? cursor}) async {
+    final EcoEvent? event = findById(eventId);
+    final int n = event?.participantCount ?? 0;
+    final String? c = cursor?.trim();
+    if (c != null && c.isNotEmpty) {
+      return const EventParticipantsPage(items: <EventParticipantRow>[], hasMore: false);
+    }
+    final List<EventParticipantRow> items = List<EventParticipantRow>.generate(
+      n,
+      (int i) => EventParticipantRow(
+        userId: 'in_memory_volunteer_$i',
+        displayName: 'Volunteer ${i + 1}',
+        joinedAt: DateTime.fromMillisecondsSinceEpoch(1000 * i, isUtc: true),
+        avatarUrl: null,
+      ),
+    );
+    return EventParticipantsPage(items: items, hasMore: false);
   }
 
   Future<void> _hydrateFromCache() async {

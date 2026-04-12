@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -130,7 +131,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  'Event created',
+                  context.l10n.eventsSuccessDialogTitle,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                         letterSpacing: -0.3,
@@ -138,7 +139,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  '${widget.title} at ${widget.siteName} is ready. Share it with your community to get volunteers on board.',
+                  context.l10n.eventsSuccessDialogBody(widget.title, widget.siteName),
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textMuted,
@@ -163,7 +164,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                       ),
                     ),
                     child: Text(
-                      'Open event',
+                      context.l10n.eventsSuccessDialogOpenEvent,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),

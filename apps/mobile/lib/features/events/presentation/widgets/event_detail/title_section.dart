@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
+import 'package:intl/intl.dart';
 
+/// Event title and schedule subtitle below the hero (status pill lives on [HeroImageBar]).
 class TitleSection extends StatelessWidget {
   const TitleSection({super.key, required this.event});
 
@@ -11,35 +13,31 @@ class TitleSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String datePart = DateFormat.yMMMEd(
+      Localizations.localeOf(context).toString(),
+    ).format(event.date);
+    final String scheduleSubtitle = '$datePart · ${event.formattedTimeRange}';
+
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xxs),
-          decoration: BoxDecoration(
-            color: event.status.color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+    return MergeSemantics(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            event.title,
+            style: AppTypography.eventsDetailHeadline(textTheme),
           ),
-          child: Text(
-            event.status.label,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              letterSpacing: -0.2,
-              color: event.status.color,
+          SizedBox(height: AppSpacing.xs),
+          Semantics(
+            label: scheduleSubtitle,
+            child: Text(
+              scheduleSubtitle,
+              style: AppTypography.eventsDetailScheduleLine(textTheme),
             ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Text(
-          event.title,
-          style: textTheme.titleLarge?.copyWith(
-            letterSpacing: -0.3,
-            height: 1.2,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

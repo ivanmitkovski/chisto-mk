@@ -450,6 +450,11 @@
   "profilePointsReasonEcoApproved": "Veprim ekologjik i miratuar",
   "profilePointsReasonEcoRealized": "Veprim ekologjik i përfunduar",
   "profilePointsReasonOther": "Përditësim pikësh",
+  "profilePointsReasonEventOrganizerApproved": "Ngjarja juaj e pastrimit u miratua",
+  "profilePointsReasonEventJoined": "U bashkove me një ngjarje pastrimi",
+  "profilePointsReasonEventJoinNoShow": "Bonusi i bashkimit u rregullua — pa regjistrim",
+  "profilePointsReasonEventCheckIn": "Regjistrim në ngjarje",
+  "profilePointsReasonEventCompleted": "Ngjarja e pastrimit u përfundua",
   "profileReportCreditsTitle": "Kreditë e raportimit",
   "profileAccountDetailsSection": "Detajet e llogarisë",
   "profileGeneralInfoTile": "Informacione të përgjithshme",
@@ -831,11 +836,41 @@
   "notificationsFilterUnread": "Të palexuara",
   "eventsEventNotFoundTitle": "Ngjarja nuk u gjet",
   "eventsEventNotFoundBody": "Kjo ngjarje nuk është më e disponueshme.",
+  "eventsDetailBrowseEvents": "Shfleto ngjarjet",
+  "eventsDetailCouldNotRefresh": "Nuk u rifreskua. Po shfaqen detajet e ruajtura.",
+  "eventsDetailRetryRefresh": "Provo përsëri",
+  "eventsDetailLocationTitle": "Vendndodhja",
+  "eventsDetailCopyAddress": "Kopjo adresën",
+  "eventsDetailAddressCopied": "Adresa u kopjua",
+  "eventsDetailLocationLongPressHint": "Shtyp gjatë për adresë të plotë dhe veprime",
+  "eventsDetailCoverImageUnavailable": "Imazhi nuk është i disponueshëm",
+  "eventsWeatherUnavailableBody": "Parashikimi i motit nuk është i disponueshëm për momentin.",
+  "eventsWeatherRetry": "Provo përsëri",
+  "eventsUnableToStartEventGeneric": "Nuk mund të nisej ngjarja. Kontrollo lidhjen dhe provo përsëri.",
+  "eventsStartEventTooEarly": "Mund ta nisni këtë veprim ekologjik pasi të arrijë koha e planifikuar e fillimit.",
+  "eventsAwaitingModerationCta": "Në pritje të aprovimit",
+  "eventsModerationBannerTitle": "Në pritje të aprovimit",
+  "eventsModerationBannerBody": "Ky veprim është i dukshëm për ju si organizator. Vullnetarët mund të bashkohen pasi moderatorët ta aprovojnë.",
+  "eventsEventPendingPublicCta": "Ende nuk është hapur për t'u bashkuar",
+  "eventsFeedOfflineStaleBanner": "Po shfaqen ngjarje të ruajtura — rifreskimi dështoi. Tërhiq poshtë për të provuar përsëri.",
+  "eventsFeedInitialLoadFailed": "Nuk mundëm të ngarkojmë ngjarjet. Kontrollo lidhjen dhe provo përsëri.",
+  "eventsOrganizerInvalidateQrTitle": "Anulo kodet e mëparshme QR",
+  "eventsOrganizerInvalidateQrSubtitle": "Përdore nëse një kod është ndarë ose fotografuar. Kodet e skanuara mbeten të vlefshme deri në skadim; kjo rrotullon sesionin që skanimet e reja të kërkojnë QR të ri.",
+  "eventsOrganizerQrSessionRotated": "Sesioni QR u përditësua. Trego kodin e ri pjesëmarrësve.",
+  "eventsOrganizerQrRotateFailed": "Nuk mundëm t'i anulojmë kodet. Provo përsëri.",
+  "eventsEditEventTitle": "Ndrysho ngjarjen",
+  "eventsEditEventSave": "Ruaj ndryshimet",
+  "eventsEventUpdated": "Ngjarja u përditësua",
+  "eventsMutationFailedGeneric": "Diçka shkoi keq. Provo përsëri.",
   "eventsManualCheckInAdd": "Shto",
   "eventsManualCheckInTitle": "Check-in manual",
   "eventsCheckInTitle": "Check-in",
   "eventsOrganizerMockAllCheckedIn": "Të gjithë pjesëmarrësit simulues janë regjistruar tashmë.",
   "eventsOrganizerAttendeeNamePlaceholder": "Emri i pjesëmarrësit",
+  "eventsOrganizerManualCheckInSubtitle": "Kërko vullnetarët që u bashkuan me këtë ngjarje, pastaj regjistroji.",
+  "eventsOrganizerManualCheckInNoJoiners": "Ende nuk ka vullnetarë të bashkuar me këtë ngjarje.",
+  "eventsOrganizerManualCheckInSelectParticipant": "Zgjidh një vullnetar nga lista.",
+  "eventsOrganizerManualCheckInNotParticipant": "Ky person nuk është në listën e pjesëmarrësve.",
   "eventsOrganizerEnterNameFirst": "Së pari shkruaj emrin e pjesëmarrësit.",
   "eventsOrganizerNameAlreadyCheckedIn": "{name} është regjistruar tashmë.",
   "@eventsOrganizerNameAlreadyCheckedIn": {
@@ -882,6 +917,56 @@
     }
   },
   "eventsOrganizerUploadAfterPhotosHint": "Ngarko fotot \"pas\" nga detaji i ngjarjes.",
+  "eventsOrganizerCompletionCheckedInNone": "Asnjë pjesëmarrës nuk u regjistrua.",
+  "eventsOrganizerCompletionJoinedLine": "{count} vullnetarë u bashkuan",
+  "@eventsOrganizerCompletionJoinedLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionJoinedOfCap": "{joined} nga {cap} vende të mbushura",
+  "@eventsOrganizerCompletionJoinedOfCap": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "cap": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionSheetSemantic": "Ngjarja përfundoi. Shiko hapat e ardhshëm.",
+  "eventsOrganizerCompletionBackToEvent": "Kthehu te ngjarja",
+  "eventsOrganizerCompletionAddPhotosNow": "Shto foto pastrimit tani",
+  "eventsOrganizerCompletionWhatNextIntro": "Përfundo në faqen e ngjarjes: dokumento rezultatet dhe nda ndikimin që patët së bashku.",
+  "eventsOrganizerCompletionNextStepsHeading": "HAPAT E ARDHSHËM",
+  "eventsOrganizerCompletionStepPhotosTitle": "Shto foto \"pas\"",
+  "eventsOrganizerCompletionStepPhotosBody": "Trego dallimin që bëtë. Shfaqen në faqen e ngjarjes për të gjithë.",
+  "eventsOrganizerCompletionStepImpactTitle": "Regjistro ndikimin",
+  "eventsOrganizerCompletionStepImpactBody": "Shëno çanta, orë vullnetare dhe vlerësime nga faqja e ngjarjes.",
+  "eventsOrganizerCompletionStepVisibilityTitle": "Ndërto besim",
+  "eventsOrganizerCompletionStepVisibilityBody": "Fotot ndihmojnë moderatorët të verifikojnë pastrimin dhe frymëzojnë veprime të ardhshme.",
+  "eventsOrganizerDetailPendingAfterPhotosTitle": "Foto \"pas\"",
+  "eventsOrganizerDetailPendingAfterPhotosMessage": "Ngarko foto pas pastrimit që vullnetarët dhe moderatorët të shohin rezultatet. Përdor butonin më poshtë.",
+  "eventsAttendeeCompletedTitle": "Faleminderit",
+  "eventsAttendeeCompletedBody": "Ky veprim ekologjik ka përfunduar. Faleminderit që erdhe.",
+  "eventsAfterPhotosOrganizerEmptyHint": "Ende pa foto \"pas\". Përdor butonin më poshtë për t'i shtuar.",
+  "eventsEvidenceScreenSubtitle": "Fotot \"pas\" dokumentojnë rezultatet dhe shfaqen në faqen e ngjarjes.",
+  "eventsEvidencePhotoCountChip": "{current} nga {max} foto",
+  "@eventsEvidencePhotoCountChip": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsEvidenceBeforeAfterTabsSemantic": "Foto para dhe pas",
+  "eventsEvidenceSavingSemantic": "Duke ruajtur fotot \"pas\"",
   "eventsOrganizerCheckInPausedSnack": "Regjistrimi u ndal përkohësisht.",
   "eventsOrganizerCheckInResumedSnack": "Regjistrimi u rifillua.",
   "eventsOrganizerUnableCancelEvent": "Nuk mund të anulohet ngjarja.",
@@ -922,6 +1007,27 @@
   },
   "eventsOrganizerQrRefreshesWhenOpen": "QR rifreskohet automatikisht dhe pas çdo skanimi",
   "eventsOrganizerResumeForFreshQr": "Rifillo regjistrimin për një QR të re",
+  "eventsOrganizerQrLoadFailedGeneric": "Nuk u ngarkua kodi i regjistrimit. Kontrollo lidhjen dhe provo përsëri.",
+  "eventsOrganizerQrRateLimited": "Shumë përpjekje rifreskimi. Prit pak dhe provo përsëri.",
+  "eventsOrganizerSessionSetupFailed": "Nuk mund të nisej regjistrimi. Sigurohu që ngjarja është në vazhdim dhe provo përsëri.",
+  "eventsOrganizerQrRetry": "Provo përsëri",
+  "eventsOrganizerQrBrightnessHint": "Këshillë: rrit ndriçimin e ekranit që skanimi të jetë më i lehtë.",
+  "eventsOrganizerQrSemantics": "Kod QR për regjistrim. Rifreskohet për rreth {seconds} sekonda.",
+  "@eventsOrganizerQrSemantics": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrEncodeError": "Ky kod nuk mund të vizatohej. Prek provo përsëri.",
+  "eventsOrganizerFeedbackInvalidQrStrict": "Ky QR nuk vlen për regjistrim.",
+  "eventsOrganizerFeedbackRequiresJoin": "Bashkohu me ngjarjen në aplikacion para regjistrimit.",
+  "eventsOrganizerFeedbackCheckInUnavailable": "Regjistrimi nuk është i disponueshëm për këtë ngjarje tani.",
+  "eventsOrganizerFeedbackRateLimited": "Shumë përpjekje. Prit pak dhe provo përsëri.",
+  "eventsOrganizerCopyQrText": "Kopjo tekstin e kodit QR",
+  "eventsOrganizerQrTextCopied": "Teksti i kodit QR u kopjua — ngjite në mesazh për pjesëmarrësit që nuk mund të skanojnë.",
+  "eventsOrganizerNoQrToCopy": "Ende nuk ka kod QR aktiv për të kopjuar.",
   "eventsOrganizerManualOverride": "Manualisht: shëno pjesëmarrës si i pranishëm",
   "eventsOrganizerCheckedInHeading": "Të regjistruar",
   "eventsOrganizerEmptyListTitle": "Ende askush nuk është regjistruar",
@@ -930,6 +1036,17 @@
   "eventsOrganizerPauseCheckIn": "Ndalo regjistrimin",
   "eventsOrganizerResumeCheckIn": "Rifillo regjistrimin",
   "eventsOrganizerCancelEvent": "Anulo ngjarjen",
+  "eventsOrganizerMoreActionsSemantic": "Më shumë veprime për ngjarjen",
+  "eventsOrganizerMoreSheetTitle": "Veprimet e ngjarjes",
+  "eventsOrganizerEndEventConfirmTitle": "Të përfundohet ngjarja?",
+  "eventsOrganizerEndEventConfirmMessage": "Regjistrimi do të mbyllet dhe ngjarja do të shënohet si e përfunduar. Mund të ngarkosh foto pas ngjarjes nga detajet e ngjarjes.",
+  "eventsOrganizerEndEventKeepManaging": "Vazhdo menaxhimin",
+  "eventsOrganizerEndEventConfirmAction": "Përfundo ngjarjen",
+  "eventsOrganizerCancelEventConfirmTitle": "Të anulohet ngjarja?",
+  "eventsOrganizerCancelEventConfirmMessage": "Vullnetarët do ta shohin ngjarjen si të anuluar. Kjo nuk zhbëhet nga aplikacioni.",
+  "eventsOrganizerCancelEventKeepEvent": "Mbaje ngjarjen",
+  "eventsOrganizerCancelEventConfirmAction": "Anulo ngjarjen",
+  "eventsOrganizerRemoveAttendeeSemantic": "Hiq {name} nga regjistrimi",
   "eventsOrganizerSimulateCheckInDev": "Simulo regjistrimin (dev)",
   "eventsPhotosTitle": "Foto",
   "createEventDefaultDescription": "Aksion pastrimi komunitar i organizuar nga vullnetarët vendas.",
@@ -968,7 +1085,42 @@
   "createEventPlaceholderDifficulty": "Vendos nivelin e vështirësisë",
   "createEventSubmitLabel": "Krijo aksionin ekologjik",
   "createEventAppBarTitle": "Krijo ngjarjen",
-  "createEventLocalInfoSnack": "Për tani ngjarja mbetet lokale, por rrjedha e organizatorit është gati menjëherë.",
+  "createEventHelpTitle": "Krijimi i një ngjarjeje",
+  "createEventHelpSubtitle": "Udhëzim i shkurtër për organizatorët",
+  "createEventHelpBulletModeration": "Ngjarjet shqyrtohen që komuniteti të shohë pastrime të sakta dhe të sigurta.",
+  "createEventHelpBulletVolunteers": "Vullnetarët shohin titullin, orarin, vendin, pajisjet dhe përshkrimin kur ngjarja është aktive.",
+  "createEventHelpBulletSite": "Zgjidh një vend ndotjeje nga lista ose harta që të dinë të gjithë ku të takohen.",
+  "createEventHelpBulletSchedule": "Cakto datën dhe intervalin kohor që kalendarët dhe kujtuesit të jenë të qartë.",
+  "createEventHelpBulletSubmit": "Kur janë plotësuar fushat e detyrueshme, përdor „Krijo aksionin ekologjik“ për publikim.",
+  "createEventFieldVolunteerCap": "Kufiri i vullnetarëve",
+  "createEventVolunteerCapPlaceholderNoLimit": "Pa kufi",
+  "createEventVolunteerCapUpTo": "Deri në {count} vullnetarë",
+  "@createEventVolunteerCapUpTo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventVolunteerCapSheetTitle": "Kufiri i vullnetarëve",
+  "createEventVolunteerCapSheetSubtitle": "Opsionale. Kufiri është midis 2 dhe 5000.",
+  "createEventVolunteerCapNoLimit": "Pa kufi",
+  "createEventVolunteerCapCustomLabel": "Numër i personalizuar",
+  "createEventVolunteerCapCustomHint": "Numri (2–5000)",
+  "createEventVolunteerCapApply": "Apliko",
+  "createEventVolunteerCapInvalid": "Shkruaj një numër të plotë midis 2 dhe 5000.",
+  "createEventSitePickerLoading": "Po ngarkohen vendet…",
+  "createEventSitePickerOfflineTitle": "Lista jashtë linje",
+  "createEventSitePickerOfflineMessage": "Po shfaqen vende të integruara sepse lista e drejtpërdrejtë është bosh ose e padisponueshme.",
+  "createEventSitePickerLoadFailedTitle": "Nuk u rifreskua",
+  "createEventSitePickerLoadFailedMessage": "Mund të zgjedhësh ende nga lista jashtë linje. Provo përsëri për listën e drejtpërdrejtë.",
+  "createEventSitePickerRetry": "Provo përsëri",
+  "createEventDiscardTitle": "Hidh poshtë ngjarjen?",
+  "createEventDiscardBody": "Do të humbasësh çfarë ke futur në këtë ekran.",
+  "createEventDiscardKeepEditing": "Vazhdo redaktimin",
+  "createEventLoadingSemantic": "Po ngarkohet forma për krijimin e ngjarjes",
+  "createEventSectionScheduleCaption": "Orari",
+  "createEventSectionDetailsCaption": "Detajet e ngjarjes",
   "createEventCleanupSiteTitle": "Vendi i pastrimit",
   "createEventSelectSiteSemantic": "Zgjidh vendin e pastrimit",
   "createEventChooseSitePlaceholder": "Zgjidh një vend me ndotje",
@@ -999,6 +1151,13 @@
   },
   "createEventTitleHint": "p.sh. Pastrimi i lumit në fundjavë",
   "createEventTitleRequired": "Titulli është i detyrueshëm.",
+  "createEventTitleMinLength": "Përdorni të paktën 3 karaktere për titullin.",
+  "createEventSitePickerTabList": "Lista",
+  "createEventSitePickerTabMap": "Harta",
+  "createEventSitePickerMapEmpty": "Asnjë vend në hartë nuk përputhet me këtë kërkim, ose vendndodhjet ende nuk janë të disponueshme.",
+  "createEventSitePickerMapSemanticLabel": "Harta e vendeve të ndotjes",
+  "createEventSitePickerMapHint": "Prek një shënues për të zgjedhur një vend.",
+  "createEventSiteMapPreviewSemantic": "Hap zgjedhjen e vendit në hartë",
   "createEventTypeRequired": "Zgjidh një lloj ngjarjeje.",
   "createEventGearPlaceholderQuestion": "Çfarë duhet të sjellin vullnetarët?",
   "createEventGearLabel": "Mjetet e nevojshme",
@@ -1027,6 +1186,171 @@
       }
     }
   },
+  "eventsCtaStartEvent": "Fillo ngjarjen",
+  "eventsCtaManageCheckIn": "Menaxho regjistrimin",
+  "eventsCtaEditAfterPhotos": "Ndrysho fotot pas",
+  "eventsCtaUploadAfterPhotos": "Ngarko fotot pas",
+  "eventsCtaCheckedIn": "I regjistruar",
+  "eventsCtaScanToCheckIn": "Skano për t'u regjistruar",
+  "eventsCtaCheckInPaused": "Regjistrimi u ndal",
+  "eventsCtaTurnReminderOff": "Fike rikujtuesin",
+  "eventsCtaSetReminder": "Vendos rikujtues",
+  "eventsCtaLeaveEvent": "Largohu nga ngjarja",
+  "eventsCtaJoinEcoAction": "Bashkohu me aksionin",
+  "eventsStatusUpcoming": "Në pritje",
+  "eventsStatusInProgress": "Në progres",
+  "eventsStatusCompleted": "E përfunduar",
+  "eventsStatusCancelled": "E anuluar",
+  "eventsCardActionsSheetTitle": "Veprime për ngjarjen",
+  "eventsCardCopyTitle": "Kopjo detajet e ngjarjes",
+  "eventsCardCopySubtitle": "Titulli, data dhe vendndodhja",
+  "eventsCardCopiedSnack": "Detajet u kopjuan.",
+  "eventsCardShareTitle": "Ndaj ngjarjen",
+  "eventsCardShareSubtitle": "Ndaj me miqtë",
+  "eventsCardOpenTitle": "Hap ngjarjen",
+  "eventsCardOpenSubtitle": "Shiko detajet e plota",
+  "eventsCardMoreActionsSemantic": "Më shumë veprime për ngjarjen",
+  "eventsCardSoonLabel": "Së shpejti",
+  "eventsFeedUpNext": "Më pas",
+  "eventsCountdownStarted": "Filloi",
+  "eventsCountdownDaysHours": "Fillon për {days}d {hours}o",
+  "@eventsCountdownDaysHours": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" }
+    }
+  },
+  "eventsCountdownHoursMinutes": "Fillon për {hours}o {minutes}m",
+  "@eventsCountdownHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsCountdownMinutes": "Fillon për {minutes}m",
+  "@eventsCountdownMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsShareEventTooltip": "Ndaj ngjarjen",
+  "eventsAttendeeCheckInSemantic": "Skano për t'u regjistruar në ngjarje",
+  "eventsAttendeeAlreadyCheckedInSnack": "Je regjistruar tashmë.",
+  "eventsAttendeeCheckInPausedSnack": "Organizatori e ndali regjistrimin për tani.",
+  "eventsAttendeeCheckInCompleteSnack": "Regjistrimi u krye.",
+  "eventsAttendeeBannerTitleCheckedIn": "Je i regjistruar",
+  "eventsAttendeeBannerTitleInProgress": "Ngjarja është në progres",
+  "eventsAttendeeBannerSubtitleAttendanceConfirmed": "Pjesëmarrja u konfirmua",
+  "eventsAttendeeBannerSubtitleCheckedInAt": "Regjistruar në {time}",
+  "@eventsAttendeeBannerSubtitleCheckedInAt": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "eventsAttendeeBannerSubtitleScanQr": "Skano QR-në e organizatorit për t'u regjistruar",
+  "eventsAttendeeBannerSubtitlePaused": "Regjistrimi është pezulluar përkohësisht",
+  "eventsDetailShareSuccess": "Ngjarja u nda.",
+  "eventsDetailCalendarAdded": "Ngjarja u shtua në kalendar.",
+  "eventsDetailCalendarFailed": "Nuk u shtua në kalendar. Provo përsëri.",
+  "eventsDetailRefreshFailed": "Nuk u rifreskua ngjarja. Provo përsëri.",
+  "eventsDetailCancelledCallout": "Kjo ngjarje është anuluar.",
+  "eventsDetailOpenInMaps": "Hape në Hartat",
+  "eventsDetailCoverSemantic": "Imazh kopertine për {title}",
+  "@eventsDetailCoverSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "eventsDetailGroupedPanelSemantic": "Vendndodhja, orari dhe detajet",
+  "eventsDetailParticipationSemantic": "Pjesëmarrja juaj",
+  "eventsAnalyticsLoadFailed": "Nuk u ngarkuan analitikat.",
+  "eventsAnalyticsRetry": "Riprovo",
+  "eventsRecurrenceDaily": "Çdo ditë",
+  "eventsRecurrenceNavigatePrevious": "Ngjarja e mëparshme në seri",
+  "eventsRecurrenceNavigateNext": "Ngjarja tjetër në seri",
+  "eventsImpactSummarySaved": "Përmbledhja e ndikimit u ruajt.",
+  "eventsImpactSummaryUpdated": "Përmbledhja e ndikimit u përditësua.",
+  "eventsReminderSetSnack": "Rikujtuesi u vendos për {when}.",
+  "@eventsReminderSetSnack": {
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "eventsFeedbackSheetTitle": "Feedback pas ngjarjes",
+  "eventsFeedbackHowWasEvent": "Si shkoi ngjarja?",
+  "eventsFeedbackRatingStars": "{rating}★",
+  "@eventsFeedbackRatingStars": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "eventsFeedbackBagsCollected": "Çanta të mbledhura",
+  "eventsFeedbackVolunteerHours": "Orë vullnetarësh: {hours}o",
+  "@eventsFeedbackVolunteerHours": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+  "eventsFeedbackNotesHint": "Çfarë funksionoi mirë? Shënime për herën tjetër?",
+  "eventsEvidenceMaxPhotosSnack": "Maksimumi {max} foto.",
+  "@eventsEvidenceMaxPhotosSnack": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "eventsEvidencePickFailedSnack": "Nuk mund të zgjidhen foto. Kontrollo lejet.",
+  "eventsEvidenceRemoveAction": "Hiq",
+  "eventsEvidenceAppBarTitle": "Dëshmi pastrimi",
+  "eventsEvidenceSaving": "Duke u ruajtur...",
+  "eventsEvidenceAfterPhotosSaved": "Fotot pas u ruajtën.",
+  "eventsEvidenceNoChanges": "Nuk ka ndryshime për të ruajtur.",
+  "eventsSiteReferencePhotoTitle": "Foto referencë e vendit",
+  "eventsSiteReferencePhotoBody": "Referencë para pastrimit. Përdor skedën Pas për foto të vendit të pastruar.",
+  "eventsManageCheckInOnlyInProgress": "Regjistrimi ofrohet vetëm gjatë ngjarjes.",
+  "eventsEventFull": "Kjo ngjarje është plot.",
+  "eventsParticipationUpdateFailed": "Nuk mund të përditësojmë pjesëmarrjen. Provo përsëri.",
+  "eventsJoinedEcoAction": "U bashkove me këtë aksion ekologjik.",
+  "eventsJoinPointsEarned": "+{points} pikë — mirë se erdhe!",
+  "@eventsJoinPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsLeftEcoAction": "U largove nga ky aksion ekologjik.",
+  "eventsCheckInPointsEarned": "+{points} pikë — u regjistrove!",
+  "@eventsCheckInPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsManualCheckInWithPoints": "{name} u regjistrua · +{points} pikë për ta",
+  "@eventsManualCheckInWithPoints": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "points": { "type": "int" }
+    }
+  },
+  "eventsJoinFirstForReminders": "Së pari bashkohu me ngjarjen për të vendosur rikujtues.",
+  "eventsReminderDisabled": "Rikujtuesi u fik.",
+  "eventsReminderSheetTitle": "Zgjidh kohën e rikujtuesit",
+  "eventsReminderSheetSubtitle": "Ngjarja fillon në {timeRange} më {date}.",
+  "eventsReminderPreset1Day": "1 ditë para",
+  "eventsReminderPreset3Hours": "3 orë para",
+  "eventsReminderPreset1Hour": "1 orë para",
+  "eventsReminderPreset30Mins": "30 minuta para",
+  "eventsReminderUnavailableSubtitle": "Jo e disponueshme për këtë orar ngjarjeje",
+  "eventsReminderCustomTitle": "Datë dhe orë të personalizuara",
+  "eventsReminderCustomSubtitle": "Zgjidh një moment specifik për rikujtuesin",
+  "eventsReminderPickTitle": "Zgjidh rikujtuesin",
+  "eventsReminderDone": "Gati",
+  "eventsCardParticipantsMore": "+{count} të tjerë",
+  "eventsCardParticipantsCountMax": "{count} / {max}",
+  "eventsCardParticipantsJoined": "{count} të bashkuar",
+  "eventsDetailSemanticsLabel": "Detaje ngjarjeje: {title}",
+  "eventsCountdownBadgeSemantic": "Kohë deri në fillim të ngjarjes: {label}",
+  "eventsEvidenceThumbnailMenuTitle": "Foto",
+  "eventsFeedRefreshFailed": "Nuk mund të rifreskojmë ngjarjet.",
+  "eventsCreateGenericError": "Nuk mund të krijojmë ngjarjen. Provo përsëri.",
   "qrScannerPointCameraHint": "Drejto kamerën te kodi QR i organizatorit",
   "qrScannerEnterManually": "Nuk skanon? Shkruaje kodin manualisht",
   "qrScannerRetryCamera": "Provo përsëri kamerën",
@@ -1035,11 +1359,15 @@
   "qrScannerHintCameraBlocked": "Nëse kamera mbetet e bllokuar, ngjit kodin manualisht ose aktivizo kamerën te Cilësimet.",
   "qrScannerGenericEventTitle": "ky pastrim",
   "qrScannerErrorInvalidFormat": "Format i pavlefshëm i QR.",
+  "qrScannerErrorInvalidQr": "Ky QR nuk vlen për regjistrim.",
   "qrScannerErrorWrongEvent": "Ky QR i përket një ngjarje tjetër.",
   "qrScannerErrorSessionClosed": "Organizatori e ndali regjistrimin.",
   "qrScannerErrorSessionExpired": "QR skadoi. Kërko një kod të ri te organizatori.",
   "qrScannerErrorReplayDetected": "Ky QR është përdorur tashmë.",
   "qrScannerErrorAlreadyCheckedIn": "Je regjistruar tashmë.",
+  "qrScannerErrorRequiresJoin": "Bashkohu me këtë ngjarje në aplikacion para se të regjistrohesh.",
+  "qrScannerErrorCheckInUnavailable": "Regjistrimi nuk është i hapur për këtë ngjarje tani.",
+  "qrScannerErrorRateLimited": "Shumë përpjekje. Prit pak dhe provo përsëri.",
   "qrScannerCameraUnavailableFeedback": "Kamera nuk është e disponueshme. Mund të ngjisësh kodin e organizatorit ose të riaktivizosh kamerën te Cilësimet.",
   "qrScannerManualEntryTitle": "Shkruaje kodin manualisht",
   "qrScannerPasteOrganizerQrHint": "Ngjit tekstin e QR të organizatorit",
@@ -1064,6 +1392,11 @@
   },
   "qrScannerDone": "U krye",
   "qrScannerAppBarTitle": "Skano për t'u regjistruar",
+  "qrScannerCameraStarting": "Po niset kamera…",
+  "qrScannerCheckingIn": "Po verifikohet regjistrimi…",
+  "qrScannerCameraErrorTitle": "Kamera jo e disponueshme",
+  "qrScannerManualEntrySubtitle": "Ngjit të gjithë tekstin që ndau organizatori (kopjo nga ekrani ose mesazhi i tyre).",
+  "qrScannerPasteButton": "Ngjit",
   "qrScannerToggleFlashlightSemantic": "Ndërro dritën e kamerës",
   "siteReportReasonFakeLabel": "Të dhëna të rreme ose mashtruese",
   "siteReportReasonFakeSubtitle": "Informacioni nuk pasqyron realitetin",
@@ -1155,6 +1488,197 @@
   "reportListEmptyTitle": "Ende pa raporte",
   "reportListEmptySubtitle": "Raportet e tua do të shfaqen këtu pasi t’i dërgosh.",
   "appSmartImageUnavailable": "Imazhi nuk është i disponueshëm",
+  "eventsReminderSectionTitle": "Kujtues për ngjarjen",
+  "eventsReminderSectionEnabled": "Kujtuesi është aktiv",
+  "eventsReminderSectionSetFor": "Vendosur për {time}",
+  "@eventsReminderSectionSetFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsReminderSectionDisabled": "Njoftohu para se të fillojë ngjarja",
+  "eventsReminderSectionDisable": "Çaktivizo",
+  "eventsReminderSectionEnable": "Aktivizo",
+  "eventsDescriptionTitle": "Rreth ngjarjes",
+  "eventsDescriptionShowLess": "Shfaq më pak",
+  "eventsDescriptionReadMore": "Lexo më shumë",
+  "eventsAfterCleanupTitle": "Pas pastrimit",
+  "eventsAfterPhotoSemantic": "Shfaq foton pas pastrimit {index} nga {total}",
+  "@eventsAfterPhotoSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsFilterAll": "Të gjitha",
+  "eventsFilterUpcoming": "Në pritje",
+  "eventsFilterNearby": "Afër",
+  "eventsFilterPast": "Të kaluara",
+  "eventsFilterMyEvents": "Ngjarjet e mia",
+  "eventsFilterSemanticPrefix": "Ngjarje",
+  "eventsParticipantsTitle": "Pjesëmarrësit",
+  "eventsParticipantsViewSemantic": "Shfaq {count} pjesëmarrës",
+  "@eventsParticipantsViewSemantic": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsYouAndOthers": "Ti dhe edhe {count} të tjerë u bashkuat",
+  "@eventsParticipantsYouAndOthers": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsVolunteersJoined": "{count} vullnetarë u bashkuan",
+  "@eventsParticipantsVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSpotsLeft": "{count} vende të lira",
+  "@eventsParticipantsSpotsLeft": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsCheckedInCount": "{checkedIn} nga {total} të regjistruar",
+  "@eventsParticipantsCheckedInCount": {
+    "placeholders": {
+      "checkedIn": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSearchPlaceholder": "Kërko pjesëmarrës",
+  "eventsParticipantsNoSearchResults": "Nuk ka përputhje me kërkimin.",
+  "eventsParticipantsYouOrganizer": "Ti · Organizator",
+  "eventsParticipantsOrganizer": "Organizator",
+  "eventsParticipantsYou": "Ti",
+  "eventsParticipantsLoadFailed": "Nuk u ngarkua lista e pjesëmarrësve. Kontrollo lidhjen dhe provo përsëri.",
+  "eventsParticipantsRetry": "Provo përsëri",
+  "eventsParticipantsViewRosterSemantic": "Shfaq listën e pjesëmarrësve",
+  "eventsGearSectionTitle": "Pajisje për t'u marrë me vete",
+  "eventsGearNoneNeeded": "Nuk nevojitet pajisje e veçantë",
+  "eventsImpactSummaryTitle": "Përmbledhje e ndikimit",
+  "eventsImpactSummaryAdd": "Shto",
+  "eventsImpactSummaryEdit": "Ndrysho",
+  "eventsImpactSummaryEmptyHint": "Regjistroni rezultatet, përpjekjen dhe mësimet nga pastrimi.",
+  "eventsImpactBadgeRating": "{rating}★ vlerësim",
+  "eventsImpactBadgeBags": "{count} thesa",
+  "eventsImpactBadgeHours": "{hours}orë",
+  "eventsImpactEstimatedLine": "{kg} kg hequr · {co2} kg CO2e të shmangura",
+  "eventsLocationSiteSemantic": "Shfaq vendndodhjen e ndotjes, {distanceKm} km larg",
+  "eventsLocationDotKm": "· {distanceKm} km",
+  "eventsEmptyAllTitle": "Ende nuk ka ngjarje mjedisore",
+  "eventsEmptyAllSubtitle": "Bëhu i pari që krijon një! Prek + sipër për të filluar.",
+  "eventsEmptyUpcomingTitle": "Nuk ka ngjarje të ardhshme",
+  "eventsEmptyUpcomingSubtitle": "Krijo një për të mbledhur vullnetarët.",
+  "eventsEmptyNearbyTitle": "Nuk ka ngjarje afër",
+  "eventsEmptyNearbySubtitle": "Provo një filtër tjetër ose krijo një ngjarje në zonën tënde.",
+  "eventsEmptyPastTitle": "Nuk ka ngjarje të kaluara",
+  "eventsEmptyPastSubtitle": "Ngjarjet e përfunduara do të shfaqen këtu.",
+  "eventsEmptyMyEventsTitle": "Ende nuk ka ngjarje",
+  "eventsEmptyMyEventsSubtitle": "Bashkohu ose krijo një ngjarje për ta parë këtu.",
+  "eventsSearchEmptyTitle": "Nuk ka rezultate për \"{query}\"",
+  "eventsSearchEmptySubtitle": "Provo një fjalë tjetër kërkimi ose kontrollo drejtshkrimin.",
+  "eventsSitePickerTitle": "Zgjidh vendndodhjen",
+  "eventsSitePickerSubtitle": "Lidhe këtë ngjarje me një vend pastrimi.",
+  "eventsSitePickerSearchPlaceholder": "Kërko sipas emrit ose përshkrimit",
+  "eventsSitePickerNoMatch": "Nuk ka vende që përputhen me \"{query}\"",
+  "eventsSitePickerRowKmDesc": "{km} km larg · {desc}",
+  "eventsSuccessDialogTitle": "Ngjarja u krijua",
+  "eventsSuccessDialogBody": "{title} në {siteName} është gati. Ndaje me komunitetin për të mbledhur vullnetarë.",
+  "eventsSuccessDialogOpenEvent": "Hap ngjarjen",
+  "eventsTimePickerSelectTime": "Zgjidh orën",
+  "eventsTimePickerConfirm": "Konfirmo",
+  "eventsTimePickerFrom": "Nga",
+  "eventsTimePickerTo": "Deri",
+  "eventsTimePickerTimeBlockSemantic": "{role}, {time}",
+  "@eventsTimePickerTimeBlockSemantic": {
+    "placeholders": {
+      "role": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+  "eventsFeedRecentSearches": "Kërkimet e fundit",
+  "eventsCleanupAfterUploadSemantic": "Ngarko foto pas pastrimit",
+  "eventsCleanupAfterViewFullscreenSemantic": "Shfaq foton në ekran të plotë",
+  "eventsCleanupAfterUploadMoreTitle": "Ngarko më shumë foto",
+  "eventsCleanupAfterUploadedCount": "{count} të ngarkuara",
+  "eventsCleanupAfterSlotsRemaining": "{count, plural, one{Edhe 1 vend i lirë} other{Edhe {count} vende të lira}}",
+  "eventsCleanupAfterAddMoreSemantic": "Shto më shumë foto",
+  "eventsCleanupAfterRemoveSemantic": "Hiq foton",
+  "eventsCleanupAfterEmptyTitle": "Shto foto të vendit të pastruar",
+  "eventsCleanupAfterEmptyMaxPhotos": "Deri në {max} foto",
+  "eventsCleanupAfterEmptyTapGallery": "Prek për të zgjedhur nga galeria",
+  "eventsCleanupEvidencePhotoSemantic": "Foto e provës së pastrimit",
+  "eventsDateRelativeEarlierToday": "Më herët sot",
+  "eventsDateRelativeDaysAgo": "{days} ditë më parë",
+  "@eventsDateRelativeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateRelativeToday": "Sot",
+  "eventsDateRelativeTomorrow": "Nesër",
+  "eventsDateRelativeInDays": "Pas {days} ditësh",
+  "@eventsDateRelativeInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateInfoSheetTitle": "Data dhe ora",
+  "eventsDateInfoSemantic": "{date}, {timeRange}",
+  "@eventsDateInfoSemantic": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "timeRange": { "type": "String" }
+    }
+  },
+  "eventsCategorySheetTitle": "Kategoria",
+  "eventsCategorySemantic": "Kategoria e ngjarjes: {label}",
+  "@eventsCategorySemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "eventsOrganizerSheetTitle": "Organizatori",
+  "eventsOrganizerYouOwnThis": "Kjo është ngjarja jote",
+  "eventsOrganizerRoleLabel": "Organizator i ngjarjes",
+  "eventsOrganizerCreatedOn": "Ngjarja u krijua më {day}/{month}/{year}",
+  "@eventsOrganizerCreatedOn": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "month": { "type": "int" },
+      "year": { "type": "int" }
+    }
+  },
+  "eventsOrganizerSemantic": "Organizatori: {name}",
+  "@eventsOrganizerSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventsOrganizedByLabel": "Organizuar nga",
+  "eventsFeedSemantic": "Lista e ngjarjeve",
+  "eventsFeedTitle": "Ngjarje",
+  "eventsFeedCreateSemantic": "Krijo ngjarje",
+  "eventsFeedSearchPlaceholder": "Kërko ngjarje",
+  "eventsFeedHappeningNow": "Në zhvillim",
+  "eventsFeedComingUp": "Në vijim",
+  "eventsFeedRecentlyCompleted": "Përfunduar së fundmi",
+  "eventsFeedViewListToggle": "Pamje listë",
+  "eventsFeedViewCalendarToggle": "Pamje kalendar",
+  "eventsCalendarPreviousMonth": "Muaji i kaluar",
+  "eventsCalendarNextMonth": "Muaji tjetër",
+  "eventsCalendarDaySemantic": "Dita {day}",
+  "@eventsCalendarDaySemantic": {
+    "placeholders": {
+      "day": { "type": "int" }
+    }
+  },
+  "eventsCalendarNoEventsThisDay": "Nuk ka ngjarje këtë ditë",
   "siteCardPollutionSiteSemantic": "Vend i ndotur: {title}. Prek për detaje.",
   "@siteCardPollutionSiteSemantic": {
     "placeholders": {
@@ -1170,5 +1694,313 @@
         "type": "String"
       }
     }
-  }
+  },
+  "eventsFilterSheetTitle": "Filtro ngjarjet",
+  "eventsFilterSheetCategory": "Kategoria",
+  "eventsFilterSheetStatus": "Statusi",
+  "eventsFilterSheetDateRange": "Periudha e datës",
+  "eventsFilterSheetDateFrom": "Nga",
+  "eventsFilterSheetDateTo": "Deri",
+  "eventsFilterSheetShowResults": "Shfaq rezultatet",
+  "eventsFilterSheetClearAll": "Fshi të gjitha",
+  "eventsFilterSheetActiveCount": "{count} aktive",
+  "@eventsFilterSheetActiveCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardTitle": "Ngjarjet e mia",
+  "eventsOrganizerDashboardEmpty": "Nuk keni organizuar asnjë ngjarje ende.",
+  "eventsOrganizerDashboardEmptyAction": "Krijo ngjarjen e parë",
+  "eventsOrganizerDashboardSectionUpcoming": "Të ardhshme",
+  "eventsOrganizerDashboardSectionInProgress": "Në progres",
+  "eventsOrganizerDashboardSectionCompleted": "Të përfunduara",
+  "eventsOrganizerDashboardSectionCancelled": "Të anuluara",
+  "eventsOrganizerDashboardParticipants": "{count}/{max} pjesëmarrës",
+  "@eventsOrganizerDashboardParticipants": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "max": { "type": "String" }
+    }
+  },
+  "eventsOrganizerDashboardParticipantsUnlimited": "{count} pjesëmarrës",
+  "@eventsOrganizerDashboardParticipantsUnlimited": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardEvidenceAction": "Provat",
+  "eventsAnalyticsTitle": "Analitika",
+  "eventsAnalyticsAttendanceRate": "Shkalla e prezencës",
+  "eventsAnalyticsJoiners": "Pjesëmarrësit me kalimin e kohës",
+  "eventsAnalyticsCheckInsByHour": "Regjistrimet sipas orës",
+  "eventsAnalyticsNoData": "Nuk ka të dhëna ende",
+  "eventsOfflineSyncQueued": "Ruajtur. Do të sinkronizohet kur të lidheni.",
+  "eventsOfflineSyncFailed": "Sinkronizimi dështoi. Do të provohet automatikisht.",
+  "eventsWeatherForecast": "Parashikimi i motit",
+  "eventsWeatherLoadFailed": "Moti nuk është i disponueshëm",
+  "eventsWeatherPrecipitationMm": "{amount} mm reshje",
+  "@eventsWeatherPrecipitationMm": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "eventsWeatherNoPrecipitation": "Pa reshje të matshme",
+  "eventsWeatherPrecipChance": "{percent}% mundësi reshjeje",
+  "@eventsWeatherPrecipChance": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "eventsWeatherIndicativeNote": "Parashikim orientues nga Open-Meteo; kushtet reale mund të ndryshojnë.",
+  "eventsWeatherIndicativeInfoTitle": "Rreth parashikimit",
+  "eventsWeatherIndicativeInfoSemantic": "Informacion mbi burimin e parashikimit të motit",
+  "eventsRecurrenceNone": "Nuk përsëritet",
+  "eventsRecurrenceWeekly": "Çdo javë",
+  "eventsRecurrenceBiweekly": "Çdo 2 javë",
+  "eventsRecurrenceMonthly": "Çdo muaj",
+  "eventsRecurrenceOccurrences": "{count} ndodhje",
+  "@eventsRecurrenceOccurrences": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsRecurrencePartOfSeries": "Pjesë e serisë",
+  "eventsRecurrenceSeriesLabel": "Ngjarje {index} nga {total}",
+  "@eventsRecurrenceSeriesLabel": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsRecurrenceDone": "Në rregull",
+  "eventsCategoryGeneralCleanup": "Pastrim i përgjithshëm",
+  "eventsCategoryGeneralCleanupDescription": "Mbledhje mbeturinash, fshesë dhe rikthim i zonës në rregull.",
+  "eventsCategoryRiverAndLake": "Pastrim lumenjsh dhe liqenesh",
+  "eventsCategoryRiverAndLakeDescription": "Heqje mbeturinash nga uji, brigjet dhe kanalet.",
+  "eventsCategoryTreeAndGreen": "Mbjellje pemësh dhe gjelbërim",
+  "eventsCategoryTreeAndGreenDescription": "Mbjellje pemësh, rikthim hapësirash të gjelbra dhe kopshte.",
+  "eventsCategoryRecyclingDrive": "Fushatë riciklimi",
+  "eventsCategoryRecyclingDriveDescription": "Ndaj, mblidh dhe transporto riciklim në përpunim.",
+  "eventsCategoryHazardousRemoval": "Heqje mbeturinash të rrezikshme",
+  "eventsCategoryHazardousRemovalDescription": "Mbledhje e sigurt e kimikateve, gomave, baterive ose azbestit.",
+  "eventsCategoryAwarenessAndEducation": "Ndërgjegjësim dhe edukim",
+  "eventsCategoryAwarenessAndEducationDescription": "Workshop-e, biseda ose angazhim komuniteti mbi praktika ekologjike.",
+  "eventsCategoryOther": "Tjetër",
+  "eventsCategoryOtherDescription": "Ngjarje e personalizuar që nuk përputhet me kategoritë e mësipërme.",
+  "eventsGearTrashBags": "Thesa mbeturinash",
+  "eventsGearGloves": "Doreza",
+  "eventsGearRakes": "Kratre dhe lopata",
+  "eventsGearWheelbarrow": "Karrocë",
+  "eventsGearWaterBoots": "Çizme uji",
+  "eventsGearSafetyVest": "Jelek reflektues",
+  "eventsGearFirstAid": "Kit i ndihmës së parë",
+  "eventsGearSunscreen": "Krem dielli dhe ujë",
+  "eventsScaleSmall": "E vogël (1–5 vetë)",
+  "eventsScaleSmallDescription": "Pastrim i shpejtë në një vend, një ose dy thesa.",
+  "eventsScaleMedium": "E mesme (6–15 vetë)",
+  "eventsScaleMediumDescription": "Përpjekje gjysmë-ditore, disa zona.",
+  "eventsScaleLarge": "E madhe (16–40 vetë)",
+  "eventsScaleLargeDescription": "Grup i organizuar, mbeturina të rënda.",
+  "eventsScaleMassive": "Masive (40+ vetë)",
+  "eventsScaleMassiveDescription": "Aksion në shkallë qyteti ose shumë vendndodhje.",
+  "eventsDifficultyEasy": "E lehtë",
+  "eventsDifficultyEasyDescription": "Terren i sheshtë, pak mbeturina, miqësore për familje.",
+  "eventsDifficultyModerate": "E mesme",
+  "eventsDifficultyModerateDescription": "Terren i përzier ose objekte të mëdha, pak më shumë përpjekje.",
+  "eventsDifficultyHard": "E vështirë",
+  "eventsDifficultyHardDescription": "Përrua të pjerrëta, mbeturina të rënda ose materiale të rrezikshme.",
+  "eventsSiteCoercedDescription": "Vend i pastrimit komunitar",
+  "homeSiteCleaningEmptyTitle": "Ende nuk ka ngjarje pastrimi",
+  "homeSiteCleaningEmptyBody": "Jini i pari që organizoni një veprim ekologjik dhe mblidhni vullnetarë për këtë vend.",
+  "homeSiteCleaningTapToCreate": "Prekni për të krijuar",
+  "homeSiteCleaningCtaCreateFirst": "Krijo veprim ekologjik",
+  "homeSiteCleaningCtaScheduleAnother": "Planifiko një veprim tjetër",
+  "homeSiteCleaningVolunteersJoined": "{count, plural, one{1 vullnetar u bashkua} other{{count} vullnetarë u bashkuan}}",
+  "@homeSiteCleaningVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeSiteCleaningOrganizerHint": "Ju e organizoni këtë veprim. Ngarkoni foto \"pas\" sapo të përfundojë.",
+  "homeSiteCleaningVolunteerHint": "Bashkohuni me veprimin për të ndihmuar në pastrimin e këtij vendi.",
+  "homeSiteCleaningJoinAction": "Bashkohu",
+  "homeSiteCleaningEventUnavailable": "Detajet e ngjarjes nuk janë të disponueshme për momentin.",
+  "errorUserNetwork": "Kontrolloni lidhjen dhe provoni përsëri.",
+  "errorUserTimeout": "Zgjati shumë. Provoni përsëri.",
+  "errorUserUnauthorized": "Hyni përsëri për të vazhduar.",
+  "errorUserForbidden": "Nuk keni leje për këtë veprim.",
+  "errorUserNotFound": "Nuk e gjetëm.",
+  "errorUserServer": "Shërbimi është i ngarkuar. Provoni së shpejti.",
+  "errorUserTooManyRequests": "Shumë përpjekje. Prisni pak.",
+  "errorUserUnknown": "Diçka shkoi keq. Provoni përsëri.",
+  "eventsFilterSheetSemantic": "Filtro ngjarjet",
+  "eventChatTitle": "Biseda",
+  "eventChatRowTitle": "Bisedë në grup",
+  "eventChatInputHint": "Mesazh",
+  "eventChatSend": "Dërgo",
+  "eventChatEmptyTitle": "Filloni bisedën",
+  "eventChatEmptyBody": "Koordinohuni me vullnetarët e tjerë para dhe gjatë ngjarjes.",
+  "eventChatMessageRemoved": "Ky mesazh u hoq",
+  "eventChatNewMessages": "Mesazhe të reja",
+  "eventChatToday": "Sot",
+  "eventChatYesterday": "Dje",
+  "eventChatReply": "Përgjigju",
+  "eventChatDelete": "Fshi",
+  "eventChatLoadError": "Nuk u ngarkuan mesazhet",
+  "eventChatSendFailed": "Mesazhi nuk u dërgua. Prekni për të riprovuar.",
+  "eventChatAttachPhotoLibrary": "Biblioteka e fotove",
+  "eventChatAttachCamera": "Kamera",
+  "eventChatAttachVideo": "Video",
+  "eventChatAttachDocument": "Dokument",
+  "eventChatAttachAudio": "Audio",
+  "eventChatVoiceDiscard": "Hidh regjistrimin",
+  "eventChatVoiceSend": "Dërgo mesazh zanor",
+  "eventChatVoicePreviewHint": "Parapamje zanore",
+  "eventChatAttachLocation": "Ndaj vendndodhjen",
+  "eventChatSendLocation": "Dërgo vendndodhjen",
+  "eventChatSending": "Po dërgohet…",
+  "eventChatReplyingTo": "Duke iu përgjigjur {name}",
+  "@eventChatReplyingTo": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatCharCountHint": "{count} / 2000",
+  "@eventChatCharCountHint": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatSemanticsBubble": "{author}, {time}. {body}",
+  "@eventChatSemanticsBubble": {
+    "placeholders": {
+      "author": { "type": "String" },
+      "time": { "type": "String" },
+      "body": { "type": "String" }
+    }
+  },
+  "eventChatInputSemantics": "Mesazh në bisedë",
+  "eventChatPushChannelName": "Bisedë e ngjarjes",
+  "eventChatEdited": "(e redaktuar)",
+  "eventChatEditMessage": "Redakto",
+  "eventChatEditing": "Duke redaktuar mesazhin",
+  "eventChatEditHint": "Redaktoni mesazhin tuaj",
+  "eventChatSaveEdit": "Ruaj",
+  "eventChatPinMessage": "Fikso",
+  "eventChatUnpinMessage": "Hiq fiksimin",
+  "eventChatPinnedBy": "Fiksuar nga {name}",
+  "@eventChatPinnedBy": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatPinnedMessagesTitle": "Mesazhe të fiksuar",
+  "eventChatPinnedBarHint": "Fiksuar",
+  "eventChatNoPinnedMessages": "Nuk ka mesazhe të fiksuar",
+  "eventChatMuted": "Njoftimet janë çaktivizuar",
+  "eventChatUnmuted": "Njoftimet janë aktivizuar",
+  "eventChatCopied": "Mesazhi u kopjua",
+  "eventChatReconnecting": "Duke u rilidhur…",
+  "eventChatConnected": "I lidhur",
+  "eventChatSearchHint": "Kërko mesazhe",
+  "eventChatSearchNoResults": "Nuk u gjetën mesazhe",
+  "eventChatSearchAction": "Kërko",
+  "eventChatParticipantsCount": "{count} pjesëmarrës",
+  "@eventChatParticipantsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsSheetTitle": "Persona në këtë bisedë",
+  "eventChatParticipantsTitleSemantic": "{eventTitle}, {count} pjesëmarrës",
+  "@eventChatParticipantsTitleSemantic": {
+    "placeholders": {
+      "eventTitle": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsLoadError": "Nuk u ngarkuan pjesëmarrësit.",
+  "eventChatParticipantsYouBadge": "Ju",
+  "eventChatParticipantsEmpty": "Ende nuk ka pjesëmarrës të ngarkuar.",
+  "eventChatSystemUserJoined": "{name} u bashkua me ngjarjen",
+  "@eventChatSystemUserJoined": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemUserLeft": "{name} e la ngjarjen",
+  "@eventChatSystemUserLeft": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemEventUpdated": "Detajet e ngjarjes u përditësuan",
+  "eventChatSwipeReplySemantic": "Rrëshqit për t’iu përgjigjur mesazhit",
+  "eventChatVoiceLevelSemantic": "Niveli i zërit",
+  "eventChatMessageOptions": "Opsionet e mesazhit",
+  "eventChatTypingUnknownParticipant": "Dikush",
+  "eventChatCopy": "Kopjo",
+  "eventChatUnpinConfirm": "Mesazhi u hoq nga fiksimet",
+  "eventChatMaxPinnedReached": "U arrit numri maksimal i mesazheve të fiksuar",
+  "eventChatMessageNotInView": "Ky mesazh nuk është ngarkuar. Rrëshqitni lart për mesazhe më të vjetra.",
+  "eventChatMuteNotifications": "Çaktivizo njoftimet",
+  "eventChatUnmuteNotifications": "Aktivizo njoftimet",
+  "eventChatSeenBy": "Parë nga {names}",
+  "@eventChatSeenBy": {
+    "placeholders": {
+      "names": { "type": "String" }
+    }
+  },
+  "eventChatSeenByTruncated": "Parë nga {names} +{count}",
+  "@eventChatSeenByTruncated": {
+    "placeholders": {
+      "names": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatTypingOne": "{name} po shkruan…",
+  "@eventChatTypingOne": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatTypingTwo": "{first} dhe {second} po shkruajnë…",
+  "@eventChatTypingTwo": {
+    "placeholders": {
+      "first": { "type": "String" },
+      "second": { "type": "String" }
+    }
+  },
+  "eventChatTypingMany": "{name} dhe {count} të tjerë po shkruajnë…",
+  "@eventChatTypingMany": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatImageViewerTitle": "Foto",
+  "eventChatImageViewerPage": "{current} nga {total}",
+  "@eventChatImageViewerPage": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventChatVideoViewerTitle": "Video",
+  "eventChatOpenFile": "Hap skedarin",
+  "eventChatDownloadFailed": "Shkarkimi i skedarit dështoi",
+  "eventChatPdfOpenFailed": "Nuk mund të hapet PDF-ja",
+  "eventChatShareFile": "Ndaj",
+  "eventChatLocationMapTitle": "Vendndodhja",
+  "eventChatCopyCoordinates": "Kopjo koordinatat",
+  "eventChatDirections": "Drejtime",
+  "eventChatAudioExpandedTitle": "Mesazh zanor",
+  "eventChatHoldToRecord": "Mbaj shtypur për të regjistruar",
+  "eventChatReleaseToSend": "Lësho për të dërguar",
+  "eventChatSlideToCancel": "Tërhiqe majtas për të anuluar",
+  "eventChatReleaseToCancel": "Lësho për të anuluar",
+  "eventChatRecording": "Duke regjistruar…",
+  "eventChatMicPermissionDenied": "Nevojitet qasja në mikrofon për mesazhet zanore.",
+  "eventChatOpenMapsFailed": "Nuk mund të hapja Hartat. Provo përsëri."
 }
