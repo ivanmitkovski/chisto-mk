@@ -24,7 +24,10 @@ export class PointHistoryItemDto {
   @ApiProperty({ description: 'Points change (positive for awards)' })
   delta!: number;
 
-  @ApiProperty({ description: 'Machine reason (e.g. FIRST_REPORT, ECO_ACTION_APPROVED)' })
+  @ApiProperty({
+    description:
+      'Machine reason (e.g. FIRST_REPORT, EVENT_JOINED, EVENT_CHECK_IN, EVENT_COMPLETED, EVENT_ORGANIZER_APPROVED)',
+  })
   reasonCode!: string;
 
   @ApiPropertyOptional({ nullable: true })

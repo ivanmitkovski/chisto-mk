@@ -1,8 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CleanupEventStatus, Prisma } from '../prisma-client';
+import { CleanupEventStatus, EcoEventLifecycleStatus, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
+import {
+  POINTS_EVENT_ORGANIZER_APPROVED,
+  REASON_EVENT_ORGANIZER_APPROVED,
+} from '../gamification/gamification.constants';
+import { EcoEventPointsService } from '../gamification/eco-event-points.service';
 import { CreateCleanupEventDto } from './dto/create-cleanup-event.dto';
 import { PatchCleanupEventDto } from './dto/patch-cleanup-event.dto';
 import { ListCleanupEventsQueryDto } from './dto/list-cleanup-events-query.dto';
@@ -12,6 +17,7 @@ export class CleanupEventsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
+    private readonly ecoEventPoints: EcoEventPointsService,
   ) {}
 
   async list(query: ListCleanupEventsQueryDto) {
@@ -21,9 +27,11 @@ export class CleanupEventsService {
 
     const where: Prisma.CleanupEventWhereInput = {};
     if (query.status === 'upcoming') {
-      where.completedAt = { equals: null };
+      where.lifecycleStatus = {
+        in: [EcoEventLifecycleStatus.UPCOMING, EcoEventLifecycleStatus.IN_PROGRESS],
+      };
     } else if (query.status === 'completed') {
-      where.completedAt = { not: null };
+      where.lifecycleStatus = EcoEventLifecycleStatus.COMPLETED;
     }
     if (query.moderationStatus) {
       where.status = query.moderationStatus as CleanupEventStatus;
@@ -53,12 +61,16 @@ export class CleanupEventsService {
     return {
       data: rows.map((e) => ({
         id: e.id,
+        title: e.title,
+        description: e.description,
         siteId: e.siteId,
         scheduledAt: e.scheduledAt.toISOString(),
         completedAt: e.completedAt?.toISOString() ?? null,
         organizerId: e.organizerId,
         participantCount: e.participantCount,
         status: e.status,
+        lifecycleStatus: e.lifecycleStatus,
+        recurrenceRule: e.recurrenceRule ?? null,
         site: e.site,
       })),
       meta: { page, limit, total },
@@ -80,12 +92,16 @@ export class CleanupEventsService {
     }
     return {
       id: e.id,
+      title: e.title,
+      description: e.description,
       siteId: e.siteId,
       scheduledAt: e.scheduledAt.toISOString(),
       completedAt: e.completedAt?.toISOString() ?? null,
       organizerId: e.organizerId,
       participantCount: e.participantCount,
       status: e.status,
+      lifecycleStatus: e.lifecycleStatus,
+      recurrenceRule: e.recurrenceRule ?? null,
       site: e.site,
     };
   }
@@ -100,14 +116,27 @@ export class CleanupEventsService {
     }
 
     const status = dto.status ?? CleanupEventStatus.APPROVED;
+    const completedAt = dto.completedAt ? new Date(dto.completedAt) : null;
+    const lifecycleStatus =
+      completedAt != null ? EcoEventLifecycleStatus.COMPLETED : EcoEventLifecycleStatus.UPCOMING;
+    const title = dto.title?.trim() || 'Cleanup event';
+    const description = dto.description?.trim() ?? '';
+    const recurrenceRule =
+      dto.recurrenceRule != null && dto.recurrenceRule.trim() !== ''
+        ? dto.recurrenceRule.trim()
+        : null;
     const e = await this.prisma.cleanupEvent.create({
       data: {
         siteId: dto.siteId,
         scheduledAt: new Date(dto.scheduledAt),
-        completedAt: dto.completedAt ? new Date(dto.completedAt) : null,
+        completedAt,
+        title,
+        description,
         organizerId: dto.organizerId ?? null,
         participantCount: dto.participantCount ?? 0,
         status, // Default APPROVED for admin, PENDING when status explicitly passed (e.g. user-created)
+        lifecycleStatus,
+        recurrenceRule,
       },
     });
 
@@ -131,11 +160,24 @@ export class CleanupEventsService {
     }
 
     const data: {
+      title?: string;
+      description?: string;
+      recurrenceRule?: string | null;
       scheduledAt?: Date;
       completedAt?: Date | null;
       participantCount?: number;
       status?: CleanupEventStatus;
     } = {};
+    if (dto.title != null) {
+      data.title = dto.title.trim() || 'Cleanup event';
+    }
+    if (dto.description != null) {
+      data.description = dto.description.trim();
+    }
+    if (dto.recurrenceRule !== undefined) {
+      const t = dto.recurrenceRule.trim();
+      data.recurrenceRule = t.length > 0 ? t : null;
+    }
     if (dto.scheduledAt != null) {
       data.scheduledAt = new Date(dto.scheduledAt);
     }
@@ -155,9 +197,20 @@ export class CleanupEventsService {
       data.status = dto.status;
     }
 
-    await this.prisma.cleanupEvent.update({
-      where: { id },
-      data,
+    await this.prisma.$transaction(async (tx) => {
+      await tx.cleanupEvent.update({
+        where: { id },
+        data,
+      });
+      if (data.status === CleanupEventStatus.APPROVED && existing.organizerId != null) {
+        await this.ecoEventPoints.creditIfNew(tx, {
+          userId: existing.organizerId,
+          delta: POINTS_EVENT_ORGANIZER_APPROVED,
+          reasonCode: REASON_EVENT_ORGANIZER_APPROVED,
+          referenceType: 'CleanupEvent',
+          referenceId: id,
+        });
+      }
     });
 
     const auditAction =
