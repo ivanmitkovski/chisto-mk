@@ -1,6 +1,8 @@
 # Dependencies
 node_modules/
 .pnpm-store/
+# Monorepo uses pnpm; npm in apps/api must not add a second lockfile
+apps/api/package-lock.json
 
 # Build outputs
 dist/
