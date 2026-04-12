@@ -22,7 +22,7 @@ class AppPillFilterChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 38,
+      height: 44,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -49,9 +49,10 @@ class AppPillFilterChips extends StatelessWidget {
                 child: AnimatedContainer(
                   duration: AppMotion.fast,
                   curve: AppMotion.emphasized,
+                  alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
-                    vertical: AppSpacing.radiusSm,
+                    vertical: AppSpacing.sm,
                   ),
                   decoration: BoxDecoration(
                     color: isActive

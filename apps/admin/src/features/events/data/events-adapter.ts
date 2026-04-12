@@ -3,14 +3,24 @@ import { getAdminAuthTokenFromCookies } from '@/features/auth/lib/admin-auth-ser
 
 export type CleanupEventModerationStatus = 'PENDING' | 'APPROVED' | 'DECLINED';
 
+export type EcoEventLifecycleStatusKey =
+  | 'UPCOMING'
+  | 'IN_PROGRESS'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
 export type CleanupEventRow = {
   id: string;
+  title: string;
+  description: string;
   siteId: string;
   scheduledAt: string;
   completedAt: string | null;
   organizerId: string | null;
   participantCount: number;
   status: CleanupEventModerationStatus;
+  lifecycleStatus: EcoEventLifecycleStatusKey;
+  recurrenceRule: string | null;
   site: {
     id: string;
     latitude: number;

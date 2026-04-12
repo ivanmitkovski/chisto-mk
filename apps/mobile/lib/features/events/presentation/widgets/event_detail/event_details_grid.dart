@@ -1,16 +1,28 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_panel.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class EventDetailsGrid extends StatelessWidget {
-  const EventDetailsGrid({super.key, required this.event});
+  const EventDetailsGrid({
+    super.key,
+    required this.event,
+    this.embeddedInGroupedPanel = false,
+  });
 
   final EcoEvent event;
+
+  /// When true, adds vertical inset for use inside [EventDetailGroupedPanel].
+  final bool embeddedInGroupedPanel;
 
   static void _showInfoSheet(BuildContext context, {
     required IconData icon,
@@ -21,53 +33,33 @@ class EventDetailsGrid extends StatelessWidget {
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.panelBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  width: AppSpacing.sheetHandle,
-                  height: AppSpacing.sheetHandleHeight,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                  ),
+        return ReportSheetScaffold(
+          title: title,
+          fitToContent: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                Container(
-                  width: 52, height: 52,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                  ),
-                  child: Icon(icon, size: 26, color: color),
+                child: Icon(icon, size: 26, color: color),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                description,
+                textAlign: TextAlign.center,
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textMuted,
+                  height: 1.5,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  title,
-                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacing.radiusSm),
-                Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -83,19 +75,20 @@ class EventDetailsGrid extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Row(
+    final AppLocalizations l10n = context.l10n;
+    final Widget row = Row(
       children: <Widget>[
         if (hasScale)
           Expanded(
             child: DetailChip(
               icon: Icons.groups_rounded,
-              label: event.scale!.label,
+              label: event.scale!.localizedLabel(l10n),
               color: AppColors.primaryDark,
               onTap: () => _showInfoSheet(
                 context,
                 icon: Icons.groups_rounded,
-                title: event.scale!.label,
-                description: event.scale!.description,
+                title: event.scale!.localizedLabel(l10n),
+                description: event.scale!.localizedDescription(l10n),
                 color: AppColors.primaryDark,
               ),
             ),
@@ -106,18 +99,130 @@ class EventDetailsGrid extends StatelessWidget {
           Expanded(
             child: DetailChip(
               icon: CupertinoIcons.shield_fill,
-              label: event.difficulty!.label,
+              label: event.difficulty!.localizedLabel(l10n),
               color: event.difficulty!.color,
               onTap: () => _showInfoSheet(
                 context,
                 icon: CupertinoIcons.shield_fill,
-                title: event.difficulty!.label,
-                description: event.difficulty!.description,
+                title: event.difficulty!.localizedLabel(l10n),
+                description: event.difficulty!.localizedDescription(l10n),
                 color: event.difficulty!.color,
               ),
             ),
           ),
       ],
+    );
+
+    if (embeddedInGroupedPanel) {
+      final TextTheme textTheme = Theme.of(context).textTheme;
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          if (hasScale)
+            _GroupedPanelDetailsRow(
+              icon: Icons.groups_outlined,
+              label: event.scale!.localizedLabel(l10n),
+              textTheme: textTheme,
+              onTap: () => _showInfoSheet(
+                context,
+                icon: Icons.groups_rounded,
+                title: event.scale!.localizedLabel(l10n),
+                description: event.scale!.localizedDescription(l10n),
+                color: AppColors.primaryDark,
+              ),
+            ),
+          if (hasScale && hasDifficulty)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: EventDetailGroupedPanel.innerDividerLeadingPadding,
+              ),
+              child: Divider(
+                height: 1,
+                thickness: 0.5,
+                color: AppColors.divider.withValues(alpha: 0.7),
+              ),
+            ),
+          if (hasDifficulty)
+            _GroupedPanelDetailsRow(
+              icon: Icons.shield_outlined,
+              label: event.difficulty!.localizedLabel(l10n),
+              textTheme: textTheme,
+              onTap: () => _showInfoSheet(
+                context,
+                icon: CupertinoIcons.shield_fill,
+                title: event.difficulty!.localizedLabel(l10n),
+                description: event.difficulty!.localizedDescription(l10n),
+                color: event.difficulty!.color,
+              ),
+            ),
+        ],
+      );
+    }
+    return row;
+  }
+}
+
+class _GroupedPanelDetailsRow extends StatelessWidget {
+  const _GroupedPanelDetailsRow({
+    required this.icon,
+    required this.label,
+    required this.textTheme,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final TextTheme textTheme;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: Material(
+        color: AppColors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 52),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  icon,
+                  size: AppSpacing.iconMd,
+                  color: AppColors.textSecondary,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textHeightBehavior: const TextHeightBehavior(
+                      applyHeightToFirstAscent: true,
+                      applyHeightToLastDescent: true,
+                      leadingDistribution: TextLeadingDistribution.even,
+                    ),
+                    style: textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ),
+                const Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 14,
+                  color: AppColors.textMuted,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

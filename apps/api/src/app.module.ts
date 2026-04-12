@@ -22,6 +22,9 @@ import { CleanupEventsModule } from './cleanup-events/cleanup-events.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { ObservabilityModule } from './observability/observability.module';
 import { GamificationModule } from './gamification/gamification.module';
+import { EventsModule } from './events/events.module';
+import { EventChatModule } from './event-chat/event-chat.module';
+import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 
 @Module({
   imports: [
@@ -49,8 +52,10 @@ import { GamificationModule } from './gamification/gamification.module';
     NotificationsModule,
     ObservabilityModule,
     GamificationModule,
+    EventsModule,
+    EventChatModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RedisIoAdapterLifecycle],
 })
 export class AppModule {}

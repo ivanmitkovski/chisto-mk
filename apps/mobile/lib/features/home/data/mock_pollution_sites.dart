@@ -108,6 +108,8 @@ List<PollutionSite> buildMockPollutionSites() {
       cleaningEvents: eventsForSite1,
       firstReport: report1,
       coReporterNames: <String>['green_skopje', 'nature_lover'],
+      latitude: 41.9985,
+      longitude: 21.4120,
     ),
     PollutionSite(
       id: '2',
@@ -133,6 +135,8 @@ List<PollutionSite> buildMockPollutionSites() {
         images: <ImageProvider>[image2],
       ),
       coReporterNames: <String>[],
+      latitude: 42.0040,
+      longitude: 21.4330,
     ),
     PollutionSite(
       id: '3',
@@ -158,6 +162,8 @@ List<PollutionSite> buildMockPollutionSites() {
         images: <ImageProvider>[image1, image2],
       ),
       coReporterNames: <String>['clean_crew', 'eco_jana'],
+      latitude: 41.9880,
+      longitude: 21.4480,
     ),
     PollutionSite(
       id: '4',
@@ -179,6 +185,8 @@ List<PollutionSite> buildMockPollutionSites() {
         <ImageProvider>[image2],
       ),
       coReporterNames: <String>['green_skopje'],
+      latitude: 41.9920,
+      longitude: 21.4180,
     ),
     PollutionSite(
       id: '5',
@@ -200,6 +208,8 @@ List<PollutionSite> buildMockPollutionSites() {
         <ImageProvider>[image1],
       ),
       coReporterNames: <String>[],
+      latitude: 41.9960,
+      longitude: 21.4380,
     ),
     PollutionSite(
       id: '6',
@@ -221,6 +231,8 @@ List<PollutionSite> buildMockPollutionSites() {
       imageProvider: image2,
       images: <ImageProvider>[image2, image1],
       comments: comments3,
+      latitude: 41.9820,
+      longitude: 21.4050,
     ),
     PollutionSite(
       id: '7',

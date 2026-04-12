@@ -56,14 +56,19 @@ class AppSnack {
             curve: Curves.easeOutCubic,
             reverseCurve: Curves.easeInCubic,
           );
-          return SlideTransition(
-            position: Tween<Offset>(
-              begin: const Offset(0, -0.12),
-              end: Offset.zero,
-            ).animate(curved),
-            child: FadeTransition(
-              opacity: curved,
-              child: child,
+          // Avoid hit-testing while SlideTransition/FractionalTranslation is still
+          // laying out (iOS top banner); prevents debugNeedsLayout assertions.
+          return IgnorePointer(
+            ignoring: animation.isAnimating,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, -0.12),
+                end: Offset.zero,
+              ).animate(curved),
+              child: FadeTransition(
+                opacity: curved,
+                child: child,
+              ),
             ),
           );
         },

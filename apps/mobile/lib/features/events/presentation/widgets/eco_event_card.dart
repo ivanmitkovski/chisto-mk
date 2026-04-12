@@ -9,22 +9,29 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 class EcoEventCard extends StatefulWidget {
   const EcoEventCard({
     super.key,
     required this.event,
     required this.onTap,
-    this.isHero = false,
+    /// When true, the thumbnail uses a [Hero] for transitions (off by default: unstable with
+    /// [SliverAppBar] + route replacement; see `hero_image_bar.dart`).
+    this.enableThumbnailHero = false,
     this.onJoin,
     this.onShare,
   });
 
   final EcoEvent event;
   final VoidCallback onTap;
-  final bool isHero;
+  final bool enableThumbnailHero;
   final VoidCallback? onJoin;
   final VoidCallback? onShare;
 
@@ -53,7 +60,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
         border: event.status == EcoEventStatus.inProgress
             ? Border(
                 left: BorderSide(
@@ -64,10 +71,16 @@ class _EcoEventCardState extends State<EcoEventCard> {
             : null,
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.black.withValues(alpha: _pressed ? 0.02 : 0.05),
-            blurRadius: _pressed ? 6 : 14,
-            offset: Offset(0, _pressed ? 2 : 5),
+            color: AppColors.shadowLight,
+            blurRadius: _pressed ? AppSpacing.sm : AppSpacing.md,
+            offset: Offset(0, _pressed ? 2 : 4),
           ),
+          if (!_pressed)
+            BoxShadow(
+              color: AppColors.shadowMedium,
+              blurRadius: AppSpacing.lg,
+              offset: const Offset(0, 8),
+            ),
         ],
       ),
       child: Opacity(
@@ -76,7 +89,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
           children: <Widget>[
             _Thumbnail(
               imageAsset: event.siteImageUrl,
-              heroTag: 'event-thumb-${event.id}',
+              heroTag: widget.enableThumbnailHero ? 'event-thumb-${event.id}' : null,
             ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
@@ -97,10 +110,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       Expanded(
                         child: Text(
                           event.formattedTimeRange,
-                          style: textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
-                            color: AppColors.textMuted,
-                          ),
+                          style: AppTypography.eventsListCardMeta(textTheme),
                         ),
                       ),
                       _MoreButton(
@@ -109,17 +119,30 @@ class _EcoEventCardState extends State<EcoEventCard> {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    event.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                      height: 1.2,
-                      decoration: isCancelled ? TextDecoration.lineThrough : null,
-                      decorationColor: AppColors.textMuted,
-                    ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          event.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTypography.eventsListCardTitle(textTheme).copyWith(
+                            decoration:
+                                isCancelled ? TextDecoration.lineThrough : null,
+                            decorationColor: AppColors.textMuted,
+                          ),
+                        ),
+                      ),
+                      if (event.isRecurring) ...<Widget>[
+                        const SizedBox(width: 4),
+                        const Icon(
+                          CupertinoIcons.repeat,
+                          size: 14,
+                          color: AppColors.textMuted,
+                        ),
+                      ],
+                    ],
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Row(
@@ -129,10 +152,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                           event.siteName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: textTheme.bodySmall?.copyWith(
-                            fontSize: 13,
-                            color: AppColors.textMuted,
-                          ),
+                          style: AppTypography.eventsListCardMeta(textTheme),
                         ),
                       ),
                       _DistanceBadge(km: event.siteDistanceKm),
@@ -144,6 +164,8 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       count: event.participantCount,
                       maxParticipants: event.maxParticipants,
                       organizerName: event.organizerName,
+                      organizerAvatarUrl: event.organizerAvatarUrl,
+                      organizerId: event.organizerId,
                     ),
                   ],
                   if (event.isCheckedIn) ...<Widget>[
@@ -192,7 +214,8 @@ class _EcoEventCardState extends State<EcoEventCard> {
 
     return Semantics(
       button: true,
-      label: '${event.title}, ${event.formattedDate}, ${event.status.label}',
+      label:
+          '${event.title}, ${formatEventCalendarDate(context, event.date)}, ${event.status.localizedLabel(context.l10n)}',
       child: RepaintBoundary(
         child: GestureDetector(
           onTapDown: (_) => setState(() => _pressed = true),
@@ -209,7 +232,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                   AppHaptics.softTransition();
                   widget.onTap();
                 },
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
                 child: card,
               ),
             ),
@@ -223,101 +246,63 @@ class _EcoEventCardState extends State<EcoEventCard> {
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
+      isScrollControlled: true,
       backgroundColor: AppColors.transparent,
       barrierColor: AppColors.overlay,
       builder: (BuildContext sheetCtx) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: AppColors.panelBackground,
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(AppSpacing.radiusSheet),
-            ),
-          ),
-          child: SafeArea(
-            top: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Center(
-                    child: Container(
-                      width: AppSpacing.sheetHandle,
-                      height: AppSpacing.sheetHandleHeight,
-                      decoration: BoxDecoration(
-                        color: AppColors.divider,
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusXs),
-                      ),
+        final l10n = sheetCtx.l10n;
+        return ReportSheetScaffold(
+          title: l10n.eventsCardActionsSheetTitle,
+          subtitle: event.title,
+          fitToContent: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              ReportActionTile(
+                icon: CupertinoIcons.doc_on_doc,
+                title: l10n.eventsCardCopyTitle,
+                subtitle: l10n.eventsCardCopySubtitle,
+                onTap: () {
+                  Clipboard.setData(
+                    ClipboardData(
+                      text:
+                          '${event.title}\n${formatEventCalendarDate(sheetCtx, event.date)} (${event.formattedTimeRange})\n${event.siteName}',
                     ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    'Event actions',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
-                        ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    event.title,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _EventActionTile(
-                    icon: CupertinoIcons.doc_on_doc,
-                    title: 'Copy event details',
-                    subtitle: 'Copy title, date and location',
-                    onTap: () {
-                      Clipboard.setData(
-                        ClipboardData(
-                          text:
-                              '${event.title}\n${event.formattedDate} (${event.formattedTimeRange})\n${event.siteName}',
-                        ),
-                      );
-                      Navigator.of(sheetCtx).pop();
-                      if (mounted) {
-                        AppSnack.show(
-                          this.context,
-                          message: 'Event details copied.',
-                          type: AppSnackType.success,
-                        );
-                      }
-                    },
-                  ),
-                  if (widget.onShare != null)
-                    _EventActionTile(
-                      icon: CupertinoIcons.share,
-                      title: 'Share event',
-                      subtitle: 'Share with friends',
-                      onTap: () {
-                        Navigator.of(sheetCtx).pop();
-                        widget.onShare?.call();
-                      },
-                    ),
-                  _EventActionTile(
-                    icon: CupertinoIcons.arrow_right_circle,
-                    title: 'Open event',
-                    subtitle: 'View full event details',
-                    onTap: () {
-                      Navigator.of(sheetCtx).pop();
-                      widget.onTap();
-                    },
-                  ),
-                ],
+                  );
+                  Navigator.of(sheetCtx).pop();
+                  if (mounted) {
+                    AppSnack.show(
+                      this.context,
+                      message: l10n.eventsCardCopiedSnack,
+                      type: AppSnackType.success,
+                    );
+                  }
+                },
               ),
-            ),
+              if (widget.onShare != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.sm),
+                ReportActionTile(
+                  icon: CupertinoIcons.share,
+                  title: l10n.eventsCardShareTitle,
+                  subtitle: l10n.eventsCardShareSubtitle,
+                  onTap: () {
+                    Navigator.of(sheetCtx).pop();
+                    widget.onShare?.call();
+                  },
+                ),
+              ],
+              const SizedBox(height: AppSpacing.sm),
+              ReportActionTile(
+                icon: CupertinoIcons.arrow_right_circle,
+                title: l10n.eventsCardOpenTitle,
+                subtitle: l10n.eventsCardOpenSubtitle,
+                onTap: () {
+                  Navigator.of(sheetCtx).pop();
+                  widget.onTap();
+                },
+              ),
+            ],
           ),
         );
       },
@@ -332,7 +317,8 @@ class _Thumbnail extends StatelessWidget {
   });
 
   final String imageAsset;
-  final String heroTag;
+  /// When null, no [Hero] — avoids duplicate `event-thumb-*` tags on the feed.
+  final String? heroTag;
 
   @override
   Widget build(BuildContext context) {
@@ -357,51 +343,31 @@ class _Thumbnail extends StatelessWidget {
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          child: Image.asset(
-            imageAsset,
+          child: EcoEventCoverImage(
+            path: imageAsset,
+            width: 80,
+            height: 80,
             fit: BoxFit.cover,
-            errorBuilder:
-                (BuildContext context, Object error, StackTrace? stack) {
-              return Container(
-                color: AppColors.inputFill,
-                child: const Icon(
-                  Icons.image_not_supported_outlined,
-                  color: AppColors.textMuted,
-                  size: 22,
-                ),
-              );
-            },
+            errorWidget: const Icon(
+              Icons.image_not_supported_outlined,
+              color: AppColors.textMuted,
+              size: 22,
+            ),
           ),
         ),
       ),
     );
 
+    if (heroTag == null) {
+      return image;
+    }
+
     return Hero(
-      tag: heroTag,
-      flightShuttleBuilder: (
-        BuildContext flightContext,
-        Animation<double> animation,
-        HeroFlightDirection flightDirection,
-        BuildContext fromHeroContext,
-        BuildContext toHeroContext,
-      ) {
-        return AnimatedBuilder(
-          animation: animation,
-          builder: (BuildContext context, Widget? child) {
-            return ClipRRect(
-              borderRadius: BorderRadius.circular(
-                14 * (1 - animation.value) + 0 * animation.value,
-              ),
-              child: Image.asset(
-                imageAsset,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(color: AppColors.inputFill),
-              ),
-            );
-          },
-        );
-      },
-      child: image,
+      tag: heroTag!,
+      child: Material(
+        type: MaterialType.transparency,
+        child: image,
+      ),
     );
   }
 }
@@ -472,7 +438,7 @@ class _StatusChipState extends State<_StatusChip>
             const SizedBox(width: AppSpacing.xxs),
           ],
           Text(
-            widget.status.label,
+            widget.status.localizedLabel(context.l10n),
             style: AppTypography.badgeLabel.copyWith(
               color: widget.status.color,
             ),
@@ -493,7 +459,7 @@ class _StartingSoonBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
       ),
       child: Text(
-        'Soon',
+        context.l10n.eventsCardSoonLabel,
         style: AppTypography.badgeLabel.copyWith(
           fontSize: 10,
           color: AppColors.accentWarningDark,
@@ -508,31 +474,41 @@ class _ParticipantRow extends StatelessWidget {
     required this.count,
     this.maxParticipants,
     required this.organizerName,
+    this.organizerAvatarUrl,
+    required this.organizerId,
   });
 
   final int count;
   final int? maxParticipants;
   final String organizerName;
+  final String? organizerAvatarUrl;
+  final String organizerId;
 
   @override
   Widget build(BuildContext context) {
     final int showCount = count.clamp(0, 4);
     final int overflow = count - showCount;
 
+    const double miniSize = 20;
+    const double miniBorder = 1.5;
+    final double miniOuter = miniSize + 2 * miniBorder;
+    const double miniStride = 14.0;
+
     return Row(
       children: <Widget>[
         SizedBox(
-          width: showCount * 16.0 + 4,
-          height: 20,
+          width: miniOuter + (showCount - 1) * miniStride,
+          height: miniOuter,
           child: Stack(
             clipBehavior: Clip.none,
             children: <Widget>[
               for (int i = 0; i < showCount; i++)
                 Positioned(
-                  left: i * 14.0,
+                  left: i * miniStride,
                   child: _MiniAvatar(
-                    label: i == 0 ? organizerName : 'P$i',
-                    index: i,
+                    label: i == 0 ? organizerName : String.fromCharCode(0x40 + i),
+                    imageUrl: i == 0 ? organizerAvatarUrl : null,
+                    seed: i == 0 ? organizerId : '${organizerId}_mini_$i',
                   ),
                 ),
             ],
@@ -541,10 +517,10 @@ class _ParticipantRow extends StatelessWidget {
         const SizedBox(width: AppSpacing.xxs),
         Text(
           overflow > 0
-              ? '+$overflow more'
+              ? context.l10n.eventsCardParticipantsMore(overflow)
               : maxParticipants != null
-                  ? '$count / $maxParticipants'
-                  : '$count joined',
+                  ? context.l10n.eventsCardParticipantsCountMax(count, maxParticipants!)
+                  : context.l10n.eventsCardParticipantsJoined(count),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w500,
             color: AppColors.textMuted,
@@ -556,31 +532,35 @@ class _ParticipantRow extends StatelessWidget {
 }
 
 class _MiniAvatar extends StatelessWidget {
-  const _MiniAvatar({required this.label, required this.index});
+  const _MiniAvatar({
+    required this.label,
+    this.imageUrl,
+    required this.seed,
+  });
 
   final String label;
-  final int index;
+  final String? imageUrl;
+  final String seed;
 
   @override
   Widget build(BuildContext context) {
+    const double size = 20;
+    const double borderW = 1.5;
+    final double outer = size + 2 * borderW;
     return Container(
-      width: 20,
-      height: 20,
+      width: outer,
+      height: outer,
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: AppColors.avatarPalette[index % AppColors.avatarPalette.length],
-        border: Border.all(color: AppColors.panelBackground, width: 1.5),
+        border: Border.all(color: AppColors.panelBackground, width: borderW),
       ),
-      child: Center(
-        child: Text(
-          label.isNotEmpty ? label[0].toUpperCase() : '?',
-          style: AppTypography.badgeLabel.copyWith(
-            fontSize: 9,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0,
-            color: AppColors.white,
-          ),
-        ),
+      clipBehavior: Clip.antiAlias,
+      child: UserAvatarCircle(
+        displayName: label,
+        imageUrl: imageUrl,
+        size: size,
+        seed: seed,
       ),
     );
   }
@@ -636,104 +616,21 @@ class _MoreButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'More event actions',
-      child: SizedBox(
-        width: 32,
-        height: 32,
-        child: IconButton(
-          onPressed: onTap,
+      label: context.l10n.eventsCardMoreActionsSemantic,
+      child: IconButton(
+        onPressed: onTap,
+        style: IconButton.styleFrom(
+          minimumSize: const Size(44, 44),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
-          icon: const Icon(
-            CupertinoIcons.ellipsis,
-            size: 18,
-            color: AppColors.textMuted,
-          ),
+        ),
+        icon: const Icon(
+          CupertinoIcons.ellipsis,
+          size: 18,
+          color: AppColors.textMuted,
         ),
       ),
     );
   }
 }
 
-class _EventActionTile extends StatelessWidget {
-  const _EventActionTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Material(
-        color: AppColors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppSpacing.radius14),
-          onTap: onTap,
-          child: Ink(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.sm,
-              vertical: AppSpacing.sm,
-            ),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              color: AppColors.inputFill.withValues(alpha: 0.6),
-            ),
-            child: Row(
-              children: <Widget>[
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: AppColors.divider,
-                      width: 1,
-                    ),
-                  ),
-                  child: Icon(icon, size: 18, color: AppColors.textPrimary),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        title,
-                        style:
-                            Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                ),
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(
-                        subtitle,
-                        style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textMuted,
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(
-                  Icons.chevron_right_rounded,
-                  size: 18,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

@@ -1600,6 +1600,36 @@ abstract class AppLocalizations {
   /// **'Points update'**
   String get profilePointsReasonOther;
 
+  /// No description provided for @profilePointsReasonEventOrganizerApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup event was approved'**
+  String get profilePointsReasonEventOrganizerApproved;
+
+  /// No description provided for @profilePointsReasonEventJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined a cleanup event'**
+  String get profilePointsReasonEventJoined;
+
+  /// No description provided for @profilePointsReasonEventJoinNoShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Join bonus adjusted — no check-in'**
+  String get profilePointsReasonEventJoinNoShow;
+
+  /// No description provided for @profilePointsReasonEventCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Event check-in'**
+  String get profilePointsReasonEventCheckIn;
+
+  /// No description provided for @profilePointsReasonEventCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup event completed'**
+  String get profilePointsReasonEventCompleted;
+
   /// No description provided for @profileReportCreditsTitle.
   ///
   /// In en, this message translates to:
@@ -2848,6 +2878,162 @@ abstract class AppLocalizations {
   /// **'This event is no longer available.'**
   String get eventsEventNotFoundBody;
 
+  /// No description provided for @eventsDetailBrowseEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse events'**
+  String get eventsDetailBrowseEvents;
+
+  /// No description provided for @eventsDetailCouldNotRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t refresh. Showing saved details.'**
+  String get eventsDetailCouldNotRefresh;
+
+  /// No description provided for @eventsDetailRetryRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get eventsDetailRetryRefresh;
+
+  /// No description provided for @eventsDetailLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get eventsDetailLocationTitle;
+
+  /// No description provided for @eventsDetailCopyAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy address'**
+  String get eventsDetailCopyAddress;
+
+  /// No description provided for @eventsDetailAddressCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Address copied'**
+  String get eventsDetailAddressCopied;
+
+  /// No description provided for @eventsDetailLocationLongPressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press for full address and actions'**
+  String get eventsDetailLocationLongPressHint;
+
+  /// No description provided for @eventsDetailCoverImageUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Image unavailable'**
+  String get eventsDetailCoverImageUnavailable;
+
+  /// No description provided for @eventsWeatherUnavailableBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast isn’t available right now.'**
+  String get eventsWeatherUnavailableBody;
+
+  /// No description provided for @eventsWeatherRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get eventsWeatherRetry;
+
+  /// No description provided for @eventsUnableToStartEventGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start the event. Check your connection and try again.'**
+  String get eventsUnableToStartEventGeneric;
+
+  /// No description provided for @eventsStartEventTooEarly.
+  ///
+  /// In en, this message translates to:
+  /// **'You can start this eco action once the scheduled start time arrives.'**
+  String get eventsStartEventTooEarly;
+
+  /// No description provided for @eventsAwaitingModerationCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting approval'**
+  String get eventsAwaitingModerationCta;
+
+  /// No description provided for @eventsModerationBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting approval'**
+  String get eventsModerationBannerTitle;
+
+  /// No description provided for @eventsModerationBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.'**
+  String get eventsModerationBannerBody;
+
+  /// No description provided for @eventsEventPendingPublicCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Not open for joining yet'**
+  String get eventsEventPendingPublicCta;
+
+  /// No description provided for @eventsFeedOfflineStaleBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing saved events — couldn’t refresh. Pull down to retry.'**
+  String get eventsFeedOfflineStaleBanner;
+
+  /// No description provided for @eventsFeedInitialLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t load events. Check your connection and try again.'**
+  String get eventsFeedInitialLoadFailed;
+
+  /// No description provided for @eventsOrganizerInvalidateQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalidate previous QR codes'**
+  String get eventsOrganizerInvalidateQrTitle;
+
+  /// No description provided for @eventsOrganizerInvalidateQrSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use if a code was shared or photographed. Already scanned codes stay valid until they expire; this rotates the session so new scans need a fresh QR.'**
+  String get eventsOrganizerInvalidateQrSubtitle;
+
+  /// No description provided for @eventsOrganizerQrSessionRotated.
+  ///
+  /// In en, this message translates to:
+  /// **'QR session updated. Show the new code to attendees.'**
+  String get eventsOrganizerQrSessionRotated;
+
+  /// No description provided for @eventsOrganizerQrRotateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not invalidate codes. Try again.'**
+  String get eventsOrganizerQrRotateFailed;
+
+  /// No description provided for @eventsEditEventTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit event'**
+  String get eventsEditEventTitle;
+
+  /// No description provided for @eventsEditEventSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get eventsEditEventSave;
+
+  /// No description provided for @eventsEventUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Event updated'**
+  String get eventsEventUpdated;
+
+  /// No description provided for @eventsMutationFailedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get eventsMutationFailedGeneric;
+
   /// No description provided for @eventsManualCheckInAdd.
   ///
   /// In en, this message translates to:
@@ -2877,6 +3063,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Attendee name'**
   String get eventsOrganizerAttendeeNamePlaceholder;
+
+  /// No description provided for @eventsOrganizerManualCheckInSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Search volunteers who joined this event, then check them in.'**
+  String get eventsOrganizerManualCheckInSubtitle;
+
+  /// No description provided for @eventsOrganizerManualCheckInNoJoiners.
+  ///
+  /// In en, this message translates to:
+  /// **'No volunteers have joined this event yet.'**
+  String get eventsOrganizerManualCheckInNoJoiners;
+
+  /// No description provided for @eventsOrganizerManualCheckInSelectParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a volunteer from the list.'**
+  String get eventsOrganizerManualCheckInSelectParticipant;
+
+  /// No description provided for @eventsOrganizerManualCheckInNotParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'This person is not on the participant list.'**
+  String get eventsOrganizerManualCheckInNotParticipant;
 
   /// No description provided for @eventsOrganizerEnterNameFirst.
   ///
@@ -2943,6 +3153,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Upload after photos from the event detail.'**
   String get eventsOrganizerUploadAfterPhotosHint;
+
+  /// No description provided for @eventsOrganizerCompletionCheckedInNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No attendees checked in.'**
+  String get eventsOrganizerCompletionCheckedInNone;
+
+  /// No description provided for @eventsOrganizerCompletionJoinedLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} volunteers joined'**
+  String eventsOrganizerCompletionJoinedLine(int count);
+
+  /// No description provided for @eventsOrganizerCompletionJoinedOfCap.
+  ///
+  /// In en, this message translates to:
+  /// **'{joined} of {cap} spots filled'**
+  String eventsOrganizerCompletionJoinedOfCap(int joined, int cap);
+
+  /// No description provided for @eventsOrganizerCompletionSheetSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Event completed. Review next steps.'**
+  String get eventsOrganizerCompletionSheetSemantic;
+
+  /// No description provided for @eventsOrganizerCompletionBackToEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Back to event'**
+  String get eventsOrganizerCompletionBackToEvent;
+
+  /// No description provided for @eventsOrganizerCompletionAddPhotosNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Add cleanup photos now'**
+  String get eventsOrganizerCompletionAddPhotosNow;
+
+  /// No description provided for @eventsOrganizerCompletionWhatNextIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrap up on the event page: document results and share the impact you made together.'**
+  String get eventsOrganizerCompletionWhatNextIntro;
+
+  /// No description provided for @eventsOrganizerCompletionNextStepsHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'NEXT STEPS'**
+  String get eventsOrganizerCompletionNextStepsHeading;
+
+  /// No description provided for @eventsOrganizerCompletionStepPhotosTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add after photos'**
+  String get eventsOrganizerCompletionStepPhotosTitle;
+
+  /// No description provided for @eventsOrganizerCompletionStepPhotosBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the difference you made. They appear on the event page for everyone.'**
+  String get eventsOrganizerCompletionStepPhotosBody;
+
+  /// No description provided for @eventsOrganizerCompletionStepImpactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log your impact'**
+  String get eventsOrganizerCompletionStepImpactTitle;
+
+  /// No description provided for @eventsOrganizerCompletionStepImpactBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Record bags collected, time volunteered, and estimates from the event page.'**
+  String get eventsOrganizerCompletionStepImpactBody;
+
+  /// No description provided for @eventsOrganizerCompletionStepVisibilityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Build trust'**
+  String get eventsOrganizerCompletionStepVisibilityTitle;
+
+  /// No description provided for @eventsOrganizerCompletionStepVisibilityBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos help moderators verify the cleanup and inspire future actions in your community.'**
+  String get eventsOrganizerCompletionStepVisibilityBody;
+
+  /// No description provided for @eventsOrganizerDetailPendingAfterPhotosTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos'**
+  String get eventsOrganizerDetailPendingAfterPhotosTitle;
+
+  /// No description provided for @eventsOrganizerDetailPendingAfterPhotosMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload photos after cleanup so volunteers and moderators can see your results. Use the button below when you are ready.'**
+  String get eventsOrganizerDetailPendingAfterPhotosMessage;
+
+  /// No description provided for @eventsAttendeeCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you'**
+  String get eventsAttendeeCompletedTitle;
+
+  /// No description provided for @eventsAttendeeCompletedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This eco action is complete. Thanks for showing up for your community.'**
+  String get eventsAttendeeCompletedBody;
+
+  /// No description provided for @eventsAfterPhotosOrganizerEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No after photos yet. Use the button below to add them.'**
+  String get eventsAfterPhotosOrganizerEmptyHint;
+
+  /// No description provided for @eventsEvidenceScreenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos document your results and appear on the event page.'**
+  String get eventsEvidenceScreenSubtitle;
+
+  /// No description provided for @eventsEvidencePhotoCountChip.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {max} photos'**
+  String eventsEvidencePhotoCountChip(int current, int max);
+
+  /// No description provided for @eventsEvidenceBeforeAfterTabsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Before and after photos'**
+  String get eventsEvidenceBeforeAfterTabsSemantic;
+
+  /// No description provided for @eventsEvidenceSavingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving after photos'**
+  String get eventsEvidenceSavingSemantic;
 
   /// No description provided for @eventsOrganizerCheckInPausedSnack.
   ///
@@ -3058,6 +3406,90 @@ abstract class AppLocalizations {
   /// **'Resume check-in to issue a fresh QR'**
   String get eventsOrganizerResumeForFreshQr;
 
+  /// No description provided for @eventsOrganizerQrLoadFailedGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load a check-in code. Check your connection and try again.'**
+  String get eventsOrganizerQrLoadFailedGeneric;
+
+  /// No description provided for @eventsOrganizerQrRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many refresh attempts. Wait a moment and try again.'**
+  String get eventsOrganizerQrRateLimited;
+
+  /// No description provided for @eventsOrganizerSessionSetupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not start check-in. Confirm the event is in progress and try again.'**
+  String get eventsOrganizerSessionSetupFailed;
+
+  /// No description provided for @eventsOrganizerQrRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get eventsOrganizerQrRetry;
+
+  /// No description provided for @eventsOrganizerQrBrightnessHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: turn up screen brightness so the code is easier to scan.'**
+  String get eventsOrganizerQrBrightnessHint;
+
+  /// No description provided for @eventsOrganizerQrSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in QR code. Refreshes in about {seconds} seconds.'**
+  String eventsOrganizerQrSemantics(int seconds);
+
+  /// No description provided for @eventsOrganizerQrEncodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'This code could not be drawn. Tap try again.'**
+  String get eventsOrganizerQrEncodeError;
+
+  /// No description provided for @eventsOrganizerFeedbackInvalidQrStrict.
+  ///
+  /// In en, this message translates to:
+  /// **'That QR is not valid for check-in.'**
+  String get eventsOrganizerFeedbackInvalidQrStrict;
+
+  /// No description provided for @eventsOrganizerFeedbackRequiresJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the event in the app before checking in.'**
+  String get eventsOrganizerFeedbackRequiresJoin;
+
+  /// No description provided for @eventsOrganizerFeedbackCheckInUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in is not available for this event right now.'**
+  String get eventsOrganizerFeedbackCheckInUnavailable;
+
+  /// No description provided for @eventsOrganizerFeedbackRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Wait briefly and try again.'**
+  String get eventsOrganizerFeedbackRateLimited;
+
+  /// No description provided for @eventsOrganizerCopyQrText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy QR code text'**
+  String get eventsOrganizerCopyQrText;
+
+  /// No description provided for @eventsOrganizerQrTextCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code text copied — paste it in a message to attendees who can\'t scan.'**
+  String get eventsOrganizerQrTextCopied;
+
+  /// No description provided for @eventsOrganizerNoQrToCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'No active QR code to copy yet.'**
+  String get eventsOrganizerNoQrToCopy;
+
   /// No description provided for @eventsOrganizerManualOverride.
   ///
   /// In en, this message translates to:
@@ -3105,6 +3537,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cancel event'**
   String get eventsOrganizerCancelEvent;
+
+  /// No description provided for @eventsOrganizerMoreActionsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'More event actions'**
+  String get eventsOrganizerMoreActionsSemantic;
+
+  /// No description provided for @eventsOrganizerMoreSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Event actions'**
+  String get eventsOrganizerMoreSheetTitle;
+
+  /// No description provided for @eventsOrganizerEndEventConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'End this event?'**
+  String get eventsOrganizerEndEventConfirmTitle;
+
+  /// No description provided for @eventsOrganizerEndEventConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in will close and the event will be marked completed. You can upload after photos from the event detail.'**
+  String get eventsOrganizerEndEventConfirmMessage;
+
+  /// No description provided for @eventsOrganizerEndEventKeepManaging.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep managing'**
+  String get eventsOrganizerEndEventKeepManaging;
+
+  /// No description provided for @eventsOrganizerEndEventConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'End event'**
+  String get eventsOrganizerEndEventConfirmAction;
+
+  /// No description provided for @eventsOrganizerCancelEventConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel this event?'**
+  String get eventsOrganizerCancelEventConfirmTitle;
+
+  /// No description provided for @eventsOrganizerCancelEventConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteers will see the event as cancelled. This cannot be undone from the app.'**
+  String get eventsOrganizerCancelEventConfirmMessage;
+
+  /// No description provided for @eventsOrganizerCancelEventKeepEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep event'**
+  String get eventsOrganizerCancelEventKeepEvent;
+
+  /// No description provided for @eventsOrganizerCancelEventConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel event'**
+  String get eventsOrganizerCancelEventConfirmAction;
+
+  /// No description provided for @eventsOrganizerRemoveAttendeeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove {name} from check-in'**
+  String eventsOrganizerRemoveAttendeeSemantic(String name);
 
   /// No description provided for @eventsOrganizerSimulateCheckInDev.
   ///
@@ -3250,11 +3748,179 @@ abstract class AppLocalizations {
   /// **'Create event'**
   String get createEventAppBarTitle;
 
-  /// No description provided for @createEventLocalInfoSnack.
+  /// No description provided for @createEventHelpTitle.
   ///
   /// In en, this message translates to:
-  /// **'Creation keeps the event local for now, but the organizer flow is ready right away.'**
-  String get createEventLocalInfoSnack;
+  /// **'Creating an event'**
+  String get createEventHelpTitle;
+
+  /// No description provided for @createEventHelpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick guide for organizers'**
+  String get createEventHelpSubtitle;
+
+  /// No description provided for @createEventHelpBulletModeration.
+  ///
+  /// In en, this message translates to:
+  /// **'Events are reviewed so the community sees accurate, safe cleanups.'**
+  String get createEventHelpBulletModeration;
+
+  /// No description provided for @createEventHelpBulletVolunteers.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteers see your title, schedule, site, gear list, and description once the event is live.'**
+  String get createEventHelpBulletVolunteers;
+
+  /// No description provided for @createEventHelpBulletSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a pollution site on the list or map so everyone knows where to meet.'**
+  String get createEventHelpBulletSite;
+
+  /// No description provided for @createEventHelpBulletSchedule.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the date and time span so calendars and reminders stay clear.'**
+  String get createEventHelpBulletSchedule;
+
+  /// No description provided for @createEventHelpBulletSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'When everything required is filled in, use Create eco action to publish.'**
+  String get createEventHelpBulletSubmit;
+
+  /// No description provided for @createEventFieldVolunteerCap.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteer cap'**
+  String get createEventFieldVolunteerCap;
+
+  /// No description provided for @createEventVolunteerCapPlaceholderNoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get createEventVolunteerCapPlaceholderNoLimit;
+
+  /// No description provided for @createEventVolunteerCapUpTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {count} volunteers'**
+  String createEventVolunteerCapUpTo(int count);
+
+  /// No description provided for @createEventVolunteerCapSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteer cap'**
+  String get createEventVolunteerCapSheetTitle;
+
+  /// No description provided for @createEventVolunteerCapSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. You can cap sign-ups between 2 and 5000.'**
+  String get createEventVolunteerCapSheetSubtitle;
+
+  /// No description provided for @createEventVolunteerCapNoLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'No limit'**
+  String get createEventVolunteerCapNoLimit;
+
+  /// No description provided for @createEventVolunteerCapCustomLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get createEventVolunteerCapCustomLabel;
+
+  /// No description provided for @createEventVolunteerCapCustomHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Number (2–5000)'**
+  String get createEventVolunteerCapCustomHint;
+
+  /// No description provided for @createEventVolunteerCapApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get createEventVolunteerCapApply;
+
+  /// No description provided for @createEventVolunteerCapInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a whole number between 2 and 5000.'**
+  String get createEventVolunteerCapInvalid;
+
+  /// No description provided for @createEventSitePickerLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading sites…'**
+  String get createEventSitePickerLoading;
+
+  /// No description provided for @createEventSitePickerOfflineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline list'**
+  String get createEventSitePickerOfflineTitle;
+
+  /// No description provided for @createEventSitePickerOfflineMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Showing built-in sites because the live list was empty or unavailable.'**
+  String get createEventSitePickerOfflineMessage;
+
+  /// No description provided for @createEventSitePickerLoadFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh'**
+  String get createEventSitePickerLoadFailedTitle;
+
+  /// No description provided for @createEventSitePickerLoadFailedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You can still pick from the offline site list. Try again to load live sites.'**
+  String get createEventSitePickerLoadFailedMessage;
+
+  /// No description provided for @createEventSitePickerRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get createEventSitePickerRetry;
+
+  /// No description provided for @createEventDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard event?'**
+  String get createEventDiscardTitle;
+
+  /// No description provided for @createEventDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You will lose what you entered on this screen.'**
+  String get createEventDiscardBody;
+
+  /// No description provided for @createEventDiscardKeepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get createEventDiscardKeepEditing;
+
+  /// No description provided for @createEventLoadingSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading create event form'**
+  String get createEventLoadingSemantic;
+
+  /// No description provided for @createEventSectionScheduleCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule'**
+  String get createEventSectionScheduleCaption;
+
+  /// No description provided for @createEventSectionDetailsCaption.
+  ///
+  /// In en, this message translates to:
+  /// **'Event details'**
+  String get createEventSectionDetailsCaption;
 
   /// No description provided for @createEventCleanupSiteTitle.
   ///
@@ -3315,6 +3981,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Event title is required.'**
   String get createEventTitleRequired;
+
+  /// No description provided for @createEventTitleMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Use at least 3 characters for the title.'**
+  String get createEventTitleMinLength;
+
+  /// No description provided for @createEventSitePickerTabList.
+  ///
+  /// In en, this message translates to:
+  /// **'List'**
+  String get createEventSitePickerTabList;
+
+  /// No description provided for @createEventSitePickerTabMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get createEventSitePickerTabMap;
+
+  /// No description provided for @createEventSitePickerMapEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites on the map match this search, or locations are not available yet.'**
+  String get createEventSitePickerMapEmpty;
+
+  /// No description provided for @createEventSitePickerMapSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Map of pollution sites'**
+  String get createEventSitePickerMapSemanticLabel;
+
+  /// No description provided for @createEventSitePickerMapHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a pin to select a site.'**
+  String get createEventSitePickerMapHint;
+
+  /// No description provided for @createEventSiteMapPreviewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open site map picker'**
+  String get createEventSiteMapPreviewSemantic;
 
   /// No description provided for @createEventTypeRequired.
   ///
@@ -3442,6 +4150,612 @@ abstract class AppLocalizations {
   /// **'{count} cleanup photos'**
   String eventsCleanupPhotosCount(int count);
 
+  /// No description provided for @eventsCtaStartEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Start event'**
+  String get eventsCtaStartEvent;
+
+  /// No description provided for @eventsCtaManageCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage check-in'**
+  String get eventsCtaManageCheckIn;
+
+  /// No description provided for @eventsCtaEditAfterPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit after photos'**
+  String get eventsCtaEditAfterPhotos;
+
+  /// No description provided for @eventsCtaUploadAfterPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload after photos'**
+  String get eventsCtaUploadAfterPhotos;
+
+  /// No description provided for @eventsCtaCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in'**
+  String get eventsCtaCheckedIn;
+
+  /// No description provided for @eventsCtaScanToCheckIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to check in'**
+  String get eventsCtaScanToCheckIn;
+
+  /// No description provided for @eventsCtaCheckInPaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in paused'**
+  String get eventsCtaCheckInPaused;
+
+  /// No description provided for @eventsCtaTurnReminderOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn reminder off'**
+  String get eventsCtaTurnReminderOff;
+
+  /// No description provided for @eventsCtaSetReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Set reminder'**
+  String get eventsCtaSetReminder;
+
+  /// No description provided for @eventsCtaLeaveEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave event'**
+  String get eventsCtaLeaveEvent;
+
+  /// No description provided for @eventsCtaJoinEcoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Join eco action'**
+  String get eventsCtaJoinEcoAction;
+
+  /// No description provided for @eventsStatusUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get eventsStatusUpcoming;
+
+  /// No description provided for @eventsStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get eventsStatusInProgress;
+
+  /// No description provided for @eventsStatusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get eventsStatusCompleted;
+
+  /// No description provided for @eventsStatusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get eventsStatusCancelled;
+
+  /// No description provided for @eventsCardActionsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Event actions'**
+  String get eventsCardActionsSheetTitle;
+
+  /// No description provided for @eventsCardCopyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy event details'**
+  String get eventsCardCopyTitle;
+
+  /// No description provided for @eventsCardCopySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy title, date and location'**
+  String get eventsCardCopySubtitle;
+
+  /// No description provided for @eventsCardCopiedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Event details copied.'**
+  String get eventsCardCopiedSnack;
+
+  /// No description provided for @eventsCardShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share event'**
+  String get eventsCardShareTitle;
+
+  /// No description provided for @eventsCardShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share with friends'**
+  String get eventsCardShareSubtitle;
+
+  /// No description provided for @eventsCardOpenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Open event'**
+  String get eventsCardOpenTitle;
+
+  /// No description provided for @eventsCardOpenSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'View full event details'**
+  String get eventsCardOpenSubtitle;
+
+  /// No description provided for @eventsCardMoreActionsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'More event actions'**
+  String get eventsCardMoreActionsSemantic;
+
+  /// No description provided for @eventsCardSoonLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Soon'**
+  String get eventsCardSoonLabel;
+
+  /// No description provided for @eventsFeedUpNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Up next'**
+  String get eventsFeedUpNext;
+
+  /// No description provided for @eventsCountdownStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Started'**
+  String get eventsCountdownStarted;
+
+  /// No description provided for @eventsCountdownDaysHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {days}d {hours}h'**
+  String eventsCountdownDaysHours(int days, int hours);
+
+  /// No description provided for @eventsCountdownHoursMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {hours}h {minutes}m'**
+  String eventsCountdownHoursMinutes(int hours, int minutes);
+
+  /// No description provided for @eventsCountdownMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts in {minutes}m'**
+  String eventsCountdownMinutes(int minutes);
+
+  /// No description provided for @eventsShareEventTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Share event'**
+  String get eventsShareEventTooltip;
+
+  /// No description provided for @eventsAttendeeCheckInSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan to check in at event'**
+  String get eventsAttendeeCheckInSemantic;
+
+  /// No description provided for @eventsAttendeeAlreadyCheckedInSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already checked in.'**
+  String get eventsAttendeeAlreadyCheckedInSnack;
+
+  /// No description provided for @eventsAttendeeCheckInPausedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer has paused check-in for now.'**
+  String get eventsAttendeeCheckInPausedSnack;
+
+  /// No description provided for @eventsAttendeeCheckInCompleteSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in complete.'**
+  String get eventsAttendeeCheckInCompleteSnack;
+
+  /// No description provided for @eventsAttendeeBannerTitleCheckedIn.
+  ///
+  /// In en, this message translates to:
+  /// **'You are checked in'**
+  String get eventsAttendeeBannerTitleCheckedIn;
+
+  /// No description provided for @eventsAttendeeBannerTitleInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Event is in progress'**
+  String get eventsAttendeeBannerTitleInProgress;
+
+  /// No description provided for @eventsAttendeeBannerSubtitleAttendanceConfirmed.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance confirmed'**
+  String get eventsAttendeeBannerSubtitleAttendanceConfirmed;
+
+  /// No description provided for @eventsAttendeeBannerSubtitleCheckedInAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Checked in at {time}'**
+  String eventsAttendeeBannerSubtitleCheckedInAt(String time);
+
+  /// No description provided for @eventsAttendeeBannerSubtitleScanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the organizer\'s QR to check in'**
+  String get eventsAttendeeBannerSubtitleScanQr;
+
+  /// No description provided for @eventsAttendeeBannerSubtitlePaused.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in is temporarily paused'**
+  String get eventsAttendeeBannerSubtitlePaused;
+
+  /// No description provided for @eventsDetailShareSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Event shared.'**
+  String get eventsDetailShareSuccess;
+
+  /// No description provided for @eventsDetailCalendarAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Event added to your calendar.'**
+  String get eventsDetailCalendarAdded;
+
+  /// No description provided for @eventsDetailCalendarFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add to calendar. Try again.'**
+  String get eventsDetailCalendarFailed;
+
+  /// No description provided for @eventsDetailRefreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh this event. Try again.'**
+  String get eventsDetailRefreshFailed;
+
+  /// No description provided for @eventsDetailCancelledCallout.
+  ///
+  /// In en, this message translates to:
+  /// **'This event has been cancelled.'**
+  String get eventsDetailCancelledCallout;
+
+  /// No description provided for @eventsDetailOpenInMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in Maps'**
+  String get eventsDetailOpenInMaps;
+
+  /// No description provided for @eventsDetailCoverSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover image for {title}'**
+  String eventsDetailCoverSemantic(String title);
+
+  /// No description provided for @eventsDetailGroupedPanelSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Location, schedule, and details'**
+  String get eventsDetailGroupedPanelSemantic;
+
+  /// No description provided for @eventsDetailParticipationSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Your participation'**
+  String get eventsDetailParticipationSemantic;
+
+  /// No description provided for @eventsAnalyticsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load analytics.'**
+  String get eventsAnalyticsLoadFailed;
+
+  /// No description provided for @eventsAnalyticsRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get eventsAnalyticsRetry;
+
+  /// No description provided for @eventsRecurrenceDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get eventsRecurrenceDaily;
+
+  /// No description provided for @eventsRecurrenceNavigatePrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous occurrence in series'**
+  String get eventsRecurrenceNavigatePrevious;
+
+  /// No description provided for @eventsRecurrenceNavigateNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next occurrence in series'**
+  String get eventsRecurrenceNavigateNext;
+
+  /// No description provided for @eventsImpactSummarySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact summary saved.'**
+  String get eventsImpactSummarySaved;
+
+  /// No description provided for @eventsImpactSummaryUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact summary updated.'**
+  String get eventsImpactSummaryUpdated;
+
+  /// No description provided for @eventsReminderSetSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder set for {when}.'**
+  String eventsReminderSetSnack(String when);
+
+  /// No description provided for @eventsFeedbackSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post-event feedback'**
+  String get eventsFeedbackSheetTitle;
+
+  /// No description provided for @eventsFeedbackHowWasEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'How was the event?'**
+  String get eventsFeedbackHowWasEvent;
+
+  /// No description provided for @eventsFeedbackBagsCollected.
+  ///
+  /// In en, this message translates to:
+  /// **'Bags collected'**
+  String get eventsFeedbackBagsCollected;
+
+  /// No description provided for @eventsFeedbackVolunteerHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Volunteer hours: {hours}h'**
+  String eventsFeedbackVolunteerHours(String hours);
+
+  /// No description provided for @eventsFeedbackNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'What worked well? Any notes for next time?'**
+  String get eventsFeedbackNotesHint;
+
+  /// No description provided for @eventsEvidenceMaxPhotosSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum {max} photos reached.'**
+  String eventsEvidenceMaxPhotosSnack(int max);
+
+  /// No description provided for @eventsEvidencePickFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not pick photos. Check permissions.'**
+  String get eventsEvidencePickFailedSnack;
+
+  /// No description provided for @eventsEvidenceRemoveAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove'**
+  String get eventsEvidenceRemoveAction;
+
+  /// No description provided for @eventsEvidenceAppBarTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup evidence'**
+  String get eventsEvidenceAppBarTitle;
+
+  /// No description provided for @eventsEvidenceSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving...'**
+  String get eventsEvidenceSaving;
+
+  /// No description provided for @eventsEvidenceAfterPhotosSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos saved.'**
+  String get eventsEvidenceAfterPhotosSaved;
+
+  /// No description provided for @eventsEvidenceNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes to save.'**
+  String get eventsEvidenceNoChanges;
+
+  /// No description provided for @eventsSiteReferencePhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Site reference photo'**
+  String get eventsSiteReferencePhotoTitle;
+
+  /// No description provided for @eventsSiteReferencePhotoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Reference taken before cleanup. Use the After tab to add photos of the cleaned site.'**
+  String get eventsSiteReferencePhotoBody;
+
+  /// No description provided for @eventsManageCheckInOnlyInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in is available only while the event is in progress.'**
+  String get eventsManageCheckInOnlyInProgress;
+
+  /// No description provided for @eventsEventFull.
+  ///
+  /// In en, this message translates to:
+  /// **'This event is full.'**
+  String get eventsEventFull;
+
+  /// No description provided for @eventsParticipationUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update participation. Try again.'**
+  String get eventsParticipationUpdateFailed;
+
+  /// No description provided for @eventsJoinedEcoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'You joined this eco action.'**
+  String get eventsJoinedEcoAction;
+
+  /// No description provided for @eventsJoinPointsEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} points — you\'re in!'**
+  String eventsJoinPointsEarned(int points);
+
+  /// No description provided for @eventsLeftEcoAction.
+  ///
+  /// In en, this message translates to:
+  /// **'You left this eco action.'**
+  String get eventsLeftEcoAction;
+
+  /// No description provided for @eventsCheckInPointsEarned.
+  ///
+  /// In en, this message translates to:
+  /// **'+{points} points — checked in!'**
+  String eventsCheckInPointsEarned(int points);
+
+  /// No description provided for @eventsManualCheckInWithPoints.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} checked in · +{points} pts for them'**
+  String eventsManualCheckInWithPoints(String name, int points);
+
+  /// No description provided for @eventsJoinFirstForReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the event first to set reminders.'**
+  String get eventsJoinFirstForReminders;
+
+  /// No description provided for @eventsReminderDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder disabled.'**
+  String get eventsReminderDisabled;
+
+  /// No description provided for @eventsReminderSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose reminder time'**
+  String get eventsReminderSheetTitle;
+
+  /// No description provided for @eventsReminderSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Event starts at {timeRange} on {date}.'**
+  String eventsReminderSheetSubtitle(String timeRange, String date);
+
+  /// No description provided for @eventsReminderPreset1Day.
+  ///
+  /// In en, this message translates to:
+  /// **'1 day before'**
+  String get eventsReminderPreset1Day;
+
+  /// No description provided for @eventsReminderPreset3Hours.
+  ///
+  /// In en, this message translates to:
+  /// **'3 hours before'**
+  String get eventsReminderPreset3Hours;
+
+  /// No description provided for @eventsReminderPreset1Hour.
+  ///
+  /// In en, this message translates to:
+  /// **'1 hour before'**
+  String get eventsReminderPreset1Hour;
+
+  /// No description provided for @eventsReminderPreset30Mins.
+  ///
+  /// In en, this message translates to:
+  /// **'30 minutes before'**
+  String get eventsReminderPreset30Mins;
+
+  /// No description provided for @eventsReminderUnavailableSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Unavailable for this event time'**
+  String get eventsReminderUnavailableSubtitle;
+
+  /// No description provided for @eventsReminderCustomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom date and time'**
+  String get eventsReminderCustomTitle;
+
+  /// No description provided for @eventsReminderCustomSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a specific reminder moment'**
+  String get eventsReminderCustomSubtitle;
+
+  /// No description provided for @eventsReminderPickTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick reminder'**
+  String get eventsReminderPickTitle;
+
+  /// No description provided for @eventsReminderDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get eventsReminderDone;
+
+  /// No description provided for @eventsCardParticipantsMore.
+  ///
+  /// In en, this message translates to:
+  /// **'+{count} more'**
+  String eventsCardParticipantsMore(int count);
+
+  /// No description provided for @eventsCardParticipantsCountMax.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} / {max}'**
+  String eventsCardParticipantsCountMax(int count, int max);
+
+  /// No description provided for @eventsCardParticipantsJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} joined'**
+  String eventsCardParticipantsJoined(int count);
+
+  /// No description provided for @eventsDetailSemanticsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event detail: {title}'**
+  String eventsDetailSemanticsLabel(String title);
+
+  /// No description provided for @eventsCountdownBadgeSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Time until event starts: {label}'**
+  String eventsCountdownBadgeSemantic(String label);
+
+  /// No description provided for @eventsEvidenceThumbnailMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get eventsEvidenceThumbnailMenuTitle;
+
+  /// No description provided for @eventsFeedRefreshFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh events.'**
+  String get eventsFeedRefreshFailed;
+
+  /// No description provided for @eventsCreateGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not create event. Try again.'**
+  String get eventsCreateGenericError;
+
   /// No description provided for @qrScannerPointCameraHint.
   ///
   /// In en, this message translates to:
@@ -3490,6 +4804,12 @@ abstract class AppLocalizations {
   /// **'Invalid QR format.'**
   String get qrScannerErrorInvalidFormat;
 
+  /// No description provided for @qrScannerErrorInvalidQr.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR is not valid for check-in.'**
+  String get qrScannerErrorInvalidQr;
+
   /// No description provided for @qrScannerErrorWrongEvent.
   ///
   /// In en, this message translates to:
@@ -3519,6 +4839,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are already checked in.'**
   String get qrScannerErrorAlreadyCheckedIn;
+
+  /// No description provided for @qrScannerErrorRequiresJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Join this event in the app before checking in.'**
+  String get qrScannerErrorRequiresJoin;
+
+  /// No description provided for @qrScannerErrorCheckInUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in is not open for this event right now.'**
+  String get qrScannerErrorCheckInUnavailable;
+
+  /// No description provided for @qrScannerErrorRateLimited.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Wait a moment and try again.'**
+  String get qrScannerErrorRateLimited;
 
   /// No description provided for @qrScannerCameraUnavailableFeedback.
   ///
@@ -3585,6 +4923,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Toggle flashlight'**
   String get qrScannerToggleFlashlightSemantic;
+
+  /// No description provided for @qrScannerCameraStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting camera…'**
+  String get qrScannerCameraStarting;
+
+  /// No description provided for @qrScannerCheckingIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Verifying check-in…'**
+  String get qrScannerCheckingIn;
+
+  /// No description provided for @qrScannerCameraErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera unavailable'**
+  String get qrScannerCameraErrorTitle;
+
+  /// No description provided for @qrScannerManualEntrySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste the full text the organizer shared (copy from their screen or a message).'**
+  String get qrScannerManualEntrySubtitle;
+
+  /// No description provided for @qrScannerPasteButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste'**
+  String get qrScannerPasteButton;
 
   /// No description provided for @siteReportReasonFakeLabel.
   ///
@@ -4000,6 +5368,660 @@ abstract class AppLocalizations {
   /// **'Image unavailable'**
   String get appSmartImageUnavailable;
 
+  /// No description provided for @eventsReminderSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Event reminder'**
+  String get eventsReminderSectionTitle;
+
+  /// No description provided for @eventsReminderSectionEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder is on'**
+  String get eventsReminderSectionEnabled;
+
+  /// No description provided for @eventsReminderSectionSetFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Set for {time}'**
+  String eventsReminderSectionSetFor(String time);
+
+  /// No description provided for @eventsReminderSectionDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Get notified before event starts'**
+  String get eventsReminderSectionDisabled;
+
+  /// No description provided for @eventsReminderSectionDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get eventsReminderSectionDisable;
+
+  /// No description provided for @eventsReminderSectionEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get eventsReminderSectionEnable;
+
+  /// No description provided for @eventsDescriptionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get eventsDescriptionTitle;
+
+  /// No description provided for @eventsDescriptionShowLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get eventsDescriptionShowLess;
+
+  /// No description provided for @eventsDescriptionReadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Read more'**
+  String get eventsDescriptionReadMore;
+
+  /// No description provided for @eventsAfterCleanupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'After cleanup'**
+  String get eventsAfterCleanupTitle;
+
+  /// No description provided for @eventsAfterPhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'View after cleanup photo {index} of {total}'**
+  String eventsAfterPhotoSemantic(int index, int total);
+
+  /// No description provided for @eventsFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get eventsFilterAll;
+
+  /// No description provided for @eventsFilterUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get eventsFilterUpcoming;
+
+  /// No description provided for @eventsFilterNearby.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get eventsFilterNearby;
+
+  /// No description provided for @eventsFilterPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Past'**
+  String get eventsFilterPast;
+
+  /// No description provided for @eventsFilterMyEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'My events'**
+  String get eventsFilterMyEvents;
+
+  /// No description provided for @eventsFilterSemanticPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get eventsFilterSemanticPrefix;
+
+  /// No description provided for @eventsParticipantsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendees'**
+  String get eventsParticipantsTitle;
+
+  /// No description provided for @eventsParticipantsViewSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'View {count} attendees'**
+  String eventsParticipantsViewSemantic(int count);
+
+  /// No description provided for @eventsParticipantsYouAndOthers.
+  ///
+  /// In en, this message translates to:
+  /// **'You and {count} others joined'**
+  String eventsParticipantsYouAndOthers(int count);
+
+  /// No description provided for @eventsParticipantsVolunteersJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} volunteers joined'**
+  String eventsParticipantsVolunteersJoined(int count);
+
+  /// No description provided for @eventsParticipantsSpotsLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} spots left'**
+  String eventsParticipantsSpotsLeft(int count);
+
+  /// No description provided for @eventsParticipantsCheckedInCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{checkedIn} of {total} checked in'**
+  String eventsParticipantsCheckedInCount(int checkedIn, int total);
+
+  /// No description provided for @eventsParticipantsSearchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search attendee'**
+  String get eventsParticipantsSearchPlaceholder;
+
+  /// No description provided for @eventsParticipantsNoSearchResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No attendee matches your search.'**
+  String get eventsParticipantsNoSearchResults;
+
+  /// No description provided for @eventsParticipantsYouOrganizer.
+  ///
+  /// In en, this message translates to:
+  /// **'You · Organizer'**
+  String get eventsParticipantsYouOrganizer;
+
+  /// No description provided for @eventsParticipantsOrganizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer'**
+  String get eventsParticipantsOrganizer;
+
+  /// No description provided for @eventsParticipantsYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get eventsParticipantsYou;
+
+  /// No description provided for @eventsParticipantsLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t load attendees. Check your connection and try again.'**
+  String get eventsParticipantsLoadFailed;
+
+  /// No description provided for @eventsParticipantsRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get eventsParticipantsRetry;
+
+  /// No description provided for @eventsParticipantsViewRosterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'View attendee list'**
+  String get eventsParticipantsViewRosterSemantic;
+
+  /// No description provided for @eventsGearSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Gear to bring'**
+  String get eventsGearSectionTitle;
+
+  /// No description provided for @eventsGearNoneNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'No special gear needed'**
+  String get eventsGearNoneNeeded;
+
+  /// No description provided for @eventsImpactSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact summary'**
+  String get eventsImpactSummaryTitle;
+
+  /// No description provided for @eventsImpactSummaryAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get eventsImpactSummaryAdd;
+
+  /// No description provided for @eventsImpactSummaryEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get eventsImpactSummaryEdit;
+
+  /// No description provided for @eventsImpactSummaryEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Capture cleanup outcomes, effort, and lessons learned.'**
+  String get eventsImpactSummaryEmptyHint;
+
+  /// No description provided for @eventsImpactBadgeRating.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating}★ rating'**
+  String eventsImpactBadgeRating(int rating);
+
+  /// No description provided for @eventsImpactBadgeBags.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} bags'**
+  String eventsImpactBadgeBags(int count);
+
+  /// No description provided for @eventsImpactBadgeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h'**
+  String eventsImpactBadgeHours(String hours);
+
+  /// No description provided for @eventsImpactEstimatedLine.
+  ///
+  /// In en, this message translates to:
+  /// **'{kg} kg removed · {co2} kg CO2e avoided'**
+  String eventsImpactEstimatedLine(String kg, String co2);
+
+  /// No description provided for @eventsLocationSiteSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'View pollution site, {distanceKm} km away'**
+  String eventsLocationSiteSemantic(String distanceKm);
+
+  /// No description provided for @eventsLocationDotKm.
+  ///
+  /// In en, this message translates to:
+  /// **'· {distanceKm} km'**
+  String eventsLocationDotKm(String distanceKm);
+
+  /// No description provided for @eventsEmptyAllTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No eco events yet'**
+  String get eventsEmptyAllTitle;
+
+  /// No description provided for @eventsEmptyAllSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to create one! Tap + above to get started.'**
+  String get eventsEmptyAllSubtitle;
+
+  /// No description provided for @eventsEmptyUpcomingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No upcoming events'**
+  String get eventsEmptyUpcomingTitle;
+
+  /// No description provided for @eventsEmptyUpcomingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create one to get volunteers together.'**
+  String get eventsEmptyUpcomingSubtitle;
+
+  /// No description provided for @eventsEmptyNearbyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No nearby events'**
+  String get eventsEmptyNearbyTitle;
+
+  /// No description provided for @eventsEmptyNearbySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different filter or create an event in your area.'**
+  String get eventsEmptyNearbySubtitle;
+
+  /// No description provided for @eventsEmptyPastTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No past events'**
+  String get eventsEmptyPastTitle;
+
+  /// No description provided for @eventsEmptyPastSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed events will show here.'**
+  String get eventsEmptyPastSubtitle;
+
+  /// No description provided for @eventsEmptyMyEventsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No events yet'**
+  String get eventsEmptyMyEventsTitle;
+
+  /// No description provided for @eventsEmptyMyEventsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join or create an event to see it here.'**
+  String get eventsEmptyMyEventsSubtitle;
+
+  /// No description provided for @eventsSearchEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No results for \"{query}\"'**
+  String eventsSearchEmptyTitle(String query);
+
+  /// No description provided for @eventsSearchEmptySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search term or check your spelling.'**
+  String get eventsSearchEmptySubtitle;
+
+  /// No description provided for @eventsSitePickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose site'**
+  String get eventsSitePickerTitle;
+
+  /// No description provided for @eventsSitePickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anchor this event to one cleanup location.'**
+  String get eventsSitePickerSubtitle;
+
+  /// No description provided for @eventsSitePickerSearchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name or description'**
+  String get eventsSitePickerSearchPlaceholder;
+
+  /// No description provided for @eventsSitePickerNoMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites match \"{query}\"'**
+  String eventsSitePickerNoMatch(String query);
+
+  /// No description provided for @eventsSitePickerRowKmDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km away · {desc}'**
+  String eventsSitePickerRowKmDesc(String km, String desc);
+
+  /// No description provided for @eventsSuccessDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Event created'**
+  String get eventsSuccessDialogTitle;
+
+  /// No description provided for @eventsSuccessDialogBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} at {siteName} is ready. Share it with your community to get volunteers on board.'**
+  String eventsSuccessDialogBody(String title, String siteName);
+
+  /// No description provided for @eventsSuccessDialogOpenEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Open event'**
+  String get eventsSuccessDialogOpenEvent;
+
+  /// No description provided for @eventsTimePickerSelectTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select time'**
+  String get eventsTimePickerSelectTime;
+
+  /// No description provided for @eventsTimePickerConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get eventsTimePickerConfirm;
+
+  /// No description provided for @eventsTimePickerFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get eventsTimePickerFrom;
+
+  /// No description provided for @eventsTimePickerTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get eventsTimePickerTo;
+
+  /// No description provided for @eventsTimePickerTimeBlockSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{role}, {time}'**
+  String eventsTimePickerTimeBlockSemantic(String role, String time);
+
+  /// No description provided for @eventsFeedbackRatingStars.
+  ///
+  /// In en, this message translates to:
+  /// **'{rating}★'**
+  String eventsFeedbackRatingStars(int rating);
+
+  /// No description provided for @eventsFeedRecentSearches.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent searches'**
+  String get eventsFeedRecentSearches;
+
+  /// No description provided for @eventsCleanupAfterUploadSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload after photos'**
+  String get eventsCleanupAfterUploadSemantic;
+
+  /// No description provided for @eventsCleanupAfterViewFullscreenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'View photo fullscreen'**
+  String get eventsCleanupAfterViewFullscreenSemantic;
+
+  /// No description provided for @eventsCleanupAfterUploadMoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload more photos'**
+  String get eventsCleanupAfterUploadMoreTitle;
+
+  /// No description provided for @eventsCleanupAfterUploadedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} uploaded'**
+  String eventsCleanupAfterUploadedCount(int count);
+
+  /// No description provided for @eventsCleanupAfterSlotsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 more slot available} other{{count} more slots available}}'**
+  String eventsCleanupAfterSlotsRemaining(int count);
+
+  /// No description provided for @eventsCleanupAfterAddMoreSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Add more photos'**
+  String get eventsCleanupAfterAddMoreSemantic;
+
+  /// No description provided for @eventsCleanupAfterRemoveSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get eventsCleanupAfterRemoveSemantic;
+
+  /// No description provided for @eventsCleanupAfterEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photos of the cleaned site'**
+  String get eventsCleanupAfterEmptyTitle;
+
+  /// No description provided for @eventsCleanupAfterEmptyMaxPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Up to {max} photos'**
+  String eventsCleanupAfterEmptyMaxPhotos(int max);
+
+  /// No description provided for @eventsCleanupAfterEmptyTapGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to select from gallery'**
+  String get eventsCleanupAfterEmptyTapGallery;
+
+  /// No description provided for @eventsCleanupEvidencePhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup evidence photo'**
+  String get eventsCleanupEvidencePhotoSemantic;
+
+  /// No description provided for @eventsDateRelativeEarlierToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Earlier today'**
+  String get eventsDateRelativeEarlierToday;
+
+  /// No description provided for @eventsDateRelativeDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days ago'**
+  String eventsDateRelativeDaysAgo(int days);
+
+  /// No description provided for @eventsDateRelativeToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get eventsDateRelativeToday;
+
+  /// No description provided for @eventsDateRelativeTomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get eventsDateRelativeTomorrow;
+
+  /// No description provided for @eventsDateRelativeInDays.
+  ///
+  /// In en, this message translates to:
+  /// **'In {days} days'**
+  String eventsDateRelativeInDays(int days);
+
+  /// No description provided for @eventsDateInfoSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Date and time'**
+  String get eventsDateInfoSheetTitle;
+
+  /// No description provided for @eventsDateInfoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}, {timeRange}'**
+  String eventsDateInfoSemantic(String date, String timeRange);
+
+  /// No description provided for @eventsCategorySheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get eventsCategorySheetTitle;
+
+  /// No description provided for @eventsCategorySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Event category: {label}'**
+  String eventsCategorySemantic(String label);
+
+  /// No description provided for @eventsOrganizerSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer'**
+  String get eventsOrganizerSheetTitle;
+
+  /// No description provided for @eventsOrganizerYouOwnThis.
+  ///
+  /// In en, this message translates to:
+  /// **'This is your event'**
+  String get eventsOrganizerYouOwnThis;
+
+  /// No description provided for @eventsOrganizerRoleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event organizer'**
+  String get eventsOrganizerRoleLabel;
+
+  /// No description provided for @eventsOrganizerCreatedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Event created on {day}/{month}/{year}'**
+  String eventsOrganizerCreatedOn(int day, int month, int year);
+
+  /// No description provided for @eventsOrganizerSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer: {name}'**
+  String eventsOrganizerSemantic(String name);
+
+  /// No description provided for @eventsOrganizedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Organized by'**
+  String get eventsOrganizedByLabel;
+
+  /// No description provided for @eventsFeedSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Events feed'**
+  String get eventsFeedSemantic;
+
+  /// No description provided for @eventsFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get eventsFeedTitle;
+
+  /// No description provided for @eventsFeedCreateSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Create event'**
+  String get eventsFeedCreateSemantic;
+
+  /// No description provided for @eventsFeedSearchPlaceholder.
+  ///
+  /// In en, this message translates to:
+  /// **'Search events'**
+  String get eventsFeedSearchPlaceholder;
+
+  /// No description provided for @eventsFeedHappeningNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Happening now'**
+  String get eventsFeedHappeningNow;
+
+  /// No description provided for @eventsFeedComingUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming up'**
+  String get eventsFeedComingUp;
+
+  /// No description provided for @eventsFeedRecentlyCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently completed'**
+  String get eventsFeedRecentlyCompleted;
+
+  /// No description provided for @eventsFeedViewListToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'List view'**
+  String get eventsFeedViewListToggle;
+
+  /// No description provided for @eventsFeedViewCalendarToggle.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar view'**
+  String get eventsFeedViewCalendarToggle;
+
+  /// No description provided for @eventsCalendarPreviousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get eventsCalendarPreviousMonth;
+
+  /// No description provided for @eventsCalendarNextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get eventsCalendarNextMonth;
+
+  /// No description provided for @eventsCalendarDaySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String eventsCalendarDaySemantic(int day);
+
+  /// No description provided for @eventsCalendarNoEventsThisDay.
+  ///
+  /// In en, this message translates to:
+  /// **'No events on this day'**
+  String get eventsCalendarNoEventsThisDay;
+
   /// No description provided for @siteCardPollutionSiteSemantic.
   ///
   /// In en, this message translates to:
@@ -4011,6 +6033,1140 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photo of {title}'**
   String siteCardPhotoSemantic(String title);
+
+  /// No description provided for @eventsFilterSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter events'**
+  String get eventsFilterSheetTitle;
+
+  /// No description provided for @eventsFilterSheetCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get eventsFilterSheetCategory;
+
+  /// No description provided for @eventsFilterSheetStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get eventsFilterSheetStatus;
+
+  /// No description provided for @eventsFilterSheetDateRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Date range'**
+  String get eventsFilterSheetDateRange;
+
+  /// No description provided for @eventsFilterSheetDateFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'From'**
+  String get eventsFilterSheetDateFrom;
+
+  /// No description provided for @eventsFilterSheetDateTo.
+  ///
+  /// In en, this message translates to:
+  /// **'To'**
+  String get eventsFilterSheetDateTo;
+
+  /// No description provided for @eventsFilterSheetShowResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Show results'**
+  String get eventsFilterSheetShowResults;
+
+  /// No description provided for @eventsFilterSheetClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get eventsFilterSheetClearAll;
+
+  /// No description provided for @eventsFilterSheetActiveCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active'**
+  String eventsFilterSheetActiveCount(int count);
+
+  /// No description provided for @eventsOrganizerDashboardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'My events'**
+  String get eventsOrganizerDashboardTitle;
+
+  /// No description provided for @eventsOrganizerDashboardEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t organised any events yet.'**
+  String get eventsOrganizerDashboardEmpty;
+
+  /// No description provided for @eventsOrganizerDashboardEmptyAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Create first event'**
+  String get eventsOrganizerDashboardEmptyAction;
+
+  /// No description provided for @eventsOrganizerDashboardSectionUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming'**
+  String get eventsOrganizerDashboardSectionUpcoming;
+
+  /// No description provided for @eventsOrganizerDashboardSectionInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get eventsOrganizerDashboardSectionInProgress;
+
+  /// No description provided for @eventsOrganizerDashboardSectionCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get eventsOrganizerDashboardSectionCompleted;
+
+  /// No description provided for @eventsOrganizerDashboardSectionCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get eventsOrganizerDashboardSectionCancelled;
+
+  /// No description provided for @eventsOrganizerDashboardParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'{count}/{max} participants'**
+  String eventsOrganizerDashboardParticipants(int count, String max);
+
+  /// No description provided for @eventsOrganizerDashboardParticipantsUnlimited.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} participants'**
+  String eventsOrganizerDashboardParticipantsUnlimited(int count);
+
+  /// No description provided for @eventsOrganizerDashboardEvidenceAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence'**
+  String get eventsOrganizerDashboardEvidenceAction;
+
+  /// No description provided for @eventsAnalyticsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analytics'**
+  String get eventsAnalyticsTitle;
+
+  /// No description provided for @eventsAnalyticsAttendanceRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Attendance rate'**
+  String get eventsAnalyticsAttendanceRate;
+
+  /// No description provided for @eventsAnalyticsJoiners.
+  ///
+  /// In en, this message translates to:
+  /// **'Joiners over time'**
+  String get eventsAnalyticsJoiners;
+
+  /// No description provided for @eventsAnalyticsCheckInsByHour.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins by hour'**
+  String get eventsAnalyticsCheckInsByHour;
+
+  /// No description provided for @eventsAnalyticsNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet'**
+  String get eventsAnalyticsNoData;
+
+  /// No description provided for @eventsOfflineSyncQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved. Will sync when back online.'**
+  String get eventsOfflineSyncQueued;
+
+  /// No description provided for @eventsOfflineSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync failed. Will retry automatically.'**
+  String get eventsOfflineSyncFailed;
+
+  /// No description provided for @eventsWeatherForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather forecast'**
+  String get eventsWeatherForecast;
+
+  /// No description provided for @eventsWeatherLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather unavailable'**
+  String get eventsWeatherLoadFailed;
+
+  /// No description provided for @eventsWeatherPrecipitationMm.
+  ///
+  /// In en, this message translates to:
+  /// **'{amount} mm precipitation'**
+  String eventsWeatherPrecipitationMm(String amount);
+
+  /// No description provided for @eventsWeatherNoPrecipitation.
+  ///
+  /// In en, this message translates to:
+  /// **'No measurable precipitation'**
+  String get eventsWeatherNoPrecipitation;
+
+  /// No description provided for @eventsWeatherPrecipChance.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% chance of precipitation'**
+  String eventsWeatherPrecipChance(int percent);
+
+  /// No description provided for @eventsWeatherIndicativeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Indicative forecast from Open-Meteo; actual conditions may differ.'**
+  String get eventsWeatherIndicativeNote;
+
+  /// No description provided for @eventsWeatherIndicativeInfoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About this forecast'**
+  String get eventsWeatherIndicativeInfoTitle;
+
+  /// No description provided for @eventsWeatherIndicativeInfoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Information about the weather forecast source'**
+  String get eventsWeatherIndicativeInfoSemantic;
+
+  /// No description provided for @eventsRecurrenceNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Does not repeat'**
+  String get eventsRecurrenceNone;
+
+  /// No description provided for @eventsRecurrenceWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every week'**
+  String get eventsRecurrenceWeekly;
+
+  /// No description provided for @eventsRecurrenceBiweekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 2 weeks'**
+  String get eventsRecurrenceBiweekly;
+
+  /// No description provided for @eventsRecurrenceMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every month'**
+  String get eventsRecurrenceMonthly;
+
+  /// No description provided for @eventsRecurrenceOccurrences.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} occurrences'**
+  String eventsRecurrenceOccurrences(int count);
+
+  /// No description provided for @eventsRecurrencePartOfSeries.
+  ///
+  /// In en, this message translates to:
+  /// **'Part of a series'**
+  String get eventsRecurrencePartOfSeries;
+
+  /// No description provided for @eventsRecurrenceSeriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event {index} of {total}'**
+  String eventsRecurrenceSeriesLabel(int index, int total);
+
+  /// No description provided for @eventsRecurrenceDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get eventsRecurrenceDone;
+
+  /// No description provided for @eventsCategoryGeneralCleanup.
+  ///
+  /// In en, this message translates to:
+  /// **'General cleanup'**
+  String get eventsCategoryGeneralCleanup;
+
+  /// No description provided for @eventsCategoryGeneralCleanupDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick up litter, sweep debris, and restore the area.'**
+  String get eventsCategoryGeneralCleanupDescription;
+
+  /// No description provided for @eventsCategoryRiverAndLake.
+  ///
+  /// In en, this message translates to:
+  /// **'River & lake cleanup'**
+  String get eventsCategoryRiverAndLake;
+
+  /// No description provided for @eventsCategoryRiverAndLakeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove waste from waterways, shores, and drainage channels.'**
+  String get eventsCategoryRiverAndLakeDescription;
+
+  /// No description provided for @eventsCategoryTreeAndGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Tree planting & greening'**
+  String get eventsCategoryTreeAndGreen;
+
+  /// No description provided for @eventsCategoryTreeAndGreenDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Plant trees, restore green spaces, and build garden beds.'**
+  String get eventsCategoryTreeAndGreenDescription;
+
+  /// No description provided for @eventsCategoryRecyclingDrive.
+  ///
+  /// In en, this message translates to:
+  /// **'Recycling drive'**
+  String get eventsCategoryRecyclingDrive;
+
+  /// No description provided for @eventsCategoryRecyclingDriveDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort, collect, and transport recyclables to processing centers.'**
+  String get eventsCategoryRecyclingDriveDescription;
+
+  /// No description provided for @eventsCategoryHazardousRemoval.
+  ///
+  /// In en, this message translates to:
+  /// **'Hazardous waste removal'**
+  String get eventsCategoryHazardousRemoval;
+
+  /// No description provided for @eventsCategoryHazardousRemovalDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Safely collect chemicals, tires, batteries, or asbestos.'**
+  String get eventsCategoryHazardousRemovalDescription;
+
+  /// No description provided for @eventsCategoryAwarenessAndEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Awareness & education'**
+  String get eventsCategoryAwarenessAndEducation;
+
+  /// No description provided for @eventsCategoryAwarenessAndEducationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Workshops, talks, or community engagement on eco practices.'**
+  String get eventsCategoryAwarenessAndEducationDescription;
+
+  /// No description provided for @eventsCategoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get eventsCategoryOther;
+
+  /// No description provided for @eventsCategoryOtherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom event that doesn\'t match the categories above.'**
+  String get eventsCategoryOtherDescription;
+
+  /// No description provided for @eventsGearTrashBags.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash bags'**
+  String get eventsGearTrashBags;
+
+  /// No description provided for @eventsGearGloves.
+  ///
+  /// In en, this message translates to:
+  /// **'Gloves'**
+  String get eventsGearGloves;
+
+  /// No description provided for @eventsGearRakes.
+  ///
+  /// In en, this message translates to:
+  /// **'Rakes & shovels'**
+  String get eventsGearRakes;
+
+  /// No description provided for @eventsGearWheelbarrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Wheelbarrow'**
+  String get eventsGearWheelbarrow;
+
+  /// No description provided for @eventsGearWaterBoots.
+  ///
+  /// In en, this message translates to:
+  /// **'Water boots'**
+  String get eventsGearWaterBoots;
+
+  /// No description provided for @eventsGearSafetyVest.
+  ///
+  /// In en, this message translates to:
+  /// **'Safety vest'**
+  String get eventsGearSafetyVest;
+
+  /// No description provided for @eventsGearFirstAid.
+  ///
+  /// In en, this message translates to:
+  /// **'First aid kit'**
+  String get eventsGearFirstAid;
+
+  /// No description provided for @eventsGearSunscreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunscreen & water'**
+  String get eventsGearSunscreen;
+
+  /// No description provided for @eventsScaleSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small (1–5 people)'**
+  String get eventsScaleSmall;
+
+  /// No description provided for @eventsScaleSmallDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick spot cleanup, one bag or two.'**
+  String get eventsScaleSmallDescription;
+
+  /// No description provided for @eventsScaleMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium (6–15 people)'**
+  String get eventsScaleMedium;
+
+  /// No description provided for @eventsScaleMediumDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Half-day effort, several areas covered.'**
+  String get eventsScaleMediumDescription;
+
+  /// No description provided for @eventsScaleLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large (16–40 people)'**
+  String get eventsScaleLarge;
+
+  /// No description provided for @eventsScaleLargeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Organized group, heavy waste removal.'**
+  String get eventsScaleLargeDescription;
+
+  /// No description provided for @eventsScaleMassive.
+  ///
+  /// In en, this message translates to:
+  /// **'Massive (40+ people)'**
+  String get eventsScaleMassive;
+
+  /// No description provided for @eventsScaleMassiveDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'City-wide or multi-site event.'**
+  String get eventsScaleMassiveDescription;
+
+  /// No description provided for @eventsDifficultyEasy.
+  ///
+  /// In en, this message translates to:
+  /// **'Easy'**
+  String get eventsDifficultyEasy;
+
+  /// No description provided for @eventsDifficultyEasyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Flat terrain, light waste, family-friendly.'**
+  String get eventsDifficultyEasyDescription;
+
+  /// No description provided for @eventsDifficultyModerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderate'**
+  String get eventsDifficultyModerate;
+
+  /// No description provided for @eventsDifficultyModerateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Mixed terrain or bulky items, some effort.'**
+  String get eventsDifficultyModerateDescription;
+
+  /// No description provided for @eventsDifficultyHard.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard'**
+  String get eventsDifficultyHard;
+
+  /// No description provided for @eventsDifficultyHardDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Steep slopes, heavy debris, or hazardous materials.'**
+  String get eventsDifficultyHardDescription;
+
+  /// No description provided for @eventsSiteCoercedDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Community cleanup site'**
+  String get eventsSiteCoercedDescription;
+
+  /// No description provided for @homeSiteCleaningEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No cleaning events yet'**
+  String get homeSiteCleaningEmptyTitle;
+
+  /// No description provided for @homeSiteCleaningEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Be the first to organize an eco action and rally volunteers for this site.'**
+  String get homeSiteCleaningEmptyBody;
+
+  /// No description provided for @homeSiteCleaningTapToCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to create'**
+  String get homeSiteCleaningTapToCreate;
+
+  /// No description provided for @homeSiteCleaningCtaCreateFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Create eco action'**
+  String get homeSiteCleaningCtaCreateFirst;
+
+  /// No description provided for @homeSiteCleaningCtaScheduleAnother.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule another action'**
+  String get homeSiteCleaningCtaScheduleAnother;
+
+  /// No description provided for @homeSiteCleaningVolunteersJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 volunteer joined} other{{count} volunteers joined}}'**
+  String homeSiteCleaningVolunteersJoined(int count);
+
+  /// No description provided for @homeSiteCleaningOrganizerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re organizing this action. Upload \"after\" photos once it\'s completed.'**
+  String get homeSiteCleaningOrganizerHint;
+
+  /// No description provided for @homeSiteCleaningVolunteerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Join the action to help clean this site.'**
+  String get homeSiteCleaningVolunteerHint;
+
+  /// No description provided for @homeSiteCleaningJoinAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Join action'**
+  String get homeSiteCleaningJoinAction;
+
+  /// No description provided for @homeSiteCleaningEventUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Event details are unavailable right now.'**
+  String get homeSiteCleaningEventUnavailable;
+
+  /// No description provided for @errorUserNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your connection and try again.'**
+  String get errorUserNetwork;
+
+  /// No description provided for @errorUserTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'That took too long. Please try again.'**
+  String get errorUserTimeout;
+
+  /// No description provided for @errorUserUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign in again to continue.'**
+  String get errorUserUnauthorized;
+
+  /// No description provided for @errorUserForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You don’t have permission to do that.'**
+  String get errorUserForbidden;
+
+  /// No description provided for @errorUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t find that.'**
+  String get errorUserNotFound;
+
+  /// No description provided for @errorUserServer.
+  ///
+  /// In en, this message translates to:
+  /// **'The service is busy. Please try again shortly.'**
+  String get errorUserServer;
+
+  /// No description provided for @errorUserTooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please wait a moment.'**
+  String get errorUserTooManyRequests;
+
+  /// No description provided for @errorUserUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errorUserUnknown;
+
+  /// No description provided for @eventsFilterSheetSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter events'**
+  String get eventsFilterSheetSemantic;
+
+  /// No description provided for @eventChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get eventChatTitle;
+
+  /// No description provided for @eventChatRowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Group chat'**
+  String get eventChatRowTitle;
+
+  /// No description provided for @eventChatInputHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get eventChatInputHint;
+
+  /// No description provided for @eventChatSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get eventChatSend;
+
+  /// No description provided for @eventChatEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Start the conversation'**
+  String get eventChatEmptyTitle;
+
+  /// No description provided for @eventChatEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Coordinate with other volunteers before and during the event.'**
+  String get eventChatEmptyBody;
+
+  /// No description provided for @eventChatMessageRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'This message was removed'**
+  String get eventChatMessageRemoved;
+
+  /// No description provided for @eventChatNewMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'New messages'**
+  String get eventChatNewMessages;
+
+  /// No description provided for @eventChatToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get eventChatToday;
+
+  /// No description provided for @eventChatYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get eventChatYesterday;
+
+  /// No description provided for @eventChatReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get eventChatReply;
+
+  /// No description provided for @eventChatDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get eventChatDelete;
+
+  /// No description provided for @eventChatLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load messages'**
+  String get eventChatLoadError;
+
+  /// No description provided for @eventChatSendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Message not sent. Tap to retry.'**
+  String get eventChatSendFailed;
+
+  /// No description provided for @eventChatOpenMapsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t open Maps. Try again.'**
+  String get eventChatOpenMapsFailed;
+
+  /// No description provided for @eventChatAttachPhotoLibrary.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo Library'**
+  String get eventChatAttachPhotoLibrary;
+
+  /// No description provided for @eventChatAttachCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get eventChatAttachCamera;
+
+  /// No description provided for @eventChatAttachVideo.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get eventChatAttachVideo;
+
+  /// No description provided for @eventChatAttachDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Document'**
+  String get eventChatAttachDocument;
+
+  /// No description provided for @eventChatAttachAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Audio'**
+  String get eventChatAttachAudio;
+
+  /// No description provided for @eventChatVoiceDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard recording'**
+  String get eventChatVoiceDiscard;
+
+  /// No description provided for @eventChatVoiceSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send voice message'**
+  String get eventChatVoiceSend;
+
+  /// No description provided for @eventChatVoicePreviewHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice preview'**
+  String get eventChatVoicePreviewHint;
+
+  /// No description provided for @eventChatAttachLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Location'**
+  String get eventChatAttachLocation;
+
+  /// No description provided for @eventChatSendLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Location'**
+  String get eventChatSendLocation;
+
+  /// No description provided for @eventChatSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get eventChatSending;
+
+  /// No description provided for @eventChatReplyingTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Replying to {name}'**
+  String eventChatReplyingTo(String name);
+
+  /// No description provided for @eventChatCharCountHint.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} / 2000'**
+  String eventChatCharCountHint(int count);
+
+  /// No description provided for @eventChatSemanticsBubble.
+  ///
+  /// In en, this message translates to:
+  /// **'{author}, {time}. {body}'**
+  String eventChatSemanticsBubble(String author, String time, String body);
+
+  /// No description provided for @eventChatInputSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat message'**
+  String get eventChatInputSemantics;
+
+  /// No description provided for @eventChatPushChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Event chat'**
+  String get eventChatPushChannelName;
+
+  /// No description provided for @eventChatEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'(edited)'**
+  String get eventChatEdited;
+
+  /// No description provided for @eventChatEditMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get eventChatEditMessage;
+
+  /// No description provided for @eventChatEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing message'**
+  String get eventChatEditing;
+
+  /// No description provided for @eventChatEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your message'**
+  String get eventChatEditHint;
+
+  /// No description provided for @eventChatSaveEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get eventChatSaveEdit;
+
+  /// No description provided for @eventChatPinMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Pin'**
+  String get eventChatPinMessage;
+
+  /// No description provided for @eventChatUnpinMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpin'**
+  String get eventChatUnpinMessage;
+
+  /// No description provided for @eventChatPinnedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned by {name}'**
+  String eventChatPinnedBy(String name);
+
+  /// No description provided for @eventChatPinnedMessagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned messages'**
+  String get eventChatPinnedMessagesTitle;
+
+  /// No description provided for @eventChatPinnedBarHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pinned'**
+  String get eventChatPinnedBarHint;
+
+  /// No description provided for @eventChatNoPinnedMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No pinned messages'**
+  String get eventChatNoPinnedMessages;
+
+  /// No description provided for @eventChatMuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications muted'**
+  String get eventChatMuted;
+
+  /// No description provided for @eventChatUnmuted.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications unmuted'**
+  String get eventChatUnmuted;
+
+  /// No description provided for @eventChatCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Message copied'**
+  String get eventChatCopied;
+
+  /// No description provided for @eventChatReconnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting…'**
+  String get eventChatReconnecting;
+
+  /// No description provided for @eventChatConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get eventChatConnected;
+
+  /// No description provided for @eventChatSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search messages'**
+  String get eventChatSearchHint;
+
+  /// No description provided for @eventChatSearchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages found'**
+  String get eventChatSearchNoResults;
+
+  /// No description provided for @eventChatSearchAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get eventChatSearchAction;
+
+  /// No description provided for @eventChatParticipantsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} participants'**
+  String eventChatParticipantsCount(int count);
+
+  /// No description provided for @eventChatParticipantsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'People in this chat'**
+  String get eventChatParticipantsSheetTitle;
+
+  /// No description provided for @eventChatParticipantsTitleSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{eventTitle}, {count} participants'**
+  String eventChatParticipantsTitleSemantic(String eventTitle, int count);
+
+  /// No description provided for @eventChatParticipantsLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t load participants.'**
+  String get eventChatParticipantsLoadError;
+
+  /// No description provided for @eventChatParticipantsYouBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get eventChatParticipantsYouBadge;
+
+  /// No description provided for @eventChatParticipantsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No participants loaded yet.'**
+  String get eventChatParticipantsEmpty;
+
+  /// No description provided for @eventChatSystemUserJoined.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} joined the event'**
+  String eventChatSystemUserJoined(String name);
+
+  /// No description provided for @eventChatSystemUserLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} left the event'**
+  String eventChatSystemUserLeft(String name);
+
+  /// No description provided for @eventChatSystemEventUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Event details were updated'**
+  String get eventChatSystemEventUpdated;
+
+  /// No description provided for @eventChatSwipeReplySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to reply to this message'**
+  String get eventChatSwipeReplySemantic;
+
+  /// No description provided for @eventChatVoiceLevelSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice level meter'**
+  String get eventChatVoiceLevelSemantic;
+
+  /// No description provided for @eventChatMessageOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Message options'**
+  String get eventChatMessageOptions;
+
+  /// No description provided for @eventChatTypingUnknownParticipant.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone'**
+  String get eventChatTypingUnknownParticipant;
+
+  /// No description provided for @eventChatCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy'**
+  String get eventChatCopy;
+
+  /// No description provided for @eventChatUnpinConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Message unpinned'**
+  String get eventChatUnpinConfirm;
+
+  /// No description provided for @eventChatMaxPinnedReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum pinned messages reached'**
+  String get eventChatMaxPinnedReached;
+
+  /// No description provided for @eventChatMessageNotInView.
+  ///
+  /// In en, this message translates to:
+  /// **'That message isn’t loaded. Scroll up for older messages.'**
+  String get eventChatMessageNotInView;
+
+  /// No description provided for @eventChatMuteNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Mute notifications'**
+  String get eventChatMuteNotifications;
+
+  /// No description provided for @eventChatUnmuteNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Unmute notifications'**
+  String get eventChatUnmuteNotifications;
+
+  /// No description provided for @eventChatSeenBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen by {names}'**
+  String eventChatSeenBy(String names);
+
+  /// No description provided for @eventChatSeenByTruncated.
+  ///
+  /// In en, this message translates to:
+  /// **'Seen by {names} +{count}'**
+  String eventChatSeenByTruncated(String names, int count);
+
+  /// No description provided for @eventChatTypingOne.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is typing…'**
+  String eventChatTypingOne(String name);
+
+  /// No description provided for @eventChatTypingTwo.
+  ///
+  /// In en, this message translates to:
+  /// **'{first} and {second} are typing…'**
+  String eventChatTypingTwo(String first, String second);
+
+  /// No description provided for @eventChatTypingMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} and {count} others are typing…'**
+  String eventChatTypingMany(String name, int count);
+
+  /// No description provided for @eventChatImageViewerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo'**
+  String get eventChatImageViewerTitle;
+
+  /// No description provided for @eventChatImageViewerPage.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {total}'**
+  String eventChatImageViewerPage(int current, int total);
+
+  /// No description provided for @eventChatVideoViewerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Video'**
+  String get eventChatVideoViewerTitle;
+
+  /// No description provided for @eventChatOpenFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Open file'**
+  String get eventChatOpenFile;
+
+  /// No description provided for @eventChatDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t download the file'**
+  String get eventChatDownloadFailed;
+
+  /// No description provided for @eventChatPdfOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn’t open the PDF'**
+  String get eventChatPdfOpenFailed;
+
+  /// No description provided for @eventChatShareFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get eventChatShareFile;
+
+  /// No description provided for @eventChatLocationMapTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get eventChatLocationMapTitle;
+
+  /// No description provided for @eventChatCopyCoordinates.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy coordinates'**
+  String get eventChatCopyCoordinates;
+
+  /// No description provided for @eventChatDirections.
+  ///
+  /// In en, this message translates to:
+  /// **'Directions'**
+  String get eventChatDirections;
+
+  /// No description provided for @eventChatAudioExpandedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice message'**
+  String get eventChatAudioExpandedTitle;
+
+  /// No description provided for @eventChatHoldToRecord.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold to record'**
+  String get eventChatHoldToRecord;
+
+  /// No description provided for @eventChatReleaseToSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to send'**
+  String get eventChatReleaseToSend;
+
+  /// No description provided for @eventChatSlideToCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Slide left to cancel'**
+  String get eventChatSlideToCancel;
+
+  /// No description provided for @eventChatReleaseToCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Release to cancel'**
+  String get eventChatReleaseToCancel;
+
+  /// No description provided for @eventChatRecording.
+  ///
+  /// In en, this message translates to:
+  /// **'Recording…'**
+  String get eventChatRecording;
+
+  /// No description provided for @eventChatMicPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone access is required to send voice messages.'**
+  String get eventChatMicPermissionDenied;
 }
 
 class _AppLocalizationsDelegate

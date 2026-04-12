@@ -10,6 +10,18 @@ class AppMotion {
   static const Duration emphasizedDuration = Duration(milliseconds: 420);
   static const Duration slow = Duration(milliseconds: 700);
 
+  /// One full three-dot typing wave (event chat).
+  static const Duration chatTypingCycle = Duration(milliseconds: 1500);
+
+  /// Message bubble fade + horizontal slide-in (event chat).
+  static const Duration chatBubbleEntrance = Duration(milliseconds: 400);
+
+  /// Eased phase 0–1 for typing dots each [chatTypingCycle] (calmer than linear).
+  static const Curve chatTypingPhaseCurve = Curves.easeInOutCubic;
+
+  /// Entrance curve for chat bubbles (matches iOS-style deceleration).
+  static const Curve chatBubbleEntranceCurve = smooth;
+
   static const Curve emphasized = Curves.easeOutCubic;
   static const Curve smooth = Cubic(0.33, 0.0, 0.2, 1.0);
   static const Curve spring = Curves.easeOutBack;

@@ -13,6 +13,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action/donate_sheet.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 class TakeActionCoordinator {
@@ -145,7 +146,11 @@ class TakeActionCoordinator {
         onShareCountChanged?.call();
         return true;
       case ShareAction.sendMessage:
-        await Share.share(text, subject: site.title);
+        await Share.share(
+          text,
+          subject: site.title,
+          sharePositionOrigin: sharePopoverOrigin(context),
+        );
         // share_plus v10 does not expose a reliable completion status for this path.
         // To avoid false-positive counters, we do not increment here.
         return false;

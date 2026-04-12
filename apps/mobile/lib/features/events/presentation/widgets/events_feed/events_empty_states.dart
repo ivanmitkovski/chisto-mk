@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 
 class EventsEmptyState extends StatelessWidget {
@@ -16,26 +19,27 @@ class EventsEmptyState extends StatelessWidget {
     final String title;
     final String subtitle;
     final IconData icon;
+    final AppLocalizations l10n = context.l10n;
     switch (filter) {
       case EcoEventFilter.all:
-        title = 'No eco events yet';
-        subtitle = 'Be the first to create one! Tap + above to get started.';
+        title = l10n.eventsEmptyAllTitle;
+        subtitle = l10n.eventsEmptyAllSubtitle;
         icon = CupertinoIcons.calendar_badge_plus;
       case EcoEventFilter.upcoming:
-        title = 'No upcoming events';
-        subtitle = 'Create one to get volunteers together.';
+        title = l10n.eventsEmptyUpcomingTitle;
+        subtitle = l10n.eventsEmptyUpcomingSubtitle;
         icon = CupertinoIcons.clock;
       case EcoEventFilter.nearby:
-        title = 'No nearby events';
-        subtitle = 'Try a different filter or create an event in your area.';
+        title = l10n.eventsEmptyNearbyTitle;
+        subtitle = l10n.eventsEmptyNearbySubtitle;
         icon = CupertinoIcons.location;
       case EcoEventFilter.past:
-        title = 'No past events';
-        subtitle = 'Completed events will show here.';
+        title = l10n.eventsEmptyPastTitle;
+        subtitle = l10n.eventsEmptyPastSubtitle;
         icon = CupertinoIcons.checkmark_circle;
       case EcoEventFilter.myEvents:
-        title = 'No events yet';
-        subtitle = 'Join or create an event to see it here.';
+        title = l10n.eventsEmptyMyEventsTitle;
+        subtitle = l10n.eventsEmptyMyEventsSubtitle;
         icon = CupertinoIcons.person_crop_circle;
     }
 
@@ -68,11 +72,7 @@ class EventsEmptyState extends StatelessWidget {
           Text(
             title,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
+            style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Padding(
@@ -80,10 +80,7 @@ class EventsEmptyState extends StatelessWidget {
             child: Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
+              style: AppTypography.emptyStateSubtitle,
             ),
           ),
         ],
@@ -119,24 +116,17 @@ class SearchEmptyState extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(
-            'No results for "$query"',
+            context.l10n.eventsSearchEmptyTitle(query),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  letterSpacing: -0.2,
-                ),
+            style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
-              'Try a different search term or check your spelling.',
+              context.l10n.eventsSearchEmptySubtitle,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.5,
-                  ),
+              style: AppTypography.emptyStateSubtitle,
             ),
           ),
         ],

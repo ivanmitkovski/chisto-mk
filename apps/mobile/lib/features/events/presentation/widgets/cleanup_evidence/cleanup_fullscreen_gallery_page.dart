@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 class CleanupFullscreenGalleryPage extends StatelessWidget {
@@ -23,7 +24,7 @@ class CleanupFullscreenGalleryPage extends StatelessWidget {
                 ? AssetImage(path)
                 : FileImage(File(path)) as ImageProvider,
             heroTag: 'cleanup-evidence-$path',
-            semanticLabel: 'Cleanup evidence photo',
+            semanticLabel: context.l10n.eventsCleanupEvidencePhotoSemantic,
           ),
         )
         .toList();

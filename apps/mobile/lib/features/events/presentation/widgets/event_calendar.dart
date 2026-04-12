@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -22,22 +23,36 @@ class EventCalendar extends StatefulWidget {
 
 class _EventCalendarState extends State<EventCalendar> {
   late DateTime _focusedMonth;
-  final DateTime _today = DateUtils.dateOnly(DateTime.now());
 
-  static const List<String> _dayLabels = <String>[
-    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
-  ];
-
-  static const List<String> _monthNames = <String>[
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December',
-  ];
+  DateTime get _today => DateUtils.dateOnly(DateTime.now());
 
   @override
   void initState() {
     super.initState();
     final DateTime base = widget.selectedDate ?? _today;
     _focusedMonth = DateTime(base.year, base.month);
+  }
+
+  @override
+  void didUpdateWidget(covariant EventCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final DateTime? next = widget.selectedDate;
+    if (next == null) {
+      return;
+    }
+    final DateTime nextMonth = DateTime(next.year, next.month);
+    final DateTime? oldSel = oldWidget.selectedDate;
+    final bool selectionChanged = oldSel == null ||
+        oldSel.year != next.year ||
+        oldSel.month != next.month ||
+        oldSel.day != next.day;
+    if (!selectionChanged) {
+      return;
+    }
+    if (nextMonth.year != _focusedMonth.year ||
+        nextMonth.month != _focusedMonth.month) {
+      setState(() => _focusedMonth = nextMonth);
+    }
   }
 
   void _goToPreviousMonth() {
@@ -108,16 +123,17 @@ class _EventCalendarState extends State<EventCalendar> {
   }
 
   Widget _buildMonthHeader(BuildContext context) {
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Semantics(
           button: true,
-          label: 'Previous month',
+          label: context.l10n.eventsCalendarPreviousMonth,
           child: IconButton(
             onPressed: _goToPreviousMonth,
             splashRadius: 20,
-            tooltip: 'Previous month',
+            tooltip: context.l10n.eventsCalendarPreviousMonth,
             icon: const Icon(
               CupertinoIcons.chevron_left_circle_fill,
               size: 28,
@@ -129,17 +145,10 @@ class _EventCalendarState extends State<EventCalendar> {
         Column(
           children: <Widget>[
             Text(
-              _monthNames[_focusedMonth.month - 1],
+              localizations.formatMonthYear(_focusedMonth),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                  ),
-            ),
-            Text(
-              '${_focusedMonth.year}',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
                   ),
             ),
           ],
@@ -147,11 +156,11 @@ class _EventCalendarState extends State<EventCalendar> {
         const SizedBox(width: AppSpacing.md),
         Semantics(
           button: true,
-          label: 'Next month',
+          label: context.l10n.eventsCalendarNextMonth,
           child: IconButton(
             onPressed: _goToNextMonth,
             splashRadius: 20,
-            tooltip: 'Next month',
+            tooltip: context.l10n.eventsCalendarNextMonth,
             icon: const Icon(
               CupertinoIcons.chevron_right_circle_fill,
               size: 28,
@@ -164,8 +173,13 @@ class _EventCalendarState extends State<EventCalendar> {
   }
 
   Widget _buildDayLabelsRow(BuildContext context) {
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    final List<String> dayLabels = <String>[
+      ...localizations.narrowWeekdays.sublist(1),
+      localizations.narrowWeekdays.first,
+    ];
     return Row(
-      children: _dayLabels.map((String label) {
+      children: dayLabels.map((String label) {
         return Expanded(
           child: Center(
             child: Text(
@@ -200,7 +214,7 @@ class _EventCalendarState extends State<EventCalendar> {
             child: Semantics(
               button: !(isPast && !isToday),
               selected: isSelected,
-              label: 'Day ${date.day}',
+              label: context.l10n.eventsCalendarDaySemantic(date.day),
               child: InkWell(
                 onTap: (isPast && !isToday)
                     ? null

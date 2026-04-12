@@ -52,7 +52,14 @@ class AppConfig {
     );
   }
 
-  /// AWS dev API. Pass URL via --dart-define=API_URL=https://your-alb-url.eu-central-1.elb.amazonaws.com
+  /// AWS dev API. Pass URL via `--dart-define=API_URL=...`.
+  ///
+  /// Use a hostname that matches the **TLS certificate** (e.g. `https://api-dev.chisto.mk`).
+  /// A raw `*.elb.amazonaws.com` URL often fails HTTPS/WebSocket handshakes when the cert
+  /// is only valid for the custom domain.
+  ///
+  /// Event chat (Socket.IO) needs `GET /socket.io/?EIO=4&transport=polling` on the **same**
+  /// host as REST; ALB rules that only forward `/api` or `/events` break live chat.
   static AppConfig get awsDev {
     const String url =
         String.fromEnvironment('API_URL', defaultValue: 'https://api-dev.chisto.mk');
@@ -61,6 +68,21 @@ class AppConfig {
       helpCenterUrl: 'https://chisto.mk/help',
       environment: AppEnvironment.dev,
     );
+  }
+
+  /// Base URL for **web** share links (`/events/:id`), without trailing slash.
+  ///
+  /// Override per environment, e.g.
+  /// `--dart-define=SHARE_BASE_URL=https://staging.chisto.mk`
+  ///
+  /// Defaults to production marketing site when unset.
+  static String get shareBaseUrlFromEnvironment {
+    const String raw = String.fromEnvironment('SHARE_BASE_URL', defaultValue: '');
+    final String trimmed = raw.trim();
+    if (trimmed.isEmpty) {
+      return 'https://chisto.mk';
+    }
+    return trimmed.replaceAll(RegExp(r'/+$'), '');
   }
 
   static AppConfig fromEnvironment() {

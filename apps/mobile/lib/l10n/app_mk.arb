@@ -450,6 +450,11 @@
   "profilePointsReasonEcoApproved": "Одобрена еко-акција",
   "profilePointsReasonEcoRealized": "Завршена еко-акција",
   "profilePointsReasonOther": "Промена на поени",
+  "profilePointsReasonEventOrganizerApproved": "Вашиот настан за чистење е одобрен",
+  "profilePointsReasonEventJoined": "Се придруживте на настан за чистење",
+  "profilePointsReasonEventJoinNoShow": "Прилагодување на бонус — без проверка",
+  "profilePointsReasonEventCheckIn": "Регистрација на настан",
+  "profilePointsReasonEventCompleted": "Завршен настан за чистење",
   "profileReportCreditsTitle": "Кредити за пријави",
   "profileAccountDetailsSection": "Детали за сметката",
   "profileGeneralInfoTile": "Општи информации",
@@ -831,11 +836,41 @@
   "notificationsFilterUnread": "Непрочитани",
   "eventsEventNotFoundTitle": "Настанот не е пронајден",
   "eventsEventNotFoundBody": "Овој настан повеќе не е достапен.",
+  "eventsDetailBrowseEvents": "Прегледај настани",
+  "eventsDetailCouldNotRefresh": "Не можеше освежување. Се прикажуваат зачувани детали.",
+  "eventsDetailRetryRefresh": "Обиди се повторно",
+  "eventsDetailLocationTitle": "Локација",
+  "eventsDetailCopyAddress": "Копирај адреса",
+  "eventsDetailAddressCopied": "Адресата е копирана",
+  "eventsDetailLocationLongPressHint": "Долг притисок за целосна адреса и акции",
+  "eventsDetailCoverImageUnavailable": "Сликата не е достапна",
+  "eventsWeatherUnavailableBody": "Прогнозата моментално не е достапна.",
+  "eventsWeatherRetry": "Обиди се повторно",
+  "eventsUnableToStartEventGeneric": "Не можевме да го започнеме настанот. Проверете ја врската и обидете се повторно.",
+  "eventsStartEventTooEarly": "Можете да го започнете ова еко дејство откако ќе настапи закажаното време на почеток.",
+  "eventsAwaitingModerationCta": "Чека одобрување",
+  "eventsModerationBannerTitle": "Чека одобрување",
+  "eventsModerationBannerBody": "Оваа акција е видлива за вас како организатор. Волонтерите ќе можат да се придружат откако модераторите ќе ја одобрат.",
+  "eventsEventPendingPublicCta": "Сè уште не е отворено за придружување",
+  "eventsFeedOfflineStaleBanner": "Прикажани се зачувани настани — освежувањето не успеа. Повлечете надолу за повторен обид.",
+  "eventsFeedInitialLoadFailed": "Не можевме да ги вчитаме настаните. Проверете ја врската и обидете се повторно.",
+  "eventsOrganizerInvalidateQrTitle": "Инвалидирај претходни QR кодови",
+  "eventsOrganizerInvalidateQrSubtitle": "Користете ако кодот бил споделен или фотографиран. Веќе скенираните кодови важат до истек; ова ја ротира сесијата за нови скенирања.",
+  "eventsOrganizerQrSessionRotated": "QR сесијата е обновена. Покажете му го новиот код на учесниците.",
+  "eventsOrganizerQrRotateFailed": "Не можевме да ги инвалидираме кодовите. Обидете се повторно.",
+  "eventsEditEventTitle": "Уреди настан",
+  "eventsEditEventSave": "Зачувај промени",
+  "eventsEventUpdated": "Настанот е ажуриран",
+  "eventsMutationFailedGeneric": "Нешто не е во ред. Обидете се повторно.",
   "eventsManualCheckInAdd": "Додај",
   "eventsManualCheckInTitle": "Рачен check-in",
   "eventsCheckInTitle": "Check-in",
   "eventsOrganizerMockAllCheckedIn": "Сите пробни учесници веќе се пријавени.",
   "eventsOrganizerAttendeeNamePlaceholder": "Име на учесник",
+  "eventsOrganizerManualCheckInSubtitle": "Пребарајте волонтери што се пријавиле на настанот, потоа ги пријавете.",
+  "eventsOrganizerManualCheckInNoJoiners": "Сè уште нема пријавени волонтери на овој настан.",
+  "eventsOrganizerManualCheckInSelectParticipant": "Изберете волонтер од листата.",
+  "eventsOrganizerManualCheckInNotParticipant": "Оваа личност не е на листата на учесници.",
   "eventsOrganizerEnterNameFirst": "Прво внесете го името на учесникот.",
   "eventsOrganizerNameAlreadyCheckedIn": "{name} веќе е пријавен/а.",
   "@eventsOrganizerNameAlreadyCheckedIn": {
@@ -882,6 +917,56 @@
     }
   },
   "eventsOrganizerUploadAfterPhotosHint": "Поставете ги фотографиите „после“ од деталите за настанот.",
+  "eventsOrganizerCompletionCheckedInNone": "Никој не се чекирал.",
+  "eventsOrganizerCompletionJoinedLine": "{count} доброволци се пријавиле",
+  "@eventsOrganizerCompletionJoinedLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionJoinedOfCap": "{joined} од {cap} места се пополнети",
+  "@eventsOrganizerCompletionJoinedOfCap": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "cap": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionSheetSemantic": "Настанот е завршен. Прегледајте ги следните чекори.",
+  "eventsOrganizerCompletionBackToEvent": "Назад кон настанот",
+  "eventsOrganizerCompletionAddPhotosNow": "Додај фотографии сега",
+  "eventsOrganizerCompletionWhatNextIntro": "Завршете на страницата на настанот: документирајте резултати и споделете го влијанието.",
+  "eventsOrganizerCompletionNextStepsHeading": "СЛЕДНИ ЧЕКОРИ",
+  "eventsOrganizerCompletionStepPhotosTitle": "Додајте фотографии „после“",
+  "eventsOrganizerCompletionStepPhotosBody": "Покажете ја разликата. Тие се гледаат на страницата на настанот за сите.",
+  "eventsOrganizerCompletionStepImpactTitle": "Запишете го влијанието",
+  "eventsOrganizerCompletionStepImpactBody": "Забележете торби, волонтерски часови и проценки од страницата на настанот.",
+  "eventsOrganizerCompletionStepVisibilityTitle": "Изградете доверба",
+  "eventsOrganizerCompletionStepVisibilityBody": "Фотографиите им помагаат на модераторите и инспирираат идни акции.",
+  "eventsOrganizerDetailPendingAfterPhotosTitle": "Фотографии „после“",
+  "eventsOrganizerDetailPendingAfterPhotosMessage": "Поставете фотографии по чистењето за да ги видат доброволците и модераторите. Користете го копчето подолу.",
+  "eventsAttendeeCompletedTitle": "Ви благодариме",
+  "eventsAttendeeCompletedBody": "Оваа еко-акција е завршена. Ви благодариме што дојдовте.",
+  "eventsAfterPhotosOrganizerEmptyHint": "Сè уште нема фотографии „после“. Користете го копчето подолу за да додадете.",
+  "eventsEvidenceScreenSubtitle": "Фотографиите „после“ го документираат резултатот и се појавуваат на страницата на настанот.",
+  "eventsEvidencePhotoCountChip": "{current} од {max} фотографии",
+  "@eventsEvidencePhotoCountChip": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsEvidenceBeforeAfterTabsSemantic": "Фотографии пред и после",
+  "eventsEvidenceSavingSemantic": "Се зачувуваат фотографиите „после“",
   "eventsOrganizerCheckInPausedSnack": "Пријавата е паузирана.",
   "eventsOrganizerCheckInResumedSnack": "Пријавата е активна повторно.",
   "eventsOrganizerUnableCancelEvent": "Не можеше да се откаже настанот.",
@@ -922,6 +1007,27 @@
   },
   "eventsOrganizerQrRefreshesWhenOpen": "QR се освежува автоматски и по секое скенирање",
   "eventsOrganizerResumeForFreshQr": "Продолжете со пријава за нов QR",
+  "eventsOrganizerQrLoadFailedGeneric": "Не можеше да се вчита код за пријава. Проверете ја врската и обидете се повторно.",
+  "eventsOrganizerQrRateLimited": "Премногу обиди за освежување. Почекајте малку и обидете се повторно.",
+  "eventsOrganizerSessionSetupFailed": "Не можевме да започнеме евиденција. Потврдете дека настанот е во тек и обидете се повторно.",
+  "eventsOrganizerQrRetry": "Обиди повторно",
+  "eventsOrganizerQrBrightnessHint": "Совет: зголемете ја осветленоста на екранот за полесно скенирање.",
+  "eventsOrganizerQrSemantics": "QR-код за пријава. Се освежува за околу {seconds} секунди.",
+  "@eventsOrganizerQrSemantics": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrEncodeError": "Кодот не можеше да се прикаже. Допрете обиди повторно.",
+  "eventsOrganizerFeedbackInvalidQrStrict": "Тој QR не важи за пријава.",
+  "eventsOrganizerFeedbackRequiresJoin": "Прво се пријавете на настанот во апликацијата.",
+  "eventsOrganizerFeedbackCheckInUnavailable": "Пријавата моментално не е достапна за овој настан.",
+  "eventsOrganizerFeedbackRateLimited": "Премногу обиди. Почекајте кратко и обидете се повторно.",
+  "eventsOrganizerCopyQrText": "Копирај QR код текст",
+  "eventsOrganizerQrTextCopied": "QR код текстот е копиран — залепете го во порака до учесниците кои не можат да скенираат.",
+  "eventsOrganizerNoQrToCopy": "Сè уште нема активен QR код за копирање.",
   "eventsOrganizerManualOverride": "Рачно: означи учесник како присутен",
   "eventsOrganizerCheckedInHeading": "Пријавени",
   "eventsOrganizerEmptyListTitle": "Сè уште никој не се пријавил",
@@ -930,6 +1036,17 @@
   "eventsOrganizerPauseCheckIn": "Паузирај пријава",
   "eventsOrganizerResumeCheckIn": "Продолжи пријава",
   "eventsOrganizerCancelEvent": "Откажи настан",
+  "eventsOrganizerMoreActionsSemantic": "Повеќе акции за настанот",
+  "eventsOrganizerMoreSheetTitle": "Акции за настанот",
+  "eventsOrganizerEndEventConfirmTitle": "Да се заврши настанот?",
+  "eventsOrganizerEndEventConfirmMessage": "Пријавата ќе се затвори и настанот ќе биде означен како завршен. Подоцна можеш да прикачиш фотографии од деталите за настанот.",
+  "eventsOrganizerEndEventKeepManaging": "Продолжи со управување",
+  "eventsOrganizerEndEventConfirmAction": "Заврши настан",
+  "eventsOrganizerCancelEventConfirmTitle": "Да се откаже настанот?",
+  "eventsOrganizerCancelEventConfirmMessage": "Волонтерите ќе го видат настанот како откажан. Ова не може да се врати од апликацијата.",
+  "eventsOrganizerCancelEventKeepEvent": "Задржи настан",
+  "eventsOrganizerCancelEventConfirmAction": "Откажи настан",
+  "eventsOrganizerRemoveAttendeeSemantic": "Отстрани го {name} од пријавата",
   "eventsOrganizerSimulateCheckInDev": "Симулирај check-in (dev)",
   "eventsPhotosTitle": "Фотографии",
   "createEventDefaultDescription": "Заедничка акција за чистење организирана од локални волонтери.",
@@ -968,7 +1085,42 @@
   "createEventPlaceholderDifficulty": "Поставете ниво на тешкотија",
   "createEventSubmitLabel": "Креирај еко-акција",
   "createEventAppBarTitle": "Креирај настан",
-  "createEventLocalInfoSnack": "Засега настанот останува локален, но организаторскиот тек е веднаш подготвен.",
+  "createEventHelpTitle": "Креирање настан",
+  "createEventHelpSubtitle": "Краток водич за организатори",
+  "createEventHelpBulletModeration": "Настаните се проверуваат за точни и безбедни акции за заедницата.",
+  "createEventHelpBulletVolunteers": "Доброволците гледаат наслов, распоред, локација, опрема и опис кога настанот е објавен.",
+  "createEventHelpBulletSite": "Изберете локација од листата или мапата за да знаат сите каде да се сретнат.",
+  "createEventHelpBulletSchedule": "Поставете датум и време за јасни календари и потсетници.",
+  "createEventHelpBulletSubmit": "Кога се пополнети задолжителните полиња, користете „Креирај еко-акција“ за објавување.",
+  "createEventFieldVolunteerCap": "Лимит на доброволци",
+  "createEventVolunteerCapPlaceholderNoLimit": "Без лимит",
+  "createEventVolunteerCapUpTo": "До {count} доброволци",
+  "@createEventVolunteerCapUpTo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventVolunteerCapSheetTitle": "Лимит на доброволци",
+  "createEventVolunteerCapSheetSubtitle": "Изборно. Лимитот е помеѓу 2 и 5000.",
+  "createEventVolunteerCapNoLimit": "Без лимит",
+  "createEventVolunteerCapCustomLabel": "Сопствен број",
+  "createEventVolunteerCapCustomHint": "Број (2–5000)",
+  "createEventVolunteerCapApply": "Примени",
+  "createEventVolunteerCapInvalid": "Внесете цел број помеѓу 2 и 5000.",
+  "createEventSitePickerLoading": "Се вчитуваат локации…",
+  "createEventSitePickerOfflineTitle": "Офлајн листа",
+  "createEventSitePickerOfflineMessage": "Се прикажуваат вградени локации бидејќи живата листа е празна или недостапна.",
+  "createEventSitePickerLoadFailedTitle": "Не можеше освежување",
+  "createEventSitePickerLoadFailedMessage": "Сè уште можете да изберете од офлајн листата. Обидете се повторно за жива листа.",
+  "createEventSitePickerRetry": "Обиди се повторно",
+  "createEventDiscardTitle": "Отфрли настан?",
+  "createEventDiscardBody": "Ќе ги изгубите внесените податоци на овој екран.",
+  "createEventDiscardKeepEditing": "Продолжи уредување",
+  "createEventLoadingSemantic": "Се вчитува формата за креирање настан",
+  "createEventSectionScheduleCaption": "Распоред",
+  "createEventSectionDetailsCaption": "Детали за настанот",
   "createEventCleanupSiteTitle": "Локација за чистење",
   "createEventSelectSiteSemantic": "Избери локација за чистење",
   "createEventChooseSitePlaceholder": "Изберете локација со загадување",
@@ -999,6 +1151,13 @@
   },
   "createEventTitleHint": "напр. Чистење на реката за викенд",
   "createEventTitleRequired": "Насловот е задолжителен.",
+  "createEventTitleMinLength": "Користете најмалку 3 знаци за насловот.",
+  "createEventSitePickerTabList": "Листа",
+  "createEventSitePickerTabMap": "Мапа",
+  "createEventSitePickerMapEmpty": "Нема локации на мапата за ова пребарување или координатите сè уште не се достапни.",
+  "createEventSitePickerMapSemanticLabel": "Мапа на локации со загадување",
+  "createEventSitePickerMapHint": "Допрете пин за да изберете локација.",
+  "createEventSiteMapPreviewSemantic": "Отвори избор на локација на мапа",
   "createEventTypeRequired": "Изберете тип на настан.",
   "createEventGearPlaceholderQuestion": "Што треба да понесат волонтерите?",
   "createEventGearLabel": "Потребна опрема",
@@ -1027,6 +1186,171 @@
       }
     }
   },
+  "eventsCtaStartEvent": "Започни настан",
+  "eventsCtaManageCheckIn": "Управувај со пријава",
+  "eventsCtaEditAfterPhotos": "Уреди фотографии после",
+  "eventsCtaUploadAfterPhotos": "Прикачи фотографии после",
+  "eventsCtaCheckedIn": "Пријавени",
+  "eventsCtaScanToCheckIn": "Скенирај за пријава",
+  "eventsCtaCheckInPaused": "Пријавата е паузирана",
+  "eventsCtaTurnReminderOff": "Исклучи потсетник",
+  "eventsCtaSetReminder": "Постави потсетник",
+  "eventsCtaLeaveEvent": "Напушти настан",
+  "eventsCtaJoinEcoAction": "Придружи се на акцијата",
+  "eventsStatusUpcoming": "Претстоен",
+  "eventsStatusInProgress": "Во тек",
+  "eventsStatusCompleted": "Завршен",
+  "eventsStatusCancelled": "Откажан",
+  "eventsCardActionsSheetTitle": "Акции за настанот",
+  "eventsCardCopyTitle": "Копирај детали за настанот",
+  "eventsCardCopySubtitle": "Наслов, датум и локација",
+  "eventsCardCopiedSnack": "Деталите се копирани.",
+  "eventsCardShareTitle": "Сподели настан",
+  "eventsCardShareSubtitle": "Сподели со пријатели",
+  "eventsCardOpenTitle": "Отвори настан",
+  "eventsCardOpenSubtitle": "Целосни детали",
+  "eventsCardMoreActionsSemantic": "Повеќе акции за настанот",
+  "eventsCardSoonLabel": "Наскоро",
+  "eventsFeedUpNext": "Следно",
+  "eventsCountdownStarted": "Започна",
+  "eventsCountdownDaysHours": "Почнува за {days}д {hours}ч",
+  "@eventsCountdownDaysHours": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" }
+    }
+  },
+  "eventsCountdownHoursMinutes": "Почнува за {hours}ч {minutes}м",
+  "@eventsCountdownHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsCountdownMinutes": "Почнува за {minutes}м",
+  "@eventsCountdownMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsShareEventTooltip": "Сподели настан",
+  "eventsAttendeeCheckInSemantic": "Скенирај за пријава на настанот",
+  "eventsAttendeeAlreadyCheckedInSnack": "Веќе сте пријавени.",
+  "eventsAttendeeCheckInPausedSnack": "Организаторот ја паузираше пријавата.",
+  "eventsAttendeeCheckInCompleteSnack": "Пријавата е завршена.",
+  "eventsAttendeeBannerTitleCheckedIn": "Пријавени сте",
+  "eventsAttendeeBannerTitleInProgress": "Настанот е во тек",
+  "eventsAttendeeBannerSubtitleAttendanceConfirmed": "Присуството е потврдено",
+  "eventsAttendeeBannerSubtitleCheckedInAt": "Пријавени во {time}",
+  "@eventsAttendeeBannerSubtitleCheckedInAt": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "eventsAttendeeBannerSubtitleScanQr": "Скенирајте го QR-кодот на организаторот",
+  "eventsAttendeeBannerSubtitlePaused": "Пријавата е привремено паузирана",
+  "eventsDetailShareSuccess": "Настанот е споделен.",
+  "eventsDetailCalendarAdded": "Настанот е додаден во календарот.",
+  "eventsDetailCalendarFailed": "Не можеше да се додаде во календарот. Обидете се повторно.",
+  "eventsDetailRefreshFailed": "Не можеше да се освежи настанот. Обидете се повторно.",
+  "eventsDetailCancelledCallout": "Овој настан е откажан.",
+  "eventsDetailOpenInMaps": "Отвори во Maps",
+  "eventsDetailCoverSemantic": "Насловна слика за {title}",
+  "@eventsDetailCoverSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "eventsDetailGroupedPanelSemantic": "Локација, распоред и детали",
+  "eventsDetailParticipationSemantic": "Ваше учество",
+  "eventsAnalyticsLoadFailed": "Не можеше да се вчитаат аналитиките.",
+  "eventsAnalyticsRetry": "Обиди се повторно",
+  "eventsRecurrenceDaily": "Секој ден",
+  "eventsRecurrenceNavigatePrevious": "Претходен настан во серијата",
+  "eventsRecurrenceNavigateNext": "Следен настан во серијата",
+  "eventsImpactSummarySaved": "Резимето на влијание е зачувано.",
+  "eventsImpactSummaryUpdated": "Резимето на влијание е ажурирано.",
+  "eventsReminderSetSnack": "Потсетникот е поставен за {when}.",
+  "@eventsReminderSetSnack": {
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "eventsFeedbackSheetTitle": "Повратна информација после настанот",
+  "eventsFeedbackHowWasEvent": "Како помина настанот?",
+  "eventsFeedbackRatingStars": "{rating}★",
+  "@eventsFeedbackRatingStars": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "eventsFeedbackBagsCollected": "Собрани ќесиња",
+  "eventsFeedbackVolunteerHours": "Волонтерски часови: {hours}ч",
+  "@eventsFeedbackVolunteerHours": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+  "eventsFeedbackNotesHint": "Што добро помина? Белешки за следниот пат?",
+  "eventsEvidenceMaxPhotosSnack": "Максимум {max} фотографии.",
+  "@eventsEvidenceMaxPhotosSnack": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "eventsEvidencePickFailedSnack": "Не можеше да се изберат фотографии. Проверете дозволи.",
+  "eventsEvidenceRemoveAction": "Отстрани",
+  "eventsEvidenceAppBarTitle": "Докази од чистење",
+  "eventsEvidenceSaving": "Се зачувува...",
+  "eventsEvidenceAfterPhotosSaved": "Фотографиите после се зачувани.",
+  "eventsEvidenceNoChanges": "Нема промени за зачувување.",
+  "eventsSiteReferencePhotoTitle": "Референтна фотографија од локацијата",
+  "eventsSiteReferencePhotoBody": "Референца пред чистење. Користете јазичето После за фотографии од исчистената локација.",
+  "eventsManageCheckInOnlyInProgress": "Пријавата е достапна само додека настанот е во тек.",
+  "eventsEventFull": "Овој настан е полн.",
+  "eventsParticipationUpdateFailed": "Не можевме да ја ажурираме учеството. Обидете се повторно.",
+  "eventsJoinedEcoAction": "Се придруживте на оваа еколошка акција.",
+  "eventsJoinPointsEarned": "+{points} поени — добредојдовте!",
+  "@eventsJoinPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsLeftEcoAction": "Се одјавивте од оваа еколошка акција.",
+  "eventsCheckInPointsEarned": "+{points} поени — регистрирани сте!",
+  "@eventsCheckInPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsManualCheckInWithPoints": "{name} е регистриран/а · +{points} поени за нив",
+  "@eventsManualCheckInWithPoints": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "points": { "type": "int" }
+    }
+  },
+  "eventsJoinFirstForReminders": "Прво се придружете на настанот за да поставите потсетници.",
+  "eventsReminderDisabled": "Потсетникот е исклучен.",
+  "eventsReminderSheetTitle": "Изберете време за потсетник",
+  "eventsReminderSheetSubtitle": "Настанот почнува во {timeRange} на {date}.",
+  "eventsReminderPreset1Day": "1 ден пред",
+  "eventsReminderPreset3Hours": "3 часа пред",
+  "eventsReminderPreset1Hour": "1 час пред",
+  "eventsReminderPreset30Mins": "30 минути пред",
+  "eventsReminderUnavailableSubtitle": "Недостапно за ова време на настанот",
+  "eventsReminderCustomTitle": "Сопствен датум и време",
+  "eventsReminderCustomSubtitle": "Изберете точен момент за потсетник",
+  "eventsReminderPickTitle": "Изберете потсетник",
+  "eventsReminderDone": "Готово",
+  "eventsCardParticipantsMore": "+{count} повеќе",
+  "eventsCardParticipantsCountMax": "{count} / {max}",
+  "eventsCardParticipantsJoined": "{count} пријавени",
+  "eventsDetailSemanticsLabel": "Детали за настан: {title}",
+  "eventsCountdownBadgeSemantic": "Време до почеток на настанот: {label}",
+  "eventsEvidenceThumbnailMenuTitle": "Фотографија",
+  "eventsFeedRefreshFailed": "Не можевме да ги освежиме настаните.",
+  "eventsCreateGenericError": "Не можевме да креираме настан. Обидете се повторно.",
   "qrScannerPointCameraHint": "Насочете ја камерата кон живиот QR код на организаторот",
   "qrScannerEnterManually": "Не скенира? Внесете го кодот рачно",
   "qrScannerRetryCamera": "Обиди повторно со камерата",
@@ -1035,11 +1359,15 @@
   "qrScannerHintCameraBlocked": "Ако пристапот до камерата е блокиран, внесете го кодот рачно или овозможете камера во Поставки.",
   "qrScannerGenericEventTitle": "оваа акција за чистење",
   "qrScannerErrorInvalidFormat": "Невалиден формат на QR.",
+  "qrScannerErrorInvalidQr": "Овој QR не важи за пријава.",
   "qrScannerErrorWrongEvent": "Овој QR е за друг настан.",
   "qrScannerErrorSessionClosed": "Организаторот ја паузираше пријавата.",
   "qrScannerErrorSessionExpired": "QR-кодот истече. Побарајте нов од организаторот.",
   "qrScannerErrorReplayDetected": "Овој QR веќе беше искористен.",
   "qrScannerErrorAlreadyCheckedIn": "Веќе сте пријавени.",
+  "qrScannerErrorRequiresJoin": "Прво се пријавете на настанот во апликацијата.",
+  "qrScannerErrorCheckInUnavailable": "Пријавата не е отворена за овој настан во моментов.",
+  "qrScannerErrorRateLimited": "Премногу обиди. Почекајте малку и обидете се повторно.",
   "qrScannerCameraUnavailableFeedback": "Камерата е недостапна. Можете да го внесете кодот од организаторот или повторно да овозможите камера во Поставки.",
   "qrScannerManualEntryTitle": "Внесете го кодот рачно",
   "qrScannerPasteOrganizerQrHint": "Залепете го текстот од QR на организаторот",
@@ -1064,6 +1392,11 @@
   },
   "qrScannerDone": "Готово",
   "qrScannerAppBarTitle": "Скенирај за пријава",
+  "qrScannerCameraStarting": "Се стартува камерата…",
+  "qrScannerCheckingIn": "Се потврдува пријавата…",
+  "qrScannerCameraErrorTitle": "Камерата е недостапна",
+  "qrScannerManualEntrySubtitle": "Залепете го целиот текст што го сподели организаторот (копирајте од нивниот екран или порака).",
+  "qrScannerPasteButton": "Залепи",
   "qrScannerToggleFlashlightSemantic": "Вклучи или исклучи блиц",
   "siteReportReasonFakeLabel": "Лажни или воведувачки податоци",
   "siteReportReasonFakeSubtitle": "Информациите не одговараат на реалноста",
@@ -1155,6 +1488,197 @@
   "reportListEmptyTitle": "Сè уште нема пријави",
   "reportListEmptySubtitle": "Вашите пријави ќе се појават тука откако ќе ги испратите.",
   "appSmartImageUnavailable": "Сликата не е достапна",
+  "eventsReminderSectionTitle": "Потсетник за настан",
+  "eventsReminderSectionEnabled": "Потсетникот е вклучен",
+  "eventsReminderSectionSetFor": "Поставен за {time}",
+  "@eventsReminderSectionSetFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsReminderSectionDisabled": "Добијте известување пред почетокот",
+  "eventsReminderSectionDisable": "Исклучи",
+  "eventsReminderSectionEnable": "Вклучи",
+  "eventsDescriptionTitle": "За настанот",
+  "eventsDescriptionShowLess": "Прикажи помалку",
+  "eventsDescriptionReadMore": "Прочитај повеќе",
+  "eventsAfterCleanupTitle": "По чистењето",
+  "eventsAfterPhotoSemantic": "Прикажи фотографија по чистење {index} од {total}",
+  "@eventsAfterPhotoSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsFilterAll": "Сите",
+  "eventsFilterUpcoming": "Претстојни",
+  "eventsFilterNearby": "Во близина",
+  "eventsFilterPast": "Поминати",
+  "eventsFilterMyEvents": "Мои настани",
+  "eventsFilterSemanticPrefix": "Настани",
+  "eventsParticipantsTitle": "Учесници",
+  "eventsParticipantsViewSemantic": "Прикажи {count} учесници",
+  "@eventsParticipantsViewSemantic": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsYouAndOthers": "Вие и уште {count} се приклучивте",
+  "@eventsParticipantsYouAndOthers": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsVolunteersJoined": "{count} волонтери се приклучија",
+  "@eventsParticipantsVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSpotsLeft": "Останати места: {count}",
+  "@eventsParticipantsSpotsLeft": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsCheckedInCount": "{checkedIn} од {total} се пријавени",
+  "@eventsParticipantsCheckedInCount": {
+    "placeholders": {
+      "checkedIn": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSearchPlaceholder": "Пребарај учесник",
+  "eventsParticipantsNoSearchResults": "Нема совпаѓања за пребарувањето.",
+  "eventsParticipantsYouOrganizer": "Вие · Организатор",
+  "eventsParticipantsOrganizer": "Организатор",
+  "eventsParticipantsYou": "Вие",
+  "eventsParticipantsLoadFailed": "Не можевме да ја вчитаме листата. Проверете ја врската и обидете се повторно.",
+  "eventsParticipantsRetry": "Обиди се повторно",
+  "eventsParticipantsViewRosterSemantic": "Погледни ја листата на учесници",
+  "eventsGearSectionTitle": "Опрема за понесување",
+  "eventsGearNoneNeeded": "Нема потреба за посебна опрема",
+  "eventsImpactSummaryTitle": "Преглед на ефект",
+  "eventsImpactSummaryAdd": "Додај",
+  "eventsImpactSummaryEdit": "Уреди",
+  "eventsImpactSummaryEmptyHint": "Забележете ги резултатите, напорот и поуките од чистењето.",
+  "eventsImpactBadgeRating": "{rating}★ оценка",
+  "eventsImpactBadgeBags": "{count} ќесии",
+  "eventsImpactBadgeHours": "{hours}ч",
+  "eventsImpactEstimatedLine": "{kg} kg отстрането · {co2} kg CO2e избегнато",
+  "eventsLocationSiteSemantic": "Погледни ја локацијата на загадување, на {distanceKm} км",
+  "eventsLocationDotKm": "· {distanceKm} км",
+  "eventsEmptyAllTitle": "Сè уште нема еко настани",
+  "eventsEmptyAllSubtitle": "Бидете први што ќе создадат! Допрете + погоре за да почнете.",
+  "eventsEmptyUpcomingTitle": "Нема претстојни настани",
+  "eventsEmptyUpcomingSubtitle": "Создадете еден за да ги соберете волонтерите.",
+  "eventsEmptyNearbyTitle": "Нема настани во близина",
+  "eventsEmptyNearbySubtitle": "Обидете се со друг филтер или создадете настан во вашата област.",
+  "eventsEmptyPastTitle": "Нема минати настани",
+  "eventsEmptyPastSubtitle": "Завршените настани ќе се појават тука.",
+  "eventsEmptyMyEventsTitle": "Сè уште нема настани",
+  "eventsEmptyMyEventsSubtitle": "Придружете се или создадете настан за да го видите тука.",
+  "eventsSearchEmptyTitle": "Нема резултати за „{query}“",
+  "eventsSearchEmptySubtitle": "Обидете се со друг термин или проверете го правописот.",
+  "eventsSitePickerTitle": "Изберете локација",
+  "eventsSitePickerSubtitle": "Поврзете го настанот со една локација за чистење.",
+  "eventsSitePickerSearchPlaceholder": "Пребарај по име или опис",
+  "eventsSitePickerNoMatch": "Нема локации што одговараат на „{query}“",
+  "eventsSitePickerRowKmDesc": "{km} км далеку · {desc}",
+  "eventsSuccessDialogTitle": "Настанот е создаден",
+  "eventsSuccessDialogBody": "„{title}“ на {siteName} е подготвен. Споделете со заедницата за да се приклучат волонтери.",
+  "eventsSuccessDialogOpenEvent": "Отвори настан",
+  "eventsTimePickerSelectTime": "Изберете време",
+  "eventsTimePickerConfirm": "Потврди",
+  "eventsTimePickerFrom": "Од",
+  "eventsTimePickerTo": "До",
+  "eventsTimePickerTimeBlockSemantic": "{role}, {time}",
+  "@eventsTimePickerTimeBlockSemantic": {
+    "placeholders": {
+      "role": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+  "eventsFeedRecentSearches": "Неодамнешни пребарувања",
+  "eventsCleanupAfterUploadSemantic": "Прикачи фотографии по чистењето",
+  "eventsCleanupAfterViewFullscreenSemantic": "Погледни ја фотографијата на цел екран",
+  "eventsCleanupAfterUploadMoreTitle": "Прикачи уште фотографии",
+  "eventsCleanupAfterUploadedCount": "{count} прикачени",
+  "eventsCleanupAfterSlotsRemaining": "{count, plural, one{Уште 1 слободно место} other{Уште {count} слободни места}}",
+  "eventsCleanupAfterAddMoreSemantic": "Додај уште фотографии",
+  "eventsCleanupAfterRemoveSemantic": "Отстрани фотографија",
+  "eventsCleanupAfterEmptyTitle": "Додајте фотографии од исчистената локација",
+  "eventsCleanupAfterEmptyMaxPhotos": "До {max} фотографии",
+  "eventsCleanupAfterEmptyTapGallery": "Допрете за избор од галерија",
+  "eventsCleanupEvidencePhotoSemantic": "Фотографија од доказ за чистење",
+  "eventsDateRelativeEarlierToday": "Порано денес",
+  "eventsDateRelativeDaysAgo": "Пред {days} дена",
+  "@eventsDateRelativeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateRelativeToday": "Денес",
+  "eventsDateRelativeTomorrow": "Утре",
+  "eventsDateRelativeInDays": "За {days} дена",
+  "@eventsDateRelativeInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateInfoSheetTitle": "Датум и време",
+  "eventsDateInfoSemantic": "{date}, {timeRange}",
+  "@eventsDateInfoSemantic": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "timeRange": { "type": "String" }
+    }
+  },
+  "eventsCategorySheetTitle": "Категорија",
+  "eventsCategorySemantic": "Категорија на настан: {label}",
+  "@eventsCategorySemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "eventsOrganizerSheetTitle": "Организатор",
+  "eventsOrganizerYouOwnThis": "Ова е ваш настан",
+  "eventsOrganizerRoleLabel": "Организатор на настан",
+  "eventsOrganizerCreatedOn": "Настанот е креиран на {day}/{month}/{year}",
+  "@eventsOrganizerCreatedOn": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "month": { "type": "int" },
+      "year": { "type": "int" }
+    }
+  },
+  "eventsOrganizerSemantic": "Организатор: {name}",
+  "@eventsOrganizerSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventsOrganizedByLabel": "Организирано од",
+  "eventsFeedSemantic": "Листа на настани",
+  "eventsFeedTitle": "Настани",
+  "eventsFeedCreateSemantic": "Креирај настан",
+  "eventsFeedSearchPlaceholder": "Пребарај настани",
+  "eventsFeedHappeningNow": "Во тек",
+  "eventsFeedComingUp": "Следуваат",
+  "eventsFeedRecentlyCompleted": "Неодамна завршени",
+  "eventsFeedViewListToggle": "Листа",
+  "eventsFeedViewCalendarToggle": "Календар",
+  "eventsCalendarPreviousMonth": "Претходен месец",
+  "eventsCalendarNextMonth": "Следен месец",
+  "eventsCalendarDaySemantic": "Ден {day}",
+  "@eventsCalendarDaySemantic": {
+    "placeholders": {
+      "day": { "type": "int" }
+    }
+  },
+  "eventsCalendarNoEventsThisDay": "Нема настани за овој ден",
   "siteCardPollutionSiteSemantic": "Загадено место: {title}. Допри за детали.",
   "@siteCardPollutionSiteSemantic": {
     "placeholders": {
@@ -1170,5 +1694,313 @@
         "type": "String"
       }
     }
-  }
+  },
+  "eventsFilterSheetTitle": "Филтрирај настани",
+  "eventsFilterSheetCategory": "Категорија",
+  "eventsFilterSheetStatus": "Статус",
+  "eventsFilterSheetDateRange": "Период на датум",
+  "eventsFilterSheetDateFrom": "Од",
+  "eventsFilterSheetDateTo": "До",
+  "eventsFilterSheetShowResults": "Прикажи резултати",
+  "eventsFilterSheetClearAll": "Исчисти сè",
+  "eventsFilterSheetActiveCount": "{count} активни",
+  "@eventsFilterSheetActiveCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardTitle": "Мои настани",
+  "eventsOrganizerDashboardEmpty": "Сè уште не сте организирале настани.",
+  "eventsOrganizerDashboardEmptyAction": "Создај прв настан",
+  "eventsOrganizerDashboardSectionUpcoming": "Претстојни",
+  "eventsOrganizerDashboardSectionInProgress": "Во тек",
+  "eventsOrganizerDashboardSectionCompleted": "Завршени",
+  "eventsOrganizerDashboardSectionCancelled": "Откажани",
+  "eventsOrganizerDashboardParticipants": "{count}/{max} учесници",
+  "@eventsOrganizerDashboardParticipants": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "max": { "type": "String" }
+    }
+  },
+  "eventsOrganizerDashboardParticipantsUnlimited": "{count} учесници",
+  "@eventsOrganizerDashboardParticipantsUnlimited": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardEvidenceAction": "Докази",
+  "eventsAnalyticsTitle": "Аналитика",
+  "eventsAnalyticsAttendanceRate": "Стапка на присуство",
+  "eventsAnalyticsJoiners": "Приклучени со текот на времето",
+  "eventsAnalyticsCheckInsByHour": "Пријави по час",
+  "eventsAnalyticsNoData": "Сè уште нема податоци",
+  "eventsOfflineSyncQueued": "Зачувано. Ќе се синхронизира кога ќе се поврзете.",
+  "eventsOfflineSyncFailed": "Синхронизацијата не успеа. Ќе се обиде повторно.",
+  "eventsWeatherForecast": "Прогноза за времето",
+  "eventsWeatherLoadFailed": "Времето не е достапно",
+  "eventsWeatherPrecipitationMm": "{amount} мм врнежи",
+  "@eventsWeatherPrecipitationMm": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "eventsWeatherNoPrecipitation": "Без значителни врнежи",
+  "eventsWeatherPrecipChance": "{percent}% веројатност за врнежи",
+  "@eventsWeatherPrecipChance": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "eventsWeatherIndicativeNote": "Индикативна прогноза од Open-Meteo; вистинските услови може да се разликуваат.",
+  "eventsWeatherIndicativeInfoTitle": "За оваа прогноза",
+  "eventsWeatherIndicativeInfoSemantic": "Информации за изворот на временската прогноза",
+  "eventsRecurrenceNone": "Не се повторува",
+  "eventsRecurrenceWeekly": "Секоја недела",
+  "eventsRecurrenceBiweekly": "На секои 2 недели",
+  "eventsRecurrenceMonthly": "Секој месец",
+  "eventsRecurrenceOccurrences": "{count} повторувања",
+  "@eventsRecurrenceOccurrences": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsRecurrencePartOfSeries": "Дел од серија",
+  "eventsRecurrenceSeriesLabel": "Настан {index} од {total}",
+  "@eventsRecurrenceSeriesLabel": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsRecurrenceDone": "Готово",
+  "eventsCategoryGeneralCleanup": "Општо чистење",
+  "eventsCategoryGeneralCleanupDescription": "Собирање ѓубре, метење и враќање на подрачјето во ред.",
+  "eventsCategoryRiverAndLake": "Чистење на реки и езера",
+  "eventsCategoryRiverAndLakeDescription": "Отстранување отпад од вода, обали и одводни канали.",
+  "eventsCategoryTreeAndGreen": "Садење дрвја и зеленило",
+  "eventsCategoryTreeAndGreenDescription": "Садење, обновување на зелени површини и градини.",
+  "eventsCategoryRecyclingDrive": "Рециклирање",
+  "eventsCategoryRecyclingDriveDescription": "Сортирање, собирање и транспорт на рециклажа до преработка.",
+  "eventsCategoryHazardousRemoval": "Опасен отпад",
+  "eventsCategoryHazardousRemovalDescription": "Безбедно собирање на хемикалии, гуми, батерии или азбест.",
+  "eventsCategoryAwarenessAndEducation": "Свест и едукација",
+  "eventsCategoryAwarenessAndEducationDescription": "Рабилници, предавања или вклучување на заедницата.",
+  "eventsCategoryOther": "Друго",
+  "eventsCategoryOtherDescription": "Прилагоден настан што не се вклопува во горните категории.",
+  "eventsGearTrashBags": "Џувалја за отпад",
+  "eventsGearGloves": "Ракавици",
+  "eventsGearRakes": "Грабли и лопати",
+  "eventsGearWheelbarrow": "Количка",
+  "eventsGearWaterBoots": "Чизми за вода",
+  "eventsGearSafetyVest": "Рефлектирачки елек",
+  "eventsGearFirstAid": "Апчиња за прва помош",
+  "eventsGearSunscreen": "Сончев крем и вода",
+  "eventsScaleSmall": "Мала (1–5 луѓе)",
+  "eventsScaleSmallDescription": "Кратко чистење на едно место, една-две торби.",
+  "eventsScaleMedium": "Средна (6–15 луѓе)",
+  "eventsScaleMediumDescription": "Полудневна акција, повеќе зони.",
+  "eventsScaleLarge": "Голема (16–40 луѓе)",
+  "eventsScaleLargeDescription": "Организирана група, потешок отпад.",
+  "eventsScaleMassive": "Масовна (40+ луѓе)",
+  "eventsScaleMassiveDescription": "Градска или повеќелокациска акција.",
+  "eventsDifficultyEasy": "Лесно",
+  "eventsDifficultyEasyDescription": "Рамен терен, малку отпад, погодно за семејства.",
+  "eventsDifficultyModerate": "Умерено",
+  "eventsDifficultyModerateDescription": "Мешан терен или обемни предмети, повеќе напор.",
+  "eventsDifficultyHard": "Тешко",
+  "eventsDifficultyHardDescription": "Стрмни нагорнини, тежок отпад или опасни материјали.",
+  "eventsSiteCoercedDescription": "Заедничка локација за чистење",
+  "homeSiteCleaningEmptyTitle": "Сè уште нема настани за чистење",
+  "homeSiteCleaningEmptyBody": "Бидете први што ќе организираат еколошка акција и ќе соберат волонтери за оваа локација.",
+  "homeSiteCleaningTapToCreate": "Допрете за да креирате",
+  "homeSiteCleaningCtaCreateFirst": "Креирај еколошка акција",
+  "homeSiteCleaningCtaScheduleAnother": "Закажи друга акција",
+  "homeSiteCleaningVolunteersJoined": "{count, plural, one{1 волонтер се приклучи} other{{count} волонтери се приклучија}}",
+  "@homeSiteCleaningVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeSiteCleaningOrganizerHint": "Вие ја организирате оваа акција. Поставете „после“ фотографии откако ќе заврши.",
+  "homeSiteCleaningVolunteerHint": "Приклучете се на акцијата за да помогнете да се исчисти локацијата.",
+  "homeSiteCleaningJoinAction": "Приклучи се",
+  "homeSiteCleaningEventUnavailable": "Деталите за настанот моментално не се достапни.",
+  "errorUserNetwork": "Проверете ја врската и обидете се повторно.",
+  "errorUserTimeout": "Побара премногу долго. Обидете се повторно.",
+  "errorUserUnauthorized": "Најавете се повторно за да продолжите.",
+  "errorUserForbidden": "Немате дозвола за таа акција.",
+  "errorUserNotFound": "Не можевме да го најдеме.",
+  "errorUserServer": "Сервисот е зафатен. Обидете се за кратко.",
+  "errorUserTooManyRequests": "Премногу обиди. Почекајте малку.",
+  "errorUserUnknown": "Нешто тргна наопаку. Обидете се повторно.",
+  "eventsFilterSheetSemantic": "Филтрирај настани",
+  "eventChatTitle": "Разговор",
+  "eventChatRowTitle": "Групен разговор",
+  "eventChatInputHint": "Порака",
+  "eventChatSend": "Испрати",
+  "eventChatEmptyTitle": "Започнете разговор",
+  "eventChatEmptyBody": "Координирајте со другите волонтери пред и за време на настанот.",
+  "eventChatMessageRemoved": "Оваа порака е отстранета",
+  "eventChatNewMessages": "Нови пораки",
+  "eventChatToday": "Денес",
+  "eventChatYesterday": "Вчера",
+  "eventChatReply": "Одговори",
+  "eventChatDelete": "Избриши",
+  "eventChatLoadError": "Не можевме да ги вчитаме пораките",
+  "eventChatSendFailed": "Пораката не е испратена. Допрете за повторен обид.",
+  "eventChatAttachPhotoLibrary": "Фото библиотека",
+  "eventChatAttachCamera": "Камера",
+  "eventChatAttachVideo": "Видео",
+  "eventChatAttachDocument": "Документ",
+  "eventChatAttachAudio": "Аудио",
+  "eventChatVoiceDiscard": "Отфрли снимка",
+  "eventChatVoiceSend": "Испрати гласовна порака",
+  "eventChatVoicePreviewHint": "Преглед на глас",
+  "eventChatAttachLocation": "Сподели локација",
+  "eventChatSendLocation": "Испрати локација",
+  "eventChatSending": "Се испраќа…",
+  "eventChatReplyingTo": "Одговор на {name}",
+  "@eventChatReplyingTo": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatCharCountHint": "{count} / 2000",
+  "@eventChatCharCountHint": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatSemanticsBubble": "{author}, {time}. {body}",
+  "@eventChatSemanticsBubble": {
+    "placeholders": {
+      "author": { "type": "String" },
+      "time": { "type": "String" },
+      "body": { "type": "String" }
+    }
+  },
+  "eventChatInputSemantics": "Порака во разговорот",
+  "eventChatPushChannelName": "Разговор на настан",
+  "eventChatEdited": "(изменето)",
+  "eventChatEditMessage": "Уреди",
+  "eventChatEditing": "Уредување порака",
+  "eventChatEditHint": "Уредете ја вашата порака",
+  "eventChatSaveEdit": "Зачувај",
+  "eventChatPinMessage": "Закачи",
+  "eventChatUnpinMessage": "Откачи",
+  "eventChatPinnedBy": "Закачено од {name}",
+  "@eventChatPinnedBy": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatPinnedMessagesTitle": "Закачени пораки",
+  "eventChatPinnedBarHint": "Закачено",
+  "eventChatNoPinnedMessages": "Нема закачени пораки",
+  "eventChatMuted": "Известувањата се исклучени",
+  "eventChatUnmuted": "Известувањата се вклучени",
+  "eventChatCopied": "Пораката е копирана",
+  "eventChatReconnecting": "Повторно поврзување…",
+  "eventChatConnected": "Поврзано",
+  "eventChatSearchHint": "Пребарај пораки",
+  "eventChatSearchNoResults": "Нема пораки",
+  "eventChatSearchAction": "Пребарај",
+  "eventChatParticipantsCount": "{count} учесници",
+  "@eventChatParticipantsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsSheetTitle": "Луѓе во овој разговор",
+  "eventChatParticipantsTitleSemantic": "{eventTitle}, {count} учесници",
+  "@eventChatParticipantsTitleSemantic": {
+    "placeholders": {
+      "eventTitle": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsLoadError": "Не можеше да се вчитаат учесниците.",
+  "eventChatParticipantsYouBadge": "Вие",
+  "eventChatParticipantsEmpty": "Сè уште нема вчитани учесници.",
+  "eventChatSystemUserJoined": "{name} се придружи на настанот",
+  "@eventChatSystemUserJoined": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemUserLeft": "{name} го напушти настанот",
+  "@eventChatSystemUserLeft": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemEventUpdated": "Деталите за настанот се ажурирани",
+  "eventChatSwipeReplySemantic": "Повлечи за одговор на порака",
+  "eventChatVoiceLevelSemantic": "Ниво на глас",
+  "eventChatMessageOptions": "Опции за порака",
+  "eventChatTypingUnknownParticipant": "Некој",
+  "eventChatCopy": "Копирај",
+  "eventChatUnpinConfirm": "Пораката е откачена",
+  "eventChatMaxPinnedReached": "Достигнат е максимумот закачени пораки",
+  "eventChatMessageNotInView": "Таа порака не е вчитана. Лизгајте нагоре за постари пораки.",
+  "eventChatMuteNotifications": "Исклучи известувања",
+  "eventChatUnmuteNotifications": "Вклучи известувања",
+  "eventChatSeenBy": "Видено од {names}",
+  "@eventChatSeenBy": {
+    "placeholders": {
+      "names": { "type": "String" }
+    }
+  },
+  "eventChatSeenByTruncated": "Видено од {names} +{count}",
+  "@eventChatSeenByTruncated": {
+    "placeholders": {
+      "names": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatTypingOne": "{name} пишува…",
+  "@eventChatTypingOne": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatTypingTwo": "{first} и {second} пишуваат…",
+  "@eventChatTypingTwo": {
+    "placeholders": {
+      "first": { "type": "String" },
+      "second": { "type": "String" }
+    }
+  },
+  "eventChatTypingMany": "{name} и уште {count} пишуваат…",
+  "@eventChatTypingMany": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatOpenMapsFailed": "Не можев да го отворам Maps. Обиди се повторно.",
+  "eventChatImageViewerTitle": "Фотографија",
+  "eventChatImageViewerPage": "{current} од {total}",
+  "@eventChatImageViewerPage": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventChatVideoViewerTitle": "Видео",
+  "eventChatOpenFile": "Отвори датотека",
+  "eventChatDownloadFailed": "Не можев да ја преземам датотеката",
+  "eventChatPdfOpenFailed": "Не можев да го отворам PDF",
+  "eventChatShareFile": "Сподели",
+  "eventChatLocationMapTitle": "Локација",
+  "eventChatCopyCoordinates": "Копирај координати",
+  "eventChatDirections": "Насоки",
+  "eventChatAudioExpandedTitle": "Гласовна порака",
+  "eventChatHoldToRecord": "Држи за снимање",
+  "eventChatReleaseToSend": "Пушти за испраќање",
+  "eventChatSlideToCancel": "Повлечи лево за откажување",
+  "eventChatReleaseToCancel": "Пушти за откажување",
+  "eventChatRecording": "Снимање…",
+  "eventChatMicPermissionDenied": "Потребен е пристап до микрофонот за гласовни пораки."
 }

@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
@@ -10,9 +11,10 @@ void main() {
   late InMemoryCheckInRepository checkInRepository;
   late EcoEvent event;
 
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
     eventsStore = InMemoryEventsStore.instance;
+    EventsRepositoryRegistry.setTestOverride(eventsStore);
     checkInRepository = InMemoryCheckInRepository.instance;
     checkInRepository.reset();
     eventsStore.resetToSeed();
@@ -36,15 +38,19 @@ void main() {
       createdAt: DateTime.now(),
       isJoined: true,
     );
-    eventsStore.create(event);
-    checkInRepository.ensureSession(event: event);
+    await eventsStore.create(event);
+    await checkInRepository.ensureSession(event: event);
   });
 
-  test('valid scan succeeds and replay is blocked', () {
-    final CheckInQrPayload payload =
-        checkInRepository.issuePayload(eventId: event.id);
+  tearDown(() {
+    EventsRepositoryRegistry.setTestOverride(null);
+  });
 
-    final CheckInSubmissionResult first = checkInRepository.submitScan(
+  test('valid scan succeeds and replay is blocked', () async {
+    final CheckInQrPayload payload =
+        await checkInRepository.issuePayload(eventId: event.id);
+
+    final CheckInSubmissionResult first = await checkInRepository.submitScan(
       rawPayload: payload.encode(),
       expectedEventId: event.id,
       attendeeId: 'user-a',
@@ -52,7 +58,7 @@ void main() {
     );
     expect(first.status, equals(CheckInSubmissionStatus.success));
 
-    final CheckInSubmissionResult replay = checkInRepository.submitScan(
+    final CheckInSubmissionResult replay = await checkInRepository.submitScan(
       rawPayload: payload.encode(),
       expectedEventId: event.id,
       attendeeId: 'user-a',
@@ -61,10 +67,10 @@ void main() {
     expect(replay.status, equals(CheckInSubmissionStatus.replayDetected));
   });
 
-  test('duplicate attendee check-in is rejected', () {
+  test('duplicate attendee check-in is rejected', () async {
     final CheckInQrPayload firstPayload =
-        checkInRepository.issuePayload(eventId: event.id);
-    final CheckInSubmissionResult first = checkInRepository.submitScan(
+        await checkInRepository.issuePayload(eventId: event.id);
+    final CheckInSubmissionResult first = await checkInRepository.submitScan(
       rawPayload: firstPayload.encode(),
       expectedEventId: event.id,
       attendeeId: 'user-b',
@@ -73,8 +79,8 @@ void main() {
     expect(first.isSuccess, isTrue);
 
     final CheckInQrPayload secondPayload =
-        checkInRepository.issuePayload(eventId: event.id);
-    final CheckInSubmissionResult second = checkInRepository.submitScan(
+        await checkInRepository.issuePayload(eventId: event.id);
+    final CheckInSubmissionResult second = await checkInRepository.submitScan(
       rawPayload: secondPayload.encode(),
       expectedEventId: event.id,
       attendeeId: 'user-b',
@@ -89,19 +95,19 @@ void main() {
       equals(const Duration(milliseconds: 45000)),
     );
 
-    final bool added = checkInRepository.markAttendeeCheckedIn(
+    final ManualCheckInResult added = await checkInRepository.markAttendeeCheckedIn(
       eventId: event.id,
-      attendeeId: 'user-c',
-      attendeeName: 'User C',
+      attendeeId: 'in_memory_volunteer_0',
+      attendeeName: 'Volunteer 1',
     );
 
-    expect(added, isTrue);
+    expect(added.recorded, isTrue);
 
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String? raw = prefs.getString('events_checkin_sessions_v1');
 
     expect(raw, isNotNull);
     expect(raw, contains(event.id));
-    expect(raw, contains('User C'));
+    expect(raw, contains('Volunteer 1'));
   });
 }

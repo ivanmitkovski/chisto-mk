@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
@@ -32,7 +33,7 @@ class ImpactSummarySection extends StatelessWidget {
           Row(
             children: <Widget>[
               Text(
-                'Impact summary',
+                context.l10n.eventsImpactSummaryTitle,
                 style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
               ),
               const Spacer(),
@@ -40,13 +41,17 @@ class ImpactSummarySection extends StatelessWidget {
                 onPressed: onEdit,
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                 minimumSize: Size.zero,
-                child: Text(data == null ? 'Add' : 'Edit'),
+                child: Text(
+                  data == null
+                      ? context.l10n.eventsImpactSummaryAdd
+                      : context.l10n.eventsImpactSummaryEdit,
+                ),
               ),
             ],
           ),
           if (data == null) ...<Widget>[
             Text(
-              'Capture cleanup outcomes, effort, and lessons learned.',
+              context.l10n.eventsImpactSummaryEmptyHint,
               style: textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
             ),
           ] else ...<Widget>[
@@ -54,15 +59,25 @@ class ImpactSummarySection extends StatelessWidget {
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.xs,
               children: <Widget>[
-                ImpactBadge(label: '${data.rating}★ rating'),
-                ImpactBadge(label: '${data.bagsCollected} bags'),
-                ImpactBadge(label: '${data.volunteerHours.toStringAsFixed(1)}h'),
+                ImpactBadge(
+                  label: context.l10n.eventsImpactBadgeRating(data.rating),
+                ),
+                ImpactBadge(
+                  label: context.l10n.eventsImpactBadgeBags(data.bagsCollected),
+                ),
+                ImpactBadge(
+                  label: context.l10n.eventsImpactBadgeHours(
+                    data.volunteerHours.toStringAsFixed(1),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(
-              '${data.estimatedKg.toStringAsFixed(1)} kg removed · '
-              '${data.estimatedCo2SavedKg.toStringAsFixed(1)} kg CO2e avoided',
+              context.l10n.eventsImpactEstimatedLine(
+                data.estimatedKg.toStringAsFixed(1),
+                data.estimatedCo2SavedKg.toStringAsFixed(1),
+              ),
               style: textTheme.bodySmall?.copyWith(
                 color: AppColors.primaryDark,
                 fontWeight: FontWeight.w600,

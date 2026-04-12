@@ -878,6 +878,24 @@ class AppLocalizationsMk extends AppLocalizations {
   String get profilePointsReasonOther => 'Промена на поени';
 
   @override
+  String get profilePointsReasonEventOrganizerApproved =>
+      'Вашиот настан за чистење е одобрен';
+
+  @override
+  String get profilePointsReasonEventJoined =>
+      'Се придруживте на настан за чистење';
+
+  @override
+  String get profilePointsReasonEventJoinNoShow =>
+      'Прилагодување на бонус — без проверка';
+
+  @override
+  String get profilePointsReasonEventCheckIn => 'Регистрација на настан';
+
+  @override
+  String get profilePointsReasonEventCompleted => 'Завршен настан за чистење';
+
+  @override
   String get profileReportCreditsTitle => 'Кредити за пријави';
 
   @override
@@ -1651,6 +1669,98 @@ class AppLocalizationsMk extends AppLocalizations {
   String get eventsEventNotFoundBody => 'Овој настан повеќе не е достапен.';
 
   @override
+  String get eventsDetailBrowseEvents => 'Прегледај настани';
+
+  @override
+  String get eventsDetailCouldNotRefresh =>
+      'Не можеше освежување. Се прикажуваат зачувани детали.';
+
+  @override
+  String get eventsDetailRetryRefresh => 'Обиди се повторно';
+
+  @override
+  String get eventsDetailLocationTitle => 'Локација';
+
+  @override
+  String get eventsDetailCopyAddress => 'Копирај адреса';
+
+  @override
+  String get eventsDetailAddressCopied => 'Адресата е копирана';
+
+  @override
+  String get eventsDetailLocationLongPressHint =>
+      'Долг притисок за целосна адреса и акции';
+
+  @override
+  String get eventsDetailCoverImageUnavailable => 'Сликата не е достапна';
+
+  @override
+  String get eventsWeatherUnavailableBody =>
+      'Прогнозата моментално не е достапна.';
+
+  @override
+  String get eventsWeatherRetry => 'Обиди се повторно';
+
+  @override
+  String get eventsUnableToStartEventGeneric =>
+      'Не можевме да го започнеме настанот. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get eventsStartEventTooEarly =>
+      'Можете да го започнете ова еко дејство откако ќе настапи закажаното време на почеток.';
+
+  @override
+  String get eventsAwaitingModerationCta => 'Чека одобрување';
+
+  @override
+  String get eventsModerationBannerTitle => 'Чека одобрување';
+
+  @override
+  String get eventsModerationBannerBody =>
+      'Оваа акција е видлива за вас како организатор. Волонтерите ќе можат да се придружат откако модераторите ќе ја одобрат.';
+
+  @override
+  String get eventsEventPendingPublicCta =>
+      'Сè уште не е отворено за придружување';
+
+  @override
+  String get eventsFeedOfflineStaleBanner =>
+      'Прикажани се зачувани настани — освежувањето не успеа. Повлечете надолу за повторен обид.';
+
+  @override
+  String get eventsFeedInitialLoadFailed =>
+      'Не можевме да ги вчитаме настаните. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get eventsOrganizerInvalidateQrTitle =>
+      'Инвалидирај претходни QR кодови';
+
+  @override
+  String get eventsOrganizerInvalidateQrSubtitle =>
+      'Користете ако кодот бил споделен или фотографиран. Веќе скенираните кодови важат до истек; ова ја ротира сесијата за нови скенирања.';
+
+  @override
+  String get eventsOrganizerQrSessionRotated =>
+      'QR сесијата е обновена. Покажете му го новиот код на учесниците.';
+
+  @override
+  String get eventsOrganizerQrRotateFailed =>
+      'Не можевме да ги инвалидираме кодовите. Обидете се повторно.';
+
+  @override
+  String get eventsEditEventTitle => 'Уреди настан';
+
+  @override
+  String get eventsEditEventSave => 'Зачувај промени';
+
+  @override
+  String get eventsEventUpdated => 'Настанот е ажуриран';
+
+  @override
+  String get eventsMutationFailedGeneric =>
+      'Нешто не е во ред. Обидете се повторно.';
+
+  @override
   String get eventsManualCheckInAdd => 'Додај';
 
   @override
@@ -1665,6 +1775,22 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get eventsOrganizerAttendeeNamePlaceholder => 'Име на учесник';
+
+  @override
+  String get eventsOrganizerManualCheckInSubtitle =>
+      'Пребарајте волонтери што се пријавиле на настанот, потоа ги пријавете.';
+
+  @override
+  String get eventsOrganizerManualCheckInNoJoiners =>
+      'Сè уште нема пријавени волонтери на овој настан.';
+
+  @override
+  String get eventsOrganizerManualCheckInSelectParticipant =>
+      'Изберете волонтер од листата.';
+
+  @override
+  String get eventsOrganizerManualCheckInNotParticipant =>
+      'Оваа личност не е на листата на учесници.';
 
   @override
   String get eventsOrganizerEnterNameFirst =>
@@ -1712,6 +1838,95 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get eventsOrganizerUploadAfterPhotosHint =>
       'Поставете ги фотографиите „после“ од деталите за настанот.';
+
+  @override
+  String get eventsOrganizerCompletionCheckedInNone => 'Никој не се чекирал.';
+
+  @override
+  String eventsOrganizerCompletionJoinedLine(int count) {
+    return '$count доброволци се пријавиле';
+  }
+
+  @override
+  String eventsOrganizerCompletionJoinedOfCap(int joined, int cap) {
+    return '$joined од $cap места се пополнети';
+  }
+
+  @override
+  String get eventsOrganizerCompletionSheetSemantic =>
+      'Настанот е завршен. Прегледајте ги следните чекори.';
+
+  @override
+  String get eventsOrganizerCompletionBackToEvent => 'Назад кон настанот';
+
+  @override
+  String get eventsOrganizerCompletionAddPhotosNow => 'Додај фотографии сега';
+
+  @override
+  String get eventsOrganizerCompletionWhatNextIntro =>
+      'Завршете на страницата на настанот: документирајте резултати и споделете го влијанието.';
+
+  @override
+  String get eventsOrganizerCompletionNextStepsHeading => 'СЛЕДНИ ЧЕКОРИ';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosTitle =>
+      'Додајте фотографии „после“';
+
+  @override
+  String get eventsOrganizerCompletionStepPhotosBody =>
+      'Покажете ја разликата. Тие се гледаат на страницата на настанот за сите.';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactTitle =>
+      'Запишете го влијанието';
+
+  @override
+  String get eventsOrganizerCompletionStepImpactBody =>
+      'Забележете торби, волонтерски часови и проценки од страницата на настанот.';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityTitle =>
+      'Изградете доверба';
+
+  @override
+  String get eventsOrganizerCompletionStepVisibilityBody =>
+      'Фотографиите им помагаат на модераторите и инспирираат идни акции.';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosTitle =>
+      'Фотографии „после“';
+
+  @override
+  String get eventsOrganizerDetailPendingAfterPhotosMessage =>
+      'Поставете фотографии по чистењето за да ги видат доброволците и модераторите. Користете го копчето подолу.';
+
+  @override
+  String get eventsAttendeeCompletedTitle => 'Ви благодариме';
+
+  @override
+  String get eventsAttendeeCompletedBody =>
+      'Оваа еко-акција е завршена. Ви благодариме што дојдовте.';
+
+  @override
+  String get eventsAfterPhotosOrganizerEmptyHint =>
+      'Сè уште нема фотографии „после“. Користете го копчето подолу за да додадете.';
+
+  @override
+  String get eventsEvidenceScreenSubtitle =>
+      'Фотографиите „после“ го документираат резултатот и се појавуваат на страницата на настанот.';
+
+  @override
+  String eventsEvidencePhotoCountChip(int current, int max) {
+    return '$current од $max фотографии';
+  }
+
+  @override
+  String get eventsEvidenceBeforeAfterTabsSemantic => 'Фотографии пред и после';
+
+  @override
+  String get eventsEvidenceSavingSemantic =>
+      'Се зачувуваат фотографиите „после“';
 
   @override
   String get eventsOrganizerCheckInPausedSnack => 'Пријавата е паузирана.';
@@ -1786,6 +2001,61 @@ class AppLocalizationsMk extends AppLocalizations {
       'Продолжете со пријава за нов QR';
 
   @override
+  String get eventsOrganizerQrLoadFailedGeneric =>
+      'Не можеше да се вчита код за пријава. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get eventsOrganizerQrRateLimited =>
+      'Премногу обиди за освежување. Почекајте малку и обидете се повторно.';
+
+  @override
+  String get eventsOrganizerSessionSetupFailed =>
+      'Не можевме да започнеме евиденција. Потврдете дека настанот е во тек и обидете се повторно.';
+
+  @override
+  String get eventsOrganizerQrRetry => 'Обиди повторно';
+
+  @override
+  String get eventsOrganizerQrBrightnessHint =>
+      'Совет: зголемете ја осветленоста на екранот за полесно скенирање.';
+
+  @override
+  String eventsOrganizerQrSemantics(int seconds) {
+    return 'QR-код за пријава. Се освежува за околу $seconds секунди.';
+  }
+
+  @override
+  String get eventsOrganizerQrEncodeError =>
+      'Кодот не можеше да се прикаже. Допрете обиди повторно.';
+
+  @override
+  String get eventsOrganizerFeedbackInvalidQrStrict =>
+      'Тој QR не важи за пријава.';
+
+  @override
+  String get eventsOrganizerFeedbackRequiresJoin =>
+      'Прво се пријавете на настанот во апликацијата.';
+
+  @override
+  String get eventsOrganizerFeedbackCheckInUnavailable =>
+      'Пријавата моментално не е достапна за овој настан.';
+
+  @override
+  String get eventsOrganizerFeedbackRateLimited =>
+      'Премногу обиди. Почекајте кратко и обидете се повторно.';
+
+  @override
+  String get eventsOrganizerCopyQrText => 'Копирај QR код текст';
+
+  @override
+  String get eventsOrganizerQrTextCopied =>
+      'QR код текстот е копиран — залепете го во порака до учесниците кои не можат да скенираат.';
+
+  @override
+  String get eventsOrganizerNoQrToCopy =>
+      'Сè уште нема активен QR код за копирање.';
+
+  @override
   String get eventsOrganizerManualOverride =>
       'Рачно: означи учесник како присутен';
 
@@ -1810,6 +2080,43 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get eventsOrganizerCancelEvent => 'Откажи настан';
+
+  @override
+  String get eventsOrganizerMoreActionsSemantic => 'Повеќе акции за настанот';
+
+  @override
+  String get eventsOrganizerMoreSheetTitle => 'Акции за настанот';
+
+  @override
+  String get eventsOrganizerEndEventConfirmTitle => 'Да се заврши настанот?';
+
+  @override
+  String get eventsOrganizerEndEventConfirmMessage =>
+      'Пријавата ќе се затвори и настанот ќе биде означен како завршен. Подоцна можеш да прикачиш фотографии од деталите за настанот.';
+
+  @override
+  String get eventsOrganizerEndEventKeepManaging => 'Продолжи со управување';
+
+  @override
+  String get eventsOrganizerEndEventConfirmAction => 'Заврши настан';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmTitle => 'Да се откаже настанот?';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmMessage =>
+      'Волонтерите ќе го видат настанот како откажан. Ова не може да се врати од апликацијата.';
+
+  @override
+  String get eventsOrganizerCancelEventKeepEvent => 'Задржи настан';
+
+  @override
+  String get eventsOrganizerCancelEventConfirmAction => 'Откажи настан';
+
+  @override
+  String eventsOrganizerRemoveAttendeeSemantic(String name) {
+    return 'Отстрани го $name од пријавата';
+  }
 
   @override
   String get eventsOrganizerSimulateCheckInDev => 'Симулирај check-in (dev)';
@@ -1893,8 +2200,104 @@ class AppLocalizationsMk extends AppLocalizations {
   String get createEventAppBarTitle => 'Креирај настан';
 
   @override
-  String get createEventLocalInfoSnack =>
-      'Засега настанот останува локален, но организаторскиот тек е веднаш подготвен.';
+  String get createEventHelpTitle => 'Креирање настан';
+
+  @override
+  String get createEventHelpSubtitle => 'Краток водич за организатори';
+
+  @override
+  String get createEventHelpBulletModeration =>
+      'Настаните се проверуваат за точни и безбедни акции за заедницата.';
+
+  @override
+  String get createEventHelpBulletVolunteers =>
+      'Доброволците гледаат наслов, распоред, локација, опрема и опис кога настанот е објавен.';
+
+  @override
+  String get createEventHelpBulletSite =>
+      'Изберете локација од листата или мапата за да знаат сите каде да се сретнат.';
+
+  @override
+  String get createEventHelpBulletSchedule =>
+      'Поставете датум и време за јасни календари и потсетници.';
+
+  @override
+  String get createEventHelpBulletSubmit =>
+      'Кога се пополнети задолжителните полиња, користете „Креирај еко-акција“ за објавување.';
+
+  @override
+  String get createEventFieldVolunteerCap => 'Лимит на доброволци';
+
+  @override
+  String get createEventVolunteerCapPlaceholderNoLimit => 'Без лимит';
+
+  @override
+  String createEventVolunteerCapUpTo(int count) {
+    return 'До $count доброволци';
+  }
+
+  @override
+  String get createEventVolunteerCapSheetTitle => 'Лимит на доброволци';
+
+  @override
+  String get createEventVolunteerCapSheetSubtitle =>
+      'Изборно. Лимитот е помеѓу 2 и 5000.';
+
+  @override
+  String get createEventVolunteerCapNoLimit => 'Без лимит';
+
+  @override
+  String get createEventVolunteerCapCustomLabel => 'Сопствен број';
+
+  @override
+  String get createEventVolunteerCapCustomHint => 'Број (2–5000)';
+
+  @override
+  String get createEventVolunteerCapApply => 'Примени';
+
+  @override
+  String get createEventVolunteerCapInvalid =>
+      'Внесете цел број помеѓу 2 и 5000.';
+
+  @override
+  String get createEventSitePickerLoading => 'Се вчитуваат локации…';
+
+  @override
+  String get createEventSitePickerOfflineTitle => 'Офлајн листа';
+
+  @override
+  String get createEventSitePickerOfflineMessage =>
+      'Се прикажуваат вградени локации бидејќи живата листа е празна или недостапна.';
+
+  @override
+  String get createEventSitePickerLoadFailedTitle => 'Не можеше освежување';
+
+  @override
+  String get createEventSitePickerLoadFailedMessage =>
+      'Сè уште можете да изберете од офлајн листата. Обидете се повторно за жива листа.';
+
+  @override
+  String get createEventSitePickerRetry => 'Обиди се повторно';
+
+  @override
+  String get createEventDiscardTitle => 'Отфрли настан?';
+
+  @override
+  String get createEventDiscardBody =>
+      'Ќе ги изгубите внесените податоци на овој екран.';
+
+  @override
+  String get createEventDiscardKeepEditing => 'Продолжи уредување';
+
+  @override
+  String get createEventLoadingSemantic =>
+      'Се вчитува формата за креирање настан';
+
+  @override
+  String get createEventSectionScheduleCaption => 'Распоред';
+
+  @override
+  String get createEventSectionDetailsCaption => 'Детали за настанот';
 
   @override
   String get createEventCleanupSiteTitle => 'Локација за чистење';
@@ -1932,6 +2335,32 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get createEventTitleRequired => 'Насловот е задолжителен.';
+
+  @override
+  String get createEventTitleMinLength =>
+      'Користете најмалку 3 знаци за насловот.';
+
+  @override
+  String get createEventSitePickerTabList => 'Листа';
+
+  @override
+  String get createEventSitePickerTabMap => 'Мапа';
+
+  @override
+  String get createEventSitePickerMapEmpty =>
+      'Нема локации на мапата за ова пребарување или координатите сè уште не се достапни.';
+
+  @override
+  String get createEventSitePickerMapSemanticLabel =>
+      'Мапа на локации со загадување';
+
+  @override
+  String get createEventSitePickerMapHint =>
+      'Допрете пин за да изберете локација.';
+
+  @override
+  String get createEventSiteMapPreviewSemantic =>
+      'Отвори избор на локација на мапа';
 
   @override
   String get createEventTypeRequired => 'Изберете тип на настан.';
@@ -2003,6 +2432,361 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
+  String get eventsCtaStartEvent => 'Започни настан';
+
+  @override
+  String get eventsCtaManageCheckIn => 'Управувај со пријава';
+
+  @override
+  String get eventsCtaEditAfterPhotos => 'Уреди фотографии после';
+
+  @override
+  String get eventsCtaUploadAfterPhotos => 'Прикачи фотографии после';
+
+  @override
+  String get eventsCtaCheckedIn => 'Пријавени';
+
+  @override
+  String get eventsCtaScanToCheckIn => 'Скенирај за пријава';
+
+  @override
+  String get eventsCtaCheckInPaused => 'Пријавата е паузирана';
+
+  @override
+  String get eventsCtaTurnReminderOff => 'Исклучи потсетник';
+
+  @override
+  String get eventsCtaSetReminder => 'Постави потсетник';
+
+  @override
+  String get eventsCtaLeaveEvent => 'Напушти настан';
+
+  @override
+  String get eventsCtaJoinEcoAction => 'Придружи се на акцијата';
+
+  @override
+  String get eventsStatusUpcoming => 'Претстоен';
+
+  @override
+  String get eventsStatusInProgress => 'Во тек';
+
+  @override
+  String get eventsStatusCompleted => 'Завршен';
+
+  @override
+  String get eventsStatusCancelled => 'Откажан';
+
+  @override
+  String get eventsCardActionsSheetTitle => 'Акции за настанот';
+
+  @override
+  String get eventsCardCopyTitle => 'Копирај детали за настанот';
+
+  @override
+  String get eventsCardCopySubtitle => 'Наслов, датум и локација';
+
+  @override
+  String get eventsCardCopiedSnack => 'Деталите се копирани.';
+
+  @override
+  String get eventsCardShareTitle => 'Сподели настан';
+
+  @override
+  String get eventsCardShareSubtitle => 'Сподели со пријатели';
+
+  @override
+  String get eventsCardOpenTitle => 'Отвори настан';
+
+  @override
+  String get eventsCardOpenSubtitle => 'Целосни детали';
+
+  @override
+  String get eventsCardMoreActionsSemantic => 'Повеќе акции за настанот';
+
+  @override
+  String get eventsCardSoonLabel => 'Наскоро';
+
+  @override
+  String get eventsFeedUpNext => 'Следно';
+
+  @override
+  String get eventsCountdownStarted => 'Започна';
+
+  @override
+  String eventsCountdownDaysHours(int days, int hours) {
+    return 'Почнува за $daysд $hoursч';
+  }
+
+  @override
+  String eventsCountdownHoursMinutes(int hours, int minutes) {
+    return 'Почнува за $hoursч $minutesм';
+  }
+
+  @override
+  String eventsCountdownMinutes(int minutes) {
+    return 'Почнува за $minutesм';
+  }
+
+  @override
+  String get eventsShareEventTooltip => 'Сподели настан';
+
+  @override
+  String get eventsAttendeeCheckInSemantic => 'Скенирај за пријава на настанот';
+
+  @override
+  String get eventsAttendeeAlreadyCheckedInSnack => 'Веќе сте пријавени.';
+
+  @override
+  String get eventsAttendeeCheckInPausedSnack =>
+      'Организаторот ја паузираше пријавата.';
+
+  @override
+  String get eventsAttendeeCheckInCompleteSnack => 'Пријавата е завршена.';
+
+  @override
+  String get eventsAttendeeBannerTitleCheckedIn => 'Пријавени сте';
+
+  @override
+  String get eventsAttendeeBannerTitleInProgress => 'Настанот е во тек';
+
+  @override
+  String get eventsAttendeeBannerSubtitleAttendanceConfirmed =>
+      'Присуството е потврдено';
+
+  @override
+  String eventsAttendeeBannerSubtitleCheckedInAt(String time) {
+    return 'Пријавени во $time';
+  }
+
+  @override
+  String get eventsAttendeeBannerSubtitleScanQr =>
+      'Скенирајте го QR-кодот на организаторот';
+
+  @override
+  String get eventsAttendeeBannerSubtitlePaused =>
+      'Пријавата е привремено паузирана';
+
+  @override
+  String get eventsDetailShareSuccess => 'Настанот е споделен.';
+
+  @override
+  String get eventsDetailCalendarAdded => 'Настанот е додаден во календарот.';
+
+  @override
+  String get eventsDetailCalendarFailed =>
+      'Не можеше да се додаде во календарот. Обидете се повторно.';
+
+  @override
+  String get eventsDetailRefreshFailed =>
+      'Не можеше да се освежи настанот. Обидете се повторно.';
+
+  @override
+  String get eventsDetailCancelledCallout => 'Овој настан е откажан.';
+
+  @override
+  String get eventsDetailOpenInMaps => 'Отвори во Maps';
+
+  @override
+  String eventsDetailCoverSemantic(String title) {
+    return 'Насловна слика за $title';
+  }
+
+  @override
+  String get eventsDetailGroupedPanelSemantic => 'Локација, распоред и детали';
+
+  @override
+  String get eventsDetailParticipationSemantic => 'Ваше учество';
+
+  @override
+  String get eventsAnalyticsLoadFailed =>
+      'Не можеше да се вчитаат аналитиките.';
+
+  @override
+  String get eventsAnalyticsRetry => 'Обиди се повторно';
+
+  @override
+  String get eventsRecurrenceDaily => 'Секој ден';
+
+  @override
+  String get eventsRecurrenceNavigatePrevious => 'Претходен настан во серијата';
+
+  @override
+  String get eventsRecurrenceNavigateNext => 'Следен настан во серијата';
+
+  @override
+  String get eventsImpactSummarySaved => 'Резимето на влијание е зачувано.';
+
+  @override
+  String get eventsImpactSummaryUpdated => 'Резимето на влијание е ажурирано.';
+
+  @override
+  String eventsReminderSetSnack(String when) {
+    return 'Потсетникот е поставен за $when.';
+  }
+
+  @override
+  String get eventsFeedbackSheetTitle => 'Повратна информација после настанот';
+
+  @override
+  String get eventsFeedbackHowWasEvent => 'Како помина настанот?';
+
+  @override
+  String get eventsFeedbackBagsCollected => 'Собрани ќесиња';
+
+  @override
+  String eventsFeedbackVolunteerHours(String hours) {
+    return 'Волонтерски часови: $hoursч';
+  }
+
+  @override
+  String get eventsFeedbackNotesHint =>
+      'Што добро помина? Белешки за следниот пат?';
+
+  @override
+  String eventsEvidenceMaxPhotosSnack(int max) {
+    return 'Максимум $max фотографии.';
+  }
+
+  @override
+  String get eventsEvidencePickFailedSnack =>
+      'Не можеше да се изберат фотографии. Проверете дозволи.';
+
+  @override
+  String get eventsEvidenceRemoveAction => 'Отстрани';
+
+  @override
+  String get eventsEvidenceAppBarTitle => 'Докази од чистење';
+
+  @override
+  String get eventsEvidenceSaving => 'Се зачувува...';
+
+  @override
+  String get eventsEvidenceAfterPhotosSaved =>
+      'Фотографиите после се зачувани.';
+
+  @override
+  String get eventsEvidenceNoChanges => 'Нема промени за зачувување.';
+
+  @override
+  String get eventsSiteReferencePhotoTitle =>
+      'Референтна фотографија од локацијата';
+
+  @override
+  String get eventsSiteReferencePhotoBody =>
+      'Референца пред чистење. Користете јазичето После за фотографии од исчистената локација.';
+
+  @override
+  String get eventsManageCheckInOnlyInProgress =>
+      'Пријавата е достапна само додека настанот е во тек.';
+
+  @override
+  String get eventsEventFull => 'Овој настан е полн.';
+
+  @override
+  String get eventsParticipationUpdateFailed =>
+      'Не можевме да ја ажурираме учеството. Обидете се повторно.';
+
+  @override
+  String get eventsJoinedEcoAction => 'Се придруживте на оваа еколошка акција.';
+
+  @override
+  String eventsJoinPointsEarned(int points) {
+    return '+$points поени — добредојдовте!';
+  }
+
+  @override
+  String get eventsLeftEcoAction => 'Се одјавивте од оваа еколошка акција.';
+
+  @override
+  String eventsCheckInPointsEarned(int points) {
+    return '+$points поени — регистрирани сте!';
+  }
+
+  @override
+  String eventsManualCheckInWithPoints(String name, int points) {
+    return '$name е регистриран/а · +$points поени за нив';
+  }
+
+  @override
+  String get eventsJoinFirstForReminders =>
+      'Прво се придружете на настанот за да поставите потсетници.';
+
+  @override
+  String get eventsReminderDisabled => 'Потсетникот е исклучен.';
+
+  @override
+  String get eventsReminderSheetTitle => 'Изберете време за потсетник';
+
+  @override
+  String eventsReminderSheetSubtitle(String timeRange, String date) {
+    return 'Настанот почнува во $timeRange на $date.';
+  }
+
+  @override
+  String get eventsReminderPreset1Day => '1 ден пред';
+
+  @override
+  String get eventsReminderPreset3Hours => '3 часа пред';
+
+  @override
+  String get eventsReminderPreset1Hour => '1 час пред';
+
+  @override
+  String get eventsReminderPreset30Mins => '30 минути пред';
+
+  @override
+  String get eventsReminderUnavailableSubtitle =>
+      'Недостапно за ова време на настанот';
+
+  @override
+  String get eventsReminderCustomTitle => 'Сопствен датум и време';
+
+  @override
+  String get eventsReminderCustomSubtitle =>
+      'Изберете точен момент за потсетник';
+
+  @override
+  String get eventsReminderPickTitle => 'Изберете потсетник';
+
+  @override
+  String get eventsReminderDone => 'Готово';
+
+  @override
+  String eventsCardParticipantsMore(int count) {
+    return '+$count повеќе';
+  }
+
+  @override
+  String eventsCardParticipantsCountMax(int count, int max) {
+    return '$count / $max';
+  }
+
+  @override
+  String eventsCardParticipantsJoined(int count) {
+    return '$count пријавени';
+  }
+
+  @override
+  String eventsDetailSemanticsLabel(String title) {
+    return 'Детали за настан: $title';
+  }
+
+  @override
+  String eventsCountdownBadgeSemantic(String label) {
+    return 'Време до почеток на настанот: $label';
+  }
+
+  @override
+  String get eventsEvidenceThumbnailMenuTitle => 'Фотографија';
+
+  @override
+  String get eventsFeedRefreshFailed => 'Не можевме да ги освежиме настаните.';
+
+  @override
+  String get eventsCreateGenericError =>
+      'Не можевме да креираме настан. Обидете се повторно.';
+
+  @override
   String get qrScannerPointCameraHint =>
       'Насочете ја камерата кон живиот QR код на организаторот';
 
@@ -2030,6 +2814,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get qrScannerErrorInvalidFormat => 'Невалиден формат на QR.';
 
   @override
+  String get qrScannerErrorInvalidQr => 'Овој QR не важи за пријава.';
+
+  @override
   String get qrScannerErrorWrongEvent => 'Овој QR е за друг настан.';
 
   @override
@@ -2045,6 +2832,18 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get qrScannerErrorAlreadyCheckedIn => 'Веќе сте пријавени.';
+
+  @override
+  String get qrScannerErrorRequiresJoin =>
+      'Прво се пријавете на настанот во апликацијата.';
+
+  @override
+  String get qrScannerErrorCheckInUnavailable =>
+      'Пријавата не е отворена за овој настан во моментов.';
+
+  @override
+  String get qrScannerErrorRateLimited =>
+      'Премногу обиди. Почекајте малку и обидете се повторно.';
 
   @override
   String get qrScannerCameraUnavailableFeedback =>
@@ -2085,6 +2884,22 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get qrScannerToggleFlashlightSemantic => 'Вклучи или исклучи блиц';
+
+  @override
+  String get qrScannerCameraStarting => 'Се стартува камерата…';
+
+  @override
+  String get qrScannerCheckingIn => 'Се потврдува пријавата…';
+
+  @override
+  String get qrScannerCameraErrorTitle => 'Камерата е недостапна';
+
+  @override
+  String get qrScannerManualEntrySubtitle =>
+      'Залепете го целиот текст што го сподели организаторот (копирајте од нивниот екран или порака).';
+
+  @override
+  String get qrScannerPasteButton => 'Залепи';
 
   @override
   String get siteReportReasonFakeLabel => 'Лажни или воведувачки податоци';
@@ -2317,6 +3132,414 @@ class AppLocalizationsMk extends AppLocalizations {
   String get appSmartImageUnavailable => 'Сликата не е достапна';
 
   @override
+  String get eventsReminderSectionTitle => 'Потсетник за настан';
+
+  @override
+  String get eventsReminderSectionEnabled => 'Потсетникот е вклучен';
+
+  @override
+  String eventsReminderSectionSetFor(String time) {
+    return 'Поставен за $time';
+  }
+
+  @override
+  String get eventsReminderSectionDisabled =>
+      'Добијте известување пред почетокот';
+
+  @override
+  String get eventsReminderSectionDisable => 'Исклучи';
+
+  @override
+  String get eventsReminderSectionEnable => 'Вклучи';
+
+  @override
+  String get eventsDescriptionTitle => 'За настанот';
+
+  @override
+  String get eventsDescriptionShowLess => 'Прикажи помалку';
+
+  @override
+  String get eventsDescriptionReadMore => 'Прочитај повеќе';
+
+  @override
+  String get eventsAfterCleanupTitle => 'По чистењето';
+
+  @override
+  String eventsAfterPhotoSemantic(int index, int total) {
+    return 'Прикажи фотографија по чистење $index од $total';
+  }
+
+  @override
+  String get eventsFilterAll => 'Сите';
+
+  @override
+  String get eventsFilterUpcoming => 'Претстојни';
+
+  @override
+  String get eventsFilterNearby => 'Во близина';
+
+  @override
+  String get eventsFilterPast => 'Поминати';
+
+  @override
+  String get eventsFilterMyEvents => 'Мои настани';
+
+  @override
+  String get eventsFilterSemanticPrefix => 'Настани';
+
+  @override
+  String get eventsParticipantsTitle => 'Учесници';
+
+  @override
+  String eventsParticipantsViewSemantic(int count) {
+    return 'Прикажи $count учесници';
+  }
+
+  @override
+  String eventsParticipantsYouAndOthers(int count) {
+    return 'Вие и уште $count се приклучивте';
+  }
+
+  @override
+  String eventsParticipantsVolunteersJoined(int count) {
+    return '$count волонтери се приклучија';
+  }
+
+  @override
+  String eventsParticipantsSpotsLeft(int count) {
+    return 'Останати места: $count';
+  }
+
+  @override
+  String eventsParticipantsCheckedInCount(int checkedIn, int total) {
+    return '$checkedIn од $total се пријавени';
+  }
+
+  @override
+  String get eventsParticipantsSearchPlaceholder => 'Пребарај учесник';
+
+  @override
+  String get eventsParticipantsNoSearchResults =>
+      'Нема совпаѓања за пребарувањето.';
+
+  @override
+  String get eventsParticipantsYouOrganizer => 'Вие · Организатор';
+
+  @override
+  String get eventsParticipantsOrganizer => 'Организатор';
+
+  @override
+  String get eventsParticipantsYou => 'Вие';
+
+  @override
+  String get eventsParticipantsLoadFailed =>
+      'Не можевме да ја вчитаме листата. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get eventsParticipantsRetry => 'Обиди се повторно';
+
+  @override
+  String get eventsParticipantsViewRosterSemantic =>
+      'Погледни ја листата на учесници';
+
+  @override
+  String get eventsGearSectionTitle => 'Опрема за понесување';
+
+  @override
+  String get eventsGearNoneNeeded => 'Нема потреба за посебна опрема';
+
+  @override
+  String get eventsImpactSummaryTitle => 'Преглед на ефект';
+
+  @override
+  String get eventsImpactSummaryAdd => 'Додај';
+
+  @override
+  String get eventsImpactSummaryEdit => 'Уреди';
+
+  @override
+  String get eventsImpactSummaryEmptyHint =>
+      'Забележете ги резултатите, напорот и поуките од чистењето.';
+
+  @override
+  String eventsImpactBadgeRating(int rating) {
+    return '$rating★ оценка';
+  }
+
+  @override
+  String eventsImpactBadgeBags(int count) {
+    return '$count ќесии';
+  }
+
+  @override
+  String eventsImpactBadgeHours(String hours) {
+    return '$hoursч';
+  }
+
+  @override
+  String eventsImpactEstimatedLine(String kg, String co2) {
+    return '$kg kg отстрането · $co2 kg CO2e избегнато';
+  }
+
+  @override
+  String eventsLocationSiteSemantic(String distanceKm) {
+    return 'Погледни ја локацијата на загадување, на $distanceKm км';
+  }
+
+  @override
+  String eventsLocationDotKm(String distanceKm) {
+    return '· $distanceKm км';
+  }
+
+  @override
+  String get eventsEmptyAllTitle => 'Сè уште нема еко настани';
+
+  @override
+  String get eventsEmptyAllSubtitle =>
+      'Бидете први што ќе создадат! Допрете + погоре за да почнете.';
+
+  @override
+  String get eventsEmptyUpcomingTitle => 'Нема претстојни настани';
+
+  @override
+  String get eventsEmptyUpcomingSubtitle =>
+      'Создадете еден за да ги соберете волонтерите.';
+
+  @override
+  String get eventsEmptyNearbyTitle => 'Нема настани во близина';
+
+  @override
+  String get eventsEmptyNearbySubtitle =>
+      'Обидете се со друг филтер или создадете настан во вашата област.';
+
+  @override
+  String get eventsEmptyPastTitle => 'Нема минати настани';
+
+  @override
+  String get eventsEmptyPastSubtitle =>
+      'Завршените настани ќе се појават тука.';
+
+  @override
+  String get eventsEmptyMyEventsTitle => 'Сè уште нема настани';
+
+  @override
+  String get eventsEmptyMyEventsSubtitle =>
+      'Придружете се или создадете настан за да го видите тука.';
+
+  @override
+  String eventsSearchEmptyTitle(String query) {
+    return 'Нема резултати за „$query“';
+  }
+
+  @override
+  String get eventsSearchEmptySubtitle =>
+      'Обидете се со друг термин или проверете го правописот.';
+
+  @override
+  String get eventsSitePickerTitle => 'Изберете локација';
+
+  @override
+  String get eventsSitePickerSubtitle =>
+      'Поврзете го настанот со една локација за чистење.';
+
+  @override
+  String get eventsSitePickerSearchPlaceholder => 'Пребарај по име или опис';
+
+  @override
+  String eventsSitePickerNoMatch(String query) {
+    return 'Нема локации што одговараат на „$query“';
+  }
+
+  @override
+  String eventsSitePickerRowKmDesc(String km, String desc) {
+    return '$km км далеку · $desc';
+  }
+
+  @override
+  String get eventsSuccessDialogTitle => 'Настанот е создаден';
+
+  @override
+  String eventsSuccessDialogBody(String title, String siteName) {
+    return '„$title“ на $siteName е подготвен. Споделете со заедницата за да се приклучат волонтери.';
+  }
+
+  @override
+  String get eventsSuccessDialogOpenEvent => 'Отвори настан';
+
+  @override
+  String get eventsTimePickerSelectTime => 'Изберете време';
+
+  @override
+  String get eventsTimePickerConfirm => 'Потврди';
+
+  @override
+  String get eventsTimePickerFrom => 'Од';
+
+  @override
+  String get eventsTimePickerTo => 'До';
+
+  @override
+  String eventsTimePickerTimeBlockSemantic(String role, String time) {
+    return '$role, $time';
+  }
+
+  @override
+  String eventsFeedbackRatingStars(int rating) {
+    return '$rating★';
+  }
+
+  @override
+  String get eventsFeedRecentSearches => 'Неодамнешни пребарувања';
+
+  @override
+  String get eventsCleanupAfterUploadSemantic =>
+      'Прикачи фотографии по чистењето';
+
+  @override
+  String get eventsCleanupAfterViewFullscreenSemantic =>
+      'Погледни ја фотографијата на цел екран';
+
+  @override
+  String get eventsCleanupAfterUploadMoreTitle => 'Прикачи уште фотографии';
+
+  @override
+  String eventsCleanupAfterUploadedCount(int count) {
+    return '$count прикачени';
+  }
+
+  @override
+  String eventsCleanupAfterSlotsRemaining(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Уште $count слободни места',
+      one: 'Уште 1 слободно место',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get eventsCleanupAfterAddMoreSemantic => 'Додај уште фотографии';
+
+  @override
+  String get eventsCleanupAfterRemoveSemantic => 'Отстрани фотографија';
+
+  @override
+  String get eventsCleanupAfterEmptyTitle =>
+      'Додајте фотографии од исчистената локација';
+
+  @override
+  String eventsCleanupAfterEmptyMaxPhotos(int max) {
+    return 'До $max фотографии';
+  }
+
+  @override
+  String get eventsCleanupAfterEmptyTapGallery =>
+      'Допрете за избор од галерија';
+
+  @override
+  String get eventsCleanupEvidencePhotoSemantic =>
+      'Фотографија од доказ за чистење';
+
+  @override
+  String get eventsDateRelativeEarlierToday => 'Порано денес';
+
+  @override
+  String eventsDateRelativeDaysAgo(int days) {
+    return 'Пред $days дена';
+  }
+
+  @override
+  String get eventsDateRelativeToday => 'Денес';
+
+  @override
+  String get eventsDateRelativeTomorrow => 'Утре';
+
+  @override
+  String eventsDateRelativeInDays(int days) {
+    return 'За $days дена';
+  }
+
+  @override
+  String get eventsDateInfoSheetTitle => 'Датум и време';
+
+  @override
+  String eventsDateInfoSemantic(String date, String timeRange) {
+    return '$date, $timeRange';
+  }
+
+  @override
+  String get eventsCategorySheetTitle => 'Категорија';
+
+  @override
+  String eventsCategorySemantic(String label) {
+    return 'Категорија на настан: $label';
+  }
+
+  @override
+  String get eventsOrganizerSheetTitle => 'Организатор';
+
+  @override
+  String get eventsOrganizerYouOwnThis => 'Ова е ваш настан';
+
+  @override
+  String get eventsOrganizerRoleLabel => 'Организатор на настан';
+
+  @override
+  String eventsOrganizerCreatedOn(int day, int month, int year) {
+    return 'Настанот е креиран на $day/$month/$year';
+  }
+
+  @override
+  String eventsOrganizerSemantic(String name) {
+    return 'Организатор: $name';
+  }
+
+  @override
+  String get eventsOrganizedByLabel => 'Организирано од';
+
+  @override
+  String get eventsFeedSemantic => 'Листа на настани';
+
+  @override
+  String get eventsFeedTitle => 'Настани';
+
+  @override
+  String get eventsFeedCreateSemantic => 'Креирај настан';
+
+  @override
+  String get eventsFeedSearchPlaceholder => 'Пребарај настани';
+
+  @override
+  String get eventsFeedHappeningNow => 'Во тек';
+
+  @override
+  String get eventsFeedComingUp => 'Следуваат';
+
+  @override
+  String get eventsFeedRecentlyCompleted => 'Неодамна завршени';
+
+  @override
+  String get eventsFeedViewListToggle => 'Листа';
+
+  @override
+  String get eventsFeedViewCalendarToggle => 'Календар';
+
+  @override
+  String get eventsCalendarPreviousMonth => 'Претходен месец';
+
+  @override
+  String get eventsCalendarNextMonth => 'Следен месец';
+
+  @override
+  String eventsCalendarDaySemantic(int day) {
+    return 'Ден $day';
+  }
+
+  @override
+  String get eventsCalendarNoEventsThisDay => 'Нема настани за овој ден';
+
+  @override
   String siteCardPollutionSiteSemantic(String title) {
     return 'Загадено место: $title. Допри за детали.';
   }
@@ -2325,4 +3548,650 @@ class AppLocalizationsMk extends AppLocalizations {
   String siteCardPhotoSemantic(String title) {
     return 'Фотографија на $title';
   }
+
+  @override
+  String get eventsFilterSheetTitle => 'Филтрирај настани';
+
+  @override
+  String get eventsFilterSheetCategory => 'Категорија';
+
+  @override
+  String get eventsFilterSheetStatus => 'Статус';
+
+  @override
+  String get eventsFilterSheetDateRange => 'Период на датум';
+
+  @override
+  String get eventsFilterSheetDateFrom => 'Од';
+
+  @override
+  String get eventsFilterSheetDateTo => 'До';
+
+  @override
+  String get eventsFilterSheetShowResults => 'Прикажи резултати';
+
+  @override
+  String get eventsFilterSheetClearAll => 'Исчисти сè';
+
+  @override
+  String eventsFilterSheetActiveCount(int count) {
+    return '$count активни';
+  }
+
+  @override
+  String get eventsOrganizerDashboardTitle => 'Мои настани';
+
+  @override
+  String get eventsOrganizerDashboardEmpty =>
+      'Сè уште не сте организирале настани.';
+
+  @override
+  String get eventsOrganizerDashboardEmptyAction => 'Создај прв настан';
+
+  @override
+  String get eventsOrganizerDashboardSectionUpcoming => 'Претстојни';
+
+  @override
+  String get eventsOrganizerDashboardSectionInProgress => 'Во тек';
+
+  @override
+  String get eventsOrganizerDashboardSectionCompleted => 'Завршени';
+
+  @override
+  String get eventsOrganizerDashboardSectionCancelled => 'Откажани';
+
+  @override
+  String eventsOrganizerDashboardParticipants(int count, String max) {
+    return '$count/$max учесници';
+  }
+
+  @override
+  String eventsOrganizerDashboardParticipantsUnlimited(int count) {
+    return '$count учесници';
+  }
+
+  @override
+  String get eventsOrganizerDashboardEvidenceAction => 'Докази';
+
+  @override
+  String get eventsAnalyticsTitle => 'Аналитика';
+
+  @override
+  String get eventsAnalyticsAttendanceRate => 'Стапка на присуство';
+
+  @override
+  String get eventsAnalyticsJoiners => 'Приклучени со текот на времето';
+
+  @override
+  String get eventsAnalyticsCheckInsByHour => 'Пријави по час';
+
+  @override
+  String get eventsAnalyticsNoData => 'Сè уште нема податоци';
+
+  @override
+  String get eventsOfflineSyncQueued =>
+      'Зачувано. Ќе се синхронизира кога ќе се поврзете.';
+
+  @override
+  String get eventsOfflineSyncFailed =>
+      'Синхронизацијата не успеа. Ќе се обиде повторно.';
+
+  @override
+  String get eventsWeatherForecast => 'Прогноза за времето';
+
+  @override
+  String get eventsWeatherLoadFailed => 'Времето не е достапно';
+
+  @override
+  String eventsWeatherPrecipitationMm(String amount) {
+    return '$amount мм врнежи';
+  }
+
+  @override
+  String get eventsWeatherNoPrecipitation => 'Без значителни врнежи';
+
+  @override
+  String eventsWeatherPrecipChance(int percent) {
+    return '$percent% веројатност за врнежи';
+  }
+
+  @override
+  String get eventsWeatherIndicativeNote =>
+      'Индикативна прогноза од Open-Meteo; вистинските услови може да се разликуваат.';
+
+  @override
+  String get eventsWeatherIndicativeInfoTitle => 'За оваа прогноза';
+
+  @override
+  String get eventsWeatherIndicativeInfoSemantic =>
+      'Информации за изворот на временската прогноза';
+
+  @override
+  String get eventsRecurrenceNone => 'Не се повторува';
+
+  @override
+  String get eventsRecurrenceWeekly => 'Секоја недела';
+
+  @override
+  String get eventsRecurrenceBiweekly => 'На секои 2 недели';
+
+  @override
+  String get eventsRecurrenceMonthly => 'Секој месец';
+
+  @override
+  String eventsRecurrenceOccurrences(int count) {
+    return '$count повторувања';
+  }
+
+  @override
+  String get eventsRecurrencePartOfSeries => 'Дел од серија';
+
+  @override
+  String eventsRecurrenceSeriesLabel(int index, int total) {
+    return 'Настан $index од $total';
+  }
+
+  @override
+  String get eventsRecurrenceDone => 'Готово';
+
+  @override
+  String get eventsCategoryGeneralCleanup => 'Општо чистење';
+
+  @override
+  String get eventsCategoryGeneralCleanupDescription =>
+      'Собирање ѓубре, метење и враќање на подрачјето во ред.';
+
+  @override
+  String get eventsCategoryRiverAndLake => 'Чистење на реки и езера';
+
+  @override
+  String get eventsCategoryRiverAndLakeDescription =>
+      'Отстранување отпад од вода, обали и одводни канали.';
+
+  @override
+  String get eventsCategoryTreeAndGreen => 'Садење дрвја и зеленило';
+
+  @override
+  String get eventsCategoryTreeAndGreenDescription =>
+      'Садење, обновување на зелени површини и градини.';
+
+  @override
+  String get eventsCategoryRecyclingDrive => 'Рециклирање';
+
+  @override
+  String get eventsCategoryRecyclingDriveDescription =>
+      'Сортирање, собирање и транспорт на рециклажа до преработка.';
+
+  @override
+  String get eventsCategoryHazardousRemoval => 'Опасен отпад';
+
+  @override
+  String get eventsCategoryHazardousRemovalDescription =>
+      'Безбедно собирање на хемикалии, гуми, батерии или азбест.';
+
+  @override
+  String get eventsCategoryAwarenessAndEducation => 'Свест и едукација';
+
+  @override
+  String get eventsCategoryAwarenessAndEducationDescription =>
+      'Рабилници, предавања или вклучување на заедницата.';
+
+  @override
+  String get eventsCategoryOther => 'Друго';
+
+  @override
+  String get eventsCategoryOtherDescription =>
+      'Прилагоден настан што не се вклопува во горните категории.';
+
+  @override
+  String get eventsGearTrashBags => 'Џувалја за отпад';
+
+  @override
+  String get eventsGearGloves => 'Ракавици';
+
+  @override
+  String get eventsGearRakes => 'Грабли и лопати';
+
+  @override
+  String get eventsGearWheelbarrow => 'Количка';
+
+  @override
+  String get eventsGearWaterBoots => 'Чизми за вода';
+
+  @override
+  String get eventsGearSafetyVest => 'Рефлектирачки елек';
+
+  @override
+  String get eventsGearFirstAid => 'Апчиња за прва помош';
+
+  @override
+  String get eventsGearSunscreen => 'Сончев крем и вода';
+
+  @override
+  String get eventsScaleSmall => 'Мала (1–5 луѓе)';
+
+  @override
+  String get eventsScaleSmallDescription =>
+      'Кратко чистење на едно место, една-две торби.';
+
+  @override
+  String get eventsScaleMedium => 'Средна (6–15 луѓе)';
+
+  @override
+  String get eventsScaleMediumDescription => 'Полудневна акција, повеќе зони.';
+
+  @override
+  String get eventsScaleLarge => 'Голема (16–40 луѓе)';
+
+  @override
+  String get eventsScaleLargeDescription =>
+      'Организирана група, потешок отпад.';
+
+  @override
+  String get eventsScaleMassive => 'Масовна (40+ луѓе)';
+
+  @override
+  String get eventsScaleMassiveDescription =>
+      'Градска или повеќелокациска акција.';
+
+  @override
+  String get eventsDifficultyEasy => 'Лесно';
+
+  @override
+  String get eventsDifficultyEasyDescription =>
+      'Рамен терен, малку отпад, погодно за семејства.';
+
+  @override
+  String get eventsDifficultyModerate => 'Умерено';
+
+  @override
+  String get eventsDifficultyModerateDescription =>
+      'Мешан терен или обемни предмети, повеќе напор.';
+
+  @override
+  String get eventsDifficultyHard => 'Тешко';
+
+  @override
+  String get eventsDifficultyHardDescription =>
+      'Стрмни нагорнини, тежок отпад или опасни материјали.';
+
+  @override
+  String get eventsSiteCoercedDescription => 'Заедничка локација за чистење';
+
+  @override
+  String get homeSiteCleaningEmptyTitle => 'Сè уште нема настани за чистење';
+
+  @override
+  String get homeSiteCleaningEmptyBody =>
+      'Бидете први што ќе организираат еколошка акција и ќе соберат волонтери за оваа локација.';
+
+  @override
+  String get homeSiteCleaningTapToCreate => 'Допрете за да креирате';
+
+  @override
+  String get homeSiteCleaningCtaCreateFirst => 'Креирај еколошка акција';
+
+  @override
+  String get homeSiteCleaningCtaScheduleAnother => 'Закажи друга акција';
+
+  @override
+  String homeSiteCleaningVolunteersJoined(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count волонтери се приклучија',
+      one: '1 волонтер се приклучи',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSiteCleaningOrganizerHint =>
+      'Вие ја организирате оваа акција. Поставете „после“ фотографии откако ќе заврши.';
+
+  @override
+  String get homeSiteCleaningVolunteerHint =>
+      'Приклучете се на акцијата за да помогнете да се исчисти локацијата.';
+
+  @override
+  String get homeSiteCleaningJoinAction => 'Приклучи се';
+
+  @override
+  String get homeSiteCleaningEventUnavailable =>
+      'Деталите за настанот моментално не се достапни.';
+
+  @override
+  String get errorUserNetwork => 'Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get errorUserTimeout => 'Побара премногу долго. Обидете се повторно.';
+
+  @override
+  String get errorUserUnauthorized => 'Најавете се повторно за да продолжите.';
+
+  @override
+  String get errorUserForbidden => 'Немате дозвола за таа акција.';
+
+  @override
+  String get errorUserNotFound => 'Не можевме да го најдеме.';
+
+  @override
+  String get errorUserServer => 'Сервисот е зафатен. Обидете се за кратко.';
+
+  @override
+  String get errorUserTooManyRequests => 'Премногу обиди. Почекајте малку.';
+
+  @override
+  String get errorUserUnknown => 'Нешто тргна наопаку. Обидете се повторно.';
+
+  @override
+  String get eventsFilterSheetSemantic => 'Филтрирај настани';
+
+  @override
+  String get eventChatTitle => 'Разговор';
+
+  @override
+  String get eventChatRowTitle => 'Групен разговор';
+
+  @override
+  String get eventChatInputHint => 'Порака';
+
+  @override
+  String get eventChatSend => 'Испрати';
+
+  @override
+  String get eventChatEmptyTitle => 'Започнете разговор';
+
+  @override
+  String get eventChatEmptyBody =>
+      'Координирајте со другите волонтери пред и за време на настанот.';
+
+  @override
+  String get eventChatMessageRemoved => 'Оваа порака е отстранета';
+
+  @override
+  String get eventChatNewMessages => 'Нови пораки';
+
+  @override
+  String get eventChatToday => 'Денес';
+
+  @override
+  String get eventChatYesterday => 'Вчера';
+
+  @override
+  String get eventChatReply => 'Одговори';
+
+  @override
+  String get eventChatDelete => 'Избриши';
+
+  @override
+  String get eventChatLoadError => 'Не можевме да ги вчитаме пораките';
+
+  @override
+  String get eventChatSendFailed =>
+      'Пораката не е испратена. Допрете за повторен обид.';
+
+  @override
+  String get eventChatOpenMapsFailed =>
+      'Не можев да го отворам Maps. Обиди се повторно.';
+
+  @override
+  String get eventChatAttachPhotoLibrary => 'Фото библиотека';
+
+  @override
+  String get eventChatAttachCamera => 'Камера';
+
+  @override
+  String get eventChatAttachVideo => 'Видео';
+
+  @override
+  String get eventChatAttachDocument => 'Документ';
+
+  @override
+  String get eventChatAttachAudio => 'Аудио';
+
+  @override
+  String get eventChatVoiceDiscard => 'Отфрли снимка';
+
+  @override
+  String get eventChatVoiceSend => 'Испрати гласовна порака';
+
+  @override
+  String get eventChatVoicePreviewHint => 'Преглед на глас';
+
+  @override
+  String get eventChatAttachLocation => 'Сподели локација';
+
+  @override
+  String get eventChatSendLocation => 'Испрати локација';
+
+  @override
+  String get eventChatSending => 'Се испраќа…';
+
+  @override
+  String eventChatReplyingTo(String name) {
+    return 'Одговор на $name';
+  }
+
+  @override
+  String eventChatCharCountHint(int count) {
+    return '$count / 2000';
+  }
+
+  @override
+  String eventChatSemanticsBubble(String author, String time, String body) {
+    return '$author, $time. $body';
+  }
+
+  @override
+  String get eventChatInputSemantics => 'Порака во разговорот';
+
+  @override
+  String get eventChatPushChannelName => 'Разговор на настан';
+
+  @override
+  String get eventChatEdited => '(изменето)';
+
+  @override
+  String get eventChatEditMessage => 'Уреди';
+
+  @override
+  String get eventChatEditing => 'Уредување порака';
+
+  @override
+  String get eventChatEditHint => 'Уредете ја вашата порака';
+
+  @override
+  String get eventChatSaveEdit => 'Зачувај';
+
+  @override
+  String get eventChatPinMessage => 'Закачи';
+
+  @override
+  String get eventChatUnpinMessage => 'Откачи';
+
+  @override
+  String eventChatPinnedBy(String name) {
+    return 'Закачено од $name';
+  }
+
+  @override
+  String get eventChatPinnedMessagesTitle => 'Закачени пораки';
+
+  @override
+  String get eventChatPinnedBarHint => 'Закачено';
+
+  @override
+  String get eventChatNoPinnedMessages => 'Нема закачени пораки';
+
+  @override
+  String get eventChatMuted => 'Известувањата се исклучени';
+
+  @override
+  String get eventChatUnmuted => 'Известувањата се вклучени';
+
+  @override
+  String get eventChatCopied => 'Пораката е копирана';
+
+  @override
+  String get eventChatReconnecting => 'Повторно поврзување…';
+
+  @override
+  String get eventChatConnected => 'Поврзано';
+
+  @override
+  String get eventChatSearchHint => 'Пребарај пораки';
+
+  @override
+  String get eventChatSearchNoResults => 'Нема пораки';
+
+  @override
+  String get eventChatSearchAction => 'Пребарај';
+
+  @override
+  String eventChatParticipantsCount(int count) {
+    return '$count учесници';
+  }
+
+  @override
+  String get eventChatParticipantsSheetTitle => 'Луѓе во овој разговор';
+
+  @override
+  String eventChatParticipantsTitleSemantic(String eventTitle, int count) {
+    return '$eventTitle, $count учесници';
+  }
+
+  @override
+  String get eventChatParticipantsLoadError =>
+      'Не можеше да се вчитаат учесниците.';
+
+  @override
+  String get eventChatParticipantsYouBadge => 'Вие';
+
+  @override
+  String get eventChatParticipantsEmpty => 'Сè уште нема вчитани учесници.';
+
+  @override
+  String eventChatSystemUserJoined(String name) {
+    return '$name се придружи на настанот';
+  }
+
+  @override
+  String eventChatSystemUserLeft(String name) {
+    return '$name го напушти настанот';
+  }
+
+  @override
+  String get eventChatSystemEventUpdated => 'Деталите за настанот се ажурирани';
+
+  @override
+  String get eventChatSwipeReplySemantic => 'Повлечи за одговор на порака';
+
+  @override
+  String get eventChatVoiceLevelSemantic => 'Ниво на глас';
+
+  @override
+  String get eventChatMessageOptions => 'Опции за порака';
+
+  @override
+  String get eventChatTypingUnknownParticipant => 'Некој';
+
+  @override
+  String get eventChatCopy => 'Копирај';
+
+  @override
+  String get eventChatUnpinConfirm => 'Пораката е откачена';
+
+  @override
+  String get eventChatMaxPinnedReached =>
+      'Достигнат е максимумот закачени пораки';
+
+  @override
+  String get eventChatMessageNotInView =>
+      'Таа порака не е вчитана. Лизгајте нагоре за постари пораки.';
+
+  @override
+  String get eventChatMuteNotifications => 'Исклучи известувања';
+
+  @override
+  String get eventChatUnmuteNotifications => 'Вклучи известувања';
+
+  @override
+  String eventChatSeenBy(String names) {
+    return 'Видено од $names';
+  }
+
+  @override
+  String eventChatSeenByTruncated(String names, int count) {
+    return 'Видено од $names +$count';
+  }
+
+  @override
+  String eventChatTypingOne(String name) {
+    return '$name пишува…';
+  }
+
+  @override
+  String eventChatTypingTwo(String first, String second) {
+    return '$first и $second пишуваат…';
+  }
+
+  @override
+  String eventChatTypingMany(String name, int count) {
+    return '$name и уште $count пишуваат…';
+  }
+
+  @override
+  String get eventChatImageViewerTitle => 'Фотографија';
+
+  @override
+  String eventChatImageViewerPage(int current, int total) {
+    return '$current од $total';
+  }
+
+  @override
+  String get eventChatVideoViewerTitle => 'Видео';
+
+  @override
+  String get eventChatOpenFile => 'Отвори датотека';
+
+  @override
+  String get eventChatDownloadFailed => 'Не можев да ја преземам датотеката';
+
+  @override
+  String get eventChatPdfOpenFailed => 'Не можев да го отворам PDF';
+
+  @override
+  String get eventChatShareFile => 'Сподели';
+
+  @override
+  String get eventChatLocationMapTitle => 'Локација';
+
+  @override
+  String get eventChatCopyCoordinates => 'Копирај координати';
+
+  @override
+  String get eventChatDirections => 'Насоки';
+
+  @override
+  String get eventChatAudioExpandedTitle => 'Гласовна порака';
+
+  @override
+  String get eventChatHoldToRecord => 'Држи за снимање';
+
+  @override
+  String get eventChatReleaseToSend => 'Пушти за испраќање';
+
+  @override
+  String get eventChatSlideToCancel => 'Повлечи лево за откажување';
+
+  @override
+  String get eventChatReleaseToCancel => 'Пушти за откажување';
+
+  @override
+  String get eventChatRecording => 'Снимање…';
+
+  @override
+  String get eventChatMicPermissionDenied =>
+      'Потребен е пристап до микрофонот за гласовни пораки.';
 }

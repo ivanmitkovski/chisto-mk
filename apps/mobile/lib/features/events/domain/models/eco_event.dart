@@ -65,6 +65,9 @@ enum EcoEventCategory {
   final String label;
   final String description;
   final int iconCodePoint;
+
+  /// The camelCase key sent to/received from the API `category` query param.
+  String get key => name;
 }
 
 enum EventGear {
@@ -113,6 +116,9 @@ enum EcoEventStatus {
   const EcoEventStatus(this.label, this.colorValue);
   final String label;
   final int colorValue;
+
+  /// The camelCase lifecycle key accepted by the `status=` query param.
+  String get apiKey => name;
 }
 
 enum AttendeeCheckInStatus {
@@ -132,6 +138,7 @@ class EcoEvent {
     required this.siteDistanceKm,
     required this.organizerId,
     required this.organizerName,
+    this.organizerAvatarUrl,
     required this.date,
     required this.startTime,
     required this.endTime,
@@ -151,6 +158,17 @@ class EcoEvent {
     this.gear = const <EventGear>[],
     this.scale,
     this.difficulty,
+    this.moderationApproved = true,
+    this.siteLat,
+    this.siteLng,
+    this.recurrenceRule,
+    this.parentEventId,
+    this.recurrenceIndex,
+    this.scheduledAtUtc,
+    this.recurrenceSeriesTotal,
+    this.recurrenceSeriesPosition,
+    this.recurrencePrevEventId,
+    this.recurrenceNextEventId,
   });
 
   final String id;
@@ -161,8 +179,39 @@ class EcoEvent {
   final String siteName;
   final String siteImageUrl;
   final double siteDistanceKm;
+  /// Geographic latitude of the cleanup site (from API). Null when not exposed.
+  final double? siteLat;
+  /// Geographic longitude of the cleanup site (from API). Null when not exposed.
+  final double? siteLng;
+
+  /// RFC 5545 RRULE string. Null for non-recurring events.
+  final String? recurrenceRule;
+
+  /// ID of the first event in a recurring series. Null for standalone / parent events.
+  final String? parentEventId;
+
+  /// 0-based position in the series (0 = parent/original). Null for non-recurring.
+  final int? recurrenceIndex;
+
+  /// Number of events in the recurring series (same root), from API. Null when not a series.
+  final int? recurrenceSeriesTotal;
+
+  /// 1-based position in the series by [scheduledAt] order, from API.
+  final int? recurrenceSeriesPosition;
+
+  /// Previous occurrence in the series (by scheduled time), when present.
+  final String? recurrencePrevEventId;
+
+  /// Next occurrence in the series (by scheduled time), when present.
+  final String? recurrenceNextEventId;
+
+  /// When the event starts in UTC (from API `scheduledAt`). Used for timezone-aware helpers.
+  final DateTime? scheduledAtUtc;
+
+  bool get isRecurring => recurrenceRule != null && recurrenceRule!.isNotEmpty;
   final String organizerId;
   final String organizerName;
+  final String? organizerAvatarUrl;
   final DateTime date;
   final EventTime startTime;
   final EventTime endTime;
@@ -183,9 +232,13 @@ class EcoEvent {
   final CleanupScale? scale;
   final EventDifficulty? difficulty;
 
+  /// Server moderation: citizen-created events are false until [CleanupEvent] is APPROVED.
+  final bool moderationApproved;
+
   bool get isOrganizer => organizerId == CurrentUser.id;
   bool get isJoinable =>
       !isOrganizer &&
+      moderationApproved &&
       status != EcoEventStatus.completed &&
       status != EcoEventStatus.cancelled;
   bool get isLifecycleClosed =>
@@ -194,6 +247,15 @@ class EcoEvent {
   bool get hasAfterImages => afterImagePaths.isNotEmpty;
   bool get canOpenAttendeeCheckIn =>
       isJoined && !isOrganizer && status == EcoEventStatus.inProgress && isCheckInOpen;
+
+  /// True while the scheduled start instant is still in the future (organizer must wait).
+  bool get isBeforeScheduledStart {
+    final DateTime? utc = scheduledAtUtc;
+    if (utc != null) {
+      return DateTime.now().toUtc().isBefore(utc);
+    }
+    return DateTime.now().isBefore(startDateTime);
+  }
 
   bool canTransitionTo(EcoEventStatus next) {
     if (status == next) {
@@ -215,14 +277,6 @@ class EcoEvent {
 
   String get formattedTimeRange => '${startTime.formatted} - ${endTime.formatted}';
 
-  String get formattedDate {
-    const List<String> months = <String>[
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
-  }
-
   DateTime get startDateTime => DateTime(
         date.year, date.month, date.day,
         startTime.hour, startTime.minute,
@@ -241,6 +295,7 @@ class EcoEvent {
     String? siteName,
     String? siteImageUrl,
     double? siteDistanceKm,
+    String? organizerAvatarUrl,
     DateTime? date,
     EventTime? startTime,
     EventTime? endTime,
@@ -262,6 +317,13 @@ class EcoEvent {
     List<EventGear>? gear,
     CleanupScale? scale,
     EventDifficulty? difficulty,
+    bool? moderationApproved,
+    DateTime? scheduledAtUtc,
+    int? recurrenceSeriesTotal,
+    int? recurrenceSeriesPosition,
+    String? recurrencePrevEventId,
+    String? recurrenceNextEventId,
+    bool clearRecurrenceNav = false,
   }) {
     return EcoEvent(
       id: id,
@@ -274,6 +336,7 @@ class EcoEvent {
       siteDistanceKm: siteDistanceKm ?? this.siteDistanceKm,
       organizerId: organizerId,
       organizerName: organizerName,
+      organizerAvatarUrl: organizerAvatarUrl ?? this.organizerAvatarUrl,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
@@ -298,6 +361,22 @@ class EcoEvent {
       gear: gear ?? this.gear,
       scale: scale ?? this.scale,
       difficulty: difficulty ?? this.difficulty,
+      moderationApproved: moderationApproved ?? this.moderationApproved,
+      siteLat: siteLat ?? this.siteLat,
+      siteLng: siteLng ?? this.siteLng,
+      recurrenceRule: recurrenceRule ?? this.recurrenceRule,
+      parentEventId: parentEventId ?? this.parentEventId,
+      recurrenceIndex: recurrenceIndex ?? this.recurrenceIndex,
+      scheduledAtUtc: scheduledAtUtc ?? this.scheduledAtUtc,
+      recurrenceSeriesTotal: recurrenceSeriesTotal ?? this.recurrenceSeriesTotal,
+      recurrenceSeriesPosition:
+          recurrenceSeriesPosition ?? this.recurrenceSeriesPosition,
+      recurrencePrevEventId: clearRecurrenceNav
+          ? null
+          : recurrencePrevEventId ?? this.recurrencePrevEventId,
+      recurrenceNextEventId: clearRecurrenceNav
+          ? null
+          : recurrenceNextEventId ?? this.recurrenceNextEventId,
     );
   }
 
@@ -320,8 +399,10 @@ class EcoEvent {
           date == other.date &&
           startTime == other.startTime &&
           endTime == other.endTime &&
+          scheduledAtUtc == other.scheduledAtUtc &&
           listEquals(afterImagePaths, other.afterImagePaths) &&
-          listEquals(gear, other.gear);
+          listEquals(gear, other.gear) &&
+          moderationApproved == other.moderationApproved;
 
   @override
   int get hashCode => Object.hash(
@@ -337,6 +418,8 @@ class EcoEvent {
         date,
         startTime,
         endTime,
+        scheduledAtUtc,
+        moderationApproved,
       );
 
   factory EcoEvent.fromJson(Map<String, dynamic> json) {
@@ -383,6 +466,7 @@ class EcoEvent {
       siteDistanceKm: (json['siteDistanceKm'] as num?)?.toDouble() ?? 0,
       organizerId: (json['organizerId'] as String?) ?? '',
       organizerName: (json['organizerName'] as String?) ?? '',
+      organizerAvatarUrl: json['organizerAvatarUrl'] as String?,
       date: parseDate(json['date'], now),
       startTime: decodeTime(json['startTime'], const EventTime(hour: 10, minute: 0)),
       endTime: decodeTime(json['endTime'], const EventTime(hour: 12, minute: 0)),
@@ -435,6 +519,24 @@ class EcoEvent {
               json['difficulty'] as String?,
               EventDifficulty.easy,
             ),
+      moderationApproved: (json['moderationApproved'] as bool?) ?? true,
+      siteLat: (json['siteLat'] as num?)?.toDouble(),
+      siteLng: (json['siteLng'] as num?)?.toDouble(),
+      recurrenceRule: json['recurrenceRule'] as String?,
+      parentEventId: json['parentEventId'] as String?,
+      recurrenceIndex: (json['recurrenceIndex'] as num?)?.toInt(),
+      recurrenceSeriesTotal: (json['recurrenceSeriesTotal'] as num?)?.toInt(),
+      recurrenceSeriesPosition:
+          (json['recurrenceSeriesPosition'] as num?)?.toInt(),
+      recurrencePrevEventId: json['recurrencePrevEventId'] as String?,
+      recurrenceNextEventId: json['recurrenceNextEventId'] as String?,
+      scheduledAtUtc: () {
+        final String? iso = json['scheduledAtUtc'] as String? ??
+            json['scheduledAt'] as String?;
+        if (iso == null) return null;
+        final DateTime? parsed = DateTime.tryParse(iso);
+        return parsed?.toUtc();
+      }(),
     );
   }
 
@@ -448,8 +550,24 @@ class EcoEvent {
       'siteName': siteName,
       'siteImageUrl': siteImageUrl,
       'siteDistanceKm': siteDistanceKm,
+      if (siteLat != null) 'siteLat': siteLat,
+      if (siteLng != null) 'siteLng': siteLng,
+      if (recurrenceRule != null) 'recurrenceRule': recurrenceRule,
+      if (parentEventId != null) 'parentEventId': parentEventId,
+      if (recurrenceIndex != null) 'recurrenceIndex': recurrenceIndex,
+      if (recurrenceSeriesTotal != null)
+        'recurrenceSeriesTotal': recurrenceSeriesTotal,
+      if (recurrenceSeriesPosition != null)
+        'recurrenceSeriesPosition': recurrenceSeriesPosition,
+      if (recurrencePrevEventId != null)
+        'recurrencePrevEventId': recurrencePrevEventId,
+      if (recurrenceNextEventId != null)
+        'recurrenceNextEventId': recurrenceNextEventId,
+      if (scheduledAtUtc != null)
+        'scheduledAtUtc': scheduledAtUtc!.toUtc().toIso8601String(),
       'organizerId': organizerId,
       'organizerName': organizerName,
+      if (organizerAvatarUrl != null) 'organizerAvatarUrl': organizerAvatarUrl,
       'date': date.toIso8601String(),
       'startTime': <String, int>{
         'hour': startTime.hour,
@@ -475,6 +593,7 @@ class EcoEvent {
       'gear': gear.map((EventGear g) => g.name).toList(growable: false),
       'scale': scale?.name,
       'difficulty': difficulty?.name,
+      'moderationApproved': moderationApproved,
     };
   }
 }

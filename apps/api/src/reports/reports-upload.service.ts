@@ -116,6 +116,15 @@ export class ReportsUploadService {
     return urls;
   }
 
+  /** Build canonical S3 HTTPS URLs for object keys (same shape as [uploadFiles]). */
+  getPublicUrlsForKeys(keys: string[]): string[] {
+    if (!this.bucket) {
+      return keys;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    return keys.map((key) => `${base}${key}`);
+  }
+
   /**
    * Converts S3 object URLs to presigned URLs (1h expiry) so clients can load
    * private objects. Non-S3 URLs are returned unchanged.
@@ -266,5 +275,83 @@ export class ReportsUploadService {
         message: 'Avatar image could not be processed.',
       });
     }
+  }
+
+  /**
+   * After-cleanup photos for citizen events. Returns S3 object keys (not public URLs).
+   */
+  async uploadCleanupEventAfterImages(
+    userId: string,
+    eventId: string,
+    files: Array<{ buffer: Buffer; mimetype: string; size: number; originalname: string }>,
+  ): Promise<string[]> {
+    if (!this.enabled || !this.s3 || !this.bucket) {
+      throw new ServiceUnavailableException({
+        code: 'S3_NOT_CONFIGURED',
+        message: 'File upload is not configured. S3_BUCKET_NAME is required.',
+      });
+    }
+
+    if (!files || files.length === 0) {
+      return [];
+    }
+
+    if (files.length > 10) {
+      throw new BadRequestException({
+        code: 'TOO_MANY_FILES',
+        message: 'Maximum 10 after-cleanup photos allowed',
+      });
+    }
+
+    const keys: string[] = [];
+    const baseTs = Date.now();
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      let mime = (file.mimetype || '').toLowerCase();
+      if (!ALLOWED_MIMES.has(mime)) {
+        if (mime === 'application/octet-stream' && file.originalname) {
+          const extMatch = file.originalname.match(IMAGE_EXTENSIONS)?.[1];
+          if (extMatch) {
+            mime =
+              extMatch.startsWith('jpeg') || extMatch.startsWith('jpg')
+                ? 'image/jpeg'
+                : extMatch === 'png'
+                  ? 'image/png'
+                  : 'image/webp';
+          }
+        }
+      }
+      if (!ALLOWED_MIMES.has(mime)) {
+        throw new BadRequestException({
+          code: 'INVALID_FILE_TYPE',
+          message: `Invalid file type: ${file.mimetype}. Only jpeg, png, and webp are allowed.`,
+        });
+      }
+
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        throw new BadRequestException({
+          code: 'FILE_TOO_LARGE',
+          message: `File ${file.originalname} exceeds 10MB limit`,
+        });
+      }
+
+      const ext =
+        mime === 'image/jpeg' || mime === 'image/jpg' ? 'jpg' : mime.split('/')[1] || 'jpg';
+      const key = `cleanup-events/${userId}/${eventId}/${baseTs}-${i}-${randomUUID()}.${ext}`;
+
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: file.buffer,
+          ContentType: mime,
+        }),
+      );
+
+      keys.push(key);
+    }
+
+    return keys;
   }
 }
