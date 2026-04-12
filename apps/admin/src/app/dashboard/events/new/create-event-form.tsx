@@ -23,6 +23,9 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
   defaultDate.setDate(defaultDate.getDate() + 7);
   defaultDate.setHours(10, 0, 0, 0);
 
+  const [title, setTitle] = useState('Cleanup event');
+  const [description, setDescription] = useState('');
+  const [recurrenceRule, setRecurrenceRule] = useState('');
   const [scheduledAt, setScheduledAt] = useState(toDatetimeLocal(defaultDate));
   const [participantCount, setParticipantCount] = useState(0);
   const [createAsPending, setCreateAsPending] = useState(false);
@@ -37,6 +40,9 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
         method: 'POST',
         body: {
           siteId,
+          title: title.trim() || 'Cleanup event',
+          description: description.trim(),
+          ...(recurrenceRule.trim() ? { recurrenceRule: recurrenceRule.trim() } : {}),
           scheduledAt: new Date(scheduledAt).toISOString(),
           participantCount,
           ...(createAsPending ? { status: 'PENDING' } : {}),
@@ -73,6 +79,40 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
           </Link>
         </p>
         <div className={styles.form}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={styles.input}
+              maxLength={200}
+            />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Description</span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={styles.input}
+              rows={4}
+              maxLength={10000}
+            />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Recurrence (optional RFC 5545 RRULE)</span>
+            <textarea
+              value={recurrenceRule}
+              onChange={(e) => setRecurrenceRule(e.target.value)}
+              className={styles.input}
+              rows={2}
+              placeholder="FREQ=WEEKLY;BYDAY=SA;COUNT=8"
+              maxLength={2048}
+            />
+            <span className={styles.fieldHint}>
+              Stored on this event for reference; admin create does not expand a series in the database.
+            </span>
+          </label>
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Scheduled date & time</span>
             <input

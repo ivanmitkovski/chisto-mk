@@ -3,11 +3,27 @@
 import { DataTable } from '@/components/ui';
 import type { CleanupEventRow } from '@/features/events/data/events-adapter';
 
+function truncate(s: string, max: number): string {
+  const t = s.trim();
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1)}…`;
+}
+
 const columns = [
+  {
+    key: 'title',
+    header: 'Title',
+    render: (e: CleanupEventRow) => truncate(e.title || '—', 48),
+  },
   {
     key: 'scheduled',
     header: 'Scheduled',
     render: (e: CleanupEventRow) => new Date(e.scheduledAt).toLocaleString(),
+  },
+  {
+    key: 'lifecycle',
+    header: 'Lifecycle',
+    render: (e: CleanupEventRow) => e.lifecycleStatus,
   },
   {
     key: 'site',
