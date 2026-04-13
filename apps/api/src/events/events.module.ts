@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { AdminEventsModule } from '../admin-events/admin-events.module';
 import { EventChatModule } from '../event-chat/event-chat.module';
 import { GamificationModule } from '../gamification/gamification.module';
 import { NotificationsModule } from '../notifications/notifications.module';
@@ -17,6 +18,7 @@ import { EventsService } from './events.service';
     GamificationModule,
     NotificationsModule,
     EventChatModule,
+    AdminEventsModule,
   ],
   controllers: [EventsController, EventsCheckInController],
   providers: [EventsMobileMapperService, EventsService, EventsCheckInService],

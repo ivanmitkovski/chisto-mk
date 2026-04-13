@@ -22,6 +22,7 @@ import {
   REASON_EVENT_JOIN_NO_SHOW,
   REASON_EVENT_JOINED,
 } from '../gamification/gamification.constants';
+import { CleanupEventsEventsService } from '../admin-events/cleanup-events-events.service';
 import { EventChatService } from '../event-chat/event-chat.service';
 import { EcoEventPointsService } from '../gamification/eco-event-points.service';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
@@ -68,6 +69,7 @@ export class EventsService {
     private readonly notificationDispatcher: NotificationDispatcherService,
     private readonly eventChat: EventChatService,
     private readonly mobileMapper: EventsMobileMapperService,
+    private readonly cleanupEventsSse: CleanupEventsEventsService,
   ) {}
 
   private isStaff(user: AuthenticatedUser): boolean {
@@ -338,6 +340,15 @@ export class EventsService {
       data: createData,
     });
 
+    if (moderation === CleanupEventStatus.PENDING) {
+      this.cleanupEventsSse.emitCleanupEventPending(created.id);
+    } else {
+      this.cleanupEventsSse.emitCleanupEventCreated(created.id, {
+        moderationStatus: moderation,
+        lifecycleStatus: EcoEventLifecycleStatus.UPCOMING,
+      });
+    }
+
     const row = await this.prisma.cleanupEvent.findFirstOrThrow({
       where: { id: created.id },
       include: eventIncludeForViewer(user.userId),
@@ -381,7 +392,7 @@ export class EventsService {
 
     const durationMs = parentEnd != null ? parentEnd.getTime() - parentStart.getTime() : 0;
 
-    return this.prisma.$transaction(async (tx) => {
+    const mobileEvent = await this.prisma.$transaction(async (tx) => {
       // Create the parent event (index 0).
       const parent = await tx.cleanupEvent.create({
         data: {
@@ -414,6 +425,20 @@ export class EventsService {
 
       return this.mobileMapper.toMobileEvent(row);
     });
+
+    const parentId = typeof mobileEvent.id === 'string' ? mobileEvent.id : '';
+    if (parentId.length > 0) {
+      if (baseData.status === CleanupEventStatus.PENDING) {
+        this.cleanupEventsSse.emitCleanupEventPending(parentId);
+      } else {
+        this.cleanupEventsSse.emitCleanupEventCreated(parentId, {
+          moderationStatus: String(baseData.status),
+          lifecycleStatus: EcoEventLifecycleStatus.UPCOMING,
+        });
+      }
+    }
+
+    return mobileEvent;
   }
 
   async patchEvent(id: string, dto: PatchPublicEventDto, user: AuthenticatedUser) {

@@ -64,6 +64,7 @@ async function bootstrap() {
     credentials: false,
   });
 
+  // SECURITY: forbidNonWhitelisted rejects mass-assignment of unknown DTO properties at the edge.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

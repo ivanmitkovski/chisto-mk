@@ -115,6 +115,11 @@ describe('EventsService', () => {
   let ecoEventPoints: { creditIfNew: jest.Mock; debitOnceIfNew: jest.Mock };
   let notificationDispatcher: { dispatchToUser: jest.Mock };
   let eventChat: { createSystemMessage: jest.Mock };
+  let cleanupEventsSse: {
+    emitCleanupEventPending: jest.Mock;
+    emitCleanupEventCreated: jest.Mock;
+    emitCleanupEventUpdated: jest.Mock;
+  };
   let service: EventsService;
 
   beforeEach(() => {
@@ -125,6 +130,11 @@ describe('EventsService', () => {
     };
     notificationDispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
     eventChat = { createSystemMessage: jest.fn().mockResolvedValue(undefined) };
+    cleanupEventsSse = {
+      emitCleanupEventPending: jest.fn(),
+      emitCleanupEventCreated: jest.fn(),
+      emitCleanupEventUpdated: jest.fn(),
+    };
     prisma = {
       site: { findUnique: jest.fn() },
       user: { findUnique: jest.fn() },
@@ -161,6 +171,7 @@ describe('EventsService', () => {
       notificationDispatcher as never,
       eventChat as never,
       new EventsMobileMapperService(prisma as never, uploads as never),
+      cleanupEventsSse as never,
     );
   });
 
