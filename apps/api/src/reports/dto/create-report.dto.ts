@@ -15,6 +15,8 @@ export class CreateReportDto {
     example: 'cm1234567890abcdefghijkl',
   })
   @IsString()
+  @MinLength(15)
+  @MaxLength(32)
   siteId!: string;
 
   @ApiProperty({
@@ -46,12 +48,4 @@ export class CreateReportDto {
   @ArrayMaxSize(5)
   @IsUrl({}, { each: true })
   mediaUrls?: string[];
-
-  @ApiPropertyOptional({
-    description:
-      'Optional reporter identifier when the report is created on behalf of an authenticated user',
-  })
-  @IsOptional()
-  @IsString()
-  reporterId?: string;
 }

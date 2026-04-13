@@ -306,6 +306,8 @@ enum ReportStatus {
 model ReportCoReporter {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  /// When this person filed their report (duplicate submission or merge source time).
+  reportedAt DateTime
 
   reportId String
   report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)

@@ -38,7 +38,11 @@ function makeService(overrides?: {
   prisma.$transaction.mockImplementation(async (cb: (tx: unknown) => Promise<unknown>) => cb(prisma));
 
   const audit = { log: jest.fn() };
-  const reportsUploadService = { signUrls: jest.fn() };
+  const reportsUploadService = {
+    signUrls: jest.fn(),
+    deleteReportMediaUrls: jest.fn().mockResolvedValue(0),
+    tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+  };
   const reportEventsService = { emitReportCreated: jest.fn(), emitReportStatusUpdated: jest.fn() };
   const notificationEventsService = { emitNotificationCreated: jest.fn() };
   const siteEventsService = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() };

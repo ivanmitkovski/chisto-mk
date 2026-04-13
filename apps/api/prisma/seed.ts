@@ -195,6 +195,7 @@ async function main() {
     data: {
       reportId: primaryReport.id,
       userId: reporterB.id,
+      reportedAt: duplicateReport.createdAt,
     },
   });
 
