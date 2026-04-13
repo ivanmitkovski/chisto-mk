@@ -8,7 +8,9 @@ import {
   IsString,
   MaxLength,
   Min,
+  MinLength,
   Matches,
+  ValidateIf,
 } from 'class-validator';
 import { CleanupEventStatus } from '../../prisma-client';
 
@@ -63,4 +65,14 @@ export class PatchCleanupEventDto {
   @IsOptional()
   @IsEnum(CleanupEventStatus)
   status?: CleanupEventStatus;
+
+  @ApiPropertyOptional({
+    description: 'Required when declining a pending event (stored in audit metadata)',
+    maxLength: 2000,
+  })
+  @ValidateIf((o) => o.status === CleanupEventStatus.DECLINED)
+  @IsString()
+  @MinLength(1, { message: 'declineReason is required when declining an event' })
+  @MaxLength(2000)
+  declineReason?: string;
 }

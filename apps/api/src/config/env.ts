@@ -46,4 +46,11 @@ export function validateEnv(): void {
       process.exit(1);
     }
   }
+
+  // SECURITY: When uploads are enabled in production, require explicit AWS credentials (no implicit instance roles in config drift).
+  const bucket = process.env.S3_BUCKET_NAME?.trim();
+  if (bucket && (nodeEnv === 'production' || nodeEnv === 'staging')) {
+    requireEnv('AWS_ACCESS_KEY_ID');
+    requireEnv('AWS_SECRET_ACCESS_KEY');
+  }
 }

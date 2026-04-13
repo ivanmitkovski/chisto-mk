@@ -11,6 +11,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
+import { EventAnalyticsResponseDto } from '../events/dto/event-analytics-response.dto';
 import { CleanupEventsService } from './cleanup-events.service';
 import { CreateCleanupEventDto } from './dto/create-cleanup-event.dto';
 import { PatchCleanupEventDto } from './dto/patch-cleanup-event.dto';
@@ -29,6 +30,35 @@ export class CleanupEventsController {
   @ApiOkResponse({ description: 'Cleanup events' })
   list(@Query() query: ListCleanupEventsQueryDto) {
     return this.cleanupEventsService.list(query);
+  }
+
+  @Get(':id/audit')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Audit trail for a cleanup event' })
+  @ApiOkResponse({ description: 'Audit log entries' })
+  listAudit(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const p = page != null && page !== '' ? Math.max(1, parseInt(page, 10) || 1) : 1;
+    const l =
+      limit != null && limit !== ''
+        ? Math.min(100, Math.max(1, parseInt(limit, 10) || 50))
+        : 50;
+    return this.cleanupEventsService.listAuditTrail(id, { page: p, limit: l });
+  }
+
+  @Get(':id/analytics')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Attendance analytics (admin read-only)' })
+  @ApiOkResponse({ description: 'Analytics', type: EventAnalyticsResponseDto })
+  analytics(@Param('id') id: string) {
+    return this.cleanupEventsService.getAnalytics(id);
   }
 
   @Get(':id')
