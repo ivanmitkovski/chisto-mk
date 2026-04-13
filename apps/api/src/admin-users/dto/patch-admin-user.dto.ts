@@ -1,6 +1,6 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, MaxLength, MinLength, ValidateIf } from 'class-validator';
-import { Role, UserStatus } from '../../prisma-client';
+import { UserStatus } from '../../prisma-client';
 
 export class PatchAdminUserDto {
   @ApiPropertyOptional({ example: 'John', maxLength: 100 })
@@ -29,9 +29,4 @@ export class PatchAdminUserDto {
   @IsOptional()
   @IsEnum(UserStatus)
   status?: UserStatus;
-
-  @ApiPropertyOptional({ enum: Role })
-  @IsOptional()
-  @IsEnum(Role)
-  role?: Role;
 }
