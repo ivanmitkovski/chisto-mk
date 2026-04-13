@@ -18,7 +18,7 @@ export function SectionState({ variant, message }: SectionStateProps) {
     .trim();
 
   return (
-    <div className={className} role={variant === 'loading' ? 'status' : undefined} aria-live="polite">
+    <div className={className} role="status" aria-live="polite">
       {variant === 'loading' && (
         <Spinner size="md" className={styles.spinner} />
       )}

@@ -49,7 +49,11 @@ export function Snack({ snack, onClose, durationMs = 3200 }: SnackProps) {
   }, [durationMs, onClose, snack]);
 
   return (
-    <div className={styles.viewport} aria-live="polite" aria-atomic>
+    <div
+      className={styles.viewport}
+      aria-live={snack ? 'polite' : undefined}
+      aria-atomic={snack ? true : undefined}
+    >
       <AnimatePresence>
         {snack ? (
           <motion.section

@@ -9,6 +9,7 @@ const roboto = Roboto({
   display: 'swap',
   variable: '--font-roboto',
   weight: ['400', '500', '700'],
+  adjustFontFallback: true,
 });
 
 function resolveMetadataBase(): URL {

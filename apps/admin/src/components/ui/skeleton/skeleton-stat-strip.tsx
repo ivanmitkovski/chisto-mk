@@ -5,14 +5,16 @@ type SkeletonStatStripProps = {
   className?: string;
 };
 
-export function SkeletonStatStrip({ count = 4, className }: SkeletonStatStripProps) {
+export function SkeletonStatStrip({ count = 5, className }: SkeletonStatStripProps) {
+  const rootClass = [styles.statStrip, className].filter(Boolean).join(' ');
   return (
-    <div
-      className={[styles.statStrip, className].filter(Boolean).join(' ')}
-      aria-hidden
-    >
+    <div className={rootClass} aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
-        <span key={i} className={styles.statPill} />
+        <div key={i} className={styles.statStripCard}>
+          <span className={styles.statStripIcon} />
+          <span className={styles.statStripValue} />
+          <span className={styles.statStripLabel} />
+        </div>
       ))}
     </div>
   );

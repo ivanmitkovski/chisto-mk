@@ -1,6 +1,14 @@
-.bar {
-  display: block;
-  height: 1rem;
+.bar,
+.statStripIcon,
+.statStripValue,
+.statStripLabel,
+.pageHeaderKicker,
+.pageHeaderTitle,
+.pageHeaderDesc,
+.toolbarPill,
+.toolbarButton,
+.pageHeaderActions,
+.actionPill {
   background: linear-gradient(
     90deg,
     var(--color-green-010) 25%,
@@ -9,6 +17,43 @@
   );
   background-size: 200% 100%;
   animation: shimmer var(--motion-duration-slow) ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bar,
+  .statStripIcon,
+  .statStripValue,
+  .statStripLabel,
+  .pageHeaderKicker,
+  .pageHeaderTitle,
+  .pageHeaderDesc,
+  .toolbarPill,
+  .toolbarButton,
+  .pageHeaderActions,
+  .actionPill {
+    animation: none;
+    background: var(--surface-subtle);
+  }
+}
+
+html.chisto-admin-reduced-motion .bar,
+html.chisto-admin-reduced-motion .statStripIcon,
+html.chisto-admin-reduced-motion .statStripValue,
+html.chisto-admin-reduced-motion .statStripLabel,
+html.chisto-admin-reduced-motion .pageHeaderKicker,
+html.chisto-admin-reduced-motion .pageHeaderTitle,
+html.chisto-admin-reduced-motion .pageHeaderDesc,
+html.chisto-admin-reduced-motion .toolbarPill,
+html.chisto-admin-reduced-motion .toolbarButton,
+html.chisto-admin-reduced-motion .pageHeaderActions,
+html.chisto-admin-reduced-motion .actionPill {
+  animation: none;
+  background: var(--surface-subtle);
+}
+
+.bar {
+  display: block;
+  height: 1rem;
   border-radius: var(--radius-sm);
 }
 
@@ -44,6 +89,117 @@
   border-bottom: 1px solid var(--border-default);
 }
 
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--bg-surface);
+  box-shadow: 0 1px 0 var(--border-default);
+}
+
+.statStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+  min-width: 0;
+}
+
+.statStripCard {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.statStripIcon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-md);
+}
+
+.statStripValue {
+  height: 1.25rem;
+  width: 40%;
+  border-radius: var(--radius-sm);
+}
+
+.statStripLabel {
+  height: 0.75rem;
+  width: 55%;
+  border-radius: var(--radius-sm);
+}
+
+.pageHeaderSkeleton {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-2);
+}
+
+.pageHeaderText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pageHeaderKicker {
+  height: 0.75rem;
+  width: 4rem;
+  border-radius: var(--radius-sm);
+}
+
+.pageHeaderTitle {
+  height: 1.5rem;
+  width: min(14rem, 60vw);
+  border-radius: var(--radius-sm);
+}
+
+.pageHeaderDesc {
+  height: 0.875rem;
+  width: min(22rem, 85vw);
+  border-radius: var(--radius-sm);
+}
+
+.pageHeaderActions {
+  height: 2.25rem;
+  width: 8rem;
+  border-radius: var(--radius-full);
+}
+
+.toolbarSkeleton {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.toolbarPill {
+  height: 2rem;
+  width: 7rem;
+  border-radius: var(--radius-md);
+}
+
+.toolbarButton {
+  height: 2rem;
+  width: 5.5rem;
+  border-radius: var(--radius-md);
+  margin-left: auto;
+}
+
+.actionPill {
+  flex-shrink: 0;
+  width: 12rem;
+  height: 2rem;
+  border-radius: var(--radius-full);
+}
+
 .card {
   display: grid;
   gap: var(--space-3);
@@ -51,14 +207,6 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--bg-surface);
-}
-
-.statStrip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-3);
-  min-width: 0;
 }
 
 .statPill {

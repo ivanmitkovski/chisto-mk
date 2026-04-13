@@ -5,10 +5,6 @@ type SkeletonActionPillProps = {
 };
 
 export function SkeletonActionPill({ className }: SkeletonActionPillProps) {
-  return (
-    <span
-      className={[styles.actionPill, className].filter(Boolean).join(' ')}
-      aria-hidden
-    />
-  );
+  const rootClass = [styles.actionPill, className].filter(Boolean).join(' ');
+  return <span className={rootClass} aria-hidden />;
 }
