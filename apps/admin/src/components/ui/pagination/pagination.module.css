@@ -11,8 +11,8 @@
 }
 
 .item {
-  min-width: 2rem;
-  height: 2rem;
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
   border: 1px solid transparent;
   border-radius: var(--radius-full);
   background: transparent;

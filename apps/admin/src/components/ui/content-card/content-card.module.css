@@ -1,0 +1,15 @@
+.root {
+  border-radius: var(--radius-page-card);
+  border: 1px solid rgba(8, 54, 39, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: var(--elevation-page);
+  min-width: 0;
+}
+
+.paddingMd {
+  padding: var(--space-5);
+}
+
+.paddingSm {
+  padding: var(--space-4);
+}

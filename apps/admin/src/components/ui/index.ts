@@ -7,7 +7,18 @@ export { Icon } from './icon';
 export { Input } from './input';
 export { Pagination } from './pagination';
 export { SectionState } from './section-state';
-export { SkeletonCard, SkeletonTable } from './skeleton';
+export {
+  SkeletonActionPill,
+  SkeletonCard,
+  SkeletonPageHeader,
+  SkeletonStatStrip,
+  SkeletonTable,
+  SkeletonToolbar,
+} from './skeleton';
+export { PageHeader } from './page-header/page-header';
+export { Toolbar } from './toolbar/toolbar';
+export { ContentCard } from './content-card/content-card';
+export { StickyTableWrap } from './sticky-table-wrap/sticky-table-wrap';
 export { Spinner } from './spinner';
 export { Snack } from './snack';
 export type { IconName } from './icon';
