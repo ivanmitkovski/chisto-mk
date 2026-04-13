@@ -54,6 +54,7 @@ function makePrisma() {
       findMany: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
       count: jest.fn().mockResolvedValue(0),
     },
     adminLoginFailure: {
@@ -144,6 +145,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let prisma: ReturnType<typeof makePrisma>;
   let jwt: ReturnType<typeof makeJwt>;
+  let eventEmitter: ReturnType<typeof makeEventEmitter>;
 
   beforeEach(async () => {
     prisma = makePrisma();
@@ -155,7 +157,7 @@ describe('AuthService', () => {
 
     const otpService = makeOtpService();
     const audit = makeAudit();
-    const eventEmitter = makeEventEmitter();
+    eventEmitter = makeEventEmitter();
     const reportsUploadService = makeReportsUploadService();
     const gamificationService = makeGamificationService();
     const rankingsService = makeRankingsService();
@@ -329,6 +331,33 @@ describe('AuthService', () => {
       await expect(
         service.refresh('tid123.wrongsecret'),
       ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('on reuse of a revoked refresh token with valid hash, revokes all user sessions and emits security event', async () => {
+      const tokenId = 'reuse-tid';
+      const fullToken = `${tokenId}.stillvalidsecret`;
+      const hash = await bcrypt.hash(fullToken, 4);
+
+      prisma.userSession.findUnique.mockResolvedValue({
+        id: 'session-revoked',
+        userId: 'user-1',
+        tokenId,
+        refreshTokenHash: hash,
+        expiresAt: new Date(Date.now() + 86400000),
+        revokedAt: new Date(),
+        user: mockUser,
+      });
+
+      await expect(service.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
+      expect(prisma.userSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'user-1', revokedAt: null },
+        }),
+      );
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'security.refresh_token_reuse',
+        expect.objectContaining({ userId: 'user-1' }),
+      );
     });
   });
 

@@ -12,6 +12,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AdminService, AdminOverviewStats, AdminSecurityOverview } from './admin.service';
+import { AdminOverviewResponseDto } from './dto/admin-overview-response.dto';
 
 @ApiTags('admin')
 @Controller('admin')
@@ -23,7 +24,7 @@ export class AdminController {
   @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get high-level admin overview metrics' })
-  @ApiOkResponse({ description: 'Overview metrics fetched successfully' })
+  @ApiOkResponse({ description: 'Overview metrics fetched successfully', type: AdminOverviewResponseDto })
   getOverview(): Promise<AdminOverviewStats> {
     return this.adminService.getOverview();
   }

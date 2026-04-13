@@ -418,12 +418,37 @@ export class AuthService {
       include: { user: true },
     });
 
-    if (
-      !session ||
-      session.revokedAt != null ||
-      session.expiresAt <= new Date() ||
-      !(await bcrypt.compare(rawRefreshToken, session.refreshTokenHash))
-    ) {
+    if (!session || session.expiresAt <= new Date()) {
+      throw new UnauthorizedException({
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Refresh token is invalid or expired',
+      });
+    }
+
+    const hashOk = await bcrypt.compare(rawRefreshToken, session.refreshTokenHash);
+
+    // SECURITY: Reuse of a revoked but otherwise valid refresh token ⇒ possible theft — revoke all sessions for the user.
+    if (session.revokedAt != null) {
+      if (hashOk) {
+        await this.revokeAllSessionsForUser(session.userId);
+        await this.audit
+          .log({
+            actorId: session.userId,
+            action: 'REFRESH_TOKEN_REUSE_DETECTED',
+            resourceType: 'UserSession',
+            resourceId: session.id,
+            metadata: { tokenId },
+          })
+          .catch(() => {});
+        this.eventEmitter.emit('security.refresh_token_reuse', { userId: session.userId });
+      }
+      throw new UnauthorizedException({
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Refresh token is invalid or expired',
+      });
+    }
+
+    if (!hashOk) {
       throw new UnauthorizedException({
         code: 'INVALID_REFRESH_TOKEN',
         message: 'Refresh token is invalid or expired',
@@ -444,6 +469,14 @@ export class AuthService {
     }
 
     return this.buildAuthResponse(user, true);
+  }
+
+  private async revokeAllSessionsForUser(userId: string): Promise<void> {
+    const now = new Date();
+    await this.prisma.userSession.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: now },
+    });
   }
 
   private parseTokenIdFromRefreshToken(fullToken: string): string | null {

@@ -10,11 +10,12 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
-import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
+import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES, SUPER_ADMIN_ROLES } from '../auth/admin-roles';
 import { AdminUsersService } from './admin-users.service';
 import { BulkAdminUsersDto } from './dto/bulk-admin-users.dto';
 import { ListAdminUsersQueryDto } from './dto/list-admin-users-query.dto';
 import { PatchAdminUserDto } from './dto/patch-admin-user.dto';
+import { PatchAdminUserRoleDto } from './dto/patch-admin-user-role.dto';
 
 @ApiTags('admin-users')
 @Controller('admin/users')
@@ -79,7 +80,7 @@ export class AdminUsersController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(...ADMIN_WRITE_ROLES)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update user status or role' })
+  @ApiOperation({ summary: 'Update user profile fields or status (not role)' })
   @ApiOkResponse({ description: 'User updated' })
   patch(
     @Param('id') id: string,
@@ -87,5 +88,19 @@ export class AdminUsersController {
     @CurrentUser() actor: AuthenticatedUser,
   ) {
     return this.adminUsersService.patch(id, dto, actor);
+  }
+
+  @Patch(':id/role')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...SUPER_ADMIN_ROLES)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Change user role (super admin only)' })
+  @ApiOkResponse({ description: 'User role updated' })
+  patchRole(
+    @Param('id') id: string,
+    @Body() dto: PatchAdminUserRoleDto,
+    @CurrentUser() actor: AuthenticatedUser,
+  ) {
+    return this.adminUsersService.patchRole(id, dto, actor);
   }
 }

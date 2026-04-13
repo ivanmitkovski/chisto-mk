@@ -46,6 +46,25 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       });
     }
 
+    // SECURITY: Bind access tokens to a live session row so logout / refresh rotation revokes JWTs that carry sid.
+    if (payload.sid) {
+      const session = await this.prisma.userSession.findFirst({
+        where: {
+          id: payload.sid,
+          userId: payload.sub,
+          revokedAt: null,
+          expiresAt: { gt: new Date() },
+        },
+        select: { id: true },
+      });
+      if (!session) {
+        throw new UnauthorizedException({
+          code: 'SESSION_REVOKED',
+          message: 'Session is no longer valid',
+        });
+      }
+    }
+
     const authUser: AuthenticatedUser = {
       userId: payload.sub,
       email: payload.email,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
@@ -13,6 +13,7 @@ export type AdminOverviewStats = {
     upcoming: number;
     completed: number;
     pending: number;
+    totalParticipants: number;
     upcomingEvents: Array<{ id: string; name: string; date: string }>;
   };
   usersCount: number;
@@ -61,6 +62,8 @@ export type AdminSecurityOverview = {
 
 @Injectable()
 export class AdminService {
+  private readonly logger = new Logger(AdminService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
@@ -68,13 +71,29 @@ export class AdminService {
     private readonly feedRanking: FeedRankingService,
   ) {}
 
+  /**
+   * Daily report counts by calendar day for the admin trend chart.
+   * Uses Prisma tagged-template SQL for efficient Postgres date bucketing (see tests / ADR).
+   */
+  private reportDailyCountsSince(since: Date) {
+    return this.prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+      SELECT ("createdAt"::date)::text as date, COUNT(*)::bigint as count
+      FROM "Report"
+      WHERE "createdAt" >= ${since}
+      GROUP BY "createdAt"::date
+      ORDER BY date ASC
+    `;
+  }
+
   async getOverview(): Promise<AdminOverviewStats> {
+    const startedAt = Date.now();
     const now = new Date();
     const sevenDaysAgo = new Date(now);
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const thirtyDaysAgo = new Date(now);
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
+    // Batch $transaction: Prisma 7 does not support timeout/maxWait on array form here; keep queries lean.
     const [
       reportGroups,
       siteGroups,
@@ -90,6 +109,7 @@ export class AdminService {
       recentLogs,
       recentFeedDemotions,
       rankingCandidates,
+      cleanupParticipantSum,
     ] = await this.prisma.$transaction([
       this.prisma.report.groupBy({
         by: ['status'],
@@ -152,13 +172,7 @@ export class AdminService {
           expiresAt: { gt: now },
         },
       }),
-      this.prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
-        SELECT ("createdAt"::date)::text as date, COUNT(*)::bigint as count
-        FROM "Report"
-        WHERE "createdAt" >= ${thirtyDaysAgo}
-        GROUP BY "createdAt"::date
-        ORDER BY date ASC
-      `,
+      this.reportDailyCountsSince(thirtyDaysAgo),
       this.prisma.auditLog.findMany({
         orderBy: { createdAt: 'desc' },
         take: 10,
@@ -182,6 +196,13 @@ export class AdminService {
             take: 1,
             select: { createdAt: true, category: true, title: true },
           },
+        },
+      }),
+      this.prisma.cleanupEvent.aggregate({
+        _sum: { participantCount: true },
+        where: {
+          status: 'APPROVED',
+          lifecycleStatus: { not: 'CANCELLED' },
         },
       }),
     ]);
@@ -258,7 +279,7 @@ export class AdminService {
       .sort((a, b) => b.count - a.count)
       .slice(0, 8);
 
-    return {
+    const payload: AdminOverviewStats = {
       reportsByStatus,
       sitesByStatus,
       duplicateGroupsCount,
@@ -266,6 +287,7 @@ export class AdminService {
         upcoming: upcomingEvents,
         completed: completedEvents,
         pending: pendingEvents,
+        totalParticipants: Number(cleanupParticipantSum._sum.participantCount ?? 0),
         upcomingEvents: upcomingEventsFormatted,
       },
       usersCount,
@@ -279,6 +301,15 @@ export class AdminService {
         recentIntegrityDemotions: recentFeedDemotions,
       },
     };
+
+    const durationMs = Date.now() - startedAt;
+    if (durationMs > 2_000) {
+      this.logger.warn(`getOverview completed in ${durationMs}ms`);
+    } else {
+      this.logger.debug(`getOverview completed in ${durationMs}ms`);
+    }
+
+    return payload;
   }
 
   async getSecurityOverview(admin: AuthenticatedUser): Promise<AdminSecurityOverview> {
