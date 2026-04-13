@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -17,11 +18,14 @@ const ALLOWED_MIMES = new Set([
 ]);
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp)$/i;
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+/** SECURITY: Report media presigned URLs — short TTL limits exposure if leaked. */
+const REPORT_MEDIA_SIGNED_URL_TTL_SECONDS = 15 * 60;
 const MAX_AVATAR_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const AVATAR_SIGNED_URL_TTL_SECONDS = 15 * 60;
 
 @Injectable()
 export class ReportsUploadService {
+  private readonly logger = new Logger(ReportsUploadService.name);
   private readonly s3: S3Client | null = null;
   private readonly bucket: string | null = null;
   private readonly region: string;
@@ -63,42 +67,49 @@ export class ReportsUploadService {
       });
     }
 
-    const timestamp = Date.now();
     const urls: string[] = [];
 
     for (const file of files) {
-      let mime = (file.mimetype || '').toLowerCase();
-      if (!ALLOWED_MIMES.has(mime)) {
-        if (mime === 'application/octet-stream' && file.originalname) {
-          const ext = file.originalname.match(IMAGE_EXTENSIONS)?.[1];
-          if (ext) {
-            mime = ext.startsWith('jpeg') || ext.startsWith('jpg')
-              ? 'image/jpeg'
-              : ext === 'png'
-                ? 'image/png'
-                : 'image/webp';
-          }
-        }
-      }
-      if (!ALLOWED_MIMES.has(mime)) {
-        throw new BadRequestException({
-          code: 'INVALID_FILE_TYPE',
-          message: `Invalid file type: ${file.mimetype}. Only jpeg, png, and webp are allowed.`,
-        });
-      }
-
       if (file.size > MAX_FILE_SIZE_BYTES) {
         throw new BadRequestException({
           code: 'FILE_TOO_LARGE',
-          message: `File ${file.originalname} exceeds 10MB limit`,
+          message: `File exceeds 10MB limit`,
+        });
+      }
+
+      // SECURITY: Detect MIME from magic bytes; never trust Content-Type or filename alone (polyglot / renamed executables).
+      const { fileTypeFromBuffer } = await import('file-type');
+      const detected = await fileTypeFromBuffer(file.buffer.subarray(0, Math.min(file.buffer.length, 4096)));
+      const rawMime = detected?.mime?.toLowerCase() ?? '';
+      const mime =
+        rawMime === 'image/jpg'
+          ? 'image/jpeg'
+          : rawMime === 'image/x-png'
+            ? 'image/png'
+            : rawMime;
+      if (!mime || !ALLOWED_MIMES.has(mime)) {
+        throw new BadRequestException({
+          code: 'INVALID_FILE_TYPE',
+          message: 'Invalid file type. Only jpeg, png, and webp images are allowed.',
+        });
+      }
+
+      const declared = (file.mimetype || '').toLowerCase();
+      if (
+        declared &&
+        declared !== 'application/octet-stream' &&
+        declared !== mime &&
+        !(declared === 'image/jpg' && mime === 'image/jpeg')
+      ) {
+        throw new BadRequestException({
+          code: 'MIME_TYPE_MISMATCH',
+          message: 'File content does not match the declared type.',
         });
       }
 
       const ext = mime === 'image/jpeg' || mime === 'image/jpg' ? 'jpg' : mime.split('/')[1] || 'jpg';
-      const safeName = (file.originalname || 'image')
-        .replace(/[^a-zA-Z0-9.-]/g, '_')
-        .slice(0, 100) || 'image';
-      const key = `reports/${userId}/${timestamp}-${safeName}.${ext}`;
+      // SECURITY: Object key uses no user-supplied filename — prevents path traversal and predictable keys.
+      const key = `reports/${userId}/${randomUUID()}.${ext}`;
 
       await this.s3.send(
         new PutObjectCommand({
@@ -151,12 +162,12 @@ export class ReportsUploadService {
         const signed = await getSignedUrl(
           this.s3,
           new GetObjectCommand({ Bucket: this.bucket, Key: key }),
-          { expiresIn: 3600 },
+          { expiresIn: REPORT_MEDIA_SIGNED_URL_TTL_SECONDS },
         );
         this.signedUrlCache.set(key, {
           url: signed,
           // Keep a safety buffer so we do not serve nearly-expired links.
-          expiresAt: now + 50 * 60 * 1000,
+          expiresAt: now + (REPORT_MEDIA_SIGNED_URL_TTL_SECONDS - 60) * 1000,
         });
         result.push(signed);
       } catch {
@@ -250,6 +261,47 @@ export class ReportsUploadService {
         Key: objectKey,
       }),
     );
+  }
+
+  /**
+   * Returns the S3 object key for a report media HTTPS URL served from this app's bucket, or null if unknown/external.
+   */
+  tryExtractReportMediaObjectKeyFromUrl(url: string | null | undefined): string | null {
+    if (!url || !this.bucket) {
+      return null;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    if (!url.startsWith(base)) {
+      return null;
+    }
+    return decodeURIComponent(url.slice(base.length).split('?')[0]);
+  }
+
+  /**
+   * Best-effort removal of duplicate report media after DB merge (DB commit must not depend on S3).
+   * Logs per-key failures; returns how many deletes succeeded.
+   */
+  async deleteReportMediaUrls(urls: string[] | null | undefined): Promise<number> {
+    if (!urls?.length) {
+      return 0;
+    }
+    const uniqueKeys = new Set<string>();
+    for (const url of urls) {
+      const key = this.tryExtractReportMediaObjectKeyFromUrl(url);
+      if (key) {
+        uniqueKeys.add(key);
+      }
+    }
+    let deleted = 0;
+    for (const key of uniqueKeys) {
+      try {
+        await this.deleteObjectByKey(key);
+        deleted += 1;
+      } catch (err) {
+        this.logger.warn(`S3 delete failed for report media key=${key}: ${(err as Error).message}`);
+      }
+    }
+    return deleted;
   }
 
   private async processAvatarImage(input: Buffer): Promise<Buffer> {

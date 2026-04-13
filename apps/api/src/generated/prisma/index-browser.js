@@ -261,6 +261,7 @@ exports.Prisma.ReportScalarFieldEnum = {
 exports.Prisma.ReportCoReporterScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
+  reportedAt: 'reportedAt',
   reportId: 'reportId',
   userId: 'userId'
 };

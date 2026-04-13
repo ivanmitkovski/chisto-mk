@@ -17838,6 +17838,7 @@ export namespace Prisma {
   export type ReportCoReporterMinAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    reportedAt: Date | null
     reportId: string | null
     userId: string | null
   }
@@ -17845,6 +17846,7 @@ export namespace Prisma {
   export type ReportCoReporterMaxAggregateOutputType = {
     id: string | null
     createdAt: Date | null
+    reportedAt: Date | null
     reportId: string | null
     userId: string | null
   }
@@ -17852,6 +17854,7 @@ export namespace Prisma {
   export type ReportCoReporterCountAggregateOutputType = {
     id: number
     createdAt: number
+    reportedAt: number
     reportId: number
     userId: number
     _all: number
@@ -17861,6 +17864,7 @@ export namespace Prisma {
   export type ReportCoReporterMinAggregateInputType = {
     id?: true
     createdAt?: true
+    reportedAt?: true
     reportId?: true
     userId?: true
   }
@@ -17868,6 +17872,7 @@ export namespace Prisma {
   export type ReportCoReporterMaxAggregateInputType = {
     id?: true
     createdAt?: true
+    reportedAt?: true
     reportId?: true
     userId?: true
   }
@@ -17875,6 +17880,7 @@ export namespace Prisma {
   export type ReportCoReporterCountAggregateInputType = {
     id?: true
     createdAt?: true
+    reportedAt?: true
     reportId?: true
     userId?: true
     _all?: true
@@ -17955,6 +17961,7 @@ export namespace Prisma {
   export type ReportCoReporterGroupByOutputType = {
     id: string
     createdAt: Date
+    reportedAt: Date
     reportId: string
     userId: string
     _count: ReportCoReporterCountAggregateOutputType | null
@@ -17979,6 +17986,7 @@ export namespace Prisma {
   export type ReportCoReporterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportedAt?: boolean
     reportId?: boolean
     userId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
@@ -17988,6 +17996,7 @@ export namespace Prisma {
   export type ReportCoReporterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportedAt?: boolean
     reportId?: boolean
     userId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
@@ -17997,6 +18006,7 @@ export namespace Prisma {
   export type ReportCoReporterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     createdAt?: boolean
+    reportedAt?: boolean
     reportId?: boolean
     userId?: boolean
     report?: boolean | ReportDefaultArgs<ExtArgs>
@@ -18006,11 +18016,12 @@ export namespace Prisma {
   export type ReportCoReporterSelectScalar = {
     id?: boolean
     createdAt?: boolean
+    reportedAt?: boolean
     reportId?: boolean
     userId?: boolean
   }
 
-  export type ReportCoReporterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportId" | "userId", ExtArgs["result"]["reportCoReporter"]>
+  export type ReportCoReporterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportedAt" | "reportId" | "userId", ExtArgs["result"]["reportCoReporter"]>
   export type ReportCoReporterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     report?: boolean | ReportDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18033,6 +18044,10 @@ export namespace Prisma {
     scalars: $Extensions.GetPayloadResult<{
       id: string
       createdAt: Date
+      /**
+       * When this person filed their report (duplicate submission or merge source time).
+       */
+      reportedAt: Date
       reportId: string
       userId: string
     }, ExtArgs["result"]["reportCoReporter"]>
@@ -18462,6 +18477,7 @@ export namespace Prisma {
   interface ReportCoReporterFieldRefs {
     readonly id: FieldRef<"ReportCoReporter", 'String'>
     readonly createdAt: FieldRef<"ReportCoReporter", 'DateTime'>
+    readonly reportedAt: FieldRef<"ReportCoReporter", 'DateTime'>
     readonly reportId: FieldRef<"ReportCoReporter", 'String'>
     readonly userId: FieldRef<"ReportCoReporter", 'String'>
   }
@@ -41903,6 +41919,7 @@ export namespace Prisma {
   export const ReportCoReporterScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
+    reportedAt: 'reportedAt',
     reportId: 'reportId',
     userId: 'userId'
   };
@@ -43526,6 +43543,7 @@ export namespace Prisma {
     NOT?: ReportCoReporterWhereInput | ReportCoReporterWhereInput[]
     id?: StringFilter<"ReportCoReporter"> | string
     createdAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
+    reportedAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
     reportId?: StringFilter<"ReportCoReporter"> | string
     userId?: StringFilter<"ReportCoReporter"> | string
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
@@ -43535,6 +43553,7 @@ export namespace Prisma {
   export type ReportCoReporterOrderByWithRelationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
     report?: ReportOrderByWithRelationInput
@@ -43548,6 +43567,7 @@ export namespace Prisma {
     OR?: ReportCoReporterWhereInput[]
     NOT?: ReportCoReporterWhereInput | ReportCoReporterWhereInput[]
     createdAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
+    reportedAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
     reportId?: StringFilter<"ReportCoReporter"> | string
     userId?: StringFilter<"ReportCoReporter"> | string
     report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
@@ -43557,6 +43577,7 @@ export namespace Prisma {
   export type ReportCoReporterOrderByWithAggregationInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
     _count?: ReportCoReporterCountOrderByAggregateInput
@@ -43570,6 +43591,7 @@ export namespace Prisma {
     NOT?: ReportCoReporterScalarWhereWithAggregatesInput | ReportCoReporterScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"ReportCoReporter"> | string
     createdAt?: DateTimeWithAggregatesFilter<"ReportCoReporter"> | Date | string
+    reportedAt?: DateTimeWithAggregatesFilter<"ReportCoReporter"> | Date | string
     reportId?: StringWithAggregatesFilter<"ReportCoReporter"> | string
     userId?: StringWithAggregatesFilter<"ReportCoReporter"> | string
   }
@@ -46222,6 +46244,7 @@ export namespace Prisma {
   export type ReportCoReporterCreateInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     report: ReportCreateNestedOneWithoutCoReportersInput
     user: UserCreateNestedOneWithoutCoReportedReportsInput
   }
@@ -46229,6 +46252,7 @@ export namespace Prisma {
   export type ReportCoReporterUncheckedCreateInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     reportId: string
     userId: string
   }
@@ -46236,6 +46260,7 @@ export namespace Prisma {
   export type ReportCoReporterUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     report?: ReportUpdateOneRequiredWithoutCoReportersNestedInput
     user?: UserUpdateOneRequiredWithoutCoReportedReportsNestedInput
   }
@@ -46243,6 +46268,7 @@ export namespace Prisma {
   export type ReportCoReporterUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -46250,6 +46276,7 @@ export namespace Prisma {
   export type ReportCoReporterCreateManyInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     reportId: string
     userId: string
   }
@@ -46257,11 +46284,13 @@ export namespace Prisma {
   export type ReportCoReporterUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ReportCoReporterUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
   }
@@ -49041,6 +49070,7 @@ export namespace Prisma {
   export type ReportCoReporterCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
   }
@@ -49048,6 +49078,7 @@ export namespace Prisma {
   export type ReportCoReporterMaxOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
   }
@@ -49055,6 +49086,7 @@ export namespace Prisma {
   export type ReportCoReporterMinOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
+    reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
   }
@@ -53427,12 +53459,14 @@ export namespace Prisma {
   export type ReportCoReporterCreateWithoutUserInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     report: ReportCreateNestedOneWithoutCoReportersInput
   }
 
   export type ReportCoReporterUncheckedCreateWithoutUserInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     reportId: string
   }
 
@@ -54213,6 +54247,7 @@ export namespace Prisma {
     NOT?: ReportCoReporterScalarWhereInput | ReportCoReporterScalarWhereInput[]
     id?: StringFilter<"ReportCoReporter"> | string
     createdAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
+    reportedAt?: DateTimeFilter<"ReportCoReporter"> | Date | string
     reportId?: StringFilter<"ReportCoReporter"> | string
     userId?: StringFilter<"ReportCoReporter"> | string
   }
@@ -56520,12 +56555,14 @@ export namespace Prisma {
   export type ReportCoReporterCreateWithoutReportInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     user: UserCreateNestedOneWithoutCoReportedReportsInput
   }
 
   export type ReportCoReporterUncheckedCreateWithoutReportInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     userId: string
   }
 
@@ -63149,6 +63186,7 @@ export namespace Prisma {
   export type ReportCoReporterCreateManyUserInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     reportId: string
   }
 
@@ -63544,18 +63582,21 @@ export namespace Prisma {
   export type ReportCoReporterUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     report?: ReportUpdateOneRequiredWithoutCoReportersNestedInput
   }
 
   export type ReportCoReporterUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ReportCoReporterUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -64539,6 +64580,7 @@ export namespace Prisma {
   export type ReportCoReporterCreateManyReportInput = {
     id?: string
     createdAt?: Date | string
+    reportedAt: Date | string
     userId: string
   }
 
@@ -64603,18 +64645,21 @@ export namespace Prisma {
   export type ReportCoReporterUpdateWithoutReportInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutCoReportedReportsNestedInput
   }
 
   export type ReportCoReporterUncheckedUpdateWithoutReportInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type ReportCoReporterUncheckedUpdateManyWithoutReportInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
   }
 

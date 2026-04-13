@@ -235,6 +235,7 @@ export class ReportsController {
     return this.reportsService.findDuplicateGroupByReport(id);
   }
 
+  // SECURITY: Authorization (moderator vs owner vs co-reporter) is enforced in ReportsService.findOne — never trust the client alone.
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

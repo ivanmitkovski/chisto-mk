@@ -17,6 +17,7 @@ import {
 import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
 
 export class CreateReportWithLocationDto {
+  // SECURITY: All fields are length/type bounded for DB alignment and to limit abuse; whitelist via global ValidationPipe.
   @ApiProperty({ description: 'Latitude of the report location', example: 41.6086 })
   @IsLatitude()
   latitude!: number;

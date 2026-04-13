@@ -101,6 +101,17 @@ export class MergeDuplicateReportsDto {
   reason?: string;
 }
 
+export class MergedCoReporterItemDto {
+  @ApiProperty()
+  userId!: string;
+
+  @ApiProperty({ description: 'Display name from user profile' })
+  name!: string;
+
+  @ApiProperty({ description: 'ISO timestamp when this person originally submitted their report' })
+  reportedAt!: string;
+}
+
 export class MergeDuplicateReportsResponseDto {
   @ApiProperty()
   primaryReportId!: string;
@@ -108,7 +119,9 @@ export class MergeDuplicateReportsResponseDto {
   @ApiProperty()
   mergedChildCount!: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    description: 'Number of duplicate report media objects removed from storage (best-effort S3 deletes)',
+  })
   mergedMediaCount!: number;
 
   @ApiProperty()
@@ -116,4 +129,15 @@ export class MergeDuplicateReportsResponseDto {
 
   @ApiProperty({ enum: ReportStatus })
   primaryStatus!: ReportStatus;
+
+  @ApiProperty({
+    type: () => [MergedCoReporterItemDto],
+    description: 'Co-reporters on the primary report after merge (original submitters of merged duplicates)',
+  })
+  coReporters!: MergedCoReporterItemDto[];
+
+  @ApiProperty({
+    description: 'Total distinct people who reported this issue (primary reporter + co-reporters)',
+  })
+  reporterCount!: number;
 }
