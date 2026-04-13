@@ -7,7 +7,12 @@ export { Icon } from './icon';
 export { Input } from './input';
 export { Pagination } from './pagination';
 export { SectionState } from './section-state';
-export { SkeletonCard, SkeletonTable } from './skeleton';
+export {
+  SkeletonActionPill,
+  SkeletonCard,
+  SkeletonStatStrip,
+  SkeletonTable,
+} from './skeleton';
 export { Spinner } from './spinner';
 export { Snack } from './snack';
 export type { IconName } from './icon';
