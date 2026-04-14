@@ -8,7 +8,7 @@ import {
   IsLongitude,
   IsOptional,
   IsString,
-  IsUrl,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -53,7 +53,10 @@ export class CreateReportWithLocationDto {
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(5)
-  @IsUrl({}, { each: true })
+  @IsString({ each: true })
+  @MaxLength(2048, { each: true })
+  /** S3 virtual-hosted URLs from POST /reports/upload — avoid @IsUrl quirks on some clients. */
+  @Matches(/^https:\/\/.+/i, { each: true, message: 'Each media URL must be an https URL' })
   mediaUrls?: string[];
 
   @ApiPropertyOptional({

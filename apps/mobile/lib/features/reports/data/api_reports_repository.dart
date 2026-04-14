@@ -1,7 +1,9 @@
+import 'dart:io';
+
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
-import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
+import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
@@ -12,6 +14,72 @@ class ApiReportsRepository implements ReportsApiRepository {
   ApiReportsRepository({required ApiClient client}) : _client = client;
 
   final ApiClient _client;
+
+  static const Duration _reportMediaUploadTimeout = Duration(seconds: 90);
+
+  /// POST /reports may be wrapped as `{ data: { reportId, ... } }` by gateways.
+  static Map<String, dynamic> _createReportSubmitPayload(Map<String, dynamic> json) {
+    final Object? data = json['data'];
+    if (data is Map<String, dynamic> && data['reportId'] != null) {
+      return data;
+    }
+    return json;
+  }
+
+  /// Matches API upload validation: magic bytes are authoritative; `application/octet-stream` is allowed.
+  static String _mimeTypeForReportUploadPath(String p) {
+    final String lower = p.toLowerCase();
+    if (lower.endsWith('.png')) return 'image/png';
+    if (lower.endsWith('.webp')) return 'image/webp';
+    if (lower.endsWith('.jpg') || lower.endsWith('.jpeg')) return 'image/jpeg';
+    return 'application/octet-stream';
+  }
+
+  static String _uploadFileNameForPath(String path, int index) {
+    final String lower = path.toLowerCase();
+    if (lower.endsWith('.png')) return 'report_$index.png';
+    if (lower.endsWith('.webp')) return 'report_$index.webp';
+    return 'report_$index.jpg';
+  }
+
+  static List<MultipartFileData> _multipartPartsForLocalPaths(List<String> filePaths) {
+    final List<MultipartFileData> parts = <MultipartFileData>[];
+    int index = 0;
+    for (final String path in filePaths) {
+      final File f = File(path);
+      if (!f.existsSync()) {
+        continue;
+      }
+      final List<int> bytes = f.readAsBytesSync();
+      if (bytes.isEmpty) {
+        continue;
+      }
+      parts.add(
+        MultipartFileData(
+          field: 'files',
+          bytes: bytes,
+          fileName: _uploadFileNameForPath(path, index),
+          mimeType: _mimeTypeForReportUploadPath(path),
+        ),
+      );
+      index++;
+    }
+    return parts;
+  }
+
+  static List<String> _urlsFromUploadResponse(Map<String, dynamic> json) {
+    Map<String, dynamic> map = json;
+    final Object? data = json['data'];
+    if (data is Map<String, dynamic> && data['urls'] != null) {
+      map = data;
+    }
+    final List<dynamic> urls = map['urls'] as List<dynamic>? ?? <dynamic>[];
+    return urls
+        .whereType<String>()
+        .map<String>((String u) => u.trim())
+        .where((String u) => u.isNotEmpty)
+        .toList();
+  }
 
   /// Some gateways return `{ data: { ...entity } }` for single-resource GETs.
   static Map<String, dynamic> _singleResourcePayload(Map<String, dynamic> json) {
@@ -64,21 +132,36 @@ class ApiReportsRepository implements ReportsApiRepository {
   @override
   Future<List<String>> uploadPhotos(List<String> filePaths) async {
     if (filePaths.isEmpty) return <String>[];
-    final ApiResponse response =
-        await _client.postMultipart('/reports/upload', filePaths);
+    final List<MultipartFileData> parts = _multipartPartsForLocalPaths(filePaths);
+    if (parts.isEmpty) {
+      throw AppError.validation(message: 'No readable photo files to upload.');
+    }
+    final ApiResponse response = await _client.multipartPostWithRetry(
+      '/reports/upload',
+      files: parts,
+      timeout: _reportMediaUploadTimeout,
+    );
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
-    final List<dynamic> urls = json['urls'] as List<dynamic>? ?? <dynamic>[];
-    return urls
-        .whereType<String>()
-        .map<String>((String u) => u)
-        .toList();
+    final List<String> urls = _urlsFromUploadResponse(json);
+    if (urls.isEmpty) {
+      throw AppError.validation(message: 'Server returned no image URLs.');
+    }
+    return urls;
   }
 
   @override
   Future<void> uploadReportMedia(String reportId, List<String> filePaths) async {
     if (filePaths.isEmpty) return;
-    await _client.postMultipart('/reports/$reportId/media', filePaths);
+    final List<MultipartFileData> parts = _multipartPartsForLocalPaths(filePaths);
+    if (parts.isEmpty) {
+      throw AppError.validation(message: 'No readable photo files to upload.');
+    }
+    await _client.multipartPostWithRetry(
+      '/reports/$reportId/media',
+      files: parts,
+      timeout: _reportMediaUploadTimeout,
+    );
   }
 
   @override
@@ -120,12 +203,19 @@ class ApiReportsRepository implements ReportsApiRepository {
     final ApiResponse response = await _client.post('/reports', body: body);
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
+    final Map<String, dynamic> payload = _createReportSubmitPayload(json);
+    final String reportId = payload['reportId'] as String? ?? '';
+    if (reportId.isEmpty) {
+      throw AppError.validation(
+        message: 'Server response missing report id; cannot upload photos.',
+      );
+    }
     return ReportSubmitResult(
-      reportId: json['reportId'] as String? ?? '',
-      reportNumber: json['reportNumber'] as String?,
-      siteId: json['siteId'] as String? ?? '',
-      isNewSite: json['isNewSite'] as bool? ?? false,
-      pointsAwarded: (json['pointsAwarded'] as num?)?.toInt() ?? 0,
+      reportId: reportId,
+      reportNumber: payload['reportNumber'] as String?,
+      siteId: payload['siteId'] as String? ?? '',
+      isNewSite: payload['isNewSite'] as bool? ?? false,
+      pointsAwarded: (payload['pointsAwarded'] as num?)?.toInt() ?? 0,
     );
   }
 

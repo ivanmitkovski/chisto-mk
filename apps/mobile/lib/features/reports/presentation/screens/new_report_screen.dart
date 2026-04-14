@@ -9,6 +9,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/data/report_flow_preferences.dart';
+import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/location_picker.dart';
@@ -467,70 +468,78 @@ class _NewReportScreenState extends State<NewReportScreen> {
     AppHaptics.medium();
     setState(() {
       _submitting = true;
-      _submitPhase = 'creating';
+      _submitPhase = _draft.photos.isNotEmpty ? 'uploading' : 'creating';
     });
 
+    final List<String> preparedPhotoPaths = <String>[];
     try {
       final reportsApi = ServiceLocator.instance.reportsApiRepository;
       final String trimmedTitle = _draft.title.trim();
       final String trimmedDescription = _draft.description.trim();
+
+      List<String>? mediaUrlsForSubmit;
+      if (_draft.photos.isNotEmpty) {
+        setState(() => _submitPhase = 'uploading');
+        if (!mounted) return;
+        preparedPhotoPaths.addAll(await prepareReportPhotoPathsForUpload(_draft.photos));
+        bool uploadResolved = false;
+        while (!uploadResolved && mounted) {
+          try {
+            mediaUrlsForSubmit = await reportsApi.uploadPhotos(preparedPhotoPaths);
+            uploadResolved = true;
+          } catch (_) {
+            if (!mounted) return;
+            setState(() => _submitPhase = null);
+            final bool? retry = await showCupertinoDialog<bool>(
+              context: context,
+              builder: (BuildContext ctx) => CupertinoAlertDialog(
+                title: Text(ctx.l10n.reportPhotoUploadFailedTitle),
+                content: Text(ctx.l10n.reportPhotoUploadFailedBody),
+                actions: <CupertinoDialogAction>[
+                  CupertinoDialogAction(
+                    onPressed: () => Navigator.of(ctx).pop(false),
+                    child: Text(ctx.l10n.commonSkip),
+                  ),
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    onPressed: () => Navigator.of(ctx).pop(true),
+                    child: Text(ctx.l10n.commonRetry),
+                  ),
+                ],
+              ),
+            );
+            if (!mounted) return;
+            if (retry != true) {
+              mediaUrlsForSubmit = null;
+              uploadResolved = true;
+              if (mounted) {
+                AppSnack.show(
+                  context,
+                  message: context.l10n.reportSubmittedPartialUploadSnack,
+                  type: AppSnackType.warning,
+                );
+              }
+            } else {
+              setState(() => _submitPhase = 'uploading');
+            }
+          }
+        }
+      }
+
+      if (!mounted) return;
+      setState(() => _submitPhase = 'creating');
+      if (!mounted) return;
       final result = await reportsApi.submitReport(
         latitude: _draft.latitude!,
         longitude: _draft.longitude!,
         title: trimmedTitle,
         description: trimmedDescription.isNotEmpty ? trimmedDescription : null,
-        mediaUrls: null,
+        mediaUrls: mediaUrlsForSubmit,
         category: _draft.category?.apiString,
         severity: _draft.severity,
         address: _draft.address?.trim().isNotEmpty == true ? _draft.address!.trim() : null,
         cleanupEffort: _draft.cleanupEffort?.apiKey,
       );
-      if (!mounted) return;
-      if (_draft.photos.isNotEmpty) {
-        setState(() => _submitPhase = 'uploading');
-        if (!mounted) return;
-        final List<String> paths =
-            _draft.photos.map<String>((XFile x) => x.path).toList();
-        bool uploadSuccess = false;
-        try {
-          await reportsApi.uploadReportMedia(result.reportId, paths);
-          uploadSuccess = true;
-        } catch (e) {
-          if (!mounted) return;
-          final bool? retry = await showCupertinoDialog<bool>(
-            context: context,
-            builder: (BuildContext ctx) => CupertinoAlertDialog(
-              title: Text(ctx.l10n.reportPhotoUploadFailedTitle),
-              content: Text(ctx.l10n.reportPhotoUploadFailedBody),
-              actions: <CupertinoDialogAction>[
-                CupertinoDialogAction(
-                  onPressed: () => Navigator.of(ctx).pop(false),
-                  child: Text(ctx.l10n.commonSkip),
-                ),
-                CupertinoDialogAction(
-                  isDefaultAction: true,
-                  onPressed: () => Navigator.of(ctx).pop(true),
-                  child: Text(ctx.l10n.commonRetry),
-                ),
-              ],
-            ),
-          );
-          if (!mounted) return;
-          if (retry == true) {
-            try {
-              await reportsApi.uploadReportMedia(result.reportId, paths);
-              uploadSuccess = true;
-            } catch (_) {}
-          }
-        }
-        if (!uploadSuccess && mounted) {
-          AppSnack.show(
-            context,
-            message: context.l10n.reportSubmittedPartialUploadSnack,
-            type: AppSnackType.warning,
-          );
-        }
-      }
       if (!mounted) return;
       ServiceLocator.instance.profileNeedsRefresh.value++;
       // Keep _submitting true until the success dialog closes so the primary
@@ -602,6 +611,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 ? AppError.network(message: e.message, cause: e)
                 : AppError.unknown(cause: e);
       });
+    } finally {
+      deleteReportUploadTempFiles(preparedPhotoPaths);
     }
   }
 

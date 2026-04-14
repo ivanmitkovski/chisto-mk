@@ -1059,6 +1059,8 @@ export class ReportsService {
         siteId: true,
         status: true,
         reporterId: true,
+        reportNumber: true,
+        createdAt: true,
         mediaUrls: true,
         coReporters: {
           select: {
@@ -1206,6 +1208,7 @@ export class ReportsService {
 
       const primaryUpdate: Prisma.ReportUncheckedUpdateInput = {
         potentialDuplicateOfId: null,
+        mergedDuplicateChildCount: { increment: selectedChildren.length },
       };
       if (primaryReport.status !== 'APPROVED') {
         primaryUpdate.status = 'APPROVED';
@@ -1287,11 +1290,99 @@ export class ReportsService {
       }
     }
 
+    const primaryReportNumberLabel = this.getReportNumber(primaryReport);
+    this.emitDuplicateMergeNotifications({
+      primaryReportId: primaryReport.id,
+      siteId: primaryReport.siteId,
+      primaryReporterId: primaryReport.reporterId,
+      primaryReportNumberLabel,
+      selectedChildren: selectedChildren.map((c) => ({ id: c.id, reporterId: c.reporterId })),
+      plannedNewCoReporterIds,
+    });
+
     return this.buildMergeCompletedSnapshot(primaryReport.id, {
       mergedChildCount: selectedChildren.length,
       mergedMediaCount: mergedMediaDeletedCount,
       mergedCoReporterCount: plannedNewCoReporterIds.length,
     });
+  }
+
+  /**
+   * In-app + push notifications for duplicate merge outcomes.
+   * Uses REPORT_STATUS so existing mute preferences apply; mergeRole distinguishes payloads.
+   */
+  private emitDuplicateMergeNotifications(params: {
+    primaryReportId: string;
+    siteId: string;
+    primaryReporterId: string | null;
+    primaryReportNumberLabel: string;
+    selectedChildren: { id: string; reporterId: string | null }[];
+    plannedNewCoReporterIds: string[];
+  }): void {
+    const {
+      primaryReportId,
+      siteId,
+      primaryReporterId,
+      primaryReportNumberLabel,
+      selectedChildren,
+      plannedNewCoReporterIds,
+    } = params;
+
+    const childReporterIds = new Set<string>();
+    for (const child of selectedChildren) {
+      if (child.reporterId) {
+        childReporterIds.add(child.reporterId);
+      }
+    }
+
+    const baseData = {
+      reportId: primaryReportId,
+      siteId,
+      status: 'APPROVED' as const,
+      reportNumber: primaryReportNumberLabel,
+    };
+
+    if (primaryReporterId != null && selectedChildren.length > 0) {
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [primaryReporterId],
+        title: 'Duplicate reports merged',
+        body: `Similar submissions were merged into your report ${primaryReportNumberLabel}.`,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'primary' },
+      });
+    }
+
+    for (const userId of childReporterIds) {
+      if (userId === primaryReporterId) {
+        continue;
+      }
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [userId],
+        title: 'Your report was merged',
+        body: `Your submission was merged into ${primaryReportNumberLabel}.`,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'merged_child' },
+      });
+    }
+
+    for (const userId of plannedNewCoReporterIds) {
+      if (userId === primaryReporterId || childReporterIds.has(userId)) {
+        continue;
+      }
+      this.eventEmitter.emit('notification.send', {
+        recipientUserIds: [userId],
+        title: 'Co-reporter credit',
+        body: `You are credited as a co-reporter on ${primaryReportNumberLabel}.`,
+        type: 'REPORT_STATUS',
+        threadKey: `report:${primaryReportId}`,
+        groupKey: `REPORT_STATUS:site:${siteId}`,
+        data: { ...baseData, mergeRole: 'co_reporter_credited' },
+      });
+    }
   }
 
   async updateStatus(
@@ -1518,7 +1609,8 @@ export class ReportsService {
     const moderationSlaLabel =
       report.status === 'NEW' ? '4h remaining' : report.status === 'IN_REVIEW' ? '2h remaining' : 'Completed';
 
-    const evidence = report.mediaUrls.map((url, index) => ({
+    const signedMediaUrls = await this.reportsUploadService.signUrls(report.mediaUrls ?? []);
+    const evidence = signedMediaUrls.map((url, index) => ({
       id: `ev-${index + 1}`,
       label: `Evidence ${index + 1}`,
       kind: 'image' as const,
