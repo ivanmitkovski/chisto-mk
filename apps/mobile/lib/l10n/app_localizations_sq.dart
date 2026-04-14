@@ -188,6 +188,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get reportReviewAfterSubmitIncomplete => 'Përfundo hapat më sipër.';
 
   @override
+  String get reportSubmitSentPending => 'Dërguar';
+
+  @override
   String get semanticsClose => 'Mbyll';
 
   @override

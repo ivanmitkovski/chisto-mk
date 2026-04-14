@@ -13,6 +13,54 @@ class ApiReportsRepository implements ReportsApiRepository {
 
   final ApiClient _client;
 
+  /// Some gateways return `{ data: { ...entity } }` for single-resource GETs.
+  static Map<String, dynamic> _singleResourcePayload(Map<String, dynamic> json) {
+    final Object? data = json['data'];
+    if (data is Map<String, dynamic> &&
+        (data.containsKey('id') ||
+            data.containsKey('mediaUrls') ||
+            data.containsKey('title'))) {
+      return data;
+    }
+    return json;
+  }
+
+  static String _normalizeMediaFetchUrl(String raw) {
+    final String s = raw.trim();
+    if (s.isEmpty) return s;
+    if (s.startsWith('//')) {
+      return 'https:$s';
+    }
+    return s;
+  }
+
+  static List<String> _mediaUrlsFromJson(Map<String, dynamic> json) {
+    final Object? raw = json['mediaUrls'] ?? json['media_urls'];
+    if (raw == null) {
+      return <String>[];
+    }
+    final List<dynamic> mediaList =
+        raw is List<dynamic> ? raw : <dynamic>[raw];
+    final List<String> out = <String>[];
+    for (final dynamic e in mediaList) {
+      if (e is String) {
+        final String n = _normalizeMediaFetchUrl(e);
+        if (n.isNotEmpty) {
+          out.add(n);
+        }
+      } else if (e is Map<String, dynamic>) {
+        final Object? u = e['url'] ?? e['href'];
+        if (u is String) {
+          final String n = _normalizeMediaFetchUrl(u);
+          if (n.isNotEmpty) {
+            out.add(n);
+          }
+        }
+      }
+    }
+    return out;
+  }
+
   @override
   Future<List<String>> uploadPhotos(List<String> filePaths) async {
     if (filePaths.isEmpty) return <String>[];
@@ -109,7 +157,7 @@ class ApiReportsRepository implements ReportsApiRepository {
     final ApiResponse response = await _client.get('/reports/$id');
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
-    return _reportDetailFromJson(json);
+    return _reportDetailFromJson(_singleResourcePayload(json));
   }
 
   @override
@@ -137,9 +185,7 @@ class ApiReportsRepository implements ReportsApiRepository {
     final ApiReportStatus status = _parseApiStatus(statusStr);
     final String submittedAtStr = json['submittedAt'] as String? ?? '';
     final DateTime submittedAt = DateTime.tryParse(submittedAtStr) ?? DateTime.now();
-    final List<dynamic> mediaList = json['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
-    final List<String> mediaUrls =
-        mediaList.whereType<String>().map<String>((String s) => s).toList();
+    final List<String> mediaUrls = _mediaUrlsFromJson(json);
     final String? categoryStr = json['category'] as String?;
     final num? severityNum = json['severity'] as num?;
     final String? cleanupStr = json['cleanupEffort'] as String?;
@@ -177,9 +223,7 @@ class ApiReportsRepository implements ReportsApiRepository {
             address: siteJson['address'] as String?,
           )
         : ReportDetailSite(id: '', latitude: 0, longitude: 0);
-    final List<dynamic> mediaList = json['mediaUrls'] as List<dynamic>? ?? <dynamic>[];
-    final List<String> mediaUrls =
-        mediaList.whereType<String>().map<String>((String s) => s).toList();
+    final List<String> mediaUrls = _mediaUrlsFromJson(json);
     final List<dynamic> coList = json['coReporterNames'] as List<dynamic>? ?? <dynamic>[];
     final List<String> coReporterNames =
         coList.whereType<String>().map<String>((String s) => s).toList();

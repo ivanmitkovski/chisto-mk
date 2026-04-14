@@ -189,6 +189,9 @@ class AppLocalizationsMk extends AppLocalizations {
       'Довршете ги чекорите погоре.';
 
   @override
+  String get reportSubmitSentPending => 'Испратено';
+
+  @override
   String get semanticsClose => 'Затвори';
 
   @override

@@ -56,6 +56,7 @@
   "reportReviewBannerAfterSubmitTitle": "По испраќање",
   "reportReviewAfterSubmitReady": "Модерација пред јавност. Статус во Мои пријави.",
   "reportReviewAfterSubmitIncomplete": "Довршете ги чекорите погоре.",
+  "reportSubmitSentPending": "Испратено",
   "semanticsClose": "Затвори",
   "semanticsAboutStep": "За {title}",
   "@semanticsAboutStep": {
