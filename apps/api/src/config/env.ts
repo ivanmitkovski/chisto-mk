@@ -47,10 +47,20 @@ export function validateEnv(): void {
     }
   }
 
-  // SECURITY: When uploads are enabled in production, require explicit AWS credentials (no implicit instance roles in config drift).
+  // When S3 uploads are enabled in production/staging, require a credential source:
+  // static keys, ECS task role (container credentials), or EKS IRSA.
   const bucket = process.env.S3_BUCKET_NAME?.trim();
   if (bucket && (nodeEnv === 'production' || nodeEnv === 'staging')) {
-    requireEnv('AWS_ACCESS_KEY_ID');
-    requireEnv('AWS_SECRET_ACCESS_KEY');
+    const hasStaticKeys =
+      Boolean(process.env.AWS_ACCESS_KEY_ID?.trim()) &&
+      Boolean(process.env.AWS_SECRET_ACCESS_KEY?.trim());
+    const hasEcsTaskRole = Boolean(process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI?.trim());
+    const hasWebIdentity = Boolean(process.env.AWS_WEB_IDENTITY_TOKEN_FILE?.trim());
+    if (!hasStaticKeys && !hasEcsTaskRole && !hasWebIdentity) {
+      console.error(
+        'When S3_BUCKET_NAME is set in production/staging, configure AWS credentials: set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, or attach an IAM task role to this container (ECS), or use IRSA (EKS).',
+      );
+      process.exit(1);
+    }
   }
 }

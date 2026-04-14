@@ -16461,10 +16461,12 @@ export namespace Prisma {
 
   export type ReportAvgAggregateOutputType = {
     severity: number | null
+    mergedDuplicateChildCount: number | null
   }
 
   export type ReportSumAggregateOutputType = {
     severity: number | null
+    mergedDuplicateChildCount: number | null
   }
 
   export type ReportMinAggregateOutputType = {
@@ -16483,6 +16485,7 @@ export namespace Prisma {
     moderationReason: string | null
     moderatedById: string | null
     potentialDuplicateOfId: string | null
+    mergedDuplicateChildCount: number | null
   }
 
   export type ReportMaxAggregateOutputType = {
@@ -16501,6 +16504,7 @@ export namespace Prisma {
     moderationReason: string | null
     moderatedById: string | null
     potentialDuplicateOfId: string | null
+    mergedDuplicateChildCount: number | null
   }
 
   export type ReportCountAggregateOutputType = {
@@ -16520,16 +16524,19 @@ export namespace Prisma {
     moderationReason: number
     moderatedById: number
     potentialDuplicateOfId: number
+    mergedDuplicateChildCount: number
     _all: number
   }
 
 
   export type ReportAvgAggregateInputType = {
     severity?: true
+    mergedDuplicateChildCount?: true
   }
 
   export type ReportSumAggregateInputType = {
     severity?: true
+    mergedDuplicateChildCount?: true
   }
 
   export type ReportMinAggregateInputType = {
@@ -16548,6 +16555,7 @@ export namespace Prisma {
     moderationReason?: true
     moderatedById?: true
     potentialDuplicateOfId?: true
+    mergedDuplicateChildCount?: true
   }
 
   export type ReportMaxAggregateInputType = {
@@ -16566,6 +16574,7 @@ export namespace Prisma {
     moderationReason?: true
     moderatedById?: true
     potentialDuplicateOfId?: true
+    mergedDuplicateChildCount?: true
   }
 
   export type ReportCountAggregateInputType = {
@@ -16585,6 +16594,7 @@ export namespace Prisma {
     moderationReason?: true
     moderatedById?: true
     potentialDuplicateOfId?: true
+    mergedDuplicateChildCount?: true
     _all?: true
   }
 
@@ -16691,6 +16701,7 @@ export namespace Prisma {
     moderationReason: string | null
     moderatedById: string | null
     potentialDuplicateOfId: string | null
+    mergedDuplicateChildCount: number
     _count: ReportCountAggregateOutputType | null
     _avg: ReportAvgAggregateOutputType | null
     _sum: ReportSumAggregateOutputType | null
@@ -16729,6 +16740,7 @@ export namespace Prisma {
     moderationReason?: boolean
     moderatedById?: boolean
     potentialDuplicateOfId?: boolean
+    mergedDuplicateChildCount?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
     moderatedBy?: boolean | Report$moderatedByArgs<ExtArgs>
@@ -16755,6 +16767,7 @@ export namespace Prisma {
     moderationReason?: boolean
     moderatedById?: boolean
     potentialDuplicateOfId?: boolean
+    mergedDuplicateChildCount?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
     moderatedBy?: boolean | Report$moderatedByArgs<ExtArgs>
@@ -16778,6 +16791,7 @@ export namespace Prisma {
     moderationReason?: boolean
     moderatedById?: boolean
     potentialDuplicateOfId?: boolean
+    mergedDuplicateChildCount?: boolean
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
     moderatedBy?: boolean | Report$moderatedByArgs<ExtArgs>
@@ -16801,9 +16815,10 @@ export namespace Prisma {
     moderationReason?: boolean
     moderatedById?: boolean
     potentialDuplicateOfId?: boolean
+    mergedDuplicateChildCount?: boolean
   }
 
-  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "title" | "description" | "mediaUrls" | "category" | "severity" | "cleanupEffort" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId", ExtArgs["result"]["report"]>
+  export type ReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "reportNumber" | "siteId" | "reporterId" | "title" | "description" | "mediaUrls" | "category" | "severity" | "cleanupEffort" | "status" | "moderatedAt" | "moderationReason" | "moderatedById" | "potentialDuplicateOfId" | "mergedDuplicateChildCount", ExtArgs["result"]["report"]>
   export type ReportInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     reporter?: boolean | Report$reporterArgs<ExtArgs>
@@ -16856,6 +16871,10 @@ export namespace Prisma {
       moderationReason: string | null
       moderatedById: string | null
       potentialDuplicateOfId: string | null
+      /**
+       * Duplicate child reports merged into this canonical report (moderation merge).
+       */
+      mergedDuplicateChildCount: number
     }, ExtArgs["result"]["report"]>
     composites: {}
   }
@@ -17301,6 +17320,7 @@ export namespace Prisma {
     readonly moderationReason: FieldRef<"Report", 'String'>
     readonly moderatedById: FieldRef<"Report", 'String'>
     readonly potentialDuplicateOfId: FieldRef<"Report", 'String'>
+    readonly mergedDuplicateChildCount: FieldRef<"Report", 'Int'>
   }
     
 
@@ -41910,7 +41930,8 @@ export namespace Prisma {
     moderatedAt: 'moderatedAt',
     moderationReason: 'moderationReason',
     moderatedById: 'moderatedById',
-    potentialDuplicateOfId: 'potentialDuplicateOfId'
+    potentialDuplicateOfId: 'potentialDuplicateOfId',
+    mergedDuplicateChildCount: 'mergedDuplicateChildCount'
   };
 
   export type ReportScalarFieldEnum = (typeof ReportScalarFieldEnum)[keyof typeof ReportScalarFieldEnum]
@@ -43430,6 +43451,7 @@ export namespace Prisma {
     moderationReason?: StringNullableFilter<"Report"> | string | null
     moderatedById?: StringNullableFilter<"Report"> | string | null
     potentialDuplicateOfId?: StringNullableFilter<"Report"> | string | null
+    mergedDuplicateChildCount?: IntFilter<"Report"> | number
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     reporter?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     moderatedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -43455,6 +43477,7 @@ export namespace Prisma {
     moderationReason?: SortOrderInput | SortOrder
     moderatedById?: SortOrderInput | SortOrder
     potentialDuplicateOfId?: SortOrderInput | SortOrder
+    mergedDuplicateChildCount?: SortOrder
     site?: SiteOrderByWithRelationInput
     reporter?: UserOrderByWithRelationInput
     moderatedBy?: UserOrderByWithRelationInput
@@ -43483,6 +43506,7 @@ export namespace Prisma {
     moderationReason?: StringNullableFilter<"Report"> | string | null
     moderatedById?: StringNullableFilter<"Report"> | string | null
     potentialDuplicateOfId?: StringNullableFilter<"Report"> | string | null
+    mergedDuplicateChildCount?: IntFilter<"Report"> | number
     site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
     reporter?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     moderatedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
@@ -43508,6 +43532,7 @@ export namespace Prisma {
     moderationReason?: SortOrderInput | SortOrder
     moderatedById?: SortOrderInput | SortOrder
     potentialDuplicateOfId?: SortOrderInput | SortOrder
+    mergedDuplicateChildCount?: SortOrder
     _count?: ReportCountOrderByAggregateInput
     _avg?: ReportAvgOrderByAggregateInput
     _max?: ReportMaxOrderByAggregateInput
@@ -43535,6 +43560,7 @@ export namespace Prisma {
     moderationReason?: StringNullableWithAggregatesFilter<"Report"> | string | null
     moderatedById?: StringNullableWithAggregatesFilter<"Report"> | string | null
     potentialDuplicateOfId?: StringNullableWithAggregatesFilter<"Report"> | string | null
+    mergedDuplicateChildCount?: IntWithAggregatesFilter<"Report"> | number
   }
 
   export type ReportCoReporterWhereInput = {
@@ -46117,6 +46143,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     reporter?: UserCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
@@ -46142,6 +46169,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
@@ -46159,6 +46187,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     reporter?: UserUpdateOneWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
@@ -46184,6 +46213,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
@@ -46205,6 +46235,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
   }
 
   export type ReportUpdateManyMutationInput = {
@@ -46220,6 +46251,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportUncheckedUpdateManyInput = {
@@ -46239,6 +46271,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportCoReporterCreateInput = {
@@ -48975,10 +49008,12 @@ export namespace Prisma {
     moderationReason?: SortOrder
     moderatedById?: SortOrder
     potentialDuplicateOfId?: SortOrder
+    mergedDuplicateChildCount?: SortOrder
   }
 
   export type ReportAvgOrderByAggregateInput = {
     severity?: SortOrder
+    mergedDuplicateChildCount?: SortOrder
   }
 
   export type ReportMaxOrderByAggregateInput = {
@@ -48997,6 +49032,7 @@ export namespace Prisma {
     moderationReason?: SortOrder
     moderatedById?: SortOrder
     potentialDuplicateOfId?: SortOrder
+    mergedDuplicateChildCount?: SortOrder
   }
 
   export type ReportMinOrderByAggregateInput = {
@@ -49015,10 +49051,12 @@ export namespace Prisma {
     moderationReason?: SortOrder
     moderatedById?: SortOrder
     potentialDuplicateOfId?: SortOrder
+    mergedDuplicateChildCount?: SortOrder
   }
 
   export type ReportSumOrderByAggregateInput = {
     severity?: SortOrder
+    mergedDuplicateChildCount?: SortOrder
   }
 
   export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -53301,6 +53339,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
@@ -53324,6 +53363,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
@@ -53351,6 +53391,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     reporter?: UserCreateNestedOneWithoutReportsInput
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
@@ -53374,6 +53415,7 @@ export namespace Prisma {
     moderatedAt?: Date | string | null
     moderationReason?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
@@ -54143,6 +54185,7 @@ export namespace Prisma {
     moderationReason?: StringNullableFilter<"Report"> | string | null
     moderatedById?: StringNullableFilter<"Report"> | string | null
     potentialDuplicateOfId?: StringNullableFilter<"Report"> | string | null
+    mergedDuplicateChildCount?: IntFilter<"Report"> | number
   }
 
   export type ReportUpsertWithWhereUniqueWithoutModeratedByInput = {
@@ -55887,6 +55930,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     reporter?: UserCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
@@ -55910,6 +55954,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
@@ -56470,6 +56515,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     reporter?: UserCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
@@ -56494,6 +56540,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
 
@@ -56515,6 +56562,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     reporter?: UserCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
@@ -56538,6 +56586,7 @@ export namespace Prisma {
     moderatedAt?: Date | string | null
     moderationReason?: string | null
     moderatedById?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
   }
@@ -56869,6 +56918,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     reporter?: UserUpdateOneWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
@@ -56893,6 +56943,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
 
@@ -56941,6 +56992,7 @@ export namespace Prisma {
     status?: $Enums.ReportStatus
     moderatedAt?: Date | string | null
     moderationReason?: string | null
+    mergedDuplicateChildCount?: number
     site: SiteCreateNestedOneWithoutReportsInput
     reporter?: UserCreateNestedOneWithoutReportsInput
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
@@ -56965,6 +57017,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
   }
 
@@ -57100,6 +57153,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     reporter?: UserUpdateOneWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
@@ -57124,6 +57178,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
   }
 
@@ -63139,6 +63194,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
   }
 
   export type ReportCreateManyModeratedByInput = {
@@ -63157,6 +63213,7 @@ export namespace Prisma {
     moderatedAt?: Date | string | null
     moderationReason?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
   }
 
   export type AdminNotificationCreateManyUserInput = {
@@ -63404,6 +63461,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
@@ -63427,6 +63485,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
@@ -63447,6 +63506,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportUpdateWithoutModeratedByInput = {
@@ -63462,6 +63522,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     reporter?: UserUpdateOneWithoutReportsNestedInput
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
@@ -63485,6 +63546,7 @@ export namespace Prisma {
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
@@ -63505,6 +63567,7 @@ export namespace Prisma {
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type AdminNotificationUpdateWithoutUserInput = {
@@ -64245,6 +64308,7 @@ export namespace Prisma {
     moderationReason?: string | null
     moderatedById?: string | null
     potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
   }
 
   export type CleanupEventCreateManySiteInput = {
@@ -64319,6 +64383,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     reporter?: UserUpdateOneWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
@@ -64342,6 +64407,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
@@ -64362,6 +64428,7 @@ export namespace Prisma {
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type CleanupEventUpdateWithoutSiteInput = {
@@ -64575,6 +64642,7 @@ export namespace Prisma {
     moderatedAt?: Date | string | null
     moderationReason?: string | null
     moderatedById?: string | null
+    mergedDuplicateChildCount?: number
   }
 
   export type ReportCoReporterCreateManyReportInput = {
@@ -64597,6 +64665,7 @@ export namespace Prisma {
     status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     site?: SiteUpdateOneRequiredWithoutReportsNestedInput
     reporter?: UserUpdateOneWithoutReportsNestedInput
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
@@ -64620,6 +64689,7 @@ export namespace Prisma {
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
@@ -64640,6 +64710,7 @@ export namespace Prisma {
     moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
     moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
   }
 
   export type ReportCoReporterUpdateWithoutReportInput = {
