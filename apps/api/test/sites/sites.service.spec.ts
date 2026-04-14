@@ -432,4 +432,94 @@ describe('SitesService', () => {
       }),
     );
   });
+
+  it('findOne includes coReporterNames aggregated from report co-reporter rows', async () => {
+    const reportedAtEarly = new Date('2026-04-01T10:00:00.000Z');
+    const reportedAtLate = new Date('2026-04-03T10:00:00.000Z');
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_corep',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: 'Site',
+          status: 'REPORTED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [
+            {
+              id: 'rep_primary',
+              createdAt: new Date('2026-04-01'),
+              reportNumber: 'R-100',
+              siteId: 'site_corep',
+              reporterId: 'user_primary',
+              title: 'Primary',
+              description: null,
+              mediaUrls: [] as string[],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'APPROVED',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'Pri',
+                lastName: 'Mary',
+                avatarObjectKey: null,
+              },
+              coReporters: [
+                {
+                  id: 'cr1',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtLate,
+                  reportId: 'rep_primary',
+                  userId: 'user_ben',
+                  user: { firstName: 'Ben', lastName: 'Co' },
+                },
+                {
+                  id: 'cr2',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtEarly,
+                  reportId: 'rep_primary',
+                  userId: 'user_ann',
+                  user: { firstName: '', lastName: '' },
+                },
+              ],
+            },
+          ],
+          events: [] as unknown[],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const service = new SitesService(
+      prismaMock,
+      { log: jest.fn() } as any,
+      {
+        signUrls: jest.fn(async (urls: string[]) => urls),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
+      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
+      { score: jest.fn(), scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: [], components: {} })) } as any,
+      { ensureSiteExists: jest.fn(async () => undefined) } as any,
+      { emit: jest.fn() } as any,
+    );
+
+    const out = await service.findOne('site_corep');
+    expect(out.coReporterNames).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries).toHaveLength(2);
+    expect(out.coReporterSummaries.map((s) => s.name)).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries.map((s) => s.userId).sort()).toEqual(['user_ann', 'user_ben'].sort());
+    expect(out.mergedDuplicateChildCountTotal).toBe(0);
+  });
 });

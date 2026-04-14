@@ -539,7 +539,7 @@
   "reportFinishStepsSnack": "Довршете ги недостасувачките чекори пред испраќање.",
   "reportSubmittedPartialUploadSnack": "Пријавата е испратена. Фотографиите не се прикачени.",
   "reportPhotoUploadFailedTitle": "Неуспешно прикачување на фотографии",
-  "reportPhotoUploadFailedBody": "Пријавата е испратена. Допрете Обиди повторно за да ги прикачите фотографиите или Прескокни за да продолжите.",
+  "reportPhotoUploadFailedBody": "Фотографиите не можеа да се прикачат. Допрете Обиди повторно или Прескокни за да испратите без фотографии.",
   "reportReviewEvidenceTitle": "Докази",
   "reportReviewPhotoCount": "{count, plural, one{{count} фотографија} other{{count} фотографии}}",
   "@reportReviewPhotoCount": {
@@ -1419,9 +1419,47 @@
   "siteDetailThankYouReportSnack": "Ви благодариме. Вашата пријава ни помага.",
   "siteDetailUpvoteFailedSnack": "Не можеше да се ажурира поддршката. Обидете се повторно.",
   "siteDetailNoUpvotesSnack": "Сè уште нема поддршка. Бидете први!",
+  "siteUpvotersSheetTitle": "Поддржувачи",
+  "siteUpvotersSupportingLabel": "Поддржува",
+  "siteUpvotersSupportersCount": "{count, plural, one{1 поддржувач} other{{count} поддржувачи}}",
+  "@siteUpvotersSupportersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteUpvotersLoadFailed": "Не успеа вчитувањето на поддржувачите.",
+  "siteUpvotersRetry": "Обиди се повторно",
   "siteDetailNoVolunteersSnack": "Сè уште нема волонтери за оваа локација.",
   "siteDetailDirectionsUnavailableSnack": "Насоки не се достапни за оваа локација.",
   "siteDetailOpenMapsFailedSnack": "Не можеше да се отвори Maps",
+  "siteDetailNoCoReportersSnack": "Сè уште нема други учесници. Заеднички известувачи се појавуваат кога некој друг ќе пријави исто место.",
+  "siteStatsCoReportersSemantic": "{count} заеднички известувачи на оваа пријава",
+  "@siteStatsCoReportersSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteParticipantStatsSemantic": "{count} учесници (заеднички известувачи или споени дупликати)",
+  "@siteParticipantStatsSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteMergedDuplicatesModalTitle": "Споени дупликат-пријави",
+  "siteMergedDuplicatesModalBody": "{count, plural, one{Една слична пријава е споена во оваа. Кога некој друг ќе пријави исто место, се појавува како заеднички известувач.} other{{count} слични пријави се споени во оваа. Кога некој друг ќе пријави исто место, се појавува како заеднички известувач.}}",
+  "@siteMergedDuplicatesModalBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteCardUpvoteFailedSnack": "Не можеше да се ажурира поддршката. Обидете се повторно.",
   "siteCardSavedFailedSnack": "Не можеше да се ажурира зачуваното. Обидете се повторно.",
   "siteCardTakeActionSemantic": "Преземи акција",

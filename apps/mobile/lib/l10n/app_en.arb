@@ -539,7 +539,7 @@
   "reportFinishStepsSnack": "Please finish the missing steps before submitting.",
   "reportSubmittedPartialUploadSnack": "Report submitted. Photos could not be uploaded.",
   "reportPhotoUploadFailedTitle": "Photo upload failed",
-  "reportPhotoUploadFailedBody": "Report was submitted. Tap Retry to upload your photos, or Skip to continue.",
+  "reportPhotoUploadFailedBody": "Photos could not be uploaded. Tap Retry to try again, or Skip to submit without photos.",
   "reportReviewEvidenceTitle": "Evidence",
   "reportReviewPhotoCount": "{count, plural, one{{count} photo} other{{count} photos}}",
   "@reportReviewPhotoCount": {
@@ -1450,9 +1450,47 @@
   "siteDetailThankYouReportSnack": "Thank you. Your report helps us improve.",
   "siteDetailUpvoteFailedSnack": "Could not update upvote. Please try again.",
   "siteDetailNoUpvotesSnack": "No upvotes yet. Be the first to support this site!",
+  "siteUpvotersSheetTitle": "Upvoters",
+  "siteUpvotersSupportingLabel": "Supporting",
+  "siteUpvotersSupportersCount": "{count, plural, one{1 supporter} other{{count} supporters}}",
+  "@siteUpvotersSupportersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteUpvotersLoadFailed": "Could not load supporters.",
+  "siteUpvotersRetry": "Retry",
   "siteDetailNoVolunteersSnack": "No volunteers yet for this site.",
   "siteDetailDirectionsUnavailableSnack": "Directions not available for this site.",
   "siteDetailOpenMapsFailedSnack": "Could not open Maps",
+  "siteDetailNoCoReportersSnack": "No other contributors yet. Co-reporters appear when someone else reports the same place.",
+  "siteStatsCoReportersSemantic": "{count} co-reporters for this report",
+  "@siteStatsCoReportersSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteParticipantStatsSemantic": "{count} for contributors (co-reporters or merged duplicates)",
+  "@siteParticipantStatsSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteMergedDuplicatesModalTitle": "Merged duplicate reports",
+  "siteMergedDuplicatesModalBody": "{count, plural, one{One similar submission was merged into this report. When someone else reports the same place, they appear as co-reporters.} other{{count} similar submissions were merged into this report. When someone else reports the same place, they appear as co-reporters.}}",
+  "@siteMergedDuplicatesModalBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteCardUpvoteFailedSnack": "Could not update upvote. Please try again.",
   "siteCardSavedFailedSnack": "Could not update saved state. Please try again.",
   "siteCardTakeActionSemantic": "Take action",

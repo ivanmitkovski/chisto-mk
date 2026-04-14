@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -99,10 +100,14 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    const urls = await this.reportsUploadService.uploadFiles(
-      user.userId,
-      files || [],
-    );
+    const fileList = files ?? [];
+    if (fileList.length === 0) {
+      throw new BadRequestException({
+        code: 'FILES_REQUIRED',
+        message: 'At least one image file is required.',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(user.userId, fileList);
     return { urls };
   }
 
@@ -130,10 +135,14 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    const urls = await this.reportsUploadService.uploadFiles(
-      user.userId,
-      files || [],
-    );
+    const fileList = files ?? [];
+    if (fileList.length === 0) {
+      throw new BadRequestException({
+        code: 'FILES_REQUIRED',
+        message: 'At least one image file is required.',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(user.userId, fileList);
     await this.reportsService.appendMedia(reportId, user.userId, urls);
     return { urls };
   }

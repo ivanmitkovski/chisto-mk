@@ -1163,7 +1163,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportPhotoUploadFailedBody =>
-      'Report was submitted. Tap Retry to upload your photos, or Skip to continue.';
+      'Photos could not be uploaded. Tap Retry to try again, or Skip to submit without photos.';
 
   @override
   String get reportReviewEvidenceTitle => 'Evidence';
@@ -2942,6 +2942,29 @@ class AppLocalizationsEn extends AppLocalizations {
       'No upvotes yet. Be the first to support this site!';
 
   @override
+  String get siteUpvotersSheetTitle => 'Upvoters';
+
+  @override
+  String get siteUpvotersSupportingLabel => 'Supporting';
+
+  @override
+  String siteUpvotersSupportersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count supporters',
+      one: '1 supporter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteUpvotersLoadFailed => 'Could not load supporters.';
+
+  @override
+  String get siteUpvotersRetry => 'Retry';
+
+  @override
   String get siteDetailNoVolunteersSnack => 'No volunteers yet for this site.';
 
   @override
@@ -2950,6 +2973,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get siteDetailOpenMapsFailedSnack => 'Could not open Maps';
+
+  @override
+  String get siteDetailNoCoReportersSnack =>
+      'No other contributors yet. Co-reporters appear when someone else reports the same place.';
+
+  @override
+  String siteStatsCoReportersSemantic(int count) {
+    return '$count co-reporters for this report';
+  }
+
+  @override
+  String siteParticipantStatsSemantic(int count) {
+    return '$count for contributors (co-reporters or merged duplicates)';
+  }
+
+  @override
+  String get siteMergedDuplicatesModalTitle => 'Merged duplicate reports';
+
+  @override
+  String siteMergedDuplicatesModalBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count similar submissions were merged into this report. When someone else reports the same place, they appear as co-reporters.',
+      one:
+          'One similar submission was merged into this report. When someone else reports the same place, they appear as co-reporters.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get siteCardUpvoteFailedSnack =>

@@ -1169,7 +1169,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportPhotoUploadFailedBody =>
-      'Raporti u dërgua. Prek Provo përsëri për të ngarkuar fotot ose Anashkalo për të vazhduar.';
+      'Fotot nuk u ngarkuan. Prek Provo përsëri ose Anashkalo për të dërguar pa foto.';
 
   @override
   String get reportReviewEvidenceTitle => 'Provat';
@@ -2971,6 +2971,29 @@ class AppLocalizationsSq extends AppLocalizations {
       'Ende pa vota. Bëhu i pari që e mbështet!';
 
   @override
+  String get siteUpvotersSheetTitle => 'Mbështetësit';
+
+  @override
+  String get siteUpvotersSupportingLabel => 'Po e mbështet';
+
+  @override
+  String siteUpvotersSupportersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count mbështetës',
+      one: '1 mbështetës',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteUpvotersLoadFailed => 'Nuk u ngarkuan mbështetësit.';
+
+  @override
+  String get siteUpvotersRetry => 'Provo përsëri';
+
+  @override
   String get siteDetailNoVolunteersSnack => 'Ende pa vullnetarë për këtë vend.';
 
   @override
@@ -2979,6 +3002,37 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get siteDetailOpenMapsFailedSnack => 'Nuk u hap Hartat';
+
+  @override
+  String get siteDetailNoCoReportersSnack =>
+      'Ende nuk ka kontribues të tjerë. Bashkëraportuesit shfaqen kur dikush tjetër raporton të njëjtin vend.';
+
+  @override
+  String siteStatsCoReportersSemantic(int count) {
+    return '$count bashkëraportues për këtë raport';
+  }
+
+  @override
+  String siteParticipantStatsSemantic(int count) {
+    return '$count për kontribues (bashkëraportues ose raporte të përbashkëta të dyfishta)';
+  }
+
+  @override
+  String get siteMergedDuplicatesModalTitle =>
+      'Raporte të dyfishta të bashkuara';
+
+  @override
+  String siteMergedDuplicatesModalBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count paraqitje të ngjashme u bashkuan në këtë raport. Kur dikush tjetër raporton të njëjtin vend, shfaqen si bashkëraportues.',
+      one:
+          'Një paraqitje e ngjashme u bashkua në këtë raport. Kur dikush tjetër raporton të njëjtin vend, shfaqet si bashkëraportues.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get siteCardUpvoteFailedSnack =>

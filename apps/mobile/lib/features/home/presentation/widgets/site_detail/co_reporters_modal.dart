@@ -2,17 +2,22 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/home/domain/models/co_reporter_profile.dart';
+import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 
 class CoReportersModal extends StatelessWidget {
   const CoReportersModal({
     super.key,
-    required this.names,
+    required this.reporters,
   });
 
-  final List<String> names;
+  final List<CoReporterProfile> reporters;
 
-  static Future<void> show(BuildContext context, List<String> names) {
-    if (names.isEmpty) return Future<void>.value();
+  static Future<void> show(
+    BuildContext context,
+    List<CoReporterProfile> reporters,
+  ) {
+    if (reporters.isEmpty) return Future<void>.value();
     return showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -22,7 +27,7 @@ class CoReportersModal extends StatelessWidget {
           top: Radius.circular(AppSpacing.radiusSheet),
         ),
       ),
-      builder: (BuildContext context) => CoReportersModal(names: names),
+      builder: (BuildContext context) => CoReportersModal(reporters: reporters),
     );
   }
 
@@ -67,7 +72,7 @@ class CoReportersModal extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${names.length} ${names.length == 1 ? 'person' : 'people'} also reported this site',
+                      '${reporters.length} ${reporters.length == 1 ? 'person' : 'people'} also reported this site',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.textMuted,
                           ),
@@ -80,22 +85,18 @@ class CoReportersModal extends StatelessWidget {
             SliverList(
               delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index) {
-                  final String name = names[index];
+                  final CoReporterProfile row = reporters[index];
                   return ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: AppColors.inputFill,
-                      child: Text(
-                        name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
+                    leading: AppAvatar(
+                      name: row.displayName,
+                      size: 40,
+                      fontSize: 14,
+                      imageUrl: row.avatarUrl,
                     ),
-                    title: Text(name),
+                    title: Text(row.displayName),
                   );
                 },
-                childCount: names.length,
+                childCount: reporters.length,
               ),
             ),
           ],

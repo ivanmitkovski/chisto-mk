@@ -28,6 +28,9 @@ class AppAvatar extends StatefulWidget {
 
 class _AppAvatarState extends State<AppAvatar> {
   Future<bool>? _localFileExists;
+  int _networkLoadAttempt = 0;
+  static const int _maxNetworkRetries = 2;
+  static const Duration _networkRetryDelay = Duration(milliseconds: 450);
 
   @override
   void initState() {
@@ -40,6 +43,11 @@ class _AppAvatarState extends State<AppAvatar> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.localImagePath != widget.localImagePath) {
       _localFileExists = _checkLocalFile(widget.localImagePath);
+    }
+    final String? oldUrl = oldWidget.imageUrl?.trim();
+    final String? newUrl = widget.imageUrl?.trim();
+    if (oldUrl != newUrl) {
+      _networkLoadAttempt = 0;
     }
   }
 
@@ -82,14 +90,21 @@ class _AppAvatarState extends State<AppAvatar> {
   }
 
   Widget _buildRemoteOrFallback(String initials) {
-    if (widget.imageUrl != null && widget.imageUrl!.isNotEmpty) {
+    final String? rawUrl = widget.imageUrl?.trim();
+    if (rawUrl != null && rawUrl.isNotEmpty) {
+      final int cacheDim = (widget.size * 3).round().clamp(72, 256);
       return ClipOval(
         child: SizedBox(
           width: widget.size,
           height: widget.size,
           child: Image.network(
-            widget.imageUrl!,
+            rawUrl,
+            key: ValueKey<String>('avatar_net|$_networkLoadAttempt|$rawUrl'),
             fit: BoxFit.cover,
+            gaplessPlayback: true,
+            cacheWidth: cacheDim,
+            cacheHeight: cacheDim,
+            filterQuality: FilterQuality.medium,
             loadingBuilder:
                 (
                   BuildContext context,
@@ -104,11 +119,28 @@ class _AppAvatarState extends State<AppAvatar> {
                     showLoadingRing: true,
                   );
                 },
-            errorBuilder: (_, _, _) => _InitialsCircle(
-              initials: initials,
-              size: widget.size,
-              fontSize: widget.fontSize,
-            ),
+            errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) {
+              if (_networkLoadAttempt < _maxNetworkRetries) {
+                Future<void>.delayed(_networkRetryDelay, () {
+                  if (!mounted) return;
+                  final String? still = widget.imageUrl?.trim();
+                  if (still == rawUrl) {
+                    setState(() => _networkLoadAttempt += 1);
+                  }
+                });
+                return _InitialsCircle(
+                  initials: initials,
+                  size: widget.size,
+                  fontSize: widget.fontSize,
+                  showLoadingRing: true,
+                );
+              }
+              return _InitialsCircle(
+                initials: initials,
+                size: widget.size,
+                fontSize: widget.fontSize,
+              );
+            },
           ),
         ),
       );

@@ -287,6 +287,9 @@ model Report {
   potentialDuplicateOf   Report? @relation("ReportPotentialDuplicate", fields: [potentialDuplicateOfId], references: [id])
   potentialDuplicates    Report[] @relation("ReportPotentialDuplicate")
 
+  /// Duplicate child reports merged into this canonical report (moderation merge).
+  mergedDuplicateChildCount Int @default(0)
+
   coReporters ReportCoReporter[]
 
   @@index([siteId])

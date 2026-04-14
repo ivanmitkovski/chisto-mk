@@ -13,6 +13,7 @@ import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { ListSiteCommentsQueryDto } from './dto/list-site-comments-query.dto';
 import { SiteCommentsSort } from './dto/list-site-comments-query.dto';
 import { ListSiteMediaQueryDto } from './dto/list-site-media-query.dto';
+import { ListSiteUpvotesQueryDto } from './dto/list-site-upvotes-query.dto';
 import { ListSitesQueryDto, SiteFeedMode, SiteFeedSort } from './dto/list-sites-query.dto';
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
 import { ShareSiteDto } from './dto/share-site.dto';
@@ -829,6 +830,69 @@ export class SitesService {
     return response;
   }
 
+  /**
+   * Stable list for mobile/site detail (deduped by userId, earliest reportedAt wins ordering).
+   * [avatarUrl] is a signed URL when the user has an avatar object key.
+   */
+  private buildSiteCoReporterSummaries(
+    reports: Array<{
+      coReporters: Array<{
+        userId: string;
+        reportedAt: Date;
+        user: { firstName: string; lastName: string; avatarUrl: string | null } | null;
+      }>;
+    }>,
+  ): { userId: string; name: string; avatarUrl: string | null }[] {
+    const anonymous = 'Anonymous';
+    const pickRicher = (a: string, b: string): string => {
+      if (a === anonymous && b !== anonymous) return b;
+      if (b === anonymous && a !== anonymous) return a;
+      return a;
+    };
+    const pickAvatar = (a: string | null, b: string | null): string | null => {
+      const x = a?.trim() ?? '';
+      const y = b?.trim() ?? '';
+      if (x.length > 0) return x;
+      if (y.length > 0) return y;
+      return null;
+    };
+    const display = (user: { firstName: string; lastName: string; avatarUrl: string | null } | null): string => {
+      if (!user) return anonymous;
+      const n = `${user.firstName} ${user.lastName}`.trim();
+      return n.length > 0 ? n : anonymous;
+    };
+    const byUser = new Map<
+      string,
+      { name: string; reportedAt: Date; avatarUrl: string | null }
+    >();
+    for (const r of reports) {
+      for (const cr of r.coReporters) {
+        const name = display(cr.user);
+        const reportedAt = cr.reportedAt;
+        const avatarUrl = cr.user?.avatarUrl?.trim() ? cr.user.avatarUrl : null;
+        const prev = byUser.get(cr.userId);
+        if (!prev) {
+          byUser.set(cr.userId, { name, reportedAt, avatarUrl });
+          continue;
+        }
+        const incomingEarlier = reportedAt < prev.reportedAt;
+        const nextAt = incomingEarlier ? reportedAt : prev.reportedAt;
+        const nextName = incomingEarlier ? pickRicher(name, prev.name) : pickRicher(prev.name, name);
+        const nextAvatar = incomingEarlier
+          ? pickAvatar(avatarUrl, prev.avatarUrl)
+          : pickAvatar(prev.avatarUrl, avatarUrl);
+        byUser.set(cr.userId, { name: nextName, reportedAt: nextAt, avatarUrl: nextAvatar });
+      }
+    }
+    return [...byUser.entries()]
+      .sort(([, av], [, bv]) => {
+        if (av.reportedAt < bv.reportedAt) return -1;
+        if (av.reportedAt > bv.reportedAt) return 1;
+        return av.name.localeCompare(bv.name);
+      })
+      .map(([userId, v]) => ({ userId, name: v.name, avatarUrl: v.avatarUrl }));
+  }
+
   async findOne(
     siteId: string,
     user?: AuthenticatedUser,
@@ -840,6 +904,9 @@ export class SitesService {
       sharesCount: number;
       isUpvotedByMe: boolean;
       isSavedByMe: boolean;
+      coReporterNames: string[];
+      coReporterSummaries: { userId: string; name: string; avatarUrl: string | null }[];
+      mergedDuplicateChildCountTotal: number;
     }
   > {
     const site = await this.prisma.site.findUnique({
@@ -853,7 +920,7 @@ export class SitesService {
             },
             coReporters: {
               include: {
-                user: { select: { firstName: true, lastName: true } },
+                user: { select: { firstName: true, lastName: true, avatarObjectKey: true } },
               },
             },
           },
@@ -884,15 +951,22 @@ export class SitesService {
                   r.reporter.avatarObjectKey,
                 ),
               };
-        const coReporters = r.coReporters.map((cr) => ({
-          id: cr.id,
-          createdAt: cr.createdAt,
-          reportId: cr.reportId,
-          userId: cr.userId,
-          user: cr.user
-            ? { firstName: cr.user.firstName, lastName: cr.user.lastName }
-            : null,
-        }));
+        const coReporters = await Promise.all(
+          r.coReporters.map(async (cr) => ({
+            id: cr.id,
+            createdAt: cr.createdAt,
+            reportedAt: cr.reportedAt,
+            reportId: cr.reportId,
+            userId: cr.userId,
+            user: cr.user
+              ? {
+                  firstName: cr.user.firstName,
+                  lastName: cr.user.lastName,
+                  avatarUrl: await this.reportsUploadService.signPrivateObjectKey(cr.user.avatarObjectKey),
+                }
+              : null,
+          })),
+        );
         return {
           id: r.id,
           createdAt: r.createdAt,
@@ -912,8 +986,14 @@ export class SitesService {
           potentialDuplicateOfId: r.potentialDuplicateOfId,
           reporter,
           coReporters,
+          mergedDuplicateChildCount: r.mergedDuplicateChildCount,
         };
       }),
+    );
+
+    const mergedDuplicateChildCountTotal = reportsWithSignedUrls.reduce(
+      (n, r) => n + (r.mergedDuplicateChildCount ?? 0),
+      0,
     );
 
     let isUpvotedByMe = false;
@@ -933,9 +1013,13 @@ export class SitesService {
       isSavedByMe = Boolean(save);
     }
 
+    const coReporterSummaries = this.buildSiteCoReporterSummaries(reportsWithSignedUrls);
     return {
       ...site,
       reports: reportsWithSignedUrls,
+      coReporterNames: coReporterSummaries.map((s) => s.name),
+      coReporterSummaries,
+      mergedDuplicateChildCountTotal,
       upvotesCount: site.upvotesCount,
       commentsCount: site.commentsCount,
       savesCount: site.savesCount,
@@ -976,6 +1060,64 @@ export class SitesService {
     return {
       data,
       meta: { page: query.page, limit: query.limit, total },
+    };
+  }
+
+  async findSiteUpvotes(siteId: string, query: ListSiteUpvotesQueryDto): Promise<{
+    data: Array<{
+      userId: string;
+      displayName: string;
+      avatarUrl: string | null;
+      upvotedAt: string;
+    }>;
+    meta: { page: number; limit: number; total: number; hasMore: boolean };
+  }> {
+    await this.siteEngagement.ensureSiteExists(siteId);
+    const where = { siteId };
+    const skip = (query.page - 1) * query.limit;
+    const [total, votes] = await Promise.all([
+      this.prisma.siteVote.count({ where }),
+      this.prisma.siteVote.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: query.limit,
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              avatarObjectKey: true,
+            },
+          },
+        },
+      }),
+    ]);
+    const data = await Promise.all(
+      votes.map(async (vote) => {
+        const displayName =
+          `${vote.user.firstName ?? ''} ${vote.user.lastName ?? ''}`.trim() || 'Anonymous';
+        const avatarUrl = await this.reportsUploadService.resolveUserAvatarUrl(
+          vote.user.avatarObjectKey,
+        );
+        return {
+          userId: vote.user.id,
+          displayName,
+          avatarUrl,
+          upvotedAt: vote.createdAt.toISOString(),
+        };
+      }),
+    );
+    const loadedThrough = skip + data.length;
+    return {
+      data,
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        hasMore: loadedThrough < total,
+      },
     };
   }
 

@@ -255,7 +255,8 @@ exports.Prisma.ReportScalarFieldEnum = {
   moderatedAt: 'moderatedAt',
   moderationReason: 'moderationReason',
   moderatedById: 'moderatedById',
-  potentialDuplicateOfId: 'potentialDuplicateOfId'
+  potentialDuplicateOfId: 'potentialDuplicateOfId',
+  mergedDuplicateChildCount: 'mergedDuplicateChildCount'
 };
 
 exports.Prisma.ReportCoReporterScalarFieldEnum = {

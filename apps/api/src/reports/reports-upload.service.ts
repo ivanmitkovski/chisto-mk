@@ -9,6 +9,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import { randomUUID } from 'crypto';
+import { detectAllowedImageMimeFromBuffer } from '../common/utils/detect-allowed-image-mime-from-buffer';
 
 const ALLOWED_MIMES = new Set([
   'image/jpeg',
@@ -78,15 +79,8 @@ export class ReportsUploadService {
       }
 
       // SECURITY: Detect MIME from magic bytes; never trust Content-Type or filename alone (polyglot / renamed executables).
-      const { fileTypeFromBuffer } = await import('file-type');
-      const detected = await fileTypeFromBuffer(file.buffer.subarray(0, Math.min(file.buffer.length, 4096)));
-      const rawMime = detected?.mime?.toLowerCase() ?? '';
-      const mime =
-        rawMime === 'image/jpg'
-          ? 'image/jpeg'
-          : rawMime === 'image/x-png'
-            ? 'image/png'
-            : rawMime;
+      const sample = file.buffer.subarray(0, Math.min(file.buffer.length, 4096));
+      const mime = detectAllowedImageMimeFromBuffer(sample);
       if (!mime || !ALLOWED_MIMES.has(mime)) {
         throw new BadRequestException({
           code: 'INVALID_FILE_TYPE',
@@ -281,6 +275,22 @@ export class ReportsUploadService {
       this.signedUrlCache.delete(objectKey);
       return null;
     }
+  }
+
+  /**
+   * Resolves a stored avatar reference to a URL the client can load.
+   * Supports bare private object keys (presigned) and canonical HTTPS URLs for this bucket (re-presigned).
+   */
+  async resolveUserAvatarUrl(stored: string | null | undefined): Promise<string | null> {
+    const t = stored?.trim();
+    if (!t) {
+      return null;
+    }
+    if (t.startsWith('http://') || t.startsWith('https://')) {
+      const signed = await this.signUrls([t]);
+      return signed[0] ?? t;
+    }
+    return this.signPrivateObjectKey(t);
   }
 
   async deleteObjectByKey(objectKey: string | null | undefined): Promise<void> {

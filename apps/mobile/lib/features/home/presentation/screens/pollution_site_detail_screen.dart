@@ -8,10 +8,12 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
+import 'package:chisto_mobile/features/home/domain/models/co_reporter_profile.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/data/site_issue_report_repository.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_card/upvoters_sheet_content.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_detail_widgets.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
 import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
@@ -274,12 +276,21 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   }
 
   Future<void> _onParticipantsTap(BuildContext context) async {
-    final List<String> coReporters = _site.coReporterNames;
+    final List<CoReporterProfile> coReporters = _site.displayCoReporterProfiles;
+    AppHaptics.tap();
     if (coReporters.isNotEmpty) {
-      AppHaptics.tap();
       await CoReportersModal.show(context, coReporters);
+    } else if (_site.mergedDuplicateChildCountTotal > 0) {
+      await MergedDuplicateSubmissionsModal.show(
+        context,
+        count: _site.mergedDuplicateChildCountTotal,
+      );
     } else {
-      await _showParticipantsSheet(context);
+      AppSnack.show(
+        context,
+        message: context.l10n.siteDetailNoCoReportersSnack,
+        type: AppSnackType.info,
+      );
     }
   }
 
@@ -386,10 +397,6 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
       return;
     }
     AppHaptics.tap();
-    final List<String> names = List<String>.generate(
-      count,
-      (int index) => 'Eco volunteer ${index + 1}',
-    );
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -413,57 +420,8 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
                 ),
               ),
               clipBehavior: Clip.antiAlias,
-              child: _UpvotersSheetContent(
-                count: count,
-                names: names,
-                scrollController: scrollController,
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  Future<void> _showParticipantsSheet(BuildContext context) async {
-    final int count = _site.participantCount.clamp(0, 999);
-    if (count == 0) {
-      AppSnack.show(
-        context,
-        message: context.l10n.siteDetailNoVolunteersSnack,
-        type: AppSnackType.info,
-      );
-      return;
-    }
-    AppHaptics.tap();
-    final List<String> names = List<String>.generate(
-      count,
-      (int index) => 'Volunteer ${index + 1}',
-    );
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      useSafeArea: true,
-      barrierColor: AppColors.overlay,
-      backgroundColor: AppColors.transparent,
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          initialChildSize: 0.5,
-          minChildSize: 0.4,
-          maxChildSize: 0.9,
-          builder: (BuildContext context, ScrollController scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.panelBackground,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.radiusPill),
-                ),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: _ParticipantsSheetContent(
-                count: count,
-                names: names,
+              child: UpvotersSheetContent(
+                siteId: _site.id,
                 scrollController: scrollController,
               ),
             );
@@ -613,140 +571,3 @@ class _PollutionSiteDetailScreenState extends State<PollutionSiteDetailScreen> {
   }
 }
 
-class _UpvotersSheetContent extends StatelessWidget {
-  const _UpvotersSheetContent({
-    required this.count,
-    required this.names,
-    required this.scrollController,
-  });
-
-  final int count;
-  final List<String> names;
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.inputBorder,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  '$count upvote${count == 1 ? '' : 's'}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-              ],
-            ),
-          ),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.inputFill,
-                  child: Text(
-                    names[index].substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                title: Text(names[index]),
-              );
-            },
-            childCount: names.length,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _ParticipantsSheetContent extends StatelessWidget {
-  const _ParticipantsSheetContent({
-    required this.count,
-    required this.names,
-    required this.scrollController,
-  });
-
-  final int count;
-  final List<String> names;
-  final ScrollController scrollController;
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: <Widget>[
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Center(
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.inputBorder,
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  '$count volunteer${count == 1 ? '' : 's'}',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                ),
-                const SizedBox(height: AppSpacing.sm),
-              ],
-            ),
-          ),
-        ),
-        SliverList(
-          delegate: SliverChildBuilderDelegate(
-            (BuildContext context, int index) {
-              return ListTile(
-                leading: CircleAvatar(
-                  backgroundColor: AppColors.inputFill,
-                  child: Text(
-                    names[index].substring(0, 1).toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-                title: Text(names[index]),
-              );
-            },
-            childCount: names.length,
-          ),
-        ),
-      ],
-    );
-  }
-}
