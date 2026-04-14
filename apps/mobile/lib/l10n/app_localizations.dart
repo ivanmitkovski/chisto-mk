@@ -436,6 +436,12 @@ abstract class AppLocalizations {
   /// **'Finish steps above.'**
   String get reportReviewAfterSubmitIncomplete;
 
+  /// No description provided for @reportSubmitSentPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sent'**
+  String get reportSubmitSentPending;
+
   /// No description provided for @semanticsClose.
   ///
   /// In en, this message translates to:

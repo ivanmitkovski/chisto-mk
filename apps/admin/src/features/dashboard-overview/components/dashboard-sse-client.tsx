@@ -7,7 +7,11 @@ import { useCallback, useEffect, useRef } from 'react';
 import { adminQueryKeys } from '@/lib/admin-api-client';
 import { getApiBaseUrl } from '@/lib/api-base-url';
 import { emitNewReportSignal } from '@/lib/realtime-signals';
-import { getAdminTokenFromBrowserCookie } from '@/features/auth/lib/admin-auth';
+import {
+  getAdminTokenFromBrowserCookie,
+  refreshAdminAccessTokenInBrowser,
+  shouldProactivelyRefreshAdminAccessToken,
+} from '@/features/auth/lib/admin-auth';
 import { useDashboardSSE } from '../context/dashboard-sse-context';
 
 const SSE_URL = `${getApiBaseUrl()}/admin/events`;
@@ -23,6 +27,14 @@ function getRetryDelayMs(retryCount: number): number {
 function isRealtimeDebugEnabled(): boolean {
   if (typeof window === 'undefined') return false;
   return process.env.NODE_ENV !== 'production' && window.localStorage.getItem(DEBUG_REALTIME_FLAG) === '1';
+}
+
+/** Thrown from SSE `onopen` after a successful refresh so the client reconnects with a new JWT. */
+class SSEAuthRefreshedError extends Error {
+  constructor() {
+    super('SSE authentication renewed');
+    this.name = 'SSEAuthRefreshedError';
+  }
 }
 
 type ReportEventPayload = {
@@ -96,99 +108,125 @@ export function DashboardSSEClient() {
   queryClientRef.current = queryClient;
   const abortRef = useRef<AbortController | null>(null);
   const retryCountRef = useRef(0);
+  const ssePostRefreshReconnectsRef = useRef(0);
 
   const sseCtxRef = useRef(sseCtx);
   sseCtxRef.current = sseCtx;
 
   const connect = useCallback(() => {
-    const token = getAdminTokenFromBrowserCookie();
-    if (!token) return;
+    void (async () => {
+      let token = getAdminTokenFromBrowserCookie();
+      if (!token) return;
 
-    if (abortRef.current) {
-      abortRef.current.abort();
-    }
-    const controller = new AbortController();
-    abortRef.current = controller;
+      if (shouldProactivelyRefreshAdminAccessToken(token)) {
+        await refreshAdminAccessTokenInBrowser();
+        token = getAdminTokenFromBrowserCookie();
+        if (!token) return;
+      }
 
-    fetchEventSource(SSE_URL, {
-      signal: controller.signal,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'text/event-stream',
-      },
-      openWhenHidden: false,
-      async onopen(response) {
-        if (response.ok) {
-          retryCountRef.current = 0;
-          sseCtxRef.current?.setConnected(true);
-          if (isRealtimeDebugEnabled()) {
-            console.debug('[realtime] sse-connected', { url: SSE_URL });
-          }
-          return;
-        }
-        if (response.status === 401 || response.status === 403) {
-          throw new Error('Unauthorized');
-        }
-        throw new Error(`SSE connection failed: ${response.status}`);
-      },
-      onmessage(ev) {
-        try {
-          const data = JSON.parse(ev.data) as unknown;
-          if (isRealtimeDebugEnabled()) {
-            console.debug('[realtime] sse-event', data);
-          }
-          const qc = queryClientRef.current;
-          if (isReportEvent(data)) {
-            if (data.type === 'report_created') {
-              emitNewReportSignal(data.reportId);
-              sseCtxRef.current?.showRefreshToast('New report received');
+      if (abortRef.current) {
+        abortRef.current.abort();
+      }
+      const controller = new AbortController();
+      abortRef.current = controller;
+
+      try {
+        await fetchEventSource(SSE_URL, {
+          signal: controller.signal,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'text/event-stream',
+          },
+          openWhenHidden: false,
+          async onopen(response) {
+            if (response.ok) {
+              retryCountRef.current = 0;
+              ssePostRefreshReconnectsRef.current = 0;
+              sseCtxRef.current?.setConnected(true);
+              if (isRealtimeDebugEnabled()) {
+                console.debug('[realtime] sse-connected', { url: SSE_URL });
+              }
+              return;
             }
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.reportsAll });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-            routerRef.current.refresh();
-          } else if (isNotificationEvent(data)) {
-            const message = data.title
-              ? `New notification: ${data.title}`
-              : 'New notification';
-            sseCtxRef.current?.showRefreshToast(message);
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.notifications });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-            routerRef.current.refresh();
-          } else if (isSiteEvent(data)) {
-            sseCtxRef.current?.showRefreshToast(
-              data.type === 'site_created' ? 'New site created' : 'Site updated',
-            );
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesAll });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesStats });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-            routerRef.current.refresh();
-          } else if (isUserEvent(data)) {
-            sseCtxRef.current?.showRefreshToast(
-              data.type === 'user_created' ? 'New user registered' : 'User updated',
-            );
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.usersAll });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.usersStats });
-            void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
-            routerRef.current.refresh();
-          }
-        } catch {
-          // Ignore parse errors (e.g. heartbeat)
+            if (response.status === 401) {
+              const refreshed = await refreshAdminAccessTokenInBrowser();
+              if (refreshed) {
+                sseCtxRef.current?.setConnected(false);
+                throw new SSEAuthRefreshedError();
+              }
+              throw new Error('Unauthorized');
+            }
+            if (response.status === 403) {
+              throw new Error('Unauthorized');
+            }
+            throw new Error(`SSE connection failed: ${response.status}`);
+          },
+          onmessage(ev) {
+            try {
+              const data = JSON.parse(ev.data) as unknown;
+              if (isRealtimeDebugEnabled()) {
+                console.debug('[realtime] sse-event', data);
+              }
+              const qc = queryClientRef.current;
+              if (isReportEvent(data)) {
+                if (data.type === 'report_created') {
+                  emitNewReportSignal(data.reportId);
+                  sseCtxRef.current?.showRefreshToast('New report received');
+                }
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.reportsAll });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                routerRef.current.refresh();
+              } else if (isNotificationEvent(data)) {
+                const message = data.title
+                  ? `New notification: ${data.title}`
+                  : 'New notification';
+                sseCtxRef.current?.showRefreshToast(message);
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.notifications });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                routerRef.current.refresh();
+              } else if (isSiteEvent(data)) {
+                sseCtxRef.current?.showRefreshToast(
+                  data.type === 'site_created' ? 'New site created' : 'Site updated',
+                );
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesAll });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.sitesStats });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                routerRef.current.refresh();
+              } else if (isUserEvent(data)) {
+                sseCtxRef.current?.showRefreshToast(
+                  data.type === 'user_created' ? 'New user registered' : 'User updated',
+                );
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.usersAll });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.usersStats });
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                routerRef.current.refresh();
+              }
+            } catch {
+              // Ignore parse errors (e.g. heartbeat)
+            }
+          },
+          onerror(err) {
+            if (err instanceof SSEAuthRefreshedError) {
+              throw err;
+            }
+            if (err instanceof Error && err.message === 'Unauthorized') {
+              throw err;
+            }
+            if (retryCountRef.current >= MAX_RETRIES) {
+              throw err;
+            }
+            retryCountRef.current += 1;
+            return getRetryDelayMs(retryCountRef.current);
+          },
+        });
+      } catch (err) {
+        sseCtxRef.current?.setConnected(false);
+        if (err instanceof SSEAuthRefreshedError && ssePostRefreshReconnectsRef.current < 3) {
+          ssePostRefreshReconnectsRef.current += 1;
+          setTimeout(() => connect(), 0);
         }
-      },
-      onerror(err) {
-        if (err instanceof Error && err.message === 'Unauthorized') {
-          throw err;
-        }
-        if (retryCountRef.current >= MAX_RETRIES) {
-          throw err;
-        }
-        retryCountRef.current += 1;
-        return getRetryDelayMs(retryCountRef.current);
-      },
-    }).catch(() => {
-      sseCtxRef.current?.setConnected(false);
-      // Connection closed or fatal error - will reconnect on visibility change
-    });
+      }
+    })();
   }, []);
 
   useEffect(() => {

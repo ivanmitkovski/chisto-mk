@@ -187,6 +187,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportReviewAfterSubmitIncomplete => 'Finish steps above.';
 
   @override
+  String get reportSubmitSentPending => 'Sent';
+
+  @override
   String get semanticsClose => 'Close';
 
   @override

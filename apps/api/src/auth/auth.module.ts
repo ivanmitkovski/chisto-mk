@@ -34,6 +34,7 @@ import { GamificationModule } from '../gamification/gamification.module';
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy, RolesGuard],
-  exports: [AuthService, RolesGuard],
+  // Re-export AuditModule so RolesGuard (AuditService) resolves in every feature module that uses @UseGuards(RolesGuard).
+  exports: [AuthService, RolesGuard, AuditModule],
 })
 export class AuthModule {}

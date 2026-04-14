@@ -137,22 +137,55 @@ export class ReportsUploadService {
   }
 
   /**
+   * Turns DB values into the canonical virtual-hosted HTTPS URL for this bucket.
+   * Bare object keys (e.g. `reports/{userId}/{uuid}.jpg`) become loadable URLs;
+   * existing `http(s)://` values are returned unchanged.
+   */
+  normalizeReportMediaRefToCanonicalHttpsUrl(ref: string): string {
+    const t = ref.trim();
+    if (!t) {
+      return t;
+    }
+    if (t.startsWith('http://') || t.startsWith('https://')) {
+      return t;
+    }
+    if (!this.bucket) {
+      return t;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    const key = t.replace(/^\//, '');
+    return `${base}${key}`;
+  }
+
+  /**
    * Converts S3 object URLs to presigned URLs (1h expiry) so clients can load
    * private objects. Non-S3 URLs are returned unchanged.
    */
   async signUrls(urls: string[]): Promise<string[]> {
-    if (!this.enabled || !this.s3 || !this.bucket || !urls?.length) {
-      return urls ?? [];
+    if (!urls?.length) {
+      return [];
+    }
+    if (!this.enabled || !this.s3 || !this.bucket) {
+      return urls
+        .filter((u): u is string => typeof u === 'string')
+        .map((u) => this.normalizeReportMediaRefToCanonicalHttpsUrl(u.trim()));
     }
     const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
     const now = Date.now();
     const result: string[] = [];
     for (const url of urls) {
-      if (typeof url !== 'string' || !url.startsWith(base)) {
-        result.push(url);
+      if (typeof url !== 'string') {
         continue;
       }
-      const key = decodeURIComponent(url.slice(base.length).split('?')[0]);
+      const canonical = this.normalizeReportMediaRefToCanonicalHttpsUrl(url.trim());
+      if (!canonical) {
+        continue;
+      }
+      if (!canonical.startsWith(base)) {
+        result.push(canonical);
+        continue;
+      }
+      const key = decodeURIComponent(canonical.slice(base.length).split('?')[0]);
       const cacheHit = this.signedUrlCache.get(key);
       if (cacheHit && cacheHit.expiresAt > now) {
         result.push(cacheHit.url);
@@ -171,7 +204,7 @@ export class ReportsUploadService {
         });
         result.push(signed);
       } catch {
-        result.push(url);
+        result.push(canonical);
       }
     }
     return result;

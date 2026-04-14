@@ -56,6 +56,7 @@
   "reportReviewBannerAfterSubmitTitle": "Pas dërgimit",
   "reportReviewAfterSubmitReady": "Moderim para publikimit. Status te Raportet e mia.",
   "reportReviewAfterSubmitIncomplete": "Përfundo hapat më sipër.",
+  "reportSubmitSentPending": "Dërguar",
   "semanticsClose": "Mbyll",
   "semanticsAboutStep": "Rreth {title}",
   "@semanticsAboutStep": {

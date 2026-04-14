@@ -532,27 +532,35 @@ class _NewReportScreenState extends State<NewReportScreen> {
         }
       }
       if (!mounted) return;
-      if (!mounted) return;
       ServiceLocator.instance.profileNeedsRefresh.value++;
-      setState(() {
-        _submitting = false;
-        _submitPhase = null;
-      });
-      final Object? dialogResult = await showDialog<Object>(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return ReportSubmittedDialog(
-            categoryLabel:
-                _draft.category?.label ?? context.l10n.reportSubmittedFallbackCategory,
-            reportNumber: result.reportNumber,
-            reportId: result.reportId,
-            address: _draft.address,
-            pointsAwarded: result.pointsAwarded,
-            isNewSite: result.isNewSite,
-          );
-        },
-      );
+      // Keep _submitting true until the success dialog closes so the primary
+      // control cannot fire a second submission (matches disabled post-action UX).
+      setState(() => _submitPhase = 'sent');
+      Object? dialogResult;
+      try {
+        dialogResult = await showDialog<Object>(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return ReportSubmittedDialog(
+              categoryLabel:
+                  _draft.category?.label ?? context.l10n.reportSubmittedFallbackCategory,
+              reportNumber: result.reportNumber,
+              reportId: result.reportId,
+              address: _draft.address,
+              pointsAwarded: result.pointsAwarded,
+              isNewSite: result.isNewSite,
+            );
+          },
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _submitting = false;
+            _submitPhase = null;
+          });
+        }
+      }
       if (!mounted) return;
       if (dialogResult == SubmittedDialogResult.reportAnother) {
         _resetDraftAndStartOver();
@@ -1490,6 +1498,25 @@ class _NewReportScreenState extends State<NewReportScreen> {
   Widget _buildBottomBar(BuildContext context) {
     final bool showBack = _currentStage != ReportStage.evidence;
     final bool isReviewStage = _currentStage == ReportStage.review;
+    final bool primaryLocked = _submitting;
+    final String primaryLabel = _submitting
+        ? (_submitPhase == 'creating'
+            ? 'Creating…'
+            : _submitPhase == 'uploading'
+                ? 'Uploading…'
+                : _submitPhase == 'sent'
+                    ? context.l10n.reportSubmitSentPending
+                    : 'Submitting…')
+        : _currentStage.config(context.l10n).primaryActionLabel;
+    final String primarySemanticsLabel = isReviewStage
+        ? (_submitting
+            ? (_submitPhase == 'sent'
+                ? context.l10n.reportSubmittedSemanticsSuccess
+                : 'Submit report')
+            : 'Submit report')
+        : context.l10n.semanticsNextStep(
+            _currentStage.config(context.l10n).shortLabel,
+          );
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -1506,7 +1533,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 button: true,
                 label: context.l10n.commonBack,
                 child: OutlinedButton(
-                  onPressed: _submitting
+                  onPressed: primaryLocked
                       ? null
                       : () => _goToStage(
                             ReportStage.values[_currentStageIndex - 1],
@@ -1538,16 +1565,16 @@ class _NewReportScreenState extends State<NewReportScreen> {
             flex: showBack ? 2 : 1,
             child: Semantics(
               button: true,
-              label: isReviewStage
-                  ? 'Submit report'
-                  : context.l10n.semanticsNextStep(
-                      _currentStage.config(context.l10n).shortLabel,
-                    ),
-              hint: isReviewStage ? 'Double-tap to submit' : 'Double-tap to go to next step.',
+              label: primarySemanticsLabel,
+              hint: primaryLocked
+                  ? null
+                  : (isReviewStage
+                      ? 'Double-tap to submit'
+                      : 'Double-tap to go to next step.'),
               child: SizedBox(
                 height: 52,
                 child: FilledButton(
-                  onPressed: _submitting ? null : _handlePrimaryAction,
+                  onPressed: primaryLocked ? null : _handlePrimaryAction,
                   style: FilledButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: AppColors.white,
@@ -1562,13 +1589,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Text(
-                      _submitting
-                          ? (_submitPhase == 'creating'
-                              ? 'Creating…'
-                              : _submitPhase == 'uploading'
-                                  ? 'Uploading…'
-                                  : 'Submitting…')
-                          : _currentStage.config(context.l10n).primaryActionLabel,
+                      primaryLabel,
                       style: Theme.of(context).textTheme.labelLarge?.copyWith(
                             fontWeight: FontWeight.w600,
                             letterSpacing: -0.2,

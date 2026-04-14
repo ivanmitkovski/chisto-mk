@@ -203,6 +203,7 @@
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				110AD4DC1FEE748755570E99 /* [CP] Embed Pods Frameworks */,
 				49E43E607DDF3CE084B5DC10 /* [CP] Copy Pods Resources */,
+				C5F8E1022EC600E100B2A901 /* Re-sign sqlite3.framework */,
 			);
 			buildRules = (
 			);
@@ -344,6 +345,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C5F8E1022EC600E100B2A901 /* Re-sign sqlite3.framework */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Re-sign sqlite3.framework";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [ \"${PLATFORM_NAME}\" != \"iphoneos\" ]; then\n  exit 0\nfi\nFRAMEWORK=\"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/Frameworks/sqlite3.framework\"\nif [ ! -d \"${FRAMEWORK}\" ]; then\n  exit 0\nfi\nif [ -z \"${EXPANDED_CODE_SIGN_IDENTITY:-}\" ] || [ \"${EXPANDED_CODE_SIGN_IDENTITY}\" = \"-\" ]; then\n  echo \"note: Re-sign sqlite3.framework skipped (no signing identity)\"\n  exit 0\nfi\necho \"note: Re-signing sqlite3.framework with ${EXPANDED_CODE_SIGN_IDENTITY}\"\n/usr/bin/codesign --force --sign \"${EXPANDED_CODE_SIGN_IDENTITY}\" --timestamp=none \"${FRAMEWORK}\"\n";
 			showEnvVarsInLog = 0;
 		};
 		9740EEB61CF901F6004384FC /* Run Script */ = {

@@ -1,14 +1,70 @@
 import { apiFetch } from '@/lib/api';
 import { getApiBaseUrl } from '@/lib/api-base-url';
-import type { AdminLoginResponse, AuthResponse } from './types';
-import { is2FAResponse } from './types';
-
-export { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY } from './auth-constants';
-
 import {
   ADMIN_AUTH_COOKIE_KEY,
   ADMIN_REFRESH_COOKIE_KEY,
 } from './auth-constants';
+import type { AdminLoginResponse, AuthResponse } from './types';
+import { is2FAResponse } from './types';
+
+export { ADMIN_AUTH_COOKIE_KEY, ADMIN_REFRESH_COOKIE_KEY };
+
+const DEFAULT_ACCESS_REFRESH_SKEW_MS = 60_000;
+
+function decodeJwtPayloadJson(token: string): Record<string, unknown> | null {
+  const parts = token.split('.');
+  if (parts.length < 2) return null;
+  try {
+    const segment = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+    const pad = segment.length % 4 === 0 ? '' : '='.repeat(4 - (segment.length % 4));
+    const json = atob(segment + pad);
+    const parsed: unknown = JSON.parse(json);
+    return typeof parsed === 'object' && parsed !== null ? (parsed as Record<string, unknown>) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Milliseconds since Unix epoch for access JWT `exp`, or null if missing or invalid. */
+export function getAdminAccessTokenExpiryMs(token: string): number | null {
+  const payload = decodeJwtPayloadJson(token);
+  if (!payload) return null;
+  const exp = payload.exp;
+  return typeof exp === 'number' ? exp * 1000 : null;
+}
+
+/**
+ * True when the access token is expired or within `skewMs` of expiry (requires a parseable `exp`).
+ * Used to refresh before browser-side fetches/SSE that would otherwise send a stale JWT.
+ */
+export function shouldProactivelyRefreshAdminAccessToken(
+  token: string,
+  skewMs: number = DEFAULT_ACCESS_REFRESH_SKEW_MS,
+): boolean {
+  const expMs = getAdminAccessTokenExpiryMs(token);
+  if (expMs == null) return false;
+  return Date.now() >= expMs - skewMs;
+}
+
+/**
+ * Exchanges the refresh cookie for new tokens and updates `document.cookie`.
+ * Returns the new access token, or null if refresh is not possible or fails.
+ */
+export async function refreshAdminAccessTokenInBrowser(): Promise<string | null> {
+  if (typeof document === 'undefined') return null;
+  const refreshToken = getAdminRefreshFromBrowserCookie();
+  if (!refreshToken) return null;
+  try {
+    const response = await apiFetch<AuthResponse>('/auth/refresh', {
+      method: 'POST',
+      body: { refreshToken },
+    });
+    setAuthCookies(response);
+    return response.accessToken;
+  } catch {
+    return null;
+  }
+}
 
 /** Client-side only: reads the admin token from document.cookie. Returns null if not found or not in browser. */
 export function getAdminTokenFromBrowserCookie(): string | null {
