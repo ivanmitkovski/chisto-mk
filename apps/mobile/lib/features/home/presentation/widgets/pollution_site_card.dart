@@ -1060,12 +1060,6 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
       return;
     }
 
-    final List<String> names = <String>[
-      'Community supporter',
-      'Local resident',
-      'Verified citizen',
-    ];
-
     await showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
@@ -1092,8 +1086,7 @@ class _PollutionSiteCardState extends State<PollutionSiteCard> {
               ),
               clipBehavior: Clip.antiAlias,
               child: UpvotersSheetContent(
-                count: count,
-                names: names,
+                siteId: widget.site.id,
                 scrollController: scrollController,
               ),
             );

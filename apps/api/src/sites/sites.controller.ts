@@ -28,12 +28,14 @@ import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/optional-jwt-auth.guard';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { ListSiteCommentsQueryDto } from './dto/list-site-comments-query.dto';
 import { ListSiteMediaQueryDto } from './dto/list-site-media-query.dto';
+import { ListSiteUpvotesQueryDto } from './dto/list-site-upvotes-query.dto';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
 import { ShareSiteDto } from './dto/share-site.dto';
@@ -68,8 +70,9 @@ export class SitesController {
   }
 
   @Get()
-  @UseGuards(ThrottlerGuard)
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
   @Throttle({ default: { limit: 90, ttl: 60_000 } })
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List sites with optional filters' })
   @ApiOkResponse({ description: 'Sites fetched successfully' })
   findAll(@Query() query: ListSitesQueryDto, @CurrentUser() user?: AuthenticatedUser) {
@@ -164,6 +167,8 @@ export class SitesController {
   }
 
   @Get(':id')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get site details with reports' })
   @ApiOkResponse({ description: 'Site fetched successfully' })
   findOne(@Param('id') id: string, @CurrentUser() user?: AuthenticatedUser) {
@@ -181,6 +186,8 @@ export class SitesController {
   }
 
   @Get(':id/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get comments for site' })
   @ApiOkResponse({ description: 'Site comments fetched successfully' })
   findComments(
@@ -189,6 +196,13 @@ export class SitesController {
     @CurrentUser() user?: AuthenticatedUser,
   ) {
     return this.sitesService.findSiteComments(id, query, user);
+  }
+
+  @Get(':id/upvotes')
+  @ApiOperation({ summary: 'List users who upvoted this site' })
+  @ApiOkResponse({ description: 'Site upvotes fetched successfully' })
+  findUpvotes(@Param('id') id: string, @Query() query: ListSiteUpvotesQueryDto) {
+    return this.sitesService.findSiteUpvotes(id, query);
   }
 
   @Post(':id/comments')

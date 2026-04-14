@@ -28,11 +28,24 @@ class EventsFilterSheet extends StatefulWidget {
     BuildContext context, {
     required EcoEventSearchParams current,
   }) {
+    // Modal overlay routes often report zero top viewPadding; use the caller's
+    // MediaQuery so the sheet clears the status bar / Dynamic Island / notch.
+    final double topInset = MediaQuery.viewPaddingOf(context).top + AppSpacing.sm;
+    final double bottomInset = MediaQuery.paddingOf(context).bottom + AppSpacing.sm;
     return showModalBottomSheet<EcoEventSearchParams>(
       context: context,
       isScrollControlled: true,
+      useSafeArea: false,
       backgroundColor: AppColors.transparent,
-      builder: (_) => EventsFilterSheet(current: current),
+      builder: (_) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          AppSpacing.sm,
+          topInset,
+          AppSpacing.sm,
+          bottomInset,
+        ),
+        child: EventsFilterSheet(current: current),
+      ),
     );
   }
 
@@ -154,11 +167,6 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
       container: true,
       label: context.l10n.eventsFilterSheetSemantic,
       child: Container(
-        margin: EdgeInsets.only(
-          left: AppSpacing.sm,
-          right: AppSpacing.sm,
-          bottom: MediaQuery.paddingOf(context).bottom + AppSpacing.sm,
-        ),
         decoration: BoxDecoration(
           color: AppColors.appBackground,
           borderRadius: BorderRadius.circular(AppSpacing.radiusXl),

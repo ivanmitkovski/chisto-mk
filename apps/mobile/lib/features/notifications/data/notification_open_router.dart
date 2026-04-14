@@ -13,8 +13,11 @@ class NotificationOpenRouter {
     final String? siteId = data['siteId'] as String?;
 
     if (siteId != null && siteId.isNotEmpty) {
-      Navigator.of(context).pushNamed(AppRoutes.home, arguments: 0);
-      NotificationOpenDiagnostics.recordOpenSuccess('push_site');
+      Navigator.of(context).pushNamed(
+        AppRoutes.homeMapFocus,
+        arguments: MapSiteFocusRouteArgs(siteId: siteId),
+      );
+      NotificationOpenDiagnostics.recordOpenSuccess('push_site_map_focus');
       return;
     }
 
@@ -69,6 +72,16 @@ class NotificationOpenRouter {
   ) {
     NotificationOpenDiagnostics.recordOpenAttempt('push_data');
     final String? type = data['type'] as String?;
+    final String? siteId = data['siteId'] as String?;
+
+    if (siteId != null && siteId.isNotEmpty) {
+      Navigator.of(context).pushNamed(
+        AppRoutes.homeMapFocus,
+        arguments: MapSiteFocusRouteArgs(siteId: siteId),
+      );
+      NotificationOpenDiagnostics.recordOpenSuccess('data_site_map_focus');
+      return;
+    }
 
     switch (type) {
       case 'CLEANUP_EVENT':

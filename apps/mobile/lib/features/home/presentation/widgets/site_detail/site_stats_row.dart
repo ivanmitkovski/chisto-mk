@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -69,20 +70,16 @@ class SiteStatsRow extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 _StatChip(
-                  iconWidget: Icon(
-                    site.coReporterNames.isNotEmpty
-                        ? Icons.person_add_alt_1_rounded
-                        : Icons.groups_rounded,
+                  iconWidget: const Icon(
+                    Icons.groups_rounded,
                     size: 16,
                     color: AppColors.textMuted,
                   ),
-                  label: site.coReporterNames.isNotEmpty
-                      ? '${site.coReporterNames.length} co-reporters'
-                      : '${site.participantCount}',
+                  label: '${site.siteParticipantStatsBadgeValue}',
                   color: AppColors.textMuted,
-                  semanticsLabel: site.coReporterNames.isNotEmpty
-                      ? '${site.coReporterNames.length} co-reporters for this site'
-                      : '${site.participantCount} people for this site',
+                  semanticsLabel: context.l10n.siteParticipantStatsSemantic(
+                    site.siteParticipantStatsBadgeValue,
+                  ),
                   onTap: onParticipantsTap,
                 ),
               ],

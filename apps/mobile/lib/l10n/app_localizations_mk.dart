@@ -1170,7 +1170,7 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportPhotoUploadFailedBody =>
-      'Пријавата е испратена. Допрете Обиди повторно за да ги прикачите фотографиите или Прескокни за да продолжите.';
+      'Фотографиите не можеа да се прикачат. Допрете Обиди повторно или Прескокни за да испратите без фотографии.';
 
   @override
   String get reportReviewEvidenceTitle => 'Докази';
@@ -2973,6 +2973,29 @@ class AppLocalizationsMk extends AppLocalizations {
   String get siteDetailNoUpvotesSnack => 'Сè уште нема поддршка. Бидете први!';
 
   @override
+  String get siteUpvotersSheetTitle => 'Поддржувачи';
+
+  @override
+  String get siteUpvotersSupportingLabel => 'Поддржува';
+
+  @override
+  String siteUpvotersSupportersCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count поддржувачи',
+      one: '1 поддржувач',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get siteUpvotersLoadFailed => 'Не успеа вчитувањето на поддржувачите.';
+
+  @override
+  String get siteUpvotersRetry => 'Обиди се повторно';
+
+  @override
   String get siteDetailNoVolunteersSnack =>
       'Сè уште нема волонтери за оваа локација.';
 
@@ -2982,6 +3005,36 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get siteDetailOpenMapsFailedSnack => 'Не можеше да се отвори Maps';
+
+  @override
+  String get siteDetailNoCoReportersSnack =>
+      'Сè уште нема други учесници. Заеднички известувачи се појавуваат кога некој друг ќе пријави исто место.';
+
+  @override
+  String siteStatsCoReportersSemantic(int count) {
+    return '$count заеднички известувачи на оваа пријава';
+  }
+
+  @override
+  String siteParticipantStatsSemantic(int count) {
+    return '$count учесници (заеднички известувачи или споени дупликати)';
+  }
+
+  @override
+  String get siteMergedDuplicatesModalTitle => 'Споени дупликат-пријави';
+
+  @override
+  String siteMergedDuplicatesModalBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count слични пријави се споени во оваа. Кога некој друг ќе пријави исто место, се појавува како заеднички известувач.',
+      one:
+          'Една слична пријава е споена во оваа. Кога некој друг ќе пријави исто место, се појавува како заеднички известувач.',
+    );
+    return '$_temp0';
+  }
 
   @override
   String get siteCardUpvoteFailedSnack =>

@@ -165,12 +165,51 @@ class ApiClient {
     }
   }
 
+  Future<ApiResponse> multipartPostWithRetry(
+    String path, {
+    required List<MultipartFileData> files,
+    Map<String, String>? fields,
+    Duration? timeout,
+  }) async {
+    try {
+      return await multipartPost(
+        path,
+        files: files,
+        fields: fields,
+        timeout: timeout,
+      );
+    } on AppError catch (e) {
+      if (e.code != 'UNAUTHORIZED' ||
+          _authPaths.contains(path) ||
+          refreshSession == null ||
+          _refreshing) {
+        rethrow;
+      }
+      _refreshing = true;
+      try {
+        final bool refreshed = await refreshSession!();
+        if (!refreshed) rethrow;
+      } on Exception catch (_) {
+        rethrow;
+      } finally {
+        _refreshing = false;
+      }
+      return await multipartPost(
+        path,
+        files: files,
+        fields: fields,
+        timeout: timeout,
+      );
+    }
+  }
+
   Future<ApiResponse> multipartPost(
     String path, {
     required List<MultipartFileData> files,
     Map<String, String>? fields,
     void Function(int sent, int total)? onSendProgress,
     bool Function()? isCancelled,
+    Duration? timeout,
   }) async {
     final Uri url = Uri.parse('$_baseUrl$path');
     final http.MultipartRequest request = http.MultipartRequest('POST', url);
@@ -210,8 +249,9 @@ class ApiClient {
     }
 
     try {
+      final Duration effectiveTimeout = timeout ?? _timeout;
       final http.StreamedResponse streamed =
-          await request.send().timeout(_timeout);
+          await request.send().timeout(effectiveTimeout);
       final http.Response response = await http.Response.fromStream(streamed);
       return _handleResponse(response);
     } on TimeoutException catch (e) {

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
@@ -9,6 +10,13 @@ import 'package:path_provider/path_provider.dart';
 
 /// Shared client improves parallel tile fetches (connection reuse) on slow links.
 final http.Client _mapTileHttpClient = http.Client();
+
+/// 1×1 transparent PNG — valid image so [MultiFrameImageStreamCompleter] never sees a hard failure.
+final Uint8List _kFallbackMapTilePng = Uint8List.fromList(
+  base64Decode(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==',
+  ),
+);
 
 TileProvider? createCachedTileProvider({int maxStaleDays = 30}) =>
     _CachedTileProvider(maxStaleDays: maxStaleDays);
@@ -142,7 +150,10 @@ class _CachedTileImageProvider
       } catch (_) {}
     }
 
-    throw StateError('Tile load failed: $url');
+    // Network/cache miss: return a blank tile instead of throwing (avoids Image resource red screen).
+    final ui.ImmutableBuffer buffer =
+        await ui.ImmutableBuffer.fromUint8List(_kFallbackMapTilePng);
+    return decode(buffer);
   }
 
   @override

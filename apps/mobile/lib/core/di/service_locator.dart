@@ -151,7 +151,10 @@ class ServiceLocator {
       config: _config!,
       authState: _authState!,
     );
-    _sitesRepository = ApiSitesRepository(client: _apiClient!);
+    _sitesRepository = ApiSitesRepository(
+      client: _apiClient!,
+      authState: _authState!,
+    );
     _eventAnalyticsRepository = ApiEventAnalyticsRepository(client: _apiClient!);
     _eventChatRepository = ApiEventChatRepository(
       client: _apiClient!,

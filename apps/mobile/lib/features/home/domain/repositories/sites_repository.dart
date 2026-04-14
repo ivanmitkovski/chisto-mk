@@ -48,6 +48,11 @@ abstract class SitesRepository {
     String sort = 'top',
     String? parentId,
   });
+  Future<SiteUpvotesResult> getSiteUpvotes(
+    String id, {
+    int page = 1,
+    int limit = 20,
+  });
   Future<SiteCommentItem> createSiteComment(
     String id,
     String body, {
@@ -221,4 +226,34 @@ class SiteMediaItem {
   final String reportId;
   final String url;
   final DateTime createdAt;
+}
+
+class SiteUpvotesResult {
+  const SiteUpvotesResult({
+    required this.items,
+    required this.page,
+    required this.limit,
+    required this.total,
+    required this.hasMore,
+  });
+
+  final List<SiteUpvoterItem> items;
+  final int page;
+  final int limit;
+  final int total;
+  final bool hasMore;
+}
+
+class SiteUpvoterItem {
+  const SiteUpvoterItem({
+    required this.userId,
+    required this.displayName,
+    this.avatarUrl,
+    required this.upvotedAt,
+  });
+
+  final String userId;
+  final String displayName;
+  final String? avatarUrl;
+  final DateTime upvotedAt;
 }

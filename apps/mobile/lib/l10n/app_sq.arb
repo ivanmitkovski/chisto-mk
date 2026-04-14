@@ -539,7 +539,7 @@
   "reportFinishStepsSnack": "Përfundo hapat që mungojnë para dërgimit.",
   "reportSubmittedPartialUploadSnack": "Raporti u dërgua. Fotot nuk u ngarkuan.",
   "reportPhotoUploadFailedTitle": "Ngarkimi i fotove dështoi",
-  "reportPhotoUploadFailedBody": "Raporti u dërgua. Prek Provo përsëri për të ngarkuar fotot ose Anashkalo për të vazhduar.",
+  "reportPhotoUploadFailedBody": "Fotot nuk u ngarkuan. Prek Provo përsëri ose Anashkalo për të dërguar pa foto.",
   "reportReviewEvidenceTitle": "Provat",
   "reportReviewPhotoCount": "{count, plural, one{{count} foto} other{{count} foto}}",
   "@reportReviewPhotoCount": {
@@ -1419,9 +1419,47 @@
   "siteDetailThankYouReportSnack": "Faleminderit. Raporti yt na ndihmon.",
   "siteDetailUpvoteFailedSnack": "Nuk u përditësua vota. Provo përsëri.",
   "siteDetailNoUpvotesSnack": "Ende pa vota. Bëhu i pari që e mbështet!",
+  "siteUpvotersSheetTitle": "Mbështetësit",
+  "siteUpvotersSupportingLabel": "Po e mbështet",
+  "siteUpvotersSupportersCount": "{count, plural, one{1 mbështetës} other{{count} mbështetës}}",
+  "@siteUpvotersSupportersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteUpvotersLoadFailed": "Nuk u ngarkuan mbështetësit.",
+  "siteUpvotersRetry": "Provo përsëri",
   "siteDetailNoVolunteersSnack": "Ende pa vullnetarë për këtë vend.",
   "siteDetailDirectionsUnavailableSnack": "Udhëzimet nuk janë të disponueshme për këtë vend.",
   "siteDetailOpenMapsFailedSnack": "Nuk u hap Hartat",
+  "siteDetailNoCoReportersSnack": "Ende nuk ka kontribues të tjerë. Bashkëraportuesit shfaqen kur dikush tjetër raporton të njëjtin vend.",
+  "siteStatsCoReportersSemantic": "{count} bashkëraportues për këtë raport",
+  "@siteStatsCoReportersSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteParticipantStatsSemantic": "{count} për kontribues (bashkëraportues ose raporte të përbashkëta të dyfishta)",
+  "@siteParticipantStatsSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteMergedDuplicatesModalTitle": "Raporte të dyfishta të bashkuara",
+  "siteMergedDuplicatesModalBody": "{count, plural, one{Një paraqitje e ngjashme u bashkua në këtë raport. Kur dikush tjetër raporton të njëjtin vend, shfaqet si bashkëraportues.} other{{count} paraqitje të ngjashme u bashkuan në këtë raport. Kur dikush tjetër raporton të njëjtin vend, shfaqen si bashkëraportues.}}",
+  "@siteMergedDuplicatesModalBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteCardUpvoteFailedSnack": "Nuk u përditësua vota. Provo përsëri.",
   "siteCardSavedFailedSnack": "Nuk u përditësua ruajtja. Provo përsëri.",
   "siteCardTakeActionSemantic": "Ndërmerr veprim",

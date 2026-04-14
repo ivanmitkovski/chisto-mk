@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'cleaning_event.dart';
+import 'co_reporter_profile.dart';
 import 'comment.dart';
 import 'site_report.dart';
 
@@ -27,6 +28,8 @@ class PollutionSite {
     this.pollutionType,
     this.firstReport,
     List<String>? coReporterNames,
+    List<CoReporterProfile>? coReporterProfiles,
+    this.mergedDuplicateChildCountTotal = 0,
     this.latitude,
     this.longitude,
     this.feedReasons = const <String>[],
@@ -36,7 +39,8 @@ class PollutionSite {
     this.latestReporterAvatarUrl,
     this.latestReportAt,
     this.latestReporterUserId,
-  }) : coReporterNames = coReporterNames ?? const [];
+  }) : coReporterNames = coReporterNames ?? const [],
+       coReporterProfiles = coReporterProfiles ?? const [];
 
   final String id;
   final String title;
@@ -68,13 +72,17 @@ class PollutionSite {
     return imgs;
   }
 
-  /// Number of comments (convenience for UI).
-  int get commentCount => comments.isNotEmpty ? comments.length : commentsCount;
-
   final String? urgencyLabel;
   final String? pollutionType;
   final SiteReport? firstReport;
   final List<String> coReporterNames;
+
+  /// Richer co-reporter rows when the API returns avatars (GET /sites/:id `coReporterSummaries`).
+  final List<CoReporterProfile> coReporterProfiles;
+
+  /// Duplicate child reports merged into site reports (same or other reporters); from GET /sites/:id.
+  final int mergedDuplicateChildCountTotal;
+
   final double? latitude;
   final double? longitude;
   final List<String> feedReasons;
@@ -88,6 +96,23 @@ class PollutionSite {
 
   /// When non-null, matches [User.id] of [latestReporterName] (feed: `latestReportReporterId`).
   final String? latestReporterUserId;
+
+  /// Number of comments (convenience for UI).
+  int get commentCount => comments.isNotEmpty ? comments.length : commentsCount;
+
+  /// Stats chip (groups icon): co-reporter count, or merged duplicate count when there are no other reporters.
+  int get siteParticipantStatsBadgeValue =>
+      coReporterNames.isNotEmpty ? coReporterNames.length : mergedDuplicateChildCountTotal;
+
+  /// Modal / list: prefer [coReporterProfiles] when it carries avatars; otherwise fall back to [coReporterNames].
+  List<CoReporterProfile> get displayCoReporterProfiles {
+    if (coReporterProfiles.isNotEmpty) {
+      return coReporterProfiles;
+    }
+    return coReporterNames
+        .map((String n) => CoReporterProfile(displayName: n))
+        .toList();
+  }
 
   PollutionSite copyWith({
     String? id,
@@ -111,6 +136,8 @@ class PollutionSite {
     String? pollutionType,
     SiteReport? firstReport,
     List<String>? coReporterNames,
+    List<CoReporterProfile>? coReporterProfiles,
+    int? mergedDuplicateChildCountTotal,
     double? latitude,
     double? longitude,
     List<String>? feedReasons,
@@ -143,6 +170,9 @@ class PollutionSite {
       pollutionType: pollutionType ?? this.pollutionType,
       firstReport: firstReport ?? this.firstReport,
       coReporterNames: coReporterNames ?? this.coReporterNames,
+      coReporterProfiles: coReporterProfiles ?? this.coReporterProfiles,
+      mergedDuplicateChildCountTotal:
+          mergedDuplicateChildCountTotal ?? this.mergedDuplicateChildCountTotal,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       feedReasons: feedReasons ?? this.feedReasons,

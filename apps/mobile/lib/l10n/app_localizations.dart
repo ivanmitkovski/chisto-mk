@@ -2137,7 +2137,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportPhotoUploadFailedBody.
   ///
   /// In en, this message translates to:
-  /// **'Report was submitted. Tap Retry to upload your photos, or Skip to continue.'**
+  /// **'Photos could not be uploaded. Tap Retry to try again, or Skip to submit without photos.'**
   String get reportPhotoUploadFailedBody;
 
   /// No description provided for @reportReviewEvidenceTitle.
@@ -5080,6 +5080,36 @@ abstract class AppLocalizations {
   /// **'No upvotes yet. Be the first to support this site!'**
   String get siteDetailNoUpvotesSnack;
 
+  /// No description provided for @siteUpvotersSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upvoters'**
+  String get siteUpvotersSheetTitle;
+
+  /// No description provided for @siteUpvotersSupportingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting'**
+  String get siteUpvotersSupportingLabel;
+
+  /// No description provided for @siteUpvotersSupportersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 supporter} other{{count} supporters}}'**
+  String siteUpvotersSupportersCount(int count);
+
+  /// No description provided for @siteUpvotersLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load supporters.'**
+  String get siteUpvotersLoadFailed;
+
+  /// No description provided for @siteUpvotersRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get siteUpvotersRetry;
+
   /// No description provided for @siteDetailNoVolunteersSnack.
   ///
   /// In en, this message translates to:
@@ -5097,6 +5127,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not open Maps'**
   String get siteDetailOpenMapsFailedSnack;
+
+  /// No description provided for @siteDetailNoCoReportersSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'No other contributors yet. Co-reporters appear when someone else reports the same place.'**
+  String get siteDetailNoCoReportersSnack;
+
+  /// No description provided for @siteStatsCoReportersSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} co-reporters for this report'**
+  String siteStatsCoReportersSemantic(int count);
+
+  /// No description provided for @siteParticipantStatsSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} for contributors (co-reporters or merged duplicates)'**
+  String siteParticipantStatsSemantic(int count);
+
+  /// No description provided for @siteMergedDuplicatesModalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merged duplicate reports'**
+  String get siteMergedDuplicatesModalTitle;
+
+  /// No description provided for @siteMergedDuplicatesModalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{One similar submission was merged into this report. When someone else reports the same place, they appear as co-reporters.} other{{count} similar submissions were merged into this report. When someone else reports the same place, they appear as co-reporters.}}'**
+  String siteMergedDuplicatesModalBody(int count);
 
   /// No description provided for @siteCardUpvoteFailedSnack.
   ///

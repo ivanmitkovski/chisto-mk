@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
+import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
 import { RolesGuard } from './roles.guard';
 import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
@@ -33,8 +34,8 @@ import { GamificationModule } from '../gamification/gamification.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, OptionalJwtAuthGuard],
   // Re-export AuditModule so RolesGuard (AuditService) resolves in every feature module that uses @UseGuards(RolesGuard).
-  exports: [AuthService, RolesGuard, AuditModule],
+  exports: [AuthService, RolesGuard, OptionalJwtAuthGuard, AuditModule],
 })
 export class AuthModule {}
