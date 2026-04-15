@@ -639,7 +639,15 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     notifyListeners();
 
     try {
-      await _client.postMultipart('/events/$eventId/after-images', imagePaths);
+      final List<String> pathsForUpload = imagePaths
+          .map((String p) => p.trim())
+          .where((String p) => p.isNotEmpty)
+          .where((String p) => !_isHttpOrHttpsUrl(p))
+          .where((String p) => !p.startsWith('assets/'))
+          .toList(growable: false);
+      if (pathsForUpload.isNotEmpty) {
+        await _client.postMultipart('/events/$eventId/after-images', pathsForUpload);
+      }
       final ApiResponse refreshed = await _client.get('/events/$eventId');
       final Map<String, dynamic>? json = refreshed.json;
       if (json != null) {
@@ -658,4 +666,9 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       Error.throwWithStackTrace(AppError.unknown(cause: e), st);
     }
   }
+}
+
+bool _isHttpOrHttpsUrl(String raw) {
+  final String t = raw.trim().toLowerCase();
+  return t.startsWith('http://') || t.startsWith('https://');
 }

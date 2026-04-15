@@ -13,6 +13,7 @@ import 'package:chisto_mobile/features/events/data/events_repository_registry.da
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/cleanup_evidence/cleanup_evidence_widgets.dart';
+import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -24,7 +25,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 
 class EventCleanupEvidenceScreen extends StatefulWidget {
   const EventCleanupEvidenceScreen({
@@ -99,17 +99,6 @@ class _EventCleanupEvidenceScreenState
     apply();
   }
 
-  Future<String> _copyToDocuments(String sourcePath) async {
-    final Directory docs = await getApplicationDocumentsDirectory();
-    final String basename = sourcePath.split('/').last;
-    final String ext = basename.contains('.') ? '.${basename.split('.').last}' : '.jpg';
-    final String name =
-        'after_${widget.eventId}_${DateTime.now().millisecondsSinceEpoch}$ext';
-    final File dest = File('${docs.path}/$name');
-    await File(sourcePath).copy(dest.path);
-    return dest.path;
-  }
-
   Future<void> _pickAfterImages() async {
     final int remaining = _maxAfterImages - _afterImages.length;
     if (remaining <= 0) {
@@ -158,11 +147,17 @@ class _EventCleanupEvidenceScreenState
         return;
       }
 
+      final List<String> prepared =
+          await prepareReportPhotoPathsForUpload(picked);
+      if (!mounted) {
+        deleteReportUploadTempFiles(prepared);
+        return;
+      }
+
       final List<String> next = List<String>.from(_afterImages);
-      for (final XFile file in picked) {
+      for (final String saved in prepared) {
         if (next.length >= _maxAfterImages) break;
-        final String saved = await _copyToDocuments(file.path);
-        if (!next.contains(saved)) {
+        if (saved.trim().isNotEmpty && !next.contains(saved)) {
           next.add(saved);
         }
       }
@@ -304,7 +299,28 @@ class _EventCleanupEvidenceScreenState
       return;
     }
     if (!mounted) return;
-    setState(() => _isSaving = false);
+
+    // Server replaces locals with signed URLs; without syncing, [hasPendingChanges]
+    // stays true vs [event.afterImagePaths] and [PopScope] blocks [Navigator.pop].
+    final List<String> pathsBeforeSync = List<String>.from(_afterImages);
+    setState(() {
+      _isSaving = false;
+      if (changed) {
+        final EcoEvent? fresh = _event;
+        if (fresh != null) {
+          _afterImages = List<String>.from(fresh.afterImagePaths);
+          if (_afterImages.isEmpty) {
+            _selectedIndex = 0;
+          } else {
+            _selectedIndex = _selectedIndex.clamp(0, _afterImages.length - 1);
+          }
+        }
+      }
+    });
+
+    if (changed) {
+      deleteReportUploadTempFiles(pathsBeforeSync);
+    }
 
     AppHaptics.success();
     AppSnack.show(
@@ -314,12 +330,17 @@ class _EventCleanupEvidenceScreenState
           : context.l10n.eventsEvidenceNoChanges,
       type: AppSnackType.success,
     );
-    // Let the success surface paint (and tests observe snack text) before popping.
-    Future<void>.delayed(const Duration(milliseconds: 350), () {
+
+    if (!changed || !mounted) {
+      return;
+    }
+
+    // Pop after rebuild so [PopScope.canPop] reflects synced state.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) {
         return;
       }
-      Navigator.of(context).pop();
+      Navigator.of(context).maybePop();
     });
   }
 

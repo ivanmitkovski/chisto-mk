@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_media_path_image_provider.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -43,9 +42,7 @@ class AfterPhotosGallery extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
             itemBuilder: (BuildContext context, int index) {
               final String path = event.afterImagePaths[index];
-              final bool isAsset = path.startsWith('assets/');
-              final ImageProvider provider =
-                  isAsset ? AssetImage(path) : FileImage(File(path)) as ImageProvider;
+              final ImageProvider provider = eventMediaPathToImageProvider(path);
 
               return Semantics(
                 button: true,
@@ -138,9 +135,7 @@ class _FullscreenGalleryPageState extends State<FullscreenGalleryPage> {
             onPageChanged: (int index) => setState(() => _currentIndex = index),
             itemBuilder: (BuildContext context, int index) {
               final String path = widget.event.afterImagePaths[index];
-              final bool isAsset = path.startsWith('assets/');
-              final ImageProvider provider =
-                  isAsset ? AssetImage(path) : FileImage(File(path)) as ImageProvider;
+              final ImageProvider provider = eventMediaPathToImageProvider(path);
               return InteractiveViewer(
                 child: Center(
                   child: Image(

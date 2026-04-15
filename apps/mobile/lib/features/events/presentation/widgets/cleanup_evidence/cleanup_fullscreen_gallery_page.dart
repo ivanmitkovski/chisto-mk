@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_media_path_image_provider.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 class CleanupFullscreenGalleryPage extends StatelessWidget {
@@ -20,9 +19,7 @@ class CleanupFullscreenGalleryPage extends StatelessWidget {
     final List<GalleryImageItem> items = imagePaths
         .map(
           (String path) => GalleryImageItem(
-            image: path.startsWith('assets/')
-                ? AssetImage(path)
-                : FileImage(File(path)) as ImageProvider,
+            image: eventMediaPathToImageProvider(path),
             heroTag: 'cleanup-evidence-$path',
             semanticLabel: context.l10n.eventsCleanupEvidencePhotoSemantic,
           ),
