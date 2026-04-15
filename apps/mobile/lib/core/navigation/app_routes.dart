@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/location_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
@@ -22,6 +23,7 @@ import 'package:chisto_mobile/features/events/presentation/screens/event_chat_sc
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_checkin_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_dashboard_screen.dart';
+import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -158,10 +160,19 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.otp:
-        final String phoneNumber = settings.arguments is String
-            ? settings.arguments! as String
-            : '+389 70 123 456';
-
+        if (settings.arguments is! String) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.otp expected String phone; got '
+              '${settings.arguments?.runtimeType}. Sending user to sign up.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const SignUpScreen(),
+            settings: settings,
+          );
+        }
+        final String phoneNumber = settings.arguments! as String;
         return MaterialPageRoute<void>(
           builder: (_) => OtpScreen(phoneNumber: phoneNumber),
           settings: settings,
@@ -172,21 +183,38 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.forgotPasswordOtp:
-        final String fpPhoneE164 = settings.arguments is String
-            ? settings.arguments! as String
-            : '+38970123456';
+        if (settings.arguments is! String) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.forgotPasswordOtp expected String; got '
+              '${settings.arguments?.runtimeType}. Restarting forgot-password flow.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const ForgotPasswordRequestScreen(),
+            settings: settings,
+          );
+        }
+        final String fpPhoneE164 = settings.arguments! as String;
         return MaterialPageRoute<void>(
           builder: (_) => ForgotPasswordOtpScreen(phoneNumberE164: fpPhoneE164),
           settings: settings,
         );
       case AppRoutes.forgotPasswordNew:
+        if (settings.arguments is! ForgotPasswordNewRouteArgs) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.forgotPasswordNew expected ForgotPasswordNewRouteArgs; '
+              'got ${settings.arguments?.runtimeType}. Restarting forgot-password flow.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const ForgotPasswordRequestScreen(),
+            settings: settings,
+          );
+        }
         final ForgotPasswordNewRouteArgs fpArgs =
-            settings.arguments is ForgotPasswordNewRouteArgs
-                ? settings.arguments! as ForgotPasswordNewRouteArgs
-                : const ForgotPasswordNewRouteArgs(
-                    phoneNumberE164: '+38970123456',
-                    code: '',
-                  );
+            settings.arguments! as ForgotPasswordNewRouteArgs;
         return MaterialPageRoute<void>(
           builder: (_) => ForgotPasswordNewScreen(
             phoneNumberE164: fpArgs.phoneNumberE164,
@@ -243,13 +271,7 @@ class AppRouter {
             ? settings.arguments! as XFile
             : null;
         return MaterialPageRoute<bool>(
-          builder: (_) => NewReportScreen(
-            initialPhoto: photo,
-            entryLabel: photo != null ? 'Camera report' : 'Guided report',
-            entryHint: photo != null
-                ? 'Starting from a live photo can speed up moderation because the evidence is already attached.'
-                : null,
-          ),
+          builder: (_) => NewReportScreen(initialPhoto: photo),
           settings: settings,
         );
       case AppRoutes.eventsCreate:
@@ -319,7 +341,9 @@ class AppRouter {
         );
       default:
         return MaterialPageRoute<void>(
-          builder: (_) => const SignInScreen(),
+          builder: (_) => UnknownRouteScreen(
+            attemptedRouteName: settings.name,
+          ),
           settings: settings,
         );
     }

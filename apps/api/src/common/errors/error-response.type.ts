@@ -4,4 +4,6 @@ export type ErrorResponse = {
   details?: unknown;
   retryable?: boolean;
   retryAfterSeconds?: number;
+  /** Set by [GlobalExceptionFilter] on outbound JSON (ISO-8601 UTC). */
+  timestamp?: string;
 };

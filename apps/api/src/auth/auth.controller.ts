@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Headers,
   HttpCode,
   HttpStatus,
   Patch,
@@ -48,6 +49,7 @@ import { MeResponseDto } from './dto/me-response.dto';
 import { PointHistoryQueryDto } from './dto/point-history-query.dto';
 import { PointHistoryResponseDto } from './dto/point-history-response.dto';
 import { PointHistoryService } from '../gamification/point-history.service';
+import { OtpSmsPurpose } from '../otp/otp-sender.interface';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -129,8 +131,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Send OTP to registered phone for verification' })
   @ApiOkResponse({ description: 'OTP sent; in development devCode is returned' })
   @HttpCode(HttpStatus.OK)
-  sendOtp(@Body() dto: SendOtpDto) {
-    return this.authService.sendOtp(dto.phoneNumber);
+  sendOtp(@Body() dto: SendOtpDto, @Headers('accept-language') acceptLanguage?: string) {
+    return this.authService.sendOtp(dto.phoneNumber, {
+      purpose: OtpSmsPurpose.PhoneVerification,
+      ...(acceptLanguage != null && acceptLanguage !== '' ? { acceptLanguage } : {}),
+    });
   }
 
   @Post('otp/verify')
@@ -147,8 +152,20 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset; sends OTP to registered phone' })
   @ApiOkResponse({ description: 'OTP sent; in development devCode is returned when SMS_PROVIDER is not Twilio' })
   @HttpCode(HttpStatus.OK)
-  requestPasswordReset(@Body() dto: SendOtpDto) {
-    return this.authService.sendOtp(dto.phoneNumber);
+  requestPasswordReset(@Body() dto: SendOtpDto, @Headers('accept-language') acceptLanguage?: string) {
+    return this.authService.sendOtp(dto.phoneNumber, {
+      purpose: OtpSmsPurpose.PasswordReset,
+      ...(acceptLanguage != null && acceptLanguage !== '' ? { acceptLanguage } : {}),
+    });
+  }
+
+  @Post('password-reset/verify-code')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Verify password-reset OTP before setting a new password' })
+  @ApiNoContentResponse({ description: 'Code is valid; OTP is not consumed until confirm' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async verifyPasswordResetCode(@Body() dto: VerifyOtpDto): Promise<void> {
+    await this.authService.verifyPasswordResetCode(dto.phoneNumber, dto.code);
   }
 
   @Post('password-reset/confirm')

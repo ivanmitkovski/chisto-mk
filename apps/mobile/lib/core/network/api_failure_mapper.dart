@@ -10,6 +10,7 @@ AppError appErrorFromFailedResponse({
   String? bodyStr,
   String? retryAfterHeader,
 }) {
+  final DateTime? serverTimestamp = _parseApiTimestamp(json?['timestamp']);
   final String code = json?['code'] is String
       ? json!['code'] as String
       : _codeForStatus(statusCode);
@@ -26,32 +27,65 @@ AppError appErrorFromFailedResponse({
     return AppError.tooManyRequests(
       message: message,
       retryAfterSeconds: jsonRetryAfter ?? headerRetryAfter,
+      serverTimestamp: serverTimestamp,
     );
   }
 
   if (statusCode == 401) {
-    return AppError(code: code, message: message);
+    return AppError(
+      code: code,
+      message: message,
+      serverTimestamp: serverTimestamp,
+    );
   }
   if (statusCode == 403) {
-    return AppError(code: code, message: message, retryable: false);
+    return AppError(
+      code: code,
+      message: message,
+      retryable: false,
+      serverTimestamp: serverTimestamp,
+    );
   }
-  if (statusCode == 404) return AppError.notFound(message: message);
+  if (statusCode == 404) {
+    return AppError.notFound(
+      message: message,
+      serverTimestamp: serverTimestamp,
+    );
+  }
   if (statusCode == 422 ||
       (statusCode == 400 && code == 'VALIDATION_ERROR')) {
-    return AppError.validation(message: message, details: details);
+    return AppError.validation(
+      message: message,
+      details: details,
+      serverTimestamp: serverTimestamp,
+    );
   }
   if (statusCode >= 500) {
-    return AppError.server(message: message);
+    return AppError.server(
+      message: message,
+      serverTimestamp: serverTimestamp,
+    );
   }
   if (statusCode == 408 || statusCode == 504) {
-    return AppError.timeout(message: message);
+    return AppError.timeout(
+      message: message,
+      serverTimestamp: serverTimestamp,
+    );
   }
   return AppError(
     code: code,
     message: message,
     retryable: statusCode >= 500 || statusCode == 408 || statusCode == 504,
     details: details,
+    serverTimestamp: serverTimestamp,
   );
+}
+
+DateTime? _parseApiTimestamp(Object? raw) {
+  if (raw is String && raw.isNotEmpty) {
+    return DateTime.tryParse(raw);
+  }
+  return null;
 }
 
 int? _parseRetryAfterSeconds(String? header) {

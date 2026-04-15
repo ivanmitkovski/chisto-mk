@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
@@ -31,13 +34,22 @@ class _SplashScreenState extends State<SplashScreen>
       ..addStatusListener(_onLottieStatus)
       ..addListener(_onLottieProgress);
 
-    _startSessionRestore();
+    unawaited(_restoreSessionDuringSplash());
     _precacheAssets();
     _startMaxDurationFallback();
   }
 
-  void _startSessionRestore() {
-    ServiceLocator.instance.authRepository.restoreSession().catchError((_) {});
+  Future<void> _restoreSessionDuringSplash() async {
+    try {
+      await ServiceLocator.instance.authRepository.restoreSession();
+    } catch (error, stackTrace) {
+      if (kDebugMode) {
+        debugPrint('[Splash] session restore failed: $error');
+        debugPrint('$stackTrace');
+      } else {
+        debugPrint('[Splash] session restore failed (${error.runtimeType})');
+      }
+    }
   }
 
   void _precacheAssets() {

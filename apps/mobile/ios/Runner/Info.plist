@@ -95,5 +95,18 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>mk.chisto.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>chisto</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

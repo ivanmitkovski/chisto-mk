@@ -41,8 +41,11 @@ export function validateEnv(): void {
     requireEnv('TWILIO_AUTH_TOKEN');
     const messagingSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
     const fromNumber = process.env.TWILIO_PHONE_NUMBER?.trim();
-    if (!messagingSid && !fromNumber) {
-      console.error('TWILIO_MESSAGING_SERVICE_SID or TWILIO_PHONE_NUMBER is required when SMS_PROVIDER=twilio');
+    const alphaSender = process.env.TWILIO_ALPHANUMERIC_SENDER?.trim();
+    if (!messagingSid && !fromNumber && !alphaSender) {
+      console.error(
+        'When SMS_PROVIDER=twilio, set TWILIO_MESSAGING_SERVICE_SID and/or TWILIO_PHONE_NUMBER and/or TWILIO_ALPHANUMERIC_SENDER (at least one sender path)',
+      );
       process.exit(1);
     }
   }

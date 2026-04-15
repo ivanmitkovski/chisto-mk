@@ -1,6 +1,9 @@
 import { CleanupEventStatus, Prisma, ReportStatus } from '../prisma-client';
 
-export const eventIncludeForViewer = (viewerId: string) =>
+const noParticipantRows: Prisma.EventParticipantWhereInput = { id: { in: [] } };
+const noCheckInRows: Prisma.EventCheckInWhereInput = { id: { in: [] } };
+
+export const eventIncludeForViewer = (viewerId?: string) =>
   ({
     site: {
       select: {
@@ -24,12 +27,16 @@ export const eventIncludeForViewer = (viewerId: string) =>
       select: { id: true, firstName: true, lastName: true, avatarObjectKey: true },
     },
     participants: {
-      where: { userId: viewerId },
+      where:
+        viewerId != null && viewerId !== ''
+          ? { userId: viewerId }
+          : noParticipantRows,
       take: 1,
       select: { id: true, reminderEnabled: true, reminderAt: true },
     },
     checkIns: {
-      where: { userId: viewerId },
+      where:
+        viewerId != null && viewerId !== '' ? { userId: viewerId } : noCheckInRows,
       take: 1,
       select: { checkedInAt: true },
     },
@@ -39,9 +46,12 @@ export type LoadedEvent = Prisma.CleanupEventGetPayload<{
   include: ReturnType<typeof eventIncludeForViewer>;
 }>;
 
-export function visibilityWhere(userId: string): Prisma.CleanupEventWhereInput {
+export function visibilityWhere(viewerUserId?: string): Prisma.CleanupEventWhereInput {
+  if (viewerUserId == null || viewerUserId === '') {
+    return { status: CleanupEventStatus.APPROVED };
+  }
   return {
-    OR: [{ status: CleanupEventStatus.APPROVED }, { organizerId: userId }],
+    OR: [{ status: CleanupEventStatus.APPROVED }, { organizerId: viewerUserId }],
   };
 }
 

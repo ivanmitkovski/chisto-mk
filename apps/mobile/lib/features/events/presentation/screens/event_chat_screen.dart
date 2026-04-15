@@ -14,6 +14,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_chat_haptics.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_client_message_id.dart';
@@ -130,6 +131,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   String? _highlightId;
   Timer? _highlightTimer;
 
+  /// Filled from [EventChatScreen.eventTitle] or after [EventsRepository.prefetchEvent] when title was missing (e.g. push notification).
+  String _resolvedEventTitle = '';
+
   EventChatConnectionStatus? _conn;
   bool _bannerVisible = false;
   bool _showConnectedFlash = false;
@@ -155,6 +159,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   @override
   void initState() {
     super.initState();
+    _resolvedEventTitle = widget.eventTitle.trim();
+    if (_resolvedEventTitle.isEmpty && widget.eventId.trim().isNotEmpty) {
+      unawaited(_resolveEventTitleFromRepository());
+    }
     _audioPlayback = EventChatAudioPlaybackController();
     WidgetsBinding.instance.addObserver(this);
     _scroll.addListener(_onScroll);
@@ -236,6 +244,29 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           _scrollToBottom();
         }
       });
+    }
+  }
+
+  Future<void> _resolveEventTitleFromRepository() async {
+    final String id = widget.eventId.trim();
+    if (!mounted || id.isEmpty) {
+      return;
+    }
+    try {
+      final EventsRepository repo = ServiceLocator.instance.eventsRepository;
+      await repo.prefetchEvent(id);
+      if (!mounted) {
+        return;
+      }
+      final String? title = repo.findById(id)?.title.trim();
+      if (title == null || title.isEmpty) {
+        return;
+      }
+      setState(() {
+        _resolvedEventTitle = title;
+      });
+    } catch (_) {
+      // Keep generic [eventChatTitle] in the AppBar.
     }
   }
 
@@ -2060,8 +2091,12 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       leading: const AppBackButton(),
       title: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          final String titleText =
-              widget.eventTitle.isEmpty ? context.l10n.eventChatTitle : widget.eventTitle;
+          final String effectiveTitle = _resolvedEventTitle.isNotEmpty
+              ? _resolvedEventTitle
+              : widget.eventTitle;
+          final String titleText = effectiveTitle.trim().isEmpty
+              ? context.l10n.eventChatTitle
+              : effectiveTitle.trim();
           final int count = _participantCount;
           return Semantics(
             button: true,

@@ -12,7 +12,7 @@ import { Role, User, UserStatus } from '../prisma-client';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
-import { OTP_SENDER, OtpSender } from '../otp/otp-sender.interface';
+import { OTP_SENDER, OtpSender, OtpSmsPurpose } from '../otp/otp-sender.interface';
 import { OtpService } from '../otp/otp.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -886,7 +886,10 @@ export class AuthService {
     ]);
   }
 
-  async sendOtp(phoneNumber: string): Promise<{ expiresIn: number; devCode?: string }> {
+  async sendOtp(
+    phoneNumber: string,
+    options: { purpose: OtpSmsPurpose; acceptLanguage?: string },
+  ): Promise<{ expiresIn: number; devCode?: string }> {
     const normalized = phoneNumber.trim();
     const user = await this.prisma.user.findUnique({
       where: { phoneNumber: normalized },
@@ -901,13 +904,20 @@ export class AuthService {
 
     const code = String(Math.floor(1000 + Math.random() * 9000));
     const expiresAt = new Date(Date.now() + OTP_EXPIRES_SECONDS * 1000);
+    const expiryMinutes = Math.max(1, Math.ceil(OTP_EXPIRES_SECONDS / 60));
 
     await this.prisma.phoneOtp.upsert({
       where: { phoneNumber: normalized },
       create: { phoneNumber: normalized, code, expiresAt },
       update: { code, expiresAt, attemptCount: 0 } as Record<string, unknown>,
     });
-    await this.otpSender.sendOtp(normalized, code);
+    await this.otpSender.sendOtp(normalized, code, {
+      purpose: options.purpose,
+      expiryMinutes,
+      ...(options.acceptLanguage != null && options.acceptLanguage !== ''
+        ? { localeHint: options.acceptLanguage }
+        : {}),
+    });
     const payload: { expiresIn: number; devCode?: string } = {
       expiresIn: OTP_EXPIRES_SECONDS,
     };
@@ -924,6 +934,14 @@ export class AuthService {
       where: { phoneNumber: normalized },
       data: { isPhoneVerified: true },
     });
+  }
+
+  /**
+   * Checks the password-reset OTP without consuming it (see {@link confirmPasswordReset}).
+   */
+  async verifyPasswordResetCode(phoneNumber: string, code: string): Promise<void> {
+    const normalized = phoneNumber.trim();
+    await this.otpService.assertOtpMatches(normalized, code);
   }
 
   async confirmPasswordReset(dto: ResetPasswordConfirmDto): Promise<{ message: string }> {
@@ -944,6 +962,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.newPassword, this.saltRounds);
     const now = new Date();
 
+    const db = this.prisma as PrismaWithLoginFailure;
     await this.prisma.$transaction([
       this.prisma.user.update({
         where: { phoneNumber: normalized },
@@ -953,6 +972,7 @@ export class AuthService {
         where: { userId: user.id, revokedAt: null },
         data: { revokedAt: now },
       }),
+      db.loginFailure.deleteMany({ where: { phoneNumber: normalized } }),
     ]);
 
     return { message: 'Password reset successful' };
@@ -961,7 +981,7 @@ export class AuthService {
   async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { passwordHash: true },
+      select: { passwordHash: true, phoneNumber: true },
     });
     if (!user) {
       throw new UnauthorizedException({
@@ -981,6 +1001,8 @@ export class AuthService {
       where: { id: userId },
       data: { passwordHash },
     });
+    const db = this.prisma as PrismaWithLoginFailure;
+    await db.loginFailure.deleteMany({ where: { phoneNumber: user.phoneNumber } }).catch(() => {});
     await this.audit.log({
       actorId: userId,
       action: 'PASSWORD_CHANGED',

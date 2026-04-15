@@ -328,6 +328,7 @@ describe('EventsService', () => {
         }),
       );
     });
+
   });
 
   describe('findOne', () => {

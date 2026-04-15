@@ -2,13 +2,10 @@ import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 
 /// API report status for list/detail display.
 enum ApiReportStatus {
-  new_('Under review'),
-  inReview('Under review'),
-  approved('Approved'),
-  deleted('Declined');
-
-  const ApiReportStatus(this.label);
-  final String label;
+  new_,
+  inReview,
+  approved,
+  deleted,
 }
 
 /// Report list item from GET /reports/me.

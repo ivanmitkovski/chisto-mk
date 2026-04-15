@@ -1,0 +1,20 @@
+Universal links and app links (production checklist)
+====================================================
+
+Android App Links
+-----------------
+1. Host `assetlinks.json` at `https://<production-domain>/.well-known/assetlinks.json` (HTTPS, no redirects to a different host).
+2. JSON must list the Android package name and signing certificate fingerprints for the release keystore (and Play App Signing cert if Google re-signs).
+3. In the mobile Android app manifest, add an `<intent-filter>` with `android:autoVerify="true"` for the HTTPS host(s) after Google Search Console / Digital Asset Links verification succeeds.
+4. QA: open a `https://<domain>/...` link from Chrome, Gmail, and Slack; confirm it offers to open in the app and routes to the correct screen.
+
+iOS Universal Links
+-------------------
+1. Host `apple-app-site-association` (AASA) at `https://<production-domain>/.well-known/apple-app-site-association` with `application/json` or correct `Content-Type`, no file extension.
+2. Enable the Associated Domains capability in the Xcode target (`applinks:<domain>`).
+3. QA: paste the same HTTPS link in Notes and long-press “Open in Chisto.mk”; confirm navigation to the in-app route.
+
+Operational notes
+-----------------
+- Keep staging host separate from production AASA / assetlinks to avoid accidental overlap.
+- After certificate rotation, update assetlinks fingerprints before shipping the new signing key.

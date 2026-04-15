@@ -175,6 +175,7 @@ class ApiReportsRepository implements ReportsApiRepository {
     int? severity,
     String? address,
     String? cleanupEffort,
+    String? idempotencyKey,
   }) async {
     final Map<String, dynamic> body = <String, dynamic>{
       'latitude': latitude,
@@ -200,7 +201,10 @@ class ApiReportsRepository implements ReportsApiRepository {
     if (cleanupEffort != null && cleanupEffort.isNotEmpty) {
       body['cleanupEffort'] = cleanupEffort;
     }
-    final ApiResponse response = await _client.post('/reports', body: body);
+    final Map<String, String>? headers = idempotencyKey != null && idempotencyKey.trim().isNotEmpty
+        ? <String, String>{'Idempotency-Key': idempotencyKey.trim()}
+        : null;
+    final ApiResponse response = await _client.post('/reports', body: body, headers: headers);
     final Map<String, dynamic>? json = response.json;
     if (json == null) throw AppError.unknown();
     final Map<String, dynamic> payload = _createReportSubmitPayload(json);

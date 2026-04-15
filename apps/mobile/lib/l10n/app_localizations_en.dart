@@ -3154,6 +3154,156 @@ class AppLocalizationsEn extends AppLocalizations {
       'Your future reports will appear here after you submit them.';
 
   @override
+  String get reportStatusUnderReviewShort => 'Under review';
+
+  @override
+  String get reportStatusApprovedShort => 'Approved';
+
+  @override
+  String get reportStatusDeclinedShort => 'Declined';
+
+  @override
+  String get reportStatusAlreadyReportedShort => 'Already reported';
+
+  @override
+  String get reportListFilterAll => 'All';
+
+  @override
+  String get reportListFilterSemanticPrefix => 'Report status';
+
+  @override
+  String get reportListHeaderTitle => 'Your reports';
+
+  @override
+  String reportListHeaderTotalPill(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reports in total',
+      one: '1 report in total',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportListHeaderUnderReviewPill(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count under review',
+      one: '1 under review',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportListHeaderSemanticSummary(int totalReports, int underReview) {
+    String _temp0 = intl.Intl.pluralLogic(
+      totalReports,
+      locale: localeName,
+      other: '$totalReports reports in total',
+      one: '1 report in total',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      underReview,
+      locale: localeName,
+      other: '$underReview currently under review',
+      one: '1 currently under review',
+    );
+    return '$_temp0. $_temp1.';
+  }
+
+  @override
+  String get reportListFilteredFooterAll => 'All reports shown';
+
+  @override
+  String reportListFilteredFooterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count reports',
+      one: '1 report',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportListNoMatchesSearchTitle => 'No reports found';
+
+  @override
+  String get reportListNoMatchesFilterTitle => 'No reports with this filter';
+
+  @override
+  String get reportListNoMatchesHintSearchAndFilter =>
+      'Try a different search or clear filters to see more reports.';
+
+  @override
+  String get reportListNoMatchesHintSearchOnly =>
+      'Check the spelling or try a broader search.';
+
+  @override
+  String get reportListNoMatchesHintFilterOnly =>
+      'Try another filter, or clear it to see all reports.';
+
+  @override
+  String get reportListClearSearch => 'Clear search';
+
+  @override
+  String reportListDateWeeksAgo(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: '$weeks weeks ago',
+      one: '1 week ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDetailOpeningInProgress => 'Opening…';
+
+  @override
+  String get reportDetailNoPhotos => 'No photos';
+
+  @override
+  String get reportDetailStatusUnderReviewTitle => 'Under review by moderators';
+
+  @override
+  String get reportDetailStatusUnderReviewBody =>
+      'Moderators are checking your evidence and location before they decide how to handle this report.';
+
+  @override
+  String get reportDetailStatusApprovedTitle => 'Approved and linked to a site';
+
+  @override
+  String get reportDetailStatusApprovedBody =>
+      'This report helped confirm a public pollution site and may contribute to cleanup actions.';
+
+  @override
+  String get reportDetailStatusAlreadyReportedTitle =>
+      'Already tracked as an existing site';
+
+  @override
+  String get reportDetailStatusAlreadyReportedBody =>
+      'Your report matched an existing site. The evidence is still useful for understanding the problem.';
+
+  @override
+  String get reportDetailStatusOutcomeTitle => 'Review outcome';
+
+  @override
+  String get reportDetailStatusOutcomeBodyFallback =>
+      'This report could not be approved in its current form.';
+
+  @override
+  String reportCardSemanticLabel(
+    String category,
+    String status,
+    String location,
+  ) {
+    return '$category, $status, $location. Tap to view details.';
+  }
+
+  @override
   String get appSmartImageUnavailable => 'Image unavailable';
 
   @override
@@ -4211,4 +4361,90 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventChatMicPermissionDenied =>
       'Microphone access is required to send voice messages.';
+
+  @override
+  String get reportEntryLabelGuided => 'Guided report';
+
+  @override
+  String get reportEntryLabelCamera => 'Camera report';
+
+  @override
+  String get reportEntryHintCamera =>
+      'Starting from a live photo can speed up moderation because the evidence is already attached.';
+
+  @override
+  String get homeReportingCapacityCheckFailed =>
+      'Could not check reporting availability right now.';
+
+  @override
+  String get homeCameraOpenFailed =>
+      'Unable to open the camera right now. Please try again in a moment.';
+
+  @override
+  String get mapTabPlaceholderHint =>
+      'Open this tab to load the live map and nearby pollution sites.';
+
+  @override
+  String get reportCategoryPickerTitle => 'Choose category';
+
+  @override
+  String get reportCategoryPickerSubtitle =>
+      'Pick the closest match for the issue you are reporting.';
+
+  @override
+  String get reportCategoryPickerBannerTitle => 'Choose the closest match';
+
+  @override
+  String get reportCategoryPickerBannerBody =>
+      'Pick the category moderators should verify first. It does not need to be perfect.';
+
+  @override
+  String get reportCategoryIllegalLandfillTitle => 'Illegal landfill';
+
+  @override
+  String get reportCategoryIllegalLandfillDescription =>
+      'Dumped waste, trash piles, or informal disposal sites.';
+
+  @override
+  String get reportCategoryWaterPollutionTitle => 'Water pollution';
+
+  @override
+  String get reportCategoryWaterPollutionDescription =>
+      'Contaminated rivers, lakes, drains, or wastewater discharge.';
+
+  @override
+  String get reportCategoryAirPollutionTitle => 'Air pollution';
+
+  @override
+  String get reportCategoryAirPollutionDescription =>
+      'Smoke, dust, burning waste, or emissions harming air quality.';
+
+  @override
+  String get reportCategoryIndustrialWasteTitle => 'Industrial waste';
+
+  @override
+  String get reportCategoryIndustrialWasteDescription =>
+      'Construction debris, factory waste, or hazardous materials.';
+
+  @override
+  String get reportCategoryOtherTitle => 'Other';
+
+  @override
+  String get reportCategoryOtherDescription =>
+      'Use when the issue does not clearly match the categories above.';
+
+  @override
+  String get unknownRouteTitle => 'Page not found';
+
+  @override
+  String get unknownRouteMessage =>
+      'This link may be out of date or incorrect.';
+
+  @override
+  String get unknownRouteContinueButton => 'Continue to the app';
+
+  @override
+  String unknownRouteDebugRoute(String routeName) {
+    return 'Debug: route name was “$routeName”.';
+  }
 }

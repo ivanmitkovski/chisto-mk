@@ -74,6 +74,11 @@ export type Report = $Result.DefaultSelection<Prisma.$ReportPayload>
  */
 export type ReportCoReporter = $Result.DefaultSelection<Prisma.$ReportCoReporterPayload>
 /**
+ * Model ReportSubmitIdempotency
+ * Client-supplied key (UUID) so duplicate POST /reports retries return the same report without double spend.
+ */
+export type ReportSubmitIdempotency = $Result.DefaultSelection<Prisma.$ReportSubmitIdempotencyPayload>
+/**
  * Model SystemConfig
  * 
  */
@@ -652,6 +657,16 @@ export class PrismaClient<
     * ```
     */
   get reportCoReporter(): Prisma.ReportCoReporterDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.reportSubmitIdempotency`: Exposes CRUD operations for the **ReportSubmitIdempotency** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ReportSubmitIdempotencies
+    * const reportSubmitIdempotencies = await prisma.reportSubmitIdempotency.findMany()
+    * ```
+    */
+  get reportSubmitIdempotency(): Prisma.ReportSubmitIdempotencyDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.systemConfig`: Exposes CRUD operations for the **SystemConfig** model.
@@ -1298,6 +1313,7 @@ export namespace Prisma {
     Site: 'Site',
     Report: 'Report',
     ReportCoReporter: 'ReportCoReporter',
+    ReportSubmitIdempotency: 'ReportSubmitIdempotency',
     SystemConfig: 'SystemConfig',
     FeatureFlag: 'FeatureFlag',
     AuditLog: 'AuditLog',
@@ -1333,7 +1349,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2222,6 +2238,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ReportCoReporterCountArgs<ExtArgs>
             result: $Utils.Optional<ReportCoReporterCountAggregateOutputType> | number
+          }
+        }
+      }
+      ReportSubmitIdempotency: {
+        payload: Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>
+        fields: Prisma.ReportSubmitIdempotencyFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ReportSubmitIdempotencyFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ReportSubmitIdempotencyFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          findFirst: {
+            args: Prisma.ReportSubmitIdempotencyFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ReportSubmitIdempotencyFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          findMany: {
+            args: Prisma.ReportSubmitIdempotencyFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>[]
+          }
+          create: {
+            args: Prisma.ReportSubmitIdempotencyCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          createMany: {
+            args: Prisma.ReportSubmitIdempotencyCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ReportSubmitIdempotencyCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>[]
+          }
+          delete: {
+            args: Prisma.ReportSubmitIdempotencyDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          update: {
+            args: Prisma.ReportSubmitIdempotencyUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          deleteMany: {
+            args: Prisma.ReportSubmitIdempotencyDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ReportSubmitIdempotencyUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ReportSubmitIdempotencyUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>[]
+          }
+          upsert: {
+            args: Prisma.ReportSubmitIdempotencyUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSubmitIdempotencyPayload>
+          }
+          aggregate: {
+            args: Prisma.ReportSubmitIdempotencyAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateReportSubmitIdempotency>
+          }
+          groupBy: {
+            args: Prisma.ReportSubmitIdempotencyGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ReportSubmitIdempotencyGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ReportSubmitIdempotencyCountArgs<ExtArgs>
+            result: $Utils.Optional<ReportSubmitIdempotencyCountAggregateOutputType> | number
           }
         }
       }
@@ -3825,6 +3915,7 @@ export namespace Prisma {
     site?: SiteOmit
     report?: ReportOmit
     reportCoReporter?: ReportCoReporterOmit
+    reportSubmitIdempotency?: ReportSubmitIdempotencyOmit
     systemConfig?: SystemConfigOmit
     featureFlag?: FeatureFlagOmit
     auditLog?: AuditLogOmit
@@ -3948,6 +4039,7 @@ export namespace Prisma {
     eventChatReadCursors: number
     eventChatPinnedMessages: number
     eventChatMutes: number
+    reportSubmitIdempotencyKeys: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3974,6 +4066,7 @@ export namespace Prisma {
     eventChatReadCursors?: boolean | UserCountOutputTypeCountEventChatReadCursorsArgs
     eventChatPinnedMessages?: boolean | UserCountOutputTypeCountEventChatPinnedMessagesArgs
     eventChatMutes?: boolean | UserCountOutputTypeCountEventChatMutesArgs
+    reportSubmitIdempotencyKeys?: boolean | UserCountOutputTypeCountReportSubmitIdempotencyKeysArgs
   }
 
   // Custom InputTypes
@@ -4148,6 +4241,13 @@ export namespace Prisma {
     where?: EventChatMuteWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountReportSubmitIdempotencyKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportSubmitIdempotencyWhereInput
+  }
+
 
   /**
    * Count Type SiteCountOutputType
@@ -4232,11 +4332,13 @@ export namespace Prisma {
   export type ReportCountOutputType = {
     potentialDuplicates: number
     coReporters: number
+    submitIdempotencyKeys: number
   }
 
   export type ReportCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     potentialDuplicates?: boolean | ReportCountOutputTypeCountPotentialDuplicatesArgs
     coReporters?: boolean | ReportCountOutputTypeCountCoReportersArgs
+    submitIdempotencyKeys?: boolean | ReportCountOutputTypeCountSubmitIdempotencyKeysArgs
   }
 
   // Custom InputTypes
@@ -4262,6 +4364,13 @@ export namespace Prisma {
    */
   export type ReportCountOutputTypeCountCoReportersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ReportCoReporterWhereInput
+  }
+
+  /**
+   * ReportCountOutputType without action
+   */
+  export type ReportCountOutputTypeCountSubmitIdempotencyKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportSubmitIdempotencyWhereInput
   }
 
 
@@ -4816,6 +4925,7 @@ export namespace Prisma {
     eventChatReadCursors?: boolean | User$eventChatReadCursorsArgs<ExtArgs>
     eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
     eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
+    reportSubmitIdempotencyKeys?: boolean | User$reportSubmitIdempotencyKeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4923,6 +5033,7 @@ export namespace Prisma {
     eventChatReadCursors?: boolean | User$eventChatReadCursorsArgs<ExtArgs>
     eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
     eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
+    reportSubmitIdempotencyKeys?: boolean | User$reportSubmitIdempotencyKeysArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4955,6 +5066,7 @@ export namespace Prisma {
       eventChatReadCursors: Prisma.$EventChatReadCursorPayload<ExtArgs>[]
       eventChatPinnedMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
       eventChatMutes: Prisma.$EventChatMutePayload<ExtArgs>[]
+      reportSubmitIdempotencyKeys: Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5398,6 +5510,7 @@ export namespace Prisma {
     eventChatReadCursors<T extends User$eventChatReadCursorsArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatReadCursorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     eventChatPinnedMessages<T extends User$eventChatPinnedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatPinnedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     eventChatMutes<T extends User$eventChatMutesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatMutesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    reportSubmitIdempotencyKeys<T extends User$reportSubmitIdempotencyKeysArgs<ExtArgs> = {}>(args?: Subset<T, User$reportSubmitIdempotencyKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6411,6 +6524,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * User.reportSubmitIdempotencyKeys
+   */
+  export type User$reportSubmitIdempotencyKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    where?: ReportSubmitIdempotencyWhereInput
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
   }
 
   /**
@@ -12797,6 +12934,7 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory | null
     isUnread: boolean | null
     href: string | null
+    messageTemplateKey: string | null
   }
 
   export type AdminNotificationMaxAggregateOutputType = {
@@ -12811,6 +12949,7 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory | null
     isUnread: boolean | null
     href: string | null
+    messageTemplateKey: string | null
   }
 
   export type AdminNotificationCountAggregateOutputType = {
@@ -12825,6 +12964,8 @@ export namespace Prisma {
     category: number
     isUnread: number
     href: number
+    messageTemplateKey: number
+    messageTemplateParams: number
     _all: number
   }
 
@@ -12841,6 +12982,7 @@ export namespace Prisma {
     category?: true
     isUnread?: true
     href?: true
+    messageTemplateKey?: true
   }
 
   export type AdminNotificationMaxAggregateInputType = {
@@ -12855,6 +12997,7 @@ export namespace Prisma {
     category?: true
     isUnread?: true
     href?: true
+    messageTemplateKey?: true
   }
 
   export type AdminNotificationCountAggregateInputType = {
@@ -12869,6 +13012,8 @@ export namespace Prisma {
     category?: true
     isUnread?: true
     href?: true
+    messageTemplateKey?: true
+    messageTemplateParams?: true
     _all?: true
   }
 
@@ -12956,6 +13101,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread: boolean
     href: string | null
+    messageTemplateKey: string | null
+    messageTemplateParams: JsonValue | null
     _count: AdminNotificationCountAggregateOutputType | null
     _min: AdminNotificationMinAggregateOutputType | null
     _max: AdminNotificationMaxAggregateOutputType | null
@@ -12987,6 +13134,8 @@ export namespace Prisma {
     category?: boolean
     isUnread?: boolean
     href?: boolean
+    messageTemplateKey?: boolean
+    messageTemplateParams?: boolean
     user?: boolean | AdminNotification$userArgs<ExtArgs>
   }, ExtArgs["result"]["adminNotification"]>
 
@@ -13002,6 +13151,8 @@ export namespace Prisma {
     category?: boolean
     isUnread?: boolean
     href?: boolean
+    messageTemplateKey?: boolean
+    messageTemplateParams?: boolean
     user?: boolean | AdminNotification$userArgs<ExtArgs>
   }, ExtArgs["result"]["adminNotification"]>
 
@@ -13017,6 +13168,8 @@ export namespace Prisma {
     category?: boolean
     isUnread?: boolean
     href?: boolean
+    messageTemplateKey?: boolean
+    messageTemplateParams?: boolean
     user?: boolean | AdminNotification$userArgs<ExtArgs>
   }, ExtArgs["result"]["adminNotification"]>
 
@@ -13032,9 +13185,11 @@ export namespace Prisma {
     category?: boolean
     isUnread?: boolean
     href?: boolean
+    messageTemplateKey?: boolean
+    messageTemplateParams?: boolean
   }
 
-  export type AdminNotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "userId" | "title" | "message" | "timeLabel" | "tone" | "category" | "isUnread" | "href", ExtArgs["result"]["adminNotification"]>
+  export type AdminNotificationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "userId" | "title" | "message" | "timeLabel" | "tone" | "category" | "isUnread" | "href" | "messageTemplateKey" | "messageTemplateParams", ExtArgs["result"]["adminNotification"]>
   export type AdminNotificationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | AdminNotification$userArgs<ExtArgs>
   }
@@ -13062,6 +13217,11 @@ export namespace Prisma {
       category: $Enums.AdminNotificationCategory
       isUnread: boolean
       href: string | null
+      /**
+       * Stable key for localized templates (e.g. `reports.submitted.new_site`). Title/message remain populated for legacy clients.
+       */
+      messageTemplateKey: string | null
+      messageTemplateParams: Prisma.JsonValue | null
     }, ExtArgs["result"]["adminNotification"]>
     composites: {}
   }
@@ -13497,6 +13657,8 @@ export namespace Prisma {
     readonly category: FieldRef<"AdminNotification", 'AdminNotificationCategory'>
     readonly isUnread: FieldRef<"AdminNotification", 'Boolean'>
     readonly href: FieldRef<"AdminNotification", 'String'>
+    readonly messageTemplateKey: FieldRef<"AdminNotification", 'String'>
+    readonly messageTemplateParams: FieldRef<"AdminNotification", 'Json'>
   }
     
 
@@ -16747,6 +16909,7 @@ export namespace Prisma {
     potentialDuplicateOf?: boolean | Report$potentialDuplicateOfArgs<ExtArgs>
     potentialDuplicates?: boolean | Report$potentialDuplicatesArgs<ExtArgs>
     coReporters?: boolean | Report$coReportersArgs<ExtArgs>
+    submitIdempotencyKeys?: boolean | Report$submitIdempotencyKeysArgs<ExtArgs>
     _count?: boolean | ReportCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["report"]>
 
@@ -16826,6 +16989,7 @@ export namespace Prisma {
     potentialDuplicateOf?: boolean | Report$potentialDuplicateOfArgs<ExtArgs>
     potentialDuplicates?: boolean | Report$potentialDuplicatesArgs<ExtArgs>
     coReporters?: boolean | Report$coReportersArgs<ExtArgs>
+    submitIdempotencyKeys?: boolean | Report$submitIdempotencyKeysArgs<ExtArgs>
     _count?: boolean | ReportCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ReportIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16850,6 +17014,7 @@ export namespace Prisma {
       potentialDuplicateOf: Prisma.$ReportPayload<ExtArgs> | null
       potentialDuplicates: Prisma.$ReportPayload<ExtArgs>[]
       coReporters: Prisma.$ReportCoReporterPayload<ExtArgs>[]
+      submitIdempotencyKeys: Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -17275,6 +17440,7 @@ export namespace Prisma {
     potentialDuplicateOf<T extends Report$potentialDuplicateOfArgs<ExtArgs> = {}>(args?: Subset<T, Report$potentialDuplicateOfArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     potentialDuplicates<T extends Report$potentialDuplicatesArgs<ExtArgs> = {}>(args?: Subset<T, Report$potentialDuplicatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     coReporters<T extends Report$coReportersArgs<ExtArgs> = {}>(args?: Subset<T, Report$coReportersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportCoReporterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    submitIdempotencyKeys<T extends Report$submitIdempotencyKeysArgs<ExtArgs> = {}>(args?: Subset<T, Report$submitIdempotencyKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17824,6 +17990,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ReportCoReporterScalarFieldEnum | ReportCoReporterScalarFieldEnum[]
+  }
+
+  /**
+   * Report.submitIdempotencyKeys
+   */
+  export type Report$submitIdempotencyKeysArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    where?: ReportSubmitIdempotencyWhereInput
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
   }
 
   /**
@@ -18916,6 +19106,1077 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ReportCoReporterInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ReportSubmitIdempotency
+   */
+
+  export type AggregateReportSubmitIdempotency = {
+    _count: ReportSubmitIdempotencyCountAggregateOutputType | null
+    _min: ReportSubmitIdempotencyMinAggregateOutputType | null
+    _max: ReportSubmitIdempotencyMaxAggregateOutputType | null
+  }
+
+  export type ReportSubmitIdempotencyMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    userId: string | null
+    key: string | null
+    reportId: string | null
+  }
+
+  export type ReportSubmitIdempotencyMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    userId: string | null
+    key: string | null
+    reportId: string | null
+  }
+
+  export type ReportSubmitIdempotencyCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    userId: number
+    key: number
+    reportId: number
+    _all: number
+  }
+
+
+  export type ReportSubmitIdempotencyMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    key?: true
+    reportId?: true
+  }
+
+  export type ReportSubmitIdempotencyMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    key?: true
+    reportId?: true
+  }
+
+  export type ReportSubmitIdempotencyCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    key?: true
+    reportId?: true
+    _all?: true
+  }
+
+  export type ReportSubmitIdempotencyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReportSubmitIdempotency to aggregate.
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSubmitIdempotencies to fetch.
+     */
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSubmitIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSubmitIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ReportSubmitIdempotencies
+    **/
+    _count?: true | ReportSubmitIdempotencyCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ReportSubmitIdempotencyMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ReportSubmitIdempotencyMaxAggregateInputType
+  }
+
+  export type GetReportSubmitIdempotencyAggregateType<T extends ReportSubmitIdempotencyAggregateArgs> = {
+        [P in keyof T & keyof AggregateReportSubmitIdempotency]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateReportSubmitIdempotency[P]>
+      : GetScalarType<T[P], AggregateReportSubmitIdempotency[P]>
+  }
+
+
+
+
+  export type ReportSubmitIdempotencyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportSubmitIdempotencyWhereInput
+    orderBy?: ReportSubmitIdempotencyOrderByWithAggregationInput | ReportSubmitIdempotencyOrderByWithAggregationInput[]
+    by: ReportSubmitIdempotencyScalarFieldEnum[] | ReportSubmitIdempotencyScalarFieldEnum
+    having?: ReportSubmitIdempotencyScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ReportSubmitIdempotencyCountAggregateInputType | true
+    _min?: ReportSubmitIdempotencyMinAggregateInputType
+    _max?: ReportSubmitIdempotencyMaxAggregateInputType
+  }
+
+  export type ReportSubmitIdempotencyGroupByOutputType = {
+    id: string
+    createdAt: Date
+    userId: string
+    key: string
+    reportId: string
+    _count: ReportSubmitIdempotencyCountAggregateOutputType | null
+    _min: ReportSubmitIdempotencyMinAggregateOutputType | null
+    _max: ReportSubmitIdempotencyMaxAggregateOutputType | null
+  }
+
+  type GetReportSubmitIdempotencyGroupByPayload<T extends ReportSubmitIdempotencyGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ReportSubmitIdempotencyGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ReportSubmitIdempotencyGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ReportSubmitIdempotencyGroupByOutputType[P]>
+            : GetScalarType<T[P], ReportSubmitIdempotencyGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ReportSubmitIdempotencySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    key?: boolean
+    reportId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["reportSubmitIdempotency"]>
+
+  export type ReportSubmitIdempotencySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    key?: boolean
+    reportId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["reportSubmitIdempotency"]>
+
+  export type ReportSubmitIdempotencySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    key?: boolean
+    reportId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["reportSubmitIdempotency"]>
+
+  export type ReportSubmitIdempotencySelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    key?: boolean
+    reportId?: boolean
+  }
+
+  export type ReportSubmitIdempotencyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userId" | "key" | "reportId", ExtArgs["result"]["reportSubmitIdempotency"]>
+  export type ReportSubmitIdempotencyInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+  export type ReportSubmitIdempotencyIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+  export type ReportSubmitIdempotencyIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    report?: boolean | ReportDefaultArgs<ExtArgs>
+  }
+
+  export type $ReportSubmitIdempotencyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ReportSubmitIdempotency"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      report: Prisma.$ReportPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      userId: string
+      key: string
+      reportId: string
+    }, ExtArgs["result"]["reportSubmitIdempotency"]>
+    composites: {}
+  }
+
+  type ReportSubmitIdempotencyGetPayload<S extends boolean | null | undefined | ReportSubmitIdempotencyDefaultArgs> = $Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload, S>
+
+  type ReportSubmitIdempotencyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ReportSubmitIdempotencyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ReportSubmitIdempotencyCountAggregateInputType | true
+    }
+
+  export interface ReportSubmitIdempotencyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ReportSubmitIdempotency'], meta: { name: 'ReportSubmitIdempotency' } }
+    /**
+     * Find zero or one ReportSubmitIdempotency that matches the filter.
+     * @param {ReportSubmitIdempotencyFindUniqueArgs} args - Arguments to find a ReportSubmitIdempotency
+     * @example
+     * // Get one ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ReportSubmitIdempotencyFindUniqueArgs>(args: SelectSubset<T, ReportSubmitIdempotencyFindUniqueArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ReportSubmitIdempotency that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ReportSubmitIdempotencyFindUniqueOrThrowArgs} args - Arguments to find a ReportSubmitIdempotency
+     * @example
+     * // Get one ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ReportSubmitIdempotencyFindUniqueOrThrowArgs>(args: SelectSubset<T, ReportSubmitIdempotencyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReportSubmitIdempotency that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyFindFirstArgs} args - Arguments to find a ReportSubmitIdempotency
+     * @example
+     * // Get one ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ReportSubmitIdempotencyFindFirstArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyFindFirstArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReportSubmitIdempotency that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyFindFirstOrThrowArgs} args - Arguments to find a ReportSubmitIdempotency
+     * @example
+     * // Get one ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ReportSubmitIdempotencyFindFirstOrThrowArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyFindFirstOrThrowArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ReportSubmitIdempotencies that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ReportSubmitIdempotencies
+     * const reportSubmitIdempotencies = await prisma.reportSubmitIdempotency.findMany()
+     * 
+     * // Get first 10 ReportSubmitIdempotencies
+     * const reportSubmitIdempotencies = await prisma.reportSubmitIdempotency.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const reportSubmitIdempotencyWithIdOnly = await prisma.reportSubmitIdempotency.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ReportSubmitIdempotencyFindManyArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ReportSubmitIdempotency.
+     * @param {ReportSubmitIdempotencyCreateArgs} args - Arguments to create a ReportSubmitIdempotency.
+     * @example
+     * // Create one ReportSubmitIdempotency
+     * const ReportSubmitIdempotency = await prisma.reportSubmitIdempotency.create({
+     *   data: {
+     *     // ... data to create a ReportSubmitIdempotency
+     *   }
+     * })
+     * 
+     */
+    create<T extends ReportSubmitIdempotencyCreateArgs>(args: SelectSubset<T, ReportSubmitIdempotencyCreateArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ReportSubmitIdempotencies.
+     * @param {ReportSubmitIdempotencyCreateManyArgs} args - Arguments to create many ReportSubmitIdempotencies.
+     * @example
+     * // Create many ReportSubmitIdempotencies
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ReportSubmitIdempotencyCreateManyArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ReportSubmitIdempotencies and returns the data saved in the database.
+     * @param {ReportSubmitIdempotencyCreateManyAndReturnArgs} args - Arguments to create many ReportSubmitIdempotencies.
+     * @example
+     * // Create many ReportSubmitIdempotencies
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ReportSubmitIdempotencies and only return the `id`
+     * const reportSubmitIdempotencyWithIdOnly = await prisma.reportSubmitIdempotency.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ReportSubmitIdempotencyCreateManyAndReturnArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ReportSubmitIdempotency.
+     * @param {ReportSubmitIdempotencyDeleteArgs} args - Arguments to delete one ReportSubmitIdempotency.
+     * @example
+     * // Delete one ReportSubmitIdempotency
+     * const ReportSubmitIdempotency = await prisma.reportSubmitIdempotency.delete({
+     *   where: {
+     *     // ... filter to delete one ReportSubmitIdempotency
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ReportSubmitIdempotencyDeleteArgs>(args: SelectSubset<T, ReportSubmitIdempotencyDeleteArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ReportSubmitIdempotency.
+     * @param {ReportSubmitIdempotencyUpdateArgs} args - Arguments to update one ReportSubmitIdempotency.
+     * @example
+     * // Update one ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ReportSubmitIdempotencyUpdateArgs>(args: SelectSubset<T, ReportSubmitIdempotencyUpdateArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ReportSubmitIdempotencies.
+     * @param {ReportSubmitIdempotencyDeleteManyArgs} args - Arguments to filter ReportSubmitIdempotencies to delete.
+     * @example
+     * // Delete a few ReportSubmitIdempotencies
+     * const { count } = await prisma.reportSubmitIdempotency.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ReportSubmitIdempotencyDeleteManyArgs>(args?: SelectSubset<T, ReportSubmitIdempotencyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReportSubmitIdempotencies.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ReportSubmitIdempotencies
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ReportSubmitIdempotencyUpdateManyArgs>(args: SelectSubset<T, ReportSubmitIdempotencyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReportSubmitIdempotencies and returns the data updated in the database.
+     * @param {ReportSubmitIdempotencyUpdateManyAndReturnArgs} args - Arguments to update many ReportSubmitIdempotencies.
+     * @example
+     * // Update many ReportSubmitIdempotencies
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ReportSubmitIdempotencies and only return the `id`
+     * const reportSubmitIdempotencyWithIdOnly = await prisma.reportSubmitIdempotency.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ReportSubmitIdempotencyUpdateManyAndReturnArgs>(args: SelectSubset<T, ReportSubmitIdempotencyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ReportSubmitIdempotency.
+     * @param {ReportSubmitIdempotencyUpsertArgs} args - Arguments to update or create a ReportSubmitIdempotency.
+     * @example
+     * // Update or create a ReportSubmitIdempotency
+     * const reportSubmitIdempotency = await prisma.reportSubmitIdempotency.upsert({
+     *   create: {
+     *     // ... data to create a ReportSubmitIdempotency
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ReportSubmitIdempotency we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ReportSubmitIdempotencyUpsertArgs>(args: SelectSubset<T, ReportSubmitIdempotencyUpsertArgs<ExtArgs>>): Prisma__ReportSubmitIdempotencyClient<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ReportSubmitIdempotencies.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyCountArgs} args - Arguments to filter ReportSubmitIdempotencies to count.
+     * @example
+     * // Count the number of ReportSubmitIdempotencies
+     * const count = await prisma.reportSubmitIdempotency.count({
+     *   where: {
+     *     // ... the filter for the ReportSubmitIdempotencies we want to count
+     *   }
+     * })
+    **/
+    count<T extends ReportSubmitIdempotencyCountArgs>(
+      args?: Subset<T, ReportSubmitIdempotencyCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ReportSubmitIdempotencyCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ReportSubmitIdempotency.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ReportSubmitIdempotencyAggregateArgs>(args: Subset<T, ReportSubmitIdempotencyAggregateArgs>): Prisma.PrismaPromise<GetReportSubmitIdempotencyAggregateType<T>>
+
+    /**
+     * Group by ReportSubmitIdempotency.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSubmitIdempotencyGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportSubmitIdempotencyGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportSubmitIdempotencyGroupByArgs['orderBy'] }
+        : { orderBy?: ReportSubmitIdempotencyGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportSubmitIdempotencyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportSubmitIdempotencyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ReportSubmitIdempotency model
+   */
+  readonly fields: ReportSubmitIdempotencyFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ReportSubmitIdempotency.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ReportSubmitIdempotencyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    report<T extends ReportDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ReportDefaultArgs<ExtArgs>>): Prisma__ReportClient<$Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ReportSubmitIdempotency model
+   */
+  interface ReportSubmitIdempotencyFieldRefs {
+    readonly id: FieldRef<"ReportSubmitIdempotency", 'String'>
+    readonly createdAt: FieldRef<"ReportSubmitIdempotency", 'DateTime'>
+    readonly userId: FieldRef<"ReportSubmitIdempotency", 'String'>
+    readonly key: FieldRef<"ReportSubmitIdempotency", 'String'>
+    readonly reportId: FieldRef<"ReportSubmitIdempotency", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ReportSubmitIdempotency findUnique
+   */
+  export type ReportSubmitIdempotencyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter, which ReportSubmitIdempotency to fetch.
+     */
+    where: ReportSubmitIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * ReportSubmitIdempotency findUniqueOrThrow
+   */
+  export type ReportSubmitIdempotencyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter, which ReportSubmitIdempotency to fetch.
+     */
+    where: ReportSubmitIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * ReportSubmitIdempotency findFirst
+   */
+  export type ReportSubmitIdempotencyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter, which ReportSubmitIdempotency to fetch.
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSubmitIdempotencies to fetch.
+     */
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReportSubmitIdempotencies.
+     */
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSubmitIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSubmitIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSubmitIdempotencies.
+     */
+    distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSubmitIdempotency findFirstOrThrow
+   */
+  export type ReportSubmitIdempotencyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter, which ReportSubmitIdempotency to fetch.
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSubmitIdempotencies to fetch.
+     */
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReportSubmitIdempotencies.
+     */
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSubmitIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSubmitIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSubmitIdempotencies.
+     */
+    distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSubmitIdempotency findMany
+   */
+  export type ReportSubmitIdempotencyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter, which ReportSubmitIdempotencies to fetch.
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSubmitIdempotencies to fetch.
+     */
+    orderBy?: ReportSubmitIdempotencyOrderByWithRelationInput | ReportSubmitIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ReportSubmitIdempotencies.
+     */
+    cursor?: ReportSubmitIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSubmitIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSubmitIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSubmitIdempotencies.
+     */
+    distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSubmitIdempotency create
+   */
+  export type ReportSubmitIdempotencyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ReportSubmitIdempotency.
+     */
+    data: XOR<ReportSubmitIdempotencyCreateInput, ReportSubmitIdempotencyUncheckedCreateInput>
+  }
+
+  /**
+   * ReportSubmitIdempotency createMany
+   */
+  export type ReportSubmitIdempotencyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ReportSubmitIdempotencies.
+     */
+    data: ReportSubmitIdempotencyCreateManyInput | ReportSubmitIdempotencyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ReportSubmitIdempotency createManyAndReturn
+   */
+  export type ReportSubmitIdempotencyCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data used to create many ReportSubmitIdempotencies.
+     */
+    data: ReportSubmitIdempotencyCreateManyInput | ReportSubmitIdempotencyCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ReportSubmitIdempotency update
+   */
+  export type ReportSubmitIdempotencyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ReportSubmitIdempotency.
+     */
+    data: XOR<ReportSubmitIdempotencyUpdateInput, ReportSubmitIdempotencyUncheckedUpdateInput>
+    /**
+     * Choose, which ReportSubmitIdempotency to update.
+     */
+    where: ReportSubmitIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * ReportSubmitIdempotency updateMany
+   */
+  export type ReportSubmitIdempotencyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ReportSubmitIdempotencies.
+     */
+    data: XOR<ReportSubmitIdempotencyUpdateManyMutationInput, ReportSubmitIdempotencyUncheckedUpdateManyInput>
+    /**
+     * Filter which ReportSubmitIdempotencies to update
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * Limit how many ReportSubmitIdempotencies to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReportSubmitIdempotency updateManyAndReturn
+   */
+  export type ReportSubmitIdempotencyUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data used to update ReportSubmitIdempotencies.
+     */
+    data: XOR<ReportSubmitIdempotencyUpdateManyMutationInput, ReportSubmitIdempotencyUncheckedUpdateManyInput>
+    /**
+     * Filter which ReportSubmitIdempotencies to update
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * Limit how many ReportSubmitIdempotencies to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ReportSubmitIdempotency upsert
+   */
+  export type ReportSubmitIdempotencyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ReportSubmitIdempotency to update in case it exists.
+     */
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    /**
+     * In case the ReportSubmitIdempotency found by the `where` argument doesn't exist, create a new ReportSubmitIdempotency with this data.
+     */
+    create: XOR<ReportSubmitIdempotencyCreateInput, ReportSubmitIdempotencyUncheckedCreateInput>
+    /**
+     * In case the ReportSubmitIdempotency was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ReportSubmitIdempotencyUpdateInput, ReportSubmitIdempotencyUncheckedUpdateInput>
+  }
+
+  /**
+   * ReportSubmitIdempotency delete
+   */
+  export type ReportSubmitIdempotencyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+    /**
+     * Filter which ReportSubmitIdempotency to delete.
+     */
+    where: ReportSubmitIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * ReportSubmitIdempotency deleteMany
+   */
+  export type ReportSubmitIdempotencyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReportSubmitIdempotencies to delete
+     */
+    where?: ReportSubmitIdempotencyWhereInput
+    /**
+     * Limit how many ReportSubmitIdempotencies to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReportSubmitIdempotency without action
+   */
+  export type ReportSubmitIdempotencyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSubmitIdempotency
+     */
+    select?: ReportSubmitIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSubmitIdempotency
+     */
+    omit?: ReportSubmitIdempotencyOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
   }
 
 
@@ -41875,7 +43136,9 @@ export namespace Prisma {
     tone: 'tone',
     category: 'category',
     isUnread: 'isUnread',
-    href: 'href'
+    href: 'href',
+    messageTemplateKey: 'messageTemplateKey',
+    messageTemplateParams: 'messageTemplateParams'
   };
 
   export type AdminNotificationScalarFieldEnum = (typeof AdminNotificationScalarFieldEnum)[keyof typeof AdminNotificationScalarFieldEnum]
@@ -41946,6 +43209,17 @@ export namespace Prisma {
   };
 
   export type ReportCoReporterScalarFieldEnum = (typeof ReportCoReporterScalarFieldEnum)[keyof typeof ReportCoReporterScalarFieldEnum]
+
+
+  export const ReportSubmitIdempotencyScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    userId: 'userId',
+    key: 'key',
+    reportId: 'reportId'
+  };
+
+  export type ReportSubmitIdempotencyScalarFieldEnum = (typeof ReportSubmitIdempotencyScalarFieldEnum)[keyof typeof ReportSubmitIdempotencyScalarFieldEnum]
 
 
   export const SystemConfigScalarFieldEnum: {
@@ -42650,6 +43924,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorListRelationFilter
     eventChatPinnedMessages?: EventChatMessageListRelationFilter
     eventChatMutes?: EventChatMuteListRelationFilter
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -42700,6 +43975,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorOrderByRelationAggregateInput
     eventChatPinnedMessages?: EventChatMessageOrderByRelationAggregateInput
     eventChatMutes?: EventChatMuteOrderByRelationAggregateInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -42753,6 +44029,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorListRelationFilter
     eventChatPinnedMessages?: EventChatMessageListRelationFilter
     eventChatMutes?: EventChatMuteListRelationFilter
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -43177,6 +44454,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFilter<"AdminNotification"> | $Enums.AdminNotificationCategory
     isUnread?: BoolFilter<"AdminNotification"> | boolean
     href?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateKey?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateParams?: JsonNullableFilter<"AdminNotification">
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
@@ -43192,6 +44471,8 @@ export namespace Prisma {
     category?: SortOrder
     isUnread?: SortOrder
     href?: SortOrderInput | SortOrder
+    messageTemplateKey?: SortOrderInput | SortOrder
+    messageTemplateParams?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
 
@@ -43210,6 +44491,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFilter<"AdminNotification"> | $Enums.AdminNotificationCategory
     isUnread?: BoolFilter<"AdminNotification"> | boolean
     href?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateKey?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateParams?: JsonNullableFilter<"AdminNotification">
     user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }, "id">
 
@@ -43225,6 +44508,8 @@ export namespace Prisma {
     category?: SortOrder
     isUnread?: SortOrder
     href?: SortOrderInput | SortOrder
+    messageTemplateKey?: SortOrderInput | SortOrder
+    messageTemplateParams?: SortOrderInput | SortOrder
     _count?: AdminNotificationCountOrderByAggregateInput
     _max?: AdminNotificationMaxOrderByAggregateInput
     _min?: AdminNotificationMinOrderByAggregateInput
@@ -43245,6 +44530,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryWithAggregatesFilter<"AdminNotification"> | $Enums.AdminNotificationCategory
     isUnread?: BoolWithAggregatesFilter<"AdminNotification"> | boolean
     href?: StringNullableWithAggregatesFilter<"AdminNotification"> | string | null
+    messageTemplateKey?: StringNullableWithAggregatesFilter<"AdminNotification"> | string | null
+    messageTemplateParams?: JsonNullableWithAggregatesFilter<"AdminNotification">
   }
 
   export type PointTransactionWhereInput = {
@@ -43458,6 +44745,7 @@ export namespace Prisma {
     potentialDuplicateOf?: XOR<ReportNullableScalarRelationFilter, ReportWhereInput> | null
     potentialDuplicates?: ReportListRelationFilter
     coReporters?: ReportCoReporterListRelationFilter
+    submitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
   }
 
   export type ReportOrderByWithRelationInput = {
@@ -43484,6 +44772,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportOrderByWithRelationInput
     potentialDuplicates?: ReportOrderByRelationAggregateInput
     coReporters?: ReportCoReporterOrderByRelationAggregateInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyOrderByRelationAggregateInput
   }
 
   export type ReportWhereUniqueInput = Prisma.AtLeast<{
@@ -43513,6 +44802,7 @@ export namespace Prisma {
     potentialDuplicateOf?: XOR<ReportNullableScalarRelationFilter, ReportWhereInput> | null
     potentialDuplicates?: ReportListRelationFilter
     coReporters?: ReportCoReporterListRelationFilter
+    submitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
   }, "id" | "reportNumber">
 
   export type ReportOrderByWithAggregationInput = {
@@ -43620,6 +44910,65 @@ export namespace Prisma {
     reportedAt?: DateTimeWithAggregatesFilter<"ReportCoReporter"> | Date | string
     reportId?: StringWithAggregatesFilter<"ReportCoReporter"> | string
     userId?: StringWithAggregatesFilter<"ReportCoReporter"> | string
+  }
+
+  export type ReportSubmitIdempotencyWhereInput = {
+    AND?: ReportSubmitIdempotencyWhereInput | ReportSubmitIdempotencyWhereInput[]
+    OR?: ReportSubmitIdempotencyWhereInput[]
+    NOT?: ReportSubmitIdempotencyWhereInput | ReportSubmitIdempotencyWhereInput[]
+    id?: StringFilter<"ReportSubmitIdempotency"> | string
+    createdAt?: DateTimeFilter<"ReportSubmitIdempotency"> | Date | string
+    userId?: StringFilter<"ReportSubmitIdempotency"> | string
+    key?: StringFilter<"ReportSubmitIdempotency"> | string
+    reportId?: StringFilter<"ReportSubmitIdempotency"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
+  }
+
+  export type ReportSubmitIdempotencyOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    key?: SortOrder
+    reportId?: SortOrder
+    user?: UserOrderByWithRelationInput
+    report?: ReportOrderByWithRelationInput
+  }
+
+  export type ReportSubmitIdempotencyWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_key?: ReportSubmitIdempotencyUserIdKeyCompoundUniqueInput
+    AND?: ReportSubmitIdempotencyWhereInput | ReportSubmitIdempotencyWhereInput[]
+    OR?: ReportSubmitIdempotencyWhereInput[]
+    NOT?: ReportSubmitIdempotencyWhereInput | ReportSubmitIdempotencyWhereInput[]
+    createdAt?: DateTimeFilter<"ReportSubmitIdempotency"> | Date | string
+    userId?: StringFilter<"ReportSubmitIdempotency"> | string
+    key?: StringFilter<"ReportSubmitIdempotency"> | string
+    reportId?: StringFilter<"ReportSubmitIdempotency"> | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    report?: XOR<ReportScalarRelationFilter, ReportWhereInput>
+  }, "id" | "userId_key">
+
+  export type ReportSubmitIdempotencyOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    key?: SortOrder
+    reportId?: SortOrder
+    _count?: ReportSubmitIdempotencyCountOrderByAggregateInput
+    _max?: ReportSubmitIdempotencyMaxOrderByAggregateInput
+    _min?: ReportSubmitIdempotencyMinOrderByAggregateInput
+  }
+
+  export type ReportSubmitIdempotencyScalarWhereWithAggregatesInput = {
+    AND?: ReportSubmitIdempotencyScalarWhereWithAggregatesInput | ReportSubmitIdempotencyScalarWhereWithAggregatesInput[]
+    OR?: ReportSubmitIdempotencyScalarWhereWithAggregatesInput[]
+    NOT?: ReportSubmitIdempotencyScalarWhereWithAggregatesInput | ReportSubmitIdempotencyScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"ReportSubmitIdempotency"> | Date | string
+    userId?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
+    key?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
+    reportId?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
   }
 
   export type SystemConfigWhereInput = {
@@ -45230,6 +46579,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -45280,6 +46630,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -45330,6 +46681,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -45380,6 +46732,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -45832,6 +47185,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
     user?: UserCreateNestedOneWithoutAdminNotificationsInput
   }
 
@@ -45847,6 +47202,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUpdateInput = {
@@ -45860,6 +47217,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
     user?: UserUpdateOneWithoutAdminNotificationsNestedInput
   }
 
@@ -45875,6 +47234,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationCreateManyInput = {
@@ -45889,6 +47250,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUpdateManyMutationInput = {
@@ -45902,6 +47265,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUncheckedUpdateManyInput = {
@@ -45916,6 +47281,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type PointTransactionCreateInput = {
@@ -46150,6 +47517,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateInput = {
@@ -46172,6 +47540,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportUpdateInput = {
@@ -46194,6 +47563,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateInput = {
@@ -46216,6 +47586,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportCreateManyInput = {
@@ -46326,6 +47697,60 @@ export namespace Prisma {
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    key: string
+    user: UserCreateNestedOneWithoutReportSubmitIdempotencyKeysInput
+    report: ReportCreateNestedOneWithoutSubmitIdempotencyKeysInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    key: string
+    reportId: string
+  }
+
+  export type ReportSubmitIdempotencyUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+    user?: UserUpdateOneRequiredWithoutReportSubmitIdempotencyKeysNestedInput
+    report?: ReportUpdateOneRequiredWithoutSubmitIdempotencyKeysNestedInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    reportId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    key: string
+    reportId: string
+  }
+
+  export type ReportSubmitIdempotencyUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    reportId?: StringFieldUpdateOperationsInput | string
   }
 
   export type SystemConfigCreateInput = {
@@ -48199,6 +49624,12 @@ export namespace Prisma {
     none?: EventChatMuteWhereInput
   }
 
+  export type ReportSubmitIdempotencyListRelationFilter = {
+    every?: ReportSubmitIdempotencyWhereInput
+    some?: ReportSubmitIdempotencyWhereInput
+    none?: ReportSubmitIdempotencyWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -48285,6 +49716,10 @@ export namespace Prisma {
   }
 
   export type EventChatMuteOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ReportSubmitIdempotencyOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -48688,73 +50123,6 @@ export namespace Prisma {
     notIn?: $Enums.AdminNotificationCategory[] | ListEnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
     not?: NestedEnumAdminNotificationCategoryFilter<$PrismaModel> | $Enums.AdminNotificationCategory
   }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
-  }
-
-  export type AdminNotificationCountOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    userId?: SortOrder
-    title?: SortOrder
-    message?: SortOrder
-    timeLabel?: SortOrder
-    tone?: SortOrder
-    category?: SortOrder
-    isUnread?: SortOrder
-    href?: SortOrder
-  }
-
-  export type AdminNotificationMaxOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    userId?: SortOrder
-    title?: SortOrder
-    message?: SortOrder
-    timeLabel?: SortOrder
-    tone?: SortOrder
-    category?: SortOrder
-    isUnread?: SortOrder
-    href?: SortOrder
-  }
-
-  export type AdminNotificationMinOrderByAggregateInput = {
-    id?: SortOrder
-    createdAt?: SortOrder
-    updatedAt?: SortOrder
-    userId?: SortOrder
-    title?: SortOrder
-    message?: SortOrder
-    timeLabel?: SortOrder
-    tone?: SortOrder
-    category?: SortOrder
-    isUnread?: SortOrder
-    href?: SortOrder
-  }
-
-  export type EnumAdminNotificationToneWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.AdminNotificationTone | EnumAdminNotificationToneFieldRefInput<$PrismaModel>
-    in?: $Enums.AdminNotificationTone[] | ListEnumAdminNotificationToneFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AdminNotificationTone[] | ListEnumAdminNotificationToneFieldRefInput<$PrismaModel>
-    not?: NestedEnumAdminNotificationToneWithAggregatesFilter<$PrismaModel> | $Enums.AdminNotificationTone
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumAdminNotificationToneFilter<$PrismaModel>
-    _max?: NestedEnumAdminNotificationToneFilter<$PrismaModel>
-  }
-
-  export type EnumAdminNotificationCategoryWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: $Enums.AdminNotificationCategory | EnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
-    in?: $Enums.AdminNotificationCategory[] | ListEnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
-    notIn?: $Enums.AdminNotificationCategory[] | ListEnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
-    not?: NestedEnumAdminNotificationCategoryWithAggregatesFilter<$PrismaModel> | $Enums.AdminNotificationCategory
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedEnumAdminNotificationCategoryFilter<$PrismaModel>
-    _max?: NestedEnumAdminNotificationCategoryFilter<$PrismaModel>
-  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -48777,6 +50145,103 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type AdminNotificationCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    message?: SortOrder
+    timeLabel?: SortOrder
+    tone?: SortOrder
+    category?: SortOrder
+    isUnread?: SortOrder
+    href?: SortOrder
+    messageTemplateKey?: SortOrder
+    messageTemplateParams?: SortOrder
+  }
+
+  export type AdminNotificationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    message?: SortOrder
+    timeLabel?: SortOrder
+    tone?: SortOrder
+    category?: SortOrder
+    isUnread?: SortOrder
+    href?: SortOrder
+    messageTemplateKey?: SortOrder
+  }
+
+  export type AdminNotificationMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    userId?: SortOrder
+    title?: SortOrder
+    message?: SortOrder
+    timeLabel?: SortOrder
+    tone?: SortOrder
+    category?: SortOrder
+    isUnread?: SortOrder
+    href?: SortOrder
+    messageTemplateKey?: SortOrder
+  }
+
+  export type EnumAdminNotificationToneWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminNotificationTone | EnumAdminNotificationToneFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminNotificationTone[] | ListEnumAdminNotificationToneFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminNotificationTone[] | ListEnumAdminNotificationToneFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminNotificationToneWithAggregatesFilter<$PrismaModel> | $Enums.AdminNotificationTone
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminNotificationToneFilter<$PrismaModel>
+    _max?: NestedEnumAdminNotificationToneFilter<$PrismaModel>
+  }
+
+  export type EnumAdminNotificationCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.AdminNotificationCategory | EnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.AdminNotificationCategory[] | ListEnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.AdminNotificationCategory[] | ListEnumAdminNotificationCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumAdminNotificationCategoryWithAggregatesFilter<$PrismaModel> | $Enums.AdminNotificationCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumAdminNotificationCategoryFilter<$PrismaModel>
+    _max?: NestedEnumAdminNotificationCategoryFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type PointTransactionCountOrderByAggregateInput = {
@@ -48821,32 +50286,6 @@ export namespace Prisma {
   export type PointTransactionSumOrderByAggregateInput = {
     delta?: SortOrder
     balanceAfter?: SortOrder
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type FloatFilter<$PrismaModel = never> = {
@@ -49127,6 +50566,35 @@ export namespace Prisma {
     reportedAt?: SortOrder
     reportId?: SortOrder
     userId?: SortOrder
+  }
+
+  export type ReportSubmitIdempotencyUserIdKeyCompoundUniqueInput = {
+    userId: string
+    key: string
+  }
+
+  export type ReportSubmitIdempotencyCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    key?: SortOrder
+    reportId?: SortOrder
+  }
+
+  export type ReportSubmitIdempotencyMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    key?: SortOrder
+    reportId?: SortOrder
+  }
+
+  export type ReportSubmitIdempotencyMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    key?: SortOrder
+    reportId?: SortOrder
   }
 
   export type SystemConfigCountOrderByAggregateInput = {
@@ -50374,6 +51842,13 @@ export namespace Prisma {
     connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
   }
 
+  export type ReportSubmitIdempotencyCreateNestedManyWithoutUserInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput> | ReportSubmitIdempotencyCreateWithoutUserInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutUserInput | ReportSubmitIdempotencyCreateOrConnectWithoutUserInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyUserInputEnvelope
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -50539,6 +52014,13 @@ export namespace Prisma {
     connectOrCreate?: EventChatMuteCreateOrConnectWithoutUserInput | EventChatMuteCreateOrConnectWithoutUserInput[]
     createMany?: EventChatMuteCreateManyUserInputEnvelope
     connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+  }
+
+  export type ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput> | ReportSubmitIdempotencyCreateWithoutUserInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutUserInput | ReportSubmitIdempotencyCreateOrConnectWithoutUserInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyUserInputEnvelope
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -50914,6 +52396,20 @@ export namespace Prisma {
     deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
   }
 
+  export type ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput> | ReportSubmitIdempotencyCreateWithoutUserInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutUserInput | ReportSubmitIdempotencyCreateOrConnectWithoutUserInput[]
+    upsert?: ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutUserInput | ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyUserInputEnvelope
+    set?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    disconnect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    delete?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    update?: ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput | ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput | ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -51244,6 +52740,20 @@ export namespace Prisma {
     update?: EventChatMuteUpdateWithWhereUniqueWithoutUserInput | EventChatMuteUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: EventChatMuteUpdateManyWithWhereWithoutUserInput | EventChatMuteUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput> | ReportSubmitIdempotencyCreateWithoutUserInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutUserInput | ReportSubmitIdempotencyCreateOrConnectWithoutUserInput[]
+    upsert?: ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutUserInput | ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyUserInputEnvelope
+    set?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    disconnect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    delete?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    update?: ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput | ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput | ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -51632,6 +53142,13 @@ export namespace Prisma {
     connect?: ReportCoReporterWhereUniqueInput | ReportCoReporterWhereUniqueInput[]
   }
 
+  export type ReportSubmitIdempotencyCreateNestedManyWithoutReportInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput> | ReportSubmitIdempotencyCreateWithoutReportInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutReportInput | ReportSubmitIdempotencyCreateOrConnectWithoutReportInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyReportInputEnvelope
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput = {
     create?: XOR<ReportCreateWithoutPotentialDuplicateOfInput, ReportUncheckedCreateWithoutPotentialDuplicateOfInput> | ReportCreateWithoutPotentialDuplicateOfInput[] | ReportUncheckedCreateWithoutPotentialDuplicateOfInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutPotentialDuplicateOfInput | ReportCreateOrConnectWithoutPotentialDuplicateOfInput[]
@@ -51644,6 +53161,13 @@ export namespace Prisma {
     connectOrCreate?: ReportCoReporterCreateOrConnectWithoutReportInput | ReportCoReporterCreateOrConnectWithoutReportInput[]
     createMany?: ReportCoReporterCreateManyReportInputEnvelope
     connect?: ReportCoReporterWhereUniqueInput | ReportCoReporterWhereUniqueInput[]
+  }
+
+  export type ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput> | ReportSubmitIdempotencyCreateWithoutReportInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutReportInput | ReportSubmitIdempotencyCreateOrConnectWithoutReportInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyReportInputEnvelope
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
   }
 
   export type ReportUpdatemediaUrlsInput = {
@@ -51733,6 +53257,20 @@ export namespace Prisma {
     deleteMany?: ReportCoReporterScalarWhereInput | ReportCoReporterScalarWhereInput[]
   }
 
+  export type ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput> | ReportSubmitIdempotencyCreateWithoutReportInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutReportInput | ReportSubmitIdempotencyCreateOrConnectWithoutReportInput[]
+    upsert?: ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutReportInput | ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutReportInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyReportInputEnvelope
+    set?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    disconnect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    delete?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    update?: ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutReportInput | ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutReportInput[]
+    updateMany?: ReportSubmitIdempotencyUpdateManyWithWhereWithoutReportInput | ReportSubmitIdempotencyUpdateManyWithWhereWithoutReportInput[]
+    deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput = {
     create?: XOR<ReportCreateWithoutPotentialDuplicateOfInput, ReportUncheckedCreateWithoutPotentialDuplicateOfInput> | ReportCreateWithoutPotentialDuplicateOfInput[] | ReportUncheckedCreateWithoutPotentialDuplicateOfInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutPotentialDuplicateOfInput | ReportCreateOrConnectWithoutPotentialDuplicateOfInput[]
@@ -51761,6 +53299,20 @@ export namespace Prisma {
     deleteMany?: ReportCoReporterScalarWhereInput | ReportCoReporterScalarWhereInput[]
   }
 
+  export type ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput = {
+    create?: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput> | ReportSubmitIdempotencyCreateWithoutReportInput[] | ReportSubmitIdempotencyUncheckedCreateWithoutReportInput[]
+    connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutReportInput | ReportSubmitIdempotencyCreateOrConnectWithoutReportInput[]
+    upsert?: ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutReportInput | ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutReportInput[]
+    createMany?: ReportSubmitIdempotencyCreateManyReportInputEnvelope
+    set?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    disconnect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    delete?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+    update?: ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutReportInput | ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutReportInput[]
+    updateMany?: ReportSubmitIdempotencyUpdateManyWithWhereWithoutReportInput | ReportSubmitIdempotencyUpdateManyWithWhereWithoutReportInput[]
+    deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+  }
+
   export type ReportCreateNestedOneWithoutCoReportersInput = {
     create?: XOR<ReportCreateWithoutCoReportersInput, ReportUncheckedCreateWithoutCoReportersInput>
     connectOrCreate?: ReportCreateOrConnectWithoutCoReportersInput
@@ -51787,6 +53339,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutCoReportedReportsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCoReportedReportsInput, UserUpdateWithoutCoReportedReportsInput>, UserUncheckedUpdateWithoutCoReportedReportsInput>
+  }
+
+  export type UserCreateNestedOneWithoutReportSubmitIdempotencyKeysInput = {
+    create?: XOR<UserCreateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportSubmitIdempotencyKeysInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ReportCreateNestedOneWithoutSubmitIdempotencyKeysInput = {
+    create?: XOR<ReportCreateWithoutSubmitIdempotencyKeysInput, ReportUncheckedCreateWithoutSubmitIdempotencyKeysInput>
+    connectOrCreate?: ReportCreateOrConnectWithoutSubmitIdempotencyKeysInput
+    connect?: ReportWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutReportSubmitIdempotencyKeysNestedInput = {
+    create?: XOR<UserCreateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput>
+    connectOrCreate?: UserCreateOrConnectWithoutReportSubmitIdempotencyKeysInput
+    upsert?: UserUpsertWithoutReportSubmitIdempotencyKeysInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutReportSubmitIdempotencyKeysInput, UserUpdateWithoutReportSubmitIdempotencyKeysInput>, UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput>
+  }
+
+  export type ReportUpdateOneRequiredWithoutSubmitIdempotencyKeysNestedInput = {
+    create?: XOR<ReportCreateWithoutSubmitIdempotencyKeysInput, ReportUncheckedCreateWithoutSubmitIdempotencyKeysInput>
+    connectOrCreate?: ReportCreateOrConnectWithoutSubmitIdempotencyKeysInput
+    upsert?: ReportUpsertWithoutSubmitIdempotencyKeysInput
+    connect?: ReportWhereUniqueInput
+    update?: XOR<XOR<ReportUpdateToOneWithWhereWithoutSubmitIdempotencyKeysInput, ReportUpdateWithoutSubmitIdempotencyKeysInput>, ReportUncheckedUpdateWithoutSubmitIdempotencyKeysInput>
   }
 
   export type UserCreateNestedOneWithoutAuditLogsInput = {
@@ -53345,6 +54925,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutReporterInput = {
@@ -53366,6 +54947,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutReporterInput = {
@@ -53397,6 +54979,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutModeratedByInput = {
@@ -53418,6 +55001,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutModeratedByInput = {
@@ -53441,6 +55025,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUncheckedCreateWithoutUserInput = {
@@ -53454,6 +55040,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationCreateOrConnectWithoutUserInput = {
@@ -54149,6 +55737,30 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ReportSubmitIdempotencyCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    key: string
+    report: ReportCreateNestedOneWithoutSubmitIdempotencyKeysInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    key: string
+    reportId: string
+  }
+
+  export type ReportSubmitIdempotencyCreateOrConnectWithoutUserInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    create: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput>
+  }
+
+  export type ReportSubmitIdempotencyCreateManyUserInputEnvelope = {
+    data: ReportSubmitIdempotencyCreateManyUserInput | ReportSubmitIdempotencyCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutReporterInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutReporterInput, ReportUncheckedUpdateWithoutReporterInput>
@@ -54235,6 +55847,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFilter<"AdminNotification"> | $Enums.AdminNotificationCategory
     isUnread?: BoolFilter<"AdminNotification"> | boolean
     href?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateKey?: StringNullableFilter<"AdminNotification"> | string | null
+    messageTemplateParams?: JsonNullableFilter<"AdminNotification">
   }
 
   export type PointTransactionUpsertWithWhereUniqueWithoutUserInput = {
@@ -54857,6 +56471,33 @@ export namespace Prisma {
     userId?: StringFilter<"EventChatMute"> | string
   }
 
+  export type ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutUserInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    update: XOR<ReportSubmitIdempotencyUpdateWithoutUserInput, ReportSubmitIdempotencyUncheckedUpdateWithoutUserInput>
+    create: XOR<ReportSubmitIdempotencyCreateWithoutUserInput, ReportSubmitIdempotencyUncheckedCreateWithoutUserInput>
+  }
+
+  export type ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    data: XOR<ReportSubmitIdempotencyUpdateWithoutUserInput, ReportSubmitIdempotencyUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput = {
+    where: ReportSubmitIdempotencyScalarWhereInput
+    data: XOR<ReportSubmitIdempotencyUpdateManyMutationInput, ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ReportSubmitIdempotencyScalarWhereInput = {
+    AND?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+    OR?: ReportSubmitIdempotencyScalarWhereInput[]
+    NOT?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+    id?: StringFilter<"ReportSubmitIdempotency"> | string
+    createdAt?: DateTimeFilter<"ReportSubmitIdempotency"> | Date | string
+    userId?: StringFilter<"ReportSubmitIdempotency"> | string
+    key?: StringFilter<"ReportSubmitIdempotency"> | string
+    reportId?: StringFilter<"ReportSubmitIdempotency"> | string
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     createdAt?: Date | string
@@ -54904,6 +56545,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -54953,6 +56595,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -55018,6 +56661,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -55067,6 +56711,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminTempTokensInput = {
@@ -55116,6 +56761,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminTempTokensInput = {
@@ -55165,6 +56811,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminTempTokensInput = {
@@ -55230,6 +56877,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminTempTokensInput = {
@@ -55279,6 +56927,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminPendingMfaInput = {
@@ -55328,6 +56977,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminPendingMfaInput = {
@@ -55377,6 +57027,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminPendingMfaInput = {
@@ -55442,6 +57093,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminPendingMfaInput = {
@@ -55491,6 +57143,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminNotificationsInput = {
@@ -55540,6 +57193,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminNotificationsInput = {
@@ -55589,6 +57243,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminNotificationsInput = {
@@ -55654,6 +57309,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
@@ -55703,6 +57359,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPointTransactionsInput = {
@@ -55752,6 +57409,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -55801,6 +57459,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -55866,6 +57525,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -55915,6 +57575,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateWithoutSiteInput = {
@@ -55936,6 +57597,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutSiteInput = {
@@ -55957,6 +57619,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutSiteInput = {
@@ -56343,6 +58006,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -56392,6 +58056,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -56446,6 +58111,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutModeratedReportsInput = {
@@ -56495,6 +58161,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutModeratedReportsInput = {
@@ -56521,6 +58188,7 @@ export namespace Prisma {
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutPotentialDuplicatesInput = {
@@ -56542,6 +58210,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: string | null
     mergedDuplicateChildCount?: number
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutPotentialDuplicatesInput = {
@@ -56568,6 +58237,7 @@ export namespace Prisma {
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutPotentialDuplicateOfInput = {
@@ -56589,6 +58259,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
     coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutPotentialDuplicateOfInput = {
@@ -56622,6 +58293,30 @@ export namespace Prisma {
 
   export type ReportCoReporterCreateManyReportInputEnvelope = {
     data: ReportCoReporterCreateManyReportInput | ReportCoReporterCreateManyReportInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ReportSubmitIdempotencyCreateWithoutReportInput = {
+    id?: string
+    createdAt?: Date | string
+    key: string
+    user: UserCreateNestedOneWithoutReportSubmitIdempotencyKeysInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedCreateWithoutReportInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    key: string
+  }
+
+  export type ReportSubmitIdempotencyCreateOrConnectWithoutReportInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    create: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput>
+  }
+
+  export type ReportSubmitIdempotencyCreateManyReportInputEnvelope = {
+    data: ReportSubmitIdempotencyCreateManyReportInput | ReportSubmitIdempotencyCreateManyReportInput[]
     skipDuplicates?: boolean
   }
 
@@ -56734,6 +58429,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -56783,6 +58479,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutModeratedReportsInput = {
@@ -56843,6 +58540,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutModeratedReportsInput = {
@@ -56892,6 +58590,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithoutPotentialDuplicatesInput = {
@@ -56924,6 +58623,7 @@ export namespace Prisma {
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutPotentialDuplicatesInput = {
@@ -56945,6 +58645,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUpsertWithWhereUniqueWithoutPotentialDuplicateOfInput = {
@@ -56979,6 +58680,22 @@ export namespace Prisma {
     data: XOR<ReportCoReporterUpdateManyMutationInput, ReportCoReporterUncheckedUpdateManyWithoutReportInput>
   }
 
+  export type ReportSubmitIdempotencyUpsertWithWhereUniqueWithoutReportInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    update: XOR<ReportSubmitIdempotencyUpdateWithoutReportInput, ReportSubmitIdempotencyUncheckedUpdateWithoutReportInput>
+    create: XOR<ReportSubmitIdempotencyCreateWithoutReportInput, ReportSubmitIdempotencyUncheckedCreateWithoutReportInput>
+  }
+
+  export type ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutReportInput = {
+    where: ReportSubmitIdempotencyWhereUniqueInput
+    data: XOR<ReportSubmitIdempotencyUpdateWithoutReportInput, ReportSubmitIdempotencyUncheckedUpdateWithoutReportInput>
+  }
+
+  export type ReportSubmitIdempotencyUpdateManyWithWhereWithoutReportInput = {
+    where: ReportSubmitIdempotencyScalarWhereInput
+    data: XOR<ReportSubmitIdempotencyUpdateManyMutationInput, ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportInput>
+  }
+
   export type ReportCreateWithoutCoReportersInput = {
     id?: string
     createdAt?: Date | string
@@ -56998,6 +58715,7 @@ export namespace Prisma {
     moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
     potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
     potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutReportInput
   }
 
   export type ReportUncheckedCreateWithoutCoReportersInput = {
@@ -57019,6 +58737,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: string | null
     mergedDuplicateChildCount?: number
     potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutReportInput
   }
 
   export type ReportCreateOrConnectWithoutCoReportersInput = {
@@ -57073,6 +58792,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCoReportedReportsInput = {
@@ -57122,6 +58842,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCoReportedReportsInput = {
@@ -57159,6 +58880,7 @@ export namespace Prisma {
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutCoReportersInput = {
@@ -57180,6 +58902,7 @@ export namespace Prisma {
     potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type UserUpsertWithoutCoReportedReportsInput = {
@@ -57240,6 +58963,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoReportedReportsInput = {
@@ -57289,6 +59013,327 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutReportSubmitIdempotencyKeysInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutReportSubmitIdempotencyKeysInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput>
+  }
+
+  export type ReportCreateWithoutSubmitIdempotencyKeysInput = {
+    id?: string
+    createdAt?: Date | string
+    reportNumber?: string | null
+    title: string
+    description?: string | null
+    mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
+    status?: $Enums.ReportStatus
+    moderatedAt?: Date | string | null
+    moderationReason?: string | null
+    mergedDuplicateChildCount?: number
+    site: SiteCreateNestedOneWithoutReportsInput
+    reporter?: UserCreateNestedOneWithoutReportsInput
+    moderatedBy?: UserCreateNestedOneWithoutModeratedReportsInput
+    potentialDuplicateOf?: ReportCreateNestedOneWithoutPotentialDuplicatesInput
+    potentialDuplicates?: ReportCreateNestedManyWithoutPotentialDuplicateOfInput
+    coReporters?: ReportCoReporterCreateNestedManyWithoutReportInput
+  }
+
+  export type ReportUncheckedCreateWithoutSubmitIdempotencyKeysInput = {
+    id?: string
+    createdAt?: Date | string
+    reportNumber?: string | null
+    siteId: string
+    reporterId?: string | null
+    title: string
+    description?: string | null
+    mediaUrls?: ReportCreatemediaUrlsInput | string[]
+    category?: string | null
+    severity?: number | null
+    cleanupEffort?: $Enums.ReportCleanupEffort | null
+    status?: $Enums.ReportStatus
+    moderatedAt?: Date | string | null
+    moderationReason?: string | null
+    moderatedById?: string | null
+    potentialDuplicateOfId?: string | null
+    mergedDuplicateChildCount?: number
+    potentialDuplicates?: ReportUncheckedCreateNestedManyWithoutPotentialDuplicateOfInput
+    coReporters?: ReportCoReporterUncheckedCreateNestedManyWithoutReportInput
+  }
+
+  export type ReportCreateOrConnectWithoutSubmitIdempotencyKeysInput = {
+    where: ReportWhereUniqueInput
+    create: XOR<ReportCreateWithoutSubmitIdempotencyKeysInput, ReportUncheckedCreateWithoutSubmitIdempotencyKeysInput>
+  }
+
+  export type UserUpsertWithoutReportSubmitIdempotencyKeysInput = {
+    update: XOR<UserUpdateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput>
+    create: XOR<UserCreateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutReportSubmitIdempotencyKeysInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutReportSubmitIdempotencyKeysInput, UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput>
+  }
+
+  export type UserUpdateWithoutReportSubmitIdempotencyKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ReportUpsertWithoutSubmitIdempotencyKeysInput = {
+    update: XOR<ReportUpdateWithoutSubmitIdempotencyKeysInput, ReportUncheckedUpdateWithoutSubmitIdempotencyKeysInput>
+    create: XOR<ReportCreateWithoutSubmitIdempotencyKeysInput, ReportUncheckedCreateWithoutSubmitIdempotencyKeysInput>
+    where?: ReportWhereInput
+  }
+
+  export type ReportUpdateToOneWithWhereWithoutSubmitIdempotencyKeysInput = {
+    where?: ReportWhereInput
+    data: XOR<ReportUpdateWithoutSubmitIdempotencyKeysInput, ReportUncheckedUpdateWithoutSubmitIdempotencyKeysInput>
+  }
+
+  export type ReportUpdateWithoutSubmitIdempotencyKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
+    status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
+    moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
+    site?: SiteUpdateOneRequiredWithoutReportsNestedInput
+    reporter?: UserUpdateOneWithoutReportsNestedInput
+    moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
+    potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
+    potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
+    coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+  }
+
+  export type ReportUncheckedUpdateWithoutSubmitIdempotencyKeysInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    reporterId?: NullableStringFieldUpdateOperationsInput | string | null
+    title?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    mediaUrls?: ReportUpdatemediaUrlsInput | string[]
+    category?: NullableStringFieldUpdateOperationsInput | string | null
+    severity?: NullableIntFieldUpdateOperationsInput | number | null
+    cleanupEffort?: NullableEnumReportCleanupEffortFieldUpdateOperationsInput | $Enums.ReportCleanupEffort | null
+    status?: EnumReportStatusFieldUpdateOperationsInput | $Enums.ReportStatus
+    moderatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    moderationReason?: NullableStringFieldUpdateOperationsInput | string | null
+    moderatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    potentialDuplicateOfId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
+    potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
+    coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type UserCreateWithoutAuditLogsInput = {
@@ -57338,6 +59383,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -57387,6 +59433,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -57452,6 +59499,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -57501,6 +59549,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutEventsInput = {
@@ -57595,6 +59644,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizedCleanupEventsInput = {
@@ -57644,6 +59694,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizedCleanupEventsInput = {
@@ -58089,6 +60140,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizedCleanupEventsInput = {
@@ -58138,6 +60190,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventParticipantUpsertWithWhereUniqueWithoutEventInput = {
@@ -58461,6 +60514,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventParticipationsInput = {
@@ -58510,6 +60564,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventParticipationsInput = {
@@ -58654,6 +60709,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventParticipationsInput = {
@@ -58703,6 +60759,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutChatMessagesInput = {
@@ -58825,6 +60882,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMessagesInput = {
@@ -58874,6 +60932,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMessagesInput = {
@@ -59031,6 +61090,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatPinnedMessagesInput = {
@@ -59080,6 +61140,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatPinnedMessagesInput = {
@@ -59260,6 +61321,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMessagesInput = {
@@ -59309,6 +61371,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventChatMessageUpsertWithoutRepliesInput = {
@@ -59440,6 +61503,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatPinnedMessagesInput = {
@@ -59489,6 +61553,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput = {
@@ -59748,6 +61813,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMutesInput = {
@@ -59797,6 +61863,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMutesInput = {
@@ -59941,6 +62008,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMutesInput = {
@@ -59990,6 +62058,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutChatReadCursorsInput = {
@@ -60112,6 +62181,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatReadCursorsInput = {
@@ -60161,6 +62231,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatReadCursorsInput = {
@@ -60305,6 +62376,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatReadCursorsInput = {
@@ -60354,6 +62426,7 @@ export namespace Prisma {
     eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInsInput = {
@@ -60476,6 +62549,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventCheckInsInput = {
@@ -60525,6 +62599,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventCheckInsInput = {
@@ -60669,6 +62744,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventCheckInsInput = {
@@ -60718,6 +62794,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInRedemptionsInput = {
@@ -60964,6 +63041,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteVotesInput = {
@@ -61013,6 +63091,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteVotesInput = {
@@ -61129,6 +63208,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteVotesInput = {
@@ -61178,6 +63258,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutSavesInput = {
@@ -61272,6 +63353,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteSavesInput = {
@@ -61321,6 +63403,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteSavesInput = {
@@ -61437,6 +63520,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteSavesInput = {
@@ -61486,6 +63570,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutCommentsInput = {
@@ -61580,6 +63665,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentsInput = {
@@ -61629,6 +63715,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentsInput = {
@@ -61834,6 +63921,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentsInput = {
@@ -61883,6 +63971,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCommentUpsertWithoutRepliesInput = {
@@ -62032,6 +64121,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentLikesInput = {
@@ -62081,6 +64171,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentLikesInput = {
@@ -62183,6 +64274,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentLikesInput = {
@@ -62232,6 +64324,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutShareEventsInput = {
@@ -62326,6 +64419,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteShareEventsInput = {
@@ -62375,6 +64469,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteShareEventsInput = {
@@ -62491,6 +64586,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteShareEventsInput = {
@@ -62540,6 +64636,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutDeviceTokensInput = {
@@ -62589,6 +64686,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -62638,6 +64736,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -62703,6 +64802,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -62752,6 +64852,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutUserNotificationsInput = {
@@ -62801,6 +64902,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutUserNotificationsInput = {
@@ -62850,6 +64952,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutUserNotificationsInput = {
@@ -62915,6 +65018,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserNotificationsInput = {
@@ -62964,6 +65068,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutNotificationPreferencesInput = {
@@ -63013,6 +65118,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -63062,6 +65168,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -63127,6 +65234,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -63176,6 +65284,7 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateManyReporterInput = {
@@ -63227,6 +65336,8 @@ export namespace Prisma {
     category: $Enums.AdminNotificationCategory
     isUnread?: boolean
     href?: string | null
+    messageTemplateKey?: string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type PointTransactionCreateManyUserInput = {
@@ -63448,6 +65559,13 @@ export namespace Prisma {
     eventId: string
   }
 
+  export type ReportSubmitIdempotencyCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    key: string
+    reportId: string
+  }
+
   export type ReportUpdateWithoutReporterInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -63467,6 +65585,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutReporterInput = {
@@ -63488,6 +65607,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutReporterInput = {
@@ -63528,6 +65648,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutModeratedByInput = {
@@ -63549,6 +65670,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutModeratedByInput = {
@@ -63581,6 +65703,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUncheckedUpdateWithoutUserInput = {
@@ -63594,6 +65718,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type AdminNotificationUncheckedUpdateManyWithoutUserInput = {
@@ -63607,6 +65733,8 @@ export namespace Prisma {
     category?: EnumAdminNotificationCategoryFieldUpdateOperationsInput | $Enums.AdminNotificationCategory
     isUnread?: BoolFieldUpdateOperationsInput | boolean
     href?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateKey?: NullableStringFieldUpdateOperationsInput | string | null
+    messageTemplateParams?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type PointTransactionUpdateWithoutUserInput = {
@@ -64292,6 +66420,27 @@ export namespace Prisma {
     eventId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type ReportSubmitIdempotencyUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+    report?: ReportUpdateOneRequiredWithoutSubmitIdempotencyKeysNestedInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+    reportId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+    reportId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type ReportCreateManySiteInput = {
     id?: string
     createdAt?: Date | string
@@ -64389,6 +66538,7 @@ export namespace Prisma {
     potentialDuplicateOf?: ReportUpdateOneWithoutPotentialDuplicatesNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutSiteInput = {
@@ -64410,6 +66560,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutSiteInput = {
@@ -64652,6 +66803,13 @@ export namespace Prisma {
     userId: string
   }
 
+  export type ReportSubmitIdempotencyCreateManyReportInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    key: string
+  }
+
   export type ReportUpdateWithoutPotentialDuplicateOfInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -64671,6 +66829,7 @@ export namespace Prisma {
     moderatedBy?: UserUpdateOneWithoutModeratedReportsNestedInput
     potentialDuplicates?: ReportUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateWithoutPotentialDuplicateOfInput = {
@@ -64692,6 +66851,7 @@ export namespace Prisma {
     mergedDuplicateChildCount?: IntFieldUpdateOperationsInput | number
     potentialDuplicates?: ReportUncheckedUpdateManyWithoutPotentialDuplicateOfNestedInput
     coReporters?: ReportCoReporterUncheckedUpdateManyWithoutReportNestedInput
+    submitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportNestedInput
   }
 
   export type ReportUncheckedUpdateManyWithoutPotentialDuplicateOfInput = {
@@ -64732,6 +66892,27 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     reportedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyUpdateWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    key?: StringFieldUpdateOperationsInput | string
+    user?: UserUpdateOneRequiredWithoutReportSubmitIdempotencyKeysNestedInput
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSubmitIdempotencyUncheckedUpdateManyWithoutReportInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
   }
 
   export type EventParticipantCreateManyEventInput = {

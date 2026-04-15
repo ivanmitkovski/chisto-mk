@@ -5428,6 +5428,190 @@ abstract class AppLocalizations {
   /// **'Your future reports will appear here after you submit them.'**
   String get reportListEmptySubtitle;
 
+  /// No description provided for @reportStatusUnderReviewShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get reportStatusUnderReviewShort;
+
+  /// No description provided for @reportStatusApprovedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get reportStatusApprovedShort;
+
+  /// No description provided for @reportStatusDeclinedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get reportStatusDeclinedShort;
+
+  /// No description provided for @reportStatusAlreadyReportedShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Already reported'**
+  String get reportStatusAlreadyReportedShort;
+
+  /// No description provided for @reportListFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get reportListFilterAll;
+
+  /// No description provided for @reportListFilterSemanticPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Report status'**
+  String get reportListFilterSemanticPrefix;
+
+  /// No description provided for @reportListHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your reports'**
+  String get reportListHeaderTitle;
+
+  /// No description provided for @reportListHeaderTotalPill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 report in total} other{{count} reports in total}}'**
+  String reportListHeaderTotalPill(int count);
+
+  /// No description provided for @reportListHeaderUnderReviewPill.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 under review} other{{count} under review}}'**
+  String reportListHeaderUnderReviewPill(int count);
+
+  /// No description provided for @reportListHeaderSemanticSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{totalReports, plural, one{1 report in total} other{{totalReports} reports in total}}. {underReview, plural, one{1 currently under review} other{{underReview} currently under review}}.'**
+  String reportListHeaderSemanticSummary(int totalReports, int underReview);
+
+  /// No description provided for @reportListFilteredFooterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All reports shown'**
+  String get reportListFilteredFooterAll;
+
+  /// No description provided for @reportListFilteredFooterCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 report} other{{count} reports}}'**
+  String reportListFilteredFooterCount(int count);
+
+  /// No description provided for @reportListNoMatchesSearchTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reports found'**
+  String get reportListNoMatchesSearchTitle;
+
+  /// No description provided for @reportListNoMatchesFilterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No reports with this filter'**
+  String get reportListNoMatchesFilterTitle;
+
+  /// No description provided for @reportListNoMatchesHintSearchAndFilter.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search or clear filters to see more reports.'**
+  String get reportListNoMatchesHintSearchAndFilter;
+
+  /// No description provided for @reportListNoMatchesHintSearchOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the spelling or try a broader search.'**
+  String get reportListNoMatchesHintSearchOnly;
+
+  /// No description provided for @reportListNoMatchesHintFilterOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Try another filter, or clear it to see all reports.'**
+  String get reportListNoMatchesHintFilterOnly;
+
+  /// No description provided for @reportListClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get reportListClearSearch;
+
+  /// No description provided for @reportListDateWeeksAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{weeks, plural, one{1 week ago} other{{weeks} weeks ago}}'**
+  String reportListDateWeeksAgo(int weeks);
+
+  /// No description provided for @reportDetailOpeningInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening…'**
+  String get reportDetailOpeningInProgress;
+
+  /// No description provided for @reportDetailNoPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos'**
+  String get reportDetailNoPhotos;
+
+  /// No description provided for @reportDetailStatusUnderReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review by moderators'**
+  String get reportDetailStatusUnderReviewTitle;
+
+  /// No description provided for @reportDetailStatusUnderReviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderators are checking your evidence and location before they decide how to handle this report.'**
+  String get reportDetailStatusUnderReviewBody;
+
+  /// No description provided for @reportDetailStatusApprovedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved and linked to a site'**
+  String get reportDetailStatusApprovedTitle;
+
+  /// No description provided for @reportDetailStatusApprovedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This report helped confirm a public pollution site and may contribute to cleanup actions.'**
+  String get reportDetailStatusApprovedBody;
+
+  /// No description provided for @reportDetailStatusAlreadyReportedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Already tracked as an existing site'**
+  String get reportDetailStatusAlreadyReportedTitle;
+
+  /// No description provided for @reportDetailStatusAlreadyReportedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your report matched an existing site. The evidence is still useful for understanding the problem.'**
+  String get reportDetailStatusAlreadyReportedBody;
+
+  /// No description provided for @reportDetailStatusOutcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review outcome'**
+  String get reportDetailStatusOutcomeTitle;
+
+  /// No description provided for @reportDetailStatusOutcomeBodyFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'This report could not be approved in its current form.'**
+  String get reportDetailStatusOutcomeBodyFallback;
+
+  /// No description provided for @reportCardSemanticLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{category}, {status}, {location}. Tap to view details.'**
+  String reportCardSemanticLabel(
+    String category,
+    String status,
+    String location,
+  );
+
   /// No description provided for @appSmartImageUnavailable.
   ///
   /// In en, this message translates to:
@@ -7233,6 +7417,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Microphone access is required to send voice messages.'**
   String get eventChatMicPermissionDenied;
+
+  /// No description provided for @reportEntryLabelGuided.
+  ///
+  /// In en, this message translates to:
+  /// **'Guided report'**
+  String get reportEntryLabelGuided;
+
+  /// No description provided for @reportEntryLabelCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera report'**
+  String get reportEntryLabelCamera;
+
+  /// No description provided for @reportEntryHintCamera.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting from a live photo can speed up moderation because the evidence is already attached.'**
+  String get reportEntryHintCamera;
+
+  /// No description provided for @homeReportingCapacityCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check reporting availability right now.'**
+  String get homeReportingCapacityCheckFailed;
+
+  /// No description provided for @homeCameraOpenFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the camera right now. Please try again in a moment.'**
+  String get homeCameraOpenFailed;
+
+  /// No description provided for @mapTabPlaceholderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Open this tab to load the live map and nearby pollution sites.'**
+  String get mapTabPlaceholderHint;
+
+  /// No description provided for @reportCategoryPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose category'**
+  String get reportCategoryPickerTitle;
+
+  /// No description provided for @reportCategoryPickerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the closest match for the issue you are reporting.'**
+  String get reportCategoryPickerSubtitle;
+
+  /// No description provided for @reportCategoryPickerBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the closest match'**
+  String get reportCategoryPickerBannerTitle;
+
+  /// No description provided for @reportCategoryPickerBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick the category moderators should verify first. It does not need to be perfect.'**
+  String get reportCategoryPickerBannerBody;
+
+  /// No description provided for @reportCategoryIllegalLandfillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Illegal landfill'**
+  String get reportCategoryIllegalLandfillTitle;
+
+  /// No description provided for @reportCategoryIllegalLandfillDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Dumped waste, trash piles, or informal disposal sites.'**
+  String get reportCategoryIllegalLandfillDescription;
+
+  /// No description provided for @reportCategoryWaterPollutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Water pollution'**
+  String get reportCategoryWaterPollutionTitle;
+
+  /// No description provided for @reportCategoryWaterPollutionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Contaminated rivers, lakes, drains, or wastewater discharge.'**
+  String get reportCategoryWaterPollutionDescription;
+
+  /// No description provided for @reportCategoryAirPollutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Air pollution'**
+  String get reportCategoryAirPollutionTitle;
+
+  /// No description provided for @reportCategoryAirPollutionDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Smoke, dust, burning waste, or emissions harming air quality.'**
+  String get reportCategoryAirPollutionDescription;
+
+  /// No description provided for @reportCategoryIndustrialWasteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Industrial waste'**
+  String get reportCategoryIndustrialWasteTitle;
+
+  /// No description provided for @reportCategoryIndustrialWasteDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Construction debris, factory waste, or hazardous materials.'**
+  String get reportCategoryIndustrialWasteDescription;
+
+  /// No description provided for @reportCategoryOtherTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get reportCategoryOtherTitle;
+
+  /// No description provided for @reportCategoryOtherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Use when the issue does not clearly match the categories above.'**
+  String get reportCategoryOtherDescription;
+
+  /// No description provided for @unknownRouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Page not found'**
+  String get unknownRouteTitle;
+
+  /// No description provided for @unknownRouteMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This link may be out of date or incorrect.'**
+  String get unknownRouteMessage;
+
+  /// No description provided for @unknownRouteContinueButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue to the app'**
+  String get unknownRouteContinueButton;
+
+  /// No description provided for @unknownRouteDebugRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Debug: route name was “{routeName}”.'**
+  String unknownRouteDebugRoute(String routeName);
 }
 
 class _AppLocalizationsDelegate

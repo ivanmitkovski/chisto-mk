@@ -1,0 +1,61 @@
+name: Mobile integration smoke
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mobile-e2e-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integration-smoke:
+    name: Flutter integration smoke
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Run integration smoke tests (with retries)
+        env:
+          INTEGRATION_TEST_API_URL: ${{ secrets.INTEGRATION_TEST_API_URL }}
+          INTEGRATION_TEST_ACCESS_TOKEN: ${{ secrets.INTEGRATION_TEST_ACCESS_TOKEN }}
+        run: |
+          set +e
+          for attempt in 1 2 3; do
+            flutter test integration_test/events_journey_smoke_test.dart integration_test/event_chat_smoke_test.dart \
+              --dart-define=API_URL="${INTEGRATION_TEST_API_URL:-}" \
+              --dart-define=INTEGRATION_TEST_ACCESS_TOKEN="${INTEGRATION_TEST_ACCESS_TOKEN:-}"
+            exit_code=$?
+            if [ "$exit_code" -eq 0 ]; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep 30
+            fi
+          done
+          exit 1
+
+      - name: Upload Flutter test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-integration-logs
+          path: |
+            apps/mobile/build/
+          if-no-files-found: ignore

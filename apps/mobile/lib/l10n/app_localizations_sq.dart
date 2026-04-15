@@ -3182,6 +3182,158 @@ class AppLocalizationsSq extends AppLocalizations {
       'Raportet e tua do të shfaqen këtu pasi t’i dërgosh.';
 
   @override
+  String get reportStatusUnderReviewShort => 'Në shqyrtim';
+
+  @override
+  String get reportStatusApprovedShort => 'Miratuar';
+
+  @override
+  String get reportStatusDeclinedShort => 'Refuzuar';
+
+  @override
+  String get reportStatusAlreadyReportedShort => 'E raportuar më parë';
+
+  @override
+  String get reportListFilterAll => 'Të gjitha';
+
+  @override
+  String get reportListFilterSemanticPrefix => 'Statusi i raportit';
+
+  @override
+  String get reportListHeaderTitle => 'Raportet e tua';
+
+  @override
+  String reportListHeaderTotalPill(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count raporte gjithsej',
+      one: '1 raport gjithsej',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportListHeaderUnderReviewPill(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count në shqyrtim',
+      one: '1 në shqyrtim',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String reportListHeaderSemanticSummary(int totalReports, int underReview) {
+    String _temp0 = intl.Intl.pluralLogic(
+      totalReports,
+      locale: localeName,
+      other: '$totalReports raporte gjithsej',
+      one: '1 raport gjithsej',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      underReview,
+      locale: localeName,
+      other: '$underReview aktualisht në shqyrtim',
+      one: '1 aktualisht në shqyrtim',
+    );
+    return '$_temp0. $_temp1.';
+  }
+
+  @override
+  String get reportListFilteredFooterAll => 'Po shfaqen të gjitha raportet';
+
+  @override
+  String reportListFilteredFooterCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count raporte',
+      one: '1 raport',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportListNoMatchesSearchTitle => 'Nuk u gjetën raporte';
+
+  @override
+  String get reportListNoMatchesFilterTitle => 'Nuk ka raporte me këtë filtr';
+
+  @override
+  String get reportListNoMatchesHintSearchAndFilter =>
+      'Provo një kërkim tjetër ose pastro filtrat për të parë më shumë raporte.';
+
+  @override
+  String get reportListNoMatchesHintSearchOnly =>
+      'Kontrollo drejtshkrimin ose provo një kërkim më të gjerë.';
+
+  @override
+  String get reportListNoMatchesHintFilterOnly =>
+      'Provo një filtr tjetër, ose pastroje për të parë të gjitha raportet.';
+
+  @override
+  String get reportListClearSearch => 'Pastro kërkimin';
+
+  @override
+  String reportListDateWeeksAgo(int weeks) {
+    String _temp0 = intl.Intl.pluralLogic(
+      weeks,
+      locale: localeName,
+      other: 'Para $weeks javësh',
+      one: 'Para 1 jave',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDetailOpeningInProgress => 'Po hapet…';
+
+  @override
+  String get reportDetailNoPhotos => 'Pa foto';
+
+  @override
+  String get reportDetailStatusUnderReviewTitle =>
+      'Në shqyrtim nga moderatorët';
+
+  @override
+  String get reportDetailStatusUnderReviewBody =>
+      'Moderatorët po kontrollojnë provat dhe vendndodhjen para se të vendosin si ta trajtojnë këtë raport.';
+
+  @override
+  String get reportDetailStatusApprovedTitle =>
+      'Miratuar dhe i lidhur me një vend';
+
+  @override
+  String get reportDetailStatusApprovedBody =>
+      'Ky raport ndihmoi të konfirmohet një vend publik i ndotur dhe mund të kontribuojë në veprime pastrimi.';
+
+  @override
+  String get reportDetailStatusAlreadyReportedTitle =>
+      'Tashmë i gjurmuar si vend ekzistues';
+
+  @override
+  String get reportDetailStatusAlreadyReportedBody =>
+      'Raporti yt përputhet me një vend ekzistues. Provat janë ende të dobishme për të kuptuar problemin.';
+
+  @override
+  String get reportDetailStatusOutcomeTitle => 'Rezultati i shqyrtimit';
+
+  @override
+  String get reportDetailStatusOutcomeBodyFallback =>
+      'Ky raport nuk mund të miratohet në formën e tij aktuale.';
+
+  @override
+  String reportCardSemanticLabel(
+    String category,
+    String status,
+    String location,
+  ) {
+    return '$category, $status, $location. Prek për detaje.';
+  }
+
+  @override
   String get appSmartImageUnavailable => 'Imazhi nuk është i disponueshëm';
 
   @override
@@ -4250,4 +4402,90 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventChatMicPermissionDenied =>
       'Nevojitet qasja në mikrofon për mesazhet zanore.';
+
+  @override
+  String get reportEntryLabelGuided => 'Raport i udhëhequr';
+
+  @override
+  String get reportEntryLabelCamera => 'Raport nga kamera';
+
+  @override
+  String get reportEntryHintCamera =>
+      'Nëse fillon me një foto të drejtpërdrejtë, moderimi zakonisht është më i shpejtë sepse prova është tashmë e bashkangjitur.';
+
+  @override
+  String get homeReportingCapacityCheckFailed =>
+      'Nuk mund të kontrollohet disponueshmëria e raportimit tani.';
+
+  @override
+  String get homeCameraOpenFailed =>
+      'Kamera nuk mund të hapet. Provo përsëri pas një çasti.';
+
+  @override
+  String get mapTabPlaceholderHint =>
+      'Hap këtë skedë për të ngarkuar hartën live dhe vendet e ndotjes afër.';
+
+  @override
+  String get reportCategoryPickerTitle => 'Zgjidh kategorinë';
+
+  @override
+  String get reportCategoryPickerSubtitle =>
+      'Zgjidh përputhjen më të afërt me problemin që raporton.';
+
+  @override
+  String get reportCategoryPickerBannerTitle => 'Zgjidh përputhjen më të afërt';
+
+  @override
+  String get reportCategoryPickerBannerBody =>
+      'Zgjidh kategorinë që moderatorët duhet ta verifikojnë së pari. Nuk duhet të jetë perfekte.';
+
+  @override
+  String get reportCategoryIllegalLandfillTitle => 'Deponi e paligjshme';
+
+  @override
+  String get reportCategoryIllegalLandfillDescription =>
+      'Mbeturina të hedhura, grumbuj mbeturinash ose vende informale hedhjeje.';
+
+  @override
+  String get reportCategoryWaterPollutionTitle => 'Ndotje e ujit';
+
+  @override
+  String get reportCategoryWaterPollutionDescription =>
+      'Lumenj, liqene, kanalizime të kontaminuara ose shkarkim ujërash të ndotura.';
+
+  @override
+  String get reportCategoryAirPollutionTitle => 'Ndotje e ajrit';
+
+  @override
+  String get reportCategoryAirPollutionDescription =>
+      'Tym, pluhur, djegie mbeturinash ose emetime që dëmtojnë cilësinë e ajrit.';
+
+  @override
+  String get reportCategoryIndustrialWasteTitle => 'Mbeturina industriale';
+
+  @override
+  String get reportCategoryIndustrialWasteDescription =>
+      'Inerte ndërtimi, mbeturina fabrike ose materiale të rrezikshme.';
+
+  @override
+  String get reportCategoryOtherTitle => 'Tjetër';
+
+  @override
+  String get reportCategoryOtherDescription =>
+      'Kur problemi nuk përputhet qartë me kategoritë më sipër.';
+
+  @override
+  String get unknownRouteTitle => 'Faqja nuk u gjet';
+
+  @override
+  String get unknownRouteMessage =>
+      'Lidhja mund të jetë e vjetër ose e pasaktë.';
+
+  @override
+  String get unknownRouteContinueButton => 'Vazhdo te aplikacioni';
+
+  @override
+  String unknownRouteDebugRoute(String routeName) {
+    return 'Debug: emri i rrugës ishte \"$routeName\".';
+  }
 }

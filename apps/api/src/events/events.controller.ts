@@ -36,19 +36,25 @@ import { EventsService } from './events.service';
 
 @ApiTags('events')
 @Controller('events')
-@UseGuards(ThrottlerGuard, JwtAuthGuard)
-@ApiBearerAuth()
+@UseGuards(ThrottlerGuard)
 export class EventsController {
   constructor(private readonly eventsService: EventsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'List cleanup events visible to the current user' })
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List cleanup events (approved public events plus caller’s own pending drafts)',
+  })
   @ApiOkResponse({ description: 'Paginated events' })
   list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListEventsQueryDto) {
     return this.eventsService.list(user, query);
   }
 
   @Get(':id/participants')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @ApiOperation({ summary: 'List event joiners (paginated); organizer is not included' })
   @ApiOkResponse({ description: 'Participants page', type: ListEventParticipantsResponseDto })
@@ -61,13 +67,20 @@ export class EventsController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get event detail' })
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Get event detail (approved public events plus caller’s own pending drafts)',
+  })
   @ApiOkResponse({ description: 'Event payload (mobile-shaped JSON)' })
   findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.eventsService.findOne(id, user);
   }
 
   @Post()
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @ApiOperation({ summary: 'Create cleanup event (PENDING for citizens, APPROVED for staff)' })
   @ApiOkResponse({ description: 'Created event' })
@@ -76,6 +89,8 @@ export class EventsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update event (organizer only)' })
   @ApiOkResponse({ description: 'Updated event' })
   patch(
@@ -87,6 +102,8 @@ export class EventsController {
   }
 
   @Post(':id/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Join event' })
   @ApiOkResponse({
     description: 'Event payload (same as GET /events/:id) plus pointsAwarded for this join',
@@ -96,6 +113,8 @@ export class EventsController {
   }
 
   @Delete(':id/join')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Leave event' })
   @ApiOkResponse({ description: 'Event with isJoined false' })
   leave(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
@@ -103,6 +122,8 @@ export class EventsController {
   }
 
   @Patch(':id/status')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Transition lifecycle status (organizer only)' })
   @ApiOkResponse({ description: 'Updated event' })
   patchStatus(
@@ -114,6 +135,8 @@ export class EventsController {
   }
 
   @Patch(':id/reminder')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Set participant reminder' })
   @ApiOkResponse({ description: 'Updated event' })
   patchReminder(
@@ -125,6 +148,8 @@ export class EventsController {
   }
 
   @Get(':id/analytics')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Attendance analytics for an event (organizer only)' })
   @ApiOkResponse({ description: 'Event analytics data', type: EventAnalyticsResponseDto })
   getAnalytics(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
@@ -132,6 +157,8 @@ export class EventsController {
   }
 
   @Post(':id/after-images')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 15 } })
   @UseInterceptors(
     FilesInterceptor('files', 10, {

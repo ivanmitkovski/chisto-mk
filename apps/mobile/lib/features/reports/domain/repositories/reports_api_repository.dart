@@ -22,6 +22,7 @@ abstract class ReportsApiRepository {
     int? severity,
     String? address,
     String? cleanupEffort,
+    String? idempotencyKey,
   });
 
   /// Paginated list of current user's reports.

@@ -1,23 +1,13 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
   AdminNotificationCategory,
   AdminNotificationTone,
   Prisma,
   Report,
   ReportCleanupEffort,
-  ReportStatus,
   SiteStatus,
 } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { ADMIN_PANEL_ROLES } from '../auth/admin-roles';
 import { assertReportVisibleToUser } from '../common/helpers/assert-ownership.helper';
@@ -25,21 +15,17 @@ import { distanceInMeters } from '../common/utils/distance';
 import { CreateReportDto } from './dto/create-report.dto';
 import { CreateReportWithLocationDto } from './dto/create-report-with-location.dto';
 import { ReportSubmitResponseDto } from './dto/report-submit-response.dto';
-import {
-  AdminReportDetailDto,
-  AdminReportListItemDto,
-  AdminReportListResponseDto,
-} from './dto/admin-report.dto';
+import { AdminReportDetailDto, AdminReportListResponseDto } from './dto/admin-report.dto';
 import {
   AdminDuplicateReportGroupDto,
   AdminDuplicateReportGroupsResponseDto,
-  AdminDuplicateReportItemDto,
   MergeDuplicateReportsDto,
   MergeDuplicateReportsResponseDto,
 } from './dto/admin-duplicate-report.dto';
 import { ListMyReportsQueryDto } from './dto/list-my-reports-query.dto';
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { ReportCapacityDto } from './dto/report-capacity.dto';
+import { ReportCapacityService } from './report-capacity.service';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { CitizenReportDetailDto } from './dto/citizen-report-detail.dto';
 import { UserReportListItemDto } from './dto/user-report.dto';
@@ -48,336 +34,74 @@ import { NotificationEventsService } from '../admin-events/notification-events.s
 import { ReportEventsService } from '../admin-events/report-events.service';
 import { SiteEventsService } from '../admin-events/site-events.service';
 import { ReportsOwnerEventsService } from './reports-owner-events.service';
-import { parseReportCleanupEffort, reportCleanupEffortLabel } from './report-cleanup-effort';
-import { stripCategoryLabelPrefix } from './report-category-narrative';
-import { POINTS_FIRST_REPORT } from '../gamification/gamification.constants';
-
-const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
-  NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
-  IN_REVIEW: ['APPROVED', 'DELETED'],
-  APPROVED: ['DELETED'],
-  DELETED: [],
-};
-
-const DUPLICATE_RADIUS_METERS = 30;
-const SITE_NEARBY_RADIUS_METERS = 50;
-const INITIAL_REPORT_CREDITS = 10;
-const DEFAULT_EMERGENCY_WINDOW_DAYS = 7;
+import { parseReportCleanupEffort } from './report-cleanup-effort';
+import { DUPLICATE_RADIUS_METERS, SITE_NEARBY_RADIUS_METERS } from './reports.constants';
+import {
+  displayReportTitle,
+  getReportNumber,
+  listLocationLabel,
+  optionalReportNarrative,
+} from './report-copy.helpers';
+import { ReportsModerationService } from './reports-moderation.service';
+import { ReportsDuplicateMergeService } from './reports-duplicate-merge.service';
 
 @Injectable()
 export class ReportsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService,
     private readonly reportsUploadService: ReportsUploadService,
     private readonly reportEventsService: ReportEventsService,
     private readonly notificationEventsService: NotificationEventsService,
     private readonly siteEventsService: SiteEventsService,
     private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly reportCapacity: ReportCapacityService,
+    private readonly reportsModeration: ReportsModerationService,
+    private readonly reportsDuplicateMerge: ReportsDuplicateMergeService,
   ) {}
 
-  /** Fallback for reports created before reportNumber column (e.g. during migration). */
-  private getReportNumberFallback(report: { id: string; createdAt: Date }): string {
-    const shortId = report.id.slice(0, 4).toUpperCase();
-    const yearSuffix = report.createdAt.getFullYear().toString().slice(-2);
-    return `R-${yearSuffix}-${shortId}`;
-  }
-
-  private getReportNumber(report: { id: string; createdAt: Date; reportNumber?: string | null }): string {
-    return report.reportNumber ?? this.getReportNumberFallback(report);
-  }
-
-  private formatLatLngLabel(latitude: number, longitude: number): string {
-    return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-  }
-
-  /**
-   * Location for queues and lists: never duplicate the report narrative when legacy `Site.description`
-   * was copied from `Report.description` (pre-address migration); show coordinates instead.
-   */
-  private listLocationLabel(
-    site: { latitude: number; longitude: number; description: string | null; address: string | null },
-    reportDescription: string | null,
-  ): string {
-    const address = site.address?.trim();
-    if (address) return address;
-    const legacy = site.description?.trim();
-    const narrative = reportDescription?.trim();
-    if (legacy && narrative && legacy === narrative) {
-      return this.formatLatLngLabel(site.latitude, site.longitude);
-    }
-    if (legacy) return legacy;
-    return this.formatLatLngLabel(site.latitude, site.longitude);
-  }
-
-  /** Report narrative for titles; falls back to legacy site.description when report text is empty. */
-  private reportNarrativeTitle(
-    reportDescription: string | null,
-    legacySiteDescription: string | null,
-  ): string {
-    const narrative = reportDescription?.trim();
-    if (narrative) return narrative;
-    const legacy = legacySiteDescription?.trim();
-    if (legacy) return legacy;
-    return 'Reported site';
-  }
-
-  /** Title / name for moderation and citizen lists (strips mobile "Category: …" prefix). */
-  private listReportTitle(
-    reportDescription: string | null,
-    legacySiteDescription: string | null,
-    category: string | null,
-  ): string {
-    const raw = this.reportNarrativeTitle(reportDescription, legacySiteDescription);
-    const stripped = stripCategoryLabelPrefix(raw, category);
-    if (stripped.length > 0) return stripped;
-    if (raw.trim().length > 0) return 'No additional details';
-    return raw.trim() || 'Reported site';
-  }
-
-  /** Headline: stored title when present, else legacy derivation (pre-title migration rows). */
-  private displayReportTitle(report: {
-    title: string;
-    description: string | null;
-    site: { description: string | null };
-    category: string | null;
-  }): string {
-    const trimmed = report.title?.trim();
-    if (trimmed) return trimmed;
-    return this.listReportTitle(report.description, report.site.description, report.category);
-  }
-
-  /** Optional narrative body only (no headline); strips category prefix from legacy single-field text. */
-  private optionalReportNarrative(description: string | null, category: string | null): string | null {
-    if (description == null || description.trim() === '') {
+  private normalizeIdempotencyKey(header: string | string[] | undefined): string | null {
+    if (header === undefined) {
       return null;
     }
-    const stripped = stripCategoryLabelPrefix(description, category);
-    return stripped.length > 0 ? stripped : null;
-  }
-
-  private derivePriority(status: ReportStatus): AdminReportDetailDto['priority'] {
-    if (status === 'NEW') {
-      return 'HIGH';
-    }
-
-    if (status === 'IN_REVIEW') {
-      return 'MEDIUM';
-    }
-
-    if (status === 'APPROVED') {
-      return 'LOW';
-    }
-
-    return 'LOW';
-  }
-
-  private buildDuplicateReportItem(report: {
-    id: string;
-    createdAt: Date;
-    status: ReportStatus;
-    title: string;
-    description: string | null;
-    category: string | null;
-    mediaUrls: string[];
-    site: {
-      latitude: number;
-      longitude: number;
-      description: string | null;
-      address: string | null;
-    };
-    coReporters: { id: string }[];
-  }): AdminDuplicateReportItemDto {
-    return {
-      id: report.id,
-      reportNumber: this.getReportNumber(report),
-      title: this.displayReportTitle(report),
-      location: this.listLocationLabel(report.site, report.description),
-      submittedAt: report.createdAt.toISOString(),
-      status: report.status,
-      coReporterCount: report.coReporters.length,
-      mediaCount: report.mediaUrls.length,
-    };
-  }
-
-  private buildDuplicateGroupQuery(query: ListReportsQueryDto): Prisma.ReportWhereInput {
-    const statusOrSiteFilters: Prisma.ReportWhereInput[] = [];
-    if (query.status) {
-      statusOrSiteFilters.push({
-        OR: [{ status: query.status }, { potentialDuplicates: { some: { status: query.status } } }],
-      });
-    }
-
-    if (query.siteId) {
-      statusOrSiteFilters.push({
-        OR: [{ siteId: query.siteId }, { potentialDuplicates: { some: { siteId: query.siteId } } }],
-      });
-    }
-
-    return {
-      potentialDuplicateOfId: null,
-      status: { not: 'DELETED' },
-      potentialDuplicates: { some: {} },
-      ...(statusOrSiteFilters.length > 0 ? { AND: statusOrSiteFilters } : {}),
-    };
-  }
-
-  /**
-   * When the first report for a site is approved, transition site from REPORTED → VERIFIED.
-   * Only updates when site is REPORTED; does not overwrite DISPUTED or other statuses.
-   */
-  private async transitionSiteToVerifiedIfFirstApproved(
-    tx: Pick<PrismaService, 'site'>,
-    siteId: string,
-  ): Promise<
-    | {
-        id: string;
-        status: SiteStatus;
-        latitude: number;
-        longitude: number;
-        updatedAt: Date;
-      }
-    | null
-  > {
-    const site = await tx.site.findUnique({
-      where: { id: siteId },
-      select: { id: true, status: true, latitude: true, longitude: true },
-    });
-    if (!site || site.status !== SiteStatus.REPORTED) {
+    const raw = Array.isArray(header) ? header[0] : header;
+    const t = raw.trim();
+    if (!t || t.length > 128) {
       return null;
     }
-
-    const updated = await tx.site.update({
-      where: { id: siteId },
-      data: { status: SiteStatus.VERIFIED },
-      select: { id: true, status: true, latitude: true, longitude: true, updatedAt: true },
-    });
-    return updated;
+    return t;
   }
 
-  private async findPrimaryReportId(reportId: string): Promise<string> {
-    const report = await this.prisma.report.findUnique({
-      where: { id: reportId },
-      select: { id: true, potentialDuplicateOfId: true },
-    });
-
-    if (!report) {
-      throw new NotFoundException({
-        code: 'REPORT_NOT_FOUND',
-        message: `Report with id '${reportId}' was not found`,
-      });
-    }
-
-    return report.potentialDuplicateOfId ?? report.id;
-  }
-
-  private emergencyRetryAfterSeconds(lastUsedAt: Date, windowDays: number, now: Date): number {
-    const windowMs = windowDays * 24 * 60 * 60 * 1000;
-    const unlockAtMs = lastUsedAt.getTime() + windowMs;
-    return Math.max(1, Math.ceil((unlockAtMs - now.getTime()) / 1000));
-  }
-
-  private buildCapacityDto(
-    user: {
-      reportCreditsAvailable: number;
-      reportEmergencyWindowDays: number;
-      reportEmergencyUsedAt: Date | null;
-    },
-    now: Date,
-  ): ReportCapacityDto {
-    const windowDays = user.reportEmergencyWindowDays || DEFAULT_EMERGENCY_WINDOW_DAYS;
-    const creditsAvailable = user.reportCreditsAvailable ?? INITIAL_REPORT_CREDITS;
-
-    let emergencyAvailable = true;
-    let retryAfterSeconds: number | null = null;
-    let nextEmergencyReportAvailableAt: string | null = null;
-    if (user.reportEmergencyUsedAt) {
-      const windowMs = windowDays * 24 * 60 * 60 * 1000;
-      const unlockAtMs = user.reportEmergencyUsedAt.getTime() + windowMs;
-      if (unlockAtMs > now.getTime()) {
-        emergencyAvailable = false;
-        retryAfterSeconds = this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now);
-        nextEmergencyReportAvailableAt = new Date(unlockAtMs).toISOString();
-      }
-    }
-
-    return {
-      creditsAvailable,
-      emergencyAvailable,
-      emergencyWindowDays: windowDays,
-      retryAfterSeconds,
-      nextEmergencyReportAvailableAt,
-      unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
-    };
-  }
-
-  private async spendReportCapacity(
-    tx: Pick<PrismaService, 'user'>,
+  private async resolveIdempotentReportSubmit(
     userId: string,
-    now: Date,
-  ): Promise<void> {
-    const spentFromCredits = await tx.user.updateMany({
-      where: {
-        id: userId,
-        reportCreditsAvailable: { gt: 0 },
-      },
-      data: {
-        reportCreditsAvailable: { decrement: 1 },
-        reportCreditsSpentTotal: { increment: 1 },
-      },
+    key: string,
+  ): Promise<ReportSubmitResponseDto | null> {
+    const row = await this.prisma.reportSubmitIdempotency.findUnique({
+      where: { userId_key: { userId, key } },
+      select: { reportId: true },
     });
-
-    if (spentFromCredits.count > 0) {
-      return;
+    if (!row) {
+      return null;
     }
-
-    const user = await tx.user.findUnique({
-      where: { id: userId },
+    const report = await this.prisma.report.findUnique({
+      where: { id: row.reportId },
       select: {
         id: true,
-        reportCreditsAvailable: true,
-        reportEmergencyWindowDays: true,
-        reportEmergencyUsedAt: true,
+        siteId: true,
+        reportNumber: true,
+        createdAt: true,
+        reporterId: true,
       },
     });
-
-    if (!user) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: `User with id '${userId}' was not found`,
-      });
+    if (!report || report.reporterId !== userId) {
+      return null;
     }
-
-    const windowDays = user.reportEmergencyWindowDays || DEFAULT_EMERGENCY_WINDOW_DAYS;
-    const emergencyAvailable =
-      !user.reportEmergencyUsedAt ||
-      user.reportEmergencyUsedAt.getTime() + windowDays * 24 * 60 * 60 * 1000 <= now.getTime();
-
-    if (emergencyAvailable) {
-      await tx.user.update({
-        where: { id: userId },
-        data: {
-          reportEmergencyUsedAt: now,
-          reportCreditsSpentTotal: { increment: 1 },
-        },
-      });
-      return;
-    }
-
-    throw new HttpException({
-      code: 'REPORTING_COOLDOWN',
-      message:
-        'You have used all report credits and emergency allowance. Join or create an eco action to unlock more reports.',
-      details: {
-        creditsAvailable: user.reportCreditsAvailable,
-        emergencyAvailable: false,
-        retryAfterSeconds: user.reportEmergencyUsedAt
-          ? this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now)
-          : null,
-        unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
-      },
-    }, HttpStatus.TOO_MANY_REQUESTS);
+    return {
+      reportId: report.id,
+      reportNumber: getReportNumber(report),
+      siteId: report.siteId,
+      isNewSite: false,
+      pointsAwarded: 0,
+    };
   }
 
   async create(dto: CreateReportDto): Promise<Report> {
@@ -466,7 +190,16 @@ export class ReportsService {
   async createWithLocation(
     user: AuthenticatedUser,
     dto: CreateReportWithLocationDto,
+    headerIdempotencyKey?: string | string[],
   ): Promise<ReportSubmitResponseDto> {
+    const trimmedIdem = this.normalizeIdempotencyKey(headerIdempotencyKey);
+    if (trimmedIdem) {
+      const replay = await this.resolveIdempotentReportSubmit(user.userId, trimmedIdem);
+      if (replay) {
+        return replay;
+      }
+    }
+
     const { latitude, longitude, title, description, mediaUrls, category, severity, address } = dto;
     const trimmedAddress = address?.trim() || null;
     const cleanupEffortParsed: ReportCleanupEffort | null = parseReportCleanupEffort(
@@ -514,7 +247,7 @@ export class ReportsService {
     const targetSiteId = primaryReport?.siteId ?? null;
 
     const result = await this.prisma.$transaction(async (tx) => {
-      await this.spendReportCapacity(tx, user.userId, new Date());
+      await this.reportCapacity.spendWithinTransaction(tx, user.userId, new Date());
 
       let siteId: string;
       let isNewSite: boolean;
@@ -578,22 +311,36 @@ export class ReportsService {
         });
       }
 
-      const reportNumber = this.getReportNumber(newReport);
+      const reportNumber = getReportNumber(newReport);
 
       const notification = await tx.adminNotification.create({
         data: {
-          title: isNewSite ? 'New pollution site reported' : 'Co-report added to existing site',
-          message: `Report ${reportNumber} submitted${isNewSite ? ' at a new location' : ' near an existing site'}.`,
-          timeLabel: 'Just now',
+          title: isNewSite ? 'Пријавено е ново загадувачко место' : 'Додаден е ко-извештај кон постоечко место',
+          message: isNewSite
+            ? `Извештај ${reportNumber} е поднесен на нова локација.`
+            : `Извештај ${reportNumber} е поднесен во близина на постоечко место.`,
+          timeLabel: 'Штотуку',
           tone: AdminNotificationTone.info,
           category: AdminNotificationCategory.reports,
           href: `/dashboard/reports?reportId=${newReport.id}`,
+          messageTemplateKey: isNewSite ? 'reports.submitted.new_site' : 'reports.submitted.co_report',
+          messageTemplateParams: { reportNumber } as Prisma.InputJsonValue,
         },
       });
 
+      if (trimmedIdem) {
+        await tx.reportSubmitIdempotency.create({
+          data: {
+            userId: user.userId,
+            key: trimmedIdem,
+            reportId: newReport.id,
+          },
+        });
+      }
+
       return {
         reportId: newReport.id,
-        reportNumber: this.getReportNumber(newReport),
+        reportNumber: getReportNumber(newReport),
         siteId,
         isNewSite,
         pointsAwarded: 0, // Points awarded when admin approves, not at submit
@@ -763,10 +510,10 @@ export class ReportsService {
             : [];
         return {
           id: report.id,
-          reportNumber: this.getReportNumber(report),
-          title: this.displayReportTitle(report),
-          description: this.optionalReportNarrative(report.description, report.category),
-          location: this.listLocationLabel(report.site, report.description),
+          reportNumber: getReportNumber(report),
+          title: displayReportTitle(report),
+          description: optionalReportNarrative(report.description, report.category),
+          location: listLocationLabel(report.site, report.description),
           submittedAt: report.createdAt.toISOString(),
           status: report.status,
           isPotentialDuplicate:
@@ -792,256 +539,19 @@ export class ReportsService {
   }
 
   async getCapacityForCurrentUser(user: AuthenticatedUser): Promise<ReportCapacityDto> {
-    const current = await this.prisma.user.findUnique({
-      where: { id: user.userId },
-      select: {
-        reportCreditsAvailable: true,
-        reportEmergencyWindowDays: true,
-        reportEmergencyUsedAt: true,
-      },
-    });
-
-    if (!current) {
-      throw new NotFoundException({
-        code: 'USER_NOT_FOUND',
-        message: `User with id '${user.userId}' was not found`,
-      });
-    }
-
-    return this.buildCapacityDto(current, new Date());
+    return this.reportCapacity.getCapacityForCurrentUser(user);
   }
 
   async findAllForModeration(query: ListReportsQueryDto): Promise<AdminReportListResponseDto> {
-    const where: Prisma.ReportWhereInput = {
-      ...(query.status ? { status: query.status } : {}),
-      ...(query.siteId ? { siteId: query.siteId } : {}),
-      ...(query.duplicatesOnly
-        ? {
-            OR: [{ potentialDuplicateOfId: { not: null } }, { potentialDuplicates: { some: {} } }],
-          }
-        : {}),
-    };
-
-    const skip = (query.page - 1) * query.limit;
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.report.findMany({
-        where,
-        skip,
-        take: query.limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          site: {
-            select: {
-              id: true,
-              status: true,
-              latitude: true,
-              longitude: true,
-              description: true,
-              address: true,
-            },
-          },
-          coReporters: true,
-          potentialDuplicates: {
-            select: { id: true },
-          },
-        },
-      }),
-      this.prisma.report.count({ where }),
-    ]);
-
-    const items: AdminReportListItemDto[] = data.map((report) => ({
-      id: report.id,
-      reportNumber: this.getReportNumber(report),
-      name: this.displayReportTitle(report),
-      location: report.site
-        ? this.listLocationLabel(report.site, report.description)
-        : 'Unknown location',
-      dateReportedAt: report.createdAt.toISOString(),
-      status: report.status,
-      isPotentialDuplicate:
-        report.potentialDuplicateOfId !== null || report.potentialDuplicates.length > 0,
-      coReporterCount: report.coReporters.length,
-      cleanupEffortLabel: reportCleanupEffortLabel(report.cleanupEffort),
-    }));
-
-    return {
-      data: items,
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total,
-      },
-    };
+    return this.reportsModeration.findAllForModeration(query);
   }
 
   async findDuplicateGroups(query: ListReportsQueryDto): Promise<AdminDuplicateReportGroupsResponseDto> {
-    const where = this.buildDuplicateGroupQuery(query);
-    const skip = (query.page - 1) * query.limit;
-
-    const [data, total] = await this.prisma.$transaction([
-      this.prisma.report.findMany({
-        where,
-        skip,
-        take: query.limit,
-        orderBy: { createdAt: 'desc' },
-        include: {
-          site: {
-            select: {
-              latitude: true,
-              longitude: true,
-              description: true,
-              address: true,
-            },
-          },
-          coReporters: {
-            select: {
-              id: true,
-            },
-          },
-          potentialDuplicates: {
-            orderBy: { createdAt: 'asc' },
-            include: {
-              site: {
-                select: {
-                  latitude: true,
-                  longitude: true,
-                  description: true,
-                  address: true,
-                },
-              },
-              coReporters: {
-                select: {
-                  id: true,
-                },
-              },
-            },
-          },
-        },
-      }),
-      this.prisma.report.count({ where }),
-    ]);
-
-    const groups: AdminDuplicateReportGroupDto[] = data.map((primaryReport) => ({
-      primaryReport: this.buildDuplicateReportItem(primaryReport),
-      duplicateReports: primaryReport.potentialDuplicates.map((duplicateReport) =>
-        this.buildDuplicateReportItem(duplicateReport),
-      ),
-      totalReports: primaryReport.potentialDuplicates.length + 1,
-    }));
-
-    return {
-      data: groups,
-      meta: {
-        page: query.page,
-        limit: query.limit,
-        total,
-      },
-    };
+    return this.reportsDuplicateMerge.findDuplicateGroups(query);
   }
 
   async findDuplicateGroupByReport(reportId: string): Promise<AdminDuplicateReportGroupDto> {
-    const primaryReportId = await this.findPrimaryReportId(reportId);
-
-    const primaryReport = await this.prisma.report.findUnique({
-      where: { id: primaryReportId },
-      include: {
-        site: {
-          select: {
-            latitude: true,
-            longitude: true,
-            description: true,
-            address: true,
-          },
-        },
-        coReporters: {
-          select: {
-            id: true,
-          },
-        },
-        potentialDuplicates: {
-          orderBy: { createdAt: 'asc' },
-          include: {
-            site: {
-              select: {
-                latitude: true,
-                longitude: true,
-                description: true,
-                address: true,
-              },
-            },
-            coReporters: {
-              select: {
-                id: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!primaryReport) {
-      throw new NotFoundException({
-        code: 'REPORT_NOT_FOUND',
-        message: `Report with id '${reportId}' was not found`,
-      });
-    }
-
-    return {
-      primaryReport: this.buildDuplicateReportItem(primaryReport),
-      duplicateReports: primaryReport.potentialDuplicates.map((duplicateReport) =>
-        this.buildDuplicateReportItem(duplicateReport),
-      ),
-      totalReports: primaryReport.potentialDuplicates.length + 1,
-    };
-  }
-
-  private async buildMergeCompletedSnapshot(
-    primaryReportId: string,
-    metrics: {
-      mergedChildCount: number;
-      mergedMediaCount: number;
-      mergedCoReporterCount: number;
-    },
-  ): Promise<MergeDuplicateReportsResponseDto> {
-    const primaryAfter = await this.prisma.report.findUniqueOrThrow({
-      where: { id: primaryReportId },
-      select: {
-        status: true,
-        reporterId: true,
-        coReporters: {
-          select: {
-            userId: true,
-            reportedAt: true,
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
-          },
-          orderBy: { reportedAt: 'asc' },
-        },
-      },
-    });
-
-    const coReporters = primaryAfter.coReporters.map((row) => ({
-      userId: row.userId,
-      name: `${row.user.firstName} ${row.user.lastName}`.trim(),
-      reportedAt: row.reportedAt.toISOString(),
-    }));
-
-    const reporterCount =
-      (primaryAfter.reporterId ? 1 : 0) + primaryAfter.coReporters.length;
-
-    return {
-      primaryReportId,
-      mergedChildCount: metrics.mergedChildCount,
-      mergedMediaCount: metrics.mergedMediaCount,
-      mergedCoReporterCount: metrics.mergedCoReporterCount,
-      primaryStatus: primaryAfter.status,
-      coReporters,
-      reporterCount,
-    };
+    return this.reportsDuplicateMerge.findDuplicateGroupByReport(reportId);
   }
 
   async mergeDuplicateReports(
@@ -1049,340 +559,7 @@ export class ReportsService {
     dto: MergeDuplicateReportsDto,
     moderator: AuthenticatedUser,
   ): Promise<MergeDuplicateReportsResponseDto> {
-    const primaryReportId = await this.findPrimaryReportId(reportId);
-    const now = new Date();
-
-    const primaryReport = await this.prisma.report.findUnique({
-      where: { id: primaryReportId },
-      select: {
-        id: true,
-        siteId: true,
-        status: true,
-        reporterId: true,
-        reportNumber: true,
-        createdAt: true,
-        mediaUrls: true,
-        coReporters: {
-          select: {
-            userId: true,
-          },
-        },
-        potentialDuplicates: {
-          select: {
-            id: true,
-            reporterId: true,
-            createdAt: true,
-            mediaUrls: true,
-            coReporters: {
-              select: {
-                userId: true,
-                createdAt: true,
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (!primaryReport) {
-      throw new NotFoundException({
-        code: 'REPORT_NOT_FOUND',
-        message: `Report with id '${reportId}' was not found`,
-      });
-    }
-
-    if (primaryReport.status === 'DELETED') {
-      throw new BadRequestException({
-        code: 'PRIMARY_REPORT_NOT_MERGEABLE',
-        message: `Primary report '${primaryReportId}' is deleted and cannot be used as a merge target`,
-      });
-    }
-
-    const childIdsInGroup = new Set(primaryReport.potentialDuplicates.map((child) => child.id));
-    const selectedChildIds = [...new Set(dto.childReportIds)];
-    const invalidChildIds = selectedChildIds.filter((childId) => !childIdsInGroup.has(childId));
-
-    if (invalidChildIds.length > 0) {
-      if (invalidChildIds.length !== selectedChildIds.length) {
-        throw new BadRequestException({
-          code: 'INVALID_DUPLICATE_SELECTION',
-          message: 'One or more selected child reports do not belong to the duplicate group',
-          details: {
-            invalidChildIds,
-          },
-        });
-      }
-      // SECURITY: Idempotent merge retry — selection is no longer in the live duplicate group; only succeed if none of those IDs still exist as standalone reports (avoids accepting arbitrary unknown IDs).
-      const orphanCount = await this.prisma.report.count({
-        where: { id: { in: selectedChildIds } },
-      });
-      if (orphanCount > 0) {
-        throw new BadRequestException({
-          code: 'INVALID_DUPLICATE_SELECTION',
-          message: 'One or more selected child reports do not belong to the duplicate group',
-          details: {
-            invalidChildIds,
-          },
-        });
-      }
-      return this.buildMergeCompletedSnapshot(primaryReport.id, {
-        mergedChildCount: 0,
-        mergedMediaCount: 0,
-        mergedCoReporterCount: 0,
-      });
-    }
-
-    const selectedChildren = primaryReport.potentialDuplicates.filter((child) => selectedChildIds.includes(child.id));
-    if (selectedChildren.length === 0) {
-      throw new BadRequestException({
-        code: 'EMPTY_MERGE_SELECTION',
-        message: 'At least one duplicate child report must be selected for merge',
-      });
-    }
-
-    const duplicateMediaUrls = [...new Set(selectedChildren.flatMap((child) => child.mediaUrls))];
-
-    const currentCoReporterIds = new Set(primaryReport.coReporters.map((coReporter) => coReporter.userId));
-    /** Earliest known submission time per co-reporter user (from duplicate report or its co-report rows). */
-    const coReporterReportedAt = new Map<string, Date>();
-    const primaryReporterId = primaryReport.reporterId;
-
-    const offerCoReporter = (userId: string | null | undefined, reportedAt: Date) => {
-      if (!userId || userId === primaryReporterId) {
-        return;
-      }
-      const prev = coReporterReportedAt.get(userId);
-      if (!prev || reportedAt < prev) {
-        coReporterReportedAt.set(userId, reportedAt);
-      }
-    };
-
-    for (const child of selectedChildren) {
-      offerCoReporter(child.reporterId, child.createdAt);
-      for (const coReporter of child.coReporters) {
-        offerCoReporter(coReporter.userId, coReporter.createdAt);
-      }
-    }
-
-    const plannedNewCoReporterIds = [...coReporterReportedAt.keys()].filter(
-      (userId) => !currentCoReporterIds.has(userId),
-    );
-
-    const mergeTxResult = await this.prisma.$transaction(async (tx) => {
-      let siteStatusEvent:
-        | {
-            id: string;
-            status: SiteStatus;
-            latitude: number;
-            longitude: number;
-            updatedAt: Date;
-          }
-        | null = null;
-
-      // Any report that pointed at a child as its duplicate-of must point at the canonical primary before we delete children.
-      await tx.report.updateMany({
-        where: { potentialDuplicateOfId: { in: selectedChildIds } },
-        data: { potentialDuplicateOfId: primaryReport.id },
-      });
-
-      for (const userId of plannedNewCoReporterIds) {
-        const reportedAt = coReporterReportedAt.get(userId);
-        if (!reportedAt) {
-          continue;
-        }
-        await tx.reportCoReporter.upsert({
-          where: {
-            reportId_userId: {
-              reportId: primaryReport.id,
-              userId,
-            },
-          },
-          update: {},
-          create: {
-            reportId: primaryReport.id,
-            userId,
-            reportedAt,
-          },
-        });
-      }
-
-      const primaryUpdate: Prisma.ReportUncheckedUpdateInput = {
-        potentialDuplicateOfId: null,
-        mergedDuplicateChildCount: { increment: selectedChildren.length },
-      };
-      if (primaryReport.status !== 'APPROVED') {
-        primaryUpdate.status = 'APPROVED';
-        primaryUpdate.moderatedAt = now;
-        primaryUpdate.moderatedById = moderator.userId;
-        primaryUpdate.moderationReason = dto.reason ?? 'Merged duplicate';
-      }
-
-      await tx.report.update({
-        where: { id: primaryReport.id },
-        data: primaryUpdate,
-      });
-
-      const approvedCountForSite = await tx.report.count({
-        where: {
-          siteId: primaryReport.siteId,
-          status: 'APPROVED',
-        },
-      });
-      if (approvedCountForSite === 1) {
-        siteStatusEvent = await this.transitionSiteToVerifiedIfFirstApproved(tx, primaryReport.siteId);
-      }
-
-      await tx.report.deleteMany({
-        where: { id: { in: selectedChildIds } },
-      });
-
-      return { siteStatusEvent };
-    });
-    const siteStatusEvent = mergeTxResult.siteStatusEvent;
-    if (siteStatusEvent != null) {
-      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
-        kind: 'status_changed',
-        status: siteStatusEvent.status,
-        latitude: siteStatusEvent.latitude,
-        longitude: siteStatusEvent.longitude,
-        updatedAt: siteStatusEvent.updatedAt,
-      });
-    }
-
-    const mergedMediaDeletedCount = await this.reportsUploadService.deleteReportMediaUrls(duplicateMediaUrls);
-
-    await this.audit.log({
-      actorId: moderator.userId,
-      action: 'REPORT_MERGE',
-      resourceType: 'Report',
-      resourceId: primaryReport.id,
-      metadata: {
-        mergedChildCount: selectedChildren.length,
-        childReportIds: selectedChildIds,
-        duplicateMediaUrlsAttempted: duplicateMediaUrls.length,
-        duplicateMediaObjectsDeleted: mergedMediaDeletedCount,
-      },
-    });
-
-    // Admin dashboard invalidation
-    this.reportEventsService.emitReportStatusUpdated(primaryReport.id);
-    for (const childId of selectedChildIds) {
-      this.reportEventsService.emitReportStatusUpdated(childId);
-    }
-
-    // Owner-facing events (each affected report owner receives an update hint)
-    if (primaryReport.reporterId) {
-      this.reportsOwnerEventsService.emit(
-        primaryReport.reporterId,
-        primaryReport.id,
-        'report_updated',
-        { kind: 'merged', status: 'APPROVED' },
-      );
-    }
-    for (const child of selectedChildren) {
-      if (child.reporterId) {
-        this.reportsOwnerEventsService.emit(
-          child.reporterId,
-          child.id,
-          'report_updated',
-          { kind: 'merged', status: 'DELETED' },
-        );
-      }
-    }
-
-    const primaryReportNumberLabel = this.getReportNumber(primaryReport);
-    this.emitDuplicateMergeNotifications({
-      primaryReportId: primaryReport.id,
-      siteId: primaryReport.siteId,
-      primaryReporterId: primaryReport.reporterId,
-      primaryReportNumberLabel,
-      selectedChildren: selectedChildren.map((c) => ({ id: c.id, reporterId: c.reporterId })),
-      plannedNewCoReporterIds,
-    });
-
-    return this.buildMergeCompletedSnapshot(primaryReport.id, {
-      mergedChildCount: selectedChildren.length,
-      mergedMediaCount: mergedMediaDeletedCount,
-      mergedCoReporterCount: plannedNewCoReporterIds.length,
-    });
-  }
-
-  /**
-   * In-app + push notifications for duplicate merge outcomes.
-   * Uses REPORT_STATUS so existing mute preferences apply; mergeRole distinguishes payloads.
-   */
-  private emitDuplicateMergeNotifications(params: {
-    primaryReportId: string;
-    siteId: string;
-    primaryReporterId: string | null;
-    primaryReportNumberLabel: string;
-    selectedChildren: { id: string; reporterId: string | null }[];
-    plannedNewCoReporterIds: string[];
-  }): void {
-    const {
-      primaryReportId,
-      siteId,
-      primaryReporterId,
-      primaryReportNumberLabel,
-      selectedChildren,
-      plannedNewCoReporterIds,
-    } = params;
-
-    const childReporterIds = new Set<string>();
-    for (const child of selectedChildren) {
-      if (child.reporterId) {
-        childReporterIds.add(child.reporterId);
-      }
-    }
-
-    const baseData = {
-      reportId: primaryReportId,
-      siteId,
-      status: 'APPROVED' as const,
-      reportNumber: primaryReportNumberLabel,
-    };
-
-    if (primaryReporterId != null && selectedChildren.length > 0) {
-      this.eventEmitter.emit('notification.send', {
-        recipientUserIds: [primaryReporterId],
-        title: 'Duplicate reports merged',
-        body: `Similar submissions were merged into your report ${primaryReportNumberLabel}.`,
-        type: 'REPORT_STATUS',
-        threadKey: `report:${primaryReportId}`,
-        groupKey: `REPORT_STATUS:site:${siteId}`,
-        data: { ...baseData, mergeRole: 'primary' },
-      });
-    }
-
-    for (const userId of childReporterIds) {
-      if (userId === primaryReporterId) {
-        continue;
-      }
-      this.eventEmitter.emit('notification.send', {
-        recipientUserIds: [userId],
-        title: 'Your report was merged',
-        body: `Your submission was merged into ${primaryReportNumberLabel}.`,
-        type: 'REPORT_STATUS',
-        threadKey: `report:${primaryReportId}`,
-        groupKey: `REPORT_STATUS:site:${siteId}`,
-        data: { ...baseData, mergeRole: 'merged_child' },
-      });
-    }
-
-    for (const userId of plannedNewCoReporterIds) {
-      if (userId === primaryReporterId || childReporterIds.has(userId)) {
-        continue;
-      }
-      this.eventEmitter.emit('notification.send', {
-        recipientUserIds: [userId],
-        title: 'Co-reporter credit',
-        body: `You are credited as a co-reporter on ${primaryReportNumberLabel}.`,
-        type: 'REPORT_STATUS',
-        threadKey: `report:${primaryReportId}`,
-        groupKey: `REPORT_STATUS:site:${siteId}`,
-        data: { ...baseData, mergeRole: 'co_reporter_credited' },
-      });
-    }
+    return this.reportsDuplicateMerge.mergeDuplicateReports(reportId, dto, moderator);
   }
 
   async updateStatus(
@@ -1390,318 +567,11 @@ export class ReportsService {
     dto: UpdateReportStatusDto,
     moderator: AuthenticatedUser,
   ): Promise<Report> {
-    const report = await this.prisma.report.findUnique({
-      where: { id: reportId },
-      select: { id: true, status: true, reporterId: true },
-    });
-
-    if (!report) {
-      throw new NotFoundException({
-        code: 'REPORT_NOT_FOUND',
-        message: `Report with id '${reportId}' was not found`,
-      });
-    }
-
-    if (report.status === dto.status) {
-      return this.prisma.report.findUniqueOrThrow({
-        where: { id: reportId },
-      });
-    }
-
-    const allowedStatuses = ALLOWED_REPORT_STATUS_TRANSITIONS[report.status];
-    if (!allowedStatuses.includes(dto.status)) {
-      throw new BadRequestException({
-        code: 'INVALID_REPORT_STATUS_TRANSITION',
-        message: `Cannot transition report status from '${report.status}' to '${dto.status}'`,
-        details: {
-          from: report.status,
-          to: dto.status,
-          allowedTo: allowedStatuses,
-        },
-      });
-    }
-
-    const now = new Date();
-
-    const updatedResult = await this.prisma.$transaction(async (tx) => {
-      const updatedReport = await tx.report.update({
-        where: { id: reportId },
-        data: {
-          status: dto.status,
-          moderatedAt: now,
-          moderationReason: dto.reason ?? null,
-          moderatedById: moderator.userId,
-        },
-      });
-
-      if (dto.status === 'APPROVED' && updatedReport.reporterId) {
-        const existingAward = await tx.pointTransaction.findFirst({
-          where: {
-            referenceType: 'Report',
-            referenceId: reportId,
-          },
-        });
-        if (!existingAward) {
-          const otherApprovedCount = await tx.report.count({
-            where: {
-              siteId: updatedReport.siteId,
-              status: 'APPROVED',
-              id: { not: reportId },
-            },
-          });
-          const isFirstApproved = otherApprovedCount === 0;
-          if (isFirstApproved) {
-            const points = POINTS_FIRST_REPORT;
-            const user = await tx.user.findUnique({
-              where: { id: updatedReport.reporterId },
-              select: { pointsBalance: true, totalPointsEarned: true },
-            });
-            if (user) {
-              const balanceAfter = user.pointsBalance + points;
-              const totalEarnedAfter = user.totalPointsEarned + points;
-              await tx.pointTransaction.create({
-                data: {
-                  userId: updatedReport.reporterId,
-                  delta: points,
-                  balanceAfter,
-                  reasonCode: 'FIRST_REPORT',
-                  referenceType: 'Report',
-                  referenceId: reportId,
-                },
-              });
-              await tx.user.update({
-                where: { id: updatedReport.reporterId },
-                data: {
-                  pointsBalance: balanceAfter,
-                  totalPointsEarned: totalEarnedAfter,
-                },
-              });
-            }
-          }
-        }
-      }
-
-      let siteStatusEvent:
-        | {
-            id: string;
-            status: SiteStatus;
-            latitude: number;
-            longitude: number;
-            updatedAt: Date;
-          }
-        | null = null;
-      if (dto.status === 'APPROVED') {
-        const otherApprovedCount = await tx.report.count({
-          where: {
-            siteId: updatedReport.siteId,
-            status: 'APPROVED',
-            id: { not: reportId },
-          },
-        });
-        if (otherApprovedCount === 0) {
-          siteStatusEvent = await this.transitionSiteToVerifiedIfFirstApproved(tx, updatedReport.siteId);
-        }
-      }
-
-      return { updatedReport, siteStatusEvent };
-    });
-    const updated = updatedResult.updatedReport;
-    if (updatedResult.siteStatusEvent != null) {
-      const siteStatusEvent = updatedResult.siteStatusEvent;
-      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
-        kind: 'status_changed',
-        status: siteStatusEvent.status,
-        latitude: siteStatusEvent.latitude,
-        longitude: siteStatusEvent.longitude,
-        updatedAt: siteStatusEvent.updatedAt,
-      });
-    }
-
-    await this.audit.log({
-      actorId: moderator.userId,
-      action: 'REPORT_STATUS_UPDATED',
-      resourceType: 'Report',
-      resourceId: reportId,
-      metadata: { from: report.status, to: dto.status },
-    });
-
-    this.reportEventsService.emitReportStatusUpdated(reportId);
-    if (report.reporterId) {
-      this.reportsOwnerEventsService.emit(
-        report.reporterId,
-        reportId,
-        'report_updated',
-        { kind: 'status_changed', status: dto.status },
-      );
-      const statusLabel = dto.status.toLowerCase().replace(/_/g, ' ');
-      this.eventEmitter.emit('notification.send', {
-        recipientUserIds: [report.reporterId],
-        title: 'Report status updated',
-        body: `Your report has been ${statusLabel}`,
-        type: 'REPORT_STATUS',
-        threadKey: `report:${reportId}`,
-        groupKey: `REPORT_STATUS:site:${updated.siteId}`,
-        data: { reportId, siteId: updated.siteId, status: dto.status },
-      });
-    }
-    return updated;
+    return this.reportsModeration.updateStatus(reportId, dto, moderator);
   }
 
   async findOneForModeration(reportId: string): Promise<AdminReportDetailDto> {
-    const report = await this.prisma.report.findUnique({
-      where: { id: reportId },
-      include: {
-        site: true,
-        reporter: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        moderatedBy: {
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-          },
-        },
-        coReporters: {
-          include: {
-            user: {
-              select: {
-                firstName: true,
-                lastName: true,
-              },
-            },
-          },
-        },
-        potentialDuplicateOf: {
-          select: {
-            id: true,
-            createdAt: true,
-          },
-        },
-        potentialDuplicates: {
-          select: {
-            id: true,
-          },
-        },
-      },
-    });
-
-    if (!report) {
-      throw new NotFoundException({
-        code: 'REPORT_NOT_FOUND',
-        message: `Report with id '${reportId}' was not found`,
-      });
-    }
-
-    const reportNumber = this.getReportNumber(report);
-    const locationLabel = this.listLocationLabel(report.site, report.description);
-
-    const reporterAlias = report.reporter
-      ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
-      : 'Anonymous reporter';
-
-    const moderationQueueLabel = 'General Queue';
-    const moderationAssignedTeam = 'City Moderation';
-    const moderationSlaLabel =
-      report.status === 'NEW' ? '4h remaining' : report.status === 'IN_REVIEW' ? '2h remaining' : 'Completed';
-
-    const signedMediaUrls = await this.reportsUploadService.signUrls(report.mediaUrls ?? []);
-    const evidence = signedMediaUrls.map((url, index) => ({
-      id: `ev-${index + 1}`,
-      label: `Evidence ${index + 1}`,
-      kind: 'image' as const,
-      sizeLabel: '—',
-      uploadedAt: report.createdAt.toISOString(),
-      previewUrl: url,
-      previewAlt: `Evidence ${index + 1} for report ${reportNumber}`,
-    }));
-
-    const timeline = [
-      {
-        id: 'tl-submitted',
-        title: 'Report submitted',
-        detail: 'Initial report created with location and optional media evidence.',
-        actor: reporterAlias,
-        occurredAt: report.createdAt.toISOString(),
-        tone: 'info' as const,
-      },
-      ...(report.moderatedAt
-        ? [
-            {
-              id: 'tl-moderated',
-              title:
-                report.status === 'APPROVED'
-                  ? 'Report approved'
-                  : report.status === 'DELETED'
-                    ? 'Report rejected'
-                    : 'Report updated',
-              detail:
-                report.moderationReason ??
-                (report.status === 'APPROVED'
-                  ? 'Report was approved after moderation review.'
-                  : 'Report was updated during moderation review.'),
-              actor: report.moderatedBy
-                ? `${report.moderatedBy.firstName} ${report.moderatedBy.lastName}`.trim()
-                : 'Moderator',
-              occurredAt: report.moderatedAt.toISOString(),
-              tone:
-                report.status === 'APPROVED'
-                  ? ('success' as const)
-                  : report.status === 'DELETED'
-                    ? ('warning' as const)
-                    : ('neutral' as const),
-            },
-          ]
-        : []),
-    ];
-
-    const coReporters: string[] = report.coReporters
-      .map((coReporter) =>
-        coReporter.user
-          ? `${coReporter.user.firstName} ${coReporter.user.lastName}`.trim()
-          : null,
-      )
-      .filter((alias): alias is string => !!alias);
-
-    const isPotentialDuplicate =
-      report.potentialDuplicateOfId !== null || report.potentialDuplicates.length > 0 || coReporters.length > 0;
-
-    const potentialDuplicateOfReportNumber = report.potentialDuplicateOf
-      ? this.getReportNumber(report.potentialDuplicateOf)
-      : null;
-
-    return {
-      id: report.id,
-      reportNumber,
-      status: report.status,
-      priority: this.derivePriority(report.status),
-      title: this.displayReportTitle(report),
-      description: this.optionalReportNarrative(report.description, report.category) ?? '',
-      location: locationLabel,
-      submittedAt: report.createdAt.toISOString(),
-      reporterAlias,
-      reporterTrust: 'Bronze',
-      evidence,
-      timeline,
-      moderation: {
-        queueLabel: moderationQueueLabel,
-        slaLabel: moderationSlaLabel,
-        assignedTeam: moderationAssignedTeam,
-      },
-      mapPin: {
-        latitude: report.site.latitude,
-        longitude: report.site.longitude,
-        label: locationLabel,
-      },
-      isPotentialDuplicate,
-      coReporters,
-      potentialDuplicateOfReportNumber,
-      cleanupEffortLabel: reportCleanupEffortLabel(report.cleanupEffort),
-    };
+    return this.reportsModeration.findOneForModeration(reportId);
   }
 
   async findOne(
@@ -1784,10 +654,10 @@ export class ReportsService {
 
     return {
       id: report.id,
-      reportNumber: this.getReportNumber(report),
+      reportNumber: getReportNumber(report),
       status: report.status,
-      title: this.displayReportTitle(report),
-      description: this.optionalReportNarrative(report.description, report.category),
+      title: displayReportTitle(report),
+      description: optionalReportNarrative(report.description, report.category),
       mediaUrls,
       submittedAt: report.createdAt.toISOString(),
       site: {
@@ -1799,7 +669,7 @@ export class ReportsService {
       },
       reporterName,
       coReporterNames,
-      location: this.listLocationLabel(report.site, report.description),
+      location: listLocationLabel(report.site, report.description),
       pointsAwarded,
       category: report.category ?? null,
       severity: report.severity ?? null,

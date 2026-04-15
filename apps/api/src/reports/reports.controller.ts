@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  Headers,
   MessageEvent as NestMessageEvent,
   Param,
   Patch,
@@ -69,6 +70,7 @@ export class ReportsController {
   createWithLocation(
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Body() dto: CreateReportWithLocationDto,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
   ): Promise<ReportSubmitResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
@@ -76,7 +78,7 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    return this.reportsService.createWithLocation(user, dto);
+    return this.reportsService.createWithLocation(user, dto, idempotencyKey);
   }
 
   @Post('upload')

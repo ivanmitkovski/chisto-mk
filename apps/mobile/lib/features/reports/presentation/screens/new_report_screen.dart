@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -8,6 +10,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/reports/data/report_draft_local_store.dart';
 import 'package:chisto_mobile/features/reports/data/report_flow_preferences.dart';
 import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
@@ -21,6 +24,7 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/report_surfa
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/new_report_widgets.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/cleanup_effort_l10n.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
@@ -72,6 +76,18 @@ class _NewReportScreenState extends State<NewReportScreen> {
   bool _reportFlowPrefsLoaded = false;
   bool _hasSeenReportHelpHint = true;
 
+  /// Stable for the current submit attempt so retries send the same `Idempotency-Key`.
+  String? _submitIdempotencyKey;
+
+  /// After a successful API submit, avoid re-persisting the same draft on dispose.
+  bool _suppressLocalDraftPersist = false;
+
+  static String _newIdempotencyKey() {
+    final Random r = Random.secure();
+    final List<int> bytes = List<int>.generate(16, (_) => r.nextInt(256));
+    return base64UrlEncode(bytes);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -90,7 +106,32 @@ class _NewReportScreenState extends State<NewReportScreen> {
       _titleController.text = _draft.title;
       _descriptionController.text = _draft.description;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) => _loadReportingCapacity());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadReportingCapacity();
+      _restoreSavedDraft();
+    });
+  }
+
+  Future<void> _restoreSavedDraft() async {
+    if (widget.initialPhoto != null) {
+      return;
+    }
+    try {
+      final ReportDraft? saved = await ReportDraftLocalStore.loadDraft();
+      if (!mounted || saved == null) {
+        return;
+      }
+      if (!saved.hasPhotos && !saved.hasTitle && !saved.hasLocation) {
+        return;
+      }
+      setState(() {
+        _draft = saved;
+        _titleController.text = saved.title;
+        _descriptionController.text = saved.description;
+      });
+    } catch (_) {
+      // Ignore corrupt local draft.
+    }
   }
 
   Future<void> _dismissFlowHelpHint() async {
@@ -112,6 +153,21 @@ class _NewReportScreenState extends State<NewReportScreen> {
 
   @override
   void dispose() {
+    final bool shouldPersist =
+        !_suppressLocalDraftPersist &&
+        !_submitting &&
+        (_draft.hasPhotos ||
+            _titleController.text.trim().isNotEmpty ||
+            _draft.hasLocation);
+    if (shouldPersist) {
+      unawaited(
+        ReportDraftLocalStore.saveDraft(
+          draft: _draft,
+          title: _titleController.text,
+          description: _descriptionController.text,
+        ),
+      );
+    }
     _titleController.dispose();
     _titleFocus.dispose();
     _descriptionController.dispose();
@@ -529,6 +585,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
       if (!mounted) return;
       setState(() => _submitPhase = 'creating');
       if (!mounted) return;
+      _submitIdempotencyKey ??= _newIdempotencyKey();
       final result = await reportsApi.submitReport(
         latitude: _draft.latitude!,
         longitude: _draft.longitude!,
@@ -539,8 +596,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
         severity: _draft.severity,
         address: _draft.address?.trim().isNotEmpty == true ? _draft.address!.trim() : null,
         cleanupEffort: _draft.cleanupEffort?.apiKey,
+        idempotencyKey: _submitIdempotencyKey,
       );
       if (!mounted) return;
+      _suppressLocalDraftPersist = true;
       ServiceLocator.instance.profileNeedsRefresh.value++;
       // Keep _submitting true until the success dialog closes so the primary
       // control cannot fire a second submission (matches disabled post-action UX).
@@ -552,8 +611,8 @@ class _NewReportScreenState extends State<NewReportScreen> {
           barrierDismissible: false,
           builder: (BuildContext context) {
             return ReportSubmittedDialog(
-              categoryLabel:
-                  _draft.category?.label ?? context.l10n.reportSubmittedFallbackCategory,
+              categoryLabel: _draft.category?.localizedTitle(context.l10n) ??
+                  context.l10n.reportSubmittedFallbackCategory,
               reportNumber: result.reportNumber,
               reportId: result.reportId,
               address: _draft.address,
@@ -572,8 +631,12 @@ class _NewReportScreenState extends State<NewReportScreen> {
       }
       if (!mounted) return;
       if (dialogResult == SubmittedDialogResult.reportAnother) {
+        _submitIdempotencyKey = null;
+        unawaited(ReportDraftLocalStore.clear());
         _resetDraftAndStartOver();
       } else {
+        _submitIdempotencyKey = null;
+        unawaited(ReportDraftLocalStore.clear());
         Navigator.of(context).pop(dialogResult is String ? dialogResult : true);
       }
     } on AppError catch (e) {
@@ -617,6 +680,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
   }
 
   void _resetDraftAndStartOver() {
+    _suppressLocalDraftPersist = false;
     setState(() {
       _draft = ReportDraft();
       _currentStage = ReportStage.evidence;
@@ -707,7 +771,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
   }
 
   Widget _buildTopBar(BuildContext context) {
-    final String title = widget.entryLabel ?? context.l10n.newReportTitle;
+    final String title = widget.entryLabel ??
+        (widget.initialPhoto != null
+            ? context.l10n.reportEntryLabelCamera
+            : context.l10n.reportEntryLabelGuided);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       mainAxisSize: MainAxisSize.min,
@@ -793,7 +860,10 @@ class _NewReportScreenState extends State<NewReportScreen> {
           child: _buildStageSurface(
             context,
             stage: ReportStage.evidence,
-            infoExtra: widget.entryHint,
+            infoExtra: widget.entryHint ??
+                (widget.initialPhoto != null
+                    ? context.l10n.reportEntryHintCamera
+                    : null),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisSize: MainAxisSize.min,
@@ -901,7 +971,7 @@ class _NewReportScreenState extends State<NewReportScreen> {
                 ReviewSummaryTile(
                   icon: _draft.category?.icon ?? Icons.category_outlined,
                   title: context.l10n.reportReviewCategoryTitle,
-                  subtitle: _draft.category?.label ??
+                  subtitle: _draft.category?.localizedTitle(context.l10n) ??
                       context.l10n.reportReviewChooseCategory,
                   isComplete: _draft.hasCategory,
                   semanticsHint: context.l10n.reviewTapToEdit,
@@ -1403,14 +1473,14 @@ class _NewReportScreenState extends State<NewReportScreen> {
         Semantics(
           button: true,
           label: context.l10n.reportSelectCategorySemantic,
-          value: _draft.category?.label,
+          value: _draft.category?.localizedTitle(context.l10n) ?? '',
           child: ReportActionTile(
             icon: _draft.category?.icon ?? Icons.category_outlined,
-            title: _draft.category?.label ??
+            title: _draft.category?.localizedTitle(context.l10n) ??
                 context.l10n.reportReviewCategoryTitle,
             subtitle: _draft.category == null
                 ? context.l10n.reportReviewChooseCategory
-                : _draft.category!.description,
+                : _draft.category!.localizedDescription(context.l10n),
             tone: hasCategoryError
                 ? ReportSurfaceTone.danger
                 : ReportSurfaceTone.neutral,

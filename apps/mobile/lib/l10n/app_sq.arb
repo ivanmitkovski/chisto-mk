@@ -1526,6 +1526,87 @@
   },
   "reportListEmptyTitle": "Ende pa raporte",
   "reportListEmptySubtitle": "Raportet e tua do të shfaqen këtu pasi t’i dërgosh.",
+  "reportStatusUnderReviewShort": "Në shqyrtim",
+  "reportStatusApprovedShort": "Miratuar",
+  "reportStatusDeclinedShort": "Refuzuar",
+  "reportStatusAlreadyReportedShort": "E raportuar më parë",
+  "reportListFilterAll": "Të gjitha",
+  "reportListFilterSemanticPrefix": "Statusi i raportit",
+  "reportListHeaderTitle": "Raportet e tua",
+  "reportListHeaderTotalPill": "{count, plural, one{1 raport gjithsej} other{{count} raporte gjithsej}}",
+  "@reportListHeaderTotalPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderUnderReviewPill": "{count, plural, one{1 në shqyrtim} other{{count} në shqyrtim}}",
+  "@reportListHeaderUnderReviewPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderSemanticSummary": "{totalReports, plural, one{1 raport gjithsej} other{{totalReports} raporte gjithsej}}. {underReview, plural, one{1 aktualisht në shqyrtim} other{{underReview} aktualisht në shqyrtim}}.",
+  "@reportListHeaderSemanticSummary": {
+    "placeholders": {
+      "totalReports": {
+        "type": "int"
+      },
+      "underReview": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilteredFooterAll": "Po shfaqen të gjitha raportet",
+  "reportListFilteredFooterCount": "{count, plural, one{1 raport} other{{count} raporte}}",
+  "@reportListFilteredFooterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListNoMatchesSearchTitle": "Nuk u gjetën raporte",
+  "reportListNoMatchesFilterTitle": "Nuk ka raporte me këtë filtr",
+  "reportListNoMatchesHintSearchAndFilter": "Provo një kërkim tjetër ose pastro filtrat për të parë më shumë raporte.",
+  "reportListNoMatchesHintSearchOnly": "Kontrollo drejtshkrimin ose provo një kërkim më të gjerë.",
+  "reportListNoMatchesHintFilterOnly": "Provo një filtr tjetër, ose pastroje për të parë të gjitha raportet.",
+  "reportListClearSearch": "Pastro kërkimin",
+  "reportListDateWeeksAgo": "{weeks, plural, one{Para 1 jave} other{Para {weeks} javësh}}",
+  "@reportListDateWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailOpeningInProgress": "Po hapet…",
+  "reportDetailNoPhotos": "Pa foto",
+  "reportDetailStatusUnderReviewTitle": "Në shqyrtim nga moderatorët",
+  "reportDetailStatusUnderReviewBody": "Moderatorët po kontrollojnë provat dhe vendndodhjen para se të vendosin si ta trajtojnë këtë raport.",
+  "reportDetailStatusApprovedTitle": "Miratuar dhe i lidhur me një vend",
+  "reportDetailStatusApprovedBody": "Ky raport ndihmoi të konfirmohet një vend publik i ndotur dhe mund të kontribuojë në veprime pastrimi.",
+  "reportDetailStatusAlreadyReportedTitle": "Tashmë i gjurmuar si vend ekzistues",
+  "reportDetailStatusAlreadyReportedBody": "Raporti yt përputhet me një vend ekzistues. Provat janë ende të dobishme për të kuptuar problemin.",
+  "reportDetailStatusOutcomeTitle": "Rezultati i shqyrtimit",
+  "reportDetailStatusOutcomeBodyFallback": "Ky raport nuk mund të miratohet në formën e tij aktuale.",
+  "reportCardSemanticLabel": "{category}, {status}, {location}. Prek për detaje.",
+  "@reportCardSemanticLabel": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "appSmartImageUnavailable": "Imazhi nuk është i disponueshëm",
   "eventsReminderSectionTitle": "Kujtues për ngjarjen",
   "eventsReminderSectionEnabled": "Kujtuesi është aktiv",
@@ -2041,5 +2122,34 @@
   "eventChatReleaseToCancel": "Lësho për të anuluar",
   "eventChatRecording": "Duke regjistruar…",
   "eventChatMicPermissionDenied": "Nevojitet qasja në mikrofon për mesazhet zanore.",
-  "eventChatOpenMapsFailed": "Nuk mund të hapja Hartat. Provo përsëri."
+  "eventChatOpenMapsFailed": "Nuk mund të hapja Hartat. Provo përsëri.",
+  "reportEntryLabelGuided": "Raport i udhëhequr",
+  "reportEntryLabelCamera": "Raport nga kamera",
+  "reportEntryHintCamera": "Nëse fillon me një foto të drejtpërdrejtë, moderimi zakonisht është më i shpejtë sepse prova është tashmë e bashkangjitur.",
+  "homeReportingCapacityCheckFailed": "Nuk mund të kontrollohet disponueshmëria e raportimit tani.",
+  "homeCameraOpenFailed": "Kamera nuk mund të hapet. Provo përsëri pas një çasti.",
+  "mapTabPlaceholderHint": "Hap këtë skedë për të ngarkuar hartën live dhe vendet e ndotjes afër.",
+  "reportCategoryPickerTitle": "Zgjidh kategorinë",
+  "reportCategoryPickerSubtitle": "Zgjidh përputhjen më të afërt me problemin që raporton.",
+  "reportCategoryPickerBannerTitle": "Zgjidh përputhjen më të afërt",
+  "reportCategoryPickerBannerBody": "Zgjidh kategorinë që moderatorët duhet ta verifikojnë së pari. Nuk duhet të jetë perfekte.",
+  "reportCategoryIllegalLandfillTitle": "Deponi e paligjshme",
+  "reportCategoryIllegalLandfillDescription": "Mbeturina të hedhura, grumbuj mbeturinash ose vende informale hedhjeje.",
+  "reportCategoryWaterPollutionTitle": "Ndotje e ujit",
+  "reportCategoryWaterPollutionDescription": "Lumenj, liqene, kanalizime të kontaminuara ose shkarkim ujërash të ndotura.",
+  "reportCategoryAirPollutionTitle": "Ndotje e ajrit",
+  "reportCategoryAirPollutionDescription": "Tym, pluhur, djegie mbeturinash ose emetime që dëmtojnë cilësinë e ajrit.",
+  "reportCategoryIndustrialWasteTitle": "Mbeturina industriale",
+  "reportCategoryIndustrialWasteDescription": "Inerte ndërtimi, mbeturina fabrike ose materiale të rrezikshme.",
+  "reportCategoryOtherTitle": "Tjetër",
+  "reportCategoryOtherDescription": "Kur problemi nuk përputhet qartë me kategoritë më sipër.",
+  "unknownRouteTitle": "Faqja nuk u gjet",
+  "unknownRouteMessage": "Lidhja mund të jetë e vjetër ose e pasaktë.",
+  "unknownRouteContinueButton": "Vazhdo te aplikacioni",
+  "unknownRouteDebugRoute": "Debug: emri i rrugës ishte \"{routeName}\".",
+  "@unknownRouteDebugRoute": {
+    "placeholders": {
+      "routeName": { "type": "String" }
+    }
+  }
 }

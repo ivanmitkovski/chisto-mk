@@ -1,8 +1,8 @@
 /// <reference types="jest" />
-import { ReportsService } from '../../src/reports/reports.service';
+import { ReportsDuplicateMergeService } from '../../src/reports/reports-duplicate-merge.service';
 import { Role } from '../../src/prisma-client';
 
-describe('ReportsService mergeDuplicateReports', () => {
+describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
   it('does not append child media to primary; hard-deletes children; deletes duplicate media from storage', async () => {
     const moderator = { userId: 'mod-1', role: Role.ADMIN };
     const primaryId = 'primary-1';
@@ -86,12 +86,11 @@ describe('ReportsService mergeDuplicateReports', () => {
     const reportsOwnerEvents = { emit: jest.fn() };
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsService(
+    const service = new ReportsDuplicateMergeService(
       prisma as never,
       { log: jest.fn() } as never,
       reportsUploadService as never,
       { emitReportStatusUpdated: jest.fn() } as never,
-      { emitNotificationCreated: jest.fn() } as never,
       { emitSiteUpdated: jest.fn() } as never,
       reportsOwnerEvents as never,
       eventEmitter as never,
@@ -197,12 +196,11 @@ describe('ReportsService mergeDuplicateReports', () => {
 
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsService(
+    const service = new ReportsDuplicateMergeService(
       prisma as never,
       { log: jest.fn() } as never,
       reportsUploadService as never,
       { emitReportStatusUpdated: jest.fn() } as never,
-      { emitNotificationCreated: jest.fn() } as never,
       { emitSiteUpdated: jest.fn() } as never,
       { emit: jest.fn() } as never,
       eventEmitter as never,
@@ -299,12 +297,11 @@ describe('ReportsService mergeDuplicateReports', () => {
 
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsService(
+    const service = new ReportsDuplicateMergeService(
       prisma as never,
       { log: jest.fn() } as never,
       reportsUploadService as never,
       { emitReportStatusUpdated: jest.fn() } as never,
-      { emitNotificationCreated: jest.fn() } as never,
       { emitSiteUpdated: jest.fn() } as never,
       { emit: jest.fn() } as never,
       eventEmitter as never,

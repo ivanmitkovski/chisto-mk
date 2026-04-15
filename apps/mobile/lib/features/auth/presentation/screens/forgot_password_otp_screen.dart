@@ -82,15 +82,35 @@ class _ForgotPasswordOtpScreenState extends State<ForgotPasswordOtpScreen> {
   }
 
   Future<void> _onContinue() async {
-    if (!_isComplete) return;
+    if (!_isComplete || _isLoading) return;
 
-    setState(() => _isLoading = true);
+    setState(() {
+      _isLoading = true;
+      _apiError = null;
+    });
     final Duration delay = MediaQuery.disableAnimationsOf(context)
         ? Duration.zero
         : AppMotion.standard;
     await Future<void>.delayed(delay);
     if (!mounted) return;
 
+    try {
+      await ServiceLocator.instance.authRepository.verifyPasswordResetCode(
+        widget.phoneNumberE164,
+        _codeController.text.trim(),
+      );
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _apiError =
+            messageForAuthError(AppLocalizations.of(context)!, e);
+      });
+      AppHaptics.warning(context);
+      return;
+    }
+
+    if (!mounted) return;
     setState(() => _isLoading = false);
     AppHaptics.success(context);
 

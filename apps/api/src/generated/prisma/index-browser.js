@@ -209,7 +209,9 @@ exports.Prisma.AdminNotificationScalarFieldEnum = {
   tone: 'tone',
   category: 'category',
   isUnread: 'isUnread',
-  href: 'href'
+  href: 'href',
+  messageTemplateKey: 'messageTemplateKey',
+  messageTemplateParams: 'messageTemplateParams'
 };
 
 exports.Prisma.PointTransactionScalarFieldEnum = {
@@ -265,6 +267,14 @@ exports.Prisma.ReportCoReporterScalarFieldEnum = {
   reportedAt: 'reportedAt',
   reportId: 'reportId',
   userId: 'userId'
+};
+
+exports.Prisma.ReportSubmitIdempotencyScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  key: 'key',
+  reportId: 'reportId'
 };
 
 exports.Prisma.SystemConfigScalarFieldEnum = {
@@ -664,6 +674,7 @@ exports.Prisma.ModelName = {
   Site: 'Site',
   Report: 'Report',
   ReportCoReporter: 'ReportCoReporter',
+  ReportSubmitIdempotency: 'ReportSubmitIdempotency',
   SystemConfig: 'SystemConfig',
   FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',

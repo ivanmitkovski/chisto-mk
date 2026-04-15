@@ -4,9 +4,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/cache/report_images_cache.dart' show reportImagesCache, stableCacheKeyForReportImage;
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_status_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 
@@ -35,10 +39,14 @@ class ReportCard extends StatelessWidget {
         (_isNetworkUrl(evidencePaths.first) || _isLocalFile(evidencePaths.first));
 
     final String location = report.address ?? report.title;
+    final AppLocalizations l10n = context.l10n;
     return Semantics(
       button: true,
-      label:
-          '${report.category.label}, ${report.status.label}, $location. Tap to view details.',
+      label: l10n.reportCardSemanticLabel(
+        report.category.localizedTitle(l10n),
+        reportUiStatusShortLabel(l10n, report.status),
+        location,
+      ),
       child: Padding(
         padding: const EdgeInsets.only(bottom: AppSpacing.sm),
         child: Material(
@@ -181,7 +189,7 @@ class ReportCard extends StatelessWidget {
                               runSpacing: AppSpacing.xs,
                               children: <Widget>[
                                 ReportStatePill(
-                                  label: report.category.label,
+                                  label: report.category.localizedTitle(context.l10n),
                                   icon: report.category.icon,
                                   tone: ReportSurfaceTone.neutral,
                                 ),
@@ -286,7 +294,7 @@ class ReportStatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.xs),
           Text(
-            status.label,
+            reportUiStatusShortLabel(context.l10n, status),
             style: AppTypography.badgeLabel.copyWith(
               fontSize: 12,
               color: status.color,
