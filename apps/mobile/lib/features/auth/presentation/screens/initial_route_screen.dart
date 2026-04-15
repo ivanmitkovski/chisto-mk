@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -27,8 +28,20 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
 
   Future<void> _resolveAndNavigate() async {
     final authRepo = ServiceLocator.instance.authRepository;
-    final Future<void> sessionFuture =
-        authRepo.restoreSession().catchError((Object error, StackTrace? stackTrace) {});
+    final Future<void> sessionFuture = () async {
+      try {
+        await authRepo.restoreSession();
+      } catch (error, stackTrace) {
+        if (kDebugMode) {
+          debugPrint('[InitialRoute] session restore failed: $error');
+          debugPrint('$stackTrace');
+        } else {
+          debugPrint(
+            '[InitialRoute] session restore failed (${error.runtimeType})',
+          );
+        }
+      }
+    }();
     final Future<void> timeoutFuture =
         Future<void>.delayed(SplashConstants.initialRouteSessionTimeout);
     final Future<void> minDisplayFuture =

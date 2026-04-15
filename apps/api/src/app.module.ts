@@ -24,6 +24,7 @@ import { ObservabilityModule } from './observability/observability.module';
 import { GamificationModule } from './gamification/gamification.module';
 import { EventsModule } from './events/events.module';
 import { EventChatModule } from './event-chat/event-chat.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 
 @Module({
@@ -54,6 +55,7 @@ import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.life
     GamificationModule,
     EventsModule,
     EventChatModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisIoAdapterLifecycle],

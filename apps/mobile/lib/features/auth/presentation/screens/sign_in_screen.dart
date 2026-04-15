@@ -1,7 +1,11 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
+import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -442,6 +446,70 @@ class _SignInScreenState extends State<SignInScreen>
                                       ),
                                     ),
                                   ),
+                                const SizedBox(height: AppSpacing.md),
+                                ValueListenableBuilder<Locale?>(
+                                  valueListenable:
+                                      ServiceLocator.instance.appLocaleOverride,
+                                  builder: (
+                                    BuildContext context,
+                                    Locale? override,
+                                    _,
+                                  ) {
+                                    final Locale effective = resolveAppLocale(
+                                      override: override,
+                                      platformLocales:
+                                          PlatformDispatcher.instance.locales,
+                                    );
+                                    final String languageLabel =
+                                        _languageDisplayName(l10n, effective);
+                                    return Center(
+                                      child: Semantics(
+                                        button: true,
+                                        label: l10n.profileLanguageTile,
+                                        child: InkWell(
+                                          onTap: () {
+                                            AppHaptics.tap(context);
+                                            showAppLanguagePicker(context);
+                                          },
+                                          borderRadius: BorderRadius.circular(
+                                            AppSpacing.radius14,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: AppSpacing.sm,
+                                              vertical: AppSpacing.xs,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.language_rounded,
+                                                  size: 22,
+                                                  color: AppColors.primaryDark,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppSpacing.xs,
+                                                ),
+                                                Text(
+                                                  languageLabel,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        color:
+                                                            AppColors.textMuted,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -457,6 +525,18 @@ class _SignInScreenState extends State<SignInScreen>
         LoadingOverlay(visible: _isLoading),
       ],
     );
+  }
+}
+
+String _languageDisplayName(AppLocalizations l10n, Locale locale) {
+  switch (locale.languageCode) {
+    case 'mk':
+      return l10n.profileLanguageNameMk;
+    case 'sq':
+      return l10n.profileLanguageNameSq;
+    case 'en':
+    default:
+      return l10n.profileLanguageNameEn;
   }
 }
 

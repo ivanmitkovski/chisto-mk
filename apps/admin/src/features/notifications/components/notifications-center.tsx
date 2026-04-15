@@ -150,6 +150,9 @@ export function NotificationsCenter({ initialItems }: NotificationsCenterProps) 
                   <div className={styles.textWrap}>
                     <p className={styles.itemTitle}>{notification.title}</p>
                     <p className={styles.itemMessage}>{notification.message}</p>
+                    {notification.messageTemplateKey ? (
+                      <p className={styles.templateKey}>{notification.messageTemplateKey}</p>
+                    ) : null}
                     {notification.href ? (
                       <span className={styles.link}>View details</span>
                     ) : null}

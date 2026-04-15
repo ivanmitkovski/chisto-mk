@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Prisma, ReportStatus, Site, SiteShareChannel, SiteStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -11,18 +11,20 @@ import { ReportsUploadService } from '../reports/reports-upload.service';
 import { CreateSiteDto } from './dto/create-site.dto';
 import { ListSitesMapQueryDto } from './dto/list-sites-map-query.dto';
 import { ListSiteCommentsQueryDto } from './dto/list-site-comments-query.dto';
-import { SiteCommentsSort } from './dto/list-site-comments-query.dto';
 import { ListSiteMediaQueryDto } from './dto/list-site-media-query.dto';
 import { ListSiteUpvotesQueryDto } from './dto/list-site-upvotes-query.dto';
 import { ListSitesQueryDto, SiteFeedMode, SiteFeedSort } from './dto/list-sites-query.dto';
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
+import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
 import { ShareSiteDto } from './dto/share-site.dto';
 import { SubmitFeedFeedbackDto } from './dto/submit-feed-feedback.dto';
 import { TrackFeedEventDto } from './dto/track-feed-event.dto';
-import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
 import { FeedRankingService, RankingInput } from './feed-ranking.service';
 import { SiteEngagementService } from './site-engagement.service';
+import { SiteCommentsService } from './site-comments.service';
+import type { SiteCommentTreeNode } from './site-comments.service';
+import { SitesMapQueryService } from './sites-map-query.service';
 
 type SiteWithReportsAndEvents = Prisma.SiteGetPayload<{
   include: { reports: true; events: true };
@@ -51,126 +53,6 @@ type FeedSiteRow = Prisma.SiteGetPayload<{
   };
 }>;
 
-type MapSiteRow = Prisma.SiteGetPayload<{
-  select: {
-    id: true;
-    latitude: true;
-    longitude: true;
-    address: true;
-    description: true;
-    status: true;
-    createdAt: true;
-    updatedAt: true;
-    upvotesCount: true;
-    commentsCount: true;
-    savesCount: true;
-    sharesCount: true;
-    _count: { select: { reports: true } };
-    reports: {
-      orderBy: { createdAt: 'desc' };
-      take: 1;
-      select: {
-        title: true;
-        description: true;
-        mediaUrls: true;
-        category: true;
-        createdAt: true;
-        reportNumber: true;
-      };
-    };
-  };
-}>;
-
-type MapSiteLiteRow = Prisma.SiteGetPayload<{
-  select: {
-    id: true;
-    latitude: true;
-    longitude: true;
-    address: true;
-    description: true;
-    status: true;
-    createdAt: true;
-    updatedAt: true;
-    reports: {
-      orderBy: { createdAt: 'desc' };
-      take: 1;
-      select: { mediaUrls: true };
-    };
-  };
-}>;
-
-/** JSON row shape for GET /sites/map (full and lite payloads share this envelope). */
-type MapListApiRow = Site & {
-  reportCount: number;
-  latestReportTitle: string | null;
-  latestReportDescription: string | null;
-  latestReportCategory: string | null;
-  latestReportCreatedAt: string | null;
-  latestReportNumber: string | null;
-  latestReportMediaUrls?: string[];
-  upvotesCount: number;
-  commentsCount: number;
-  savesCount: number;
-  sharesCount: number;
-  distanceKm?: number;
-};
-
-const MAP_SITE_LITE_SELECT = {
-  id: true,
-  latitude: true,
-  longitude: true,
-  address: true,
-  description: true,
-  status: true,
-  createdAt: true,
-  updatedAt: true,
-  reports: {
-    orderBy: { createdAt: 'desc' },
-    take: 1,
-    select: { mediaUrls: true },
-  },
-} as const;
-
-export type SiteCommentTreeNode = {
-  id: string;
-  parentId: string | null;
-  body: string;
-  createdAt: string;
-  authorId: string;
-  authorName: string;
-  likesCount: number;
-  isLikedByMe: boolean;
-  replies: SiteCommentTreeNode[];
-  repliesCount: number;
-};
-
-const MAP_SITE_FIND_SELECT = {
-  id: true,
-  latitude: true,
-  longitude: true,
-  address: true,
-  description: true,
-  status: true,
-  createdAt: true,
-  updatedAt: true,
-  upvotesCount: true,
-  commentsCount: true,
-  savesCount: true,
-  sharesCount: true,
-  _count: { select: { reports: true } },
-  reports: {
-    orderBy: { createdAt: 'desc' },
-    take: 1,
-    select: {
-      title: true,
-      description: true,
-      mediaUrls: true,
-      category: true,
-      createdAt: true,
-      reportNumber: true,
-    },
-  },
-} as const;
 
 const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
   REPORTED: ['VERIFIED', 'DISPUTED'],
@@ -183,11 +65,8 @@ const ALLOWED_SITE_STATUS_TRANSITIONS: Record<SiteStatus, SiteStatus[]> = {
 
 @Injectable()
 export class SitesService {
-  /** Horizons presigned map thumbnails before AWS URL expiry (~1h); client refreshes map data. */
-  private static readonly MAP_SIGNED_MEDIA_CLIENT_BUFFER_MS = 55 * 60 * 1000;
 
   private readonly feedCacheTtlMs = 15_000;
-  private readonly mapCacheTtlMs = 4_000;
   private readonly feedQueryTimeoutMs = 5_000;
   private readonly feedResponseCache = new Map<
     string,
@@ -223,34 +102,6 @@ export class SitesService {
     }
   >();
   private readonly feedCacheSiteIndex = new Map<string, Set<string>>();
-  private readonly mapResponseCache = new Map<
-    string,
-    {
-      cachedAt: number;
-      value: {
-        data: Array<
-          Site & {
-            reportCount: number;
-            latestReportTitle: string | null;
-            latestReportDescription: string | null;
-            latestReportCategory: string | null;
-            latestReportCreatedAt: string | null;
-            latestReportNumber: string | null;
-            latestReportMediaUrls?: string[];
-            upvotesCount: number;
-            commentsCount: number;
-            savesCount: number;
-            sharesCount: number;
-            distanceKm?: number;
-          }
-        >;
-        meta: { signedMediaExpiresAt: string };
-      };
-    }
-  >();
-  private readonly mapCacheSiteIndex = new Map<string, Set<string>>();
-  /** Cached: does this DB report the postgis extension (map queries can use ST_DWithin / ST_Within). */
-  private postgisMapSupport: boolean | null = null;
   private readonly feedUserPreferences = new Map<
     string,
     {
@@ -268,8 +119,14 @@ export class SitesService {
     private readonly siteEventsService: SiteEventsService,
     private readonly feedRanking: FeedRankingService,
     private readonly siteEngagement: SiteEngagementService,
+    private readonly siteComments: SiteCommentsService,
     private readonly eventEmitter: EventEmitter2,
+    private readonly sitesMapQuery: SitesMapQueryService,
   ) {}
+
+  async findAllForMap(query: ListSitesMapQueryDto) {
+    return this.sitesMapQuery.findAllForMap(query);
+  }
 
   async create(dto: CreateSiteDto): Promise<Site> {
     const site = await this.prisma.site.create({
@@ -280,7 +137,7 @@ export class SitesService {
       },
     });
     this.invalidateFeedCache('site_created');
-    this.invalidateMapCache('site_created');
+    this.sitesMapQuery.invalidateMapCache('site_created');
     this.siteEventsService.emitSiteCreated(site.id, {
       status: site.status,
       latitude: site.latitude,
@@ -683,152 +540,6 @@ export class SitesService {
     return response;
   }
 
-  async findAllForMap(query: ListSitesMapQueryDto) {
-    const startedAt = Date.now();
-    this.validateMapViewportQuery(query);
-    const cacheKey = this.buildMapCacheKey(query);
-    const cached = this.mapResponseCache.get(cacheKey);
-    const nowMs = Date.now();
-    if (cached && nowMs - cached.cachedAt <= this.mapCacheTtlMs) {
-      ObservabilityStore.recordMapRequest({
-        durationMs: Date.now() - startedAt,
-        candidatePoolSize: cached.value.data.length,
-        cacheHit: true,
-      });
-      return cached.value;
-    }
-
-    const limit = Math.min(Math.max(query.limit, 10), 260);
-    const mapTimeoutMs = Math.min(this.feedQueryTimeoutMs, 4_000);
-    const isLite = query.detail === 'lite';
-    let sites: MapSiteRow[] | MapSiteLiteRow[];
-    let usedPostgisExactGeo = false;
-    try {
-      const postgisOk = await this.isPostgisMapAvailable();
-      if (postgisOk) {
-        try {
-          sites = await this.withTimeout(
-            this.loadMapSitesWithPostgis(query, limit),
-            mapTimeoutMs,
-            'Map query timed out',
-          );
-          usedPostgisExactGeo = true;
-        } catch {
-          sites = await this.withTimeout(
-            this.loadMapSitesWithPrismaBounds(query, limit),
-            mapTimeoutMs,
-            'Map query timed out',
-          );
-        }
-      } else {
-        sites = await this.withTimeout(
-          this.loadMapSitesWithPrismaBounds(query, limit),
-          mapTimeoutMs,
-          'Map query timed out',
-        );
-      }
-    } catch (error) {
-      if (cached) {
-        ObservabilityStore.recordMapRequest({
-          durationMs: Date.now() - startedAt,
-          candidatePoolSize: cached.value.data.length,
-          cacheHit: true,
-        });
-        return cached.value;
-      }
-      throw error;
-    }
-
-    const data: MapListApiRow[] = (isLite
-      ? await this.mapWithConcurrency(sites as MapSiteLiteRow[], 8, async (site) => {
-          const firstReport = site.reports[0];
-          const signedMedia =
-            firstReport != null && firstReport.mediaUrls.length > 0
-              ? await this.reportsUploadService.signUrls(firstReport.mediaUrls.slice(0, 1))
-              : undefined;
-          const distanceKm = this.computeMapDistanceKm(query, site.latitude, site.longitude);
-          return {
-            id: site.id,
-            latitude: site.latitude,
-            longitude: site.longitude,
-            address: site.address,
-            description: site.description,
-            status: site.status,
-            upvotesCount: 0,
-            commentsCount: 0,
-            savesCount: 0,
-            sharesCount: 0,
-            reportCount: firstReport != null ? 1 : 0,
-            latestReportTitle: null,
-            latestReportDescription: null,
-            latestReportCategory: null,
-            latestReportCreatedAt: null,
-            latestReportNumber: null,
-            ...(signedMedia != null && signedMedia.length > 0
-              ? { latestReportMediaUrls: signedMedia }
-              : {}),
-            ...(distanceKm != null ? { distanceKm } : {}),
-            createdAt: site.createdAt,
-            updatedAt: site.updatedAt,
-          } satisfies MapListApiRow;
-        })
-      : await this.mapWithConcurrency(sites as MapSiteRow[], 8, async (site) => {
-          const firstReport = site.reports[0];
-          const signedMedia =
-            firstReport != null && firstReport.mediaUrls.length > 0
-              ? await this.reportsUploadService.signUrls(firstReport.mediaUrls.slice(0, 1))
-              : undefined;
-          const distanceKm = this.computeMapDistanceKm(query, site.latitude, site.longitude);
-          return {
-            id: site.id,
-            latitude: site.latitude,
-            longitude: site.longitude,
-            address: site.address,
-            description: site.description,
-            status: site.status,
-            upvotesCount: site.upvotesCount,
-            commentsCount: site.commentsCount,
-            savesCount: site.savesCount,
-            sharesCount: site.sharesCount,
-            reportCount: site._count.reports,
-            latestReportTitle: firstReport?.title ?? null,
-            latestReportDescription: firstReport?.description ?? null,
-            latestReportCategory: firstReport?.category ?? null,
-            latestReportCreatedAt: firstReport?.createdAt?.toISOString() ?? null,
-            latestReportNumber: firstReport?.reportNumber ?? null,
-            ...(signedMedia != null && signedMedia.length > 0
-              ? { latestReportMediaUrls: signedMedia }
-              : {}),
-            ...(distanceKm != null ? { distanceKm } : {}),
-            createdAt: site.createdAt,
-            updatedAt: site.updatedAt,
-          } satisfies MapListApiRow;
-        })) as MapListApiRow[];
-
-    // Client hint: presigned report media uses ~1h AWS expiry; refresh map before then.
-    const signedMediaExpiresAt = new Date(
-      Date.now() + SitesService.MAP_SIGNED_MEDIA_CLIENT_BUFFER_MS,
-    ).toISOString();
-    const response = {
-      data: usedPostgisExactGeo ? data : this.filterMapRowsToExactRadius(data, query),
-      meta: { signedMediaExpiresAt },
-    };
-    this.mapResponseCache.set(cacheKey, { cachedAt: nowMs, value: response });
-    this.indexMapCacheKeySites(
-      cacheKey,
-      response.data.map((row) => row.id),
-    );
-    if (this.mapResponseCache.size > 300) {
-      const oldestKey = this.mapResponseCache.keys().next().value as string | undefined;
-      if (oldestKey) this.removeMapCacheKey(oldestKey);
-    }
-    ObservabilityStore.recordMapRequest({
-      durationMs: Date.now() - startedAt,
-      candidatePoolSize: response.data.length,
-      cacheHit: false,
-    });
-    return response;
-  }
 
   /**
    * Stable list for mobile/site detail (deduped by userId, earliest reportedAt wins ordering).
@@ -1126,271 +837,26 @@ export class SitesService {
     query: ListSiteCommentsQueryDto,
     user?: AuthenticatedUser,
   ): Promise<{ data: SiteCommentTreeNode[]; meta: { page: number; limit: number; total: number } }> {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const baseWhere = { siteId, isDeleted: false };
-    const maxThreadDepth = 6;
-
-    if (query.parentId) {
-      const where = { ...baseWhere, parentId: query.parentId };
-      const [total, comments] = await Promise.all([
-        this.prisma.siteComment.count({ where }),
-        this.prisma.siteComment.findMany({
-          where,
-          orderBy: { createdAt: 'desc' },
-          skip: (query.page - 1) * query.limit,
-          take: query.limit,
-          include: {
-            author: {
-              select: { firstName: true, lastName: true },
-            },
-            likes: user
-              ? {
-                  where: { userId: user.userId },
-                  select: { id: true },
-                  take: 1,
-                }
-              : false,
-          },
-        }),
-      ]);
-      const ordered =
-        query.sort === SiteCommentsSort.TOP
-          ? [...comments].sort((a, b) => this.compareCommentsTop(a, b))
-          : comments;
-      return {
-        data: ordered.map((comment) => ({
-          id: comment.id,
-          parentId: comment.parentId,
-          body: comment.body,
-          createdAt: comment.createdAt.toISOString(),
-          authorId: comment.authorId,
-          authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
-          likesCount: comment.likesCount,
-          isLikedByMe: Array.isArray(comment.likes) && comment.likes.length > 0,
-          replies: [],
-          repliesCount: 0,
-        })),
-        meta: { page: query.page, limit: query.limit, total },
-      };
-    }
-
-    const rootsWhere = { ...baseWhere, parentId: null };
-    const [total, rootComments] = await Promise.all([
-      this.prisma.siteComment.count({ where: rootsWhere }),
-      this.prisma.siteComment.findMany({
-        where: rootsWhere,
-        orderBy: { createdAt: 'desc' },
-        skip: (query.page - 1) * query.limit,
-        take: query.limit,
-        include: {
-          author: {
-            select: { firstName: true, lastName: true },
-          },
-          likes: user
-            ? {
-                where: { userId: user.userId },
-                select: { id: true },
-                take: 1,
-              }
-            : false,
-        },
-      }),
-    ]);
-
-    const rootIds = rootComments.map((c) => c.id);
-    const descendants: Array<
-      Prisma.SiteCommentGetPayload<{
-        include: { author: { select: { firstName: true; lastName: true } } };
-      }>
-    > = [];
-    let frontier = [...rootIds];
-    let depth = 0;
-    while (frontier.length > 0 && depth < maxThreadDepth) {
-      const children = await this.prisma.siteComment.findMany({
-        where: {
-          ...baseWhere,
-          parentId: { in: frontier },
-        },
-        orderBy: { createdAt: 'asc' },
-        include: {
-          author: {
-            select: { firstName: true, lastName: true },
-          },
-          likes: user
-            ? {
-                where: { userId: user.userId },
-                select: { id: true },
-                take: 1,
-              }
-            : false,
-        },
-      });
-      if (children.length === 0) break;
-      descendants.push(...children);
-      frontier = children.map((c) => c.id);
-      depth += 1;
-    }
-
-    const all = [...rootComments, ...descendants];
-    const byParent = new Map<string, typeof all>();
-    for (const comment of all) {
-      if (!comment.parentId) continue;
-      const list = byParent.get(comment.parentId) ?? [];
-      list.push(comment);
-      byParent.set(comment.parentId, list);
-    }
-
-    const mapNode = (comment: (typeof all)[number]): SiteCommentTreeNode => {
-      const rawReplies = (byParent.get(comment.id) ?? []).map(mapNode);
-      const replies =
-        query.sort === SiteCommentsSort.TOP
-          ? [...rawReplies].sort((a, b) => this.compareCommentNodesTop(a, b))
-          : rawReplies.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
-      return {
-        id: comment.id,
-        parentId: comment.parentId,
-        body: comment.body,
-        createdAt: comment.createdAt.toISOString(),
-        authorId: comment.authorId,
-        authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
-        likesCount: comment.likesCount,
-        isLikedByMe:
-          Array.isArray((comment as { likes?: Array<{ id: string }> }).likes) &&
-          ((comment as { likes?: Array<{ id: string }> }).likes?.length ?? 0) > 0,
-        replies,
-        repliesCount: replies.length,
-      };
-    };
-
-    const roots =
-      query.sort === SiteCommentsSort.TOP
-        ? [...rootComments].sort((a, b) => this.compareCommentsTop(a, b))
-        : rootComments;
-
-    return {
-      data: roots.map(mapNode),
-      meta: { page: query.page, limit: query.limit, total },
-    };
+    return this.siteComments.findSiteComments(siteId, query, user);
   }
 
-  async createSiteComment(
-    siteId: string,
-    dto: CreateSiteCommentDto,
-    user: AuthenticatedUser,
-  ) {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const body = dto.body.trim();
-    if (!body) {
-      throw new BadRequestException({
-        code: 'COMMENT_EMPTY',
-        message: 'Comment body cannot be empty.',
-      });
-    }
-    if (dto.parentId) {
-      const parent = await this.prisma.siteComment.findUnique({
-        where: { id: dto.parentId },
-        select: { id: true, siteId: true, isDeleted: true },
-      });
-      if (!parent || parent.isDeleted || parent.siteId !== siteId) {
-        throw new BadRequestException({
-          code: 'INVALID_PARENT_COMMENT',
-          message: 'Parent comment is invalid for this site.',
-        });
-      }
-    }
-    const result = await this.prisma.$transaction(async (tx) => {
-      const comment = await tx.siteComment.create({
-        data: { siteId, authorId: user.userId, body, parentId: dto.parentId ?? null },
-        include: { author: { select: { firstName: true, lastName: true } } },
-      });
-      await tx.site.update({
-        where: { id: siteId },
-        data: { commentsCount: { increment: 1 } },
-      });
-      return comment;
-    });
+  async createSiteComment(siteId: string, dto: CreateSiteCommentDto, user: AuthenticatedUser) {
+    const created = await this.siteComments.createSiteComment(siteId, dto, user);
     this.invalidateFeedCache('comment_created', siteId);
     this.emitSiteNotification(siteId, user.userId, 'COMMENT', 'New comment on a site you follow');
-    return {
-      id: result.id,
-      parentId: result.parentId,
-      body: result.body,
-      createdAt: result.createdAt.toISOString(),
-      authorId: result.authorId,
-      authorName: `${result.author.firstName} ${result.author.lastName}`.trim(),
-      likesCount: result.likesCount,
-      isLikedByMe: false,
-      replies: [],
-      repliesCount: 0,
-    };
+    return created;
   }
 
   async likeSiteComment(siteId: string, commentId: string, user: AuthenticatedUser) {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const comment = await this.prisma.siteComment.findUnique({
-      where: { id: commentId },
-      select: { id: true, siteId: true, isDeleted: true, likesCount: true },
-    });
-    if (!comment || comment.isDeleted || comment.siteId !== siteId) {
-      throw new NotFoundException({
-        code: 'COMMENT_NOT_FOUND',
-        message: 'Comment not found for this site.',
-      });
-    }
-    const result = await this.prisma.$transaction(async (tx) => {
-      const existing = await tx.siteCommentLike.findUnique({
-        where: { commentId_userId: { commentId, userId: user.userId } },
-        select: { id: true },
-      });
-      if (!existing) {
-        await tx.siteCommentLike.create({
-          data: { commentId, userId: user.userId },
-        });
-        return tx.siteComment.update({
-          where: { id: commentId },
-          data: { likesCount: { increment: 1 } },
-          select: { id: true, likesCount: true },
-        });
-      }
-      return tx.siteComment.findUniqueOrThrow({
-        where: { id: commentId },
-        select: { id: true, likesCount: true },
-      });
-    });
+    const out = await this.siteComments.likeSiteComment(siteId, commentId, user);
     this.invalidateFeedCache('comment_liked', siteId);
-    return { commentId: result.id, likesCount: result.likesCount, isLikedByMe: true };
+    return out;
   }
 
   async unlikeSiteComment(siteId: string, commentId: string, user: AuthenticatedUser) {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const comment = await this.prisma.siteComment.findUnique({
-      where: { id: commentId },
-      select: { id: true, siteId: true, isDeleted: true, likesCount: true },
-    });
-    if (!comment || comment.isDeleted || comment.siteId !== siteId) {
-      throw new NotFoundException({
-        code: 'COMMENT_NOT_FOUND',
-        message: 'Comment not found for this site.',
-      });
-    }
-    const result = await this.prisma.$transaction(async (tx) => {
-      const deleted = await tx.siteCommentLike.deleteMany({
-        where: { commentId, userId: user.userId },
-      });
-      if (deleted.count > 0) {
-        return tx.siteComment.update({
-          where: { id: commentId },
-          data: { likesCount: { decrement: 1 } },
-          select: { id: true, likesCount: true },
-        });
-      }
-      return tx.siteComment.findUniqueOrThrow({
-        where: { id: commentId },
-        select: { id: true, likesCount: true },
-      });
-    });
+    const out = await this.siteComments.unlikeSiteComment(siteId, commentId, user);
     this.invalidateFeedCache('comment_unliked', siteId);
-    return { commentId: result.id, likesCount: Math.max(0, result.likesCount), isLikedByMe: false };
+    return out;
   }
 
   async updateSiteComment(
@@ -1399,116 +865,15 @@ export class SitesService {
     dto: UpdateSiteCommentDto,
     user: AuthenticatedUser,
   ) {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const body = dto.body.trim();
-    if (!body) {
-      throw new BadRequestException({
-        code: 'COMMENT_EMPTY',
-        message: 'Comment body cannot be empty.',
-      });
-    }
-    const comment = await this.prisma.siteComment.findUnique({
-      where: { id: commentId },
-      select: {
-        id: true,
-        siteId: true,
-        authorId: true,
-        isDeleted: true,
-        parentId: true,
-        createdAt: true,
-        likesCount: true,
-        author: { select: { firstName: true, lastName: true } },
-      },
-    });
-    if (!comment || comment.isDeleted || comment.siteId !== siteId) {
-      throw new NotFoundException({
-        code: 'COMMENT_NOT_FOUND',
-        message: 'Comment not found for this site.',
-      });
-    }
-    if (comment.authorId !== user.userId) {
-      throw new ForbiddenException({
-        code: 'COMMENT_FORBIDDEN',
-        message: 'You can edit only your own comments.',
-      });
-    }
-    const updated = await this.prisma.siteComment.update({
-      where: { id: commentId },
-      data: { body },
-      include: { author: { select: { firstName: true, lastName: true } } },
-    });
+    const updated = await this.siteComments.updateSiteComment(siteId, commentId, dto, user);
     this.invalidateFeedCache('comment_updated', siteId);
-    return {
-      id: updated.id,
-      parentId: updated.parentId,
-      body: updated.body,
-      createdAt: updated.createdAt.toISOString(),
-      authorId: updated.authorId,
-      authorName: `${updated.author.firstName} ${updated.author.lastName}`.trim(),
-      likesCount: updated.likesCount,
-      isLikedByMe: false,
-      replies: [],
-      repliesCount: 0,
-    };
+    return updated;
   }
 
   async deleteSiteComment(siteId: string, commentId: string, user: AuthenticatedUser) {
-    await this.siteEngagement.ensureSiteExists(siteId);
-    const comment = await this.prisma.siteComment.findUnique({
-      where: { id: commentId },
-      select: { id: true, siteId: true, authorId: true, isDeleted: true },
-    });
-    if (!comment || comment.isDeleted || comment.siteId !== siteId) {
-      throw new NotFoundException({
-        code: 'COMMENT_NOT_FOUND',
-        message: 'Comment not found for this site.',
-      });
-    }
-    if (comment.authorId !== user.userId) {
-      throw new ForbiddenException({
-        code: 'COMMENT_FORBIDDEN',
-        message: 'You can delete only your own comments.',
-      });
-    }
-    const affectedCount = await this.prisma.$transaction(async (tx) => {
-      const descendants = await tx.siteComment.findMany({
-        where: { siteId, isDeleted: false },
-        select: { id: true, parentId: true },
-      });
-      const byParent = new Map<string, string[]>();
-      for (const row of descendants) {
-        if (!row.parentId) continue;
-        const list = byParent.get(row.parentId) ?? [];
-        list.push(row.id);
-        byParent.set(row.parentId, list);
-      }
-      const toDelete = new Set<string>();
-      const stack: string[] = [commentId];
-      while (stack.length > 0) {
-        const current = stack.pop();
-        if (!current || toDelete.has(current)) continue;
-        toDelete.add(current);
-        const children = byParent.get(current) ?? [];
-        stack.push(...children);
-      }
-      const ids = [...toDelete];
-      await tx.siteCommentLike.deleteMany({
-        where: { commentId: { in: ids } },
-      });
-      const updated = await tx.siteComment.updateMany({
-        where: { id: { in: ids }, isDeleted: false },
-        data: { isDeleted: true },
-      });
-      if (updated.count > 0) {
-        await tx.site.update({
-          where: { id: siteId },
-          data: { commentsCount: { decrement: updated.count } },
-        });
-      }
-      return updated.count;
-    });
+    const out = await this.siteComments.deleteSiteComment(siteId, commentId, user);
     this.invalidateFeedCache('comment_deleted', siteId);
-    return { commentId, deletedCount: affectedCount };
+    return out;
   }
 
   async upvoteSite(siteId: string, user: AuthenticatedUser) {
@@ -1685,7 +1050,7 @@ export class SitesService {
     });
 
     this.invalidateFeedCache('site_status_updated');
-    this.invalidateMapCache('site_status_updated', updated.id);
+    this.sitesMapQuery.invalidateMapCache('site_status_updated', updated.id);
     return updated;
   }
 
@@ -1702,45 +1067,6 @@ export class SitesService {
         message: 'Site must have at least one approved report to create eco actions.',
       });
     }
-  }
-
-  private compareCommentsTop(
-    a: { likesCount: number; createdAt: Date; id: string },
-    b: { likesCount: number; createdAt: Date; id: string },
-  ): number {
-    const scoreB = this.computeCommentTopScore(b.likesCount, b.createdAt, b.id);
-    const scoreA = this.computeCommentTopScore(a.likesCount, a.createdAt, a.id);
-    return scoreB - scoreA;
-  }
-
-  private compareCommentNodesTop(a: SiteCommentTreeNode, b: SiteCommentTreeNode): number {
-    const scoreB = this.computeCommentTopScore(
-      b.likesCount + b.repliesCount,
-      new Date(b.createdAt),
-      b.id,
-    );
-    const scoreA = this.computeCommentTopScore(
-      a.likesCount + a.repliesCount,
-      new Date(a.createdAt),
-      a.id,
-    );
-    return scoreB - scoreA;
-  }
-
-  private computeCommentTopScore(baseSignals: number, createdAt: Date, id: string): number {
-    const ageHours = Math.max(0, (Date.now() - createdAt.getTime()) / (1000 * 60 * 60));
-    const freshness = Math.exp(-Math.log(2) * (ageHours / 24));
-    const engagement = Math.log1p(Math.max(0, baseSignals));
-    const jitter = this.commentJitter(id);
-    return freshness * 0.55 + engagement * 0.45 + jitter;
-  }
-
-  private commentJitter(id: string): number {
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = (hash * 31 + id.charCodeAt(i)) | 0;
-    }
-    return ((Math.abs(hash) % 1000) / 1000 - 0.5) * 0.01;
   }
 
   private sessionCategoryAffinity(category: string | null): number {
@@ -1846,212 +1172,6 @@ export class SitesService {
     };
   }
 
-  private hasMapViewportBounds(query: ListSitesMapQueryDto): boolean {
-    return (
-      query.minLat != null &&
-      query.maxLat != null &&
-      query.minLng != null &&
-      query.maxLng != null
-    );
-  }
-
-  private validateMapViewportQuery(query: ListSitesMapQueryDto): void {
-    const hasAnyBounds =
-      query.minLat != null ||
-      query.maxLat != null ||
-      query.minLng != null ||
-      query.maxLng != null;
-    const hasAllBounds = this.hasMapViewportBounds(query);
-    if (hasAnyBounds && !hasAllBounds) {
-      throw new BadRequestException({
-        code: 'INVALID_MAP_VIEWPORT',
-        message: 'All map viewport bounds must be provided together.',
-      });
-    }
-    if (hasAllBounds && (query.minLat! > query.maxLat! || query.minLng! > query.maxLng!)) {
-      throw new BadRequestException({
-        code: 'INVALID_MAP_VIEWPORT',
-        message: 'Map viewport bounds are invalid.',
-      });
-    }
-  }
-
-  private buildMapWhere(query: ListSitesMapQueryDto): Prisma.SiteWhereInput {
-    const where: Prisma.SiteWhereInput = query.status ? { status: query.status } : {};
-    if (this.hasMapViewportBounds(query)) {
-      where.latitude = {
-        gte: query.minLat!,
-        lte: query.maxLat!,
-      };
-      where.longitude = {
-        gte: query.minLng!,
-        lte: query.maxLng!,
-      };
-      return where;
-    }
-
-    const radiusMeters = (query.radiusKm ?? 10) * 1000;
-    const metersPerDegreeLat = 111_320;
-    const deltaLat = radiusMeters / metersPerDegreeLat;
-    const metersPerDegreeLng =
-      Math.cos((query.lat * Math.PI) / 180) * metersPerDegreeLat || metersPerDegreeLat;
-    const deltaLng = radiusMeters / metersPerDegreeLng;
-    where.latitude = {
-      gte: query.lat - deltaLat,
-      lte: query.lat + deltaLat,
-    };
-    where.longitude = {
-      gte: query.lng - deltaLng,
-      lte: query.lng + deltaLng,
-    };
-    return where;
-  }
-
-  private async isPostgisMapAvailable(): Promise<boolean> {
-    if (this.postgisMapSupport !== null) {
-      return this.postgisMapSupport;
-    }
-    try {
-      const rows = await this.prisma.$queryRaw<{ ok: number }[]>`
-        SELECT 1::int as ok FROM pg_extension WHERE extname = 'postgis' LIMIT 1
-      `;
-      this.postgisMapSupport = rows.length > 0;
-    } catch {
-      this.postgisMapSupport = false;
-    }
-    return this.postgisMapSupport;
-  }
-
-  private async queryMapSiteIdsByPostgis(query: ListSitesMapQueryDto, limit: number): Promise<string[]> {
-    const statusFragment = query.status
-      ? Prisma.sql`AND s.status = ${query.status}::"SiteStatus"`
-      : Prisma.empty;
-
-    if (this.hasMapViewportBounds(query)) {
-      const rows = await this.prisma.$queryRaw<{ id: string }[]>`
-        SELECT s.id FROM "Site" s
-        WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
-          AND ST_Within(
-            ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4326),
-            ST_MakeEnvelope(${query.minLng}, ${query.minLat}, ${query.maxLng}, ${query.maxLat}, 4326)
-          )
-          ${statusFragment}
-        ORDER BY ST_Distance(
-          ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4326)::geography,
-          ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography
-        ) ASC NULLS LAST,
-        s.id ASC
-        LIMIT ${limit}
-      `;
-      return rows.map((r) => r.id);
-    }
-
-    const radiusMeters = (query.radiusKm ?? 10) * 1000;
-    const rows = await this.prisma.$queryRaw<{ id: string }[]>`
-      SELECT s.id FROM "Site" s
-      WHERE s.latitude IS NOT NULL AND s.longitude IS NOT NULL
-        AND ST_DWithin(
-          ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4326)::geography,
-          ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography,
-          ${radiusMeters}
-        )
-        ${statusFragment}
-      ORDER BY ST_Distance(
-        ST_SetSRID(ST_MakePoint(s.longitude, s.latitude), 4326)::geography,
-        ST_SetSRID(ST_MakePoint(${query.lng}, ${query.lat}), 4326)::geography
-      ) ASC NULLS LAST,
-      s.id ASC
-      LIMIT ${limit}
-    `;
-    return rows.map((r) => r.id);
-  }
-
-  private mapSiteSelectForQuery(query: ListSitesMapQueryDto) {
-    return query.detail === 'lite' ? MAP_SITE_LITE_SELECT : MAP_SITE_FIND_SELECT;
-  }
-
-  private async loadMapSitesWithPostgis(
-    query: ListSitesMapQueryDto,
-    limit: number,
-  ): Promise<MapSiteRow[] | MapSiteLiteRow[]> {
-    const ids = await this.queryMapSiteIdsByPostgis(query, limit);
-    if (ids.length === 0) {
-      return [];
-    }
-    const select = this.mapSiteSelectForQuery(query);
-    const unsorted = await this.prisma.site.findMany({
-      where: { id: { in: ids } },
-      select,
-    });
-    const rank = new Map(ids.map((id, i) => [id, i]));
-    return [...unsorted].sort((a, b) => (rank.get(a.id) ?? 0) - (rank.get(b.id) ?? 0)) as
-      | MapSiteRow[]
-      | MapSiteLiteRow[];
-  }
-
-  private async loadMapSitesWithPrismaBounds(
-    query: ListSitesMapQueryDto,
-    limit: number,
-  ): Promise<MapSiteRow[] | MapSiteLiteRow[]> {
-    const where = this.buildMapWhere(query);
-    const select = this.mapSiteSelectForQuery(query);
-    const rows = await this.prisma.site.findMany({
-      where,
-      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-      take: limit,
-      select,
-    });
-    return rows as MapSiteRow[] | MapSiteLiteRow[];
-  }
-
-  private computeMapDistanceKm(
-    query: ListSitesMapQueryDto,
-    latitude: number | null,
-    longitude: number | null,
-  ): number | undefined {
-    if (latitude == null || longitude == null) {
-      return undefined;
-    }
-    return distanceInMeters(query.lat, query.lng, latitude, longitude) / 1000;
-  }
-
-  private filterMapRowsToExactRadius<
-    T extends { id: string; latitude: number | null; longitude: number | null; distanceKm?: number },
-  >(rows: T[], query: ListSitesMapQueryDto): T[] {
-    const radiusMeters = (query.radiusKm ?? 10) * 1000;
-    return rows.filter((row) => {
-      if (this.hasMapViewportBounds(query)) {
-        return (
-          row.latitude != null &&
-          row.longitude != null &&
-          row.latitude >= query.minLat! &&
-          row.latitude <= query.maxLat! &&
-          row.longitude >= query.minLng! &&
-          row.longitude <= query.maxLng!
-        );
-      }
-      if (row.distanceKm == null) {
-        return false;
-      }
-      return row.distanceKm * 1000 <= radiusMeters;
-    });
-  }
-
-  private buildMapCacheKey(query: ListSitesMapQueryDto): string {
-    return [
-      query.detail ?? 'full',
-      query.status ?? '',
-      query.limit,
-      query.radiusKm.toFixed(1),
-      query.lat.toFixed(4),
-      query.lng.toFixed(4),
-      query.minLat?.toFixed(4) ?? '',
-      query.maxLat?.toFixed(4) ?? '',
-      query.minLng?.toFixed(4) ?? '',
-      query.maxLng?.toFixed(4) ?? '',
-    ].join('|');
-  }
-
   private buildFeedCacheKey(query: ListSitesQueryDto, user?: AuthenticatedUser): string {
     return [
       user?.userId ?? 'anon',
@@ -2098,27 +1218,6 @@ export class SitesService {
     this.feedResponseCache.delete(cacheKey);
   }
 
-  private indexMapCacheKeySites(cacheKey: string, siteIds: string[]): void {
-    for (const siteId of siteIds) {
-      const set = this.mapCacheSiteIndex.get(siteId) ?? new Set<string>();
-      set.add(cacheKey);
-      this.mapCacheSiteIndex.set(siteId, set);
-    }
-  }
-
-  private removeMapCacheKey(cacheKey: string): void {
-    const cached = this.mapResponseCache.get(cacheKey);
-    if (cached) {
-      for (const row of cached.value.data) {
-        const keys = this.mapCacheSiteIndex.get(row.id);
-        if (!keys) continue;
-        keys.delete(cacheKey);
-        if (keys.size === 0) this.mapCacheSiteIndex.delete(row.id);
-      }
-    }
-    this.mapResponseCache.delete(cacheKey);
-  }
-
   private invalidateFeedCache(reason: string, siteId?: string): void {
     ObservabilityStore.recordFeedCacheInvalidation(reason);
     if (siteId) {
@@ -2135,21 +1234,6 @@ export class SitesService {
     this.feedCacheSiteIndex.clear();
   }
 
-  private invalidateMapCache(reason: string, siteId?: string): void {
-    ObservabilityStore.recordFeedCacheInvalidation(`map_${reason}`);
-    if (siteId) {
-      const keys = this.mapCacheSiteIndex.get(siteId);
-      if (keys && keys.size > 0) {
-        for (const key of [...keys]) {
-          this.removeMapCacheKey(key);
-        }
-        this.mapCacheSiteIndex.delete(siteId);
-        return;
-      }
-    }
-    this.mapResponseCache.clear();
-    this.mapCacheSiteIndex.clear();
-  }
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
     let timer: NodeJS.Timeout | null = null;

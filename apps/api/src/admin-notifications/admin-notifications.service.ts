@@ -7,7 +7,16 @@ import { ListAdminNotificationsQueryDto } from './dto/list-admin-notifications.d
 
 type AdminNotificationListItem = Pick<
   AdminNotification,
-  'id' | 'title' | 'message' | 'timeLabel' | 'tone' | 'category' | 'isUnread' | 'href'
+  | 'id'
+  | 'title'
+  | 'message'
+  | 'timeLabel'
+  | 'tone'
+  | 'category'
+  | 'isUnread'
+  | 'href'
+  | 'messageTemplateKey'
+  | 'messageTemplateParams'
 > & {
   /** ISO 8601 — clients should prefer this for display (browser locale, live updates). */
   createdAt: string;
@@ -70,6 +79,8 @@ export class AdminNotificationsService {
         category: notification.category,
         isUnread: notification.isUnread,
         href: notification.href ?? null,
+        messageTemplateKey: notification.messageTemplateKey ?? null,
+        messageTemplateParams: notification.messageTemplateParams ?? null,
       }),
     );
 

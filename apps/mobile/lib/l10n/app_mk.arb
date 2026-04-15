@@ -1526,6 +1526,87 @@
   },
   "reportListEmptyTitle": "Сè уште нема пријави",
   "reportListEmptySubtitle": "Вашите пријави ќе се појават тука откако ќе ги испратите.",
+  "reportStatusUnderReviewShort": "На преглед",
+  "reportStatusApprovedShort": "Одобрено",
+  "reportStatusDeclinedShort": "Одбиено",
+  "reportStatusAlreadyReportedShort": "Веќе пријавено",
+  "reportListFilterAll": "Сите",
+  "reportListFilterSemanticPrefix": "Статус на пријава",
+  "reportListHeaderTitle": "Вашите пријави",
+  "reportListHeaderTotalPill": "{count, plural, one{1 пријава вкупно} other{{count} пријави вкупно}}",
+  "@reportListHeaderTotalPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderUnderReviewPill": "{count, plural, one{1 на преглед} other{{count} на преглед}}",
+  "@reportListHeaderUnderReviewPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderSemanticSummary": "{totalReports, plural, one{1 пријава вкупно} other{{totalReports} пријави вкупно}}. {underReview, plural, one{1 моментално на преглед} other{{underReview} моментално на преглед}}.",
+  "@reportListHeaderSemanticSummary": {
+    "placeholders": {
+      "totalReports": {
+        "type": "int"
+      },
+      "underReview": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilteredFooterAll": "Сите пријави се прикажани",
+  "reportListFilteredFooterCount": "{count, plural, one{1 пријава} other{{count} пријави}}",
+  "@reportListFilteredFooterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListNoMatchesSearchTitle": "Нема пронајдени пријави",
+  "reportListNoMatchesFilterTitle": "Нема пријави за овој филтер",
+  "reportListNoMatchesHintSearchAndFilter": "Обидете се со друго пребарување или исчистете ги филтрите за да видите повеќе пријави.",
+  "reportListNoMatchesHintSearchOnly": "Проверете го правописот или обидете се со пошироко пребарување.",
+  "reportListNoMatchesHintFilterOnly": "Обидете се со друг филтер или исчистете го за да ги видите сите пријави.",
+  "reportListClearSearch": "Исчисти пребарување",
+  "reportListDateWeeksAgo": "{weeks, plural, one{Пред 1 недела} other{Пред {weeks} недели}}",
+  "@reportListDateWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailOpeningInProgress": "Се отвора…",
+  "reportDetailNoPhotos": "Нема фотографии",
+  "reportDetailStatusUnderReviewTitle": "На преглед кај модераторите",
+  "reportDetailStatusUnderReviewBody": "Модераторите ги проверуваат вашите докази и локацијата пред да одлучат како да постапат со пријавата.",
+  "reportDetailStatusApprovedTitle": "Одобрено и поврзано со локација",
+  "reportDetailStatusApprovedBody": "Оваа пријава помогна да се потврди јавно загадување и може да придонесе кон акции за чистење.",
+  "reportDetailStatusAlreadyReportedTitle": "Веќе е забележана како постоечка локација",
+  "reportDetailStatusAlreadyReportedBody": "Вашата пријава се совпаѓа со постоечка локација. Доказите сè уште се корисни за подобро разбирање на проблемот.",
+  "reportDetailStatusOutcomeTitle": "Исход од прегледот",
+  "reportDetailStatusOutcomeBodyFallback": "Оваа пријава не можеше да се одобри во сегашната форма.",
+  "reportCardSemanticLabel": "{category}, {status}, {location}. Допри за детали.",
+  "@reportCardSemanticLabel": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "appSmartImageUnavailable": "Сликата не е достапна",
   "eventsReminderSectionTitle": "Потсетник за настан",
   "eventsReminderSectionEnabled": "Потсетникот е вклучен",
@@ -2041,5 +2122,34 @@
   "eventChatSlideToCancel": "Повлечи лево за откажување",
   "eventChatReleaseToCancel": "Пушти за откажување",
   "eventChatRecording": "Снимање…",
-  "eventChatMicPermissionDenied": "Потребен е пристап до микрофонот за гласовни пораки."
+  "eventChatMicPermissionDenied": "Потребен е пристап до микрофонот за гласовни пораки.",
+  "reportEntryLabelGuided": "Воден извештај",
+  "reportEntryLabelCamera": "Извештај од камера",
+  "reportEntryHintCamera": "Ако почнеш со жива фотографија, модерацијата обично е побрза бидејќи доказот веќе е прикачен.",
+  "homeReportingCapacityCheckFailed": "Не можевме да ја провериме достапноста за пријавување.",
+  "homeCameraOpenFailed": "Камерата не може да се отвори. Обиди се повторно за момент.",
+  "mapTabPlaceholderHint": "Отвори ја оваа картичка за да се вчита живата мапа и локалитетите на загадување.",
+  "reportCategoryPickerTitle": "Избери категорија",
+  "reportCategoryPickerSubtitle": "Избери најблиската опција за проблемот што го пријавуваш.",
+  "reportCategoryPickerBannerTitle": "Избери најблиската опција",
+  "reportCategoryPickerBannerBody": "Избери ја категоријата што модераторите прво треба да ја потврдат. Не мора да биде совршено.",
+  "reportCategoryIllegalLandfillTitle": "Незаконска депонија",
+  "reportCategoryIllegalLandfillDescription": "Фрлен отпад, купишта ѓубре или неформални места за одлагање.",
+  "reportCategoryWaterPollutionTitle": "Загадување на вода",
+  "reportCategoryWaterPollutionDescription": "Загадени реки, езера, одводи или испуштање на отпадни води.",
+  "reportCategoryAirPollutionTitle": "Загадување на воздух",
+  "reportCategoryAirPollutionDescription": "Чад, прашина, пален отпад или емисии што му штетат на воздухот.",
+  "reportCategoryIndustrialWasteTitle": "Индустриски отпад",
+  "reportCategoryIndustrialWasteDescription": "Градежен шут, фабрички отпад или опасни материјали.",
+  "reportCategoryOtherTitle": "Друго",
+  "reportCategoryOtherDescription": "Кога проблемот не се вклопува јасно во категориите погоре.",
+  "unknownRouteTitle": "Страницата не е пронајдена",
+  "unknownRouteMessage": "Линкот може да е застарен или погрешен.",
+  "unknownRouteContinueButton": "Продолжи кон апликацијата",
+  "unknownRouteDebugRoute": "Дебаг: името на рутата беше „{routeName}“.",
+  "@unknownRouteDebugRoute": {
+    "placeholders": {
+      "routeName": { "type": "String" }
+    }
+  }
 }

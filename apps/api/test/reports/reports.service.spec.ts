@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import { ReportsService } from '../../src/reports/reports.service';
+import { ReportCapacityService } from '../../src/reports/report-capacity.service';
 import { Role } from '../../src/prisma-client';
 
 function makeService(overrides?: {
@@ -37,7 +38,6 @@ function makeService(overrides?: {
   };
   prisma.$transaction.mockImplementation(async (cb: (tx: unknown) => Promise<unknown>) => cb(prisma));
 
-  const audit = { log: jest.fn() };
   const reportsUploadService = {
     signUrls: jest.fn(),
     deleteReportMediaUrls: jest.fn().mockResolvedValue(0),
@@ -48,17 +48,18 @@ function makeService(overrides?: {
   const siteEventsService = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() };
   const reportsOwnerEventsService = { emit: jest.fn() };
 
-  const eventEmitter = { emit: jest.fn() };
+  const reportCapacity = new ReportCapacityService(prisma as never);
 
   const service = new ReportsService(
     prisma as never,
-    audit as never,
     reportsUploadService as never,
     reportEventsService as never,
     notificationEventsService as never,
     siteEventsService as never,
     reportsOwnerEventsService as never,
-    eventEmitter as never,
+    reportCapacity,
+    {} as never,
+    {} as never,
   );
 
   return { service, prisma };

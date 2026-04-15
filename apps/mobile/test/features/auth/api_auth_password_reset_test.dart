@@ -54,4 +54,25 @@ void main() {
     expect(client.lastPostBody, <String, dynamic>{'phoneNumber': '+38970123456'});
     expect(result.expiresInSeconds, 599);
   });
+
+  test('verifyPasswordResetCode posts to /auth/password-reset/verify-code', () async {
+    SharedPreferences.setMockInitialValues(<String, Object>{});
+    final _PathCapturingApiClient client = _PathCapturingApiClient();
+    final ApiAuthRepository repo = ApiAuthRepository(
+      client: client,
+      authState: AuthState(),
+      tokenStorage: SecureTokenStorage(
+        storage: const FlutterSecureStorage(),
+      ),
+      preferences: await SharedPreferences.getInstance(),
+    );
+
+    await repo.verifyPasswordResetCode('+38970123456', '4829');
+
+    expect(client.lastPostPath, '/auth/password-reset/verify-code');
+    expect(client.lastPostBody, <String, dynamic>{
+      'phoneNumber': '+38970123456',
+      'code': '4829',
+    });
+  });
 }

@@ -13,7 +13,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Citizen auth over HTTP — paths align with NestJS `AuthController` in `apps/api`:
 /// `POST /auth/register`, `/auth/login`, `/auth/refresh`, `/auth/logout`;
 /// `POST /auth/otp/send`, `/auth/otp/verify`,
-/// `/auth/password-reset/request`, `/auth/password-reset/confirm`;
+/// `/auth/password-reset/request`, `/auth/password-reset/verify-code`,
+/// `/auth/password-reset/confirm`;
 /// `GET`/`PATCH` `/auth/me`, `PATCH /auth/me/password`, `DELETE /auth/me`;
 /// multipart `POST`/`DELETE` `/auth/me/avatar`.
 const String _keyUserId = 'chisto_user_id';
@@ -145,6 +146,17 @@ class ApiAuthRepository implements AuthRepository {
         ? json['expiresIn'] as int
         : 600;
     return SendOtpResult(expiresInSeconds: expiresIn);
+  }
+
+  @override
+  Future<void> verifyPasswordResetCode(String phoneNumberE164, String code) async {
+    await _client.post(
+      '/auth/password-reset/verify-code',
+      body: <String, dynamic>{
+        'phoneNumber': phoneNumberE164,
+        'code': code,
+      },
+    );
   }
 
   @override

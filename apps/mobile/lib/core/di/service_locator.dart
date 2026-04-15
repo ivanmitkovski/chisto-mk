@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
 
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
@@ -108,6 +110,13 @@ class ServiceLocator {
         } else {
           _authState!.setUnauthenticated();
         }
+      },
+      acceptLanguageHeader: () {
+        final Locale effective = resolveAppLocale(
+          override: appLocaleOverride.value,
+          platformLocales: PlatformDispatcher.instance.locales,
+        );
+        return acceptLanguageFromLocale(effective);
       },
     );
 

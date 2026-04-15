@@ -20,19 +20,38 @@ class ApiClient {
     required AppConfig config,
     required String? Function() accessToken,
     required void Function() onUnauthorized,
+    String? Function()? acceptLanguageHeader,
   })  : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
         _accessToken = accessToken,
-        _onUnauthorized = onUnauthorized;
+        _onUnauthorized = onUnauthorized,
+        _acceptLanguageHeader = acceptLanguageHeader;
 
   final String _baseUrl;
   final String? Function() _accessToken;
   final void Function() _onUnauthorized;
+  final String? Function()? _acceptLanguageHeader;
 
   Future<bool> Function()? refreshSession;
 
   bool _refreshing = false;
 
   static const Duration _timeout = Duration(seconds: 30);
+
+  void _maybeAddAcceptLanguage(Map<String, String> headers) {
+    final String? Function()? headerFn = _acceptLanguageHeader;
+    if (headerFn == null) {
+      return;
+    }
+    const String key = 'Accept-Language';
+    if (headers.keys.any((String k) => k.toLowerCase() == key.toLowerCase())) {
+      return;
+    }
+    final String? value = headerFn();
+    if (value == null || value.trim().isEmpty) {
+      return;
+    }
+    headers[key] = value.trim();
+  }
 
   Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
     return _requestWithRetry('GET', path, headers: headers);
@@ -114,6 +133,7 @@ class ApiClient {
       request.headers['Authorization'] = 'Bearer $token';
     }
     request.headers['Accept'] = 'application/json';
+    _maybeAddAcceptLanguage(request.headers);
 
     for (final String filePath in filePaths) {
       final MediaType? contentType = _contentTypeForPath(filePath);
@@ -219,6 +239,7 @@ class ApiClient {
       request.headers['Authorization'] = 'Bearer $token';
     }
     request.headers['Accept'] = 'application/json';
+    _maybeAddAcceptLanguage(request.headers);
 
     if (fields != null) {
       request.fields.addAll(fields);
@@ -289,6 +310,7 @@ class ApiClient {
     '/auth/otp/send',
     '/auth/otp/verify',
     '/auth/password-reset/request',
+    '/auth/password-reset/verify-code',
     '/auth/password-reset/confirm',
   };
 
@@ -338,6 +360,7 @@ class ApiClient {
     if (token != null && token.isNotEmpty) {
       requestHeaders['Authorization'] = 'Bearer $token';
     }
+    _maybeAddAcceptLanguage(requestHeaders);
 
     String? bodyStr;
     if (body != null) {

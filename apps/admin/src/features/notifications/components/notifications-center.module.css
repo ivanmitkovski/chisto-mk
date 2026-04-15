@@ -189,6 +189,13 @@
   color: var(--text-secondary);
 }
 
+.templateKey {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
 .meta {
   display: flex;
   align-items: center;

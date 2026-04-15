@@ -38,30 +38,31 @@ model User {
   totpSecret     String? // Base32-encoded TOTP secret when 2FA enabled
   mfaBackupCodes String[] @default([]) // Hashed backup codes
 
-  reports                 Report[]                     @relation("ReporterReports")
-  moderatedReports        Report[]                     @relation("ModeratorReports")
-  adminNotifications      AdminNotification[]
-  pointTransactions       PointTransaction[]
-  coReportedReports       ReportCoReporter[]
-  sessions                UserSession[]
-  auditLogs               AuditLog[]
-  adminTempTokens         AdminTempToken[]
-  adminPendingMfa         AdminPendingMfa?
-  siteVotes               SiteVote[]
-  siteSaves               SiteSave[]
-  siteComments            SiteComment[]
-  siteShareEvents         SiteShareEvent[]
-  siteCommentLikes        SiteCommentLike[]
-  deviceTokens            UserDeviceToken[]
-  userNotifications       UserNotification[]
-  notificationPreferences UserNotificationPreference[]
-  organizedCleanupEvents  CleanupEvent[]               @relation("CleanupEventOrganizer")
-  eventParticipations     EventParticipant[]
-  eventCheckIns           EventCheckIn[]
-  eventChatMessages       EventChatMessage[]           @relation("EventChatMessages")
-  eventChatReadCursors    EventChatReadCursor[]        @relation("EventChatReadCursors")
-  eventChatPinnedMessages EventChatMessage[]           @relation("EventChatPinnedBy")
-  eventChatMutes          EventChatMute[]              @relation("EventChatMutes")
+  reports                     Report[]                     @relation("ReporterReports")
+  moderatedReports            Report[]                     @relation("ModeratorReports")
+  adminNotifications          AdminNotification[]
+  pointTransactions           PointTransaction[]
+  coReportedReports           ReportCoReporter[]
+  sessions                    UserSession[]
+  auditLogs                   AuditLog[]
+  adminTempTokens             AdminTempToken[]
+  adminPendingMfa             AdminPendingMfa?
+  siteVotes                   SiteVote[]
+  siteSaves                   SiteSave[]
+  siteComments                SiteComment[]
+  siteShareEvents             SiteShareEvent[]
+  siteCommentLikes            SiteCommentLike[]
+  deviceTokens                UserDeviceToken[]
+  userNotifications           UserNotification[]
+  notificationPreferences     UserNotificationPreference[]
+  organizedCleanupEvents      CleanupEvent[]               @relation("CleanupEventOrganizer")
+  eventParticipations         EventParticipant[]
+  eventCheckIns               EventCheckIn[]
+  eventChatMessages           EventChatMessage[]           @relation("EventChatMessages")
+  eventChatReadCursors        EventChatReadCursor[]        @relation("EventChatReadCursors")
+  eventChatPinnedMessages     EventChatMessage[]           @relation("EventChatPinnedBy")
+  eventChatMutes              EventChatMute[]              @relation("EventChatMutes")
+  reportSubmitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([role])
   @@index([status])
@@ -172,6 +173,10 @@ model AdminNotification {
   category  AdminNotificationCategory
   isUnread  Boolean                   @default(true)
   href      String?
+
+  /// Stable key for localized templates (e.g. `reports.submitted.new_site`). Title/message remain populated for legacy clients.
+  messageTemplateKey    String?
+  messageTemplateParams Json?
 
   @@index([userId, createdAt])
   @@index([category, createdAt])
@@ -290,7 +295,8 @@ model Report {
   /// Duplicate child reports merged into this canonical report (moderation merge).
   mergedDuplicateChildCount Int @default(0)
 
-  coReporters ReportCoReporter[]
+  coReporters           ReportCoReporter[]
+  submitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([siteId])
   @@index([reporterId])
@@ -320,6 +326,22 @@ model ReportCoReporter {
 
   @@unique([reportId, userId])
   @@index([userId])
+}
+
+/// Client-supplied key (UUID) so duplicate POST /reports retries return the same report without double spend.
+model ReportSubmitIdempotency {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key      String
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([createdAt])
 }
 
 model SystemConfig {

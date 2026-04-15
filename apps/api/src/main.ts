@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import compression from 'compression';
+import express from 'express';
 import { RedisIoAdapter } from './common/adapters/redis-io.adapter';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 import { EventChatClusterConfig } from './event-chat/event-chat-cluster.config';
@@ -14,6 +15,9 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 async function bootstrap() {
   validateEnv();
   const app = await NestFactory.create(AppModule);
+
+  const expressApp = app.getHttpAdapter().getInstance() as express.Application;
+  expressApp.use(express.urlencoded({ extended: true }));
 
   const redisUrl = process.env.REDIS_URL?.trim();
   if (redisUrl) {

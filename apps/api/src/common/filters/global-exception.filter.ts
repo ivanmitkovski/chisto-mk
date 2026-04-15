@@ -19,18 +19,24 @@ type HttpExceptionPayload = {
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private static stamp<T extends object>(body: T): T & { timestamp: string } {
+    return { ...body, timestamp: new Date().toISOString() };
+  }
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const context = host.switchToHttp();
     const response = context.getResponse();
     const request = context.getRequest<{ method?: string; url?: string; requestId?: string }>();
 
     if (exception instanceof ThrottlerException) {
-      response.status(HttpStatus.TOO_MANY_REQUESTS).json({
-        code: 'TOO_MANY_REQUESTS',
-        message: 'Too many requests. Please wait and try again.',
-        retryable: true,
-        retryAfterSeconds: 60,
-      });
+      response.status(HttpStatus.TOO_MANY_REQUESTS).json(
+        GlobalExceptionFilter.stamp({
+          code: 'TOO_MANY_REQUESTS',
+          message: 'Too many requests. Please wait and try again.',
+          retryable: true,
+          retryAfterSeconds: 60,
+        }),
+      );
       return;
     }
 
@@ -39,13 +45,13 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const payload = exception.getResponse();
       const normalized = this.normalizeHttpPayload(status, payload);
 
-      response.status(status).json(normalized);
+      response.status(status).json(GlobalExceptionFilter.stamp(normalized));
       return;
     }
 
     const prismaMapped = this.tryMapPrismaError(exception);
     if (prismaMapped) {
-      response.status(prismaMapped.status).json(prismaMapped.body);
+      response.status(prismaMapped.status).json(GlobalExceptionFilter.stamp(prismaMapped.body));
       return;
     }
 
@@ -63,12 +69,12 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       }),
     );
 
-    const fallback: ErrorResponse = {
-      code: 'INTERNAL_ERROR',
-      message: 'Internal server error',
-    };
-
-    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(fallback);
+    response.status(HttpStatus.INTERNAL_SERVER_ERROR).json(
+      GlobalExceptionFilter.stamp({
+        code: 'INTERNAL_ERROR',
+        message: 'Internal server error',
+      }),
+    );
   }
 
   private tryMapPrismaError(exception: unknown): { status: number; body: ErrorResponse } | null {

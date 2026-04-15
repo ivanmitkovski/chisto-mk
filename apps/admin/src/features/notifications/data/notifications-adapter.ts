@@ -13,6 +13,8 @@ type AdminNotificationApiItem = {
   category: string;
   isUnread: boolean;
   href: string | null;
+  messageTemplateKey?: string | null;
+  messageTemplateParams?: Record<string, unknown> | null;
 };
 
 type AdminNotificationsListResponse = {
@@ -46,6 +48,12 @@ function mapApiItemToAdminNotification(item: AdminNotificationApiItem): AdminNot
     category: item.category as AdminNotification['category'],
     icon: toneCategoryToIcon(item.tone, item.category),
     ...(item.href && { href: item.href }),
+    ...(item.messageTemplateKey != null && item.messageTemplateKey !== ''
+      ? { messageTemplateKey: item.messageTemplateKey }
+      : {}),
+    ...(item.messageTemplateParams != null
+      ? { messageTemplateParams: item.messageTemplateParams }
+      : {}),
   };
 }
 

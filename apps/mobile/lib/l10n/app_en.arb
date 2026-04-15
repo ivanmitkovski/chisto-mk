@@ -1557,6 +1557,87 @@
   },
   "reportListEmptyTitle": "No reports yet",
   "reportListEmptySubtitle": "Your future reports will appear here after you submit them.",
+  "reportStatusUnderReviewShort": "Under review",
+  "reportStatusApprovedShort": "Approved",
+  "reportStatusDeclinedShort": "Declined",
+  "reportStatusAlreadyReportedShort": "Already reported",
+  "reportListFilterAll": "All",
+  "reportListFilterSemanticPrefix": "Report status",
+  "reportListHeaderTitle": "Your reports",
+  "reportListHeaderTotalPill": "{count, plural, one{1 report in total} other{{count} reports in total}}",
+  "@reportListHeaderTotalPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderUnderReviewPill": "{count, plural, one{1 under review} other{{count} under review}}",
+  "@reportListHeaderUnderReviewPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderSemanticSummary": "{totalReports, plural, one{1 report in total} other{{totalReports} reports in total}}. {underReview, plural, one{1 currently under review} other{{underReview} currently under review}}.",
+  "@reportListHeaderSemanticSummary": {
+    "placeholders": {
+      "totalReports": {
+        "type": "int"
+      },
+      "underReview": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilteredFooterAll": "All reports shown",
+  "reportListFilteredFooterCount": "{count, plural, one{1 report} other{{count} reports}}",
+  "@reportListFilteredFooterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListNoMatchesSearchTitle": "No reports found",
+  "reportListNoMatchesFilterTitle": "No reports with this filter",
+  "reportListNoMatchesHintSearchAndFilter": "Try a different search or clear filters to see more reports.",
+  "reportListNoMatchesHintSearchOnly": "Check the spelling or try a broader search.",
+  "reportListNoMatchesHintFilterOnly": "Try another filter, or clear it to see all reports.",
+  "reportListClearSearch": "Clear search",
+  "reportListDateWeeksAgo": "{weeks, plural, one{1 week ago} other{{weeks} weeks ago}}",
+  "@reportListDateWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailOpeningInProgress": "Opening…",
+  "reportDetailNoPhotos": "No photos",
+  "reportDetailStatusUnderReviewTitle": "Under review by moderators",
+  "reportDetailStatusUnderReviewBody": "Moderators are checking your evidence and location before they decide how to handle this report.",
+  "reportDetailStatusApprovedTitle": "Approved and linked to a site",
+  "reportDetailStatusApprovedBody": "This report helped confirm a public pollution site and may contribute to cleanup actions.",
+  "reportDetailStatusAlreadyReportedTitle": "Already tracked as an existing site",
+  "reportDetailStatusAlreadyReportedBody": "Your report matched an existing site. The evidence is still useful for understanding the problem.",
+  "reportDetailStatusOutcomeTitle": "Review outcome",
+  "reportDetailStatusOutcomeBodyFallback": "This report could not be approved in its current form.",
+  "reportCardSemanticLabel": "{category}, {status}, {location}. Tap to view details.",
+  "@reportCardSemanticLabel": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
   "appSmartImageUnavailable": "Image unavailable",
   "eventsReminderSectionTitle": "Event reminder",
   "eventsReminderSectionEnabled": "Reminder is on",
@@ -2146,5 +2227,34 @@
   "eventChatSlideToCancel": "Slide left to cancel",
   "eventChatReleaseToCancel": "Release to cancel",
   "eventChatRecording": "Recording…",
-  "eventChatMicPermissionDenied": "Microphone access is required to send voice messages."
+  "eventChatMicPermissionDenied": "Microphone access is required to send voice messages.",
+  "reportEntryLabelGuided": "Guided report",
+  "reportEntryLabelCamera": "Camera report",
+  "reportEntryHintCamera": "Starting from a live photo can speed up moderation because the evidence is already attached.",
+  "homeReportingCapacityCheckFailed": "Could not check reporting availability right now.",
+  "homeCameraOpenFailed": "Unable to open the camera right now. Please try again in a moment.",
+  "mapTabPlaceholderHint": "Open this tab to load the live map and nearby pollution sites.",
+  "reportCategoryPickerTitle": "Choose category",
+  "reportCategoryPickerSubtitle": "Pick the closest match for the issue you are reporting.",
+  "reportCategoryPickerBannerTitle": "Choose the closest match",
+  "reportCategoryPickerBannerBody": "Pick the category moderators should verify first. It does not need to be perfect.",
+  "reportCategoryIllegalLandfillTitle": "Illegal landfill",
+  "reportCategoryIllegalLandfillDescription": "Dumped waste, trash piles, or informal disposal sites.",
+  "reportCategoryWaterPollutionTitle": "Water pollution",
+  "reportCategoryWaterPollutionDescription": "Contaminated rivers, lakes, drains, or wastewater discharge.",
+  "reportCategoryAirPollutionTitle": "Air pollution",
+  "reportCategoryAirPollutionDescription": "Smoke, dust, burning waste, or emissions harming air quality.",
+  "reportCategoryIndustrialWasteTitle": "Industrial waste",
+  "reportCategoryIndustrialWasteDescription": "Construction debris, factory waste, or hazardous materials.",
+  "reportCategoryOtherTitle": "Other",
+  "reportCategoryOtherDescription": "Use when the issue does not clearly match the categories above.",
+  "unknownRouteTitle": "Page not found",
+  "unknownRouteMessage": "This link may be out of date or incorrect.",
+  "unknownRouteContinueButton": "Continue to the app",
+  "unknownRouteDebugRoute": "Debug: route name was “{routeName}”.",
+  "@unknownRouteDebugRoute": {
+    "placeholders": {
+      "routeName": { "type": "String" }
+    }
+  }
 }

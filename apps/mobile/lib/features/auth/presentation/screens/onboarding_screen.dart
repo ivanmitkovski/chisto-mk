@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -47,10 +49,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void initState() {
     super.initState();
     _pageController = PageController();
+    ServiceLocator.instance.appLocaleOverride.addListener(_onAppLocaleChanged);
+  }
+
+  void _onAppLocaleChanged() {
+    if (mounted) setState(() {});
   }
 
   @override
   void dispose() {
+    ServiceLocator.instance.appLocaleOverride.removeListener(_onAppLocaleChanged);
     _pageController.dispose();
     super.dispose();
   }
@@ -102,6 +110,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           AppColors.transparent,
                           AppColors.white.withValues(alpha: 0.14),
                         ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: SafeArea(
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          top: AppSpacing.sm,
+                          right: AppSpacing.md,
+                        ),
+                        child: Material(
+                          color: AppColors.black.withValues(alpha: 0.18),
+                          shape: const CircleBorder(),
+                          clipBehavior: Clip.antiAlias,
+                          child: IconButton(
+                            icon: const Icon(Icons.language_rounded),
+                            iconSize: 20,
+                            color: AppColors.white.withValues(alpha: 0.82),
+                            style: IconButton.styleFrom(
+                              padding: const EdgeInsets.all(7),
+                              minimumSize: const Size(38, 38),
+                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              overlayColor:
+                                  AppColors.white.withValues(alpha: 0.12),
+                            ),
+                            tooltip: l10n.profileLanguageTile,
+                            onPressed: () {
+                              AppHaptics.light(context);
+                              showAppLanguagePicker(context);
+                            },
+                          ),
+                        ),
                       ),
                     ),
                   ),
