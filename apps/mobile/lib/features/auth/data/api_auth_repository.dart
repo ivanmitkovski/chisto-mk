@@ -347,6 +347,8 @@ class ApiAuthRepository implements AuthRepository {
       phoneNumber: phoneNumber,
     );
 
+    profileAvatarState.setRemoteUrl(_extractAvatarUrl(user));
+
     await _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,

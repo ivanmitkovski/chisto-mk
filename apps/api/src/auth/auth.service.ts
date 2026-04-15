@@ -1074,6 +1074,8 @@ export class AuthService {
       { expiresIn: this.accessTokenTtl },
     );
 
+    const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
+
     return {
       accessToken,
       refreshToken: fullRefreshToken,
@@ -1087,6 +1089,7 @@ export class AuthService {
         status: user.status,
         isPhoneVerified: user.isPhoneVerified,
         pointsBalance: user.pointsBalance,
+        avatarUrl,
       },
     };
   }

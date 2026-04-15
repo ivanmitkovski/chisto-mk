@@ -146,6 +146,7 @@ describe('AuthService', () => {
   let prisma: ReturnType<typeof makePrisma>;
   let jwt: ReturnType<typeof makeJwt>;
   let eventEmitter: ReturnType<typeof makeEventEmitter>;
+  let reportsUploadService: ReturnType<typeof makeReportsUploadService>;
 
   beforeEach(async () => {
     prisma = makePrisma();
@@ -158,7 +159,7 @@ describe('AuthService', () => {
     const otpService = makeOtpService();
     const audit = makeAudit();
     eventEmitter = makeEventEmitter();
-    const reportsUploadService = makeReportsUploadService();
+    reportsUploadService = makeReportsUploadService();
     const gamificationService = makeGamificationService();
     const rankingsService = makeRankingsService();
     service = new AuthService(
@@ -192,6 +193,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('jwt-token');
       expect(result.refreshToken).toBeDefined();
       expect(result.user.id).toBe('user-1');
+      expect(result.user.avatarUrl).toBeNull();
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
       expect(prisma.userSession.create).toHaveBeenCalledTimes(1);
     });
@@ -237,6 +239,28 @@ describe('AuthService', () => {
 
       expect(result.accessToken).toBe('jwt-token');
       expect(result.user.phoneNumber).toBe('+38970123456');
+      expect(result.user.avatarUrl).toBeNull();
+    });
+
+    it('includes signed avatarUrl when user has avatarObjectKey', async () => {
+      reportsUploadService.signPrivateObjectKey.mockResolvedValue(
+        'https://signed.example/avatar',
+      );
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        avatarObjectKey: 'private/avatars/user-1',
+      });
+      prisma.userSession.create.mockResolvedValue({});
+
+      const result = await service.citizenLogin({
+        phoneNumber: '+38970123456',
+        password: 'StrongPass123!',
+      });
+
+      expect(reportsUploadService.signPrivateObjectKey).toHaveBeenCalledWith(
+        'private/avatars/user-1',
+      );
+      expect(result.user.avatarUrl).toBe('https://signed.example/avatar');
     });
 
     it('rejects invalid phone number', async () => {
@@ -310,6 +334,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('jwt-token');
       expect(result.refreshToken).toBeDefined();
       expect(result.refreshToken).toContain('.');
+      expect(result.user.avatarUrl).toBeNull();
       expect(prisma.userSession.findUnique).toHaveBeenCalledWith({
         where: { tokenId },
         include: { user: true },
