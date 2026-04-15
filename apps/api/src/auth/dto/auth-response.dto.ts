@@ -28,6 +28,12 @@ export class AuthUserDto {
 
   @ApiProperty()
   pointsBalance!: number;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Signed URL for the profile avatar, if set',
+  })
+  avatarUrl!: string | null;
 }
 
 export class AuthResponseDto {
