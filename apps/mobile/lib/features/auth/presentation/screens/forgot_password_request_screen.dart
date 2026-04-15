@@ -3,12 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_validators.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/validation/macedonian_phone_formatter.dart';
 import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
@@ -24,7 +26,8 @@ class ForgotPasswordRequestScreen extends StatefulWidget {
       _ForgotPasswordRequestScreenState();
 }
 
-class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScreen> {
+class _ForgotPasswordRequestScreenState
+    extends State<ForgotPasswordRequestScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _phoneController = TextEditingController();
   final FocusNode _phoneFocus = FocusNode();
@@ -54,34 +57,29 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
     });
   }
 
-  bool get _canSubmit => _phoneController.text.trim().replaceAll(RegExp(r'\D'), '').length == 8;
-
-  String? _validateMacedonianPhone(String? value) {
-    final String digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) return 'Phone number is required';
-    if (digits.length != 8) return 'Enter an 8-digit phone number';
-    return null;
-  }
+  bool get _canSubmit =>
+      _phoneController.text.trim().replaceAll(RegExp(r'\D'), '').length == 8;
 
   Future<void> _handleSendCode() async {
     if (_isLoading) return;
     final FormState? formState = _formKey.currentState;
     setState(() => _hasSubmitted = true);
     if (formState == null || !formState.validate()) {
-      AppHaptics.tap();
+      AppHaptics.tap(context);
       return;
     }
 
-    AppHaptics.light();
+    AppHaptics.light(context);
     setState(() => _isLoading = true);
     setState(() => _apiError = null);
 
     try {
       final String phoneE164 = normalizeToE164(_phoneController.text);
-      await ServiceLocator.instance.authRepository.requestPasswordReset(phoneE164);
+      await ServiceLocator.instance.authRepository
+          .requestPasswordReset(phoneE164);
       if (!mounted) return;
       setState(() => _isLoading = false);
-      AppHaptics.success();
+      AppHaptics.success(context);
       Navigator.of(context).pushNamed(
         AppRoutes.forgotPasswordOtp,
         arguments: phoneE164,
@@ -89,28 +87,29 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
     } on AppError catch (e) {
       if (!mounted) return;
       setState(() => _isLoading = false);
-      setState(() => _apiError = messageForAuthError(e));
-      AppHaptics.warning();
+      setState(
+        () => _apiError = messageForAuthError(AppLocalizations.of(context)!, e),
+      );
+      AppHaptics.warning(context);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+
     return Stack(
       children: [
         AuthShell(
           header: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Tooltip(
-                message: 'Go back',
-                child: AppBackButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                ),
+              AppBackButton(
+                onPressed: () => Navigator.of(context).pop(),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Reset password',
+                l10n.authForgotPasswordTitle,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   letterSpacing: -0.3,
@@ -118,7 +117,7 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
               ),
               const SizedBox(height: 4),
               Text(
-                'Enter your phone number and we\'ll send you a code to reset your password',
+                l10n.authForgotPasswordSubtitle,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.textMuted,
                 ),
@@ -127,7 +126,8 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
           ),
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+              final double keyboardInset =
+                  MediaQuery.viewInsetsOf(context).bottom;
 
               return SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
@@ -157,8 +157,8 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
                           const SizedBox(height: AppSpacing.md),
                         ],
                         AuthTextField(
-                          label: 'Phone Number',
-                          hintText: '70 123 456',
+                          label: l10n.authFieldPhoneNumber,
+                          hintText: l10n.authFieldPhoneHint,
                           prefixFixedText: '+389',
                           controller: _phoneController,
                           focusNode: _phoneFocus,
@@ -167,7 +167,8 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
                           autofillHints: const <String>[
                             AutofillHints.telephoneNumber,
                           ],
-                          validator: _validateMacedonianPhone,
+                          validator: (String? v) =>
+                              AuthValidators.macedonianPhone(l10n, v),
                           inputFormatters: const <TextInputFormatter>[
                             MacedonianPhoneFormatter(),
                           ],
@@ -176,9 +177,9 @@ class _ForgotPasswordRequestScreenState extends State<ForgotPasswordRequestScree
                         const SizedBox(height: AppSpacing.radius22),
                         Semantics(
                           button: true,
-                          label: 'Request code',
+                          label: l10n.authForgotPasswordRequestSemantic,
                           child: PrimaryButton(
-                            label: 'Send reset code',
+                            label: l10n.authForgotPasswordSendCode,
                             enabled: _canSubmit && !_isLoading,
                             onPressed: _isLoading ? null : _handleSendCode,
                           ),

@@ -26,7 +26,7 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Get Started'));
+    await tester.tap(find.text('Get started'));
     await tester.pumpAndSettle();
 
     expect(find.byType(SignInScreen), findsOneWidget);

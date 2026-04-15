@@ -2,14 +2,18 @@ import 'dart:async';
 
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('shows reporting cooldown dialog copy', (WidgetTester tester) async {
     await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(body: SizedBox.shrink()),
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: const Scaffold(body: SizedBox.shrink()),
       ),
     );
 
@@ -21,6 +25,7 @@ void main() {
         emergencyAvailable: false,
         emergencyWindowDays: 7,
         retryAfterSeconds: 3600,
+        nextEmergencyReportAvailableAt: null,
         unlockHint: 'Join and verify attendance, or create an eco action.',
       ),
     ));

@@ -1,7 +1,20 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDateString, IsEnum, IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+  MinLength,
+  Matches,
+} from 'class-validator';
 import { CleanupEventStatus } from '../../prisma-client';
+
+/** Optional RFC 5545 RRULE line (with or without `RRULE:` prefix). Stored on the event; not expanded server-side for admin creates. */
+const RRULE_MAX = 2048;
 
 export class CreateCleanupEventDto {
   @ApiProperty()
@@ -12,6 +25,30 @@ export class CreateCleanupEventDto {
   @ApiProperty()
   @IsDateString()
   scheduledAt!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  title?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(10_000)
+  description?: string;
+
+  @ApiPropertyOptional({
+    description: 'Optional recurrence rule (RFC 5545). Stored as metadata for this single event.',
+    maxLength: RRULE_MAX,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(RRULE_MAX)
+  @Matches(/^[\x09\x0A\x0D\x20-\x7E]*$/, {
+    message: 'recurrenceRule must be printable ASCII',
+  })
+  recurrenceRule?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -1,9 +1,11 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report_reason.dart';
+import 'package:chisto_mobile/features/home/presentation/l10n/site_report_reason_l10n.dart';
 import 'package:chisto_mobile/features/home/data/site_issue_report_repository.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
@@ -250,7 +252,7 @@ class _ReasonTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        reason.label,
+                        reason.localizedLabel(context.l10n),
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: isSelected
@@ -260,7 +262,7 @@ class _ReasonTile extends StatelessWidget {
                       ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
-                        reason.subtitle,
+                        reason.localizedSubtitle(context.l10n),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textMuted,
                         ),

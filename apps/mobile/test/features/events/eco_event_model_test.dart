@@ -1,5 +1,7 @@
+import 'package:chisto_mobile/features/events/data/event_json.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
+import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -30,6 +32,7 @@ void main() {
     EcoEvent buildEvent({
       String id = 'evt-1',
       EcoEventStatus status = EcoEventStatus.upcoming,
+      String organizerId = 'org-1',
     }) {
       return EcoEvent(
         id: id,
@@ -40,7 +43,7 @@ void main() {
         siteName: 'Test site',
         siteImageUrl: 'assets/test.png',
         siteDistanceKm: 5.0,
-        organizerId: 'org-1',
+        organizerId: organizerId,
         organizerName: 'Organizer',
         date: DateTime(2025, 6, 15),
         startTime: const EventTime(hour: 10, minute: 0),
@@ -82,6 +85,32 @@ void main() {
       expect(completed.canTransitionTo(EcoEventStatus.inProgress), isFalse);
     });
 
+    test('isJoinable respects moderation for volunteers', () {
+      final EcoEvent pending = buildEvent().copyWith(moderationApproved: false);
+      expect(pending.isJoinable, isFalse);
+      final EcoEvent approved = buildEvent().copyWith(moderationApproved: true);
+      expect(approved.isJoinable, isTrue);
+    });
+
+    test('organizer is never joinable via isJoinable', () {
+      final EcoEvent orgEvent = buildEvent(
+        organizerId: CurrentUser.id,
+      ).copyWith(moderationApproved: false);
+      expect(orgEvent.isOrganizer, isTrue);
+      expect(orgEvent.isJoinable, isFalse);
+    });
+
+    test('isBeforeScheduledStart uses scheduledAtUtc when set', () {
+      final EcoEvent futureUtc = buildEvent().copyWith(
+        scheduledAtUtc: DateTime.utc(2035, 1, 1, 12),
+      );
+      expect(futureUtc.isBeforeScheduledStart, isTrue);
+      final EcoEvent pastUtc = buildEvent().copyWith(
+        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12),
+      );
+      expect(pastUtc.isBeforeScheduledStart, isFalse);
+    });
+
     test('isValidRange validates time ranges', () {
       expect(
         EcoEvent.isValidRange(
@@ -117,6 +146,12 @@ void main() {
         gear: <EventGear>[EventGear.gloves, EventGear.trashBags],
         scale: CleanupScale.medium,
         difficulty: EventDifficulty.moderate,
+        scheduledAtUtc: DateTime.utc(2025, 6, 15, 8, 30),
+        recurrenceSeriesTotal: 3,
+        recurrenceSeriesPosition: 2,
+        recurrencePrevEventId: 'evt-prev',
+        recurrenceNextEventId: 'evt-next',
+        organizerAvatarUrl: 'https://signed.example/o.webp',
       );
       final Map<String, dynamic> json = original.toJson();
       final EcoEvent decoded = EcoEvent.fromJson(json);
@@ -128,11 +163,40 @@ void main() {
       expect(decoded.gear.length, original.gear.length);
       expect(decoded.scale, original.scale);
       expect(decoded.difficulty, original.difficulty);
+      expect(decoded.scheduledAtUtc?.toUtc(), original.scheduledAtUtc?.toUtc());
+      expect(decoded.recurrenceSeriesTotal, 3);
+      expect(decoded.recurrenceSeriesPosition, 2);
+      expect(decoded.recurrencePrevEventId, 'evt-prev');
+      expect(decoded.recurrenceNextEventId, 'evt-next');
+      expect(decoded.organizerAvatarUrl, 'https://signed.example/o.webp');
     });
 
-    test('formattedDate and formattedTimeRange', () {
+    test('ecoEventFromJson sets scheduledAtUtc from scheduledAt', () {
+      final EcoEvent e = ecoEventFromJson(<String, dynamic>{
+        'id': 'api-1',
+        'title': 'Clean',
+        'description': '',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Park',
+        'siteImageUrl': '',
+        'siteDistanceKm': 1.2,
+        'organizerId': 'org',
+        'organizerName': 'O',
+        'participantCount': 0,
+        'status': 'upcoming',
+        'createdAt': '2025-06-01T00:00:00.000Z',
+        'scheduledAt': '2025-06-15T10:00:00.000Z',
+      });
+      expect(e.scheduledAtUtc, isNotNull);
+      expect(
+        e.scheduledAtUtc!.toUtc().toIso8601String(),
+        '2025-06-15T10:00:00.000Z',
+      );
+    });
+
+    test('formattedTimeRange', () {
       final EcoEvent event = buildEvent();
-      expect(event.formattedDate, 'June 15, 2025');
       expect(event.formattedTimeRange, '10:00 - 12:00');
     });
   });
@@ -176,8 +240,21 @@ void main() {
       expect(decoded, isNotNull);
       expect(decoded!.id, 'user-1');
       expect(decoded.name, 'Alice');
+      expect(decoded.userId, isNull);
       expect(decoded.checkedInAt.millisecondsSinceEpoch,
           original.checkedInAt.millisecondsSinceEpoch);
+    });
+
+    test('toJson and fromJson preserves userId when set', () {
+      final CheckedInAttendee original = CheckedInAttendee(
+        id: 'row-1',
+        name: 'Bob',
+        checkedInAt: DateTime(2025, 6, 15, 11, 0),
+        userId: 'usr_abc',
+      );
+      final CheckedInAttendee? decoded =
+          CheckedInAttendee.fromJson(original.toJson());
+      expect(decoded?.userId, 'usr_abc');
     });
 
     test('equality is based on id', () {

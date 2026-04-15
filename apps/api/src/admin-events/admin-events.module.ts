@@ -6,6 +6,7 @@ import { ReportEventsService } from './report-events.service';
 import { SiteEventsService } from './site-events.service';
 import { UserCreatedListener } from './user-created.listener';
 import { UserEventsService } from './user-events.service';
+import { CleanupEventsEventsService } from './cleanup-events-events.service';
 
 @Module({
   imports: [AuthModule],
@@ -16,12 +17,14 @@ import { UserEventsService } from './user-events.service';
     NotificationEventsService,
     SiteEventsService,
     UserEventsService,
+    CleanupEventsEventsService,
   ],
   exports: [
     ReportEventsService,
     NotificationEventsService,
     SiteEventsService,
     UserEventsService,
+    CleanupEventsEventsService,
   ],
 })
 export class AdminEventsModule {}

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_validators.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/validation/phone_normalizer.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -10,8 +11,8 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/core/validation/input_validators.dart';
 import 'package:chisto_mobile/core/validation/password_strength.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/password_strength_indicator.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
@@ -28,8 +29,11 @@ class SignUpScreen extends StatefulWidget {
   State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _fullNameFieldKey = GlobalKey();
+  final GlobalKey _emailFieldKey = GlobalKey();
   final GlobalKey _phoneFieldKey = GlobalKey();
   final GlobalKey _passwordFieldKey = GlobalKey();
   final TextEditingController _fullNameController = TextEditingController();
@@ -45,6 +49,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool _hasValidationError = false;
   String? _apiError;
   PasswordStrength _passwordStrength = PasswordStrength.none;
+  late AnimationController _entranceController;
+  late Animation<double> _entranceAnimation;
 
   @override
   void initState() {
@@ -54,19 +60,41 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.addListener(_onInputChanged);
     _phoneController.addListener(_onInputChanged);
     _passwordController.addListener(_onInputChanged);
+    _fullNameFocus.addListener(_scrollToFocusedField);
+    _emailFocus.addListener(_scrollToFocusedField);
     _phoneFocus.addListener(_scrollToFocusedField);
     _passwordFocus.addListener(_scrollToFocusedField);
+    _entranceController = AnimationController(
+      vsync: this,
+      duration: AppMotion.standard,
+    );
+    _entranceAnimation = CurvedAnimation(
+      parent: _entranceController,
+      curve: AppMotion.emphasized,
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _entranceController.value = 1.0;
+      } else {
+        _entranceController.forward();
+      }
+    });
   }
 
   void _scrollToFocusedField() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
-        final BuildContext? ctx = _phoneFocus.hasFocus
-            ? _phoneFieldKey.currentContext
-            : _passwordFocus.hasFocus
-                ? _passwordFieldKey.currentContext
-                : null;
+        final BuildContext? ctx = _fullNameFocus.hasFocus
+            ? _fullNameFieldKey.currentContext
+            : _emailFocus.hasFocus
+                ? _emailFieldKey.currentContext
+                : _phoneFocus.hasFocus
+                    ? _phoneFieldKey.currentContext
+                    : _passwordFocus.hasFocus
+                        ? _passwordFieldKey.currentContext
+                        : null;
         if (ctx != null) {
           Scrollable.ensureVisible(
             ctx,
@@ -93,6 +121,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailFocus.dispose();
     _phoneFocus.dispose();
     _passwordFocus.dispose();
+    _fullNameFocus.removeListener(_scrollToFocusedField);
+    _emailFocus.removeListener(_scrollToFocusedField);
     _phoneFocus.removeListener(_scrollToFocusedField);
     _passwordFocus.removeListener(_scrollToFocusedField);
     _fullNameController.removeListener(_onInputChanged);
@@ -103,25 +133,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
     _emailController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
+    _entranceController.dispose();
     super.dispose();
   }
 
-  bool get _isSubmitReady {
-    return InputValidators.validateRequired(_fullNameController.text, 'Full name') == null &&
-        InputValidators.validateEmail(_emailController.text) == null &&
-        _validateMacedonianPhone(_phoneController.text) == null &&
-        InputValidators.validatePassword(_passwordController.text) == null;
-  }
-
-  String? _validateMacedonianPhone(String? value) {
-    final String digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) {
-      return 'Phone number is required';
-    }
-    if (digits.length != 8) {
-      return 'Enter an 8-digit phone number';
-    }
-    return null;
+  bool _isSubmitReady(AppLocalizations l10n) {
+    return AuthValidators.requiredField(
+              l10n,
+              _fullNameController.text,
+              l10n.authFieldFullName,
+            ) ==
+            null &&
+        AuthValidators.email(l10n, _emailController.text) == null &&
+        AuthValidators.macedonianPhone(l10n, _phoneController.text) == null &&
+        AuthValidators.password(l10n, _passwordController.text) == null;
   }
 
   Future<void> _handleSignUp() async {
@@ -129,13 +154,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _hasSubmitted = true);
     if (currentState == null) {
       setState(() => _hasValidationError = true);
-      AppHaptics.tap();
+      AppHaptics.tap(context);
       return;
     }
     final bool isValid = currentState.validate();
     if (!isValid) {
       setState(() => _hasValidationError = true);
-      AppHaptics.tap();
+      AppHaptics.tap(context);
       return;
     }
     setState(() {
@@ -159,15 +184,17 @@ class _SignUpScreenState extends State<SignUpScreen> {
         password: _passwordController.text,
       );
       if (!mounted) return;
-      AppHaptics.success();
+      AppHaptics.success(context);
       Navigator.of(context).pushNamed(
         AppRoutes.otp,
         arguments: phoneE164,
       );
     } on AppError catch (e) {
       if (!mounted) return;
-      setState(() => _apiError = messageForAuthError(e));
-      AppHaptics.warning();
+      setState(
+        () => _apiError = messageForAuthError(AppLocalizations.of(context)!, e),
+      );
+      AppHaptics.warning(context);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -175,28 +202,39 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
+
     return Stack(
       children: [
         AuthShell(
-          header: const Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              BrandLogo(compact: true),
-              SizedBox(height: AppSpacing.sm),
-              Text(
-                'Sign up',
-                style: AppTypography.authHeadline,
+          header: FadeTransition(
+            opacity: _entranceAnimation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.08),
+                end: Offset.zero,
+              ).animate(_entranceAnimation),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const BrandLogo(compact: true),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    l10n.authSignUpTitle,
+                    style: AppTypography.authHeadline,
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    l10n.authSignUpSubtitle,
+                    style: AppTypography.authSubtitle,
+                  ),
+                ],
               ),
-              SizedBox(height: AppSpacing.xs),
-              Text(
-                'Welcome! Please enter your details',
-                style: AppTypography.authSubtitle,
-              ),
-            ],
+            ),
           ),
           body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
-              final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
               return SingleChildScrollView(
                 keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                 padding: EdgeInsets.fromLTRB(
@@ -206,142 +244,142 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   AppSpacing.lg + keyboardInset,
                 ),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight - AppSpacing.radius18),
-                  child: AutofillGroup(
-                    child: Form(
-                      key: _formKey,
-                      autovalidateMode: _hasSubmitted
-                          ? AutovalidateMode.onUserInteraction
-                          : AutovalidateMode.disabled,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (_apiError != null) ...[
-                            ApiErrorBanner(
-                              message: _apiError!,
-                              onDismiss: () => setState(() => _apiError = null),
-                            ),
-                            const SizedBox(height: AppSpacing.md),
-                          ],
-                          AuthTextField(
-                            label: 'Full Name',
-                            controller: _fullNameController,
-                            focusNode: _fullNameFocus,
-                            hintText: 'John Doe',
-                            textCapitalization: TextCapitalization.words,
-                            autofillHints: const <String>[AutofillHints.name],
-                            onFieldSubmitted: (_) => _emailFocus.requestFocus(),
-                            validator: (String? value) =>
-                                InputValidators.validateRequired(value, 'Full name'),
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          AuthTextField(
-                            label: 'Email',
-                            controller: _emailController,
-                            focusNode: _emailFocus,
-                            hintText: 'john@chisto.mk',
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const <String>[AutofillHints.email],
-                            onFieldSubmitted: (_) => _phoneFocus.requestFocus(),
-                            validator: InputValidators.validateEmail,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          AuthTextField(
-                            key: _phoneFieldKey,
-                            label: 'Phone Number',
-                            hintText: '70 123 456',
-                            prefixFixedText: '+389',
-                            controller: _phoneController,
-                            focusNode: _phoneFocus,
-                            keyboardType: TextInputType.phone,
-                            textInputAction: TextInputAction.next,
-                            autofillHints: const <String>[AutofillHints.telephoneNumber],
-                            onFieldSubmitted: (_) => _passwordFocus.requestFocus(),
-                            validator: _validateMacedonianPhone,
-                            inputFormatters: const <TextInputFormatter>[MacedonianPhoneFormatter()],
-                          ),
-                          const SizedBox(height: AppSpacing.sm),
-                          AuthTextField(
-                            key: _passwordFieldKey,
-                            label: 'Password',
-                            controller: _passwordController,
-                            focusNode: _passwordFocus,
-                            hintText: 'Enter your password',
-                            obscureText: true,
-                            textInputAction: TextInputAction.done,
-                            validator: InputValidators.validatePassword,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            scrollPadding: EdgeInsets.only(
-                              bottom: keyboardInset + 100,
-                            ),
-                            onFieldSubmitted: (_) => _handleSignUp(),
-                          ),
-                          PasswordStrengthIndicator(strength: _passwordStrength),
-                          const SizedBox(height: AppSpacing.xs),
-                          Text(
-                            'At least 8 characters, with letters and numbers',
-                            style: AppTypography.cardSubtitle,
-                          ),
-                          const SizedBox(height: AppSpacing.md),
-                          RichText(
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            text: const TextSpan(
-                              text: 'By signing up you agree to our ',
-                              style: AppTypography.authSubtitle,
-                              children: [
-                                TextSpan(
-                                  text: 'terms and conditions',
-                                  style: TextStyle(
-                                    color: AppColors.primaryDark,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight - AppSpacing.radius18,
+                  ),
+                  child: FadeTransition(
+                    opacity: _entranceAnimation,
+                    child: SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0, 0.06),
+                        end: Offset.zero,
+                      ).animate(
+                        CurvedAnimation(
+                          parent: _entranceController,
+                          curve: const Interval(0.15, 1, curve: Curves.easeOut),
+                        ),
+                      ),
+                      child: AutofillGroup(
+                        child: Form(
+                          key: _formKey,
+                          autovalidateMode: _hasSubmitted
+                              ? AutovalidateMode.onUserInteraction
+                              : AutovalidateMode.disabled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (_apiError != null) ...[
+                                ApiErrorBanner(
+                                  message: _apiError!,
+                                  onDismiss: () =>
+                                      setState(() => _apiError = null),
                                 ),
+                                const SizedBox(height: AppSpacing.md),
                               ],
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xl),
-                          AnimatedSize(
-                            duration: AppMotion.fast,
-                            curve: AppMotion.emphasized,
-                            child: _hasValidationError
-                                ? Padding(
-                                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                                    child: Text(
-                                      'Please check the highlighted fields above.',
-                                      style: AppTypography.cardSubtitle.copyWith(color: AppColors.error),
+                              AuthTextField(
+                                key: _fullNameFieldKey,
+                                label: l10n.authFieldFullName,
+                                controller: _fullNameController,
+                                focusNode: _fullNameFocus,
+                                hintText: l10n.authFieldFullNameHint,
+                                textCapitalization: TextCapitalization.words,
+                                textInputAction: TextInputAction.next,
+                                autofillHints: const <String>[
+                                  AutofillHints.name,
+                                ],
+                                onFieldSubmitted: (_) =>
+                                    _emailFocus.requestFocus(),
+                                validator: (String? value) =>
+                                    AuthValidators.requiredField(
+                                      l10n,
+                                      value,
+                                      l10n.authFieldFullName,
                                     ),
-                                  )
-                                : const SizedBox.shrink(),
-                          ),
-                          Semantics(
-                            button: true,
-                            label: 'Sign up',
-                            child: PrimaryButton(
-                              label: 'Sign Up',
-                              enabled: _isSubmitReady && !_isLoading,
-                              onPressed: _isLoading ? null : _handleSignUp,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.xxl),
-                          Center(
-                            child: Semantics(
-                              button: true,
-                              label: 'Sign in',
-                              child: GestureDetector(
-                                onTap: () =>
-                                    Navigator.of(context).pushReplacementNamed(AppRoutes.signIn),
-                                child: RichText(
-                                text: const TextSpan(
-                                  text: 'Already have an account? ',
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              AuthTextField(
+                                key: _emailFieldKey,
+                                label: l10n.authFieldEmail,
+                                controller: _emailController,
+                                focusNode: _emailFocus,
+                                hintText: l10n.authFieldEmailHint,
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.next,
+                                autofillHints: const <String>[
+                                  AutofillHints.email,
+                                ],
+                                onFieldSubmitted: (_) =>
+                                    _phoneFocus.requestFocus(),
+                                validator: (String? value) =>
+                                    AuthValidators.email(l10n, value),
+                                enableSuggestions: false,
+                                autocorrect: false,
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              AuthTextField(
+                                key: _phoneFieldKey,
+                                label: l10n.authFieldPhoneNumber,
+                                hintText: l10n.authFieldPhoneHint,
+                                prefixFixedText: '+389',
+                                controller: _phoneController,
+                                focusNode: _phoneFocus,
+                                keyboardType: TextInputType.phone,
+                                textInputAction: TextInputAction.next,
+                                autofillHints: const <String>[
+                                  AutofillHints.telephoneNumber,
+                                ],
+                                onFieldSubmitted: (_) =>
+                                    _passwordFocus.requestFocus(),
+                                validator: (String? value) =>
+                                    AuthValidators.macedonianPhone(
+                                      l10n,
+                                      value,
+                                    ),
+                                inputFormatters: const <TextInputFormatter>[
+                                  MacedonianPhoneFormatter(),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              AuthTextField(
+                                key: _passwordFieldKey,
+                                label: l10n.authFieldPassword,
+                                controller: _passwordController,
+                                focusNode: _passwordFocus,
+                                hintText: l10n.authFieldPasswordHint,
+                                obscureText: true,
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.visiblePassword,
+                                validator: (String? value) =>
+                                    AuthValidators.password(l10n, value),
+                                enableSuggestions: false,
+                                autocorrect: false,
+                                scrollPadding: EdgeInsets.only(
+                                  bottom: keyboardInset + 100,
+                                ),
+                                autofillHints: const <String>[
+                                  AutofillHints.newPassword,
+                                ],
+                                onFieldSubmitted: (_) => _handleSignUp(),
+                              ),
+                              PasswordStrengthIndicator(
+                                strength: _passwordStrength,
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                l10n.authPasswordRequirementsHint,
+                                style: AppTypography.cardSubtitle,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              RichText(
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                text: TextSpan(
+                                  text: l10n.authTermsPrefix,
                                   style: AppTypography.authSubtitle,
                                   children: [
                                     TextSpan(
-                                      text: 'Sign In',
-                                      style: TextStyle(
+                                      text: l10n.authTermsLink,
+                                      style: const TextStyle(
                                         color: AppColors.primaryDark,
                                         fontWeight: FontWeight.w700,
                                       ),
@@ -349,10 +387,68 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                   ],
                                 ),
                               ),
-                            ),
-                            ),
+                              const SizedBox(height: AppSpacing.xl),
+                              AnimatedSize(
+                                duration: AppMotion.fast,
+                                curve: AppMotion.emphasized,
+                                child: _hasValidationError
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: AppSpacing.sm,
+                                        ),
+                                        child: Text(
+                                          l10n.authValidationCheckFields,
+                                          style: AppTypography.cardSubtitle
+                                              .copyWith(
+                                            color: AppColors.error,
+                                          ),
+                                        ),
+                                      )
+                                    : const SizedBox.shrink(),
+                              ),
+                              Semantics(
+                                button: true,
+                                label: l10n.authSignUpCta,
+                                child: PrimaryButton(
+                                  label: l10n.authSignUpCta,
+                                  enabled:
+                                      _isSubmitReady(l10n) && !_isLoading,
+                                  onPressed:
+                                      _isLoading ? null : _handleSignUp,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xxl),
+                              Center(
+                                child: Semantics(
+                                  button: true,
+                                  label:
+                                      '${l10n.authSignInPrompt}${l10n.authSignInLink}',
+                                  child: GestureDetector(
+                                    onTap: () => Navigator.of(context)
+                                        .pushReplacementNamed(
+                                      AppRoutes.signIn,
+                                    ),
+                                    child: RichText(
+                                      text: TextSpan(
+                                        text: l10n.authSignInPrompt,
+                                        style: AppTypography.authSubtitle,
+                                        children: [
+                                          TextSpan(
+                                            text: l10n.authSignInLink,
+                                            style: const TextStyle(
+                                              color: AppColors.primaryDark,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

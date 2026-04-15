@@ -1,33 +1,57 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math' show min;
 
 import 'package:chisto_mobile/core/config/app_config.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 
 /// HTTP client for Chisto API. Attaches base URL, auth token, maps errors to
 /// [AppError], and transparently retries once on 401 after refreshing the
 /// session (if a [refreshSession] callback is provided).
+///
+/// Parallel 401s: [_refreshing] allows only one refresh at a time; other
+/// requests may fail once before the retry path succeeds after refresh.
 class ApiClient {
   ApiClient({
     required AppConfig config,
     required String? Function() accessToken,
     required void Function() onUnauthorized,
+    String? Function()? acceptLanguageHeader,
   })  : _baseUrl = config.apiBaseUrl.replaceFirst(RegExp(r'/$'), ''),
         _accessToken = accessToken,
-        _onUnauthorized = onUnauthorized;
+        _onUnauthorized = onUnauthorized,
+        _acceptLanguageHeader = acceptLanguageHeader;
 
   final String _baseUrl;
   final String? Function() _accessToken;
   final void Function() _onUnauthorized;
+  final String? Function()? _acceptLanguageHeader;
 
   Future<bool> Function()? refreshSession;
 
   bool _refreshing = false;
 
   static const Duration _timeout = Duration(seconds: 30);
+
+  void _maybeAddAcceptLanguage(Map<String, String> headers) {
+    final String? Function()? headerFn = _acceptLanguageHeader;
+    if (headerFn == null) {
+      return;
+    }
+    const String key = 'Accept-Language';
+    if (headers.keys.any((String k) => k.toLowerCase() == key.toLowerCase())) {
+      return;
+    }
+    final String? value = headerFn();
+    if (value == null || value.trim().isEmpty) {
+      return;
+    }
+    headers[key] = value.trim();
+  }
 
   Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
     return _requestWithRetry('GET', path, headers: headers);
@@ -47,6 +71,14 @@ class ApiClient {
     Object? body,
   }) async {
     return _requestWithRetry('PATCH', path, headers: headers, body: body);
+  }
+
+  Future<ApiResponse> put(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return _requestWithRetry('PUT', path, headers: headers, body: body);
   }
 
   Future<ApiResponse> delete(String path, {Map<String, String>? headers}) async {
@@ -101,6 +133,7 @@ class ApiClient {
       request.headers['Authorization'] = 'Bearer $token';
     }
     request.headers['Accept'] = 'application/json';
+    _maybeAddAcceptLanguage(request.headers);
 
     for (final String filePath in filePaths) {
       final MediaType? contentType = _contentTypeForPath(filePath);
@@ -116,6 +149,130 @@ class ApiClient {
     try {
       final http.StreamedResponse streamed =
           await request.send().timeout(_timeout);
+      final http.Response response = await http.Response.fromStream(streamed);
+      return _handleResponse(response);
+    } on TimeoutException catch (e) {
+      throw AppError.timeout(
+          message: e.message?.isEmpty ?? true ? null : e.message);
+    } on SocketException catch (e) {
+      throw AppError.network(message: e.message, cause: e);
+    } on AppError {
+      rethrow;
+    } on Exception catch (e) {
+      if (e is http.ClientException) {
+        throw AppError.network(message: e.message, cause: e);
+      }
+      rethrow;
+    }
+  }
+
+  Stream<List<int>> _chunkedByteStream(
+    List<int> bytes, {
+    required void Function(int chunkLength) onChunk,
+    bool Function()? isCancelled,
+  }) async* {
+    const int chunkSize = 64 * 1024;
+    int offset = 0;
+    while (offset < bytes.length) {
+      if (isCancelled?.call() == true) {
+        throw AppError.cancelled(message: 'Upload cancelled');
+      }
+      final int end = min(offset + chunkSize, bytes.length);
+      final List<int> slice = bytes.sublist(offset, end);
+      yield slice;
+      onChunk(slice.length);
+      offset = end;
+    }
+  }
+
+  Future<ApiResponse> multipartPostWithRetry(
+    String path, {
+    required List<MultipartFileData> files,
+    Map<String, String>? fields,
+    Duration? timeout,
+  }) async {
+    try {
+      return await multipartPost(
+        path,
+        files: files,
+        fields: fields,
+        timeout: timeout,
+      );
+    } on AppError catch (e) {
+      if (e.code != 'UNAUTHORIZED' ||
+          _authPaths.contains(path) ||
+          refreshSession == null ||
+          _refreshing) {
+        rethrow;
+      }
+      _refreshing = true;
+      try {
+        final bool refreshed = await refreshSession!();
+        if (!refreshed) rethrow;
+      } on Exception catch (_) {
+        rethrow;
+      } finally {
+        _refreshing = false;
+      }
+      return await multipartPost(
+        path,
+        files: files,
+        fields: fields,
+        timeout: timeout,
+      );
+    }
+  }
+
+  Future<ApiResponse> multipartPost(
+    String path, {
+    required List<MultipartFileData> files,
+    Map<String, String>? fields,
+    void Function(int sent, int total)? onSendProgress,
+    bool Function()? isCancelled,
+    Duration? timeout,
+  }) async {
+    final Uri url = Uri.parse('$_baseUrl$path');
+    final http.MultipartRequest request = http.MultipartRequest('POST', url);
+
+    final String? token = _accessToken();
+    if (token != null && token.isNotEmpty) {
+      request.headers['Authorization'] = 'Bearer $token';
+    }
+    request.headers['Accept'] = 'application/json';
+    _maybeAddAcceptLanguage(request.headers);
+
+    if (fields != null) {
+      request.fields.addAll(fields);
+    }
+
+    final int totalBytes =
+        files.fold<int>(0, (int a, MultipartFileData f) => a + f.bytes.length);
+    int sentTotal = 0;
+    for (final MultipartFileData f in files) {
+      final int fileLen = f.bytes.length;
+      final Stream<List<int>> stream = _chunkedByteStream(
+        f.bytes,
+        onChunk: (int n) {
+          sentTotal += n;
+          onSendProgress?.call(sentTotal, totalBytes);
+        },
+        isCancelled: isCancelled,
+      );
+      request.files.add(
+        http.MultipartFile(
+          f.field,
+          http.ByteStream(stream),
+          fileLen,
+          filename: f.fileName,
+          contentType: MediaType.parse(f.mimeType),
+        ),
+      );
+    }
+
+    try {
+      final Duration effectiveTimeout = timeout ?? _timeout;
+      final http.StreamedResponse streamed =
+          await request.send().timeout(effectiveTimeout);
       final http.Response response = await http.Response.fromStream(streamed);
       return _handleResponse(response);
     } on TimeoutException catch (e) {
@@ -152,6 +309,8 @@ class ApiClient {
     '/auth/logout',
     '/auth/otp/send',
     '/auth/otp/verify',
+    '/auth/password-reset/request',
+    '/auth/password-reset/verify-code',
     '/auth/password-reset/confirm',
   };
 
@@ -201,6 +360,7 @@ class ApiClient {
     if (token != null && token.isNotEmpty) {
       requestHeaders['Authorization'] = 'Bearer $token';
     }
+    _maybeAddAcceptLanguage(requestHeaders);
 
     String? bodyStr;
     if (body != null) {
@@ -228,6 +388,13 @@ class ApiClient {
           break;
         case 'PATCH':
           request = http.patch(
+            url,
+            headers: requestHeaders,
+            body: bodyStr,
+          );
+          break;
+        case 'PUT':
+          request = http.put(
             url,
             headers: requestHeaders,
             body: bodyStr,
@@ -277,68 +444,25 @@ class ApiClient {
       );
     }
 
-    final AppError error = _errorFromResponse(response.statusCode, json, bodyStr);
-    throw error;
-  }
+    final String? retryAfterHeader = response.headers['retry-after'];
+    final AppError error = appErrorFromFailedResponse(
+      statusCode: response.statusCode,
+      json: json,
+      bodyStr: bodyStr,
+      retryAfterHeader: retryAfterHeader,
+    );
 
-  AppError _errorFromResponse(
-    int statusCode,
-    Map<String, dynamic>? json,
-    String? bodyStr,
-  ) {
-    final String code = json?['code'] is String
-        ? json!['code'] as String
-        : _codeForStatus(statusCode);
-    final String message = json?['message'] is String
-        ? json!['message'] as String
-        : (bodyStr ?? 'Request failed');
-    final dynamic details = json?['details'];
-
-    if (statusCode == 401) {
-      final String authCode = code;
+    if (response.statusCode == 401) {
+      final String authCode = error.code;
       // ACCOUNT_NOT_ACTIVE = soft-deleted/suspended; sign out like other auth failures
       if (authCode == 'UNAUTHORIZED' ||
           authCode == 'INVALID_TOKEN_USER' ||
           authCode == 'ACCOUNT_NOT_ACTIVE') {
         _onUnauthorized();
-        return AppError(code: authCode, message: message);
       }
-      return AppError(code: authCode, message: message);
     }
-    if (statusCode == 403) return AppError.forbidden(message: message);
-    if (statusCode == 404) return AppError.notFound(message: message);
-    if (statusCode == 422 || statusCode == 400 && code == 'VALIDATION_ERROR') {
-      return AppError.validation(message: message, details: details);
-    }
-    if (statusCode >= 500) {
-      return AppError.server(message: message);
-    }
-    if (statusCode == 408 || statusCode == 504) {
-      return AppError.timeout(message: message);
-    }
-    return AppError(
-      code: code,
-      message: message,
-      retryable: statusCode >= 500 || statusCode == 408 || statusCode == 504,
-      details: details,
-    );
-  }
 
-  static String _codeForStatus(int status) {
-    switch (status) {
-      case 400:
-        return 'BAD_REQUEST';
-      case 401:
-        return 'UNAUTHORIZED';
-      case 403:
-        return 'FORBIDDEN';
-      case 404:
-        return 'NOT_FOUND';
-      case 409:
-        return 'CONFLICT';
-      default:
-        return 'HTTP_ERROR';
-    }
+    throw error;
   }
 }
 
@@ -353,4 +477,19 @@ class ApiResponse {
   final int statusCode;
   final String? body;
   final Map<String, dynamic>? json;
+}
+
+/// Represents a single file to include in a multipart upload.
+class MultipartFileData {
+  const MultipartFileData({
+    required this.field,
+    required this.bytes,
+    required this.fileName,
+    required this.mimeType,
+  });
+
+  final String field;
+  final List<int> bytes;
+  final String fileName;
+  final String mimeType;
 }

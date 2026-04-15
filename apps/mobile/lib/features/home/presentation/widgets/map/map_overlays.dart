@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -191,7 +192,7 @@ class EmptyFilterOverlay extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: onResetFilters,
                     icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text('Reset filters'),
+                    label: Text(context.l10n.mapResetFiltersSemantic),
                   ),
                 ],
               ),

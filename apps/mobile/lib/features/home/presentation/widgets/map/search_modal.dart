@@ -2,6 +2,7 @@ import 'dart:async' as async;
 import 'dart:math' as math;
 import 'dart:ui';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_site_pin_image.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -275,7 +276,7 @@ class _MapSearchModalState extends State<MapSearchModal> {
                                       vertical: 12,
                                     ),
                                     child: Text(
-                                      'Cancel',
+                                      context.l10n.searchModalCancel,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodyLarge

@@ -1,13 +1,21 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'dart:ui' show PlatformDispatcher;
+
+import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
+import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/network/api_client.dart';
 import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/api_auth_repository.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
-import 'package:chisto_mobile/features/events/data/in_memory_check_in_repository.dart';
+import 'package:chisto_mobile/features/events/data/api_check_in_repository.dart';
+import 'package:chisto_mobile/features/events/data/api_events_repository.dart';
+import 'package:chisto_mobile/features/events/data/api_event_analytics_repository.dart';
+import 'package:chisto_mobile/features/events/data/chat/api_event_chat_repository.dart';
+import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
+import 'package:chisto_mobile/features/events/data/check_in_sync_service.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
@@ -28,12 +36,18 @@ class ServiceLocator {
 
   static final ServiceLocator instance = ServiceLocator._();
 
+  static const String _appLocaleCodeKey = 'app_locale_code';
+
+  /// Non-null: user chose a fixed app language. Null: follow device locale (with [supported] fallback).
+  final ValueNotifier<Locale?> appLocaleOverride = ValueNotifier<Locale?>(null);
+
   AppConfig? _config;
   AuthState? _authState;
   SecureTokenStorage? _tokenStorage;
   SharedPreferences? _preferences;
   ApiClient? _apiClient;
   AuthRepository? _authRepository;
+  AuthRepository? _authRepositoryForUnauthorized;
   EventsRepository? _eventsRepository;
   CheckInRepository? _checkInRepository;
   ProfileRepository? _profileRepository;
@@ -43,11 +57,14 @@ class ServiceLocator {
   MapRealtimeService? _mapRealtimeService;
   NotificationsRepository? _notificationsRepository;
   PushNotificationService? _pushNotificationService;
+  ApiEventAnalyticsRepository? _eventAnalyticsRepository;
+  EventChatRepository? _eventChatRepository;
 
   /// Increment to trigger profile refresh (e.g. after report submit).
   final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
 
   AppConfig get config => _config!;
+  AuthState? get authStateOrNull => _authState;
   AuthState get authState => _authState!;
   SecureTokenStorage get tokenStorage => _tokenStorage!;
   SharedPreferences get preferences => _preferences!;
@@ -64,6 +81,11 @@ class ServiceLocator {
       _notificationsRepository!;
   PushNotificationService get pushNotificationService =>
       _pushNotificationService!;
+
+  ApiEventAnalyticsRepository get eventAnalyticsRepository =>
+      _eventAnalyticsRepository!;
+
+  EventChatRepository get eventChatRepository => _eventChatRepository!;
 
   bool _initialized = false;
   bool get isInitialized => _initialized;
@@ -82,7 +104,19 @@ class ServiceLocator {
       config: _config!,
       accessToken: () => _authState!.accessToken,
       onUnauthorized: () {
-        _authState!.setUnauthenticated();
+        final AuthRepository? repo = _authRepositoryForUnauthorized;
+        if (repo != null) {
+          unawaited(repo.invalidateLocalSession());
+        } else {
+          _authState!.setUnauthenticated();
+        }
+      },
+      acceptLanguageHeader: () {
+        final Locale effective = resolveAppLocale(
+          override: appLocaleOverride.value,
+          platformLocales: PlatformDispatcher.instance.locales,
+        );
+        return acceptLanguageFromLocale(effective);
       },
     );
 
@@ -98,6 +132,7 @@ class ServiceLocator {
       preferences: prefs,
       pushService: _pushNotificationService,
     );
+    _authRepositoryForUnauthorized = _authRepository;
 
     _apiClient!.refreshSession = () async {
       try {
@@ -108,8 +143,13 @@ class ServiceLocator {
       }
     };
 
-    _eventsRepository = InMemoryEventsStore.instance;
-    _checkInRepository = InMemoryCheckInRepository.instance;
+    final ApiEventsRepository eventsRepo =
+        ApiEventsRepository(client: _apiClient!);
+    _eventsRepository = eventsRepo;
+    _checkInRepository = ApiCheckInRepository(
+      client: _apiClient!,
+      eventsRepository: eventsRepo,
+    );
     _profileRepository = ApiProfileRepository(client: _apiClient!);
     _reportsApiRepository = ApiReportsRepository(client: _apiClient!);
     _reportsRealtimeService = ReportsRealtimeService(
@@ -120,12 +160,62 @@ class ServiceLocator {
       config: _config!,
       authState: _authState!,
     );
-    _sitesRepository = ApiSitesRepository(client: _apiClient!);
+    _sitesRepository = ApiSitesRepository(
+      client: _apiClient!,
+      authState: _authState!,
+    );
+    _eventAnalyticsRepository = ApiEventAnalyticsRepository(client: _apiClient!);
+    _eventChatRepository = ApiEventChatRepository(
+      client: _apiClient!,
+      config: _config!,
+      authState: _authState!,
+    );
+
+    // Start offline check-in sync service (drains queued payloads on connectivity restore).
+    unawaited(
+      CheckInSyncService.start(
+        client: _apiClient!,
+        eventsRepository: _eventsRepository!,
+        checkInRepository: _checkInRepository!,
+      ),
+    );
+
+    _loadStoredAppLocale(prefs);
 
     _initialized = true;
   }
 
+  void _loadStoredAppLocale(SharedPreferences prefs) {
+    final String? code = prefs.getString(_appLocaleCodeKey);
+    if (code == 'en') {
+      appLocaleOverride.value = const Locale('en');
+    } else if (code == 'mk') {
+      appLocaleOverride.value = const Locale('mk');
+    } else if (code == 'sq') {
+      appLocaleOverride.value = const Locale('sq');
+    } else {
+      appLocaleOverride.value = null;
+    }
+  }
+
+  /// Persists choice. Pass [null] to use device language.
+  Future<void> setAppLocale(Locale? locale) async {
+    final SharedPreferences prefs = _preferences!;
+    if (locale == null) {
+      await prefs.remove(_appLocaleCodeKey);
+      appLocaleOverride.value = null;
+      return;
+    }
+    final String code = locale.languageCode;
+    if (code != 'en' && code != 'mk' && code != 'sq') {
+      return;
+    }
+    await prefs.setString(_appLocaleCodeKey, code);
+    appLocaleOverride.value = Locale(code);
+  }
+
   void reset() {
+    CheckInSyncService.dispose();
     _reportsRealtimeService?.dispose();
     _mapRealtimeService?.dispose();
     _pushNotificationService?.dispose();
@@ -135,6 +225,7 @@ class ServiceLocator {
     _preferences = null;
     _apiClient = null;
     _authRepository = null;
+    _authRepositoryForUnauthorized = null;
     _eventsRepository = null;
     _checkInRepository = null;
     _profileRepository = null;
@@ -144,6 +235,9 @@ class ServiceLocator {
     _sitesRepository = null;
     _notificationsRepository = null;
     _pushNotificationService = null;
+    _eventAnalyticsRepository = null;
+    _eventChatRepository = null;
     _initialized = false;
+    appLocaleOverride.value = null;
   }
 }

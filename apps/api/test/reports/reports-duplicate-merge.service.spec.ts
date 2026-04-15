@@ -1,0 +1,321 @@
+/// <reference types="jest" />
+import { ReportsDuplicateMergeService } from '../../src/reports/reports-duplicate-merge.service';
+import { Role } from '../../src/prisma-client';
+
+describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
+  it('does not append child media to primary; hard-deletes children; deletes duplicate media from storage', async () => {
+    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const primaryId = 'primary-1';
+    const childId = 'child-1';
+    const childMedia = ['https://test-bucket.s3.eu-central-1.amazonaws.com/reports/u1/a.jpg'];
+
+    const txReportUpdate = jest.fn();
+    const txReportDeleteMany = jest.fn().mockResolvedValue({ count: 1 });
+    const txReportUpdateMany = jest.fn().mockResolvedValue({ count: 0 });
+    const txReportCoReporterUpsert = jest.fn();
+    const txReportCount = jest.fn().mockResolvedValue(2);
+
+    const mergePayload = {
+      id: primaryId,
+      siteId: 'site-1',
+      status: 'NEW' as const,
+      reporterId: 'user-a',
+      reportNumber: 'CH-000001',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      mediaUrls: ['https://test-bucket.s3.eu-central-1.amazonaws.com/reports/u-a/orig.jpg'],
+      coReporters: [] as { userId: string }[],
+      potentialDuplicates: [
+        {
+          id: childId,
+          reporterId: 'user-b',
+          createdAt: new Date('2026-01-02T00:00:00.000Z'),
+          mediaUrls: childMedia,
+          coReporters: [] as { userId: string; createdAt: Date }[],
+        },
+      ],
+    };
+
+    let findUniqueCalls = 0;
+    const prisma: any = {
+      report: {
+        findUnique: jest.fn().mockImplementation(() => {
+          findUniqueCalls += 1;
+          if (findUniqueCalls === 1) {
+            return Promise.resolve({ id: primaryId, potentialDuplicateOfId: null });
+          }
+          return Promise.resolve(mergePayload);
+        }),
+        findUniqueOrThrow: jest.fn().mockResolvedValue({
+          status: 'APPROVED',
+          reporterId: 'user-a',
+          coReporters: [
+            {
+              userId: 'user-b',
+              reportedAt: new Date('2026-01-02T00:00:00.000Z'),
+              user: { firstName: 'B', lastName: 'User' },
+            },
+          ],
+        }),
+      },
+      $transaction: jest.fn(async (cb: (tx: unknown) => Promise<unknown>) => {
+        const tx = {
+          report: {
+            update: txReportUpdate,
+            updateMany: txReportUpdateMany,
+            deleteMany: txReportDeleteMany,
+            count: txReportCount,
+          },
+          reportCoReporter: {
+            upsert: txReportCoReporterUpsert,
+          },
+          site: {
+            findUnique: jest.fn(),
+            update: jest.fn(),
+          },
+        };
+        return cb(tx);
+      }),
+    };
+
+    const reportsUploadService = {
+      signUrls: jest.fn(),
+      deleteReportMediaUrls: jest.fn().mockResolvedValue(1),
+      tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+    };
+
+    const reportsOwnerEvents = { emit: jest.fn() };
+    const eventEmitter = { emit: jest.fn() };
+
+    const service = new ReportsDuplicateMergeService(
+      prisma as never,
+      { log: jest.fn() } as never,
+      reportsUploadService as never,
+      { emitReportStatusUpdated: jest.fn() } as never,
+      { emitSiteUpdated: jest.fn() } as never,
+      reportsOwnerEvents as never,
+      eventEmitter as never,
+    );
+
+    const result = await service.mergeDuplicateReports(
+      primaryId,
+      { childReportIds: [childId], reason: 'test' },
+      moderator as never,
+    );
+
+    expect(txReportUpdate).toHaveBeenCalledWith({
+      where: { id: primaryId },
+      data: expect.objectContaining({
+        mergedDuplicateChildCount: { increment: 1 },
+      }),
+    });
+    expect(txReportUpdate).toHaveBeenCalledWith({
+      where: { id: primaryId },
+      data: expect.not.objectContaining({
+        mediaUrls: expect.anything(),
+      }),
+    });
+    expect(txReportDeleteMany).toHaveBeenCalledWith({
+      where: { id: { in: [childId] } },
+    });
+    expect(reportsUploadService.deleteReportMediaUrls).toHaveBeenCalledWith(childMedia);
+    expect(result.reporterCount).toBe(2);
+    expect(result.coReporters).toHaveLength(1);
+    expect(result.coReporters[0].userId).toBe('user-b');
+    expect(result.mergedMediaCount).toBe(1);
+    expect(txReportCoReporterUpsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: expect.objectContaining({
+          reportId: primaryId,
+          userId: 'user-b',
+          reportedAt: mergePayload.potentialDuplicates[0].createdAt,
+        }),
+      }),
+    );
+
+    const notificationSends = eventEmitter.emit.mock.calls.filter((c) => c[0] === 'notification.send');
+    expect(notificationSends).toHaveLength(2);
+    expect(notificationSends[0][1]).toMatchObject({
+      recipientUserIds: ['user-a'],
+      type: 'REPORT_STATUS',
+      data: expect.objectContaining({
+        mergeRole: 'primary',
+        reportId: primaryId,
+        siteId: 'site-1',
+        reportNumber: 'CH-000001',
+      }),
+    });
+    expect(notificationSends[1][1]).toMatchObject({
+      recipientUserIds: ['user-b'],
+      type: 'REPORT_STATUS',
+      data: expect.objectContaining({
+        mergeRole: 'merged_child',
+        reportId: primaryId,
+        siteId: 'site-1',
+      }),
+    });
+  });
+
+  it('is idempotent when child reports were already removed (no duplicate co-reporter rows on retry)', async () => {
+    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const primaryId = 'primary-1';
+    const childId = 'child-1';
+
+    let findCall = 0;
+    const prisma: any = {
+      report: {
+        findUnique: jest.fn().mockImplementation(() => {
+          findCall += 1;
+          if (findCall === 1) {
+            return Promise.resolve({ id: primaryId, potentialDuplicateOfId: null });
+          }
+          return Promise.resolve({
+            id: primaryId,
+            siteId: 'site-1',
+            status: 'APPROVED',
+            reporterId: 'user-a',
+            mediaUrls: [],
+            coReporters: [],
+            potentialDuplicates: [],
+          });
+        }),
+        findUniqueOrThrow: jest.fn().mockResolvedValue({
+          status: 'APPROVED',
+          reporterId: 'user-a',
+          coReporters: [],
+        }),
+        count: jest.fn().mockResolvedValue(0),
+      },
+      $transaction: jest.fn(),
+    };
+
+    const reportsUploadService = {
+      signUrls: jest.fn(),
+      deleteReportMediaUrls: jest.fn(),
+      tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+    };
+
+    const eventEmitter = { emit: jest.fn() };
+
+    const service = new ReportsDuplicateMergeService(
+      prisma as never,
+      { log: jest.fn() } as never,
+      reportsUploadService as never,
+      { emitReportStatusUpdated: jest.fn() } as never,
+      { emitSiteUpdated: jest.fn() } as never,
+      { emit: jest.fn() } as never,
+      eventEmitter as never,
+    );
+
+    const result = await service.mergeDuplicateReports(
+      primaryId,
+      { childReportIds: [childId] },
+      moderator as never,
+    );
+
+    expect(result.mergedChildCount).toBe(0);
+    expect(result.primaryReportId).toBe(primaryId);
+    expect(prisma.$transaction).not.toHaveBeenCalled();
+    expect(reportsUploadService.deleteReportMediaUrls).not.toHaveBeenCalled();
+    expect(eventEmitter.emit.mock.calls.filter((c) => c[0] === 'notification.send')).toHaveLength(0);
+  });
+
+  it('notifies co-reporter-only users credited on merge (not duplicate of child reporter)', async () => {
+    const moderator = { userId: 'mod-1', role: Role.ADMIN };
+    const primaryId = 'primary-1';
+    const childId = 'child-1';
+    const coOnlyUserId = 'user-co-only';
+
+    const mergePayload = {
+      id: primaryId,
+      siteId: 'site-1',
+      status: 'NEW' as const,
+      reporterId: 'user-a',
+      reportNumber: 'CH-000099',
+      createdAt: new Date('2026-01-01T00:00:00.000Z'),
+      mediaUrls: [],
+      coReporters: [] as { userId: string }[],
+      potentialDuplicates: [
+        {
+          id: childId,
+          reporterId: null,
+          createdAt: new Date('2026-01-02T00:00:00.000Z'),
+          mediaUrls: [] as string[],
+          coReporters: [
+            { userId: coOnlyUserId, createdAt: new Date('2026-01-02T12:00:00.000Z') },
+          ],
+        },
+      ],
+    };
+
+    let findUniqueCalls = 0;
+    const prisma: any = {
+      report: {
+        findUnique: jest.fn().mockImplementation(() => {
+          findUniqueCalls += 1;
+          if (findUniqueCalls === 1) {
+            return Promise.resolve({ id: primaryId, potentialDuplicateOfId: null });
+          }
+          return Promise.resolve(mergePayload);
+        }),
+        findUniqueOrThrow: jest.fn().mockResolvedValue({
+          status: 'APPROVED',
+          reporterId: 'user-a',
+          coReporters: [
+            {
+              userId: coOnlyUserId,
+              reportedAt: new Date('2026-01-02T12:00:00.000Z'),
+              user: { firstName: 'Co', lastName: 'Only' },
+            },
+          ],
+        }),
+      },
+      $transaction: jest.fn(async (cb: (tx: unknown) => Promise<unknown>) => {
+        const tx = {
+          report: {
+            update: jest.fn(),
+            updateMany: jest.fn().mockResolvedValue({ count: 0 }),
+            deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+            count: jest.fn().mockResolvedValue(2),
+          },
+          reportCoReporter: {
+            upsert: jest.fn(),
+          },
+          site: {
+            findUnique: jest.fn(),
+            update: jest.fn(),
+          },
+        };
+        return cb(tx);
+      }),
+    };
+
+    const reportsUploadService = {
+      signUrls: jest.fn(),
+      deleteReportMediaUrls: jest.fn().mockResolvedValue(0),
+      tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+    };
+
+    const eventEmitter = { emit: jest.fn() };
+
+    const service = new ReportsDuplicateMergeService(
+      prisma as never,
+      { log: jest.fn() } as never,
+      reportsUploadService as never,
+      { emitReportStatusUpdated: jest.fn() } as never,
+      { emitSiteUpdated: jest.fn() } as never,
+      { emit: jest.fn() } as never,
+      eventEmitter as never,
+    );
+
+    await service.mergeDuplicateReports(
+      primaryId,
+      { childReportIds: [childId], reason: 'test' },
+      moderator as never,
+    );
+
+    const notificationSends = eventEmitter.emit.mock.calls.filter((c) => c[0] === 'notification.send');
+    expect(notificationSends).toHaveLength(2);
+    const roles = notificationSends.map((c) => (c[1] as { data: { mergeRole: string } }).data.mergeRole).sort();
+    expect(roles).toEqual(['co_reporter_credited', 'primary']);
+  });
+});

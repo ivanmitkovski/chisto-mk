@@ -1,4 +1,19 @@
-import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Patch, Post, UnauthorizedException, UseGuards, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  HttpCode,
+  HttpStatus,
+  Patch,
+  Post,
+  Query,
+  UnauthorizedException,
+  UseGuards,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
@@ -30,12 +45,20 @@ import { Roles } from './roles.decorator';
 import { RolesGuard } from './roles.guard';
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuthResponseDto } from './dto/auth-response.dto';
+import { MeResponseDto } from './dto/me-response.dto';
+import { PointHistoryQueryDto } from './dto/point-history-query.dto';
+import { PointHistoryResponseDto } from './dto/point-history-response.dto';
+import { PointHistoryService } from '../gamification/point-history.service';
+import { OtpSmsPurpose } from '../otp/otp-sender.interface';
 
 @ApiTags('auth')
 @Controller('auth')
 @UseGuards(ThrottlerGuard)
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly pointHistoryService: PointHistoryService,
+  ) {}
 
   @Post('register')
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
@@ -108,8 +131,11 @@ export class AuthController {
   @ApiOperation({ summary: 'Send OTP to registered phone for verification' })
   @ApiOkResponse({ description: 'OTP sent; in development devCode is returned' })
   @HttpCode(HttpStatus.OK)
-  sendOtp(@Body() dto: SendOtpDto) {
-    return this.authService.sendOtp(dto.phoneNumber);
+  sendOtp(@Body() dto: SendOtpDto, @Headers('accept-language') acceptLanguage?: string) {
+    return this.authService.sendOtp(dto.phoneNumber, {
+      purpose: OtpSmsPurpose.PhoneVerification,
+      ...(acceptLanguage != null && acceptLanguage !== '' ? { acceptLanguage } : {}),
+    });
   }
 
   @Post('otp/verify')
@@ -126,8 +152,20 @@ export class AuthController {
   @ApiOperation({ summary: 'Request password reset; sends OTP to registered phone' })
   @ApiOkResponse({ description: 'OTP sent; in development devCode is returned when SMS_PROVIDER is not Twilio' })
   @HttpCode(HttpStatus.OK)
-  requestPasswordReset(@Body() dto: SendOtpDto) {
-    return this.authService.sendOtp(dto.phoneNumber);
+  requestPasswordReset(@Body() dto: SendOtpDto, @Headers('accept-language') acceptLanguage?: string) {
+    return this.authService.sendOtp(dto.phoneNumber, {
+      purpose: OtpSmsPurpose.PasswordReset,
+      ...(acceptLanguage != null && acceptLanguage !== '' ? { acceptLanguage } : {}),
+    });
+  }
+
+  @Post('password-reset/verify-code')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Verify password-reset OTP before setting a new password' })
+  @ApiNoContentResponse({ description: 'Code is valid; OTP is not consumed until confirm' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async verifyPasswordResetCode(@Body() dto: VerifyOtpDto): Promise<void> {
+    await this.authService.verifyPasswordResetCode(dto.phoneNumber, dto.code);
   }
 
   @Post('password-reset/confirm')
@@ -219,12 +257,30 @@ export class AuthController {
     await this.authService.disableMfa(user.userId, dto);
   }
 
+  @Get('me/point-history')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Paginated point awards history and level-up milestones' })
+  @ApiOkResponse({ description: 'Point transactions (newest first)', type: PointHistoryResponseDto })
+  async pointHistory(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Query() query: PointHistoryQueryDto,
+  ): Promise<PointHistoryResponseDto> {
+    if (!user) {
+      throw new UnauthorizedException({
+        code: 'UNAUTHORIZED',
+        message: 'Authentication required',
+      });
+    }
+    return this.pointHistoryService.listForUser(user.userId, query);
+  }
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get authenticated user profile' })
-  @ApiOkResponse({ description: 'Authenticated user profile' })
-  me(@CurrentUser() user?: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Authenticated user profile', type: MeResponseDto })
+  me(@CurrentUser() user?: AuthenticatedUser): Promise<MeResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
         code: 'UNAUTHORIZED',

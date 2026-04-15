@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -66,29 +67,27 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
     final double sheetHeight = screenHeight * 4 / 5;
 
     return Semantics(
-      label: 'Review and confirm photo before adding to report',
+      label: context.l10n.reportPhotoReviewSemantic,
       child: SizedBox(
         height: sheetHeight,
         child: ReportSheetScaffold(
-          title: 'Review evidence',
-          subtitle: 'Keep the clearest frame before adding it to the report.',
+          title: context.l10n.reportPhotoReviewSheetTitle,
+          subtitle: context.l10n.reportPhotoReviewSheetSubtitle,
           trailing: ReportCircleIconButton(
             icon: Icons.close_rounded,
-            semanticLabel: 'Close without adding photo',
+            semanticLabel: context.l10n.reportPhotoReviewCloseSemantic,
             onTap: () async {
               AppHaptics.tap();
               final bool? discard = await showDialog<bool>(
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: const Text('Discard this photo?'),
-                    content: const Text(
-                      'You can retake or choose another from your library.',
-                    ),
+                    title: Text(context.l10n.photoReviewDiscardTitle),
+                    content: Text(context.l10n.photoReviewDiscardBody),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(false),
-                        child: const Text('Keep editing'),
+                        child: Text(context.l10n.commonKeepEditing),
                       ),
                       TextButton(
                         onPressed: () {
@@ -98,7 +97,7 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.accentDanger,
                         ),
-                        child: const Text('Discard'),
+                        child: Text(context.l10n.commonDiscard),
                       ),
                     ],
                   );
@@ -114,7 +113,7 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
               Expanded(
                 child: Semantics(
                   button: true,
-                  label: 'Retake photo',
+                  label: context.l10n.reportPhotoReviewRetakeSemantic,
                   child: OutlinedButton(
                     onPressed: () {
                       AppHaptics.tap();
@@ -131,9 +130,9 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                     ),
-                    child: const Text(
-                      'Retake',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.reportPhotoReviewRetake,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -146,7 +145,7 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
               Expanded(
                 child: Semantics(
                   button: true,
-                  label: 'Use this photo',
+                  label: context.l10n.reportPhotoReviewUseSemantic,
                   child: FilledButton(
                     onPressed: () {
                       AppHaptics.medium();
@@ -161,9 +160,9 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
                     ),
-                    child: const Text(
-                      'Use this photo',
-                      style: TextStyle(
+                    child: Text(
+                      context.l10n.reportPhotoReviewUsePhoto,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
@@ -175,7 +174,7 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
             ],
           ),
           child: Semantics(
-            label: 'Photo preview',
+            label: context.l10n.reportPhotoReviewPreviewSemantic,
             image: true,
             child: Container(
               decoration: BoxDecoration(

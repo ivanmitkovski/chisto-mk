@@ -3,6 +3,7 @@ import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -56,6 +57,8 @@ void main() {
     final List<String> siteIds = <String>[];
     await tester.pumpWidget(
       MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         home: _ReportSheetHost(
           report: MockReport(
             reportId: 'r1',

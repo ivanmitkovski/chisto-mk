@@ -1,10 +1,21 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 class ParticipantsSection extends StatelessWidget {
   const ParticipantsSection({super.key, required this.event});
@@ -13,81 +24,19 @@ class ParticipantsSection extends StatelessWidget {
 
   void _showAttendeeList(BuildContext context) {
     AppHaptics.tap();
-    final List<AttendeePreview> attendees = _buildAttendeePreview(event);
-
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.panelBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: AppColors.transparent,
       isScrollControlled: true,
       builder: (BuildContext ctx) {
-        return AttendeeListSheet(
-          attendees: attendees,
-          joinedCount: event.participantCount,
+        return ReportSheetScaffold(
+          title: ctx.l10n.eventsParticipantsTitle,
+          subtitle: ctx.l10n.eventsCardParticipantsJoined(event.participantCount),
+          maxHeightFactor: 0.84,
+          child: ParticipantRosterSheetBody(event: event),
         );
       },
     );
-  }
-
-  static List<AttendeePreview> _buildAttendeePreview(EcoEvent event) {
-    const List<String> pool = <String>[
-      'Ana M.', 'Marko T.', 'Jana K.', 'Stefan P.',
-      'Elena R.', 'Nikola D.', 'Petra S.', 'Boris V.',
-      'Ivana L.', 'Dejan N.', 'Maja G.', 'Filip B.',
-    ];
-    final List<AttendeePreview> attendees = <AttendeePreview>[];
-    int slotsLeft = event.participantCount.clamp(0, 1000000);
-    int seed = 0;
-
-    void addAttendee({
-      required String name,
-      required bool isOrganizer,
-      required bool isCurrentUser,
-    }) {
-      if (slotsLeft <= 0) {
-        return;
-      }
-      attendees.add(
-        AttendeePreview(
-          name: name,
-          isOrganizer: isOrganizer,
-          isCurrentUser: isCurrentUser,
-          joinedOrder: seed++,
-        ),
-      );
-      slotsLeft -= 1;
-    }
-
-    addAttendee(
-      name: event.organizerName,
-      isOrganizer: true,
-      isCurrentUser: event.isOrganizer,
-    );
-    if (event.isJoined && !event.isOrganizer) {
-      addAttendee(name: 'You', isOrganizer: false, isCurrentUser: true);
-    }
-    for (final String name in pool) {
-      if (slotsLeft <= 0) {
-        break;
-      }
-      addAttendee(name: name, isOrganizer: false, isCurrentUser: false);
-    }
-
-    int checkedInSlots = event.checkedInCount.clamp(0, attendees.length);
-    if (event.isCheckedIn) {
-      checkedInSlots = checkedInSlots.clamp(1, attendees.length);
-    }
-    final List<AttendeePreview> withStatus = <AttendeePreview>[];
-    for (int i = 0; i < attendees.length; i++) {
-      final AttendeePreview attendee = attendees[i];
-      final bool checkedIn = attendee.isCurrentUser
-          ? event.isCheckedIn
-          : i < checkedInSlots;
-      withStatus.add(attendee.copyWith(isCheckedIn: checkedIn));
-    }
-    return withStatus;
   }
 
   @override
@@ -97,11 +46,13 @@ class ParticipantsSection extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'View $count attendees',
+      label: count > 0
+          ? context.l10n.eventsParticipantsViewSemantic(count)
+          : context.l10n.eventsParticipantsViewRosterSemantic,
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
-          onTap: count > 0 ? () => _showAttendeeList(context) : null,
+          onTap: () => _showAttendeeList(context),
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -118,7 +69,7 @@ class ParticipantsSection extends StatelessWidget {
             ),
             child: Row(
               children: <Widget>[
-                AvatarStack(count: count),
+                AvatarStack(count: count, event: event),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Column(
@@ -126,8 +77,8 @@ class ParticipantsSection extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         event.isJoined && count > 1
-                            ? 'You and ${count - 1} other${count == 2 ? '' : 's'} joined'
-                            : '$count volunteer${count == 1 ? '' : 's'} joined',
+                            ? context.l10n.eventsParticipantsYouAndOthers(count - 1)
+                            : context.l10n.eventsParticipantsVolunteersJoined(count),
                         style: textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -137,10 +88,11 @@ class ParticipantsSection extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.xxs / 2),
                           child: Text(
-                            '${(event.maxParticipants! - count).clamp(0, 1000000)} spots left',
+                            context.l10n.eventsParticipantsSpotsLeft(
+                              (event.maxParticipants! - count).clamp(0, 1000000),
+                            ),
                             style: textTheme.bodySmall?.copyWith(
                               color: AppColors.textMuted,
-                              fontSize: 13,
                             ),
                           ),
                         ),
@@ -150,22 +102,23 @@ class ParticipantsSection extends StatelessWidget {
                         Padding(
                           padding: const EdgeInsets.only(top: AppSpacing.xxs / 2),
                           child: Text(
-                            '${event.checkedInCount} of $count checked in',
+                            context.l10n.eventsParticipantsCheckedInCount(
+                              event.checkedInCount,
+                              count,
+                            ),
                             style: textTheme.bodySmall?.copyWith(
                               color: AppColors.primaryDark,
-                              fontSize: 13,
                             ),
                           ),
                         ),
                     ],
                   ),
                 ),
-                if (count > 0)
-                  Icon(
-                    CupertinoIcons.chevron_right,
-                    size: 16,
-                    color: AppColors.textMuted.withValues(alpha: 0.6),
-                  ),
+                Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 16,
+                  color: AppColors.textMuted.withValues(alpha: 0.6),
+                ),
               ],
             ),
           ),
@@ -173,6 +126,160 @@ class ParticipantsSection extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Loads joiners from [EventsRepository.fetchParticipants] and prepends the organizer from [EcoEvent].
+class ParticipantRosterSheetBody extends StatefulWidget {
+  const ParticipantRosterSheetBody({super.key, required this.event});
+
+  final EcoEvent event;
+
+  @override
+  State<ParticipantRosterSheetBody> createState() => _ParticipantRosterSheetBodyState();
+}
+
+class _ParticipantRosterSheetBodyState extends State<ParticipantRosterSheetBody> {
+  bool _loading = true;
+  Object? _error;
+  List<AttendeePreview> _attendees = <AttendeePreview>[];
+
+  @override
+  void initState() {
+    super.initState();
+    unawaited(_load());
+  }
+
+  Future<void> _load() async {
+    if (mounted) {
+      setState(() {
+        _loading = true;
+        _error = null;
+      });
+    }
+    try {
+      final EventsRepository repo = EventsRepositoryRegistry.instance;
+      final List<EventParticipantRow> rows = <EventParticipantRow>[];
+      String? cursor;
+      for (int page = 0; page < 50; page++) {
+        final EventParticipantsPage p =
+            await repo.fetchParticipants(widget.event.id, cursor: cursor);
+        rows.addAll(p.items);
+        if (!p.hasMore) {
+          break;
+        }
+        final String? next = p.nextCursor;
+        if (next == null || next.isEmpty) {
+          break;
+        }
+        cursor = next;
+      }
+      if (!mounted) {
+        return;
+      }
+      final String youLabel = context.l10n.eventsParticipantsYou;
+      setState(() {
+        _attendees = mergeParticipantPreviews(
+          event: widget.event,
+          apiRows: rows,
+          youLabel: youLabel,
+        );
+        _loading = false;
+        _error = null;
+      });
+    } on Object catch (e) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _loading = false;
+        _error = e;
+      });
+    }
+  }
+
+  String _errorMessage() {
+    final Object? e = _error;
+    if (e is AppError) {
+      return localizedAppErrorMessage(context.l10n, e);
+    }
+    return context.l10n.eventsParticipantsLoadFailed;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Padding(
+        padding: EdgeInsets.all(AppSpacing.xl),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    if (_error != null) {
+      return Padding(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              _errorMessage(),
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textMuted,
+                  ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            TextButton(
+              onPressed: () => unawaited(_load()),
+              child: Text(context.l10n.eventsParticipantsRetry),
+            ),
+          ],
+        ),
+      );
+    }
+    return AttendeeListSheet(
+      attendees: _attendees,
+      joinedCount: widget.event.participantCount,
+    );
+  }
+}
+
+List<AttendeePreview> mergeParticipantPreviews({
+  required EcoEvent event,
+  required List<EventParticipantRow> apiRows,
+  required String youLabel,
+}) {
+  int order = 0;
+  final List<AttendeePreview> list = <AttendeePreview>[];
+  final String orgName =
+      event.organizerName.trim().isEmpty ? '—' : event.organizerName;
+  list.add(
+    AttendeePreview(
+      userId: event.organizerId,
+      name: orgName,
+      avatarUrl: event.organizerAvatarUrl,
+      isOrganizer: true,
+      isCurrentUser: event.isOrganizer,
+      joinedOrder: order++,
+      isCheckedIn: event.isOrganizer && event.isCheckedIn,
+    ),
+  );
+  for (final EventParticipantRow row in apiRows) {
+    final bool isYou = row.userId.isNotEmpty && row.userId == CurrentUser.id;
+    final String name =
+        isYou ? youLabel : (row.displayName.trim().isEmpty ? '—' : row.displayName);
+    list.add(
+      AttendeePreview(
+        userId: row.userId,
+        name: name,
+        avatarUrl: row.avatarUrl,
+        isOrganizer: false,
+        isCurrentUser: isYou,
+        joinedOrder: order++,
+        isCheckedIn: isYou && event.isCheckedIn,
+      ),
+    );
+  }
+  return list;
 }
 
 enum AttendeeSort {
@@ -183,14 +290,18 @@ enum AttendeeSort {
 
 class AttendeePreview {
   const AttendeePreview({
+    required this.userId,
     required this.name,
+    this.avatarUrl,
     required this.isOrganizer,
     required this.isCurrentUser,
     required this.joinedOrder,
     this.isCheckedIn = false,
   });
 
+  final String userId;
   final String name;
+  final String? avatarUrl;
   final bool isOrganizer;
   final bool isCurrentUser;
   final int joinedOrder;
@@ -200,7 +311,9 @@ class AttendeePreview {
     bool? isCheckedIn,
   }) {
     return AttendeePreview(
+      userId: userId,
       name: name,
+      avatarUrl: avatarUrl,
       isOrganizer: isOrganizer,
       isCurrentUser: isCurrentUser,
       joinedOrder: joinedOrder,
@@ -262,52 +375,15 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
   @override
   Widget build(BuildContext context) {
     final List<AttendeePreview> visible = _visibleAttendees;
-    return SafeArea(
-      top: false,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.72,
-        child: Column(
-          children: <Widget>[
-            const SizedBox(height: AppSpacing.xs),
-            Container(
-              width: AppSpacing.sheetHandle,
-              height: AppSpacing.sheetHandleHeight,
-              decoration: BoxDecoration(
-                color: AppColors.divider,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.xs,
-              ),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Text(
-                      'Attendees',
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w700,
-                          ),
-                    ),
-                  ),
-                  Text(
-                    '${widget.joinedCount} joined',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
-                  ),
-                ],
-              ),
-            ),
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.62,
+      child: Column(
+        children: <Widget>[
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
               child: CupertinoSearchTextField(
                 controller: _searchController,
-                placeholder: 'Search attendee',
+                placeholder: context.l10n.eventsParticipantsSearchPlaceholder,
                 onChanged: (String value) {
                   setState(() {
                     _query = value;
@@ -322,18 +398,18 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
                 groupValue: _sort,
                 thumbColor: AppColors.white,
                 backgroundColor: AppColors.inputFill,
-                children: const <AttendeeSort, Widget>{
+                children: <AttendeeSort, Widget>{
                   AttendeeSort.recent: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('Recent'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsRecent),
                   ),
                   AttendeeSort.alphabetical: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('A-Z'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsAz),
                   ),
                   AttendeeSort.checkedInFirst: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
-                    child: Text('Checked-in'),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xs),
+                    child: Text(context.l10n.eventsParticipantsCheckedIn),
                   ),
                 },
                 onValueChanged: (AttendeeSort? value) {
@@ -352,7 +428,7 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
               child: visible.isEmpty
                   ? Center(
                       child: Text(
-                        'No attendee matches your search.',
+                        context.l10n.eventsParticipantsNoSearchResults,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppColors.textMuted,
                             ),
@@ -369,8 +445,7 @@ class _AttendeeListSheetState extends State<AttendeeListSheet> {
                       },
                     ),
             ),
-          ],
-        ),
+        ],
       ),
     );
   }
@@ -397,22 +472,11 @@ class AttendeeRow extends StatelessWidget {
       ),
       child: Row(
         children: <Widget>[
-          Container(
-            width: AppSpacing.avatarSm,
-            height: AppSpacing.avatarSm,
-            decoration: BoxDecoration(
-              color: AppColors.avatarPalette[index % AppColors.avatarPalette.length],
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Text(
-                attendee.name.isNotEmpty ? attendee.name[0].toUpperCase() : '?',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.white,
-                ),
-              ),
-            ),
+          UserAvatarCircle(
+            displayName: attendee.name,
+            imageUrl: attendee.avatarUrl,
+            size: AppSpacing.avatarSm,
+            seed: attendee.userId.isNotEmpty ? attendee.userId : attendee.name,
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -431,8 +495,10 @@ class AttendeeRow extends StatelessWidget {
                 if (attendee.isOrganizer || attendee.isCurrentUser)
                   Text(
                     attendee.isOrganizer
-                        ? (attendee.isCurrentUser ? 'You · Organizer' : 'Organizer')
-                        : 'You',
+                        ? (attendee.isCurrentUser
+                            ? context.l10n.eventsParticipantsYouOrganizer
+                            : context.l10n.eventsParticipantsOrganizer)
+                        : context.l10n.eventsParticipantsYou,
                     style: textTheme.bodySmall?.copyWith(
                       color: AppColors.primaryDark,
                       fontSize: 12,
@@ -454,42 +520,71 @@ class AttendeeRow extends StatelessWidget {
   }
 }
 
+/// Decorative overlapping avatar circles (up to 4). First slot is the organizer
+/// (photo or initials). Extra slots use placeholder initials — we do not load the
+/// full participant list until the user opens the roster.
 class AvatarStack extends StatelessWidget {
-  const AvatarStack({super.key, required this.count});
+  const AvatarStack({super.key, required this.count, required this.event});
 
   final int count;
+  final EcoEvent event;
 
   @override
   Widget build(BuildContext context) {
     final int display = count.clamp(0, 4);
-    const double size = 32;
-    const double overlap = 10;
-    final double totalWidth = size + (display - 1) * (size - overlap);
+    if (display == 0) {
+      return const SizedBox.shrink();
+    }
+    const double size = 30;
+    const double overlap = 9;
+    const double borderW = 2;
+    // Border is inset: a 30px avatar needs a 34px box so the child is not overflow-clipped.
+    final double outer = size + 2 * borderW;
+    final double totalWidth = outer + (display - 1) * (size - overlap);
 
     return SizedBox(
       width: totalWidth,
-      height: size,
+      height: outer,
       child: Stack(
+        clipBehavior: Clip.none,
         children: List<Widget>.generate(display, (int i) {
-          return Positioned(
-            left: i * (size - overlap),
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: AppColors.avatarPalette[i % AppColors.avatarPalette.length].withValues(alpha: 0.3),
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.panelBackground, width: 2),
-              ),
-              child: Center(
-                child: Text(
-                  String.fromCharCode(65 + i),
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryDark,
-                  ),
+          final double left = i * (size - overlap).toDouble();
+          if (i == 0) {
+            return Positioned(
+              left: left,
+              child: Container(
+                width: outer,
+                height: outer,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.panelBackground, width: borderW),
                 ),
+                child: UserAvatarCircle(
+                  displayName: event.organizerName,
+                  imageUrl: event.organizerAvatarUrl,
+                  size: size,
+                  seed: event.organizerId,
+                ),
+              ),
+            );
+          }
+          // Placeholder letters until roster is opened (no per-user data on the event).
+          final String placeholderLabel = String.fromCharCode(0x40 + i);
+          return Positioned(
+            left: left,
+            child: Container(
+              width: outer,
+              height: outer,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.panelBackground, width: borderW),
+              ),
+              child: UserAvatarCircle(
+                displayName: placeholderLabel,
+                size: size,
+                seed: '${event.id}_stack_$i',
               ),
             ),
           );

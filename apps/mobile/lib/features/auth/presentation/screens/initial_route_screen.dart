@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/splash_constants.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 /// Resolves session then navigates to home or onboarding.
 ///
@@ -26,8 +28,20 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
 
   Future<void> _resolveAndNavigate() async {
     final authRepo = ServiceLocator.instance.authRepository;
-    final Future<void> sessionFuture =
-        authRepo.restoreSession().catchError((Object error, StackTrace? stackTrace) {});
+    final Future<void> sessionFuture = () async {
+      try {
+        await authRepo.restoreSession();
+      } catch (error, stackTrace) {
+        if (kDebugMode) {
+          debugPrint('[InitialRoute] session restore failed: $error');
+          debugPrint('$stackTrace');
+        } else {
+          debugPrint(
+            '[InitialRoute] session restore failed (${error.runtimeType})',
+          );
+        }
+      }
+    }();
     final Future<void> timeoutFuture =
         Future<void>.delayed(SplashConstants.initialRouteSessionTimeout);
     final Future<void> minDisplayFuture =
@@ -54,7 +68,7 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Semantics(
-        label: 'Loading',
+        label: AppLocalizations.of(context)!.authLoading,
         child: const Center(
           child: CircularProgressIndicator(
             color: AppColors.white,

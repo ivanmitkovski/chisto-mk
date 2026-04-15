@@ -1,10 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 class OrganizerSection extends StatelessWidget {
   const OrganizerSection({super.key, required this.event});
@@ -15,80 +18,61 @@ class OrganizerSection extends StatelessWidget {
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.panelBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      backgroundColor: AppColors.transparent,
       builder: (BuildContext ctx) {
-        return SafeArea(
-          top: false,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.sm, AppSpacing.lg, AppSpacing.lg,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Container(
-                  width: AppSpacing.sheetHandle,
-                  height: AppSpacing.sheetHandleHeight,
-                  decoration: BoxDecoration(
-                    color: AppColors.divider,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                  ),
+        return ReportSheetScaffold(
+          title: ctx.l10n.eventsOrganizerSheetTitle,
+          subtitle: event.organizerName,
+          fitToContent: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              UserAvatarCircle(
+                displayName: event.organizerName,
+                imageUrl: event.organizerAvatarUrl,
+                size: 64,
+                seed: event.organizerId,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                event.isOrganizer
+                    ? ctx.l10n.eventsOrganizerYouOwnThis
+                    : ctx.l10n.eventsOrganizerRoleLabel,
+                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textMuted,
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                Container(
-                  width: 64, height: 64,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      event.organizerName.isNotEmpty
-                          ? event.organizerName[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
-                      ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(AppSpacing.radius14),
+                ),
+                child: Row(
+                  children: <Widget>[
+                    const Icon(
+                      CupertinoIcons.calendar,
+                      size: 18,
+                      color: AppColors.textMuted,
                     ),
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  event.organizerName,
-                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-                ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  event.isOrganizer ? 'This is your event' : 'Event organizer',
-                  style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
-                ),
-                const SizedBox(height: AppSpacing.lg),
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: AppColors.inputFill,
-                    borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      const Icon(CupertinoIcons.calendar, size: 18, color: AppColors.textMuted),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          'Event created on ${event.createdAt.day}/${event.createdAt.month}/${event.createdAt.year}',
-                          style: Theme.of(ctx).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        ctx.l10n.eventsOrganizerCreatedOn(
+                          event.createdAt.day,
+                          event.createdAt.month,
+                          event.createdAt.year,
+                        ),
+                        style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
+                          color: AppColors.textSecondary,
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -101,7 +85,7 @@ class OrganizerSection extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: 'Organizer: ${event.organizerName}',
+      label: context.l10n.eventsOrganizerSemantic(event.organizerName),
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
@@ -111,25 +95,11 @@ class OrganizerSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(
               children: <Widget>[
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      event.organizerName.isNotEmpty
-                          ? event.organizerName[0].toUpperCase()
-                          : '?',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ),
+                UserAvatarCircle(
+                  displayName: event.organizerName,
+                  imageUrl: event.organizerAvatarUrl,
+                  size: 40,
+                  seed: event.organizerId,
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
@@ -137,7 +107,7 @@ class OrganizerSection extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'Organized by',
+                        context.l10n.eventsOrganizedByLabel,
                         style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
                       ),
                       Text(

@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -254,7 +255,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       });
       AppSnack.show(
         context,
-        message: 'Could not load more posts. Tap retry.',
+        message: context.l10n.feedLoadMoreFailedSnack,
         type: AppSnackType.warning,
       );
     } finally {
@@ -376,7 +377,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                             child: OutlinedButton.icon(
                               onPressed: _loadMoreFeed,
                               icon: const Icon(Icons.refresh_rounded, size: 18),
-                              label: const Text('Retry loading more'),
+                              label: Text(context.l10n.feedRetryLoadingMore),
                             ),
                           ),
                         );
@@ -457,7 +458,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
           height: topHotZoneHeight,
           child: Semantics(
             button: true,
-            label: 'Scroll feed to top',
+            label: context.l10n.feedScrollToTopSemantic,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
@@ -474,7 +475,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
           height: topHotZoneHeight,
           child: Semantics(
             button: true,
-            label: 'Scroll feed to top',
+            label: context.l10n.feedScrollToTopSemantic,
             child: GestureDetector(
               behavior: HitTestBehavior.translucent,
               onTap: () {
@@ -648,7 +649,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     vertical: AppSpacing.sm,
                   ),
                 ),
-                child: const Text('Show all sites'),
+                child: Text(context.l10n.feedShowAllSites),
               )
             else
               OutlinedButton(
@@ -667,7 +668,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     vertical: AppSpacing.sm,
                   ),
                 ),
-                child: const Text('Pull to refresh'),
+                child: Text(context.l10n.feedPullToRefreshSemantic),
               ),
           ],
         ),

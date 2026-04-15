@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -30,10 +31,6 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
     DateTime.now().month,
     DateTime.now().day,
   );
-
-  static const List<String> _weekdays = <String>[
-    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
-  ];
 
   @override
   void initState() {
@@ -90,6 +87,11 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
   Widget build(BuildContext context) {
     final List<DateTime> days = _buildDays();
     final List<EcoEvent> selectedEvents = _eventsForSelectedDate;
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    final List<String> weekdays = <String>[
+      ...localizations.narrowWeekdays.sublist(1),
+      localizations.narrowWeekdays.first,
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -105,14 +107,14 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                       _focusedMonth.year, _focusedMonth.month - 1);
                 });
               },
-              tooltip: 'Previous month',
+              tooltip: context.l10n.eventsCalendarPreviousMonth,
               icon: const Icon(
                 CupertinoIcons.chevron_left,
                 color: AppColors.primaryDark,
               ),
             ),
             Text(
-              '${_monthName(_focusedMonth.month)} ${_focusedMonth.year}',
+              localizations.formatMonthYear(_focusedMonth),
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
@@ -125,7 +127,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
                       _focusedMonth.year, _focusedMonth.month + 1);
                 });
               },
-              tooltip: 'Next month',
+              tooltip: context.l10n.eventsCalendarNextMonth,
               icon: const Icon(
                 CupertinoIcons.chevron_right,
                 color: AppColors.primaryDark,
@@ -135,7 +137,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
         ),
         const SizedBox(height: AppSpacing.sm),
         Row(
-          children: _weekdays
+          children: weekdays
               .map((String w) => Expanded(
                     child: Center(
                       child: Text(
@@ -170,7 +172,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
             final bool isPast = date.isBefore(_today);
 
             return Semantics(
-              label: 'Day ${date.day}',
+              label: context.l10n.eventsCalendarDaySemantic(date.day),
               button: inMonth,
               selected: isSelected,
               child: GestureDetector(
@@ -229,7 +231,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
         if (_selectedDate != null) ...<Widget>[
           const SizedBox(height: AppSpacing.lg),
           Text(
-            _formatDate(_selectedDate!),
+            localizations.formatMediumDate(_selectedDate!),
             style: Theme.of(context).textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.textSecondary,
@@ -240,7 +242,7 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg),
               child: Text(
-                'No events on this day',
+                context.l10n.eventsCalendarNoEventsThisDay,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -320,15 +322,4 @@ class _EventsCalendarViewState extends State<EventsCalendarView> {
     );
   }
 
-  String _monthName(int month) {
-    const List<String> names = <String>[
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-    return names[month - 1];
-  }
-
-  String _formatDate(DateTime d) {
-    return '${_monthName(d.month)} ${d.day}, ${d.year}';
-  }
 }

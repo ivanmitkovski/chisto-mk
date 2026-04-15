@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/l10n/app_localizations_en.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -8,14 +9,17 @@ void main() {
   testWidgets('reports capacity visibility widgets show mapped copy', (
     WidgetTester tester,
   ) async {
+    final AppLocalizationsEn l10n = AppLocalizationsEn();
     final ui = mapReportCapacityToUiState(
       const ReportCapacity(
         creditsAvailable: 0,
         emergencyAvailable: true,
         emergencyWindowDays: 7,
         retryAfterSeconds: null,
+        nextEmergencyReportAvailableAt: null,
         unlockHint: 'Join eco actions to unlock new credits.',
       ),
+      l10n: l10n,
     );
 
     await tester.pumpWidget(
@@ -40,22 +44,27 @@ void main() {
       ),
     );
 
-    expect(find.text('Emergency report available'), findsOneWidget);
-    expect(find.text('Emergency allowance ready'), findsOneWidget);
-    expect(find.textContaining('unlock new credits'), findsOneWidget);
+    expect(find.text(l10n.reportCapacityPillEmergency), findsNWidgets(2));
+    expect(
+      find.textContaining('up to 10'),
+      findsOneWidget,
+    );
   });
 
   test('new report review message uses shared mapper', () {
+    final AppLocalizationsEn l10n = AppLocalizationsEn();
     final ui = mapReportCapacityToUiState(
       const ReportCapacity(
         creditsAvailable: 2,
         emergencyAvailable: true,
         emergencyWindowDays: 7,
         retryAfterSeconds: null,
+        nextEmergencyReportAvailableAt: null,
         unlockHint: 'Join eco actions to unlock new credits.',
       ),
+      l10n: l10n,
     );
 
-    expect(ui.reviewMessage, contains('use 1 report credit'));
+    expect(ui.reviewMessage, contains('1 credit'));
   });
 }

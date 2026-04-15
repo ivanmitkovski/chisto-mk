@@ -1,18 +1,48 @@
+import { SitesMapQueryService } from '../../src/sites/sites-map-query.service';
 import { SitesService } from '../../src/sites/sites.service';
+import { SiteCommentsService } from '../../src/sites/site-comments.service';
+
+function makeSitesService(
+  prisma: any,
+  options?: {
+    feedRanking?: any;
+    reportsUpload?: any;
+    siteEngagement?: any;
+  },
+) {
+  const siteEngagement =
+    options?.siteEngagement ?? ({ ensureSiteExists: jest.fn(async () => undefined) } as any);
+  const feedRanking =
+    options?.feedRanking ??
+    ({
+      score: jest.fn(() => 0),
+      scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: ['test'], components: {} })),
+    } as any);
+  const reportsUpload =
+    options?.reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
+  const sitesMapQuery = new SitesMapQueryService(prisma, reportsUpload);
+  return new SitesService(
+    prisma,
+    { log: jest.fn() } as any,
+    reportsUpload,
+    { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
+    feedRanking,
+    siteEngagement,
+    new SiteCommentsService(prisma, siteEngagement),
+    { emit: jest.fn() } as any,
+    sitesMapQuery,
+  );
+}
 
 describe('SitesService', () => {
   const baseUser = { userId: 'user_1' } as any;
 
   const buildService = (prismaMock: any, ensureSiteExists?: jest.Mock) =>
-    new SitesService(
-      prismaMock,
-      { log: jest.fn() } as any,
-      { signUrls: jest.fn(async (v: string[]) => v) } as any,
-      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-      { score: jest.fn(() => 0), scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: ['test'], components: {} })) } as any,
-      { ensureSiteExists: ensureSiteExists ?? jest.fn(async () => undefined) } as any,
-      { emit: jest.fn() } as any,
-    );
+    makeSitesService(prismaMock, {
+      siteEngagement: {
+        ensureSiteExists: ensureSiteExists ?? jest.fn(async () => undefined),
+      } as any,
+    });
 
   it('rejects partial geo query (lat without lng)', async () => {
     const service = buildService({} as any);
@@ -136,12 +166,8 @@ describe('SitesService', () => {
         count: jest.fn(async () => 2),
       },
     } as any;
-    const service = new SitesService(
-      prismaMock,
-      { log: jest.fn() } as any,
-      { signUrls: jest.fn(async (v: string[]) => v) } as any,
-      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-      {
+    const service = makeSitesService(prismaMock, {
+      feedRanking: {
         score: feedScore,
         scoreDetailed: jest.fn((input: any) => ({
           score: feedScore(input),
@@ -149,9 +175,7 @@ describe('SitesService', () => {
           components: {},
         })),
       } as any,
-      { ensureSiteExists: jest.fn(async () => undefined) } as any,
-      { emit: jest.fn() } as any,
-    );
+    });
 
     const result = await service.findAll({
       lat: 41.6086,
@@ -209,18 +233,12 @@ describe('SitesService', () => {
         count: jest.fn(async () => 2),
       },
     } as any;
-    const service = new SitesService(
-      prismaMock,
-      { log: jest.fn() } as any,
-      { signUrls: jest.fn(async (v: string[]) => v) } as any,
-      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-      {
+    const service = makeSitesService(prismaMock, {
+      feedRanking: {
         score: jest.fn(() => 1),
         scoreDetailed: jest.fn(() => ({ score: 1, reasonCodes: ['test'], components: {} })),
       } as any,
-      { ensureSiteExists: jest.fn(async () => undefined) } as any,
-      { emit: jest.fn() } as any,
-    );
+    });
 
     const first = await service.findAll({ page: 1, limit: 20, sort: 'hybrid' } as any);
     const second = await service.findAll({ page: 1, limit: 20, sort: 'hybrid' } as any);
@@ -278,158 +296,87 @@ describe('SitesService', () => {
     expect(result.data[0].rankingReasons).toContain('latest_mode');
   });
 
-  it('rejects partial viewport bounds for map queries', async () => {
-    const service = buildService({} as any);
-    await expect(
-      service.findAllForMap({
-        lat: 41.6,
-        lng: 21.7,
-        radiusKm: 20,
-        limit: 120,
-        minLat: 41.55,
-      } as any),
-    ).rejects.toMatchObject({
-      response: { code: 'INVALID_MAP_VIEWPORT' },
+  it('findOne includes coReporterNames aggregated from report co-reporter rows', async () => {
+    const reportedAtEarly = new Date('2026-04-01T10:00:00.000Z');
+    const reportedAtLate = new Date('2026-04-03T10:00:00.000Z');
+    const prismaMock = {
+      site: {
+        findUnique: jest.fn(async () => ({
+          id: 'site_corep',
+          latitude: 41.6,
+          longitude: 21.7,
+          address: null,
+          description: 'Site',
+          status: 'REPORTED',
+          createdAt: new Date('2026-03-01'),
+          updatedAt: new Date('2026-03-01'),
+          upvotesCount: 0,
+          commentsCount: 0,
+          savesCount: 0,
+          sharesCount: 0,
+          reports: [
+            {
+              id: 'rep_primary',
+              createdAt: new Date('2026-04-01'),
+              reportNumber: 'R-100',
+              siteId: 'site_corep',
+              reporterId: 'user_primary',
+              title: 'Primary',
+              description: null,
+              mediaUrls: [] as string[],
+              category: 'illegal',
+              severity: null,
+              cleanupEffort: null,
+              status: 'APPROVED',
+              moderatedAt: null,
+              moderationReason: null,
+              moderatedById: null,
+              potentialDuplicateOfId: null,
+              mergedDuplicateChildCount: 0,
+              reporter: {
+                firstName: 'Pri',
+                lastName: 'Mary',
+                avatarObjectKey: null,
+              },
+              coReporters: [
+                {
+                  id: 'cr1',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtLate,
+                  reportId: 'rep_primary',
+                  userId: 'user_ben',
+                  user: { firstName: 'Ben', lastName: 'Co' },
+                },
+                {
+                  id: 'cr2',
+                  createdAt: reportedAtEarly,
+                  reportedAt: reportedAtEarly,
+                  reportId: 'rep_primary',
+                  userId: 'user_ann',
+                  user: { firstName: '', lastName: '' },
+                },
+              ],
+            },
+          ],
+          events: [] as unknown[],
+        })),
+      },
+      siteVote: { findUnique: jest.fn(async () => null) },
+      siteSave: { findUnique: jest.fn(async () => null) },
+    } as any;
+
+    const service = makeSitesService(prismaMock, {
+      reportsUpload: {
+        signUrls: jest.fn(async (urls: string[]) => urls),
+        signPrivateObjectKey: jest.fn(async () => null),
+      } as any,
     });
-  });
 
-  it('uses dedicated viewport-aware map query without feed ranking', async () => {
-    const createdAt = new Date('2026-03-27T10:00:00.000Z');
-    const siteRow = {
-      id: 'site_map_1',
-      latitude: 41.61,
-      longitude: 21.75,
-      address: null,
-      description: 'Map only',
-      status: 'REPORTED',
-      createdAt,
-      updatedAt: createdAt,
-      upvotesCount: 3,
-      commentsCount: 1,
-      savesCount: 0,
-      sharesCount: 0,
-      _count: { reports: 1 },
-      reports: [
-        {
-          title: 'Map title',
-          description: 'Map desc',
-          mediaUrls: ['media-1'],
-          category: 'illegal_waste',
-          createdAt,
-          reportNumber: 'R-44',
-        },
-      ],
-    };
-    const prismaMock = {
-      $queryRaw: jest
-        .fn()
-        .mockResolvedValueOnce([{ ok: 1 }])
-        .mockResolvedValueOnce([{ id: 'site_map_1' }]),
-      site: {
-        findMany: jest.fn(async () => [siteRow]),
-      },
-    } as any;
-    const feedRanking = {
-      score: jest.fn(() => 999),
-      scoreDetailed: jest.fn(() => ({
-        score: 999,
-        reasonCodes: ['should_not_run'],
-        components: {},
-      })),
-    };
-    const service = new SitesService(
-      prismaMock,
-      { log: jest.fn() } as any,
-      { signUrls: jest.fn(async () => ['signed-media']) } as any,
-      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-      feedRanking as any,
-      { ensureSiteExists: jest.fn(async () => undefined) } as any,
-      { emit: jest.fn() } as any,
-    );
-
-    const result = await service.findAllForMap({
-      lat: 41.6086,
-      lng: 21.7453,
-      radiusKm: 20,
-      limit: 120,
-      minLat: 41.55,
-      maxLat: 41.7,
-      minLng: 21.6,
-      maxLng: 21.85,
-    } as any);
-
-    expect(prismaMock.$queryRaw).toHaveBeenCalled();
-    expect(prismaMock.site.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        where: { id: { in: ['site_map_1'] } },
-        select: expect.any(Object),
-      }),
-    );
-    expect(feedRanking.scoreDetailed).not.toHaveBeenCalled();
-    expect(result.data[0]).toEqual(
-      expect.objectContaining({
-        id: 'site_map_1',
-        latestReportMediaUrls: ['signed-media'],
-      }),
-    );
-    expect(result.meta?.signedMediaExpiresAt).toEqual(expect.any(String));
-    expect(Date.parse(result.meta!.signedMediaExpiresAt)).not.toBeNaN();
-  });
-
-  it('falls back to Prisma bbox map query when PostGIS extension is missing', async () => {
-    const createdAt = new Date('2026-03-27T10:00:00.000Z');
-    const prismaMock = {
-      $queryRaw: jest.fn().mockResolvedValueOnce([]),
-      site: {
-        findMany: jest.fn(async () => [
-          {
-            id: 'site_legacy_1',
-            latitude: 41.61,
-            longitude: 21.75,
-            address: null,
-            description: null,
-            status: 'REPORTED',
-            createdAt,
-            updatedAt: createdAt,
-            upvotesCount: 0,
-            commentsCount: 0,
-            savesCount: 0,
-            sharesCount: 0,
-            _count: { reports: 0 },
-            reports: [],
-          },
-        ]),
-      },
-    } as any;
-    const service = new SitesService(
-      prismaMock,
-      { log: jest.fn() } as any,
-      { signUrls: jest.fn(async () => []) } as any,
-      { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-      { score: jest.fn(), scoreDetailed: jest.fn(() => ({ score: 0, reasonCodes: [], components: {} })) } as any,
-      { ensureSiteExists: jest.fn(async () => undefined) } as any,
-      { emit: jest.fn() } as any,
-    );
-
-    await service.findAllForMap({
-      lat: 41.6086,
-      lng: 21.7453,
-      radiusKm: 20,
-      limit: 120,
-      minLat: 41.55,
-      maxLat: 41.7,
-      minLng: 21.6,
-      maxLng: 21.85,
-    } as any);
-
-    expect(prismaMock.site.findMany).toHaveBeenCalledWith(
-      expect.objectContaining({
-        take: 120,
-        where: expect.objectContaining({
-          latitude: expect.objectContaining({ gte: 41.55, lte: 41.7 }),
-          longitude: expect.objectContaining({ gte: 21.6, lte: 21.85 }),
-        }),
-      }),
-    );
+    const out = await service.findOne('site_corep');
+    expect(out.coReporterNames).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries).toHaveLength(2);
+    expect(out.coReporterSummaries.map((s) => s.name)).toEqual(['Anonymous', 'Ben Co']);
+    expect(out.coReporterSummaries.map((s) => s.userId).sort()).toEqual(['user_ann', 'user_ben'].sort());
+    expect(out.mergedDuplicateChildCountTotal).toBe(0);
   });
 });

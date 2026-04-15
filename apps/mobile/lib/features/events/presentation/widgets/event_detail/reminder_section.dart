@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 
 class ReminderSection extends StatelessWidget {
   const ReminderSection({
@@ -18,13 +20,16 @@ class ReminderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final String reminderState = event.reminderEnabled
+        ? (event.reminderAt == null
+            ? context.l10n.eventsReminderSectionEnabled
+            : context.l10n.eventsReminderSectionSetFor(
+                TimeOfDay.fromDateTime(event.reminderAt!).format(context),
+              ))
+        : context.l10n.eventsReminderSectionDisabled;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.divider),
-      ),
+      decoration: EventDetailSurfaceDecoration.elevatedCard(),
       child: Row(
         children: <Widget>[
           Container(
@@ -46,7 +51,7 @@ class ReminderSection extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Event reminder',
+                  context.l10n.eventsReminderSectionTitle,
                   style: textTheme.bodyMedium?.copyWith(
                     color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
@@ -54,11 +59,7 @@ class ReminderSection extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  event.reminderEnabled
-                      ? (event.reminderAt == null
-                          ? 'Reminder is on'
-                          : 'Set for ${event.reminderAt!.hour.toString().padLeft(2, '0')}:${event.reminderAt!.minute.toString().padLeft(2, '0')}')
-                      : 'Get notified before event starts',
+                  reminderState,
                   style: textTheme.bodySmall?.copyWith(
                     color: AppColors.textMuted,
                     fontSize: 13,
@@ -72,7 +73,9 @@ class ReminderSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.radius10, vertical: AppSpacing.xxs),
             minimumSize: Size.zero,
             child: Text(
-              event.reminderEnabled ? 'Disable' : 'Enable',
+              event.reminderEnabled
+                  ? context.l10n.eventsReminderSectionDisable
+                  : context.l10n.eventsReminderSectionEnable,
               style: textTheme.bodyMedium?.copyWith(
                 color: AppColors.primaryDark,
                 fontWeight: FontWeight.w600,

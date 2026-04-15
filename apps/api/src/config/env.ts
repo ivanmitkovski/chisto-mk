@@ -41,8 +41,28 @@ export function validateEnv(): void {
     requireEnv('TWILIO_AUTH_TOKEN');
     const messagingSid = process.env.TWILIO_MESSAGING_SERVICE_SID?.trim();
     const fromNumber = process.env.TWILIO_PHONE_NUMBER?.trim();
-    if (!messagingSid && !fromNumber) {
-      console.error('TWILIO_MESSAGING_SERVICE_SID or TWILIO_PHONE_NUMBER is required when SMS_PROVIDER=twilio');
+    const alphaSender = process.env.TWILIO_ALPHANUMERIC_SENDER?.trim();
+    if (!messagingSid && !fromNumber && !alphaSender) {
+      console.error(
+        'When SMS_PROVIDER=twilio, set TWILIO_MESSAGING_SERVICE_SID and/or TWILIO_PHONE_NUMBER and/or TWILIO_ALPHANUMERIC_SENDER (at least one sender path)',
+      );
+      process.exit(1);
+    }
+  }
+
+  // When S3 uploads are enabled in production/staging, require a credential source:
+  // static keys, ECS task role (container credentials), or EKS IRSA.
+  const bucket = process.env.S3_BUCKET_NAME?.trim();
+  if (bucket && (nodeEnv === 'production' || nodeEnv === 'staging')) {
+    const hasStaticKeys =
+      Boolean(process.env.AWS_ACCESS_KEY_ID?.trim()) &&
+      Boolean(process.env.AWS_SECRET_ACCESS_KEY?.trim());
+    const hasEcsTaskRole = Boolean(process.env.AWS_CONTAINER_CREDENTIALS_RELATIVE_URI?.trim());
+    const hasWebIdentity = Boolean(process.env.AWS_WEB_IDENTITY_TOKEN_FILE?.trim());
+    if (!hasStaticKeys && !hasEcsTaskRole && !hasWebIdentity) {
+      console.error(
+        'When S3_BUCKET_NAME is set in production/staging, configure AWS credentials: set AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, or attach an IAM task role to this container (ECS), or use IRSA (EKS).',
+      );
       process.exit(1);
     }
   }

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -8,6 +9,7 @@ import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } fro
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import sharp from 'sharp';
 import { randomUUID } from 'crypto';
+import { detectAllowedImageMimeFromBuffer } from '../common/utils/detect-allowed-image-mime-from-buffer';
 
 const ALLOWED_MIMES = new Set([
   'image/jpeg',
@@ -17,11 +19,14 @@ const ALLOWED_MIMES = new Set([
 ]);
 const IMAGE_EXTENSIONS = /\.(jpe?g|png|webp)$/i;
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+/** SECURITY: Report media presigned URLs — short TTL limits exposure if leaked. */
+const REPORT_MEDIA_SIGNED_URL_TTL_SECONDS = 15 * 60;
 const MAX_AVATAR_FILE_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const AVATAR_SIGNED_URL_TTL_SECONDS = 15 * 60;
 
 @Injectable()
 export class ReportsUploadService {
+  private readonly logger = new Logger(ReportsUploadService.name);
   private readonly s3: S3Client | null = null;
   private readonly bucket: string | null = null;
   private readonly region: string;
@@ -63,42 +68,42 @@ export class ReportsUploadService {
       });
     }
 
-    const timestamp = Date.now();
     const urls: string[] = [];
 
     for (const file of files) {
-      let mime = (file.mimetype || '').toLowerCase();
-      if (!ALLOWED_MIMES.has(mime)) {
-        if (mime === 'application/octet-stream' && file.originalname) {
-          const ext = file.originalname.match(IMAGE_EXTENSIONS)?.[1];
-          if (ext) {
-            mime = ext.startsWith('jpeg') || ext.startsWith('jpg')
-              ? 'image/jpeg'
-              : ext === 'png'
-                ? 'image/png'
-                : 'image/webp';
-          }
-        }
-      }
-      if (!ALLOWED_MIMES.has(mime)) {
-        throw new BadRequestException({
-          code: 'INVALID_FILE_TYPE',
-          message: `Invalid file type: ${file.mimetype}. Only jpeg, png, and webp are allowed.`,
-        });
-      }
-
       if (file.size > MAX_FILE_SIZE_BYTES) {
         throw new BadRequestException({
           code: 'FILE_TOO_LARGE',
-          message: `File ${file.originalname} exceeds 10MB limit`,
+          message: `File exceeds 10MB limit`,
+        });
+      }
+
+      // SECURITY: Detect MIME from magic bytes; never trust Content-Type or filename alone (polyglot / renamed executables).
+      const sample = file.buffer.subarray(0, Math.min(file.buffer.length, 4096));
+      const mime = detectAllowedImageMimeFromBuffer(sample);
+      if (!mime || !ALLOWED_MIMES.has(mime)) {
+        throw new BadRequestException({
+          code: 'INVALID_FILE_TYPE',
+          message: 'Invalid file type. Only jpeg, png, and webp images are allowed.',
+        });
+      }
+
+      const declared = (file.mimetype || '').toLowerCase();
+      if (
+        declared &&
+        declared !== 'application/octet-stream' &&
+        declared !== mime &&
+        !(declared === 'image/jpg' && mime === 'image/jpeg')
+      ) {
+        throw new BadRequestException({
+          code: 'MIME_TYPE_MISMATCH',
+          message: 'File content does not match the declared type.',
         });
       }
 
       const ext = mime === 'image/jpeg' || mime === 'image/jpg' ? 'jpg' : mime.split('/')[1] || 'jpg';
-      const safeName = (file.originalname || 'image')
-        .replace(/[^a-zA-Z0-9.-]/g, '_')
-        .slice(0, 100) || 'image';
-      const key = `reports/${userId}/${timestamp}-${safeName}.${ext}`;
+      // SECURITY: Object key uses no user-supplied filename — prevents path traversal and predictable keys.
+      const key = `reports/${userId}/${randomUUID()}.${ext}`;
 
       await this.s3.send(
         new PutObjectCommand({
@@ -116,23 +121,65 @@ export class ReportsUploadService {
     return urls;
   }
 
+  /** Build canonical S3 HTTPS URLs for object keys (same shape as [uploadFiles]). */
+  getPublicUrlsForKeys(keys: string[]): string[] {
+    if (!this.bucket) {
+      return keys;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    return keys.map((key) => `${base}${key}`);
+  }
+
+  /**
+   * Turns DB values into the canonical virtual-hosted HTTPS URL for this bucket.
+   * Bare object keys (e.g. `reports/{userId}/{uuid}.jpg`) become loadable URLs;
+   * existing `http(s)://` values are returned unchanged.
+   */
+  normalizeReportMediaRefToCanonicalHttpsUrl(ref: string): string {
+    const t = ref.trim();
+    if (!t) {
+      return t;
+    }
+    if (t.startsWith('http://') || t.startsWith('https://')) {
+      return t;
+    }
+    if (!this.bucket) {
+      return t;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    const key = t.replace(/^\//, '');
+    return `${base}${key}`;
+  }
+
   /**
    * Converts S3 object URLs to presigned URLs (1h expiry) so clients can load
    * private objects. Non-S3 URLs are returned unchanged.
    */
   async signUrls(urls: string[]): Promise<string[]> {
-    if (!this.enabled || !this.s3 || !this.bucket || !urls?.length) {
-      return urls ?? [];
+    if (!urls?.length) {
+      return [];
+    }
+    if (!this.enabled || !this.s3 || !this.bucket) {
+      return urls
+        .filter((u): u is string => typeof u === 'string')
+        .map((u) => this.normalizeReportMediaRefToCanonicalHttpsUrl(u.trim()));
     }
     const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
     const now = Date.now();
     const result: string[] = [];
     for (const url of urls) {
-      if (typeof url !== 'string' || !url.startsWith(base)) {
-        result.push(url);
+      if (typeof url !== 'string') {
         continue;
       }
-      const key = decodeURIComponent(url.slice(base.length).split('?')[0]);
+      const canonical = this.normalizeReportMediaRefToCanonicalHttpsUrl(url.trim());
+      if (!canonical) {
+        continue;
+      }
+      if (!canonical.startsWith(base)) {
+        result.push(canonical);
+        continue;
+      }
+      const key = decodeURIComponent(canonical.slice(base.length).split('?')[0]);
       const cacheHit = this.signedUrlCache.get(key);
       if (cacheHit && cacheHit.expiresAt > now) {
         result.push(cacheHit.url);
@@ -142,16 +189,16 @@ export class ReportsUploadService {
         const signed = await getSignedUrl(
           this.s3,
           new GetObjectCommand({ Bucket: this.bucket, Key: key }),
-          { expiresIn: 3600 },
+          { expiresIn: REPORT_MEDIA_SIGNED_URL_TTL_SECONDS },
         );
         this.signedUrlCache.set(key, {
           url: signed,
           // Keep a safety buffer so we do not serve nearly-expired links.
-          expiresAt: now + 50 * 60 * 1000,
+          expiresAt: now + (REPORT_MEDIA_SIGNED_URL_TTL_SECONDS - 60) * 1000,
         });
         result.push(signed);
       } catch {
-        result.push(url);
+        result.push(canonical);
       }
     }
     return result;
@@ -230,6 +277,22 @@ export class ReportsUploadService {
     }
   }
 
+  /**
+   * Resolves a stored avatar reference to a URL the client can load.
+   * Supports bare private object keys (presigned) and canonical HTTPS URLs for this bucket (re-presigned).
+   */
+  async resolveUserAvatarUrl(stored: string | null | undefined): Promise<string | null> {
+    const t = stored?.trim();
+    if (!t) {
+      return null;
+    }
+    if (t.startsWith('http://') || t.startsWith('https://')) {
+      const signed = await this.signUrls([t]);
+      return signed[0] ?? t;
+    }
+    return this.signPrivateObjectKey(t);
+  }
+
   async deleteObjectByKey(objectKey: string | null | undefined): Promise<void> {
     if (!objectKey || !this.enabled || !this.s3 || !this.bucket) {
       return;
@@ -241,6 +304,47 @@ export class ReportsUploadService {
         Key: objectKey,
       }),
     );
+  }
+
+  /**
+   * Returns the S3 object key for a report media HTTPS URL served from this app's bucket, or null if unknown/external.
+   */
+  tryExtractReportMediaObjectKeyFromUrl(url: string | null | undefined): string | null {
+    if (!url || !this.bucket) {
+      return null;
+    }
+    const base = `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
+    if (!url.startsWith(base)) {
+      return null;
+    }
+    return decodeURIComponent(url.slice(base.length).split('?')[0]);
+  }
+
+  /**
+   * Best-effort removal of duplicate report media after DB merge (DB commit must not depend on S3).
+   * Logs per-key failures; returns how many deletes succeeded.
+   */
+  async deleteReportMediaUrls(urls: string[] | null | undefined): Promise<number> {
+    if (!urls?.length) {
+      return 0;
+    }
+    const uniqueKeys = new Set<string>();
+    for (const url of urls) {
+      const key = this.tryExtractReportMediaObjectKeyFromUrl(url);
+      if (key) {
+        uniqueKeys.add(key);
+      }
+    }
+    let deleted = 0;
+    for (const key of uniqueKeys) {
+      try {
+        await this.deleteObjectByKey(key);
+        deleted += 1;
+      } catch (err) {
+        this.logger.warn(`S3 delete failed for report media key=${key}: ${(err as Error).message}`);
+      }
+    }
+    return deleted;
   }
 
   private async processAvatarImage(input: Buffer): Promise<Buffer> {
@@ -266,5 +370,83 @@ export class ReportsUploadService {
         message: 'Avatar image could not be processed.',
       });
     }
+  }
+
+  /**
+   * After-cleanup photos for citizen events. Returns S3 object keys (not public URLs).
+   */
+  async uploadCleanupEventAfterImages(
+    userId: string,
+    eventId: string,
+    files: Array<{ buffer: Buffer; mimetype: string; size: number; originalname: string }>,
+  ): Promise<string[]> {
+    if (!this.enabled || !this.s3 || !this.bucket) {
+      throw new ServiceUnavailableException({
+        code: 'S3_NOT_CONFIGURED',
+        message: 'File upload is not configured. S3_BUCKET_NAME is required.',
+      });
+    }
+
+    if (!files || files.length === 0) {
+      return [];
+    }
+
+    if (files.length > 10) {
+      throw new BadRequestException({
+        code: 'TOO_MANY_FILES',
+        message: 'Maximum 10 after-cleanup photos allowed',
+      });
+    }
+
+    const keys: string[] = [];
+    const baseTs = Date.now();
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      let mime = (file.mimetype || '').toLowerCase();
+      if (!ALLOWED_MIMES.has(mime)) {
+        if (mime === 'application/octet-stream' && file.originalname) {
+          const extMatch = file.originalname.match(IMAGE_EXTENSIONS)?.[1];
+          if (extMatch) {
+            mime =
+              extMatch.startsWith('jpeg') || extMatch.startsWith('jpg')
+                ? 'image/jpeg'
+                : extMatch === 'png'
+                  ? 'image/png'
+                  : 'image/webp';
+          }
+        }
+      }
+      if (!ALLOWED_MIMES.has(mime)) {
+        throw new BadRequestException({
+          code: 'INVALID_FILE_TYPE',
+          message: `Invalid file type: ${file.mimetype}. Only jpeg, png, and webp are allowed.`,
+        });
+      }
+
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        throw new BadRequestException({
+          code: 'FILE_TOO_LARGE',
+          message: `File ${file.originalname} exceeds 10MB limit`,
+        });
+      }
+
+      const ext =
+        mime === 'image/jpeg' || mime === 'image/jpg' ? 'jpg' : mime.split('/')[1] || 'jpg';
+      const key = `cleanup-events/${userId}/${eventId}/${baseTs}-${i}-${randomUUID()}.${ext}`;
+
+      await this.s3.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: file.buffer,
+          ContentType: mime,
+        }),
+      );
+
+      keys.push(key);
+    }
+
+    return keys;
   }
 }

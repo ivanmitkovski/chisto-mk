@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -16,10 +17,11 @@ class AttendeeCheckInBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
 
     return Semantics(
       button: true,
-      label: 'Scan to check in at event',
+      label: l10n.eventsAttendeeCheckInSemantic,
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
@@ -27,7 +29,7 @@ class AttendeeCheckInBanner extends StatelessWidget {
             if (event.isCheckedIn) {
               AppSnack.show(
                 context,
-                message: 'You are already checked in.',
+                message: l10n.eventsAttendeeAlreadyCheckedInSnack,
                 type: AppSnackType.success,
               );
               return;
@@ -35,7 +37,7 @@ class AttendeeCheckInBanner extends StatelessWidget {
             if (!event.canOpenAttendeeCheckIn) {
               AppSnack.show(
                 context,
-                message: 'Organizer has paused check-in for now.',
+                message: l10n.eventsAttendeeCheckInPausedSnack,
                 type: AppSnackType.warning,
               );
               return;
@@ -50,7 +52,7 @@ class AttendeeCheckInBanner extends StatelessWidget {
             }
             AppSnack.show(
               context,
-              message: 'Check-in complete.',
+              message: l10n.eventsAttendeeCheckInCompleteSnack,
               type: AppSnackType.success,
             );
           },
@@ -85,7 +87,9 @@ class AttendeeCheckInBanner extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        event.isCheckedIn ? 'You are checked in' : 'Event is in progress',
+                        event.isCheckedIn
+                            ? l10n.eventsAttendeeBannerTitleCheckedIn
+                            : l10n.eventsAttendeeBannerTitleInProgress,
                         style: textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
@@ -95,13 +99,14 @@ class AttendeeCheckInBanner extends StatelessWidget {
                       Text(
                         event.isCheckedIn
                             ? (event.attendeeCheckedInAt == null
-                                ? 'Attendance confirmed'
-                                : 'Checked in at '
+                                ? l10n.eventsAttendeeBannerSubtitleAttendanceConfirmed
+                                : l10n.eventsAttendeeBannerSubtitleCheckedInAt(
                                     '${event.attendeeCheckedInAt!.hour.toString().padLeft(2, '0')}:'
-                                    '${event.attendeeCheckedInAt!.minute.toString().padLeft(2, '0')}')
+                                    '${event.attendeeCheckedInAt!.minute.toString().padLeft(2, '0')}',
+                                  ))
                             : (event.canOpenAttendeeCheckIn
-                                ? 'Scan the organizer\'s QR to check in'
-                                : 'Check-in is temporarily paused'),
+                                ? l10n.eventsAttendeeBannerSubtitleScanQr
+                                : l10n.eventsAttendeeBannerSubtitlePaused),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodySmall?.copyWith(

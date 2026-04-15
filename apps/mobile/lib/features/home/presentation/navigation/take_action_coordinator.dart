@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -12,6 +13,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share
 import 'package:chisto_mobile/features/home/presentation/widgets/take_action/donate_sheet.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 class TakeActionCoordinator {
@@ -102,7 +104,7 @@ class TakeActionCoordinator {
     if (!ok && context.mounted) {
       AppSnack.show(
         context,
-        message: 'Could not open donation page',
+        message: context.l10n.takeActionDonationOpenFailed,
         type: AppSnackType.warning,
       );
     }
@@ -122,9 +124,9 @@ class TakeActionCoordinator {
       useSafeArea: true,
       barrierColor: AppColors.overlay,
       backgroundColor: AppColors.transparent,
-      builder: (BuildContext context) => ShareSheet(
-        title: 'Share site',
-        subtitle: 'Help others discover and support this site',
+      builder: (BuildContext sheetContext) => ShareSheet(
+        title: sheetContext.l10n.takeActionShareSiteTitle,
+        subtitle: sheetContext.l10n.takeActionShareSiteSubtitle,
       ),
     );
     if (action == null || !context.mounted) return false;
@@ -135,12 +137,20 @@ class TakeActionCoordinator {
       case ShareAction.copyLink:
         await Clipboard.setData(ClipboardData(text: siteUrl));
         if (context.mounted) {
-          AppSnack.show(context, message: 'Link copied', type: AppSnackType.success);
+          AppSnack.show(
+            context,
+            message: context.l10n.takeActionLinkCopied,
+            type: AppSnackType.success,
+          );
         }
         onShareCountChanged?.call();
         return true;
       case ShareAction.sendMessage:
-        await Share.share(text, subject: site.title);
+        await Share.share(
+          text,
+          subject: site.title,
+          sharePositionOrigin: sharePopoverOrigin(context),
+        );
         // share_plus v10 does not expose a reliable completion status for this path.
         // To avoid false-positive counters, we do not increment here.
         return false;
@@ -148,7 +158,7 @@ class TakeActionCoordinator {
         if (context.mounted) {
           AppSnack.show(
             context,
-            message: 'Shared to your profile',
+            message: context.l10n.takeActionSharedToProfile,
             type: AppSnackType.success,
           );
         }

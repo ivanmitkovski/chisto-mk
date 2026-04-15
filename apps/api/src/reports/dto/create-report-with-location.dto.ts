@@ -8,7 +8,7 @@ import {
   IsLongitude,
   IsOptional,
   IsString,
-  IsUrl,
+  Matches,
   Max,
   MaxLength,
   Min,
@@ -17,6 +17,7 @@ import {
 import { REPORT_CLEANUP_EFFORT_KEYS } from '../report-cleanup-effort';
 
 export class CreateReportWithLocationDto {
+  // SECURITY: All fields are length/type bounded for DB alignment and to limit abuse; whitelist via global ValidationPipe.
   @ApiProperty({ description: 'Latitude of the report location', example: 41.6086 })
   @IsLatitude()
   latitude!: number;
@@ -52,7 +53,10 @@ export class CreateReportWithLocationDto {
   @IsOptional()
   @IsArray()
   @ArrayMaxSize(5)
-  @IsUrl({}, { each: true })
+  @IsString({ each: true })
+  @MaxLength(2048, { each: true })
+  /** S3 virtual-hosted URLs from POST /reports/upload — avoid @IsUrl quirks on some clients. */
+  @Matches(/^https:\/\/.+/i, { each: true, message: 'Each media URL must be an https URL' })
   mediaUrls?: string[];
 
   @ApiPropertyOptional({

@@ -5,9 +5,8 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
-import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
+import 'package:chisto_mobile/features/profile/domain/models/profile_user.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
@@ -19,6 +18,7 @@ import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
 import 'package:chisto_mobile/features/profile/presentation/avatar/profile_avatar_flow.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
 
 class ProfileGeneralInfoScreen extends StatefulWidget {
   const ProfileGeneralInfoScreen({super.key, this.user});
@@ -34,6 +34,7 @@ class ProfileGeneralInfoScreen extends StatefulWidget {
 class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   late final TextEditingController _nameController;
   late final TextEditingController _phoneController;
+  late String _email;
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _phoneFocus = FocusNode();
   final GlobalKey _nameFieldKey = GlobalKey();
@@ -44,6 +45,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
   String? _localAvatarPath;
   String? _remoteAvatarUrl;
   void _initFromUser(ProfileUser user) {
+    _email = user.email.trim();
     _nameController = TextEditingController(
       text: user.firstName.isNotEmpty || user.lastName.isNotEmpty
           ? '${user.firstName} ${user.lastName}'.trim()
@@ -60,6 +62,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
           .getMe();
       if (!mounted) return;
       setState(() {
+        _email = user.email.trim();
         _nameController.text =
             user.firstName.isNotEmpty || user.lastName.isNotEmpty
             ? '${user.firstName} ${user.lastName}'.trim()
@@ -82,7 +85,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       if (!mounted) return;
       AppSnack.show(
         context,
-        message: 'Could not load profile',
+        message: context.l10n.profileGeneralLoadFailedSnack,
         type: AppSnackType.warning,
       );
     }
@@ -175,27 +178,12 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     if (!mounted || !_phoneFocus.hasFocus) return;
     final BuildContext? ctx = _phoneFieldKey.currentContext;
     if (ctx == null) return;
-    final RenderObject? renderObject = ctx.findRenderObject();
-    if (renderObject is! RenderBox) return;
-    final RenderBox box = renderObject;
-    final Rect rect = box.localToGlobal(Offset.zero, ancestor: null) & box.size;
-    final double keyboardInset = MediaQuery.viewInsetsOf(ctx).bottom;
-    if (keyboardInset <= 0) return;
-    final double screenHeight = MediaQuery.sizeOf(ctx).height;
-    const double paddingAboveKeyboard = 24;
-    final double safeY = screenHeight - keyboardInset - paddingAboveKeyboard;
-    if (rect.bottom <= safeY) return;
-    final double delta = rect.bottom - safeY;
-    final ScrollPosition position = _scrollController.position;
-    final double targetOffset = (position.pixels + delta).clamp(
-      0.0,
-      position.maxScrollExtent,
-    );
-    if ((targetOffset - position.pixels).abs() < 1) return;
-    _scrollController.animateTo(
-      targetOffset,
+    Scrollable.ensureVisible(
+      ctx,
+      alignment: 0.25,
       duration: AppMotion.medium,
       curve: AppMotion.smooth,
+      alignmentPolicy: ScrollPositionAlignmentPolicy.explicit,
     );
   }
 
@@ -206,11 +194,20 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       name: authState.displayName ?? 'User',
       firstName: '',
       lastName: '',
+      email: '',
       phoneNumber: '—',
       points: 0,
       totalPointsEarned: 0,
       level: 1,
-      pointsToNextLevel: 100,
+      levelTierKey: 'numeric_1',
+      levelDisplayName: 'Level 1',
+      pointsToNextLevel: 36,
+      levelProgress: 0,
+      pointsInLevel: 0,
+      weeklyPoints: 0,
+      weeklyRank: null,
+      weekStartsAt: '',
+      weekEndsAt: '',
       avatarColor: AppColors.primary,
       avatarUrl: null,
     );
@@ -246,13 +243,22 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     super.dispose();
   }
 
+  /// Shared style for name, email, and phone values so the form reads as one rhythm.
+  TextStyle _profileFieldValueStyle(BuildContext context) {
+    return Theme.of(context).textTheme.bodyMedium!.copyWith(
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w400,
+          height: 1.35,
+        );
+  }
+
   Future<void> _handleSave() async {
     if (_isSaving) return;
     final String nameTrimmed = _nameController.text.trim();
     if (nameTrimmed.isEmpty) {
       AppSnack.show(
         context,
-        message: 'Name is required',
+        message: context.l10n.profileGeneralNameRequiredSnack,
         type: AppSnackType.warning,
       );
       return;
@@ -260,7 +266,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     if (nameTrimmed.length > 100) {
       AppSnack.show(
         context,
-        message: 'Name is too long',
+        message: context.l10n.profileGeneralNameTooLongSnack,
         type: AppSnackType.warning,
       );
       return;
@@ -284,7 +290,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       if (!mounted) return;
       AppSnack.show(
         context,
-        message: 'Profile updated',
+        message: context.l10n.profileGeneralUpdatedSnack,
         type: AppSnackType.success,
       );
       if (updated != null) {
@@ -341,7 +347,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
       profileAvatarState.setRemoteUrl(_normalizeAvatarUrl(avatarUrl));
       AppSnack.show(
         context,
-        message: 'Profile picture updated',
+        message: context.l10n.profileGeneralPictureUpdatedSnack,
         type: AppSnackType.success,
       );
     } on AppError catch (e) {
@@ -414,8 +420,18 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
     final bool canPeekAvatar = _canPeekGeneralInfoAvatar();
     return Scaffold(
       backgroundColor: AppColors.panelBackground,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
+      bottomNavigationBar: ProfilePrimaryActionBar(
+        padForKeyboard: false,
+        child: PrimaryButton(
+          label: _isSaving
+              ? context.l10n.profileGeneralSaving
+              : context.l10n.profileGeneralUpdateButton,
+          onPressed: _isSaving ? null : _handleSave,
+        ),
+      ),
       body: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
@@ -435,7 +451,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Text(
-                    'General info',
+                    context.l10n.profileGeneralInfoTile,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       letterSpacing: -0.2,
@@ -443,7 +459,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Edit your profile details',
+                    context.l10n.profileGeneralInfoSubtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -469,8 +485,8 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                         children: <Widget>[
                           Semantics(
                             label: _isAvatarBusy
-                                ? 'Updating profile photo'
-                                : 'Profile photo. Double tap to change',
+                                ? context.l10n.profileGeneralAvatarSemanticUpdating
+                                : context.l10n.profileGeneralAvatarSemanticChange,
                             button: true,
                             enabled: !_isSaving && !_isAvatarBusy,
                             child: Material(
@@ -541,7 +557,8 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                                                 .text
                                                                 .trim()
                                                                 .isEmpty
-                                                            ? 'User'
+                                                            ? context.l10n
+                                                                .profileGeneralDefaultDisplayName
                                                             : _nameController
                                                                   .text
                                                                   .trim(),
@@ -661,7 +678,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              'Name',
+                              context.l10n.profileGeneralNameLabel,
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: AppColors.textSecondary,
@@ -676,15 +693,66 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                 controller: _nameController,
                                 focusNode: _nameFocus,
                                 textInputAction: TextInputAction.next,
+                                style: _profileFieldValueStyle(context),
                                 onSubmitted: (_) => FocusScope.of(
                                   context,
                                 ).requestFocus(_phoneFocus),
-                                decoration: _inputDecoration('Your name'),
+                                decoration: _inputDecoration(
+                                  context,
+                                  context.l10n.profileGeneralNameHint,
+                                ),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
-                              'Mobile phone',
+                              context.l10n.profileEmailLabel,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.textSecondary,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: -0.1,
+                                  ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Semantics(
+                              readOnly: true,
+                              label: context.l10n.profileEmailLabel,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.md,
+                                  vertical: AppSpacing.sm,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.inputFill,
+                                  borderRadius: BorderRadius.circular(
+                                    AppSpacing.radius18,
+                                  ),
+                                  border: Border.all(
+                                    color: AppColors.inputBorder,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  _email.isEmpty
+                                      ? context.l10n.profileGeneralEmptyValue
+                                      : _email,
+                                  style: _profileFieldValueStyle(context),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.xs),
+                            Text(
+                              context.l10n.profileEmailReadOnlyHint,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: AppColors.textMuted,
+                                    height: 1.35,
+                                  ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                            Text(
+                              context.l10n.profileGeneralMobileLabel,
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: AppColors.textSecondary,
@@ -701,7 +769,11 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                 readOnly: true,
                                 keyboardType: TextInputType.phone,
                                 textInputAction: TextInputAction.done,
-                                decoration: _inputDecoration('70 123 456'),
+                                style: _profileFieldValueStyle(context),
+                                decoration: _inputDecoration(
+                                  context,
+                                  context.l10n.profileGeneralPhonePlaceholder,
+                                ),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.sm),
@@ -730,7 +802,7 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                                   const SizedBox(width: AppSpacing.xs),
                                   Expanded(
                                     child: Text(
-                                      'Name changes are limited. Phone number changes require verification.',
+                                      context.l10n.profileGeneralLimitsNotice,
                                       style: Theme.of(context)
                                           .textTheme
                                           .bodySmall
@@ -751,28 +823,20 @@ class _ProfileGeneralInfoScreenState extends State<ProfileGeneralInfoScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                0,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              child: PrimaryButton(
-                label: _isSaving ? 'Saving…' : 'Update info',
-                onPressed: _isSaving ? null : _handleSave,
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-  InputDecoration _inputDecoration(String hint) {
+  InputDecoration _inputDecoration(BuildContext context, String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: AppTypography.cardSubtitle.copyWith(fontSize: 15),
+      hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppColors.textMuted,
+            fontWeight: FontWeight.w400,
+            height: 1.35,
+          ),
       filled: true,
       fillColor: AppColors.inputFill,
       contentPadding: const EdgeInsets.symmetric(

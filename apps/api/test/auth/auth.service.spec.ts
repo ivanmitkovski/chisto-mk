@@ -54,6 +54,7 @@ function makePrisma() {
       findMany: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
+      updateMany: jest.fn().mockResolvedValue({ count: 0 }),
       count: jest.fn().mockResolvedValue(0),
     },
     adminLoginFailure: {
@@ -68,6 +69,10 @@ function makePrisma() {
       update: jest.fn(),
       create: jest.fn(),
     },
+    pointTransaction: {
+      aggregate: jest.fn().mockResolvedValue({ _sum: { delta: null } }),
+    },
+    $queryRaw: jest.fn(),
   };
 }
 
@@ -112,10 +117,36 @@ function makeReportsUploadService() {
   };
 }
 
+function makeGamificationService() {
+  return {
+    getLevelProgress: jest.fn().mockReturnValue({
+      level: 1,
+      pointsInLevel: 0,
+      pointsToNextLevel: 36,
+      levelProgress: 0,
+      levelTierKey: 'numeric_1',
+      levelDisplayName: 'Level 1',
+    }),
+  };
+}
+
+function makeRankingsService() {
+  return {
+    getUserWeeklySummary: jest.fn().mockResolvedValue({
+      weeklyPoints: 0,
+      weeklyRank: null,
+      weekStartsAt: '2026-03-30T22:00:00.000Z',
+      weekEndsAt: '2026-04-05T21:59:59.999Z',
+    }),
+  };
+}
+
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: ReturnType<typeof makePrisma>;
   let jwt: ReturnType<typeof makeJwt>;
+  let eventEmitter: ReturnType<typeof makeEventEmitter>;
+  let reportsUploadService: ReturnType<typeof makeReportsUploadService>;
 
   beforeEach(async () => {
     prisma = makePrisma();
@@ -127,8 +158,10 @@ describe('AuthService', () => {
 
     const otpService = makeOtpService();
     const audit = makeAudit();
-    const eventEmitter = makeEventEmitter();
-    const reportsUploadService = makeReportsUploadService();
+    eventEmitter = makeEventEmitter();
+    reportsUploadService = makeReportsUploadService();
+    const gamificationService = makeGamificationService();
+    const rankingsService = makeRankingsService();
     service = new AuthService(
       prisma as any,
       jwt as unknown as JwtService,
@@ -138,6 +171,8 @@ describe('AuthService', () => {
       audit as any,
       eventEmitter as any,
       reportsUploadService as any,
+      gamificationService as any,
+      rankingsService as any,
     );
   });
 
@@ -158,6 +193,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('jwt-token');
       expect(result.refreshToken).toBeDefined();
       expect(result.user.id).toBe('user-1');
+      expect(result.user.avatarUrl).toBeNull();
       expect(prisma.user.create).toHaveBeenCalledTimes(1);
       expect(prisma.userSession.create).toHaveBeenCalledTimes(1);
     });
@@ -203,6 +239,28 @@ describe('AuthService', () => {
 
       expect(result.accessToken).toBe('jwt-token');
       expect(result.user.phoneNumber).toBe('+38970123456');
+      expect(result.user.avatarUrl).toBeNull();
+    });
+
+    it('includes signed avatarUrl when user has avatarObjectKey', async () => {
+      reportsUploadService.signPrivateObjectKey.mockResolvedValue(
+        'https://signed.example/avatar',
+      );
+      prisma.user.findUnique.mockResolvedValue({
+        ...mockUser,
+        avatarObjectKey: 'private/avatars/user-1',
+      });
+      prisma.userSession.create.mockResolvedValue({});
+
+      const result = await service.citizenLogin({
+        phoneNumber: '+38970123456',
+        password: 'StrongPass123!',
+      });
+
+      expect(reportsUploadService.signPrivateObjectKey).toHaveBeenCalledWith(
+        'private/avatars/user-1',
+      );
+      expect(result.user.avatarUrl).toBe('https://signed.example/avatar');
     });
 
     it('rejects invalid phone number', async () => {
@@ -276,6 +334,7 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('jwt-token');
       expect(result.refreshToken).toBeDefined();
       expect(result.refreshToken).toContain('.');
+      expect(result.user.avatarUrl).toBeNull();
       expect(prisma.userSession.findUnique).toHaveBeenCalledWith({
         where: { tokenId },
         include: { user: true },
@@ -297,6 +356,33 @@ describe('AuthService', () => {
       await expect(
         service.refresh('tid123.wrongsecret'),
       ).rejects.toThrow(UnauthorizedException);
+    });
+
+    it('on reuse of a revoked refresh token with valid hash, revokes all user sessions and emits security event', async () => {
+      const tokenId = 'reuse-tid';
+      const fullToken = `${tokenId}.stillvalidsecret`;
+      const hash = await bcrypt.hash(fullToken, 4);
+
+      prisma.userSession.findUnique.mockResolvedValue({
+        id: 'session-revoked',
+        userId: 'user-1',
+        tokenId,
+        refreshTokenHash: hash,
+        expiresAt: new Date(Date.now() + 86400000),
+        revokedAt: new Date(),
+        user: mockUser,
+      });
+
+      await expect(service.refresh(fullToken)).rejects.toThrow(UnauthorizedException);
+      expect(prisma.userSession.updateMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { userId: 'user-1', revokedAt: null },
+        }),
+      );
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'security.refresh_token_reuse',
+        expect.objectContaining({ userId: 'user-1' }),
+      );
     });
   });
 

@@ -6,11 +6,14 @@ import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_feed_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_map_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav_bar.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
@@ -219,7 +222,7 @@ class _HomeShellState extends State<HomeShell> {
       if (!mounted) return false;
       AppSnack.show(
         context,
-        message: 'Could not check reporting availability right now.',
+        message: context.l10n.homeReportingCapacityCheckFailed,
         type: AppSnackType.warning,
       );
       return false;
@@ -239,8 +242,7 @@ class _HomeShellState extends State<HomeShell> {
       if (mounted) {
         AppSnack.show(
           context,
-          message:
-              'Unable to open the camera right now. Please try again in a moment.',
+          message: context.l10n.homeCameraOpenFailed,
           type: AppSnackType.warning,
         );
       }
@@ -271,12 +273,7 @@ class _HomeShellState extends State<HomeShell> {
       AppHaptics.softTransition();
       final Object? result = await Navigator.of(context).push<Object>(
         MaterialPageRoute<Object>(
-          builder: (_) => NewReportScreen(
-            initialPhoto: selectedFile,
-            entryLabel: 'Camera report',
-            entryHint:
-                'Starting from a live photo can speed up moderation because the evidence is already attached.',
-          ),
+          builder: (_) => NewReportScreen(initialPhoto: selectedFile),
         ),
       );
       if (result != null && mounted) {
@@ -373,13 +370,26 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
 class _MapTabPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     return Container(
       color: AppColors.appBackground,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Center(
-        child: Icon(
-          Icons.map_outlined,
-          size: 48,
-          color: AppColors.textMuted.withValues(alpha: 0.4),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              Icons.map_outlined,
+              size: 48,
+              color: AppColors.textMuted.withValues(alpha: 0.4),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              l10n.mapTabPlaceholderHint,
+              textAlign: TextAlign.center,
+              style: AppTypography.emptyStateSubtitle,
+            ),
+          ],
         ),
       ),
     );

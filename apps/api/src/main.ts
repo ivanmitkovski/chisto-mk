@@ -1,7 +1,12 @@
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import compression from 'compression';
+import express from 'express';
+import { RedisIoAdapter } from './common/adapters/redis-io.adapter';
+import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
+import { EventChatClusterConfig } from './event-chat/event-chat-cluster.config';
 import { AppModule } from './app.module';
 import { validateEnv } from './config/env';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
@@ -10,7 +15,45 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 async function bootstrap() {
   validateEnv();
   const app = await NestFactory.create(AppModule);
-  app.use(compression({ threshold: 1024 }));
+
+  const expressApp = app.getHttpAdapter().getInstance() as express.Application;
+  expressApp.use(express.urlencoded({ extended: true }));
+
+  const redisUrl = process.env.REDIS_URL?.trim();
+  if (redisUrl) {
+    try {
+      const redisIoAdapter = new RedisIoAdapter(app);
+      await redisIoAdapter.connectToRedis(redisUrl);
+      app.useWebSocketAdapter(redisIoAdapter);
+      app.get(EventChatClusterConfig).setSocketIoClustered(true);
+      app.get(RedisIoAdapterLifecycle).register(redisIoAdapter);
+      console.log('Socket.IO Redis adapter enabled (multi-replica WebSocket fan-out)');
+    } catch (err) {
+      console.error(
+        'REDIS_URL is set but Socket.IO Redis adapter failed; falling back to single-node WebSockets. Error:',
+        err,
+      );
+      app.useWebSocketAdapter(new IoAdapter(app));
+    }
+  } else {
+    app.useWebSocketAdapter(new IoAdapter(app));
+  }
+  // Never compress Engine.IO / Socket.IO — breaks polling payloads and causes endless reconnects.
+  app.use(
+    compression({
+      threshold: 1024,
+      filter: (req, res) => {
+        const path =
+          'originalUrl' in req && typeof req.originalUrl === 'string'
+            ? req.originalUrl.split('?')[0] ?? ''
+            : (req.url ?? '').split('?')[0] ?? '';
+        if (path.includes('/socket.io')) {
+          return false;
+        }
+        return compression.filter(req, res);
+      },
+    }),
+  );
   app.enableShutdownHooks();
 
   const allowedOriginsEnv = process.env.CORS_ORIGINS;
@@ -25,6 +68,7 @@ async function bootstrap() {
     credentials: false,
   });
 
+  // SECURITY: forbidNonWhitelisted rejects mass-assignment of unknown DTO properties at the edge.
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,

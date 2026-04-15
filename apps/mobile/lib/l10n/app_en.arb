@@ -56,6 +56,7 @@
   "reportReviewBannerAfterSubmitTitle": "After submit",
   "reportReviewAfterSubmitReady": "Moderated before public. Status in My reports.",
   "reportReviewAfterSubmitIncomplete": "Finish steps above.",
+  "reportSubmitSentPending": "Sent",
   "semanticsClose": "Close",
   "semanticsAboutStep": "About {title}",
   "@semanticsAboutStep": {
@@ -85,7 +86,7 @@
       }
     }
   },
-  "errorBannerDraftSavedHint": "Your draft is saved — you can try again when ready.",
+  "errorBannerDraftSavedHint": "Your draft is saved, you can try again when ready.",
   "reportSubmittedTitle": "Report submitted",
   "reportSubmittedSavedAs": "Saved as report {number}",
   "@reportSubmittedSavedAs": {
@@ -152,7 +153,7 @@
   "profileAvatarRemoveFailed": "Could not remove your photo. Please try again.",
   "profileAvatarSourceRecommended": "Recommended",
   "profileAvatarCropMoveAndScale": "Move and scale",
-  "profileAvatarCropHint": "Pinch to zoom · drag to position",
+  "profileAvatarCropHint": "Pinch to zoom, drag to position",
   "profileAvatarCropLoading": "Loading photo…",
   "profileAvatarCropCancel": "Cancel",
   "profileAvatarCropDone": "Done",
@@ -163,5 +164,2097 @@
   "profileAvatarCameraUnavailable": "Unable to open the camera right now. Please try again in a moment.",
   "profileAvatarReadPhotoFailed": "Could not read the photo. Please try again.",
   "profileAvatarProcessPhotoFailed": "Could not process the photo. Please try again.",
-  "profileAvatarPeekSemantic": "Profile photo"
+  "profileAvatarPeekSemantic": "Profile photo",
+  "errorBannerDismiss": "Dismiss",
+  "errorBannerTryAgain": "Try again",
+  "authSemanticGoBack": "Go back",
+  "authLoading": "Loading",
+  "authSignInTitle": "Sign in",
+  "authSignInSubtitle": "Welcome back. Enter your details to continue.",
+  "authFieldPhone": "Phone number",
+  "authFieldPhoneHint": "70 123 456",
+  "authFieldPassword": "Password",
+  "authFieldPasswordHint": "Enter your password",
+  "authRememberMe": "Remember me",
+  "authForgotPassword": "Forgot password?",
+  "authSignInCta": "Sign in",
+  "authValidationCheckPhonePassword": "Please check your phone number and password.",
+  "authSignUpPrompt": "Don't have an account? ",
+  "authSignUpLink": "Sign up",
+  "authSignUpTitle": "Sign up",
+  "authSignUpSubtitle": "Welcome! Please enter your details",
+  "authFieldFullName": "Full name",
+  "authFieldFullNameHint": "John Doe",
+  "authFieldEmail": "Email",
+  "authFieldEmailHint": "john@chisto.mk",
+  "authFieldPhoneNumber": "Phone number",
+  "authPasswordRequirementsHint": "At least 8 characters, with letters and numbers",
+  "authTermsPrefix": "By signing up you agree to our ",
+  "authTermsLink": "terms and conditions",
+  "authValidationCheckFields": "Please check the highlighted fields above.",
+  "authSignUpCta": "Sign up",
+  "authSignInPrompt": "Already have an account? ",
+  "authSignInLink": "Sign in",
+  "authValidationFieldRequired": "{fieldName} is required",
+  "@authValidationFieldRequired": {
+    "placeholders": {
+      "fieldName": {
+        "type": "String"
+      }
+    }
+  },
+  "authValidationPhoneRequired": "Phone number is required",
+  "authValidationPhoneDigits": "Enter an 8-digit phone number",
+  "authValidationEmailRequired": "Email is required",
+  "authValidationEmailInvalid": "Enter a valid email",
+  "authValidationPasswordRequired": "Password is required",
+  "authValidationPasswordMinLength": "Password must be at least 8 characters",
+  "authValidationPasswordNeedNumber": "Password must contain at least one number",
+  "authValidationPasswordNeedLetter": "Password must contain at least one letter",
+  "authValidationConfirmPasswordRequired": "Please confirm your password",
+  "authValidationConfirmPasswordMismatch": "Passwords do not match",
+  "authErrorInvalidCredentials": "Wrong phone number or password.",
+  "authErrorAccountSuspended": "This account is not active.",
+  "authErrorPhoneNotRegistered": "No account found for this phone number.",
+  "authErrorEmailRegistered": "This email is already registered.",
+  "authErrorPhoneRegistered": "This phone number is already registered.",
+  "authErrorOtpNotFound": "No code was sent. Request a new code.",
+  "authErrorOtpExpired": "This code has expired. Request a new code.",
+  "authErrorOtpInvalid": "Invalid code. Please try again.",
+  "authErrorOtpMaxAttempts": "Too many wrong codes. Request a new code.",
+  "authErrorCurrentPasswordInvalid": "Current password is incorrect.",
+  "authErrorTooManyAttempts": "Too many failed attempts. Try again later.",
+  "authErrorRateLimited": "Too many requests. Please wait a moment and try again.",
+  "authErrorUserNotFound": "We could not find an account for this number. Please check and try again.",
+  "authOtpTitle": "Enter code",
+  "authOtpSubtitle": "We just sent a 4-digit code to {phone}",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authOtpContinue": "Continue",
+  "authOtpResendPrefix": "Didn't receive code? ",
+  "authOtpResendAction": "Send again",
+  "authOtpResendCountdown": "Resend code in {seconds}s",
+  "@authOtpResendCountdown": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResentMessage": "We've sent a new code to {phone}.",
+  "@authOtpResentMessage": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authForgotPasswordTitle": "Reset password",
+  "authForgotPasswordSubtitle": "Enter your phone number and we'll send you a code to reset your password",
+  "authForgotPasswordSendCode": "Send reset code",
+  "authForgotPasswordRequestSemantic": "Send reset code",
+  "authForgotPasswordOtpTitle": "Enter code",
+  "authForgotPasswordOtpSubtitle": "We sent a 4-digit code to {phone}",
+  "@authForgotPasswordOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "authNewPasswordTitle": "Create new password",
+  "authNewPasswordSubtitle": "Enter a new password for your account",
+  "authFieldNewPassword": "New password",
+  "authFieldNewPasswordHint": "At least 8 characters",
+  "authFieldConfirmPassword": "Confirm password",
+  "authFieldConfirmPasswordHint": "Re-enter your password",
+  "authResetPasswordCta": "Reset password",
+  "authPasswordResetSuccessTitle": "Password reset",
+  "authPasswordResetSuccessBody": "Your password has been reset successfully. You can now sign in with your new password.",
+  "authBackToSignIn": "Back to sign in",
+  "authOnboardingWelcomeTo": "Welcome to",
+  "authOnboardingBrandName": "Chisto.mk",
+  "authOnboardingWelcomeDescription": "See it. Report it. Clean it.",
+  "authOnboardingWelcomeSupporting": "A cleaner city starts with one tap.",
+  "authOnboardingSlide2Title": "Report in seconds",
+  "authOnboardingSlide2Description": "Share a report with location in a few taps.",
+  "authOnboardingSlide2Supporting": "Fast flow, clear status updates.",
+  "authOnboardingSlide3Title": "Join cleanup events",
+  "authOnboardingSlide3Description": "Track progress and community impact nearby.",
+  "authOnboardingSlide3Supporting": "Together we keep neighborhoods green.",
+  "authOnboardingContinue": "Continue",
+  "authOnboardingGetStarted": "Get started",
+  "authLocationTitle": "Choose your location",
+  "authLocationSubtitle": "We use your location to show cleanups and reports near you.",
+  "authLocationMapPlaceholder": "Use current location to update this area",
+  "authLocationDetecting": "Detecting location…",
+  "authLocationContinue": "Continue",
+  "authLocationUseCurrent": "Use current location",
+  "authLocationUseDifferent": "Use a different location",
+  "authLocationPrivacyNote": "We only use your location to show nearby cleanups. We don't track you in the background.",
+  "authLocationServicesDisabled": "Location services are disabled. Please enable them in Settings.",
+  "authLocationPermissionDenied": "Location permission denied. You can enable it in Settings to use this feature.",
+  "authLocationPermissionForever": "Location permission is permanently denied. Opening Settings…",
+  "authLocationMacedoniaOnly": "Currently we only support locations in Macedonia.",
+  "authLocationResolveFailed": "Could not resolve your location. Please try again.",
+  "authOtpCodeSemantic": "Verification code",
+  "authOtpDigitSemantic": "Digit {index} of {total}",
+  "@authOtpDigitSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsTitle": "Weekly rankings",
+  "profileWeeklyRankingsSubtitle": "Reports, eco-actions & more, this week.",
+  "profileWeeklyRankingsTopSupporters": "This week's top supporters",
+  "profileWeeklyRankingsEmptyTitle": "No rankings yet",
+  "profileWeeklyRankingsEmptySubtitle": "Earn points this week from any credited activity to show up here.",
+  "profileWeeklyRankingsRetry": "Retry",
+  "profileWeeklyRankingsYouRank": "You are No. {rank} this week",
+  "@profileWeeklyRankingsYouRank": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsPtsThisWeek": "{points} pts this week",
+  "@profileWeeklyRankingsPtsThisWeek": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileWeeklyRankingsYouBadge": "You",
+  "profileWeeklyRankingsScrollToYouHint": "Scroll to your position in the list",
+  "profileWeeklyRankingsLoadingSemantic": "Loading weekly rankings",
+  "profileWeeklyRankingsRowSemantic": "Rank {rank}, {name}, {points} points",
+  "@profileWeeklyRankingsRowSemantic": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelLine": "Level {level}",
+  "@profileLevelLine": {
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "profileTierLegend": "Chisto Legend",
+  "profilePtsToNextLevel": "{points} pts to next level",
+  "@profilePtsToNextLevel": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLevelXpSegment": "{current} / {total} XP",
+  "@profileLevelXpSegment": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "profileLifetimeXpOnBar": "{xp} lifetime XP",
+  "@profileLifetimeXpOnBar": {
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsBalanceShort": "Balance {balance}",
+  "@profilePointsBalanceShort": {
+    "placeholders": {
+      "balance": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankTitle": "My weekly rank",
+  "profileMyWeeklyRankDetailRanked": "#{rank}, {points} pts",
+  "@profileMyWeeklyRankDetailRanked": {
+    "placeholders": {
+      "rank": {
+        "type": "int"
+      },
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankDetailPointsOnly": "{points} pts",
+  "@profileMyWeeklyRankDetailPointsOnly": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profileMyWeeklyRankNoPoints": "No points this week yet",
+  "profileViewRankings": "View rankings",
+  "profilePointsHistoryTitle": "Points & levels",
+  "profilePointsHistorySubtitle": "XP you earned and every level you unlocked.",
+  "profilePointsHistoryOpenSemantic": "Open points and level history",
+  "profilePointsHistoryLoadingSemantic": "Loading points and levels",
+  "profileLoadingSemantic": "Loading profile",
+  "profilePointsHistoryMilestonesSection": "Level ups",
+  "profilePointsHistoryActivitySection": "Activity",
+  "profilePointsHistoryDayToday": "Today",
+  "profilePointsHistoryDayYesterday": "Yesterday",
+  "profilePointsHistoryEmpty": "No points yet. When a report you submitted is approved as the first on a site, you earn XP here.",
+  "profilePointsHistoryLevelUpBadge": "LEVEL UP",
+  "profilePointsHistoryLoadMore": "Loading…",
+  "profilePointsDeltaPositive": "+{points} XP",
+  "@profilePointsDeltaPositive": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsDeltaNegative": "{points} XP",
+  "@profilePointsDeltaNegative": {
+    "placeholders": {
+      "points": {
+        "type": "int"
+      }
+    }
+  },
+  "profilePointsReasonFirstReport": "First approved report on a site",
+  "profilePointsReasonEcoApproved": "Eco action approved",
+  "profilePointsReasonEcoRealized": "Eco action completed",
+  "profilePointsReasonOther": "Points update",
+  "profilePointsReasonEventOrganizerApproved": "Your cleanup event was approved",
+  "profilePointsReasonEventJoined": "Joined a cleanup event",
+  "profilePointsReasonEventJoinNoShow": "Join bonus adjusted — no check-in",
+  "profilePointsReasonEventCheckIn": "Event check-in",
+  "profilePointsReasonEventCompleted": "Cleanup event completed",
+  "profileReportCreditsTitle": "Report credits",
+  "profileAccountDetailsSection": "Account details",
+  "profileGeneralInfoTile": "General info",
+  "profileLanguageTile": "Language",
+  "profileLanguageScreenTitle": "App language",
+  "profileLanguageSubtitleDevice": "Device settings",
+  "profileLanguageOptionSystem": "Use device language",
+  "profileLanguageNameEn": "English",
+  "profileLanguageNameMk": "Македонски",
+  "profileLanguageNameSq": "Shqip",
+  "profilePasswordTile": "Password",
+  "profileSupportSection": "Support",
+  "profileHelpCenterTile": "Help center",
+  "profileAccountSection": "Account",
+  "profileSignOutTile": "Sign out",
+  "profileDeleteAccountTile": "Delete account",
+  "profileEmailLabel": "Email",
+  "profileEmailReadOnlyHint": "Read-only. Contact support to change your email.",
+  "profileNoConnectionSnack": "No connection",
+  "profileRefreshFailedSnack": "Couldn't refresh your profile. Try again in a moment.",
+  "profilePasswordScreenTitle": "Change password",
+  "profilePasswordScreenSubtitle": "Choose a strong, unique password.",
+  "profilePasswordCurrentLabel": "Current password",
+  "profilePasswordNewLabel": "New password",
+  "profilePasswordConfirmLabel": "Confirm new password",
+  "profilePasswordNewHelper": "At least 8 characters, with a number.",
+  "profilePasswordConfirmMismatchHelper": "Make sure this matches the new password above.",
+  "profilePasswordSecurityHint": "For security, avoid reusing passwords from other apps.",
+  "profilePasswordSubmit": "Update password",
+  "profilePasswordSubmitting": "Updating…",
+  "profilePasswordSuccess": "Password updated",
+  "profilePasswordEnterCurrentWarning": "Enter your current password.",
+  "profilePasswordMismatchError": "Passwords do not match.",
+  "profilePasswordSessionExpired": "Session expired. Please sign in again.",
+  "profilePasswordCurrentSemantic": "Current password",
+  "profilePasswordNewSemantic": "New password",
+  "profilePasswordConfirmSemantic": "Confirm new password",
+  "commonCancel": "Cancel",
+  "commonRetry": "Retry",
+  "commonTryAgain": "Try again",
+  "commonDelete": "Delete",
+  "commonSave": "Save",
+  "commonSkip": "Skip",
+  "commonBack": "Back",
+  "commonClose": "Close",
+  "commonGotIt": "Got it",
+  "commonKeepEditing": "Keep editing",
+  "commonDiscard": "Discard",
+  "profileSignOutDialogTitle": "Sign out?",
+  "profileSignOutDialogBody": "You can sign back in anytime with your account.",
+  "profileDeleteAccountDialogTitle": "Delete account?",
+  "profileDeleteAccountDialogBody": "All your data will be permanently removed. This action cannot be undone.",
+  "profileDeleteAccountFinalDialogTitle": "Permanently delete?",
+  "profileDeleteAccountFinalDialogBody": "Your account and all associated data will be permanently deleted.",
+  "profileDeleteAccountTypeConfirmTitle": "Confirm by typing",
+  "profileDeleteAccountTypeConfirmBody": "Type the word below exactly as shown. This helps prevent accidental deletion.",
+  "profileDeleteAccountConfirmPhrase": "DELETE",
+  "profileDeleteAccountTypeFieldPlaceholder": "Type here",
+  "profileDeleteAccountTypeMismatchSnack": "Type the confirmation word exactly as shown.",
+  "profileHelpCenterOpenFailedSnack": "Could not open help center",
+  "profileGeneralLoadFailedSnack": "Could not load profile",
+  "profileGeneralNameRequiredSnack": "Name is required",
+  "profileGeneralNameTooLongSnack": "Name is too long",
+  "profileGeneralUpdatedSnack": "Profile updated",
+  "profileGeneralPictureUpdatedSnack": "Profile picture updated",
+  "profileGeneralInfoSubtitle": "Edit your profile details",
+  "profileGeneralNameLabel": "Name",
+  "profileGeneralNameHint": "Your name",
+  "profileGeneralMobileLabel": "Mobile phone",
+  "profileGeneralPhonePlaceholder": "70 123 456",
+  "profileGeneralLimitsNotice": "Name changes are limited. Phone number changes require verification.",
+  "profileGeneralUpdateButton": "Update info",
+  "profileGeneralSaving": "Saving…",
+  "profileGeneralAvatarSemanticUpdating": "Updating profile photo",
+  "profileGeneralAvatarSemanticChange": "Profile photo. Double tap to change",
+  "profileGeneralEmptyValue": "—",
+  "profileGeneralDefaultDisplayName": "User",
+  "reportListFabLabel": "Report pollution",
+  "reportListSearchSemantic": "Search reports",
+  "reportAvailabilityCheckFailedSnack": "Could not check reporting availability right now.",
+  "reportFinishStepsSnack": "Please finish the missing steps before submitting.",
+  "reportSubmittedPartialUploadSnack": "Report submitted. Photos could not be uploaded.",
+  "reportPhotoUploadFailedTitle": "Photo upload failed",
+  "reportPhotoUploadFailedBody": "Photos could not be uploaded. Tap Retry to try again, or Skip to submit without photos.",
+  "reportReviewEvidenceTitle": "Evidence",
+  "reportReviewPhotoCount": "{count, plural, one{{count} photo} other{{count} photos}}",
+  "@reportReviewPhotoCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportReviewAddPhoto": "Add a photo",
+  "reportReviewCategoryTitle": "Category",
+  "reportReviewChooseCategory": "Choose category",
+  "reportReviewTitleLabel": "Title",
+  "reportReviewAddTitle": "Add title",
+  "reportReviewSeverityTitle": "Severity",
+  "reportReviewLocationTitle": "Location",
+  "reportReviewPinnedShort": "Pinned",
+  "reportReviewPinMacedonia": "Pin in Macedonia",
+  "reportReviewExtraContextTitle": "Extra context",
+  "reportReviewCleanupEffortTitle": "Cleanup effort",
+  "reportSelectCategorySemantic": "Select report category",
+  "reportBackSemantic": "Back",
+  "reportPreviousStepSemantic": "Previous step",
+  "reportCleanupEffortChipHint": "Double-tap to set estimated cleanup effort.",
+  "reportCleanupEffortOneToTwo": "1–2 people",
+  "reportCleanupEffortThreeToFive": "3–5 people",
+  "reportCleanupEffortSixToTen": "6–10 people",
+  "reportCleanupEffortTenPlus": "10+ people",
+  "reportCleanupEffortNotSure": "Not sure",
+  "reportCooldownTitle": "Reporting cooldown",
+  "reportCooldownBody": "You have used all 10 report credits and the emergency allowance.\n\nEmergency unlock retries in {retry}.\n\n{hint}",
+  "@reportCooldownBody": {
+    "placeholders": {
+      "retry": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCooldownModalIntro": "You have used all 10 report credits and the emergency allowance.",
+  "reportCooldownModalRetryLead": "Emergency unlock retries in",
+  "reportCooldownDurationListSeparator": ", ",
+  "reportCooldownDurationDays": "{count, plural, one{{count} day} other{{count} days}}",
+  "@reportCooldownDurationDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationHours": "{count, plural, one{{count} hour} other{{count} hours}}",
+  "@reportCooldownDurationHours": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationMinutes": "{count, plural, one{{count} minute} other{{count} minutes}}",
+  "@reportCooldownDurationMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownDurationSeconds": "{count, plural, one{{count} second} other{{count} seconds}}",
+  "@reportCooldownDurationSeconds": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetrySoon": "soon",
+  "reportCooldownRetrySeconds": "{seconds}s",
+  "@reportCooldownRetrySeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryMinutes": "{minutes}m",
+  "@reportCooldownRetryMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCooldownRetryHoursMinutes": "{hours}h {minutes}m",
+  "@reportCooldownRetryHoursMinutes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityUnlockHint": "Join events or eco actions to get more reports (up to 10).",
+  "reportCapacityPillHealthy": "{count, plural, one{{count} credit} other{{count} credits}}",
+  "@reportCapacityPillHealthy": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerHealthyTitle": "All set",
+  "reportCapacityBannerHealthyBody": "{count, plural, one{{count} credit available} other{{count} credits available}}",
+  "@reportCapacityBannerHealthyBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityReviewHealthy": "Uses 1 credit.",
+  "reportCapacityPillLow": "{count, plural, one{{count} report left} other{{count} reports left}}",
+  "@reportCapacityPillLow": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportCapacityBannerLowTitle": "Almost out",
+  "reportCapacityBannerLowBody": "Low balance. {hint}",
+  "@reportCapacityBannerLowBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewLow": "Uses 1 credit. {hint}",
+  "@reportCapacityReviewLow": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillEmergency": "Emergency report",
+  "reportCapacityBannerEmergencyTitle": "Emergency report",
+  "reportCapacityBannerEmergencyBody": "You have one left. {hint}",
+  "@reportCapacityBannerEmergencyBody": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewEmergency": "Uses your emergency report. {hint}",
+  "@reportCapacityReviewEmergency": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityPillCooldown": "Cooldown active",
+  "reportCapacityBannerCooldownTitle": "Cooldown",
+  "reportCapacityCooldownRetryOnDate": "Next emergency: {date}.",
+  "@reportCapacityCooldownRetryOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownTryAgainInAbout": "Try again in ~{duration}.",
+  "@reportCapacityCooldownTryAgainInAbout": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityCooldownStillWaiting": "Emergency report cooling down.",
+  "reportCapacityBannerCooldownBody": "{retryLine} {hint}",
+  "@reportCapacityBannerCooldownBody": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacityReviewCooldown": "{retryLine} {hint}",
+  "@reportCapacityReviewCooldown": {
+    "placeholders": {
+      "retryLine": {
+        "type": "String"
+      },
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "reportCapacitySecondsRemaining": "({seconds}s remaining)",
+  "@reportCapacitySecondsRemaining": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "feedRetryLoadingMore": "Retry loading more",
+  "feedShowAllSites": "Show all sites",
+  "feedPullToRefreshSemantic": "Pull to refresh",
+  "feedLoadMoreFailedSnack": "Could not load more posts. Tap retry.",
+  "feedScrollToTopSemantic": "Scroll feed to top",
+  "mapResetFiltersSemantic": "Reset filters",
+  "mapOpenMapsFailed": "Could not open Maps",
+  "locationRetryAddressSemantic": "Retry address",
+  "photoReviewDiscardTitle": "Discard this photo?",
+  "photoReviewDiscardBody": "You can retake or choose another from your library.",
+  "reportPhotoReviewSheetTitle": "Review evidence",
+  "reportPhotoReviewSheetSubtitle": "Keep the clearest frame before adding it to the report.",
+  "reportPhotoReviewSemantic": "Review and confirm photo before adding to report",
+  "reportPhotoReviewCloseSemantic": "Close without adding photo",
+  "reportPhotoReviewRetake": "Retake",
+  "reportPhotoReviewUsePhoto": "Use this photo",
+  "reportPhotoReviewRetakeSemantic": "Retake photo",
+  "reportPhotoReviewUseSemantic": "Use this photo",
+  "reportPhotoReviewPreviewSemantic": "Photo preview",
+  "reportPhotoGridAddShort": "Add",
+  "reportPhotoGridAdd": "Add a photo",
+  "reportPhotoGridSourceHint": "Camera or library",
+  "notificationsTitle": "Notifications",
+  "notificationsMarkAllRead": "Mark all read",
+  "notificationsShowAll": "Show all notifications",
+  "notificationsPreferencesTooltip": "Notification preferences",
+  "notificationsScrollToTopSemantic": "Scroll notifications to top",
+  "notificationsRetryLoadingMore": "Retry loading more",
+  "notificationsMarkAllReadFailed": "Could not mark all as read. Please try again.",
+  "notificationsAllMarkedReadSuccess": "All notifications marked as read",
+  "notificationsSiteUnavailable": "This site is no longer available.",
+  "notificationsReadStateUpdateFailed": "Could not update read state. Please try again.",
+  "notificationsMarkedUnreadLocal": "Marked as unread (local).",
+  "notificationsArchivedFromView": "Notification archived from this view",
+  "notificationsPrefsLoadFailed": "Could not load notification preferences.",
+  "notificationsPreferenceUpdateFailed": "Could not update preference. Please try again.",
+  "notificationsPrefsSheetTitle": "Notification preferences",
+  "notificationsPrefsSheetSubtitle": "Mute notification types you do not want to receive.",
+  "notificationsPrefMuted": "Muted",
+  "notificationsPrefEnabled": "Enabled",
+  "notificationsTypeSiteUpdates": "Site updates",
+  "notificationsTypeReportStatus": "Report status",
+  "notificationsTypeUpvotes": "Upvotes",
+  "notificationsTypeComments": "Comments",
+  "notificationsTypeNearbyReports": "Nearby reports",
+  "notificationsTypeCleanupEvents": "Cleanup events",
+  "notificationsTypeSystem": "System",
+  "notificationsSwipeMarkUnread": "Mark unread",
+  "notificationsSwipeMarkRead": "Mark read",
+  "notificationsSwipeArchive": "Archive",
+  "notificationsDebugPreviewTriggered": "Local notification preview triggered",
+  "notificationsAllCaughtUp": "All caught up",
+  "notificationsUnreadUpdatesCount": "{count, plural, =1{1 unread update} other{{count} unread updates}}",
+  "@notificationsUnreadUpdatesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsUnreadBannerOne": "1 unread notification needs your attention",
+  "notificationsUnreadBannerMany": "{count} unread notifications need your attention",
+  "@notificationsUnreadBannerMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationsSwipeHint": "Swipe right to mark read or unread · left to archive",
+  "notificationsEmptyUnreadTitle": "No unread notifications",
+  "notificationsEmptyAllTitle": "No notifications yet",
+  "notificationsEmptyUnreadBody": "You are all caught up. New updates will appear here.",
+  "notificationsEmptyAllBody": "When people react to sites and actions, you will see updates here.",
+  "notificationsErrorLoadTitle": "Could not load notifications",
+  "notificationsErrorLoadFallback": "Please check your connection and try again.",
+  "notificationsErrorNetwork": "Network issue while loading notifications.",
+  "notificationsErrorGeneric": "Something went wrong while loading notifications.",
+  "notificationsFilterAll": "All",
+  "notificationsFilterUnread": "Unread",
+  "eventsEventNotFoundTitle": "Event not found",
+  "eventsEventNotFoundBody": "This event is no longer available.",
+  "eventsDetailBrowseEvents": "Browse events",
+  "eventsDetailCouldNotRefresh": "Couldn’t refresh. Showing saved details.",
+  "eventsDetailRetryRefresh": "Retry",
+  "eventsDetailLocationTitle": "Location",
+  "eventsDetailCopyAddress": "Copy address",
+  "eventsDetailAddressCopied": "Address copied",
+  "eventsDetailLocationLongPressHint": "Long-press for full address and actions",
+  "eventsDetailCoverImageUnavailable": "Image unavailable",
+  "eventsWeatherUnavailableBody": "Forecast isn’t available right now.",
+  "eventsWeatherRetry": "Try again",
+  "eventsUnableToStartEventGeneric": "Could not start the event. Check your connection and try again.",
+  "eventsStartEventTooEarly": "You can start this eco action once the scheduled start time arrives.",
+  "eventsAwaitingModerationCta": "Awaiting approval",
+  "eventsModerationBannerTitle": "Awaiting approval",
+  "eventsModerationBannerBody": "This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.",
+  "eventsEventPendingPublicCta": "Not open for joining yet",
+  "eventsFeedOfflineStaleBanner": "Showing saved events — couldn’t refresh. Pull down to retry.",
+  "eventsFeedInitialLoadFailed": "We couldn’t load events. Check your connection and try again.",
+  "eventsOrganizerInvalidateQrTitle": "Invalidate previous QR codes",
+  "eventsOrganizerInvalidateQrSubtitle": "Use if a code was shared or photographed. Already scanned codes stay valid until they expire; this rotates the session so new scans need a fresh QR.",
+  "eventsOrganizerQrSessionRotated": "QR session updated. Show the new code to attendees.",
+  "eventsOrganizerQrRotateFailed": "Could not invalidate codes. Try again.",
+  "eventsEditEventTitle": "Edit event",
+  "eventsEditEventSave": "Save changes",
+  "eventsEventUpdated": "Event updated",
+  "eventsMutationFailedGeneric": "Something went wrong. Please try again.",
+  "eventsManualCheckInAdd": "Add",
+  "eventsManualCheckInTitle": "Manual check-in",
+  "eventsCheckInTitle": "Check-in",
+  "eventsOrganizerMockAllCheckedIn": "All mock attendees are already checked in.",
+  "eventsOrganizerAttendeeNamePlaceholder": "Attendee name",
+  "eventsOrganizerManualCheckInSubtitle": "Search volunteers who joined this event, then check them in.",
+  "eventsOrganizerManualCheckInNoJoiners": "No volunteers have joined this event yet.",
+  "eventsOrganizerManualCheckInSelectParticipant": "Select a volunteer from the list.",
+  "eventsOrganizerManualCheckInNotParticipant": "This person is not on the participant list.",
+  "eventsOrganizerEnterNameFirst": "Enter attendee name first.",
+  "eventsOrganizerNameAlreadyCheckedIn": "{name} is already checked in.",
+  "@eventsOrganizerNameAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameAddedByOrganizer": "{name} added by organizer.",
+  "@eventsOrganizerNameAddedByOrganizer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerCouldNotRemoveName": "Could not remove {name}.",
+  "@eventsOrganizerCouldNotRemoveName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerNameRemovedFromCheckIn": "{name} removed from check-in.",
+  "@eventsOrganizerNameRemovedFromCheckIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerUnableCompleteEvent": "Unable to complete the event.",
+  "eventsOrganizerEndedTitle": "Event ended",
+  "eventsOrganizerThanksOrganizing": "Thanks for organizing!",
+  "eventsOrganizerEndSummaryOneAttendee": "1 attendee checked in.",
+  "eventsOrganizerEndSummaryManyAttendees": "{count} attendees checked in.",
+  "@eventsOrganizerEndSummaryManyAttendees": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerUploadAfterPhotosHint": "Upload after photos from the event detail.",
+  "eventsOrganizerCompletionCheckedInNone": "No attendees checked in.",
+  "eventsOrganizerCompletionJoinedLine": "{count} volunteers joined",
+  "@eventsOrganizerCompletionJoinedLine": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionJoinedOfCap": "{joined} of {cap} spots filled",
+  "@eventsOrganizerCompletionJoinedOfCap": {
+    "placeholders": {
+      "joined": {
+        "type": "int"
+      },
+      "cap": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerCompletionSheetSemantic": "Event completed. Review next steps.",
+  "eventsOrganizerCompletionBackToEvent": "Back to event",
+  "eventsOrganizerCompletionAddPhotosNow": "Add cleanup photos now",
+  "eventsOrganizerCompletionWhatNextIntro": "Wrap up on the event page: document results and share the impact you made together.",
+  "eventsOrganizerCompletionNextStepsHeading": "NEXT STEPS",
+  "eventsOrganizerCompletionStepPhotosTitle": "Add after photos",
+  "eventsOrganizerCompletionStepPhotosBody": "Show the difference you made. They appear on the event page for everyone.",
+  "eventsOrganizerCompletionStepImpactTitle": "Log your impact",
+  "eventsOrganizerCompletionStepImpactBody": "Record bags collected, time volunteered, and estimates from the event page.",
+  "eventsOrganizerCompletionStepVisibilityTitle": "Build trust",
+  "eventsOrganizerCompletionStepVisibilityBody": "Photos help moderators verify the cleanup and inspire future actions in your community.",
+  "eventsOrganizerDetailPendingAfterPhotosTitle": "After photos",
+  "eventsOrganizerDetailPendingAfterPhotosMessage": "Upload photos after cleanup so volunteers and moderators can see your results. Use the button below when you are ready.",
+  "eventsAttendeeCompletedTitle": "Thank you",
+  "eventsAttendeeCompletedBody": "This eco action is complete. Thanks for showing up for your community.",
+  "eventsAfterPhotosOrganizerEmptyHint": "No after photos yet. Use the button below to add them.",
+  "eventsEvidenceScreenSubtitle": "After photos document your results and appear on the event page.",
+  "eventsEvidencePhotoCountChip": "{current} of {max} photos",
+  "@eventsEvidencePhotoCountChip": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsEvidenceBeforeAfterTabsSemantic": "Before and after photos",
+  "eventsEvidenceSavingSemantic": "Saving after photos",
+  "eventsOrganizerCheckInPausedSnack": "Check-in paused.",
+  "eventsOrganizerCheckInResumedSnack": "Check-in resumed.",
+  "eventsOrganizerUnableCancelEvent": "Unable to cancel the event.",
+  "eventsOrganizerEventCancelledSnack": "Event cancelled.",
+  "eventsOrganizerFeedbackCheckedIn": "{name} checked in",
+  "@eventsOrganizerFeedbackCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerFeedbackInvalidQr": "Invalid QR code.",
+  "eventsOrganizerFeedbackWrongEvent": "Wrong event QR.",
+  "eventsOrganizerFeedbackPaused": "Check-in is currently paused.",
+  "eventsOrganizerFeedbackQrExpired": "QR expired. Generate a new one.",
+  "eventsOrganizerFeedbackQrReplay": "QR already used. Regenerating...",
+  "eventsOrganizerFeedbackAlreadyCheckedIn": "{name} is already checked in.",
+  "@eventsOrganizerFeedbackAlreadyCheckedIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshHelp": "Attendees should always scan the newest QR. The code refreshes automatically before it expires.",
+  "eventsOrganizerHoldPhoneForScan": "Hold your phone so attendees can scan",
+  "eventsOrganizerPausedLabel": "Check-in paused",
+  "eventsOrganizerStatusOpen": "Open",
+  "eventsOrganizerStatusPaused": "Paused",
+  "eventsOrganizerRefreshInSeconds": "Refresh in {seconds}s",
+  "@eventsOrganizerRefreshInSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrRefreshesWhenOpen": "QR refreshes automatically and after each scan",
+  "eventsOrganizerResumeForFreshQr": "Resume check-in to issue a fresh QR",
+  "eventsOrganizerQrLoadFailedGeneric": "Could not load a check-in code. Check your connection and try again.",
+  "eventsOrganizerQrRateLimited": "Too many refresh attempts. Wait a moment and try again.",
+  "eventsOrganizerSessionSetupFailed": "Could not start check-in. Confirm the event is in progress and try again.",
+  "eventsOrganizerQrRetry": "Try again",
+  "eventsOrganizerQrBrightnessHint": "Tip: turn up screen brightness so the code is easier to scan.",
+  "eventsOrganizerQrSemantics": "Check-in QR code. Refreshes in about {seconds} seconds.",
+  "@eventsOrganizerQrSemantics": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOrganizerQrEncodeError": "This code could not be drawn. Tap try again.",
+  "eventsOrganizerFeedbackInvalidQrStrict": "That QR is not valid for check-in.",
+  "eventsOrganizerFeedbackRequiresJoin": "Join the event in the app before checking in.",
+  "eventsOrganizerFeedbackCheckInUnavailable": "Check-in is not available for this event right now.",
+  "eventsOrganizerFeedbackRateLimited": "Too many attempts. Wait briefly and try again.",
+  "eventsOrganizerCopyQrText": "Copy QR code text",
+  "eventsOrganizerQrTextCopied": "QR code text copied — paste it in a message to attendees who can't scan.",
+  "eventsOrganizerNoQrToCopy": "No active QR code to copy yet.",
+  "eventsOrganizerManualOverride": "Manual override: mark attendee present",
+  "eventsOrganizerCheckedInHeading": "Checked in",
+  "eventsOrganizerEmptyListTitle": "No one checked in yet",
+  "eventsOrganizerEmptyListSubtitle": "Attendees scan your QR to check in",
+  "eventsOrganizerEndEvent": "End event",
+  "eventsOrganizerPauseCheckIn": "Pause check-in",
+  "eventsOrganizerResumeCheckIn": "Resume check-in",
+  "eventsOrganizerCancelEvent": "Cancel event",
+  "eventsOrganizerMoreActionsSemantic": "More event actions",
+  "eventsOrganizerMoreSheetTitle": "Event actions",
+  "eventsOrganizerEndEventConfirmTitle": "End this event?",
+  "eventsOrganizerEndEventConfirmMessage": "Check-in will close and the event will be marked completed. You can upload after photos from the event detail.",
+  "eventsOrganizerEndEventKeepManaging": "Keep managing",
+  "eventsOrganizerEndEventConfirmAction": "End event",
+  "eventsOrganizerCancelEventConfirmTitle": "Cancel this event?",
+  "eventsOrganizerCancelEventConfirmMessage": "Volunteers will see the event as cancelled. This cannot be undone from the app.",
+  "eventsOrganizerCancelEventKeepEvent": "Keep event",
+  "eventsOrganizerCancelEventConfirmAction": "Cancel event",
+  "eventsOrganizerRemoveAttendeeSemantic": "Remove {name} from check-in",
+  "@eventsOrganizerRemoveAttendeeSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventsOrganizerSimulateCheckInDev": "Simulate check-in (dev)",
+  "eventsPhotosTitle": "Photos",
+  "createEventDefaultDescription": "Community cleanup action organized by local volunteers.",
+  "createEventCategoryTitle": "Event type",
+  "createEventCategorySubtitle": "What kind of action are you organizing?",
+  "createEventGearTitle": "Gear needed",
+  "createEventGearSubtitle": "Select everything volunteers should bring.",
+  "createEventGearDoneSelectedCount": "Done ({count} selected)",
+  "@createEventGearDoneSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventGearMultiselectTitle": "Multi-select",
+  "createEventGearMultiselectMessage": "Tap each item volunteers should bring. You can select as many as needed.",
+  "createEventTeamSizeTitle": "Team size",
+  "createEventTeamSizeSubtitle": "How many volunteers do you expect?",
+  "createEventDifficultyTitle": "Difficulty",
+  "createEventDifficultySubtitle": "Set expectations for volunteers.",
+  "createEventStepProgress": "Step {step} of 5",
+  "@createEventStepProgress": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventEndTimeError": "End time must be later than start time.",
+  "createEventFieldType": "Event type",
+  "createEventPlaceholderType": "Select event type",
+  "createEventFieldTeamSize": "Team size",
+  "createEventPlaceholderTeamSize": "How many people?",
+  "createEventFieldDifficulty": "Difficulty",
+  "createEventPlaceholderDifficulty": "Set difficulty level",
+  "createEventSubmitLabel": "Create eco action",
+  "createEventAppBarTitle": "Create event",
+  "createEventHelpTitle": "Creating an event",
+  "createEventHelpSubtitle": "Quick guide for organizers",
+  "createEventHelpBulletModeration": "Events are reviewed so the community sees accurate, safe cleanups.",
+  "createEventHelpBulletVolunteers": "Volunteers see your title, schedule, site, gear list, and description once the event is live.",
+  "createEventHelpBulletSite": "Pick a pollution site on the list or map so everyone knows where to meet.",
+  "createEventHelpBulletSchedule": "Set the date and time span so calendars and reminders stay clear.",
+  "createEventHelpBulletSubmit": "When everything required is filled in, use Create eco action to publish.",
+  "createEventFieldVolunteerCap": "Volunteer cap",
+  "createEventVolunteerCapPlaceholderNoLimit": "No limit",
+  "createEventVolunteerCapUpTo": "Up to {count} volunteers",
+  "@createEventVolunteerCapUpTo": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventVolunteerCapSheetTitle": "Volunteer cap",
+  "createEventVolunteerCapSheetSubtitle": "Optional. You can cap sign-ups between 2 and 5000.",
+  "createEventVolunteerCapNoLimit": "No limit",
+  "createEventVolunteerCapCustomLabel": "Custom",
+  "createEventVolunteerCapCustomHint": "Number (2–5000)",
+  "createEventVolunteerCapApply": "Apply",
+  "createEventVolunteerCapInvalid": "Enter a whole number between 2 and 5000.",
+  "createEventSitePickerLoading": "Loading sites…",
+  "createEventSitePickerOfflineTitle": "Offline list",
+  "createEventSitePickerOfflineMessage": "Showing built-in sites because the live list was empty or unavailable.",
+  "createEventSitePickerLoadFailedTitle": "Could not refresh",
+  "createEventSitePickerLoadFailedMessage": "You can still pick from the offline site list. Try again to load live sites.",
+  "createEventSitePickerRetry": "Try again",
+  "createEventDiscardTitle": "Discard event?",
+  "createEventDiscardBody": "You will lose what you entered on this screen.",
+  "createEventDiscardKeepEditing": "Keep editing",
+  "createEventLoadingSemantic": "Loading create event form",
+  "createEventSectionScheduleCaption": "Schedule",
+  "createEventSectionDetailsCaption": "Event details",
+  "createEventCleanupSiteTitle": "Cleanup site",
+  "createEventSelectSiteSemantic": "Select cleanup site",
+  "createEventChooseSitePlaceholder": "Choose a pollution site",
+  "createEventSiteAnchorHint": "Every event should be anchored to one cleanup location.",
+  "createEventSiteDistanceAway": "{distanceKm} km away · {description}",
+  "@createEventSiteDistanceAway": {
+    "placeholders": {
+      "distanceKm": {
+        "type": "String"
+      },
+      "description": {
+        "type": "String"
+      }
+    }
+  },
+  "createEventSiteRequiredError": "Choose the site before creating the event.",
+  "createEventTitleLabel": "Event title",
+  "createEventTitleCounter": "{current} / {max}",
+  "@createEventTitleCounter": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventTitleHint": "e.g. Weekend river cleanup",
+  "createEventTitleRequired": "Event title is required.",
+  "createEventTitleMinLength": "Use at least 3 characters for the title.",
+  "createEventSitePickerTabList": "List",
+  "createEventSitePickerTabMap": "Map",
+  "createEventSitePickerMapEmpty": "No sites on the map match this search, or locations are not available yet.",
+  "createEventSitePickerMapSemanticLabel": "Map of pollution sites",
+  "createEventSitePickerMapHint": "Tap a pin to select a site.",
+  "createEventSiteMapPreviewSemantic": "Open site map picker",
+  "createEventTypeRequired": "Select an event type.",
+  "createEventGearPlaceholderQuestion": "What should volunteers bring?",
+  "createEventGearLabel": "Gear needed",
+  "createEventSelectGearSemantic": "Select gear needed",
+  "createEventDescriptionLabel": "Description",
+  "createEventDescriptionSubtitle": "Optional: give volunteers more context.",
+  "createEventDescriptionHint": "Describe what to expect, meeting point, etc.",
+  "eventsEventNotFoundShort": "Event not found.",
+  "eventsBeforeLabel": "Before",
+  "eventsAfterLabel": "After",
+  "eventsDiscardChangesTitle": "Discard changes?",
+  "eventsDiscardChangesBody": "You have unsaved photos. Are you sure you want to leave?",
+  "eventsSetCover": "Set as cover",
+  "eventsViewFullscreen": "View fullscreen",
+  "eventsAddToCalendar": "Add to calendar",
+  "eventsParticipantsRecent": "Recent",
+  "eventsParticipantsAz": "A-Z",
+  "eventsParticipantsCheckedIn": "Checked-in",
+  "eventsSaveImpactSummary": "Save impact summary",
+  "eventsCheckedInBadge": "Checked in",
+  "eventsCleanupPhotosCount": "{count} cleanup photos",
+  "@eventsCleanupPhotosCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCtaStartEvent": "Start event",
+  "eventsCtaManageCheckIn": "Manage check-in",
+  "eventsCtaEditAfterPhotos": "Edit after photos",
+  "eventsCtaUploadAfterPhotos": "Upload after photos",
+  "eventsCtaCheckedIn": "Checked in",
+  "eventsCtaScanToCheckIn": "Scan to check in",
+  "eventsCtaCheckInPaused": "Check-in paused",
+  "eventsCtaTurnReminderOff": "Turn reminder off",
+  "eventsCtaSetReminder": "Set reminder",
+  "eventsCtaLeaveEvent": "Leave event",
+  "eventsCtaJoinEcoAction": "Join eco action",
+  "eventsStatusUpcoming": "Upcoming",
+  "eventsStatusInProgress": "In progress",
+  "eventsStatusCompleted": "Completed",
+  "eventsStatusCancelled": "Cancelled",
+  "eventsCardActionsSheetTitle": "Event actions",
+  "eventsCardCopyTitle": "Copy event details",
+  "eventsCardCopySubtitle": "Copy title, date and location",
+  "eventsCardCopiedSnack": "Event details copied.",
+  "eventsCardShareTitle": "Share event",
+  "eventsCardShareSubtitle": "Share with friends",
+  "eventsCardOpenTitle": "Open event",
+  "eventsCardOpenSubtitle": "View full event details",
+  "eventsCardMoreActionsSemantic": "More event actions",
+  "eventsCardSoonLabel": "Soon",
+  "eventsFeedUpNext": "Up next",
+  "eventsCountdownStarted": "Started",
+  "eventsCountdownDaysHours": "Starts in {days}d {hours}h",
+  "@eventsCountdownDaysHours": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "hours": { "type": "int" }
+    }
+  },
+  "eventsCountdownHoursMinutes": "Starts in {hours}h {minutes}m",
+  "@eventsCountdownHoursMinutes": {
+    "placeholders": {
+      "hours": { "type": "int" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsCountdownMinutes": "Starts in {minutes}m",
+  "@eventsCountdownMinutes": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "eventsShareEventTooltip": "Share event",
+  "eventsAttendeeCheckInSemantic": "Scan to check in at event",
+  "eventsAttendeeAlreadyCheckedInSnack": "You are already checked in.",
+  "eventsAttendeeCheckInPausedSnack": "Organizer has paused check-in for now.",
+  "eventsAttendeeCheckInCompleteSnack": "Check-in complete.",
+  "eventsAttendeeBannerTitleCheckedIn": "You are checked in",
+  "eventsAttendeeBannerTitleInProgress": "Event is in progress",
+  "eventsAttendeeBannerSubtitleAttendanceConfirmed": "Attendance confirmed",
+  "eventsAttendeeBannerSubtitleCheckedInAt": "Checked in at {time}",
+  "@eventsAttendeeBannerSubtitleCheckedInAt": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  },
+  "eventsAttendeeBannerSubtitleScanQr": "Scan the organizer's QR to check in",
+  "eventsAttendeeBannerSubtitlePaused": "Check-in is temporarily paused",
+  "eventsDetailShareSuccess": "Event shared.",
+  "eventsDetailCalendarAdded": "Event added to your calendar.",
+  "eventsDetailCalendarFailed": "Could not add to calendar. Try again.",
+  "eventsDetailRefreshFailed": "Could not refresh this event. Try again.",
+  "eventsDetailCancelledCallout": "This event has been cancelled.",
+  "eventsDetailOpenInMaps": "Open in Maps",
+  "eventsDetailCoverSemantic": "Cover image for {title}",
+  "@eventsDetailCoverSemantic": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "eventsDetailGroupedPanelSemantic": "Location, schedule, and details",
+  "eventsDetailParticipationSemantic": "Your participation",
+  "eventsAnalyticsLoadFailed": "Could not load analytics.",
+  "eventsAnalyticsRetry": "Retry",
+  "eventsRecurrenceDaily": "Every day",
+  "eventsRecurrenceNavigatePrevious": "Previous occurrence in series",
+  "eventsRecurrenceNavigateNext": "Next occurrence in series",
+  "eventsImpactSummarySaved": "Impact summary saved.",
+  "eventsImpactSummaryUpdated": "Impact summary updated.",
+  "eventsReminderSetSnack": "Reminder set for {when}.",
+  "@eventsReminderSetSnack": {
+    "placeholders": {
+      "when": { "type": "String" }
+    }
+  },
+  "eventsFeedbackSheetTitle": "Post-event feedback",
+  "eventsFeedbackHowWasEvent": "How was the event?",
+  "eventsFeedbackBagsCollected": "Bags collected",
+  "eventsFeedbackVolunteerHours": "Volunteer hours: {hours}h",
+  "@eventsFeedbackVolunteerHours": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+  "eventsFeedbackNotesHint": "What worked well? Any notes for next time?",
+  "eventsEvidenceMaxPhotosSnack": "Maximum {max} photos reached.",
+  "@eventsEvidenceMaxPhotosSnack": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "eventsEvidencePickFailedSnack": "Could not pick photos. Check permissions.",
+  "eventsEvidenceRemoveAction": "Remove",
+  "eventsEvidenceAppBarTitle": "Cleanup evidence",
+  "eventsEvidenceSaving": "Saving...",
+  "eventsEvidenceAfterPhotosSaved": "After photos saved.",
+  "eventsEvidenceNoChanges": "No changes to save.",
+  "eventsSiteReferencePhotoTitle": "Site reference photo",
+  "eventsSiteReferencePhotoBody": "Reference taken before cleanup. Use the After tab to add photos of the cleaned site.",
+  "eventsManageCheckInOnlyInProgress": "Check-in is available only while the event is in progress.",
+  "eventsEventFull": "This event is full.",
+  "eventsParticipationUpdateFailed": "Could not update participation. Try again.",
+  "eventsJoinedEcoAction": "You joined this eco action.",
+  "eventsJoinPointsEarned": "+{points} points — you're in!",
+  "@eventsJoinPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsLeftEcoAction": "You left this eco action.",
+  "eventsCheckInPointsEarned": "+{points} points — checked in!",
+  "@eventsCheckInPointsEarned": {
+    "placeholders": {
+      "points": { "type": "int" }
+    }
+  },
+  "eventsManualCheckInWithPoints": "{name} checked in · +{points} pts for them",
+  "@eventsManualCheckInWithPoints": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "points": { "type": "int" }
+    }
+  },
+  "eventsJoinFirstForReminders": "Join the event first to set reminders.",
+  "eventsReminderDisabled": "Reminder disabled.",
+  "eventsReminderSheetTitle": "Choose reminder time",
+  "eventsReminderSheetSubtitle": "Event starts at {timeRange} on {date}.",
+  "@eventsReminderSheetSubtitle": {
+    "placeholders": {
+      "timeRange": { "type": "String" },
+      "date": { "type": "String" }
+    }
+  },
+  "eventsReminderPreset1Day": "1 day before",
+  "eventsReminderPreset3Hours": "3 hours before",
+  "eventsReminderPreset1Hour": "1 hour before",
+  "eventsReminderPreset30Mins": "30 minutes before",
+  "eventsReminderUnavailableSubtitle": "Unavailable for this event time",
+  "eventsReminderCustomTitle": "Custom date and time",
+  "eventsReminderCustomSubtitle": "Pick a specific reminder moment",
+  "eventsReminderPickTitle": "Pick reminder",
+  "eventsReminderDone": "Done",
+  "eventsCardParticipantsMore": "+{count} more",
+  "@eventsCardParticipantsMore": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsCardParticipantsCountMax": "{count} / {max}",
+  "@eventsCardParticipantsCountMax": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "max": { "type": "int" }
+    }
+  },
+  "eventsCardParticipantsJoined": "{count} joined",
+  "@eventsCardParticipantsJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsDetailSemanticsLabel": "Event detail: {title}",
+  "@eventsDetailSemanticsLabel": {
+    "placeholders": {
+      "title": { "type": "String" }
+    }
+  },
+  "eventsCountdownBadgeSemantic": "Time until event starts: {label}",
+  "@eventsCountdownBadgeSemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "eventsEvidenceThumbnailMenuTitle": "Photo",
+  "eventsFeedRefreshFailed": "Could not refresh events.",
+  "eventsCreateGenericError": "Could not create event. Try again.",
+  "qrScannerPointCameraHint": "Point your camera at the organizer's live QR code",
+  "qrScannerEnterManually": "Can't scan? Enter code manually",
+  "qrScannerRetryCamera": "Retry camera",
+  "qrScannerSubmitCode": "Submit code",
+  "qrScannerHintFreshQr": "If the organizer refreshes their QR, scan the newest one.",
+  "qrScannerHintCameraBlocked": "If camera access stays blocked, paste the code manually or enable camera access in Settings.",
+  "qrScannerGenericEventTitle": "this cleanup event",
+  "qrScannerErrorInvalidFormat": "Invalid QR format.",
+  "qrScannerErrorInvalidQr": "This QR is not valid for check-in.",
+  "qrScannerErrorWrongEvent": "This QR belongs to another event.",
+  "qrScannerErrorSessionClosed": "Organizer paused check-in.",
+  "qrScannerErrorSessionExpired": "QR expired. Ask organizer for a new code.",
+  "qrScannerErrorReplayDetected": "This QR was already used.",
+  "qrScannerErrorAlreadyCheckedIn": "You are already checked in.",
+  "qrScannerErrorRequiresJoin": "Join this event in the app before checking in.",
+  "qrScannerErrorCheckInUnavailable": "Check-in is not open for this event right now.",
+  "qrScannerErrorRateLimited": "Too many attempts. Wait a moment and try again.",
+  "qrScannerCameraUnavailableFeedback": "Camera access is unavailable. You can paste the organizer code or re-enable camera access in Settings.",
+  "qrScannerManualEntryTitle": "Enter code manually",
+  "qrScannerPasteOrganizerQrHint": "Paste organizer QR text",
+  "qrScannerPasteFromClipboardTooltip": "Paste from clipboard",
+  "qrScannerEnterCodeFirst": "Enter a code first.",
+  "qrScannerCheckedInTitle": "You're checked in!",
+  "qrScannerWelcomeTo": "Welcome to {eventTitle}",
+  "@qrScannerWelcomeTo": {
+    "placeholders": {
+      "eventTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerCheckedInAt": "Checked in at {time}",
+  "@qrScannerCheckedInAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "qrScannerDone": "Done",
+  "qrScannerAppBarTitle": "Scan to check in",
+  "qrScannerToggleFlashlightSemantic": "Toggle flashlight",
+  "qrScannerCameraStarting": "Starting camera…",
+  "qrScannerCheckingIn": "Verifying check-in…",
+  "qrScannerCameraErrorTitle": "Camera unavailable",
+  "qrScannerManualEntrySubtitle": "Paste the full text the organizer shared (copy from their screen or a message).",
+  "qrScannerPasteButton": "Paste",
+  "siteReportReasonFakeLabel": "Fake or misleading data",
+  "siteReportReasonFakeSubtitle": "Information does not reflect reality",
+  "siteReportReasonResolvedLabel": "Already resolved",
+  "siteReportReasonResolvedSubtitle": "Issue was cleaned or fixed",
+  "siteReportReasonWrongLocationLabel": "Wrong location",
+  "siteReportReasonWrongLocationSubtitle": "Site is placed incorrectly on the map",
+  "siteReportReasonDuplicateLabel": "Duplicate report",
+  "siteReportReasonDuplicateSubtitle": "Same site reported multiple times",
+  "siteReportReasonSpamLabel": "Spam or abuse",
+  "siteReportReasonSpamSubtitle": "Inappropriate or malicious content",
+  "siteReportReasonOtherLabel": "Other",
+  "siteReportReasonOtherSubtitle": "Something else is wrong",
+  "takeActionDonationOpenFailed": "Could not open donation page",
+  "takeActionShareSiteTitle": "Share site",
+  "takeActionShareSiteSubtitle": "Help others discover and support this site",
+  "takeActionLinkCopied": "Link copied",
+  "takeActionSharedToProfile": "Shared to your profile",
+  "siteDetailThankYouReportSnack": "Thank you. Your report helps us improve.",
+  "siteDetailUpvoteFailedSnack": "Could not update upvote. Please try again.",
+  "siteDetailNoUpvotesSnack": "No upvotes yet. Be the first to support this site!",
+  "siteUpvotersSheetTitle": "Upvoters",
+  "siteUpvotersSupportingLabel": "Supporting",
+  "siteUpvotersSupportersCount": "{count, plural, one{1 supporter} other{{count} supporters}}",
+  "@siteUpvotersSupportersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteUpvotersLoadFailed": "Could not load supporters.",
+  "siteUpvotersRetry": "Retry",
+  "siteDetailNoVolunteersSnack": "No volunteers yet for this site.",
+  "siteDetailDirectionsUnavailableSnack": "Directions not available for this site.",
+  "siteDetailOpenMapsFailedSnack": "Could not open Maps",
+  "siteDetailNoCoReportersSnack": "No other contributors yet. Co-reporters appear when someone else reports the same place.",
+  "siteStatsCoReportersSemantic": "{count} co-reporters for this report",
+  "@siteStatsCoReportersSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteParticipantStatsSemantic": "{count} for contributors (co-reporters or merged duplicates)",
+  "@siteParticipantStatsSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteMergedDuplicatesModalTitle": "Merged duplicate reports",
+  "siteMergedDuplicatesModalBody": "{count, plural, one{One similar submission was merged into this report. When someone else reports the same place, they appear as co-reporters.} other{{count} similar submissions were merged into this report. When someone else reports the same place, they appear as co-reporters.}}",
+  "@siteMergedDuplicatesModalBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteCardUpvoteFailedSnack": "Could not update upvote. Please try again.",
+  "siteCardSavedFailedSnack": "Could not update saved state. Please try again.",
+  "siteCardTakeActionSemantic": "Take action",
+  "siteCardFeedOptionsSemantic": "Feed options",
+  "siteCardCommentsLoadFailedSnack": "Could not load comments right now.",
+  "siteCardShareTrackFailedSnack": "Could not track share right now.",
+  "siteCardFeedbackSubmitFailedSnack": "Could not submit feedback right now.",
+  "siteCardNotRelevantTitle": "Not relevant",
+  "siteCardShowLessTitle": "Show less like this",
+  "siteCardDuplicateTitle": "Duplicate",
+  "siteCardMisleadingTitle": "Misleading",
+  "siteCardHidePostTitle": "Hide this post",
+  "commentsSheetTitle": "Comment actions",
+  "commentsSheetSubtitle": "Manage this comment",
+  "commentsEditTitle": "Edit comment",
+  "commentsEditSubtitle": "Update the text in composer",
+  "commentsDeleteTitle": "Delete comment",
+  "commentsDeleteSubtitle": "Remove it from this thread",
+  "commentsEditFailedSnack": "Could not edit comment right now.",
+  "commentsReplyFailedSnack": "Could not post your reply. Please try again.",
+  "commentsDeletedSnack": "Comment deleted.",
+  "commentsDeleteFailedSnack": "Could not delete comment right now.",
+  "commentsLikeFailedSnack": "Could not update like right now.",
+  "commentsCancelEditSemantic": "Cancel editing and clear draft",
+  "commentsCancelReplySemantic": "Cancel replying and clear draft",
+  "commentsReplyToSemantic": "Reply to {name}",
+  "@commentsReplyToSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "searchModalCancel": "Cancel",
+  "appSmartImageRetry": "Retry",
+  "appSmartImageRetryIn": "Retry in {seconds}s",
+  "@appSmartImageRetryIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "semanticClose": "Close",
+  "pollutionSiteTabTakeAction": "Take action",
+  "reportDescriptionHint": "Anything else",
+  "reportSubmittedFallbackCategory": "Report",
+  "reportSeverityLow": "Low",
+  "reportSeverityModerate": "Moderate",
+  "reportSeveritySignificant": "Significant",
+  "reportSeverityHigh": "High",
+  "reportSeverityCritical": "Critical",
+  "reportListSearchPlaceholder": "Search your reports",
+  "reportListSearchHintPrefix": "Search by title, location, category, or status.",
+  "reportListSearchNoMatches": "No matches",
+  "reportListSearchOneReport": "1 report",
+  "reportListSearchNReports": "{count} reports",
+  "@reportListSearchNReports": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListEmptyTitle": "No reports yet",
+  "reportListEmptySubtitle": "Your future reports will appear here after you submit them.",
+  "reportStatusUnderReviewShort": "Under review",
+  "reportStatusApprovedShort": "Approved",
+  "reportStatusDeclinedShort": "Declined",
+  "reportStatusAlreadyReportedShort": "Already reported",
+  "reportListFilterAll": "All",
+  "reportListFilterSemanticPrefix": "Report status",
+  "reportListHeaderTitle": "Your reports",
+  "reportListHeaderTotalPill": "{count, plural, one{1 report in total} other{{count} reports in total}}",
+  "@reportListHeaderTotalPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderUnderReviewPill": "{count, plural, one{1 under review} other{{count} under review}}",
+  "@reportListHeaderUnderReviewPill": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListHeaderSemanticSummary": "{totalReports, plural, one{1 report in total} other{{totalReports} reports in total}}. {underReview, plural, one{1 currently under review} other{{underReview} currently under review}}.",
+  "@reportListHeaderSemanticSummary": {
+    "placeholders": {
+      "totalReports": {
+        "type": "int"
+      },
+      "underReview": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilteredFooterAll": "All reports shown",
+  "reportListFilteredFooterCount": "{count, plural, one{1 report} other{{count} reports}}",
+  "@reportListFilteredFooterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListNoMatchesSearchTitle": "No reports found",
+  "reportListNoMatchesFilterTitle": "No reports with this filter",
+  "reportListNoMatchesHintSearchAndFilter": "Try a different search or clear filters to see more reports.",
+  "reportListNoMatchesHintSearchOnly": "Check the spelling or try a broader search.",
+  "reportListNoMatchesHintFilterOnly": "Try another filter, or clear it to see all reports.",
+  "reportListClearSearch": "Clear search",
+  "reportListDateWeeksAgo": "{weeks, plural, one{1 week ago} other{{weeks} weeks ago}}",
+  "@reportListDateWeeksAgo": {
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailOpeningInProgress": "Opening…",
+  "reportDetailNoPhotos": "No photos",
+  "reportDetailStatusUnderReviewTitle": "Under review by moderators",
+  "reportDetailStatusUnderReviewBody": "Moderators are checking your evidence and location before they decide how to handle this report.",
+  "reportDetailStatusApprovedTitle": "Approved and linked to a site",
+  "reportDetailStatusApprovedBody": "This report helped confirm a public pollution site and may contribute to cleanup actions.",
+  "reportDetailStatusAlreadyReportedTitle": "Already tracked as an existing site",
+  "reportDetailStatusAlreadyReportedBody": "Your report matched an existing site. The evidence is still useful for understanding the problem.",
+  "reportDetailStatusOutcomeTitle": "Review outcome",
+  "reportDetailStatusOutcomeBodyFallback": "This report could not be approved in its current form.",
+  "reportCardSemanticLabel": "{category}, {status}, {location}. Tap to view details.",
+  "@reportCardSemanticLabel": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "appSmartImageUnavailable": "Image unavailable",
+  "eventsReminderSectionTitle": "Event reminder",
+  "eventsReminderSectionEnabled": "Reminder is on",
+  "eventsReminderSectionSetFor": "Set for {time}",
+  "@eventsReminderSectionSetFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsReminderSectionDisabled": "Get notified before event starts",
+  "eventsReminderSectionDisable": "Disable",
+  "eventsReminderSectionEnable": "Enable",
+  "eventsDescriptionTitle": "About",
+  "eventsDescriptionShowLess": "Show less",
+  "eventsDescriptionReadMore": "Read more",
+  "eventsAfterCleanupTitle": "After cleanup",
+  "eventsAfterPhotoSemantic": "View after cleanup photo {index} of {total}",
+  "@eventsAfterPhotoSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsFilterAll": "All",
+  "eventsFilterUpcoming": "Upcoming",
+  "eventsFilterNearby": "Nearby",
+  "eventsFilterPast": "Past",
+  "eventsFilterMyEvents": "My events",
+  "eventsFilterSemanticPrefix": "Events",
+  "eventsParticipantsTitle": "Attendees",
+  "eventsParticipantsViewSemantic": "View {count} attendees",
+  "@eventsParticipantsViewSemantic": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsYouAndOthers": "You and {count} others joined",
+  "@eventsParticipantsYouAndOthers": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsVolunteersJoined": "{count} volunteers joined",
+  "@eventsParticipantsVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSpotsLeft": "{count} spots left",
+  "@eventsParticipantsSpotsLeft": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsParticipantsCheckedInCount": "{checkedIn} of {total} checked in",
+  "@eventsParticipantsCheckedInCount": {
+    "placeholders": {
+      "checkedIn": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsParticipantsSearchPlaceholder": "Search attendee",
+  "eventsParticipantsNoSearchResults": "No attendee matches your search.",
+  "eventsParticipantsYouOrganizer": "You · Organizer",
+  "eventsParticipantsOrganizer": "Organizer",
+  "eventsParticipantsYou": "You",
+  "eventsParticipantsLoadFailed": "Couldn't load attendees. Check your connection and try again.",
+  "eventsParticipantsRetry": "Retry",
+  "eventsParticipantsViewRosterSemantic": "View attendee list",
+  "eventsGearSectionTitle": "Gear to bring",
+  "eventsGearNoneNeeded": "No special gear needed",
+  "eventsImpactSummaryTitle": "Impact summary",
+  "eventsImpactSummaryAdd": "Add",
+  "eventsImpactSummaryEdit": "Edit",
+  "eventsImpactSummaryEmptyHint": "Capture cleanup outcomes, effort, and lessons learned.",
+  "eventsImpactBadgeRating": "{rating}★ rating",
+  "@eventsImpactBadgeRating": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "eventsImpactBadgeBags": "{count} bags",
+  "@eventsImpactBadgeBags": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsImpactBadgeHours": "{hours}h",
+  "@eventsImpactBadgeHours": {
+    "placeholders": {
+      "hours": { "type": "String" }
+    }
+  },
+  "eventsImpactEstimatedLine": "{kg} kg removed · {co2} kg CO2e avoided",
+  "@eventsImpactEstimatedLine": {
+    "placeholders": {
+      "kg": { "type": "String" },
+      "co2": { "type": "String" }
+    }
+  },
+  "eventsLocationSiteSemantic": "View pollution site, {distanceKm} km away",
+  "@eventsLocationSiteSemantic": {
+    "placeholders": {
+      "distanceKm": { "type": "String" }
+    }
+  },
+  "eventsLocationDotKm": "· {distanceKm} km",
+  "@eventsLocationDotKm": {
+    "placeholders": {
+      "distanceKm": { "type": "String" }
+    }
+  },
+  "eventsEmptyAllTitle": "No eco events yet",
+  "eventsEmptyAllSubtitle": "Be the first to create one! Tap + above to get started.",
+  "eventsEmptyUpcomingTitle": "No upcoming events",
+  "eventsEmptyUpcomingSubtitle": "Create one to get volunteers together.",
+  "eventsEmptyNearbyTitle": "No nearby events",
+  "eventsEmptyNearbySubtitle": "Try a different filter or create an event in your area.",
+  "eventsEmptyPastTitle": "No past events",
+  "eventsEmptyPastSubtitle": "Completed events will show here.",
+  "eventsEmptyMyEventsTitle": "No events yet",
+  "eventsEmptyMyEventsSubtitle": "Join or create an event to see it here.",
+  "eventsSearchEmptyTitle": "No results for \"{query}\"",
+  "@eventsSearchEmptyTitle": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "eventsSearchEmptySubtitle": "Try a different search term or check your spelling.",
+  "eventsSitePickerTitle": "Choose site",
+  "eventsSitePickerSubtitle": "Anchor this event to one cleanup location.",
+  "eventsSitePickerSearchPlaceholder": "Search by name or description",
+  "eventsSitePickerNoMatch": "No sites match \"{query}\"",
+  "@eventsSitePickerNoMatch": {
+    "placeholders": {
+      "query": { "type": "String" }
+    }
+  },
+  "eventsSitePickerRowKmDesc": "{km} km away · {desc}",
+  "@eventsSitePickerRowKmDesc": {
+    "placeholders": {
+      "km": { "type": "String" },
+      "desc": { "type": "String" }
+    }
+  },
+  "eventsSuccessDialogTitle": "Event created",
+  "eventsSuccessDialogBody": "{title} at {siteName} is ready. Share it with your community to get volunteers on board.",
+  "@eventsSuccessDialogBody": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "siteName": { "type": "String" }
+    }
+  },
+  "eventsSuccessDialogOpenEvent": "Open event",
+  "eventsTimePickerSelectTime": "Select time",
+  "eventsTimePickerConfirm": "Confirm",
+  "eventsTimePickerFrom": "From",
+  "eventsTimePickerTo": "To",
+  "eventsTimePickerTimeBlockSemantic": "{role}, {time}",
+  "@eventsTimePickerTimeBlockSemantic": {
+    "placeholders": {
+      "role": { "type": "String" },
+      "time": { "type": "String" }
+    }
+  },
+  "eventsFeedbackRatingStars": "{rating}★",
+  "@eventsFeedbackRatingStars": {
+    "placeholders": {
+      "rating": { "type": "int" }
+    }
+  },
+  "eventsFeedRecentSearches": "Recent searches",
+  "eventsCleanupAfterUploadSemantic": "Upload after photos",
+  "eventsCleanupAfterViewFullscreenSemantic": "View photo fullscreen",
+  "eventsCleanupAfterUploadMoreTitle": "Upload more photos",
+  "eventsCleanupAfterUploadedCount": "{count} uploaded",
+  "@eventsCleanupAfterUploadedCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsCleanupAfterSlotsRemaining": "{count, plural, one{1 more slot available} other{{count} more slots available}}",
+  "@eventsCleanupAfterSlotsRemaining": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsCleanupAfterAddMoreSemantic": "Add more photos",
+  "eventsCleanupAfterRemoveSemantic": "Remove photo",
+  "eventsCleanupAfterEmptyTitle": "Add photos of the cleaned site",
+  "eventsCleanupAfterEmptyMaxPhotos": "Up to {max} photos",
+  "@eventsCleanupAfterEmptyMaxPhotos": {
+    "placeholders": {
+      "max": { "type": "int" }
+    }
+  },
+  "eventsCleanupAfterEmptyTapGallery": "Tap to select from gallery",
+  "eventsCleanupEvidencePhotoSemantic": "Cleanup evidence photo",
+  "eventsDateRelativeEarlierToday": "Earlier today",
+  "eventsDateRelativeDaysAgo": "{days} days ago",
+  "@eventsDateRelativeDaysAgo": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateRelativeToday": "Today",
+  "eventsDateRelativeTomorrow": "Tomorrow",
+  "eventsDateRelativeInDays": "In {days} days",
+  "@eventsDateRelativeInDays": {
+    "placeholders": {
+      "days": { "type": "int" }
+    }
+  },
+  "eventsDateInfoSheetTitle": "Date and time",
+  "eventsDateInfoSemantic": "{date}, {timeRange}",
+  "@eventsDateInfoSemantic": {
+    "placeholders": {
+      "date": { "type": "String" },
+      "timeRange": { "type": "String" }
+    }
+  },
+  "eventsCategorySheetTitle": "Category",
+  "eventsCategorySemantic": "Event category: {label}",
+  "@eventsCategorySemantic": {
+    "placeholders": {
+      "label": { "type": "String" }
+    }
+  },
+  "eventsOrganizerSheetTitle": "Organizer",
+  "eventsOrganizerYouOwnThis": "This is your event",
+  "eventsOrganizerRoleLabel": "Event organizer",
+  "eventsOrganizerCreatedOn": "Event created on {day}/{month}/{year}",
+  "@eventsOrganizerCreatedOn": {
+    "placeholders": {
+      "day": { "type": "int" },
+      "month": { "type": "int" },
+      "year": { "type": "int" }
+    }
+  },
+  "eventsOrganizerSemantic": "Organizer: {name}",
+  "@eventsOrganizerSemantic": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventsOrganizedByLabel": "Organized by",
+  "eventsFeedSemantic": "Events feed",
+  "eventsFeedTitle": "Events",
+  "eventsFeedCreateSemantic": "Create event",
+  "eventsFeedSearchPlaceholder": "Search events",
+  "eventsFeedHappeningNow": "Happening now",
+  "eventsFeedComingUp": "Coming up",
+  "eventsFeedRecentlyCompleted": "Recently completed",
+  "eventsFeedViewListToggle": "List view",
+  "eventsFeedViewCalendarToggle": "Calendar view",
+  "eventsCalendarPreviousMonth": "Previous month",
+  "eventsCalendarNextMonth": "Next month",
+  "eventsCalendarDaySemantic": "Day {day}",
+  "@eventsCalendarDaySemantic": {
+    "placeholders": {
+      "day": { "type": "int" }
+    }
+  },
+  "eventsCalendarNoEventsThisDay": "No events on this day",
+  "siteCardPollutionSiteSemantic": "Pollution site: {title}. Tap to open details.",
+  "@siteCardPollutionSiteSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardPhotoSemantic": "Photo of {title}",
+  "@siteCardPhotoSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsFilterSheetTitle": "Filter events",
+  "eventsFilterSheetCategory": "Category",
+  "eventsFilterSheetStatus": "Status",
+  "eventsFilterSheetDateRange": "Date range",
+  "eventsFilterSheetDateFrom": "From",
+  "eventsFilterSheetDateTo": "To",
+  "eventsFilterSheetShowResults": "Show results",
+  "eventsFilterSheetClearAll": "Clear all",
+  "eventsFilterSheetActiveCount": "{count} active",
+  "@eventsFilterSheetActiveCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardTitle": "My events",
+  "eventsOrganizerDashboardEmpty": "You haven't organised any events yet.",
+  "eventsOrganizerDashboardEmptyAction": "Create first event",
+  "eventsOrganizerDashboardSectionUpcoming": "Upcoming",
+  "eventsOrganizerDashboardSectionInProgress": "In progress",
+  "eventsOrganizerDashboardSectionCompleted": "Completed",
+  "eventsOrganizerDashboardSectionCancelled": "Cancelled",
+  "eventsOrganizerDashboardParticipants": "{count}/{max} participants",
+  "@eventsOrganizerDashboardParticipants": {
+    "placeholders": {
+      "count": { "type": "int" },
+      "max": { "type": "String" }
+    }
+  },
+  "eventsOrganizerDashboardParticipantsUnlimited": "{count} participants",
+  "@eventsOrganizerDashboardParticipantsUnlimited": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsOrganizerDashboardEvidenceAction": "Evidence",
+  "eventsAnalyticsTitle": "Analytics",
+  "eventsAnalyticsAttendanceRate": "Attendance rate",
+  "eventsAnalyticsJoiners": "Joiners over time",
+  "eventsAnalyticsCheckInsByHour": "Check-ins by hour",
+  "eventsAnalyticsNoData": "No data yet",
+  "eventsOfflineSyncQueued": "Saved. Will sync when back online.",
+  "eventsOfflineSyncFailed": "Sync failed. Will retry automatically.",
+  "eventsWeatherForecast": "Weather forecast",
+  "eventsWeatherLoadFailed": "Weather unavailable",
+  "eventsWeatherPrecipitationMm": "{amount} mm precipitation",
+  "@eventsWeatherPrecipitationMm": {
+    "placeholders": {
+      "amount": { "type": "String" }
+    }
+  },
+  "eventsWeatherNoPrecipitation": "No measurable precipitation",
+  "eventsWeatherPrecipChance": "{percent}% chance of precipitation",
+  "@eventsWeatherPrecipChance": {
+    "placeholders": {
+      "percent": { "type": "int" }
+    }
+  },
+  "eventsWeatherIndicativeNote": "Indicative forecast from Open-Meteo; actual conditions may differ.",
+  "eventsWeatherIndicativeInfoTitle": "About this forecast",
+  "eventsWeatherIndicativeInfoSemantic": "Information about the weather forecast source",
+  "eventsRecurrenceNone": "Does not repeat",
+  "eventsRecurrenceWeekly": "Every week",
+  "eventsRecurrenceBiweekly": "Every 2 weeks",
+  "eventsRecurrenceMonthly": "Every month",
+  "eventsRecurrenceOccurrences": "{count} occurrences",
+  "@eventsRecurrenceOccurrences": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventsRecurrencePartOfSeries": "Part of a series",
+  "eventsRecurrenceSeriesLabel": "Event {index} of {total}",
+  "@eventsRecurrenceSeriesLabel": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventsRecurrenceDone": "Done",
+  "eventsCategoryGeneralCleanup": "General cleanup",
+  "eventsCategoryGeneralCleanupDescription": "Pick up litter, sweep debris, and restore the area.",
+  "eventsCategoryRiverAndLake": "River & lake cleanup",
+  "eventsCategoryRiverAndLakeDescription": "Remove waste from waterways, shores, and drainage channels.",
+  "eventsCategoryTreeAndGreen": "Tree planting & greening",
+  "eventsCategoryTreeAndGreenDescription": "Plant trees, restore green spaces, and build garden beds.",
+  "eventsCategoryRecyclingDrive": "Recycling drive",
+  "eventsCategoryRecyclingDriveDescription": "Sort, collect, and transport recyclables to processing centers.",
+  "eventsCategoryHazardousRemoval": "Hazardous waste removal",
+  "eventsCategoryHazardousRemovalDescription": "Safely collect chemicals, tires, batteries, or asbestos.",
+  "eventsCategoryAwarenessAndEducation": "Awareness & education",
+  "eventsCategoryAwarenessAndEducationDescription": "Workshops, talks, or community engagement on eco practices.",
+  "eventsCategoryOther": "Other",
+  "eventsCategoryOtherDescription": "Custom event that doesn't match the categories above.",
+  "eventsGearTrashBags": "Trash bags",
+  "eventsGearGloves": "Gloves",
+  "eventsGearRakes": "Rakes & shovels",
+  "eventsGearWheelbarrow": "Wheelbarrow",
+  "eventsGearWaterBoots": "Water boots",
+  "eventsGearSafetyVest": "Safety vest",
+  "eventsGearFirstAid": "First aid kit",
+  "eventsGearSunscreen": "Sunscreen & water",
+  "eventsScaleSmall": "Small (1–5 people)",
+  "eventsScaleSmallDescription": "Quick spot cleanup, one bag or two.",
+  "eventsScaleMedium": "Medium (6–15 people)",
+  "eventsScaleMediumDescription": "Half-day effort, several areas covered.",
+  "eventsScaleLarge": "Large (16–40 people)",
+  "eventsScaleLargeDescription": "Organized group, heavy waste removal.",
+  "eventsScaleMassive": "Massive (40+ people)",
+  "eventsScaleMassiveDescription": "City-wide or multi-site event.",
+  "eventsDifficultyEasy": "Easy",
+  "eventsDifficultyEasyDescription": "Flat terrain, light waste, family-friendly.",
+  "eventsDifficultyModerate": "Moderate",
+  "eventsDifficultyModerateDescription": "Mixed terrain or bulky items, some effort.",
+  "eventsDifficultyHard": "Hard",
+  "eventsDifficultyHardDescription": "Steep slopes, heavy debris, or hazardous materials.",
+  "eventsSiteCoercedDescription": "Community cleanup site",
+  "homeSiteCleaningEmptyTitle": "No cleaning events yet",
+  "homeSiteCleaningEmptyBody": "Be the first to organize an eco action and rally volunteers for this site.",
+  "homeSiteCleaningTapToCreate": "Tap to create",
+  "homeSiteCleaningCtaCreateFirst": "Create eco action",
+  "homeSiteCleaningCtaScheduleAnother": "Schedule another action",
+  "homeSiteCleaningVolunteersJoined": "{count, plural, one{1 volunteer joined} other{{count} volunteers joined}}",
+  "@homeSiteCleaningVolunteersJoined": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "homeSiteCleaningOrganizerHint": "You're organizing this action. Upload \"after\" photos once it's completed.",
+  "homeSiteCleaningVolunteerHint": "Join the action to help clean this site.",
+  "homeSiteCleaningJoinAction": "Join action",
+  "homeSiteCleaningEventUnavailable": "Event details are unavailable right now.",
+  "errorUserNetwork": "Check your connection and try again.",
+  "errorUserTimeout": "That took too long. Please try again.",
+  "errorUserUnauthorized": "Please sign in again to continue.",
+  "errorUserForbidden": "You don’t have permission to do that.",
+  "errorUserNotFound": "We couldn’t find that.",
+  "errorUserServer": "The service is busy. Please try again shortly.",
+  "errorUserTooManyRequests": "Too many attempts. Please wait a moment.",
+  "errorUserUnknown": "Something went wrong. Please try again.",
+  "eventsFilterSheetSemantic": "Filter events",
+  "eventChatTitle": "Chat",
+  "eventChatRowTitle": "Group chat",
+  "eventChatInputHint": "Message",
+  "eventChatSend": "Send",
+  "eventChatEmptyTitle": "Start the conversation",
+  "eventChatEmptyBody": "Coordinate with other volunteers before and during the event.",
+  "eventChatMessageRemoved": "This message was removed",
+  "eventChatNewMessages": "New messages",
+  "eventChatToday": "Today",
+  "eventChatYesterday": "Yesterday",
+  "eventChatReply": "Reply",
+  "eventChatDelete": "Delete",
+  "eventChatLoadError": "Could not load messages",
+  "eventChatSendFailed": "Message not sent. Tap to retry.",
+  "eventChatOpenMapsFailed": "Couldn’t open Maps. Try again.",
+  "eventChatAttachPhotoLibrary": "Photo Library",
+  "eventChatAttachCamera": "Camera",
+  "eventChatAttachVideo": "Video",
+  "eventChatAttachDocument": "Document",
+  "eventChatAttachAudio": "Audio",
+  "eventChatVoiceDiscard": "Discard recording",
+  "eventChatVoiceSend": "Send voice message",
+  "eventChatVoicePreviewHint": "Voice preview",
+  "eventChatAttachLocation": "Share Location",
+  "eventChatSendLocation": "Send Location",
+  "eventChatSending": "Sending…",
+  "eventChatReplyingTo": "Replying to {name}",
+  "@eventChatReplyingTo": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatCharCountHint": "{count} / 2000",
+  "@eventChatCharCountHint": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatSemanticsBubble": "{author}, {time}. {body}",
+  "@eventChatSemanticsBubble": {
+    "placeholders": {
+      "author": { "type": "String" },
+      "time": { "type": "String" },
+      "body": { "type": "String" }
+    }
+  },
+  "eventChatInputSemantics": "Chat message",
+  "eventChatPushChannelName": "Event chat",
+  "eventChatEdited": "(edited)",
+  "eventChatEditMessage": "Edit",
+  "eventChatEditing": "Editing message",
+  "eventChatEditHint": "Edit your message",
+  "eventChatSaveEdit": "Save",
+  "eventChatPinMessage": "Pin",
+  "eventChatUnpinMessage": "Unpin",
+  "eventChatPinnedBy": "Pinned by {name}",
+  "@eventChatPinnedBy": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatPinnedMessagesTitle": "Pinned messages",
+  "eventChatPinnedBarHint": "Pinned",
+  "eventChatNoPinnedMessages": "No pinned messages",
+  "eventChatMuted": "Notifications muted",
+  "eventChatUnmuted": "Notifications unmuted",
+  "eventChatCopied": "Message copied",
+  "eventChatReconnecting": "Reconnecting…",
+  "eventChatConnected": "Connected",
+  "eventChatSearchHint": "Search messages",
+  "eventChatSearchNoResults": "No messages found",
+  "eventChatSearchAction": "Search",
+  "eventChatParticipantsCount": "{count} participants",
+  "@eventChatParticipantsCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsSheetTitle": "People in this chat",
+  "eventChatParticipantsTitleSemantic": "{eventTitle}, {count} participants",
+  "@eventChatParticipantsTitleSemantic": {
+    "placeholders": {
+      "eventTitle": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatParticipantsLoadError": "Couldn’t load participants.",
+  "eventChatParticipantsYouBadge": "You",
+  "eventChatParticipantsEmpty": "No participants loaded yet.",
+  "eventChatSystemUserJoined": "{name} joined the event",
+  "@eventChatSystemUserJoined": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemUserLeft": "{name} left the event",
+  "@eventChatSystemUserLeft": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatSystemEventUpdated": "Event details were updated",
+  "eventChatSwipeReplySemantic": "Swipe to reply to this message",
+  "eventChatVoiceLevelSemantic": "Voice level meter",
+  "eventChatMessageOptions": "Message options",
+  "eventChatTypingUnknownParticipant": "Someone",
+  "eventChatCopy": "Copy",
+  "eventChatUnpinConfirm": "Message unpinned",
+  "eventChatMaxPinnedReached": "Maximum pinned messages reached",
+  "eventChatMessageNotInView": "That message isn’t loaded. Scroll up for older messages.",
+  "eventChatMuteNotifications": "Mute notifications",
+  "eventChatUnmuteNotifications": "Unmute notifications",
+  "eventChatSeenBy": "Seen by {names}",
+  "@eventChatSeenBy": {
+    "placeholders": {
+      "names": { "type": "String" }
+    }
+  },
+  "eventChatSeenByTruncated": "Seen by {names} +{count}",
+  "@eventChatSeenByTruncated": {
+    "placeholders": {
+      "names": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatTypingOne": "{name} is typing…",
+  "@eventChatTypingOne": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "eventChatTypingTwo": "{first} and {second} are typing…",
+  "@eventChatTypingTwo": {
+    "placeholders": {
+      "first": { "type": "String" },
+      "second": { "type": "String" }
+    }
+  },
+  "eventChatTypingMany": "{name} and {count} others are typing…",
+  "@eventChatTypingMany": {
+    "placeholders": {
+      "name": { "type": "String" },
+      "count": { "type": "int" }
+    }
+  },
+  "eventChatImageViewerTitle": "Photo",
+  "eventChatImageViewerPage": "{current} of {total}",
+  "@eventChatImageViewerPage": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "eventChatVideoViewerTitle": "Video",
+  "eventChatOpenFile": "Open file",
+  "eventChatDownloadFailed": "Couldn’t download the file",
+  "eventChatPdfOpenFailed": "Couldn’t open the PDF",
+  "eventChatShareFile": "Share",
+  "eventChatLocationMapTitle": "Location",
+  "eventChatCopyCoordinates": "Copy coordinates",
+  "eventChatDirections": "Directions",
+  "eventChatAudioExpandedTitle": "Voice message",
+  "eventChatHoldToRecord": "Hold to record",
+  "eventChatReleaseToSend": "Release to send",
+  "eventChatSlideToCancel": "Slide left to cancel",
+  "eventChatReleaseToCancel": "Release to cancel",
+  "eventChatRecording": "Recording…",
+  "eventChatMicPermissionDenied": "Microphone access is required to send voice messages.",
+  "reportEntryLabelGuided": "Guided report",
+  "reportEntryLabelCamera": "Camera report",
+  "reportEntryHintCamera": "Starting from a live photo can speed up moderation because the evidence is already attached.",
+  "homeReportingCapacityCheckFailed": "Could not check reporting availability right now.",
+  "homeCameraOpenFailed": "Unable to open the camera right now. Please try again in a moment.",
+  "mapTabPlaceholderHint": "Open this tab to load the live map and nearby pollution sites.",
+  "reportCategoryPickerTitle": "Choose category",
+  "reportCategoryPickerSubtitle": "Pick the closest match for the issue you are reporting.",
+  "reportCategoryPickerBannerTitle": "Choose the closest match",
+  "reportCategoryPickerBannerBody": "Pick the category moderators should verify first. It does not need to be perfect.",
+  "reportCategoryIllegalLandfillTitle": "Illegal landfill",
+  "reportCategoryIllegalLandfillDescription": "Dumped waste, trash piles, or informal disposal sites.",
+  "reportCategoryWaterPollutionTitle": "Water pollution",
+  "reportCategoryWaterPollutionDescription": "Contaminated rivers, lakes, drains, or wastewater discharge.",
+  "reportCategoryAirPollutionTitle": "Air pollution",
+  "reportCategoryAirPollutionDescription": "Smoke, dust, burning waste, or emissions harming air quality.",
+  "reportCategoryIndustrialWasteTitle": "Industrial waste",
+  "reportCategoryIndustrialWasteDescription": "Construction debris, factory waste, or hazardous materials.",
+  "reportCategoryOtherTitle": "Other",
+  "reportCategoryOtherDescription": "Use when the issue does not clearly match the categories above.",
+  "unknownRouteTitle": "Page not found",
+  "unknownRouteMessage": "This link may be out of date or incorrect.",
+  "unknownRouteContinueButton": "Continue to the app",
+  "unknownRouteDebugRoute": "Debug: route name was “{routeName}”.",
+  "@unknownRouteDebugRoute": {
+    "placeholders": {
+      "routeName": { "type": "String" }
+    }
+  }
 }

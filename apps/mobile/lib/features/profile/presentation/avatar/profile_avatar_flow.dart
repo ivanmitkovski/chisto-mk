@@ -62,9 +62,9 @@ Future<ProfileAvatarFlowResult> runProfileAvatarFlow(
       picked = await picker.pickImage(
         source: ImageSource.camera,
         preferredCameraDevice: CameraDevice.front,
-        imageQuality: 92,
-        maxWidth: 4096,
-        maxHeight: 4096,
+        imageQuality: 88,
+        maxWidth: 3072,
+        maxHeight: 3072,
       );
     } on PlatformException {
       if (context.mounted) {
@@ -80,7 +80,9 @@ Future<ProfileAvatarFlowResult> runProfileAvatarFlow(
     final ImagePicker picker = ImagePicker();
     picked = await picker.pickImage(
       source: ImageSource.gallery,
-      imageQuality: 96,
+      imageQuality: 90,
+      maxWidth: 2048,
+      maxHeight: 2048,
     );
   }
 

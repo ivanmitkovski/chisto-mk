@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -142,7 +143,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         widget.onCommentsChanged?.call(List<Comment>.unmodifiable(_comments));
         AppSnack.show(
           context,
-          message: 'Could not edit comment right now.',
+          message: context.l10n.commentsEditFailedSnack,
           type: AppSnackType.warning,
         );
       } finally {
@@ -200,7 +201,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         widget.onCommentsChanged?.call(List<Comment>.unmodifiable(_comments));
         AppSnack.show(
           context,
-          message: 'Could not post your reply. Please try again.',
+          message: context.l10n.commentsReplyFailedSnack,
           type: AppSnackType.warning,
         );
       }
@@ -272,11 +273,11 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         return ReportSheetScaffold(
           fitToContent: true,
           addBottomInset: false,
-          title: 'Comment actions',
-          subtitle: 'Manage this comment',
+          title: context.l10n.commentsSheetTitle,
+          subtitle: context.l10n.commentsSheetSubtitle,
           trailing: ReportCircleIconButton(
             icon: Icons.close_rounded,
-            semanticLabel: 'Close',
+            semanticLabel: context.l10n.semanticClose,
             onTap: () => Navigator.of(context).pop(),
           ),
           child: Column(
@@ -284,16 +285,16 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
             children: <Widget>[
               ReportActionTile(
                 icon: Icons.edit_outlined,
-                title: 'Edit comment',
-                subtitle: 'Update the text in composer',
+                title: context.l10n.commentsEditTitle,
+                subtitle: context.l10n.commentsEditSubtitle,
                 onTap: () => Navigator.of(context).pop('edit'),
                 tone: ReportSurfaceTone.neutral,
               ),
               const SizedBox(height: AppSpacing.sm),
               ReportActionTile(
                 icon: Icons.delete_outline_rounded,
-                title: 'Delete comment',
-                subtitle: 'Remove it from this thread',
+                title: context.l10n.commentsDeleteTitle,
+                subtitle: context.l10n.commentsDeleteSubtitle,
                 onTap: () => Navigator.of(context).pop('delete'),
                 tone: ReportSurfaceTone.danger,
               ),
@@ -346,7 +347,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       HapticFeedback.lightImpact();
       AppSnack.show(
         context,
-        message: 'Comment deleted.',
+        message: context.l10n.commentsDeletedSnack,
         type: AppSnackType.info,
       );
     } catch (_) {
@@ -360,7 +361,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       widget.onCommentsChanged?.call(List<Comment>.unmodifiable(_comments));
       AppSnack.show(
         context,
-        message: 'Could not delete comment right now.',
+        message: context.l10n.commentsDeleteFailedSnack,
         type: AppSnackType.warning,
       );
     } finally {
@@ -420,7 +421,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       });
       AppSnack.show(
         context,
-        message: 'Could not update like right now.',
+        message: context.l10n.commentsLikeFailedSnack,
         type: AppSnackType.warning,
       );
       if (!mounted) return;
@@ -689,7 +690,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                     child: _editingCommentId != null
                         ? Semantics(
                             button: true,
-                            label: 'Cancel editing and clear draft',
+                            label: context.l10n.commentsCancelEditSemantic,
                             child: GestureDetector(
                               onTap: () => setState(() {
                                 _editingCommentId = null;
@@ -709,7 +710,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
                             ? const SizedBox.shrink()
                             : Semantics(
                             button: true,
-                            label: 'Cancel replying and clear draft',
+                            label: context.l10n.commentsCancelReplySemantic,
                             child: GestureDetector(
                               onTap: () => setState(() {
                                 _replyToCommentId = null;
@@ -915,7 +916,7 @@ class _CommentTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Semantics(
                   button: true,
-                  label: 'Reply to ${comment.authorName}',
+                  label: context.l10n.commentsReplyToSemantic(comment.authorName),
                   child: GestureDetector(
                     onTap: onReplyTap,
                     behavior: HitTestBehavior.opaque,

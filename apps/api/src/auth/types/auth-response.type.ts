@@ -13,6 +13,7 @@ export type AuthResponse = {
     status: UserStatus;
     isPhoneVerified: boolean;
     pointsBalance: number;
+    avatarUrl: string | null;
   };
 };
 

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 
-// TODO: Wire to GET /rankings or GET /users/rankings when endpoint is available
-
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/features/profile/data/profile_mock_data.dart';
+import 'package:chisto_mobile/features/profile/domain/models/weekly_rankings_result.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/weekly_rankings_skeleton.dart';
+import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+import 'package:intl/intl.dart';
 
 class WeeklyRankingsScreen extends StatefulWidget {
   const WeeklyRankingsScreen({super.key});
@@ -21,10 +26,50 @@ class _WeeklyRankingsScreenState extends State<WeeklyRankingsScreen> {
   final ScrollController _scrollController = ScrollController();
   final GlobalKey _currentUserRowKey = GlobalKey();
 
+  bool _loading = true;
+  AppError? _error;
+  WeeklyRankingsResult? _data;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _load() async {
+    setState(() {
+      _loading = true;
+      _error = null;
+    });
+    try {
+      final WeeklyRankingsResult data = await ServiceLocator
+          .instance
+          .profileRepository
+          .getWeeklyRankings(limit: 50);
+      if (!mounted) return;
+      setState(() {
+        _data = data;
+        _loading = false;
+      });
+    } on AppError catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = AppError.network(cause: e);
+        _loading = false;
+      });
+    }
   }
 
   void _scrollToCurrentUser() {
@@ -39,107 +84,284 @@ class _WeeklyRankingsScreenState extends State<WeeklyRankingsScreen> {
     );
   }
 
+  /// Single typographic en dash (U+2013); avoids `--` from spaced hyphen + locale formats.
+  static const String _enDash = '\u2013';
+
+  String? _weekRangeLine(BuildContext context) {
+    final WeeklyRankingsResult? d = _data;
+    if (d == null) return null;
+    final DateTime? startUtc = DateTime.tryParse(d.weekStartsAt);
+    final DateTime? endUtc = DateTime.tryParse(d.weekEndsAt);
+    if (startUtc == null || endUtc == null) return null;
+    final DateTime startLocal = startUtc.toLocal();
+    final DateTime endLocal = endUtc.toLocal();
+    final String loc = Localizations.localeOf(context).toString();
+    final int nowYear = DateTime.now().year;
+
+    if (startLocal.year == endLocal.year && startLocal.month == endLocal.month) {
+      final String month = DateFormat.MMM(loc).format(startLocal);
+      final String span = '$month ${startLocal.day}$_enDash${endLocal.day}';
+      if (startLocal.year != nowYear) {
+        return '$span, ${startLocal.year}';
+      }
+      return span;
+    }
+
+    final String left = DateFormat.MMMd(loc).format(startLocal);
+    final String right = startLocal.year == endLocal.year
+        ? DateFormat.MMMd(loc).format(endLocal)
+        : DateFormat.yMMMd(loc).format(endLocal);
+    return '$left $_enDash $right';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<WeeklyRankingEntry> entries = ProfileMockData.weeklyRankings;
-
-    WeeklyRankingEntry? currentUserEntry;
-    try {
-      currentUserEntry =
-          entries.firstWhere((WeeklyRankingEntry e) => e.isCurrentUser);
-    } catch (_) {
-      currentUserEntry = null;
-    }
+    final String phase = _loading && _data == null
+        ? 'loading'
+        : _error != null && _data == null
+            ? 'error'
+            : 'content';
 
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.md,
-                AppSpacing.lg,
-                AppSpacing.sm,
+        child: AnimatedPhaseSwitcher(
+          phaseKey: phase,
+          child: _weeklyRankingsPhaseChild(context, phase),
+        ),
+      ),
+    );
+  }
+
+  Widget _weeklyRankingsPhaseChild(BuildContext context, String phase) {
+    switch (phase) {
+      case 'loading':
+        return const WeeklyRankingsSkeleton();
+      case 'error':
+        return AppErrorView(error: _error!, onRetry: _load);
+      default:
+        return _buildWeeklyRankingsLoadedBody(context);
+    }
+  }
+
+  Widget _buildWeeklyRankingsLoadedBody(BuildContext context) {
+    final WeeklyRankingsResult data = _data!;
+    final List<WeeklyLeaderboardEntry> entries = data.entries;
+    final String? weekRange = _weekRangeLine(context);
+
+    WeeklyLeaderboardEntry? currentUserEntry;
+    try {
+      currentUserEntry = entries.firstWhere(
+        (WeeklyLeaderboardEntry e) => e.isCurrentUser,
+      );
+    } catch (_) {
+      currentUserEntry = null;
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.md,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              const AppBackButton(),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                context.l10n.profileWeeklyRankingsTitle,
+                style: AppTypography.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.25,
+                  color: AppColors.textPrimary,
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  const AppBackButton(),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    'Weekly rankings',
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleMedium
-                        ?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: -0.2,
-                        ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                context.l10n.profileWeeklyRankingsSubtitle,
+                style: AppTypography.cardSubtitle.copyWith(
+                  color: AppColors.textSecondary,
+                  height: 1.25,
+                  letterSpacing: -0.05,
+                ),
+              ),
+              if (weekRange != null) ...<Widget>[
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  weekRange,
+                  style: AppTypography.cardSubtitle.copyWith(
+                    color: AppColors.primaryDark,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.1,
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'See how you compare this week.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                  ),
-                ],
+                ),
+              ],
+            ],
+          ),
+        ),
+        if (entries.isNotEmpty) ...<Widget>[
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: Text(
+              context.l10n.profileWeeklyRankingsTopSupporters,
+              style: AppTypography.cardSubtitle.copyWith(
+                color: AppColors.textMuted,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.05,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-              child: Text(
-                'This week\'s top supporters',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
+        if (currentUserEntry != null)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.lg,
+              0,
+              AppSpacing.lg,
+              AppSpacing.md,
+            ),
+            child: Semantics(
+              button: true,
+              hint: context.l10n.profileWeeklyRankingsScrollToYouHint,
+              child: _CurrentUserRankCard(
+                entry: currentUserEntry,
+                onTap: _scrollToCurrentUser,
+              ),
+            ),
+          ),
+        Expanded(
+          child: RefreshIndicator(
+            color: AppColors.primary,
+            onRefresh: _load,
+            child: entries.isEmpty
+                ? LayoutBuilder(
+                    builder:
+                        (BuildContext context, BoxConstraints constraints) {
+                      return SingleChildScrollView(
+                        physics: const AlwaysScrollableScrollPhysics(
+                          parent: BouncingScrollPhysics(),
+                        ),
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            minHeight: constraints.maxHeight,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: AppSpacing.lg,
+                            ),
+                            child: _WeeklyRankingsEmpty(
+                              title: context
+                                  .l10n.profileWeeklyRankingsEmptyTitle,
+                              subtitle: context
+                                  .l10n.profileWeeklyRankingsEmptySubtitle,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  )
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.sm,
+                      AppSpacing.lg,
+                      AppSpacing.xl,
                     ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            if (currentUserEntry != null)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  0,
-                  AppSpacing.lg,
-                  AppSpacing.md,
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(
+                      parent: BouncingScrollPhysics(),
+                    ),
+                    itemBuilder: (BuildContext context, int index) {
+                      final WeeklyLeaderboardEntry entry = entries[index];
+                      if (entry.isCurrentUser) {
+                        return KeyedSubtree(
+                          key: _currentUserRowKey,
+                          child: _RankingRow(entry: entry),
+                        );
+                      }
+                      return _RankingRow(entry: entry);
+                    },
+                    separatorBuilder: (_, _) =>
+                        const SizedBox(height: AppSpacing.xs),
+                    itemCount: entries.length,
+                  ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _WeeklyRankingsEmpty extends StatelessWidget {
+  const _WeeklyRankingsEmpty({
+    required this.title,
+    required this.subtitle,
+  });
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      label: '$title. $subtitle',
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+                  boxShadow: <BoxShadow>[
+                    BoxShadow(
+                      color: AppColors.shadowLight,
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
-                child: _CurrentUserRankCard(
-                  entry: currentUserEntry,
-                  onTap: _scrollToCurrentUser,
+                child: const Icon(
+                  Icons.emoji_events_outlined,
+                  size: 30,
+                  color: AppColors.textMuted,
                 ),
               ),
-            Expanded(
-              child: ListView.separated(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.sm,
-                  AppSpacing.lg,
-                  AppSpacing.xl,
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: AppTypography.emptyStateTitle.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.25,
                 ),
-                controller: _scrollController,
-                itemBuilder: (BuildContext context, int index) {
-                  final WeeklyRankingEntry entry = entries[index];
-                  if (entry.isCurrentUser) {
-                    return KeyedSubtree(
-                      key: _currentUserRowKey,
-                      child: _RankingRow(entry: entry),
-                    );
-                  }
-                  return _RankingRow(entry: entry);
-                },
-                separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.xs),
-                itemCount: entries.length,
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: AppTypography.authSubtitle.copyWith(
+                  fontSize: 15,
+                  color: AppColors.textSecondary,
+                  height: 1.35,
+                  letterSpacing: -0.1,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -152,7 +374,7 @@ class _CurrentUserRankCard extends StatelessWidget {
     required this.onTap,
   });
 
-  final WeeklyRankingEntry entry;
+  final WeeklyLeaderboardEntry entry;
   final VoidCallback onTap;
 
   @override
@@ -190,10 +412,8 @@ class _CurrentUserRankCard extends StatelessWidget {
                     Row(
                       children: <Widget>[
                         Text(
-                          'You are #${entry.position} this week',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          context.l10n.profileWeeklyRankingsYouRank(entry.rank),
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: AppColors.textPrimary,
                                 fontWeight: FontWeight.w600,
@@ -207,10 +427,12 @@ class _CurrentUserRankCard extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.12),
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusCircle,
+                            ),
                           ),
                           child: Text(
-                            'You',
+                            context.l10n.profileWeeklyRankingsYouBadge,
                             style: AppTypography.badgeLabel.copyWith(
                               color: AppColors.primaryDark,
                               fontSize: 10,
@@ -221,10 +443,12 @@ class _CurrentUserRankCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${entry.points} pts collected this week',
+                      context.l10n.profileWeeklyRankingsPtsThisWeek(
+                        entry.weeklyPoints,
+                      ),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ],
                 ),
@@ -237,27 +461,28 @@ class _CurrentUserRankCard extends StatelessWidget {
   }
 }
 
-// Intentionally left empty – top 3 is represented directly in the leaderboard rows.
-
 class _RankingRow extends StatelessWidget {
   const _RankingRow({required this.entry});
 
-  final WeeklyRankingEntry entry;
+  final WeeklyLeaderboardEntry entry;
 
   @override
   Widget build(BuildContext context) {
-    final bool isTopThree = entry.position <= 3;
+    final bool isTopThree = entry.rank <= 3;
     final bool isCurrentUser = entry.isCurrentUser;
+    final String initial = entry.displayName.isNotEmpty
+        ? entry.displayName[0].toUpperCase()
+        : '?';
 
     IconData? leadingIcon;
     Color iconColor = AppColors.textMuted;
-    if (entry.position == 1) {
+    if (entry.rank == 1) {
       leadingIcon = Icons.emoji_events_rounded;
       iconColor = AppColors.accentWarning;
-    } else if (entry.position == 2) {
+    } else if (entry.rank == 2) {
       leadingIcon = Icons.emoji_events_rounded;
       iconColor = AppColors.textMuted;
-    } else if (entry.position == 3) {
+    } else if (entry.rank == 3) {
       leadingIcon = Icons.emoji_events_rounded;
       iconColor = AppColors.accentWarningDark;
     }
@@ -269,70 +494,76 @@ class _RankingRow extends StatelessWidget {
         ? AppColors.primary.withValues(alpha: 0.4)
         : AppColors.divider.withValues(alpha: 0.9);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.sm,
+    return Semantics(
+      label: context.l10n.profileWeeklyRankingsRowSemantic(
+        entry.rank,
+        entry.displayName,
+        entry.weeklyPoints,
       ),
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: borderColor),
-      ),
-      child: Row(
-        children: <Widget>[
-          SizedBox(
-            width: AppSpacing.xl,
-            child: Center(
-              child: isTopThree && leadingIcon != null
-                  ? Icon(
-                      leadingIcon,
-                      size: AppSpacing.iconMd,
-                      color: iconColor,
-                    )
-                  : Text(
-                      '${entry.position}',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w600,
-                          ),
-                    ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.sm,
+        ),
+        decoration: BoxDecoration(
+          color: backgroundColor,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: <Widget>[
+            SizedBox(
+              width: AppSpacing.xl,
+              child: Center(
+                child: isTopThree && leadingIcon != null
+                    ? Icon(
+                        leadingIcon,
+                        size: AppSpacing.iconMd,
+                        color: iconColor,
+                      )
+                    : Text(
+                        '${entry.rank}',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.textMuted,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+              ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          CircleAvatar(
-            radius: AppSpacing.radius18,
-            backgroundColor: AppColors.inputFill,
-            child: Text(
-              entry.name.isNotEmpty ? entry.name[0] : '?',
-              style: AppTypography.cardTitle.copyWith(
+            const SizedBox(width: AppSpacing.sm),
+            CircleAvatar(
+              radius: AppSpacing.radius18,
+              backgroundColor: AppColors.inputFill,
+              child: Text(
+                initial,
+                style: AppTypography.cardTitle.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Text(
+                entry.displayName,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: isCurrentUser ? FontWeight.w600 : FontWeight.w500,
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              '${entry.weeklyPoints}',
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(
-              entry.name,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: isCurrentUser ? FontWeight.w600 : FontWeight.w500,
-                  ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Text(
-            '${entry.points}',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
-

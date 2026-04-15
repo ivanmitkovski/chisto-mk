@@ -1,7 +1,10 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -15,12 +18,13 @@ void showReportCategoryPicker(
   showCupertinoModalPopup<void>(
     context: context,
     builder: (BuildContext context) {
+      final AppLocalizations l10n = context.l10n;
       return ReportSheetScaffold(
-        title: 'Choose category',
-        subtitle: 'Pick the closest match for the issue you are reporting.',
+        title: l10n.reportCategoryPickerTitle,
+        subtitle: l10n.reportCategoryPickerSubtitle,
         trailing: ReportCircleIconButton(
           icon: CupertinoIcons.xmark,
-          semanticLabel: 'Close',
+          semanticLabel: l10n.semanticsClose,
           onTap: () => Navigator.of(context).pop(),
         ),
         maxHeightFactor: 0.78,
@@ -28,10 +32,9 @@ void showReportCategoryPicker(
           shrinkWrap: true,
           physics: const BouncingScrollPhysics(),
           children: <Widget>[
-            const ReportInfoBanner(
-              title: 'Choose the closest match',
-              message:
-                  'Pick the category moderators should verify first. It does not need to be perfect.',
+            ReportInfoBanner(
+              title: l10n.reportCategoryPickerBannerTitle,
+              message: l10n.reportCategoryPickerBannerBody,
               icon: CupertinoIcons.square_list,
             ),
             const SizedBox(height: AppSpacing.md),
@@ -40,8 +43,8 @@ void showReportCategoryPicker(
               return <Widget>[
                 ReportActionTile(
                   icon: cat.icon,
-                  title: cat.label,
-                  subtitle: cat.description,
+                  title: cat.localizedTitle(l10n),
+                  subtitle: cat.localizedDescription(l10n),
                   tone: isActive
                       ? ReportSurfaceTone.accent
                       : ReportSurfaceTone.neutral,

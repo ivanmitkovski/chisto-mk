@@ -158,7 +158,7 @@ export function HeroPhoneSwipeDeck() {
                 drag={isFront && !reduceMotion ? "x" : false}
                 dragConstraints={{ left: -130, right: 130 }}
                 dragElastic={0.12}
-                onDragStart={isFront ? dismissGestureHint : undefined}
+                {...(isFront ? { onDragStart: dismissGestureHint } : {})}
                 onDragEnd={(_, info) => onDragEnd(i, info)}
               >
                 {isFront ? (

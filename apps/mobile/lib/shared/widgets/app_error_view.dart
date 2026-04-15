@@ -1,3 +1,5 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -40,7 +42,7 @@ class AppErrorView extends StatelessWidget {
             ),
             const SizedBox(height: AppSpacing.lg),
             Text(
-              error.message,
+              localizedAppErrorMessage(context.l10n, error),
               style: AppTypography.emptyStateTitle,
               textAlign: TextAlign.center,
             ),
@@ -49,7 +51,7 @@ class AppErrorView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Try again'),
+                label: Text(context.l10n.commonTryAgain),
               ),
             ],
           ],

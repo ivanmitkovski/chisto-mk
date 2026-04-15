@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
@@ -30,7 +31,7 @@ class RecentSearchesShelf extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Recent searches',
+            context.l10n.eventsFeedRecentSearches,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.textMuted,
                   fontWeight: FontWeight.w600,

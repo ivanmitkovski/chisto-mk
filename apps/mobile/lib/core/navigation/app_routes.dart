@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/location_screen.dart';
-import 'package:chisto_mobile/features/events/presentation/navigation/event_page_transitions.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/forgot_password_new_screen.dart';
@@ -17,8 +19,11 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/create_event_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_cleanup_evidence_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/event_chat_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_checkin_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/organizer_dashboard_screen.dart';
+import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:image_picker/image_picker.dart';
@@ -47,6 +52,8 @@ class AppRoutes {
   static const String eventsAttendeeCheckIn = '/events/attendee-check-in';
   static const String eventsOrganizerCheckIn = '/events/organizer-check-in';
   static const String eventsCleanupEvidence = '/events/cleanup-evidence';
+  static const String eventsOrganizerDashboard = '/events/organizer-dashboard';
+  static const String eventChat = '/events/chat';
 }
 
 class ForgotPasswordNewRouteArgs {
@@ -77,6 +84,22 @@ class EventRouteArguments {
   const EventRouteArguments({required this.eventId});
 
   final String eventId;
+}
+
+class EventChatRouteArguments {
+  EventChatRouteArguments({
+    required this.eventId,
+    required this.eventTitle,
+    required this.isOrganizer,
+    this.readSyncCompleter,
+  });
+
+  final String eventId;
+  final String eventTitle;
+  final bool isOrganizer;
+
+  /// When set, completed after exit read-sync (see [EventChatScreen.readSyncCompleter]).
+  final Completer<void>? readSyncCompleter;
 }
 
 /// Deep link: `Navigator.pushNamed(context, AppRoutes.homeMapFocus, arguments: MapSiteFocusRouteArgs(siteId: id))`.
@@ -137,10 +160,19 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.otp:
-        final String phoneNumber = settings.arguments is String
-            ? settings.arguments! as String
-            : '+389 70 123 456';
-
+        if (settings.arguments is! String) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.otp expected String phone; got '
+              '${settings.arguments?.runtimeType}. Sending user to sign up.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const SignUpScreen(),
+            settings: settings,
+          );
+        }
+        final String phoneNumber = settings.arguments! as String;
         return MaterialPageRoute<void>(
           builder: (_) => OtpScreen(phoneNumber: phoneNumber),
           settings: settings,
@@ -151,21 +183,38 @@ class AppRouter {
           settings: settings,
         );
       case AppRoutes.forgotPasswordOtp:
-        final String fpPhoneE164 = settings.arguments is String
-            ? settings.arguments! as String
-            : '+38970123456';
+        if (settings.arguments is! String) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.forgotPasswordOtp expected String; got '
+              '${settings.arguments?.runtimeType}. Restarting forgot-password flow.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const ForgotPasswordRequestScreen(),
+            settings: settings,
+          );
+        }
+        final String fpPhoneE164 = settings.arguments! as String;
         return MaterialPageRoute<void>(
           builder: (_) => ForgotPasswordOtpScreen(phoneNumberE164: fpPhoneE164),
           settings: settings,
         );
       case AppRoutes.forgotPasswordNew:
+        if (settings.arguments is! ForgotPasswordNewRouteArgs) {
+          if (kDebugMode) {
+            debugPrint(
+              '[AppRouter] AppRoutes.forgotPasswordNew expected ForgotPasswordNewRouteArgs; '
+              'got ${settings.arguments?.runtimeType}. Restarting forgot-password flow.',
+            );
+          }
+          return MaterialPageRoute<void>(
+            builder: (_) => const ForgotPasswordRequestScreen(),
+            settings: settings,
+          );
+        }
         final ForgotPasswordNewRouteArgs fpArgs =
-            settings.arguments is ForgotPasswordNewRouteArgs
-                ? settings.arguments! as ForgotPasswordNewRouteArgs
-                : const ForgotPasswordNewRouteArgs(
-                    phoneNumberE164: '+38970123456',
-                    code: '',
-                  );
+            settings.arguments! as ForgotPasswordNewRouteArgs;
         return MaterialPageRoute<void>(
           builder: (_) => ForgotPasswordNewScreen(
             phoneNumberE164: fpArgs.phoneNumberE164,
@@ -222,13 +271,7 @@ class AppRouter {
             ? settings.arguments! as XFile
             : null;
         return MaterialPageRoute<bool>(
-          builder: (_) => NewReportScreen(
-            initialPhoto: photo,
-            entryLabel: photo != null ? 'Camera report' : 'Guided report',
-            entryHint: photo != null
-                ? 'Starting from a live photo can speed up moderation because the evidence is already attached.'
-                : null,
-          ),
+          builder: (_) => NewReportScreen(initialPhoto: photo),
           settings: settings,
         );
       case AppRoutes.eventsCreate:
@@ -236,7 +279,8 @@ class AppRouter {
             settings.arguments is EventCreateRouteArguments
                 ? settings.arguments! as EventCreateRouteArguments
                 : const EventCreateRouteArguments();
-        return EventSheetPageRoute<EcoEvent>(
+        // CupertinoPageRoute enables iOS edge swipe-back (unlike fullscreen sheet routes).
+        return CupertinoPageRoute<EcoEvent?>(
           builder: (_) => CreateEventSheet(
             preselectedSiteId: args.preselectedSiteId,
             preselectedSiteName: args.preselectedSiteName,
@@ -255,14 +299,14 @@ class AppRouter {
       case AppRoutes.eventsAttendeeCheckIn:
         final EventRouteArguments args =
             settings.arguments as EventRouteArguments;
-        return EventCheckInPageRoute<bool>(
+        return CupertinoPageRoute<bool>(
           builder: (_) => AttendeeQrScannerScreen(eventId: args.eventId),
           settings: settings,
         );
       case AppRoutes.eventsOrganizerCheckIn:
         final EventRouteArguments args =
             settings.arguments as EventRouteArguments;
-        return EventCheckInPageRoute<void>(
+        return CupertinoPageRoute<void>(
           builder: (_) => OrganizerCheckInScreen(eventId: args.eventId),
           settings: settings,
         );
@@ -273,11 +317,55 @@ class AppRouter {
           builder: (_) => EventCleanupEvidenceScreen(eventId: args.eventId),
           settings: settings,
         );
+      case AppRoutes.eventsOrganizerDashboard:
+        return CupertinoPageRoute<void>(
+          builder: (_) => const OrganizerDashboardScreen(),
+          settings: settings,
+        );
+      case AppRoutes.eventChat:
+        final EventChatRouteArguments args = settings.arguments is EventChatRouteArguments
+            ? settings.arguments! as EventChatRouteArguments
+            : EventChatRouteArguments(
+                eventId: '',
+                eventTitle: '',
+                isOrganizer: false,
+              );
+        return CupertinoPageRoute<void>(
+          builder: (_) => EventChatScreen(
+            eventId: args.eventId,
+            eventTitle: args.eventTitle,
+            isOrganizer: args.isOrganizer,
+            readSyncCompleter: args.readSyncCompleter,
+          ),
+          settings: settings,
+        );
       default:
         return MaterialPageRoute<void>(
-          builder: (_) => const SignInScreen(),
+          builder: (_) => UnknownRouteScreen(
+            attemptedRouteName: settings.name,
+          ),
           settings: settings,
         );
     }
+  }
+
+  /// Swaps event detail without a Hero transition between two different `event-thumb-*`
+  /// tags (avoids `_HeroFlight.divert` / `manifest.tag == newManifest.tag` crashes).
+  static Route<void> eventDetailReplacementRoute(String eventId) {
+    return PageRouteBuilder<void>(
+      settings: RouteSettings(
+        name: AppRoutes.eventsDetail,
+        arguments: EventRouteArguments(eventId: eventId),
+      ),
+      opaque: true,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+      pageBuilder:
+          (BuildContext context, Animation<double> animation, Animation<double> secondary) =>
+              EventDetailScreen(
+                eventId: eventId,
+                enableThumbnailHero: false,
+              ),
+    );
   }
 }

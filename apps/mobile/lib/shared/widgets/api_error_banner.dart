@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 class ApiErrorBanner extends StatelessWidget {
   const ApiErrorBanner({
@@ -18,6 +19,7 @@ class ApiErrorBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final String semanticsLabel = detail != null && detail!.isNotEmpty
         ? '$message $detail'
         : message;
@@ -67,7 +69,7 @@ class ApiErrorBanner extends StatelessWidget {
                 if (onDismiss != null) ...[
                   const SizedBox(width: AppSpacing.xs),
                   Semantics(
-                    label: 'Dismiss',
+                    label: l10n.errorBannerDismiss,
                     button: true,
                     child: IconButton(
                       onPressed: onDismiss,
@@ -103,11 +105,11 @@ class ApiErrorBanner extends StatelessWidget {
               const SizedBox(height: AppSpacing.sm),
               Semantics(
                 button: true,
-                label: 'Try again',
+                label: l10n.errorBannerTryAgain,
                 child: TextButton.icon(
                   onPressed: onRetry,
                   icon: const Icon(Icons.refresh_rounded, size: 18),
-                  label: const Text('Try again'),
+                  label: Text(l10n.errorBannerTryAgain),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.primary,
                     padding: EdgeInsets.zero,

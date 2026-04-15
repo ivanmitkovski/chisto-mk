@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
+  Headers,
   MessageEvent as NestMessageEvent,
   Param,
   Patch,
@@ -68,6 +70,7 @@ export class ReportsController {
   createWithLocation(
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Body() dto: CreateReportWithLocationDto,
+    @Headers('idempotency-key') idempotencyKey?: string | string[],
   ): Promise<ReportSubmitResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
@@ -75,7 +78,7 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    return this.reportsService.createWithLocation(user, dto);
+    return this.reportsService.createWithLocation(user, dto, idempotencyKey);
   }
 
   @Post('upload')
@@ -99,10 +102,14 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    const urls = await this.reportsUploadService.uploadFiles(
-      user.userId,
-      files || [],
-    );
+    const fileList = files ?? [];
+    if (fileList.length === 0) {
+      throw new BadRequestException({
+        code: 'FILES_REQUIRED',
+        message: 'At least one image file is required.',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(user.userId, fileList);
     return { urls };
   }
 
@@ -130,10 +137,14 @@ export class ReportsController {
         message: 'Authentication required',
       });
     }
-    const urls = await this.reportsUploadService.uploadFiles(
-      user.userId,
-      files || [],
-    );
+    const fileList = files ?? [];
+    if (fileList.length === 0) {
+      throw new BadRequestException({
+        code: 'FILES_REQUIRED',
+        message: 'At least one image file is required.',
+      });
+    }
+    const urls = await this.reportsUploadService.uploadFiles(user.userId, fileList);
     await this.reportsService.appendMedia(reportId, user.userId, urls);
     return { urls };
   }
@@ -235,6 +246,7 @@ export class ReportsController {
     return this.reportsService.findDuplicateGroupByReport(id);
   }
 
+  // SECURITY: Authorization (moderator vs owner vs co-reporter) is enforced in ReportsService.findOne — never trust the client alone.
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

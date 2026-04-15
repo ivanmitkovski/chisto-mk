@@ -1,6 +1,9 @@
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_retry_duration.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 enum ReportCapacityUiKind { healthy, low, emergency, cooldown }
 
@@ -28,75 +31,85 @@ class ReportCapacityUiState {
   final String reviewMessage;
 }
 
-ReportCapacityUiState mapReportCapacityToUiState(ReportCapacity capacity) {
+ReportCapacityUiState mapReportCapacityToUiState(
+  ReportCapacity capacity, {
+  required AppLocalizations l10n,
+  /// Localized date/time phrase when emergency unlocks (e.g. from [DateFormat]); overrides generic retry text in cooldown.
+  String? nextEmergencyAvailableDescription,
+}) {
+  final String unlockHint = l10n.reportCapacityUnlockHint;
   final int credits = capacity.creditsAvailable;
   if (credits > 2) {
     return ReportCapacityUiState(
       kind: ReportCapacityUiKind.healthy,
-      pillLabel: '$credits reports available',
+      pillLabel: l10n.reportCapacityPillHealthy(credits),
       pillTone: ReportSurfaceTone.success,
-      pillIcon: Icons.eco_outlined,
-      bannerTitle: 'Reporting capacity',
-      bannerMessage: 'You have $credits report credits available right now.',
+      pillIcon: Icons.assignment_outlined,
+      bannerTitle: l10n.reportCapacityBannerHealthyTitle,
+      bannerMessage: l10n.reportCapacityBannerHealthyBody(credits),
       bannerTone: ReportSurfaceTone.success,
-      bannerIcon: Icons.eco_outlined,
-      reviewMessage: 'This submission will use 1 report credit.',
+      bannerIcon: Icons.assignment_outlined,
+      reviewMessage: l10n.reportCapacityReviewHealthy,
     );
   }
   if (credits > 0) {
     return ReportCapacityUiState(
       kind: ReportCapacityUiKind.low,
-      pillLabel: '$credits report${credits == 1 ? '' : 's'} left',
+      pillLabel: l10n.reportCapacityPillLow(credits),
       pillTone: ReportSurfaceTone.warning,
       pillIcon: Icons.bolt_rounded,
-      bannerTitle: 'Low report credits',
-      bannerMessage: 'You are running low. ${capacity.unlockHint}',
+      bannerTitle: l10n.reportCapacityBannerLowTitle,
+      bannerMessage: l10n.reportCapacityBannerLowBody(unlockHint),
       bannerTone: ReportSurfaceTone.warning,
       bannerIcon: Icons.bolt_rounded,
-      reviewMessage:
-          'This submission will use 1 report credit. ${capacity.unlockHint}',
+      reviewMessage: l10n.reportCapacityReviewLow(unlockHint),
     );
   }
   if (capacity.emergencyAvailable) {
     return ReportCapacityUiState(
       kind: ReportCapacityUiKind.emergency,
-      pillLabel: 'Emergency report available',
+      pillLabel: l10n.reportCapacityPillEmergency,
       pillTone: ReportSurfaceTone.warning,
       pillIcon: Icons.warning_amber_rounded,
-      bannerTitle: 'Emergency allowance ready',
+      bannerTitle: l10n.reportCapacityBannerEmergencyTitle,
       bannerMessage:
-          'You can submit one emergency report now. ${capacity.unlockHint}',
+          l10n.reportCapacityBannerEmergencyBody(unlockHint),
       bannerTone: ReportSurfaceTone.warning,
       bannerIcon: Icons.warning_amber_rounded,
-      reviewMessage:
-          'This submission uses your emergency report allowance. ${capacity.unlockHint}',
+      reviewMessage: l10n.reportCapacityReviewEmergency(unlockHint),
     );
   }
   final int? retryAfterSeconds = capacity.retryAfterSeconds;
-  final String retryHint = retryAfterSeconds != null && retryAfterSeconds > 0
-      ? 'Try again in about ${_cooldownText(retryAfterSeconds)}.'
-      : 'Your next emergency report is still cooling down.';
+  final String? trimmedNext = nextEmergencyAvailableDescription?.trim();
+  final String retryLine = trimmedNext != null && trimmedNext.isNotEmpty
+      ? l10n.reportCapacityCooldownRetryOnDate(trimmedNext)
+      : retryAfterSeconds != null && retryAfterSeconds > 0
+          ? l10n.reportCapacityCooldownTryAgainInAbout(
+              formatReportCapacityRetryDuration(l10n, retryAfterSeconds),
+            )
+          : l10n.reportCapacityCooldownStillWaiting;
   return ReportCapacityUiState(
     kind: ReportCapacityUiKind.cooldown,
-    pillLabel: 'Reporting cooldown active',
+    pillLabel: l10n.reportCapacityPillCooldown,
     pillTone: ReportSurfaceTone.danger,
     pillIcon: Icons.timer_off_rounded,
-    bannerTitle: 'Reporting cooldown',
-    bannerMessage: '$retryHint ${capacity.unlockHint}',
+    bannerTitle: l10n.reportCapacityBannerCooldownTitle,
+    bannerMessage: l10n.reportCapacityBannerCooldownBody(
+      retryLine,
+      unlockHint,
+    ),
     bannerTone: ReportSurfaceTone.danger,
     bannerIcon: Icons.timer_off_rounded,
-    reviewMessage: '$retryHint ${capacity.unlockHint}',
+    reviewMessage: l10n.reportCapacityReviewCooldown(
+      retryLine,
+      unlockHint,
+    ),
   );
 }
 
-String _cooldownText(int retryAfterSeconds) {
-  if (retryAfterSeconds < 60) {
-    return '${retryAfterSeconds}s';
-  }
-  final int minutes = (retryAfterSeconds / 60).ceil();
-  if (minutes < 60) {
-    return '${minutes}m';
-  }
-  final int hours = (minutes / 60).ceil();
-  return '${hours}h';
+/// Formats [utc] in the device locale for cooldown copy (expects API UTC instant).
+String? formatNextEmergencyUnlockLocal(BuildContext context, DateTime? utc) {
+  if (utc == null) return null;
+  final String localeName = Localizations.localeOf(context).toString();
+  return DateFormat.yMMMEd(localeName).add_jm().format(utc.toLocal());
 }

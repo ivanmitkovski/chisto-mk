@@ -622,12 +622,12 @@ class _LocationPickerState extends State<LocationPicker> {
                 children: <Widget>[
                   Semantics(
                     button: true,
-                    label: 'Retry address',
+                    label: context.l10n.locationRetryAddressSemantic,
                     hint: 'Double-tap to look up the address again.',
                     child: TextButton.icon(
                     onPressed: _retryGeocode,
                     icon: const Icon(Icons.refresh_rounded, size: 18),
-                    label: const Text('Retry address'),
+                    label: Text(context.l10n.locationRetryAddressSemantic),
                     style: TextButton.styleFrom(
                       foregroundColor: AppColors.primaryDark,
                     ),

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:chisto_mobile/core/cache/image_cache_diagnostics.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -156,7 +157,7 @@ class _AppSmartImageState extends State<AppSmartImage> {
             ),
             const SizedBox(height: AppSpacing.xxs),
             Text(
-              'Image unavailable',
+              context.l10n.appSmartImageUnavailable,
               style: Theme.of(
                 context,
               ).textTheme.labelSmall?.copyWith(color: AppColors.textMuted),
@@ -165,7 +166,11 @@ class _AppSmartImageState extends State<AppSmartImage> {
               const SizedBox(height: AppSpacing.xxs),
               TextButton(
                 onPressed: canRetry ? _retry : null,
-                child: Text(canRetry ? 'Retry' : 'Retry in ${secondsLeft}s'),
+                child: Text(
+                  canRetry
+                      ? context.l10n.appSmartImageRetry
+                      : context.l10n.appSmartImageRetryIn(secondsLeft),
+                ),
               ),
             ],
           ],

@@ -1,4 +1,33 @@
+/*
+ * Layout breakpoints (align with AdminShell matchMedia + CSS):
+ * - --bp-phone-sm 20rem (~320px) — minimum width QA
+ * - --bp-phone-md 24.375rem (~390px) — common phone
+ * - --bp-mobile 48rem (768px) — drawer nav, tight shell padding
+ * - --bp-tablet 64rem (1024px) — relaxed padding; data tables drop sticky-first-column helper
+ */
 :root {
+  --bp-phone-sm: 20rem;
+  --bp-phone-md: 24.375rem;
+  --bp-mobile: 48rem;
+  --bp-tablet: 64rem;
+  --content-max-width: 80rem;
+  --touch-target-min: 2.75rem;
+
+  --elevation-page: var(--elevation-1);
+  --elevation-sticky: 0 4px 12px rgba(8, 54, 39, 0.06);
+  --radius-page-card: var(--radius-xl);
+
+  /* List / data pages (reports, events, users) */
+  --page-list-title-size: 1.25rem;
+  --page-list-title-weight: 700;
+  --page-list-title-tracking: -0.02em;
+  --page-list-kicker-size: 0.6875rem;
+  --page-list-kicker-weight: 600;
+  --page-list-kicker-tracking: 0.08em;
+  --page-table-header-size: 0.6875rem;
+  --page-table-header-weight: 600;
+  --page-table-header-tracking: 0.04em;
+
   --color-primary: #25db86;
   --color-black: #000000;
   --color-green-100: #96f4a7;

@@ -4,13 +4,21 @@ import { AuditModule } from '../audit/audit.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { FeedRankingService } from './feed-ranking.service';
 import { SiteEngagementService } from './site-engagement.service';
+import { SiteCommentsService } from './site-comments.service';
 import { SitesController } from './sites.controller';
+import { SitesMapQueryService } from './sites-map-query.service';
 import { SitesService } from './sites.service';
 
 @Module({
   imports: [AuditModule, ReportsUploadModule, AdminEventsModule],
   controllers: [SitesController],
-  providers: [SitesService, FeedRankingService, SiteEngagementService],
+  providers: [
+    SitesMapQueryService,
+    SitesService,
+    FeedRankingService,
+    SiteEngagementService,
+    SiteCommentsService,
+  ],
   exports: [SitesService, FeedRankingService],
 })
 export class SitesModule {}

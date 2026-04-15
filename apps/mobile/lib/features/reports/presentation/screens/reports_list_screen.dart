@@ -1,7 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -15,9 +17,11 @@ import 'package:chisto_mobile/features/reports/domain/models/report_list_item.da
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card_skeleton.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_status_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
 import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
@@ -65,16 +69,19 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return normalized.split(' ').where((String s) => s.isNotEmpty).toList();
   }
 
-  bool _reportMatchesQuery(ReportListItem r, List<String> tokens) {
+  bool _reportMatchesQuery(
+    ReportListItem r,
+    List<String> tokens,
+    AppLocalizations l10n,
+  ) {
     final String title = r.title.toLowerCase();
     final String address = r.location.toLowerCase();
-    final String category = (r.category?.label ?? 'other').toLowerCase();
-    final String statusLabel = r.status.label.toLowerCase();
+    final String category = (r.category?.apiString ?? 'other').toLowerCase();
     for (final String token in tokens) {
       final bool matches = title.contains(token) ||
           address.contains(token) ||
           category.contains(token) ||
-          statusLabel.contains(token);
+          apiReportStatusMatchesSearchToken(l10n, r.status, token);
       if (!matches) return false;
     }
     return true;
@@ -83,7 +90,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   int _reportSearchScore(ReportListItem r, List<String> tokens) {
     final String title = r.title.toLowerCase();
     final String address = r.location.toLowerCase();
-    final String category = (r.category?.label ?? 'other').toLowerCase();
+    final String category = (r.category?.apiString ?? 'other').toLowerCase();
     int score = 0;
     for (final String token in tokens) {
       if (title.contains(token)) score += 10;
@@ -105,7 +112,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
   }
 
-  List<ReportListItem> get _filteredReports {
+  List<ReportListItem> _filteredReports(AppLocalizations l10n) {
     List<ReportListItem> list = _reports;
     if (_statusFilter != null) {
       list = list
@@ -114,7 +121,9 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
     final List<String> tokens = _searchTokens(_searchQuery);
     if (tokens.isEmpty) return list;
-    list = list.where((ReportListItem r) => _reportMatchesQuery(r, tokens)).toList();
+    list = list
+        .where((ReportListItem r) => _reportMatchesQuery(r, tokens, l10n))
+        .toList();
     list = List<ReportListItem>.from(list)
       ..sort((ReportListItem a, ReportListItem b) {
         final int scoreA = _reportSearchScore(a, tokens);
@@ -219,7 +228,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       if (mounted) {
         AppSnack.show(
           context,
-          message: 'No connection',
+          message: context.l10n.profileNoConnectionSnack,
           type: AppSnackType.warning,
         );
       }
@@ -275,7 +284,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       final detail = await ServiceLocator.instance.reportsApiRepository
           .getReportById(id);
       if (!mounted) return;
-      final MockReport display = ReportsListMockStore.fromDetail(detail);
+      final MockReport display =
+          ReportsListMockStore.fromDetail(detail, context.l10n);
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -310,7 +320,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       final detail = await ServiceLocator.instance.reportsApiRepository
           .getReportById(report.id);
       if (!mounted) return;
-      final MockReport display = ReportsListMockStore.fromDetail(detail);
+      final MockReport display =
+          ReportsListMockStore.fromDetail(detail, context.l10n);
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -332,7 +343,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       AppSnack.show(context, message: e.message, type: AppSnackType.warning);
     } catch (_) {
       if (!mounted) return;
-      final MockReport display = ReportsListMockStore.fromListItem(report);
+      final MockReport display =
+          ReportsListMockStore.fromListItem(report, context.l10n);
       await showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
@@ -355,18 +367,24 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     }
   }
 
-  static String _formatDate(DateTime d) {
+  String _formatReportDate(DateTime d) {
+    final AppLocalizations l10n = context.l10n;
     final Duration diff = DateTime.now().difference(d);
-    if (diff.inDays == 0) return 'Today';
-    if (diff.inDays == 1) return 'Yesterday';
-    if (diff.inDays < 7) return '${diff.inDays} days ago';
-    if (diff.inDays < 30) return '${(diff.inDays / 7).floor()} wk ago';
-    return '${d.day}.${d.month}.${d.year}';
+    if (diff.inDays == 0) return l10n.eventsDateRelativeToday;
+    if (diff.inDays == 1) return l10n.profilePointsHistoryDayYesterday;
+    if (diff.inDays < 7) return l10n.eventsDateRelativeDaysAgo(diff.inDays);
+    if (diff.inDays < 30) {
+      final int weeks = (diff.inDays / 7).floor();
+      return l10n.reportListDateWeeksAgo(weeks);
+    }
+    final String locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMd(locale).format(d);
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<ReportListItem> filteredReports = _filteredReports;
+    final AppLocalizations l10n = context.l10n;
+    final List<ReportListItem> filteredReports = _filteredReports(l10n);
     return SafeArea(
       bottom: false,
       child: RefreshIndicator(
@@ -430,20 +448,20 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                     }
                     final ReportListItem report = filteredReports[index];
                     final MockReport display =
-                        ReportsListMockStore.fromListItem(report);
+                        ReportsListMockStore.fromListItem(report, l10n);
                     return AnimatedListItem(
                       index: index,
                       slideOffset: 14,
                       child: ReportCard(
                         report: display,
                         onTap: () => _openReportDetail(report),
-                        formatDate: _formatDate,
+                        formatDate: _formatReportDate,
                       ),
                     );
                   },
                 ),
               ),
-            if (!_isLoading && _filteredReports.isNotEmpty)
+            if (!_isLoading && _filteredReports(l10n).isNotEmpty)
               SliverToBoxAdapter(
                 child: Padding(
                   padding: EdgeInsets.only(
@@ -453,8 +471,10 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                   child: Center(
                     child: Text(
                       _statusFilter == null
-                          ? 'All reports shown'
-                          : '${_filteredReports.length} report${_filteredReports.length == 1 ? '' : 's'}',
+                          ? l10n.reportListFilteredFooterAll
+                          : l10n.reportListFilteredFooterCount(
+                              filteredReports.length,
+                            ),
                       style: AppTypography.textTheme.bodySmall!.copyWith(
                         color: AppColors.textMuted,
                         fontWeight: FontWeight.w500,
@@ -488,7 +508,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
-            'Your reports',
+            context.l10n.reportListHeaderTitle,
             style: AppTypography.textTheme.headlineLarge?.copyWith(
               letterSpacing: -0.5,
             ),
@@ -496,19 +516,22 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           const SizedBox(height: AppSpacing.sm),
           Semantics(
             liveRegion: true,
-            label:
-                '$totalReports report${totalReports == 1 ? '' : 's'} in total. $underReviewCount currently under review.',
+            label: context.l10n.reportListHeaderSemanticSummary(
+              totalReports,
+              underReviewCount,
+            ),
             child: Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.xs,
               children: <Widget>[
                 ReportStatePill(
-                  label:
-                      '$totalReports report${totalReports == 1 ? '' : 's'} in total',
+                  label: context.l10n.reportListHeaderTotalPill(totalReports),
                   icon: Icons.description_outlined,
                 ),
                 ReportStatePill(
-                  label: '$underReviewCount under review',
+                  label: context.l10n.reportListHeaderUnderReviewPill(
+                    underReviewCount,
+                  ),
                   icon: Icons.schedule_rounded,
                   tone: underReviewCount > 0
                       ? ReportSurfaceTone.warning
@@ -518,7 +541,15 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                   Builder(
                     builder: (BuildContext context) {
                       final ReportCapacityUiState ui =
-                          mapReportCapacityToUiState(_reportCapacity!);
+                          mapReportCapacityToUiState(
+                        _reportCapacity!,
+                        l10n: context.l10n,
+                        nextEmergencyAvailableDescription:
+                            formatNextEmergencyUnlockLocal(
+                          context,
+                          _reportCapacity!.nextEmergencyReportAvailableAt,
+                        ),
+                      );
                       return ReportStatePill(
                         label: ui.pillLabel,
                         icon: ui.pillIcon,
@@ -535,14 +566,15 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildSearchBar(BuildContext context) {
-    final List<ReportListItem> filtered = _filteredReports;
+    final List<ReportListItem> filtered = _filteredReports(context.l10n);
+    final AppLocalizations l10n = context.l10n;
     final String resultLabel = _searchQuery.isEmpty
         ? ''
         : filtered.isEmpty
-            ? 'No matches'
+            ? l10n.reportListSearchNoMatches
             : filtered.length == 1
-                ? '1 report'
-                : '${filtered.length} reports';
+                ? l10n.reportListSearchOneReport
+                : l10n.reportListSearchNReports(filtered.length);
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -552,12 +584,12 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         AppSpacing.md,
       ),
       child: Semantics(
-        label: 'Search reports',
-        hint: 'Search by title, location, category, or status. $resultLabel'.trim(),
+        label: l10n.reportListSearchSemantic,
+        hint: '${l10n.reportListSearchHintPrefix} $resultLabel'.trim(),
         child: CupertinoSearchTextField(
           controller: _searchController,
           focusNode: _searchFocusNode,
-          placeholder: 'Search your reports',
+          placeholder: l10n.reportListSearchPlaceholder,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 color: AppColors.textPrimary,
               ),
@@ -587,9 +619,12 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildStatusFilter(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final List<String> labels = <String>[
-      'All',
-      ...ReportStatus.values.map((ReportStatus s) => s.label),
+      l10n.reportListFilterAll,
+      ...ReportStatus.values.map(
+        (ReportStatus s) => reportUiStatusShortLabel(l10n, s),
+      ),
     ];
     final int selectedIndex = _statusFilter == null
         ? 0
@@ -600,7 +635,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       child: AppPillFilterChips(
         labels: labels,
         selectedIndex: selectedIndex,
-        semanticLabelPrefix: 'Reports',
+        semanticLabelPrefix: l10n.reportListFilterSemanticPrefix,
         onSelected: (int index) {
           AppHaptics.tap();
           setState(() {
@@ -620,19 +655,20 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildFilterEmptyState(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final bool hasSearch = _searchQuery.isNotEmpty;
     final bool hasFilter = _statusFilter != null;
     final String message = hasSearch
-        ? 'No reports found'
-        : 'No reports with this filter';
+        ? l10n.reportListNoMatchesSearchTitle
+        : l10n.reportListNoMatchesFilterTitle;
     final IconData icon = hasSearch
         ? Icons.search_off_rounded
         : Icons.filter_list_off_rounded;
     final String hint = hasSearch && hasFilter
-        ? 'Try a different search or clear filters to see more reports.'
+        ? l10n.reportListNoMatchesHintSearchAndFilter
         : hasSearch
-            ? 'Check the spelling or try a broader search.'
-            : 'Try another filter, or clear it to see all reports.';
+            ? l10n.reportListNoMatchesHintSearchOnly
+            : l10n.reportListNoMatchesHintFilterOnly;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -671,7 +707,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                     vertical: AppSpacing.xs,
                   ),
                   child: Text(
-                    'Clear search',
+                    l10n.reportListClearSearch,
                     style: AppTypography.buttonLabel.copyWith(
                       color: AppColors.primary,
                       fontSize: 16,
@@ -690,10 +726,12 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     AppHaptics.medium();
     final bool canProceed = await _ensureCanStartReportFlow();
     if (!canProceed) return;
+    if (!mounted) return;
+    final String newReportEntryLabel = context.l10n.newReportTitle;
     final Object? result = await Navigator.of(context).push<Object>(
       MaterialPageRoute<Object>(
-        builder: (_) => const NewReportScreen(
-          entryLabel: 'New report',
+        builder: (_) => NewReportScreen(
+          entryLabel: newReportEntryLabel,
         ),
       ),
     );
@@ -727,7 +765,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       if (!mounted) return false;
       AppSnack.show(
         context,
-        message: 'Could not check reporting availability right now.',
+        message: context.l10n.reportAvailabilityCheckFailedSnack,
         type: AppSnackType.warning,
       );
       return false;
@@ -735,11 +773,6 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
-    final ReportCapacity? capacity = _reportCapacity;
-    final ui = capacity != null ? mapReportCapacityToUiState(capacity) : null;
-    final bool showCapacityBanner = ui != null &&
-        (ui.kind == ReportCapacityUiKind.emergency ||
-            ui.kind == ReportCapacityUiKind.cooldown);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
       child: Column(
@@ -761,34 +794,25 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'No reports yet',
+            context.l10n.reportListEmptyTitle,
             style: AppTypography.emptyStateTitle,
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
-            'Your future reports will appear here after you submit them.',
+            context.l10n.reportListEmptySubtitle,
             textAlign: TextAlign.center,
             style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
           ),
-          if (showCapacityBanner) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            ReportInfoBanner(
-              title: ui!.bannerTitle,
-              message: ui.bannerMessage,
-              icon: ui.bannerIcon,
-              tone: ui.bannerTone,
-            ),
-          ],
           const SizedBox(height: AppSpacing.lg),
           Semantics(
             button: true,
-            label: 'Report pollution',
+            label: context.l10n.reportListFabLabel,
             child: SizedBox(
               width: double.infinity,
               child: FilledButton.icon(
                 onPressed: _startNewReport,
                 icon: const Icon(Icons.add_rounded, size: 20),
-                label: const Text('Report pollution'),
+                label: Text(context.l10n.reportListFabLabel),
                 style: FilledButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.white,

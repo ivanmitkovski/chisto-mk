@@ -55,6 +55,14 @@ model User {
   deviceTokens         UserDeviceToken[]
   userNotifications    UserNotification[]
   notificationPreferences UserNotificationPreference[]
+  organizedCleanupEvents CleanupEvent[] @relation("CleanupEventOrganizer")
+  eventParticipations    EventParticipant[]
+  eventCheckIns          EventCheckIn[]
+  eventChatMessages      EventChatMessage[] @relation("EventChatMessages")
+  eventChatReadCursors   EventChatReadCursor[] @relation("EventChatReadCursors")
+  eventChatPinnedMessages EventChatMessage[] @relation("EventChatPinnedBy")
+  eventChatMutes         EventChatMute[] @relation("EventChatMutes")
+  reportSubmitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([role])
   @@index([status])
@@ -165,6 +173,10 @@ model AdminNotification {
   category  AdminNotificationCategory
   isUnread  Boolean @default(true)
   href      String?
+
+  /// Stable key for localized templates (e.g. `reports.submitted.new_site`). Title/message remain populated for legacy clients.
+  messageTemplateKey    String?
+  messageTemplateParams Json?
 
   @@index([userId, createdAt])
   @@index([category, createdAt])
@@ -280,7 +292,11 @@ model Report {
   potentialDuplicateOf   Report? @relation("ReportPotentialDuplicate", fields: [potentialDuplicateOfId], references: [id])
   potentialDuplicates    Report[] @relation("ReportPotentialDuplicate")
 
+  /// Duplicate child reports merged into this canonical report (moderation merge).
+  mergedDuplicateChildCount Int @default(0)
+
   coReporters ReportCoReporter[]
+  submitIdempotencyKeys ReportSubmitIdempotency[]
 
   @@index([siteId])
   @@index([reporterId])
@@ -299,6 +315,8 @@ enum ReportStatus {
 model ReportCoReporter {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())
+  /// When this person filed their report (duplicate submission or merge source time).
+  reportedAt DateTime
 
   reportId String
   report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
@@ -308,6 +326,22 @@ model ReportCoReporter {
 
   @@unique([reportId, userId])
   @@index([userId])
+}
+
+/// Client-supplied key (UUID) so duplicate POST /reports retries return the same report without double spend.
+model ReportSubmitIdempotency {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key      String
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, key])
+  @@index([createdAt])
 }
 
 model SystemConfig {
@@ -356,6 +390,37 @@ enum CleanupEventStatus {
   DECLINED  // Rejected by admin
 }
 
+/// Citizen-facing lifecycle (aligned with mobile EcoEventStatus).
+enum EcoEventLifecycleStatus {
+  UPCOMING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum EcoEventCategory {
+  GENERAL_CLEANUP
+  RIVER_AND_LAKE
+  TREE_AND_GREEN
+  RECYCLING_DRIVE
+  HAZARDOUS_REMOVAL
+  AWARENESS_AND_EDUCATION
+  OTHER
+}
+
+enum EcoCleanupScale {
+  SMALL
+  MEDIUM
+  LARGE
+  MASSIVE
+}
+
+enum EcoEventDifficulty {
+  EASY
+  MODERATE
+  HARD
+}
+
 // Cleanup event at a site
 model CleanupEvent {
   id        String   @id @default(cuid())
@@ -365,16 +430,222 @@ model CleanupEvent {
   siteId    String
   site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
+  title       String
+  description String @db.Text
+  category    EcoEventCategory @default(GENERAL_CLEANUP)
+
   scheduledAt DateTime
+  endAt       DateTime?
   completedAt DateTime?
-  status      CleanupEventStatus @default(APPROVED) // PENDING when created by user, APPROVED by admin
+
+  /// Moderation (admin approval for user-created events).
+  status CleanupEventStatus @default(APPROVED)
+
+  /// Lifecycle shown in the mobile app when event is APPROVED.
+  lifecycleStatus EcoEventLifecycleStatus @default(UPCOMING)
 
   organizerId String?
+  organizer   User?   @relation("CleanupEventOrganizer", fields: [organizerId], references: [id], onDelete: SetNull)
+
   participantCount Int @default(0)
+
+  gear           String[] @default([])
+  scale          EcoCleanupScale?
+  difficulty     EcoEventDifficulty?
+  afterImageKeys String[] @default([])
+  maxParticipants Int?
+
+  /// Rotates when organizer opens check-in or taps rotate; invalidates old QR tokens.
+  checkInSessionId String?
+  checkInOpen      Boolean @default(false)
+  /// Denormalized count of [EventCheckIn] rows for this event.
+  checkedInCount   Int     @default(0)
+
+  participants EventParticipant[]
+  checkIns              EventCheckIn[]
+  checkInRedemptions    EventCheckInRedemption[]
+  chatMessages          EventChatMessage[]
+  chatReadCursors       EventChatReadCursor[]
+  chatMutes             EventChatMute[]
+
+  /// RFC 5545 RRULE string (e.g. FREQ=WEEKLY;COUNT=8;BYDAY=SA).
+  /// Null for non-recurring events.
+  recurrenceRule  String?
+
+  /// References the first event in a recurring series. Null for standalone/parent events.
+  parentEventId   String?
+  parentEvent     CleanupEvent?  @relation("RecurrenceSeries", fields: [parentEventId], references: [id], onDelete: SetNull)
+  seriesChildren  CleanupEvent[] @relation("RecurrenceSeries")
+
+  /// 0-based index within its series (0 = original/parent). Null for non-recurring.
+  recurrenceIndex Int?
 
   @@index([siteId])
   @@index([scheduledAt])
   @@index([status])
+  @@index([lifecycleStatus, scheduledAt])
+  @@index([organizerId])
+  @@index([parentEventId])
+}
+
+enum EventChatMessageType {
+  TEXT
+  SYSTEM
+  IMAGE
+  LOCATION
+  VIDEO
+  AUDIO
+  FILE
+}
+
+model EventParticipant {
+  id       String   @id @default(cuid())
+  joinedAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  reminderEnabled Boolean  @default(false)
+  reminderAt      DateTime?
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+/// Text or system message in an event participant chat (organizer + joiners).
+model EventChatMessage {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  authorId String
+  author   User @relation("EventChatMessages", fields: [authorId], references: [id], onDelete: Cascade)
+
+  body String @db.Text
+
+  replyToId String?
+  replyTo   EventChatMessage?  @relation("ChatReplies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   EventChatMessage[] @relation("ChatReplies")
+
+  deletedAt DateTime?
+
+  editedAt DateTime?
+
+  isPinned   Boolean   @default(false)
+  pinnedAt   DateTime?
+  pinnedById String?
+  pinnedBy   User?     @relation("EventChatPinnedBy", fields: [pinnedById], references: [id], onDelete: SetNull)
+
+  messageType    EventChatMessageType @default(TEXT)
+  systemPayload  Json?
+
+  locationLat   Float?
+  locationLng   Float?
+  locationLabel String?
+
+  bodyEncrypted Boolean @default(false)
+
+  /// Client-generated UUID for idempotent sends (POST retry / offline flush).
+  clientMessageId String?
+
+  attachments EventChatAttachment[]
+
+  @@unique([eventId, clientMessageId])
+  @@index([eventId, createdAt])
+  @@index([authorId])
+  @@index([eventId, isPinned, pinnedAt])
+}
+
+model EventChatAttachment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  messageId String
+  message   EventChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  url          String
+  mimeType     String
+  fileName     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  duration     Int?
+  thumbnailUrl String?
+
+  @@index([messageId])
+}
+
+/// Per-user mute for event chat push notifications (SSE still delivers).
+model EventChatMute {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation("EventChatMutes", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+/// Per-user read position for event chat unread counts.
+model EventChatReadCursor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation("EventChatReadCursors", fields: [userId], references: [id], onDelete: Cascade)
+
+  lastReadMessageId String?
+
+  @@unique([eventId, userId])
+  @@index([userId])
+}
+
+/// Attendee check-in at an event (registered user or manual guest list).
+model EventCheckIn {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  /// `u:<userId>` for app users, `g:<slug>` for manual guest rows (normalized name).
+  dedupeKey String
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  guestDisplayName String?
+
+  checkedInAt DateTime @default(now())
+
+  @@unique([eventId, dedupeKey])
+  @@index([eventId, checkedInAt])
+}
+
+/// Single-use QR token ids (jti) — prevents screenshot replay across different users.
+model EventCheckInRedemption {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  jti String @unique
+
+  @@index([eventId])
 }
 
 model SiteVote {
@@ -506,6 +777,7 @@ enum NotificationType {
   COMMENT
   NEARBY_REPORT
   CLEANUP_EVENT
+  EVENT_CHAT
   SYSTEM
 }
 

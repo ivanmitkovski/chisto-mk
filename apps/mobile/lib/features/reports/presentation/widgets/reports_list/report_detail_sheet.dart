@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:chisto_mobile/core/cache/report_image_provider.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -11,6 +13,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
+import 'package:chisto_mobile/features/reports/presentation/l10n/report_category_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card.dart';
@@ -18,6 +21,7 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/device_platform.dart';
 import 'package:chisto_mobile/shared/utils/file_exists.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 const List<String> _severityLabels = <String>[
@@ -53,22 +57,9 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
 
   MockReport get report => _report ?? widget.report;
 
-  static String _formatDateFull(DateTime d) {
-    const List<String> months = <String>[
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return '${d.day} ${months[d.month - 1]} ${d.year}';
+  String _formatSubmittedDate(DateTime d) {
+    final String locale = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMd(locale).format(d);
   }
 
   static bool _isNetworkUrl(String s) =>
@@ -242,7 +233,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
       final detail = await ServiceLocator.instance.reportsApiRepository.getReportById(reportId);
       if (!mounted) return;
       setState(() {
-        _report = ReportsListMockStore.fromDetail(detail);
+        _report = ReportsListMockStore.fromDetail(detail, context.l10n);
       });
     } catch (_) {
       // Best-effort: keep current UI, manual pull-to-refresh exists in list.
@@ -253,6 +244,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final List<String> evidencePaths = report.evidenceImagePaths ?? const <String>[];
     final bool hasEvidenceImage = evidencePaths.isNotEmpty &&
         (_isNetworkUrl(evidencePaths.first) ||
@@ -266,7 +258,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
           : 'See what you submitted and how moderators handled this report.',
       trailing: ReportCircleIconButton(
         icon: _isRefreshing ? Icons.sync_rounded : Icons.close_rounded,
-        semanticLabel: 'Close',
+        semanticLabel: l10n.semanticClose,
         onTap: () {
           AppHaptics.tap();
           Navigator.of(context).pop();
@@ -283,6 +275,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
               _ReportEvidenceGallery(
                 evidencePaths: evidencePaths,
                 reportTag: report.reportNumber ?? 'report',
+                noPhotosLabel: l10n.reportDetailNoPhotos,
               ),
               const SizedBox(height: AppSpacing.md),
             ],
@@ -298,7 +291,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
                   ),
                 ReportStatusBadge(status: report.status),
                 ReportStatePill(
-                  label: _formatDateFull(report.createdAt),
+                  label: _formatSubmittedDate(report.createdAt),
                   icon: Icons.schedule_rounded,
                   tone: ReportSurfaceTone.neutral,
                 ),
@@ -319,7 +312,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
                   report.score <= 0 &&
                   !_hasLocationData,
               child: Text(
-                report.category.label,
+                report.category.localizedTitle(context.l10n),
                 style: AppTypography.cardTitle,
               ),
             ),
@@ -377,7 +370,7 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
                           ),
                           const SizedBox(width: AppSpacing.sm),
                           Text(
-                            'Opening…',
+                            l10n.reportDetailOpeningInProgress,
                             style: AppTypography.textTheme.bodyMedium!.copyWith(
                               color: AppColors.textMuted,
                             ),
@@ -411,12 +404,12 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
             const SizedBox(height: AppSpacing.lg),
             ReportInfoBanner(
               title: report.status == ReportStatus.underReview
-                  ? 'Under review by moderators'
+                  ? l10n.reportDetailStatusUnderReviewTitle
                   : report.status == ReportStatus.approved
-                      ? 'Approved and linked to a site'
+                      ? l10n.reportDetailStatusApprovedTitle
                       : report.status == ReportStatus.alreadyReported
-                          ? 'Already tracked as an existing site'
-                          : 'Review outcome',
+                          ? l10n.reportDetailStatusAlreadyReportedTitle
+                          : l10n.reportDetailStatusOutcomeTitle,
               icon: report.status == ReportStatus.approved
                   ? Icons.verified_outlined
                   : report.status == ReportStatus.declined
@@ -430,13 +423,13 @@ class _ReportDetailSheetState extends State<ReportDetailSheet> {
                           ? ReportSurfaceTone.warning
                           : ReportSurfaceTone.neutral,
               message: report.status == ReportStatus.underReview
-                  ? 'Moderators are checking your evidence and location before they decide how to handle this report.'
+                  ? l10n.reportDetailStatusUnderReviewBody
                   : report.status == ReportStatus.approved
-                      ? 'This report helped confirm a public pollution site and may contribute to cleanup actions.'
+                      ? l10n.reportDetailStatusApprovedBody
                       : report.status == ReportStatus.alreadyReported
-                          ? 'Your report matched an existing site. The evidence is still useful for understanding the problem.'
+                          ? l10n.reportDetailStatusAlreadyReportedBody
                           : report.declineReason ??
-                              'This report could not be approved in its current form.',
+                              l10n.reportDetailStatusOutcomeBodyFallback,
             ),
           ],
         ),
@@ -449,10 +442,12 @@ class _ReportEvidenceGallery extends StatelessWidget {
   const _ReportEvidenceGallery({
     required this.evidencePaths,
     required this.reportTag,
+    required this.noPhotosLabel,
   });
 
   final List<String> evidencePaths;
   final String reportTag;
+  final String noPhotosLabel;
 
   static bool _isNetworkUrl(String s) =>
       s.startsWith('http://') || s.startsWith('https://');
@@ -489,7 +484,7 @@ class _ReportEvidenceGallery extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
-                  'No photos',
+                  noPhotosLabel,
                   style: AppTypography.textTheme.bodySmall!.copyWith(
                     color: AppColors.textMuted,
                   ),

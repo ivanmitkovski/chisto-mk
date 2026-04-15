@@ -12,6 +12,8 @@
 	<string>We use your location to help autofill your city and improve report accuracy.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>We use the camera for profile photos and to capture photos for pollution reports.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We use the microphone so you can send voice messages in event chat.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>We need access to your photo library so you can choose a profile picture.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
@@ -39,7 +41,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Chisto Mobile</string>
+	<string>Chisto.mk</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -47,7 +49,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>chisto_mobile</string>
+	<string>Chisto.mk</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -88,15 +90,23 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>mk.chisto.deeplink</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>chisto</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>

@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 import { ReportsService } from '../../src/reports/reports.service';
+import { ReportCapacityService } from '../../src/reports/report-capacity.service';
 import { Role } from '../../src/prisma-client';
 
 function makeService(overrides?: {
@@ -37,24 +38,28 @@ function makeService(overrides?: {
   };
   prisma.$transaction.mockImplementation(async (cb: (tx: unknown) => Promise<unknown>) => cb(prisma));
 
-  const audit = { log: jest.fn() };
-  const reportsUploadService = { signUrls: jest.fn() };
+  const reportsUploadService = {
+    signUrls: jest.fn(),
+    deleteReportMediaUrls: jest.fn().mockResolvedValue(0),
+    tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+  };
   const reportEventsService = { emitReportCreated: jest.fn(), emitReportStatusUpdated: jest.fn() };
   const notificationEventsService = { emitNotificationCreated: jest.fn() };
   const siteEventsService = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() };
   const reportsOwnerEventsService = { emit: jest.fn() };
 
-  const eventEmitter = { emit: jest.fn() };
+  const reportCapacity = new ReportCapacityService(prisma as never);
 
   const service = new ReportsService(
     prisma as never,
-    audit as never,
     reportsUploadService as never,
     reportEventsService as never,
     notificationEventsService as never,
     siteEventsService as never,
     reportsOwnerEventsService as never,
-    eventEmitter as never,
+    reportCapacity,
+    {} as never,
+    {} as never,
   );
 
   return { service, prisma };
@@ -103,6 +108,7 @@ describe('ReportsService capacity guards', () => {
     const result = await service.getCapacityForCurrentUser(user as never);
     expect(result.creditsAvailable).toBe(3);
     expect(result.emergencyAvailable).toBe(true);
+    expect(result.nextEmergencyReportAvailableAt).toBeNull();
     expect(result.unlockHint).toContain('unlock');
   });
 
@@ -117,6 +123,7 @@ describe('ReportsService capacity guards', () => {
     const result = await service.getCapacityForCurrentUser(user as never);
     expect(result.emergencyAvailable).toBe(false);
     expect((result.retryAfterSeconds ?? 0) > 0).toBe(true);
+    expect(result.nextEmergencyReportAvailableAt).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 });
 

@@ -102,7 +102,9 @@ export default async function NewsArticlePage({ params }: Props) {
     headline: post.title,
     description: post.excerpt,
     datePublished: post.publishedAt,
-    coverImage: post.coverImage,
+    ...(post.coverImage !== undefined && post.coverImage !== ""
+      ? { coverImage: post.coverImage }
+      : {}),
   });
 
   return (

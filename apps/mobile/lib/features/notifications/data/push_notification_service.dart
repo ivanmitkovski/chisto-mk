@@ -67,12 +67,19 @@ class PushNotificationService {
       description: 'Default notification channel for Chisto.mk',
       importance: Importance.high,
     );
+    const AndroidNotificationChannel chatChannel = AndroidNotificationChannel(
+      'chisto_event_chat',
+      'Event chat',
+      description: 'Messages on cleanup events you joined',
+      importance: Importance.high,
+    );
 
     if (Platform.isAndroid) {
-      await _localNotifications
-          .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
+      final AndroidFlutterLocalNotificationsPlugin? android =
+          _localNotifications.resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>();
+      await android?.createNotificationChannel(channel);
+      await android?.createNotificationChannel(chatChannel);
     }
 
     const AndroidInitializationSettings androidSettings =
@@ -135,24 +142,39 @@ class PushNotificationService {
   }
 
   void _showLocalNotification(RemoteMessage message) {
+    final String? type = message.data['type'] as String?;
     final RemoteNotification? notification = message.notification;
-    if (notification == null) return;
+    String? title = notification?.title;
+    String? body = notification?.body;
+    if (type == 'EVENT_CHAT') {
+      title ??= message.data['title'] as String?;
+      body ??= message.data['messagePreview'] as String? ?? message.data['body'] as String?;
+    }
+    if (title == null || title.isEmpty || body == null || body.isEmpty) {
+      return;
+    }
 
+    final bool isChat = type == 'EVENT_CHAT';
     _localNotifications.show(
-      notification.hashCode,
-      notification.title,
-      notification.body,
-      const NotificationDetails(
+      message.hashCode,
+      title,
+      body,
+      NotificationDetails(
         android: AndroidNotificationDetails(
-          'chisto_default',
-          'Chisto Notifications',
+          isChat ? 'chisto_event_chat' : 'chisto_default',
+          isChat ? 'Event chat' : 'Chisto Notifications',
+          channelDescription: isChat
+              ? 'Messages on cleanup events you joined'
+              : 'Default notification channel for Chisto.mk',
           importance: Importance.high,
           priority: Priority.high,
+          groupKey: isChat ? 'event_chat' : null,
         ),
         iOS: DarwinNotificationDetails(
           presentAlert: true,
           presentBadge: true,
           presentSound: true,
+          threadIdentifier: isChat ? (message.data['eventId'] as String? ?? 'event_chat') : null,
         ),
       ),
       payload: message.data['notificationId'] as String?,

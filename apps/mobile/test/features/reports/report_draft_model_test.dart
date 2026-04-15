@@ -43,10 +43,9 @@ void main() {
       expect(ReportCategory.values, contains(ReportCategory.other));
     });
 
-    test('each category has label and description', () {
+    test('each category has stable API pollution label for map filters', () {
       for (final ReportCategory cat in ReportCategory.values) {
-        expect(cat.label, isNotEmpty);
-        expect(cat.description, isNotEmpty);
+        expect(cat.apiPollutionTypeLabel, isNotEmpty);
       }
     });
   });

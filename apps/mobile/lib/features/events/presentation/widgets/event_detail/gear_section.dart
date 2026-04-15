@@ -1,9 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 
 class GearSection extends StatelessWidget {
   const GearSection({super.key, required this.event});
@@ -17,44 +21,74 @@ class GearSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          'Gear to bring',
-          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Wrap(
-          spacing: AppSpacing.radiusSm,
-          runSpacing: AppSpacing.radiusSm,
-          children: event.gear.map((EventGear gear) {
-            return Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.sm,
-                vertical: AppSpacing.sm,
+        DetailSectionHeader(context.l10n.eventsGearSectionTitle),
+        if (event.gear.isEmpty)
+          // "No gear" chip — avoids a blank section under the header.
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.inputFill,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              border: Border.all(
+                color: AppColors.divider.withValues(alpha: 0.7),
               ),
-              decoration: BoxDecoration(
-                color: AppColors.inputFill,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(
-                  color: AppColors.divider.withValues(alpha: 0.8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                const Icon(
+                  CupertinoIcons.checkmark_circle,
+                  size: 15,
+                  color: AppColors.textMuted,
                 ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(gear.icon, size: 16, color: AppColors.textSecondary),
-                  const SizedBox(width: AppSpacing.xs),
-                  Text(
-                    gear.label,
-                    style: textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textPrimary,
-                    ),
+                const SizedBox(width: AppSpacing.xs),
+                Text(
+                  context.l10n.eventsGearNoneNeeded,
+                  style: textTheme.bodySmall?.copyWith(
+                    color: AppColors.textMuted,
+                    fontWeight: FontWeight.w500,
                   ),
-                ],
-              ),
-            );
-          }).toList(),
-        ),
+                ),
+              ],
+            ),
+          )
+        else
+          Wrap(
+            spacing: AppSpacing.xs,
+            runSpacing: AppSpacing.xs,
+            children: event.gear.map((EventGear gear) {
+              return Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.sm,
+                  vertical: AppSpacing.xs,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(
+                    color: AppColors.divider.withValues(alpha: 0.8),
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Icon(gear.icon, size: 15, color: AppColors.textSecondary),
+                    const SizedBox(width: AppSpacing.xs),
+                    Text(
+                      gear.localizedLabel(context.l10n),
+                      style: textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }

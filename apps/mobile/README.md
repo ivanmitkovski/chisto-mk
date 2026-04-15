@@ -2,6 +2,10 @@
 
 A new Flutter project.
 
+## Local development privacy (draft)
+
+When you run the app against a local or staging API, your device still sends the same categories of data the production build would (for example, account identifiers when signed in, photos and location when you file a report, and telemetry needed for maps and events). Treat any non-production backend like real user data: use test accounts, avoid personal photos in shared builds, and do not log or share API responses that could contain someone else’s submissions.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.

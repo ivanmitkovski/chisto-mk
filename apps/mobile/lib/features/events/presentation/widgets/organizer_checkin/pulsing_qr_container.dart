@@ -5,10 +5,16 @@ class PulsingQRContainer extends StatefulWidget {
     super.key,
     required this.isActive,
     required this.child,
+    this.pulseOnlyNearExpiry = false,
+    this.remainingSecondsUntilExpiry,
   });
 
   final bool isActive;
   final Widget child;
+
+  /// When true, pulse only while [remainingSecondsUntilExpiry] is at most 10.
+  final bool pulseOnlyNearExpiry;
+  final int? remainingSecondsUntilExpiry;
 
   @override
   State<PulsingQRContainer> createState() => _PulsingQRContainerState();
@@ -41,6 +47,12 @@ class _PulsingQRContainerState extends State<PulsingQRContainer>
   Widget build(BuildContext context) {
     if (!widget.isActive) {
       return widget.child;
+    }
+    if (widget.pulseOnlyNearExpiry) {
+      final int? sec = widget.remainingSecondsUntilExpiry;
+      if (sec == null || sec > 10) {
+        return widget.child;
+      }
     }
     return AnimatedBuilder(
       animation: _scaleAnimation,

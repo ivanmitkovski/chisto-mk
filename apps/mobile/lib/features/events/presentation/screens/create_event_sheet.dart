@@ -1,22 +1,39 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/create_event_form_validation.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_async_site_picker.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_modal_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_details_section.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_help_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_schedule_section.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_screen_skeleton.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_site_section.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sticky_footer.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_step_progress_header.dart';
+import 'package:chisto_mobile/features/profile/presentation/widgets/profile_primary_action_bar.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_success_dialog.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/time_range_picker.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_widgets.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CreateEventSheet extends StatefulWidget {
   const CreateEventSheet({
@@ -36,7 +53,8 @@ class CreateEventSheet extends StatefulWidget {
   State<CreateEventSheet> createState() => _CreateEventSheetState();
 }
 
-class _CreateEventSheetState extends State<CreateEventSheet> {
+class _CreateEventSheetState extends State<CreateEventSheet>
+    with SingleTickerProviderStateMixin {
   EventSiteSummary? _selectedSite;
   DateTime? _selectedDate;
   EventTime _startTime = const EventTime(hour: 12, minute: 0);
@@ -45,23 +63,35 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
   final Set<EventGear> _selectedGear = <EventGear>{};
   CleanupScale? _selectedScale;
   EventDifficulty? _selectedDifficulty;
+  int? _maxParticipants;
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _titleController = TextEditingController();
   bool _showValidationErrors = false;
+  bool _submitting = false;
+  bool _showBootstrapSkeleton = true;
+  bool _appliedLocalizedCoercedSiteDescription = false;
+
+  static const int _minBootstrapVisibleMs = 360;
+
+  late final _CreateEventFormSnapshot _initialSnapshot;
+  late final AnimationController _sectionEntranceController;
+
+  final GlobalKey _siteSectionKey = GlobalKey();
+  final GlobalKey _scheduleSectionKey = GlobalKey();
+  final GlobalKey _titleFieldKey = GlobalKey();
+  final GlobalKey _categorySectionKey = GlobalKey();
 
   bool get _isTimeRangeValid => EcoEvent.isValidRange(_startTime, _endTime);
 
-  bool get _isValid =>
-      _selectedSite != null &&
-      _selectedDate != null &&
-      _selectedCategory != null &&
-      _titleController.text.trim().isNotEmpty &&
-      _isTimeRangeValid;
+  bool get _isValid => createEventFormIsSubmittable(
+        hasSite: _selectedSite != null,
+        hasDate: _selectedDate != null,
+        category: _selectedCategory,
+        titleTrimmed: _titleController.text.trim(),
+        timeRangeValid: _isTimeRangeValid,
+      );
 
-  static DateTime _nextSaturday(DateTime now) {
-    final int daysUntilSaturday = (DateTime.saturday - now.weekday) % 7;
-    return DateTime(now.year, now.month, now.day + (daysUntilSaturday == 0 ? 7 : daysUntilSaturday));
-  }
+  bool get _isDirty => !_initialSnapshot.matches(this);
 
   @override
   void initState() {
@@ -73,32 +103,157 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       siteImageUrl: widget.preselectedSiteImageUrl,
       siteDistanceKm: widget.preselectedSiteDistanceKm,
     );
-    _selectedDate = _nextSaturday(now);
+    _selectedDate = DateUtils.dateOnly(now);
     _startTime = const EventTime(hour: 10, minute: 0);
     _endTime = const EventTime(hour: 12, minute: 0);
-  }
-
-  int get _completedSteps {
-    int n = 0;
-    if (_selectedSite != null) n++;
-    if (_selectedDate != null) n++;
-    if (_selectedCategory != null) n++;
-    if (_titleController.text.trim().isNotEmpty) n++;
-    if (_isTimeRangeValid) n++;
-    return n;
+    _initialSnapshot = _CreateEventFormSnapshot.capture(this);
+    _sectionEntranceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_completeBootstrapSkeleton());
+    });
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_appliedLocalizedCoercedSiteDescription) {
+      return;
+    }
+    _appliedLocalizedCoercedSiteDescription = true;
+    final EventSiteSummary? localized = EventSiteResolver.coerceSummary(
+      siteId: widget.preselectedSiteId,
+      siteName: widget.preselectedSiteName,
+      siteImageUrl: widget.preselectedSiteImageUrl,
+      siteDistanceKm: widget.preselectedSiteDistanceKm,
+      syntheticSiteDescription: context.l10n.eventsSiteCoercedDescription,
+    );
+    if (localized != null) {
+      setState(() => _selectedSite = localized);
+    }
+  }
+
+  Future<void> _completeBootstrapSkeleton() async {
+    await Future<void>.delayed(
+      const Duration(milliseconds: _minBootstrapVisibleMs),
+    );
+    if (!mounted) {
+      return;
+    }
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+    setState(() => _showBootstrapSkeleton = false);
+    if (!mounted) {
+      return;
+    }
+    if (reduceMotion) {
+      _sectionEntranceController.value = 1;
+    } else {
+      unawaited(_sectionEntranceController.forward(from: 0));
+    }
+  }
+
+  /// Progress milestones match [_isValid].
+  int get _completedSteps => createEventFormCompletedSteps(
+        hasSite: _selectedSite != null,
+        hasDate: _selectedDate != null,
+        category: _selectedCategory,
+        titleTrimmed: _titleController.text.trim(),
+        timeRangeValid: _isTimeRangeValid,
+      );
+
+  @override
   void dispose() {
+    _sectionEntranceController.dispose();
     _descriptionController.dispose();
     _titleController.dispose();
     super.dispose();
   }
 
+  Widget _sectionGroupCaption(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+      child: Text(
+        text.toUpperCase(),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.7,
+            ),
+      ),
+    );
+  }
+
+  Widget _staggeredSection({required int slot, required Widget child}) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return child;
+    }
+    return FadeTransition(
+      opacity: CurvedAnimation(
+        parent: _sectionEntranceController,
+        curve: Interval(
+          0.05 + slot * 0.2,
+          0.55 + slot * 0.2,
+          curve: AppMotion.smooth,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  Future<bool> _confirmDiscard() async {
+    final bool? discard = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return CupertinoAlertDialog(
+          title: Text(ctx.l10n.createEventDiscardTitle),
+          content: Padding(
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
+            child: Text(ctx.l10n.createEventDiscardBody),
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(ctx.l10n.createEventDiscardKeepEditing),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(ctx.l10n.commonDiscard),
+            ),
+          ],
+        );
+      },
+    );
+    return discard == true;
+  }
+
+  Future<void> _onBackPressed() async {
+    if (!_isDirty) {
+      Navigator.of(context).maybePop();
+      return;
+    }
+    // `maybePop` respects `PopScope(canPop: !_isDirty)` and would re-fire
+    // `onPopInvokedWithResult` instead of dismissing.
+    if (await _confirmDiscard() && mounted) {
+      Navigator.of(context).pop();
+    }
+  }
+
   Future<void> _handleCreate() async {
+    if (_submitting) {
+      return;
+    }
     if (!_isValid) {
       AppHaptics.warning();
       setState(() => _showValidationErrors = true);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        _scrollToFirstInvalid();
+      });
       return;
     }
 
@@ -113,7 +268,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     final String eventId = 'evt-local-${DateTime.now().microsecondsSinceEpoch}';
     final String title = _titleController.text.trim();
     final String description = _descriptionController.text.trim().isEmpty
-        ? 'Community cleanup action organized by local volunteers.'
+        ? context.l10n.createEventDefaultDescription
         : _descriptionController.text.trim();
     final EcoEventCategory category =
         _selectedCategory ?? EcoEventCategory.generalCleanup;
@@ -131,14 +286,50 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       date: DateTime(selectedDate.year, selectedDate.month, selectedDate.day),
       startTime: _startTime,
       endTime: _endTime,
-      participantCount: 1,
+      participantCount: 0,
       status: EcoEventStatus.upcoming,
       createdAt: now,
-      isJoined: true,
+      isJoined: false,
       gear: _selectedGear.toList(growable: false),
       scale: _selectedScale,
       difficulty: _selectedDifficulty,
+      maxParticipants: _maxParticipants,
     );
+
+    setState(() => _submitting = true);
+    EcoEvent created;
+    try {
+      created = await EventsRepositoryRegistry.instance.create(createdEvent);
+    } on AppError catch (e) {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: localizedAppErrorMessage(context.l10n, e),
+          type: AppSnackType.warning,
+        );
+      }
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+      return;
+    } on Object {
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsCreateGenericError,
+          type: AppSnackType.warning,
+        );
+      }
+      if (mounted) {
+        setState(() => _submitting = false);
+      }
+      return;
+    }
+
+    if (!mounted) {
+      return;
+    }
+    setState(() => _submitting = false);
 
     AppHaptics.success();
 
@@ -146,29 +337,144 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       context: context,
       barrierDismissible: false,
       barrierColor: AppColors.overlay,
-      builder: (BuildContext context) => EventSuccessDialog(
-        title: createdEvent.title,
-        siteName: createdEvent.siteName,
-      ),
+      builder: (BuildContext context) =>
+          EventSuccessDialog(title: created.title, siteName: created.siteName),
     );
 
     if (confirmed == true && mounted) {
-      EventsRepositoryRegistry.instance.create(createdEvent);
-      Navigator.of(context).pop(createdEvent);
+      Navigator.of(context).pop(created);
     }
   }
 
-  void _showSitePicker() {
-    AppHaptics.tap();
-    final List<EventSiteSummary> allSites = EventSiteResolver.allSites()
+  Future<(double?, double?)> _tryUserLatLng() async {
+    try {
+      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return (null, null);
+      }
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return (null, null);
+      }
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 8),
+      );
+      return (position.latitude, position.longitude);
+    } on Object {
+      return (null, null);
+    }
+  }
+
+  List<EventSiteSummary> _offlineSiteSummaries() {
+    return EventSiteResolver.allSites()
         .map(EventSiteSummary.fromPollutionSite)
         .toList(growable: false);
-    showCupertinoModalPopup<void>(
+  }
+
+  Future<CreateEventSitesLoadResult> _loadSitesForCreatePicker() async {
+    if (!ServiceLocator.instance.isInitialized) {
+      return CreateEventSitesLoadResult(
+        sites: _offlineSiteSummaries(),
+        usedOfflineFallback: true,
+        networkError: false,
+      );
+    }
+    final (double? lat, double? lng) = await _tryUserLatLng();
+    try {
+      final SitesListResult result = await ServiceLocator
+          .instance
+          .sitesRepository
+          .getSites(
+            latitude: lat,
+            longitude: lng,
+            radiusKm: 120,
+            page: 1,
+            limit: 100,
+            sort: 'hybrid',
+            mode: 'for_you',
+          );
+      final List<EventSiteSummary> sites = result.sites
+          .map(EventSiteSummary.fromPollutionSite)
+          .toList(growable: false);
+      sites.sort((EventSiteSummary a, EventSiteSummary b) {
+        final bool da = a.distanceKm >= 0;
+        final bool db = b.distanceKm >= 0;
+        if (da && db) {
+          final int c = a.distanceKm.compareTo(b.distanceKm);
+          if (c != 0) {
+            return c;
+          }
+        } else if (da != db) {
+          return da ? -1 : 1;
+        }
+        return a.title.compareTo(b.title);
+      });
+      if (sites.isEmpty) {
+        return CreateEventSitesLoadResult(
+          sites: _offlineSiteSummaries(),
+          usedOfflineFallback: true,
+          networkError: false,
+        );
+      }
+      return CreateEventSitesLoadResult(sites: sites);
+    } on Object {
+      return CreateEventSitesLoadResult(
+        sites: _offlineSiteSummaries(),
+        usedOfflineFallback: true,
+        networkError: true,
+      );
+    }
+  }
+
+  void _ensureSectionVisible(GlobalKey key) {
+    final BuildContext? ctx = key.currentContext;
+    if (ctx == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      ctx,
+      duration: AppMotion.standard,
+      curve: AppMotion.standardCurve,
+      alignment: 0.12,
+    );
+  }
+
+  void _scrollToFirstInvalid() {
+    if (_selectedSite == null) {
+      _ensureSectionVisible(_siteSectionKey);
+      return;
+    }
+    if (_selectedDate == null) {
+      _ensureSectionVisible(_scheduleSectionKey);
+      return;
+    }
+    if (!_isTimeRangeValid) {
+      _ensureSectionVisible(_scheduleSectionKey);
+      return;
+    }
+    if (_titleController.text.trim().length < 3) {
+      _ensureSectionVisible(_titleFieldKey);
+      return;
+    }
+    if (_selectedCategory == null) {
+      _ensureSectionVisible(_categorySectionKey);
+    }
+  }
+
+  void _showSitePicker({bool showMapTab = false}) {
+    AppHaptics.tap();
+    showCreateEventModalBottomSheet<void>(
       context: context,
       builder: (BuildContext ctx) {
-        return SitePickerSheet(
-          allSites: allSites,
+        return CreateEventAsyncSitePicker(
+          load: _loadSitesForCreatePicker,
           selectedSiteId: _selectedSite?.id,
+          initialShowMapTab: showMapTab,
           onSelect: (EventSiteSummary site) {
             AppHaptics.tap();
             setState(() => _selectedSite = site);
@@ -180,31 +486,54 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
     );
   }
 
+  void _showVolunteerCapPicker() {
+    AppHaptics.tap();
+    showCreateEventModalBottomSheet<void>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return _VolunteerCapPickerSheet(
+          initial: _maxParticipants,
+          onApply: (int? value) {
+            setState(() => _maxParticipants = value);
+            Navigator.of(ctx).pop();
+          },
+        );
+      },
+    );
+  }
+
   void _showCategoryPicker() {
     AppHaptics.tap();
-    showCupertinoModalPopup<void>(
+    showCreateEventModalBottomSheet<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Event type',
-          subtitle: 'What kind of action are you organizing?',
+          title: ctx.l10n.createEventCategoryTitle,
+          subtitle: ctx.l10n.createEventCategorySubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
           maxHeightFactor: 0.82,
+          addBottomInset: false,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            0,
+          ),
           child: ListView(
-            shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
             children: <Widget>[
               ...EcoEventCategory.values.expand((EcoEventCategory cat) {
                 final bool isActive = cat == _selectedCategory;
                 return <Widget>[
                   ReportActionTile(
                     icon: cat.icon,
-                    title: cat.label,
-                    subtitle: cat.description,
+                    title: cat.localizedLabel(ctx.l10n),
+                    subtitle: cat.localizedDescription(ctx.l10n),
                     tone: isActive
                         ? ReportSurfaceTone.accent
                         : ReportSurfaceTone.neutral,
@@ -213,8 +542,9 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                           ? CupertinoIcons.checkmark_circle_fill
                           : CupertinoIcons.circle,
                       size: 22,
-                      color:
-                          isActive ? AppColors.primaryDark : AppColors.divider,
+                      color: isActive
+                          ? AppColors.primaryDark
+                          : AppColors.divider,
                     ),
                     onTap: () {
                       AppHaptics.tap();
@@ -235,55 +565,72 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
 
   void _showGearPicker() {
     AppHaptics.tap();
-    showCupertinoModalPopup<void>(
+    showCreateEventModalBottomSheet<void>(
       context: context,
       builder: (BuildContext ctx) {
         return StatefulBuilder(
           builder: (BuildContext ctx, StateSetter setModalState) {
             return ReportSheetScaffold(
-              title: 'Gear needed',
-              subtitle: 'Select everything volunteers should bring.',
+              title: ctx.l10n.createEventGearTitle,
+              subtitle: ctx.l10n.createEventGearSubtitle,
               trailing: ReportCircleIconButton(
                 icon: CupertinoIcons.xmark,
-                semanticLabel: 'Close',
+                semanticLabel: ctx.l10n.commonClose,
                 onTap: () => Navigator.of(ctx).pop(),
               ),
               maxHeightFactor: 0.82,
-              footer: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () {
-                    AppHaptics.tap();
-                    Navigator.of(ctx).pop();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: AppColors.textPrimary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+              addBottomInset: false,
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                AppSpacing.sm,
+                AppSpacing.lg,
+                0,
+              ),
+              footer: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.viewPaddingOf(ctx).bottom,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      AppHaptics.tap();
+                      Navigator.of(ctx).pop();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: AppColors.textPrimary,
+                      alignment: Alignment.center,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusPill,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    _selectedGear.isEmpty
-                        ? 'Skip'
-                        : 'Done (${_selectedGear.length} selected)',
-                    style: const TextStyle(
-                      fontSize: 17,
-                      fontWeight: FontWeight.w600,
+                    child: Text(
+                      _selectedGear.isEmpty
+                          ? ctx.l10n.commonSkip
+                          : ctx.l10n.createEventGearDoneSelectedCount(
+                              _selectedGear.length,
+                            ),
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
               child: ListView(
-                shrinkWrap: true,
                 physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.only(bottom: AppSpacing.lg),
                 children: <Widget>[
-                  const ReportInfoBanner(
-                    title: 'Multi-select',
-                    message:
-                        'Tap each item volunteers should bring. You can select as many as needed.',
+                  ReportInfoBanner(
+                    title: ctx.l10n.createEventGearMultiselectTitle,
+                    message: ctx.l10n.createEventGearMultiselectMessage,
                     icon: CupertinoIcons.bag,
                   ),
                   const SizedBox(height: AppSpacing.md),
@@ -292,7 +639,7 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                     return <Widget>[
                       ReportActionTile(
                         icon: gear.icon,
-                        title: gear.label,
+                        title: gear.localizedLabel(ctx.l10n),
                         tone: isActive
                             ? ReportSurfaceTone.accent
                             : ReportSurfaceTone.neutral,
@@ -332,29 +679,36 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
 
   void _showScalePicker() {
     AppHaptics.tap();
-    showCupertinoModalPopup<void>(
+    showCreateEventModalBottomSheet<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Team size',
-          subtitle: 'How many volunteers do you expect?',
+          title: ctx.l10n.createEventTeamSizeTitle,
+          subtitle: ctx.l10n.createEventTeamSizeSubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
-          maxHeightFactor: 0.6,
+          maxHeightFactor: 0.65,
+          addBottomInset: false,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            0,
+          ),
           child: ListView(
-            shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
             children: <Widget>[
               ...CleanupScale.values.expand((CleanupScale scale) {
                 final bool isActive = scale == _selectedScale;
                 return <Widget>[
                   ReportActionTile(
                     icon: Icons.groups_rounded,
-                    title: scale.label,
-                    subtitle: scale.description,
+                    title: scale.localizedLabel(ctx.l10n),
+                    subtitle: scale.localizedDescription(ctx.l10n),
                     tone: isActive
                         ? ReportSurfaceTone.accent
                         : ReportSurfaceTone.neutral,
@@ -363,8 +717,9 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                           ? CupertinoIcons.checkmark_circle_fill
                           : CupertinoIcons.circle,
                       size: 22,
-                      color:
-                          isActive ? AppColors.primaryDark : AppColors.divider,
+                      color: isActive
+                          ? AppColors.primaryDark
+                          : AppColors.divider,
                     ),
                     onTap: () {
                       AppHaptics.tap();
@@ -385,21 +740,28 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
 
   void _showDifficultyPicker() {
     AppHaptics.tap();
-    showCupertinoModalPopup<void>(
+    showCreateEventModalBottomSheet<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
-          title: 'Difficulty',
-          subtitle: 'Set expectations for volunteers.',
+          title: ctx.l10n.createEventDifficultyTitle,
+          subtitle: ctx.l10n.createEventDifficultySubtitle,
           trailing: ReportCircleIconButton(
             icon: CupertinoIcons.xmark,
-            semanticLabel: 'Close',
+            semanticLabel: ctx.l10n.commonClose,
             onTap: () => Navigator.of(ctx).pop(),
           ),
-          maxHeightFactor: 0.55,
+          maxHeightFactor: 0.6,
+          addBottomInset: false,
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            0,
+          ),
           child: ListView(
-            shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: AppSpacing.lg),
             children: <Widget>[
               ...EventDifficulty.values.expand((EventDifficulty diff) {
                 final bool isActive = diff == _selectedDifficulty;
@@ -408,8 +770,8 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
                     icon: isActive
                         ? CupertinoIcons.checkmark_shield_fill
                         : CupertinoIcons.shield,
-                    title: diff.label,
-                    subtitle: diff.description,
+                    title: diff.localizedLabel(ctx.l10n),
+                    subtitle: diff.localizedDescription(ctx.l10n),
                     tone: isActive
                         ? ReportSurfaceTone.accent
                         : ReportSurfaceTone.neutral,
@@ -441,139 +803,179 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
   @override
   Widget build(BuildContext context) {
     final double topPadding = MediaQuery.of(context).padding.top;
-
     final int steps = _completedSteps;
 
-    return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: Column(
-        children: <Widget>[
-          _buildAppBar(context, topPadding),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(AppSpacing.lg, 0, AppSpacing.lg, AppSpacing.sm),
-            child: Row(
-              children: <Widget>[
-                Text(
-                  'Step $steps of 5',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    fontSize: 13,
+    // When canPop is false (dirty form), iOS edge swipe invokes
+    // onPopInvokedWithResult(didPop: false) so we can show the discard dialog.
+    return PopScope(
+      canPop: !_isDirty,
+      onPopInvokedWithResult: (bool didPop, Object? result) async {
+        if (didPop) {
+          return;
+        }
+        final bool discard = await _confirmDiscard();
+        if (!context.mounted) {
+          return;
+        }
+        if (discard) {
+          Navigator.of(context).pop(result);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.appBackground,
+        // Keep the form from resizing for the keyboard; the sticky CTA stays
+        // pinned to the bottom safe area (not lifted above the keyboard).
+        resizeToAvoidBottomInset: false,
+        body: Column(
+          children: <Widget>[
+            _buildAppBar(context, topPadding),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: AppMotion.medium,
+                switchInCurve: AppMotion.smooth,
+                switchOutCurve: AppMotion.standardCurve,
+                child: _showBootstrapSkeleton
+                    ? Padding(
+                        key: const ValueKey<String>('create_event_bootstrap'),
+                        padding: const EdgeInsets.fromLTRB(
+                          AppSpacing.lg,
+                          AppSpacing.sm,
+                          AppSpacing.lg,
+                          0,
+                        ),
+                        child: const CreateEventScreenSkeleton(),
+                      )
+                    : Padding(
+                        key: const ValueKey<String>('create_event_form'),
+                        padding: EdgeInsets.zero,
+                        child: _buildFormScroll(context, steps),
+                      ),
+              ),
+            ),
+            if (_showBootstrapSkeleton)
+              ProfilePrimaryActionBar(
+                padForKeyboard: false,
+                child: ExcludeSemantics(
+                  child: Container(
+                    height: 56,
+                    width: double.infinity,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppColors.panelBackground,
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.radiusPill),
+                      border: Border.all(color: AppColors.divider),
+                    ),
                   ),
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                    child: LinearProgressIndicator(
-                      value: steps / 5,
-                      minHeight: 4,
-                      backgroundColor: AppColors.divider.withValues(alpha: 0.5),
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
-                    ),
+              )
+            else
+              CreateEventStickyFooter(
+                submitting: _submitting,
+                submitLabel: context.l10n.createEventSubmitLabel,
+                onSubmit: _handleCreate,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormScroll(BuildContext context, int steps) {
+    return CustomScrollView(
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+      physics: const BouncingScrollPhysics(),
+      slivers: <Widget>[
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: CreateEventStepProgressDelegate(steps: steps),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.lg + CreateEventStickyFooter.scrollBottomReserve,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                _staggeredSection(
+                  slot: 0,
+                  child: CreateEventSiteSection(
+                    sectionKey: _siteSectionKey,
+                    site: _selectedSite,
+                    showValidationErrors: _showValidationErrors,
+                    onSelectSiteTap: () async => _showSitePicker(),
+                    onMapPreviewTap: () async =>
+                        _showSitePicker(showMapTab: true),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _staggeredSection(
+                  slot: 1,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      _sectionGroupCaption(
+                        context,
+                        context.l10n.createEventSectionScheduleCaption,
+                      ),
+                      CreateEventScheduleSection(
+                        sectionKey: _scheduleSectionKey,
+                        selectedDate: _selectedDate,
+                        startTime: _startTime,
+                        endTime: _endTime,
+                        showValidationErrors: _showValidationErrors,
+                        isTimeRangeValid: _isTimeRangeValid,
+                        onDateSelected: (DateTime date) =>
+                            setState(() => _selectedDate = date),
+                        onStartChanged: (EventTime t) =>
+                            setState(() => _startTime = t),
+                        onEndChanged: (EventTime t) =>
+                            setState(() => _endTime = t),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                _staggeredSection(
+                  slot: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      _sectionGroupCaption(
+                        context,
+                        context.l10n.createEventSectionDetailsCaption,
+                      ),
+                      CreateEventDetailsSection(
+                        titleFieldKey: _titleFieldKey,
+                        categorySectionKey: _categorySectionKey,
+                        titleController: _titleController,
+                        descriptionController: _descriptionController,
+                        showValidationErrors: _showValidationErrors,
+                        selectedCategory: _selectedCategory,
+                        selectedScale: _selectedScale,
+                        selectedDifficulty: _selectedDifficulty,
+                        selectedGear: _selectedGear,
+                        maxParticipants: _maxParticipants,
+                        onTitleChanged: () => setState(() {}),
+                        onCategoryTap: _showCategoryPicker,
+                        onVolunteerCapTap: _showVolunteerCapPicker,
+                        onScaleTap: _showScalePicker,
+                        onDifficultyTap: _showDifficultyPicker,
+                        onGearTap: _showGearPicker,
+                        onDescriptionChanged: (_) => setState(() {}),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          Expanded(
-            child: SingleChildScrollView(
-              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.xxl,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  _buildSiteCard(context),
-                  const SizedBox(height: AppSpacing.lg),
-                  EventCalendar(
-                    selectedDate: _selectedDate,
-                    onDateSelected: (DateTime date) {
-                      setState(() => _selectedDate = date);
-                    },
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: AppSpacing.sheetHandleHeight,
-                      decoration: BoxDecoration(
-                        color: AppColors.textPrimary,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusXs),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  TimeRangePicker(
-                    startTime: _startTime.toTimeOfDay(),
-                    endTime: _endTime.toTimeOfDay(),
-                    hasError: _showValidationErrors && !_isTimeRangeValid,
-                    onStartChanged: (TimeOfDay t) =>
-                        setState(() => _startTime = EventTimeUI.fromTimeOfDay(t)),
-                    onEndChanged: (TimeOfDay t) =>
-                        setState(() => _endTime = EventTimeUI.fromTimeOfDay(t)),
-                  ),
-                  if (_showValidationErrors && !_isTimeRangeValid) ...<Widget>[
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'End time must be later than start time.',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.accentDanger,
-                            fontWeight: FontWeight.w500,
-                          ),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildTitleField(context),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildPickerTile(
-                    context,
-                    label: 'Event type',
-                    value: _selectedCategory?.label,
-                    icon: _selectedCategory?.icon,
-                    placeholder: 'Select event type',
-                    onTap: _showCategoryPicker,
-                    hasError: _showValidationErrors && _selectedCategory == null,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildPickerTile(
-                    context,
-                    label: 'Team size',
-                    value: _selectedScale?.label,
-                    icon: Icons.groups_rounded,
-                    placeholder: 'How many people?',
-                    onTap: _showScalePicker,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildPickerTile(
-                    context,
-                    label: 'Difficulty',
-                    value: _selectedDifficulty?.label,
-                    icon: CupertinoIcons.shield,
-                    trailingDot: _selectedDifficulty?.color,
-                    placeholder: 'Set difficulty level',
-                    onTap: _showDifficultyPicker,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildGearTile(context),
-                  const SizedBox(height: AppSpacing.lg),
-                  _buildDescriptionField(context),
-                  const SizedBox(height: AppSpacing.xl),
-                  PrimaryButton(
-                    label: 'Create eco action',
-                    enabled: true,
-                    onPressed: _handleCreate,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -588,14 +990,17 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       ),
       child: Row(
         children: <Widget>[
-          const AppBackButton(),
+          AppBackButton(
+            backgroundColor: AppColors.inputFill,
+            onPressed: () => unawaited(_onBackPressed()),
+          ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              'Create event',
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              context.l10n.createEventAppBarTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),
@@ -607,15 +1012,10 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
               iconSize: 18,
               onPressed: () {
                 AppHaptics.tap();
-                AppSnack.show(
-                  context,
-                  message:
-                      'Creation keeps the event local for now, but the organizer flow is ready right away.',
-                  type: AppSnackType.info,
-                );
+                showCreateEventHelpSheet(context);
               },
               icon: const Icon(
-                CupertinoIcons.bell,
+                CupertinoIcons.info_circle,
                 size: 18,
                 color: AppColors.textPrimary,
               ),
@@ -625,456 +1025,297 @@ class _CreateEventSheetState extends State<CreateEventSheet> {
       ),
     );
   }
+}
 
-  Widget _buildSiteCard(BuildContext context) {
-    final EventSiteSummary? site = _selectedSite;
-    final bool hasError = _showValidationErrors && site == null;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Cleanup site',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        Semantics(
-          button: true,
-          label: 'Select cleanup site',
-          child: GestureDetector(
-            onTap: _showSitePicker,
-            child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: hasError
-                  ? AppColors.accentDanger.withValues(alpha: 0.04)
-                  : AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radius18),
-              border: Border.all(
-                color: hasError
-                    ? AppColors.accentDanger
-                    : site == null
-                        ? AppColors.divider
-                        : AppColors.primary.withValues(alpha: 0.3),
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  width: 44,
-                  height: AppSpacing.avatarMd,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                  ),
-                  child: const Icon(
-                    CupertinoIcons.location_solid,
-                    color: AppColors.primaryDark,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        site?.title ?? 'Choose a pollution site',
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: site == null
-                                  ? AppColors.textMuted
-                                  : AppColors.textPrimary,
-                            ),
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Text(
-                        site == null
-                            ? 'Every event should be anchored to one cleanup location.'
-                            : '${site.distanceKm.toStringAsFixed(1)} km away · ${site.description}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textMuted,
-                              height: 1.35,
-                            ),
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                const Icon(
-                  CupertinoIcons.chevron_down,
-                  size: 18,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
+class _VolunteerCapPickerSheet extends StatelessWidget {
+  const _VolunteerCapPickerSheet({
+    required this.initial,
+    required this.onApply,
+  });
+
+  final int? initial;
+  final void Function(int?) onApply;
+
+  static const List<int> _presets = <int>[15, 30, 50, 100];
+
+  @override
+  Widget build(BuildContext context) {
+    return ReportSheetScaffold(
+      title: context.l10n.createEventVolunteerCapSheetTitle,
+      subtitle: context.l10n.createEventVolunteerCapSheetSubtitle,
+      trailing: ReportCircleIconButton(
+        icon: CupertinoIcons.xmark,
+        semanticLabel: context.l10n.commonClose,
+        onTap: () => Navigator.of(context).pop(),
       ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.xs),
-            child: Text(
-              'Choose the site before creating the event.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-      ],
+      maxHeightFactor: 0.72,
+      addBottomInset: false,
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.lg,
+        AppSpacing.sm,
+        AppSpacing.lg,
+        0,
+      ),
+      child: _VolunteerCapPickerBody(
+        initial: initial,
+        presets: _presets,
+        onApply: onApply,
+      ),
     );
   }
+}
 
-  Widget _buildTitleField(BuildContext context) {
-    final bool titleError =
-        _showValidationErrors && _titleController.text.trim().isEmpty;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+class _VolunteerCapPickerBody extends StatefulWidget {
+  const _VolunteerCapPickerBody({
+    required this.initial,
+    required this.presets,
+    required this.onApply,
+  });
+
+  final int? initial;
+  final List<int> presets;
+  final void Function(int?) onApply;
+
+  @override
+  State<_VolunteerCapPickerBody> createState() =>
+      _VolunteerCapPickerBodyState();
+}
+
+class _VolunteerCapPickerBodyState extends State<_VolunteerCapPickerBody> {
+  late int? _selected;
+  final TextEditingController _customController = TextEditingController();
+  String? _customError;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.initial;
+    final int? initial = widget.initial;
+    if (initial != null && !widget.presets.contains(initial)) {
+      _customController.text = '$initial';
+    }
+  }
+
+  @override
+  void dispose() {
+    _customController.dispose();
+    super.dispose();
+  }
+
+  void _applyCustom() {
+    final int? parsed = int.tryParse(_customController.text.trim());
+    if (parsed == null || parsed < 2 || parsed > 5000) {
+      setState(
+        () => _customError = context.l10n.createEventVolunteerCapInvalid,
+      );
+      return;
+    }
+    widget.onApply(parsed);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: const BouncingScrollPhysics(),
+      padding: const EdgeInsets.only(bottom: AppSpacing.lg),
       children: <Widget>[
-        Text(
-          'Event title',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
+        ReportActionTile(
+          icon: CupertinoIcons.infinite,
+          title: context.l10n.createEventVolunteerCapNoLimit,
+          tone: _selected == null
+              ? ReportSurfaceTone.accent
+              : ReportSurfaceTone.neutral,
+          trailing: Icon(
+            _selected == null
+                ? CupertinoIcons.checkmark_circle_fill
+                : CupertinoIcons.circle,
+            size: 22,
+            color: _selected == null
+                ? AppColors.primaryDark
+                : AppColors.divider,
+          ),
+          onTap: () {
+            AppHaptics.tap();
+            widget.onApply(null);
+          },
         ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _titleController,
-          maxLength: 60,
-          onChanged: (_) => setState(() {}),
-          buildCounter: (
-            BuildContext context, {
-            required int currentLength,
-            required bool isFocused,
-            int? maxLength,
-          }) =>
-              Text(
-            '$currentLength / ${maxLength ?? 60}',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: currentLength >= (maxLength ?? 60) * 0.9
-                      ? AppColors.accentDanger
-                      : AppColors.textMuted,
-                  fontSize: 12,
-                ),
-          ),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: 'e.g. Weekend river cleanup',
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textMuted,
+        const SizedBox(height: AppSpacing.sm),
+        ...widget.presets.expand((int n) {
+          final bool isActive = _selected == n;
+          return <Widget>[
+            ReportActionTile(
+              icon: CupertinoIcons.person_3_fill,
+              title: '$n',
+              tone: isActive
+                  ? ReportSurfaceTone.accent
+                  : ReportSurfaceTone.neutral,
+              trailing: Icon(
+                isActive
+                    ? CupertinoIcons.checkmark_circle_fill
+                    : CupertinoIcons.circle,
+                size: 22,
+                color: isActive
+                    ? AppColors.primaryDark
+                    : AppColors.divider,
+              ),
+              onTap: () {
+                AppHaptics.tap();
+                widget.onApply(n);
+              },
             ),
+            const SizedBox(height: AppSpacing.sm),
+          ];
+        }),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          context.l10n.createEventVolunteerCapCustomLabel,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        TextField(
+          controller: _customController,
+          keyboardType: TextInputType.number,
+          onChanged: (_) => setState(() => _customError = null),
+          decoration: InputDecoration(
+            hintText: context.l10n.createEventVolunteerCapCustomHint,
             filled: true,
-            fillColor: titleError
-                ? AppColors.accentDanger.withValues(alpha: 0.04)
-                : AppColors.panelBackground,
+            fillColor: AppColors.panelBackground,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
               vertical: 14,
             ),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: BorderSide(
-                color: titleError
-                    ? AppColors.accentDanger
-                    : AppColors.divider,
-              ),
-            ),
-            errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: const BorderSide(color: AppColors.accentDanger),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: BorderSide(
-                color: titleError
-                    ? AppColors.accentDanger
-                    : AppColors.divider,
-              ),
+              borderSide: const BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: BorderSide(
-                color: titleError
-                    ? AppColors.accentDanger
-                    : AppColors.primary,
+              borderSide: const BorderSide(
+                color: AppColors.primary,
                 width: 1.5,
               ),
             ),
           ),
         ),
-        if (titleError)
+        if (_customError != null)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              'Event title is required.',
+              _customError!,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: AppColors.accentDanger,
                     fontWeight: FontWeight.w500,
                   ),
             ),
           ),
-      ],
-    );
-  }
-
-  Widget _buildPickerTile(
-    BuildContext context, {
-    required String label,
-    required String? value,
-    required IconData? icon,
-    required String placeholder,
-    required VoidCallback onTap,
-    Color? trailingDot,
-    bool hasError = false,
-  }) {
-    final bool hasValue = value != null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        Semantics(
-          button: true,
-          label: label,
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: 14,
-            ),
-            decoration: BoxDecoration(
-              color: hasError
-                  ? AppColors.accentDanger.withValues(alpha: 0.04)
-                  : AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              border: Border.all(
-                color: hasError
-                    ? AppColors.accentDanger
-                    : (hasValue ? AppColors.primary.withValues(alpha: 0.3) : AppColors.divider),
+        const SizedBox(height: AppSpacing.md),
+        SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: ElevatedButton(
+            onPressed: _applyCustom,
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               ),
             ),
-            child: Row(
-              children: <Widget>[
-                if (icon != null && hasValue) ...<Widget>[
-                  Icon(icon, size: 18, color: AppColors.primaryDark),
-                  const SizedBox(width: 10),
-                ],
-                Expanded(
-                  child: Text(
-                    hasValue ? value : placeholder,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: hasValue
-                          ? AppColors.textPrimary
-                          : AppColors.textMuted,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (trailingDot != null && hasValue) ...<Widget>[
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: trailingDot,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
-                const Icon(
-                  CupertinoIcons.chevron_down,
-                  size: 18,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
-          ),
-        ),
-        ),
-        if (hasError)
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
-              'Select an event type.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-      ],
-    );
-  }
-
-  Widget _buildGearTile(BuildContext context) {
-    final bool hasGear = _selectedGear.isNotEmpty;
-    final String summary = hasGear
-        ? _selectedGear.map((EventGear g) => g.label).join(', ')
-        : 'What should volunteers bring?';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Gear needed',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: 8),
-        Semantics(
-          button: true,
-          label: 'Select gear needed',
-          child: GestureDetector(
-            onTap: _showGearPicker,
-            child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppSpacing.md,
-              vertical: 14,
-            ),
-            decoration: BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              border: Border.all(
-                color: hasGear ? AppColors.primary.withValues(alpha: 0.3) : AppColors.divider,
+              context.l10n.createEventVolunteerCapApply,
+              style: const TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w600,
               ),
             ),
-            child: Row(
-              children: <Widget>[
-                if (hasGear) ...<Widget>[
-                  const Icon(
-                    CupertinoIcons.bag_fill,
-                    size: 18,
-                    color: AppColors.primaryDark,
-                  ),
-                  const SizedBox(width: 10),
-                ],
-                Expanded(
-                  child: Text(
-                    summary,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: hasGear
-                          ? AppColors.textPrimary
-                          : AppColors.textMuted,
-                    ),
-                  ),
-                ),
-                if (hasGear) ...<Widget>[
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppSpacing.radius10),
-                    ),
-                    child: Text(
-                      '${_selectedGear.length}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primaryDark,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                ],
-                const Icon(
-                  CupertinoIcons.chevron_down,
-                  size: 18,
-                  color: AppColors.textMuted,
-                ),
-              ],
-            ),
           ),
-        ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildDescriptionField(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          'Description',
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(fontWeight: FontWeight.w600),
-        ),
-        const SizedBox(height: AppSpacing.xxs),
-        Text(
-          'Optional: give volunteers more context.',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
-              ),
-        ),
-        const SizedBox(height: 8),
-        TextField(
-          controller: _descriptionController,
-          maxLines: 3,
-          maxLength: 300,
-          onChanged: (_) => setState(() {}),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.textPrimary,
-          ),
-          decoration: InputDecoration(
-            hintText: 'Describe what to expect, meeting point, etc.',
-            hintStyle:
-                Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                ),
-            filled: true,
-            fillColor: AppColors.panelBackground,
-            counterStyle:
-                Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
-            contentPadding: const EdgeInsets.all(AppSpacing.md),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide: const BorderSide(color: AppColors.divider),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSpacing.radius14),
-              borderSide:
-                  const BorderSide(color: AppColors.primary, width: 1.5),
-            ),
-          ),
-        ),
-      ],
+class _CreateEventFormSnapshot {
+  _CreateEventFormSnapshot._({
+    required this.siteId,
+    required this.dateMillis,
+    required this.startHour,
+    required this.startMinute,
+    required this.endHour,
+    required this.endMinute,
+    required this.categoryIndex,
+    required this.gearNames,
+    required this.scaleIndex,
+    required this.difficultyIndex,
+    required this.title,
+    required this.description,
+    required this.maxParticipants,
+  });
+
+  factory _CreateEventFormSnapshot.capture(_CreateEventSheetState s) {
+    final List<String> gearNames =
+        s._selectedGear.map((EventGear g) => g.name).toList()..sort();
+    return _CreateEventFormSnapshot._(
+      siteId: s._selectedSite?.id,
+      dateMillis: s._selectedDate?.millisecondsSinceEpoch,
+      startHour: s._startTime.hour,
+      startMinute: s._startTime.minute,
+      endHour: s._endTime.hour,
+      endMinute: s._endTime.minute,
+      categoryIndex: s._selectedCategory?.index,
+      gearNames: gearNames,
+      scaleIndex: s._selectedScale?.index,
+      difficultyIndex: s._selectedDifficulty?.index,
+      title: s._titleController.text,
+      description: s._descriptionController.text,
+      maxParticipants: s._maxParticipants,
     );
+  }
+
+  final String? siteId;
+  final int? dateMillis;
+  final int startHour;
+  final int startMinute;
+  final int endHour;
+  final int endMinute;
+  final int? categoryIndex;
+  final List<String> gearNames;
+  final int? scaleIndex;
+  final int? difficultyIndex;
+  final String title;
+  final String description;
+  final int? maxParticipants;
+
+  bool matches(_CreateEventSheetState s) {
+    final List<String> gear =
+        s._selectedGear.map((EventGear g) => g.name).toList()..sort();
+    return siteId == s._selectedSite?.id &&
+        dateMillis == s._selectedDate?.millisecondsSinceEpoch &&
+        startHour == s._startTime.hour &&
+        startMinute == s._startTime.minute &&
+        endHour == s._endTime.hour &&
+        endMinute == s._endTime.minute &&
+        categoryIndex == s._selectedCategory?.index &&
+        _listEq(gearNames, gear) &&
+        scaleIndex == s._selectedScale?.index &&
+        difficultyIndex == s._selectedDifficulty?.index &&
+        title == s._titleController.text &&
+        description == s._descriptionController.text &&
+        maxParticipants == s._maxParticipants;
+  }
+
+  static bool _listEq(List<String> a, List<String> b) {
+    if (a.length != b.length) {
+      return false;
+    }
+    for (int i = 0; i < a.length; i++) {
+      if (a[i] != b[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -89,7 +90,7 @@ class TimeRangePicker extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        'Confirm',
+                        ctx.l10n.eventsTimePickerConfirm,
                         style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w600,
                             ),
@@ -113,7 +114,7 @@ class TimeRangePicker extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          'Select time',
+          context.l10n.eventsTimePickerSelectTime,
           style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: AppSpacing.sm),
@@ -142,7 +143,11 @@ class TimeRangePicker extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               _TimeBlock(
-                label: 'From',
+                label: context.l10n.eventsTimePickerFrom,
+                semanticLabel: context.l10n.eventsTimePickerTimeBlockSemantic(
+                  context.l10n.eventsTimePickerFrom,
+                  _formatTime(startTime),
+                ),
                 value: _formatTime(startTime),
                 onTap: () => _pickTime(
                   context,
@@ -159,7 +164,11 @@ class TimeRangePicker extends StatelessWidget {
                 ),
               ),
               _TimeBlock(
-                label: 'To',
+                label: context.l10n.eventsTimePickerTo,
+                semanticLabel: context.l10n.eventsTimePickerTimeBlockSemantic(
+                  context.l10n.eventsTimePickerTo,
+                  _formatTime(endTime),
+                ),
                 value: _formatTime(endTime),
                 onTap: () => _pickTime(
                   context,
@@ -178,11 +187,13 @@ class TimeRangePicker extends StatelessWidget {
 class _TimeBlock extends StatelessWidget {
   const _TimeBlock({
     required this.label,
+    required this.semanticLabel,
     required this.value,
     required this.onTap,
   });
 
   final String label;
+  final String semanticLabel;
   final String value;
   final VoidCallback onTap;
 
@@ -190,7 +201,7 @@ class _TimeBlock extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '$label time, $value',
+      label: semanticLabel,
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(16),

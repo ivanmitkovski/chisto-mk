@@ -41,33 +41,28 @@ bool isReportLocationInMacedonia(double lat, double lng) =>
 enum ReportCategory {
   illegalLandfill(
     'Illegal landfill',
-    'Dumped waste, trash piles, or informal disposal sites.',
     Icons.delete_outline_rounded,
   ),
   waterPollution(
     'Water pollution',
-    'Contaminated rivers, lakes, drains, or wastewater discharge.',
     Icons.water_drop_outlined,
   ),
   airPollution(
     'Air pollution',
-    'Smoke, dust, burning waste, or emissions harming air quality.',
     Icons.air_rounded,
   ),
   industrialWaste(
     'Industrial waste',
-    'Construction debris, factory waste, or hazardous materials.',
     Icons.factory_rounded,
   ),
   other(
     'Other',
-    'Use when the issue does not clearly match the categories above.',
     Icons.more_horiz_rounded,
   );
 
-  const ReportCategory(this.label, this.description, this.icon);
-  final String label;
-  final String description;
+  /// English label returned by the API on [PollutionSite.pollutionType] — map filters use this, not localized UI copy.
+  const ReportCategory(this.apiPollutionTypeLabel, this.icon);
+  final String apiPollutionTypeLabel;
   final IconData icon;
 
   static ReportCategory? fromApiString(String? s) {
@@ -91,9 +86,9 @@ enum ReportCategory {
       };
 }
 
-/// Canonical pollution types for filtering and reporting (aligned with ReportCategory).
+/// Canonical pollution types for filtering and reporting (aligned with API [PollutionSite.pollutionType]).
 List<String> get reportPollutionTypeLabels =>
-    ReportCategory.values.map((ReportCategory c) => c.label).toList();
+    ReportCategory.values.map((ReportCategory c) => c.apiPollutionTypeLabel).toList();
 
 enum ReportRequirement {
   photos('Add at least one photo'),

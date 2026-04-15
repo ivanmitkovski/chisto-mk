@@ -276,7 +276,9 @@ export function getNewsPosts(locale: string): ResolvedNewsPost[] {
       slug: p.slug,
       publishedAt: p.publishedAt,
       category: p.category,
-      coverImage: p.coverImage,
+      ...(p.coverImage !== undefined && p.coverImage !== ""
+        ? { coverImage: p.coverImage }
+        : {}),
       ...p.content[loc],
     }));
 }
@@ -289,7 +291,9 @@ export function getNewsPostBySlug(locale: string, slug: string): ResolvedNewsPos
     slug: post.slug,
     publishedAt: post.publishedAt,
     category: post.category,
-    coverImage: post.coverImage,
+    ...(post.coverImage !== undefined && post.coverImage !== ""
+      ? { coverImage: post.coverImage }
+      : {}),
     ...post.content[loc],
   };
 }

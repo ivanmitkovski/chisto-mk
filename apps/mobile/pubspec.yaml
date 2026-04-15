@@ -53,11 +53,13 @@ dependencies:
   image_picker: ^1.2.1
   flutter_image_compress: ^2.3.0
   shared_preferences: ^2.3.3
+  connectivity_plus: ^6.1.4
   flutter_map_animations: ^0.6.0
   flutter_map_heatmap: ^0.0.7
   add_2_calendar: ^3.0.1
   share_plus: ^10.0.0
   url_launcher: ^6.3.1
+  app_links: ^6.4.0
   flutter_tts: ^4.0.0
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.2.0
@@ -67,14 +69,28 @@ dependencies:
   cached_network_image: ^3.4.1
   flutter_cache_manager: ^3.4.0
   visibility_detector: ^0.4.0+2
+  sqflite: ^2.4.2
   sqflite_common_ffi: ^2.4.0
   firebase_core: ^3.13.0
   firebase_messaging: ^15.2.4
   flutter_local_notifications: ^18.0.1
   crop_your_image: ^2.0.0
+  video_player: ^2.11.1
+  chewie: ^1.13.0
+  just_audio: ^0.10.5
+  file_picker: ^11.0.2
+  socket_io_client: ^3.1.4
+  mime: ^2.0.0
+  photo_view: ^0.15.0
+  pdfx: ^2.9.2
+  record: ^6.0.0
+  permission_handler: ^12.0.0
+  open_filex: ^4.7.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -83,6 +99,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -127,3 +144,15 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Regenerate launcher bitmaps (Android mipmaps + adaptive layers, iOS, macOS):
+#   cd apps/mobile && dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  macos:
+    generate: true
+  image_path: assets/icons/icon-1024.png
+  adaptive_icon_background: assets/icons/adaptive_icon_background.png
+  adaptive_icon_foreground: assets/icons/adaptive_icon_foreground.png
+  remove_alpha_ios: true

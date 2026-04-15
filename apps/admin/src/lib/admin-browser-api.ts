@@ -1,5 +1,6 @@
-import { apiFetch } from './api';
+import { ApiError, apiFetch } from './api';
 import { ADMIN_AUTH_COOKIE_KEY } from '@/features/auth/lib/auth-constants';
+import { refreshAdminAccessTokenInBrowser } from '@/features/auth/lib/admin-auth';
 
 export function getAdminTokenFromDocumentCookie(): string | null {
   if (typeof document === 'undefined') {
@@ -20,9 +21,23 @@ export async function adminBrowserFetch<TResponse>(
   if (!token) {
     throw new Error('Not signed in');
   }
-  return apiFetch<TResponse>(path, {
-    method: options.method ?? 'GET',
-    body: options.body,
-    authToken: token,
-  });
+
+  const run = (authToken: string) =>
+    apiFetch<TResponse>(path, {
+      method: options.method ?? 'GET',
+      body: options.body,
+      authToken,
+    });
+
+  try {
+    return await run(token);
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) {
+      const next = await refreshAdminAccessTokenInBrowser();
+      if (next) {
+        return await run(next);
+      }
+    }
+    throw error;
+  }
 }

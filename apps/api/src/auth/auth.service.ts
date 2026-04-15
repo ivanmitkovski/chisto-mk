@@ -12,7 +12,7 @@ import { Role, User, UserStatus } from '../prisma-client';
 import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { generateSecret, generateURI, verify as verifyTotp } from 'otplib';
-import { OTP_SENDER, OtpSender } from '../otp/otp-sender.interface';
+import { OTP_SENDER, OtpSender, OtpSmsPurpose } from '../otp/otp-sender.interface';
 import { OtpService } from '../otp/otp.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { AdminLoginDto } from './dto/admin-login.dto';
@@ -30,6 +30,8 @@ import {
 import { AuthenticatedUser } from './types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import { GamificationService } from '../gamification/gamification.service';
+import { RankingsService } from '../gamification/rankings.service';
 
 const OTP_EXPIRES_SECONDS = 600;
 const LOGIN_MAX_ATTEMPTS = 5;
@@ -66,6 +68,8 @@ export class AuthService {
     private readonly audit: AuditService,
     private readonly eventEmitter: EventEmitter2,
     private readonly reportsUploadService: ReportsUploadService,
+    private readonly gamificationService: GamificationService,
+    private readonly rankingsService: RankingsService,
   ) {
     const isProduction = configService.get<string>('NODE_ENV') === 'production';
     const smsProvider = configService.get<string>('SMS_PROVIDER')?.toLowerCase() ?? 'none';
@@ -414,12 +418,37 @@ export class AuthService {
       include: { user: true },
     });
 
-    if (
-      !session ||
-      session.revokedAt != null ||
-      session.expiresAt <= new Date() ||
-      !(await bcrypt.compare(rawRefreshToken, session.refreshTokenHash))
-    ) {
+    if (!session || session.expiresAt <= new Date()) {
+      throw new UnauthorizedException({
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Refresh token is invalid or expired',
+      });
+    }
+
+    const hashOk = await bcrypt.compare(rawRefreshToken, session.refreshTokenHash);
+
+    // SECURITY: Reuse of a revoked but otherwise valid refresh token ⇒ possible theft — revoke all sessions for the user.
+    if (session.revokedAt != null) {
+      if (hashOk) {
+        await this.revokeAllSessionsForUser(session.userId);
+        await this.audit
+          .log({
+            actorId: session.userId,
+            action: 'REFRESH_TOKEN_REUSE_DETECTED',
+            resourceType: 'UserSession',
+            resourceId: session.id,
+            metadata: { tokenId },
+          })
+          .catch(() => {});
+        this.eventEmitter.emit('security.refresh_token_reuse', { userId: session.userId });
+      }
+      throw new UnauthorizedException({
+        code: 'INVALID_REFRESH_TOKEN',
+        message: 'Refresh token is invalid or expired',
+      });
+    }
+
+    if (!hashOk) {
       throw new UnauthorizedException({
         code: 'INVALID_REFRESH_TOKEN',
         message: 'Refresh token is invalid or expired',
@@ -440,6 +469,14 @@ export class AuthService {
     }
 
     return this.buildAuthResponse(user, true);
+  }
+
+  private async revokeAllSessionsForUser(userId: string): Promise<void> {
+    const now = new Date();
+    await this.prisma.userSession.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: now },
+    });
   }
 
   private parseTokenIdFromRefreshToken(fullToken: string): string | null {
@@ -483,6 +520,16 @@ export class AuthService {
     totalPointsSpent: number;
     mfaEnabled: boolean;
     avatarUrl: string | null;
+    level: number;
+    levelProgress: number;
+    pointsInLevel: number;
+    pointsToNextLevel: number;
+    levelTierKey: string;
+    levelDisplayName: string;
+    weeklyPoints: number;
+    weeklyRank: number | null;
+    weekStartsAt: string;
+    weekEndsAt: string;
   }> {
     const user = await this.prisma.user.findUnique({
       where: { id: authenticatedUser.userId },
@@ -512,7 +559,23 @@ export class AuthService {
 
     const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
     const { totpSecret: _, avatarObjectKey: __, ...rest } = user;
-    return { ...rest, mfaEnabled: !!user.totpSecret, avatarUrl };
+    const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned);
+    const weekly = await this.rankingsService.getUserWeeklySummary(authenticatedUser.userId);
+    return {
+      ...rest,
+      mfaEnabled: !!user.totpSecret,
+      avatarUrl,
+      level: levelState.level,
+      levelProgress: levelState.levelProgress,
+      pointsInLevel: levelState.pointsInLevel,
+      pointsToNextLevel: levelState.pointsToNextLevel,
+      levelTierKey: levelState.levelTierKey,
+      levelDisplayName: levelState.levelDisplayName,
+      weeklyPoints: weekly.weeklyPoints,
+      weeklyRank: weekly.weeklyRank,
+      weekStartsAt: weekly.weekStartsAt,
+      weekEndsAt: weekly.weekEndsAt,
+    };
   }
 
   async setupMfa(userId: string): Promise<{ uri: string; secret: string }> {
@@ -823,7 +886,10 @@ export class AuthService {
     ]);
   }
 
-  async sendOtp(phoneNumber: string): Promise<{ expiresIn: number; devCode?: string }> {
+  async sendOtp(
+    phoneNumber: string,
+    options: { purpose: OtpSmsPurpose; acceptLanguage?: string },
+  ): Promise<{ expiresIn: number; devCode?: string }> {
     const normalized = phoneNumber.trim();
     const user = await this.prisma.user.findUnique({
       where: { phoneNumber: normalized },
@@ -838,13 +904,20 @@ export class AuthService {
 
     const code = String(Math.floor(1000 + Math.random() * 9000));
     const expiresAt = new Date(Date.now() + OTP_EXPIRES_SECONDS * 1000);
+    const expiryMinutes = Math.max(1, Math.ceil(OTP_EXPIRES_SECONDS / 60));
 
     await this.prisma.phoneOtp.upsert({
       where: { phoneNumber: normalized },
       create: { phoneNumber: normalized, code, expiresAt },
       update: { code, expiresAt, attemptCount: 0 } as Record<string, unknown>,
     });
-    await this.otpSender.sendOtp(normalized, code);
+    await this.otpSender.sendOtp(normalized, code, {
+      purpose: options.purpose,
+      expiryMinutes,
+      ...(options.acceptLanguage != null && options.acceptLanguage !== ''
+        ? { localeHint: options.acceptLanguage }
+        : {}),
+    });
     const payload: { expiresIn: number; devCode?: string } = {
       expiresIn: OTP_EXPIRES_SECONDS,
     };
@@ -861,6 +934,14 @@ export class AuthService {
       where: { phoneNumber: normalized },
       data: { isPhoneVerified: true },
     });
+  }
+
+  /**
+   * Checks the password-reset OTP without consuming it (see {@link confirmPasswordReset}).
+   */
+  async verifyPasswordResetCode(phoneNumber: string, code: string): Promise<void> {
+    const normalized = phoneNumber.trim();
+    await this.otpService.assertOtpMatches(normalized, code);
   }
 
   async confirmPasswordReset(dto: ResetPasswordConfirmDto): Promise<{ message: string }> {
@@ -881,6 +962,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(dto.newPassword, this.saltRounds);
     const now = new Date();
 
+    const db = this.prisma as PrismaWithLoginFailure;
     await this.prisma.$transaction([
       this.prisma.user.update({
         where: { phoneNumber: normalized },
@@ -890,6 +972,7 @@ export class AuthService {
         where: { userId: user.id, revokedAt: null },
         data: { revokedAt: now },
       }),
+      db.loginFailure.deleteMany({ where: { phoneNumber: normalized } }),
     ]);
 
     return { message: 'Password reset successful' };
@@ -898,7 +981,7 @@ export class AuthService {
   async changePassword(userId: string, dto: ChangePasswordDto): Promise<void> {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { passwordHash: true },
+      select: { passwordHash: true, phoneNumber: true },
     });
     if (!user) {
       throw new UnauthorizedException({
@@ -918,6 +1001,8 @@ export class AuthService {
       where: { id: userId },
       data: { passwordHash },
     });
+    const db = this.prisma as PrismaWithLoginFailure;
+    await db.loginFailure.deleteMany({ where: { phoneNumber: user.phoneNumber } }).catch(() => {});
     await this.audit.log({
       actorId: userId,
       action: 'PASSWORD_CHANGED',
@@ -989,6 +1074,8 @@ export class AuthService {
       { expiresIn: this.accessTokenTtl },
     );
 
+    const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
+
     return {
       accessToken,
       refreshToken: fullRefreshToken,
@@ -1002,6 +1089,7 @@ export class AuthService {
         status: user.status,
         isPhoneVerified: user.isPhoneVerified,
         pointsBalance: user.pointsBalance,
+        avatarUrl,
       },
     };
   }

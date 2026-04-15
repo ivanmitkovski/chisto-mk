@@ -11,6 +11,8 @@ class EventSiteSummary {
     required this.description,
     required this.distanceKm,
     required this.imageUrl,
+    this.latitude,
+    this.longitude,
   });
 
   final String id;
@@ -19,13 +21,23 @@ class EventSiteSummary {
   final double distanceKm;
   final String imageUrl;
 
+  /// Present when the backing [PollutionSite] or API row includes coordinates.
+  final double? latitude;
+  final double? longitude;
+
   factory EventSiteSummary.fromPollutionSite(PollutionSite site) {
+    final String? primary = site.primaryImageUrl?.trim();
+    final String imageUrl = primary != null && primary.isNotEmpty
+        ? primary
+        : 'assets/images/references/onboarding_reference.png';
     return EventSiteSummary(
       id: site.id,
       title: site.title,
       description: site.description,
       distanceKm: site.distanceKm.toDouble(),
-      imageUrl: 'assets/images/references/onboarding_reference.png',
+      imageUrl: imageUrl,
+      latitude: site.latitude,
+      longitude: site.longitude,
     );
   }
 
@@ -74,6 +86,8 @@ class EventSiteResolver {
     String? siteName,
     String? siteImageUrl,
     double? siteDistanceKm,
+    /// When the site is not in the mock catalog (synthetic row), shown as description.
+    String syntheticSiteDescription = 'Community cleanup site',
   }) {
     if (siteId == null || siteId.isEmpty) {
       return null;
@@ -88,26 +102,44 @@ class EventSiteResolver {
     return EventSiteSummary(
       id: siteId,
       title: siteName.trim(),
-      description: 'Community cleanup site',
+      description: syntheticSiteDescription,
       distanceKm: siteDistanceKm ?? 0,
       imageUrl:
           siteImageUrl ?? 'assets/images/references/onboarding_reference.png',
     );
   }
 
-  static PollutionSite resolveSiteForEvent(EcoEvent event) {
+  /// [statusLabel] is shown on synthetic sites (not in the mock catalog). Pass a
+  /// localized string from the UI layer; when null, uses [EcoEventStatus.label] (English).
+  static PollutionSite resolveSiteForEvent(
+    EcoEvent event, {
+    String? statusLabel,
+  }) {
     final PollutionSite? canonical = findSiteById(event.siteId);
     if (canonical != null) {
       return canonical;
     }
-    final ImageProvider imageProvider = event.siteImageUrl.startsWith('assets/')
-        ? AssetImage(event.siteImageUrl)
-        : const AssetImage('assets/images/references/onboarding_reference.png');
+    final String cover = event.siteImageUrl.trim();
+    final ImageProvider imageProvider;
+    if (cover.isEmpty) {
+      imageProvider =
+          const AssetImage('assets/images/references/onboarding_reference.png');
+    } else {
+      final String lower = cover.toLowerCase();
+      if (lower.startsWith('http://') || lower.startsWith('https://')) {
+        imageProvider = NetworkImage(cover);
+      } else if (cover.startsWith('assets/')) {
+        imageProvider = AssetImage(cover);
+      } else {
+        imageProvider =
+            const AssetImage('assets/images/references/onboarding_reference.png');
+      }
+    }
     return PollutionSite(
       id: event.siteId,
       title: event.siteName,
       description: event.description,
-      statusLabel: event.status.label,
+      statusLabel: statusLabel ?? event.status.label,
       statusColor: Color(event.status.colorValue),
       distanceKm: event.siteDistanceKm.toDouble(),
       score: event.participantCount,
@@ -137,6 +169,7 @@ class EventSiteResolver {
   static List<CleaningEvent> cleaningEventsForSite({
     required String siteId,
     required List<EcoEvent> events,
+    required String Function(EcoEventStatus status) statusLabelFor,
   }) {
     return eventsForSite(siteId: siteId, events: events)
         .map(
@@ -146,7 +179,7 @@ class EventSiteResolver {
             dateTime: event.startDateTime,
             participantCount: event.participantCount,
             isOrganizer: event.isOrganizer,
-            statusLabel: event.status.label,
+            statusLabel: statusLabelFor(event.status),
             statusColor: Color(event.status.colorValue),
           ),
         )

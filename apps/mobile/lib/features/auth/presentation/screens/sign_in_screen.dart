@@ -1,7 +1,11 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/app_language_picker.dart';
+import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/auth/presentation/constants/auth_error_messages.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -11,7 +15,8 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/validation/input_validators.dart';
+import 'package:chisto_mobile/features/auth/presentation/utils/auth_validators.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/widgets/api_error_banner.dart';
 import 'package:chisto_mobile/shared/widgets/auth_shell.dart';
 import 'package:chisto_mobile/shared/widgets/auth_text_field.dart';
@@ -33,6 +38,8 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey _phoneFieldKey = GlobalKey();
+  final GlobalKey _passwordFieldKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -52,6 +59,8 @@ class _SignInScreenState extends State<SignInScreen>
     _phoneController.text = '';
     _phoneController.addListener(_onInputChanged);
     _passwordController.addListener(_onInputChanged);
+    _phoneFocus.addListener(_scrollToFocusedField);
+    _passwordFocus.addListener(_scrollToFocusedField);
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.standard,
@@ -60,8 +69,36 @@ class _SignInScreenState extends State<SignInScreen>
       parent: _entranceController,
       curve: AppMotion.emphasized,
     );
-    _entranceController.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _entranceController.value = 1.0;
+      } else {
+        _entranceController.forward();
+      }
+    });
     _loadRememberMe();
+  }
+
+  void _scrollToFocusedField() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final BuildContext? ctx = _phoneFocus.hasFocus
+            ? _phoneFieldKey.currentContext
+            : _passwordFocus.hasFocus
+                ? _passwordFieldKey.currentContext
+                : null;
+        if (ctx != null) {
+          Scrollable.ensureVisible(
+            ctx,
+            alignment: 0.2,
+            duration: AppMotion.standard,
+            curve: Curves.easeOut,
+          );
+        }
+      });
+    });
   }
 
   Future<void> _loadRememberMe() async {
@@ -94,6 +131,8 @@ class _SignInScreenState extends State<SignInScreen>
   void dispose() {
     _phoneController.removeListener(_onInputChanged);
     _passwordController.removeListener(_onInputChanged);
+    _phoneFocus.removeListener(_scrollToFocusedField);
+    _passwordFocus.removeListener(_scrollToFocusedField);
     _scrollController.dispose();
     _phoneFocus.dispose();
     _passwordFocus.dispose();
@@ -115,24 +154,17 @@ class _SignInScreenState extends State<SignInScreen>
       _phoneController.text.trim().replaceAll(RegExp(r'\D'), '').length == 8 &&
       _passwordController.text.trim().isNotEmpty;
 
-  String? _validateMacedonianPhone(String? value) {
-    final String digits = (value ?? '').replaceAll(RegExp(r'\D'), '');
-    if (digits.isEmpty) return 'Phone number is required';
-    if (digits.length != 8) return 'Enter an 8-digit phone number';
-    return null;
-  }
-
   Future<void> _handleSignIn() async {
     if (_isLoading) return;
     final FormState? formState = _formKey.currentState;
     setState(() => _hasSubmitted = true);
     if (formState == null || !formState.validate()) {
       setState(() => _hasValidationError = true);
-      AppHaptics.warning();
+      AppHaptics.warning(context);
       return;
     }
     setState(() => _hasValidationError = false);
-    AppHaptics.light();
+    AppHaptics.light(context);
     setState(() {
       _isLoading = true;
       _apiError = null;
@@ -147,32 +179,35 @@ class _SignInScreenState extends State<SignInScreen>
       if (!mounted) return;
       await _saveRememberMe(phoneE164: phoneE164, remember: _rememberMe);
       if (!mounted) return;
-      AppHaptics.success();
+      AppHaptics.success(context);
       Navigator.of(context).pushNamedAndRemoveUntil(
         AppRoutes.home,
         (Route<dynamic> route) => false,
       );
     } on AppError catch (e) {
       if (!mounted) return;
-      setState(() => _apiError = messageForAuthError(e));
-      AppHaptics.warning();
+      setState(
+        () => _apiError = messageForAuthError(AppLocalizations.of(context)!, e),
+      );
+      AppHaptics.warning(context);
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
   }
 
   void _handleForgotPassword() {
-    AppHaptics.tap();
+    AppHaptics.tap(context);
     Navigator.of(context).pushNamed(AppRoutes.forgotPasswordRequest);
   }
 
   void _handleSignUp() {
-    AppHaptics.tap();
+    AppHaptics.tap(context);
     Navigator.of(context).pushNamed(AppRoutes.signUp);
   }
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
     final double keyboardInset = MediaQuery.viewInsetsOf(context).bottom;
 
     return Stack(
@@ -191,7 +226,7 @@ class _SignInScreenState extends State<SignInScreen>
                   const BrandLogo(compact: true),
                   const SizedBox(height: AppSpacing.md),
                   Text(
-                    'Sign in',
+                    l10n.authSignInTitle,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       letterSpacing: -0.5,
@@ -200,7 +235,7 @@ class _SignInScreenState extends State<SignInScreen>
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    'Welcome back. Enter your details to continue.',
+                    l10n.authSignInSubtitle,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
                       height: 1.4,
@@ -258,8 +293,9 @@ class _SignInScreenState extends State<SignInScreen>
                                   const SizedBox(height: AppSpacing.md),
                                 ],
                                 AuthTextField(
-                                  label: 'Phone number',
-                                  hintText: '70 123 456',
+                                  key: _phoneFieldKey,
+                                  label: l10n.authFieldPhone,
+                                  hintText: l10n.authFieldPhoneHint,
                                   prefixFixedText: '+389',
                                   controller: _phoneController,
                                   focusNode: _phoneFocus,
@@ -267,23 +303,27 @@ class _SignInScreenState extends State<SignInScreen>
                                   textInputAction: TextInputAction.next,
                                   autofillHints: const <String>[
                                     AutofillHints.telephoneNumber,
+                                    AutofillHints.username,
                                   ],
                                   onFieldSubmitted: (_) =>
                                       _passwordFocus.requestFocus(),
-                                  validator: _validateMacedonianPhone,
+                                  validator: (String? v) =>
+                                      AuthValidators.macedonianPhone(l10n, v),
                                   inputFormatters: const <TextInputFormatter>[
                                     MacedonianPhoneFormatter(),
                                   ],
                                 ),
                                 const SizedBox(height: AppSpacing.md),
                                 AuthTextField(
-                                  label: 'Password',
+                                  key: _passwordFieldKey,
+                                  label: l10n.authFieldPassword,
                                   controller: _passwordController,
                                   focusNode: _passwordFocus,
-                                  hintText: 'Enter your password',
+                                  hintText: l10n.authFieldPasswordHint,
                                   obscureText: true,
                                   keyboardType: TextInputType.visiblePassword,
-                                  validator: InputValidators.validatePassword,
+                                  validator: (String? v) =>
+                                      AuthValidators.password(l10n, v),
                                   textInputAction: TextInputAction.done,
                                   autofillHints: const <String>[
                                     AutofillHints.password,
@@ -294,6 +334,7 @@ class _SignInScreenState extends State<SignInScreen>
                                 ),
                                 const SizedBox(height: AppSpacing.md),
                                 _RememberMeRow(
+                                  l10n: l10n,
                                   value: _rememberMe,
                                   onChanged: (bool v) {
                                     setState(() => _rememberMe = v);
@@ -335,7 +376,7 @@ class _SignInScreenState extends State<SignInScreen>
                                               ),
                                               Expanded(
                                                 child: Text(
-                                                  'Please check your phone number and password.',
+                                                  l10n.authValidationCheckPhonePassword,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodySmall
@@ -355,9 +396,9 @@ class _SignInScreenState extends State<SignInScreen>
                                 ),
                                 Semantics(
                                   button: true,
-                                  label: 'Sign in',
+                                  label: l10n.authSignInCta,
                                   child: PrimaryButton(
-                                    label: 'Sign in',
+                                    label: l10n.authSignInCta,
                                     enabled: _canSubmit && !_isLoading,
                                     onPressed: _isLoading ? null : _handleSignIn,
                                   ),
@@ -366,7 +407,8 @@ class _SignInScreenState extends State<SignInScreen>
                                 Center(
                                     child: Semantics(
                                       button: true,
-                                      label: 'Create account',
+                                      label:
+                                          '${l10n.authSignUpPrompt}${l10n.authSignUpLink}',
                                       child: GestureDetector(
                                         onTap: _handleSignUp,
                                         behavior: HitTestBehavior.opaque,
@@ -377,7 +419,7 @@ class _SignInScreenState extends State<SignInScreen>
                                           ),
                                           child: RichText(
                                             text: TextSpan(
-                                              text: 'Don\'t have an account? ',
+                                              text: l10n.authSignUpPrompt,
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .bodyMedium
@@ -386,7 +428,7 @@ class _SignInScreenState extends State<SignInScreen>
                                                   ),
                                               children: <TextSpan>[
                                                 TextSpan(
-                                                  text: 'Sign up',
+                                                  text: l10n.authSignUpLink,
                                                   style: Theme.of(context)
                                                       .textTheme
                                                       .bodyMedium
@@ -404,6 +446,70 @@ class _SignInScreenState extends State<SignInScreen>
                                       ),
                                     ),
                                   ),
+                                const SizedBox(height: AppSpacing.md),
+                                ValueListenableBuilder<Locale?>(
+                                  valueListenable:
+                                      ServiceLocator.instance.appLocaleOverride,
+                                  builder: (
+                                    BuildContext context,
+                                    Locale? override,
+                                    _,
+                                  ) {
+                                    final Locale effective = resolveAppLocale(
+                                      override: override,
+                                      platformLocales:
+                                          PlatformDispatcher.instance.locales,
+                                    );
+                                    final String languageLabel =
+                                        _languageDisplayName(l10n, effective);
+                                    return Center(
+                                      child: Semantics(
+                                        button: true,
+                                        label: l10n.profileLanguageTile,
+                                        child: InkWell(
+                                          onTap: () {
+                                            AppHaptics.tap(context);
+                                            showAppLanguagePicker(context);
+                                          },
+                                          borderRadius: BorderRadius.circular(
+                                            AppSpacing.radius14,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: AppSpacing.sm,
+                                              vertical: AppSpacing.xs,
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: <Widget>[
+                                                Icon(
+                                                  Icons.language_rounded,
+                                                  size: 22,
+                                                  color: AppColors.primaryDark,
+                                                ),
+                                                const SizedBox(
+                                                  width: AppSpacing.xs,
+                                                ),
+                                                Text(
+                                                  languageLabel,
+                                                  style: Theme.of(context)
+                                                      .textTheme
+                                                      .bodyMedium
+                                                      ?.copyWith(
+                                                        color:
+                                                            AppColors.textMuted,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
                               ],
                             ),
                           ),
@@ -422,13 +528,27 @@ class _SignInScreenState extends State<SignInScreen>
   }
 }
 
+String _languageDisplayName(AppLocalizations l10n, Locale locale) {
+  switch (locale.languageCode) {
+    case 'mk':
+      return l10n.profileLanguageNameMk;
+    case 'sq':
+      return l10n.profileLanguageNameSq;
+    case 'en':
+    default:
+      return l10n.profileLanguageNameEn;
+  }
+}
+
 class _RememberMeRow extends StatelessWidget {
   const _RememberMeRow({
+    required this.l10n,
     required this.value,
     required this.onChanged,
     required this.onForgotPassword,
   });
 
+  final AppLocalizations l10n;
   final bool value;
   final ValueChanged<bool> onChanged;
   final VoidCallback onForgotPassword;
@@ -452,7 +572,7 @@ class _RememberMeRow extends StatelessWidget {
           children: <Widget>[
             Semantics(
               button: true,
-              label: 'Remember me',
+              label: l10n.authRememberMe,
               child: InkWell(
                 onTap: () => onChanged(!value),
                 borderRadius: BorderRadius.circular(AppSpacing.radius14),
@@ -469,7 +589,7 @@ class _RememberMeRow extends StatelessWidget {
                       ),
                       const SizedBox(width: AppSpacing.sm),
                       Text(
-                        'Remember me',
+                        l10n.authRememberMe,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           fontWeight: value ? FontWeight.w600 : FontWeight.w500,
                           color: value
@@ -485,7 +605,7 @@ class _RememberMeRow extends StatelessWidget {
             const SizedBox(width: AppSpacing.sm),
             Semantics(
               button: true,
-              label: 'Forgot password?',
+              label: l10n.authForgotPassword,
               child: CupertinoButton(
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.sm,
@@ -494,7 +614,7 @@ class _RememberMeRow extends StatelessWidget {
                 minimumSize: Size.zero,
                 onPressed: onForgotPassword,
                 child: Text(
-                  'Forgot password?',
+                  l10n.authForgotPassword,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: AppColors.primaryDark,
                     fontWeight: FontWeight.w500,

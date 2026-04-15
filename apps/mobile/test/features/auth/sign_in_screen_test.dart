@@ -1,9 +1,24 @@
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_up_screen.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
+import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+Finder _primaryCta(String label) {
+  return find.byWidgetPredicate(
+    (Widget w) => w is PrimaryButton && w.label == label,
+  );
+}
+
+Finder _primaryCtaElevated(String label) {
+  return find.descendant(
+    of: _primaryCta(label),
+    matching: find.byType(ElevatedButton),
+  );
+}
 
 void main() {
   setUpAll(() async {
@@ -12,6 +27,9 @@ void main() {
 
   Widget buildTestApp() {
     return MaterialApp(
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      locale: const Locale('en'),
       onGenerateRoute: AppRouter.onGenerateRoute,
       home: const SignInScreen(),
     );
@@ -33,10 +51,7 @@ void main() {
     await tester.pumpAndSettle();
 
     final ElevatedButton signInButton = tester.widget<ElevatedButton>(
-      find.ancestor(
-        of: find.text('Sign in'),
-        matching: find.byType(ElevatedButton),
-      ).first,
+      _primaryCtaElevated('Sign in'),
     );
     expect(signInButton.onPressed, isNull);
   });
@@ -52,10 +67,7 @@ void main() {
     await tester.pump();
 
     final ElevatedButton signInButton = tester.widget<ElevatedButton>(
-      find.ancestor(
-        of: find.text('Sign in'),
-        matching: find.byType(ElevatedButton),
-      ).first,
+      _primaryCtaElevated('Sign in'),
     );
     expect(signInButton.onPressed, isNotNull);
   });
@@ -70,16 +82,12 @@ void main() {
     await tester.enterText(find.byType(TextFormField).last, 'short');
     await tester.pump();
 
-    await tester.tap(
-      find.ancestor(
-        of: find.text('Sign in'),
-        matching: find.byType(ElevatedButton),
-      ).first,
-    );
+    await tester.ensureVisible(_primaryCtaElevated('Sign in'));
+    await tester.tap(_primaryCtaElevated('Sign in'));
     await tester.pumpAndSettle();
 
     expect(
-      find.textContaining('Please check your phone number and password'),
+      find.text('Please check your phone number and password.'),
       findsOneWidget,
     );
   });

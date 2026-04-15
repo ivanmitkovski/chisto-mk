@@ -28,6 +28,9 @@ type EventDetailViewProps = {
 
 export function EventDetailView({ event }: EventDetailViewProps) {
   const router = useRouter();
+  const [title, setTitle] = useState(event.title);
+  const [description, setDescription] = useState(event.description);
+  const [recurrenceRule, setRecurrenceRule] = useState(event.recurrenceRule ?? '');
   const [scheduledAt, setScheduledAt] = useState(event.scheduledAt);
   const [completedAt, setCompletedAt] = useState(event.completedAt ?? '');
   const [participantCount, setParticipantCount] = useState(event.participantCount);
@@ -45,7 +48,17 @@ export function EventDetailView({ event }: EventDetailViewProps) {
   async function saveUpdates() {
     setSaving(true);
     setSnack(null);
-    const body: { scheduledAt: string; participantCount: number; completedAt?: string | null } = {
+    const body: {
+      title: string;
+      description: string;
+      recurrenceRule: string;
+      scheduledAt: string;
+      participantCount: number;
+      completedAt?: string | null;
+    } = {
+      title: title.trim() || 'Cleanup event',
+      description: description.trim(),
+      recurrenceRule: recurrenceRule.trim(),
       scheduledAt: new Date(scheduledAt).toISOString(),
       participantCount,
     };
@@ -139,6 +152,7 @@ export function EventDetailView({ event }: EventDetailViewProps) {
           <span className={isCompleted ? styles.statusCompleted : styles.statusUpcoming}>
             {isCompleted ? 'Completed' : 'Upcoming'}
           </span>
+          <span className={styles.lifecyclePill}>{event.lifecycleStatus}</span>
           <span
             className={
               moderationStatus === 'PENDING'
@@ -151,6 +165,16 @@ export function EventDetailView({ event }: EventDetailViewProps) {
             {moderationStatus}
           </span>
         </div>
+        <h1 className={styles.eventTitle}>{event.title}</h1>
+        {event.description ? (
+          <p className={styles.eventDescription}>{event.description}</p>
+        ) : null}
+        {event.recurrenceRule ? (
+          <p className={styles.recurrenceReadonly}>
+            <span className={styles.metaLabel}>Recurrence</span>
+            <code className={styles.rruleCode}>{event.recurrenceRule}</code>
+          </p>
+        ) : null}
         <div className={styles.metaRow}>
           <div className={styles.metaItem}>
             <span className={styles.metaLabel}>Scheduled</span>
@@ -210,6 +234,38 @@ export function EventDetailView({ event }: EventDetailViewProps) {
           {isPending ? 'You can also edit details before approving.' : 'Edit event details. Changes are saved when you click Save.'}
         </p>
         <div className={styles.form}>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Title</span>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className={styles.input}
+              maxLength={200}
+            />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Description</span>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={styles.textarea}
+              rows={4}
+              maxLength={10000}
+            />
+          </label>
+          <label className={styles.field}>
+            <span className={styles.fieldLabel}>Recurrence (RRULE, optional)</span>
+            <textarea
+              value={recurrenceRule}
+              onChange={(e) => setRecurrenceRule(e.target.value)}
+              className={styles.textarea}
+              rows={2}
+              placeholder="Leave empty to clear"
+              maxLength={2048}
+            />
+            <span className={styles.fieldHint}>Clear the field and save to remove recurrence metadata.</span>
+          </label>
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Scheduled date & time</span>
             <input
