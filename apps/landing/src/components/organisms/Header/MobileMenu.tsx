@@ -7,8 +7,8 @@ import { useTranslations } from "next-intl";
 import { NavItem } from "@/components/molecules/NavItem";
 import { Button } from "@/components/atoms/Button";
 
-const NAV_HREFS = ["/", "/about", "/news", "/press", "/contact"] as const;
-const NAV_KEYS = ["home", "about", "news", "press", "contact"] as const;
+const NAV_HREFS = ["/", "/about", "/news", "/press", "/help", "/contact"] as const;
+const NAV_KEYS = ["home", "about", "news", "press", "help", "contact"] as const;
 
 export function MobileMenu() {
   const [open, setOpen] = useState(false);

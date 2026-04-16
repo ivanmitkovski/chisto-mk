@@ -1,10 +1,16 @@
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { MotionProvider } from "@/components/layout/MotionProvider";
+import { getSiteUrl } from "@/lib/site-url";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(getSiteUrl()),
+};
 
 const inter = Inter({
   subsets: ["latin", "latin-ext", "cyrillic"],

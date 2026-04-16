@@ -11,9 +11,15 @@ interface NavItemProps {
   onClick?: () => void;
 }
 
+function pathMatchesNavHref(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href === "/help" && pathname.startsWith("/help")) return true;
+  return false;
+}
+
 export function NavItem({ href, label, onClick }: NavItemProps) {
   const pathname = usePathname();
-  const isActive = pathname === href;
+  const isActive = pathMatchesNavHref(pathname, href);
 
   function onLinkClick(e: MouseEvent<HTMLAnchorElement>) {
     handleHomeNavigationClick(e, pathname, href);

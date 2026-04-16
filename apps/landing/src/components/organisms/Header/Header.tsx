@@ -10,8 +10,8 @@ import { LanguageSelector } from "@/components/molecules/LanguageSelector";
 import { MobileMenu } from "@/components/organisms/Header/MobileMenu";
 import { cn } from "@/lib/utils/cn";
 
-const NAV_HREFS = ["/", "/about", "/news", "/press", "/contact"] as const;
-const NAV_KEYS = ["home", "about", "news", "press", "contact"] as const;
+const NAV_HREFS = ["/", "/about", "/news", "/press", "/help", "/contact"] as const;
+const NAV_KEYS = ["home", "about", "news", "press", "help", "contact"] as const;
 
 export function Header() {
   const [scrolled, setScrolled] = useState(false);

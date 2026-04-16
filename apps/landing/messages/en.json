@@ -36,6 +36,10 @@
     "data": {
       "title": "Your data & account | Chisto.mk",
       "description": "How to request access, correction, or deletion of your personal data and Chisto.mk account."
+    },
+    "help": {
+      "title": "Help centre | Chisto.mk",
+      "description": "Learn how to use Chisto.mk: get started, report pollution sites, and join cleanup events."
     }
   },
   "nav": {
@@ -44,7 +48,8 @@
     "about": "About us",
     "news": "News",
     "press": "Press",
-    "contact": "Contact"
+    "contact": "Contact",
+    "help": "Help"
   },
   "common": {
     "download": "Download",
@@ -90,7 +95,7 @@
         "description": "Waste by the path? Smoky chimney? Put it on the map with a short note and a picture if you can."
       },
       {
-        "title": "Join a clean-up",
+        "title": "Join a cleanup",
         "description": "When someone organises a pick-up or planting day nearby, you will see it in the app."
       }
     ]
@@ -166,7 +171,7 @@
         "variant": "green"
       },
       {
-        "title": "How do clean-up events work?",
+        "title": "How do cleanup events work?",
         "content": "Organisers can publish actions in the app. You can browse nearby events, sign up where available, and see outcomes after the activity.",
         "variant": "green"
       },
@@ -194,6 +199,7 @@
     "linkNews": "News",
     "linkPress": "Press",
     "linkContact": "Contact",
+    "linkHelp": "Help centre",
     "terms": "Terms of use",
     "privacy": "Privacy policy",
     "cookies": "Cookie policy",
@@ -311,7 +317,7 @@
     "inquiriesTitle": "Contact",
     "inquiriesLead": "Press and partnership questions:",
     "boilerplateTitle": "Short description",
-    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. People report litter, illegal dumping, and dirty air on a public map with photos and locations, and can join local clean-up actions when organisers post them in the app."
+    "boilerplate": "Chisto.mk is a civic environmental platform in Macedonia. People report litter, illegal dumping, and dirty air on a public map with photos and locations, and can join local cleanup actions when organisers post them in the app."
   },
   "termsPage": {
     "badge": "Legal",
@@ -319,11 +325,11 @@
     "lastUpdatedLabel": "Last updated",
     "lastUpdated": "28 March 2026",
     "noticeTitle": "Before you rely on these terms",
-    "noticeBody": "Complete all bracketed fields with verified legal and operational information before treating this text as final. App store privacy declarations should match this document and your published app. This is not legal advice and does not guarantee store approval. Consider review by qualified counsel in North Macedonia (and, for EEA users, EU counsel) where appropriate.",
+    "noticeBody": "Complete all bracketed fields with verified legal and operational information before treating this text as final. App store privacy declarations should match this document and your published app. This is not legal advice and does not guarantee store approval. Consider review by qualified counsel in Macedonia (and, for EEA users, EU counsel) where appropriate.",
     "sections": [
       {
         "title": "Introduction",
-        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
+        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
       },
       {
         "title": "1. Definitions",
@@ -331,7 +337,7 @@
       },
       {
         "title": "2. Legal framework and applicability",
-        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of North Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of North Macedonia and the European Union."
+        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of Macedonia and the European Union."
       },
       {
         "title": "3. Platform description and scope",
@@ -355,7 +361,7 @@
       },
       {
         "title": "8. Consumer rights (EU and Macedonian users)",
-        "body": "8.1 Digital services and price\n\nThe core civic map and reporting features are currently provided without charge. Where we do not ask you to pay for access, many consumer \"distance contract\" rules (including the 14-day right of withdrawal under Directive 2011/83/EU) often do not apply in the same way as for paid digital content. Nothing in this Section limits mandatory rights that still apply to you under North Macedonian or EU law.\n\n8.2 Information we provide\n\nWe aim to give clear information about:\n\nWho operates the Platform (Section 17)\nWhat the Service does (Section 3)\nHow to complain (Section 13)\n\n8.3 Consumer disputes\n\nMacedonian consumers may file complaints with:\n\nCommission for Consumer Protection (Комисија за заштита на потрошувачите)\nEU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr\n\nContact us at [CONTACT_EMAIL] or [CONTACT_ADDRESS] for service issues before you escalate where reasonable."
+        "body": "8.1 Digital services and price\n\nThe core civic map and reporting features are currently provided without charge. Where we do not ask you to pay for access, many consumer \"distance contract\" rules (including the 14-day right of withdrawal under Directive 2011/83/EU) often do not apply in the same way as for paid digital content. Nothing in this Section limits mandatory rights that still apply to you under Macedonian or EU law.\n\n8.2 Information we provide\n\nWe aim to give clear information about:\n\nWho operates the Platform (Section 17)\nWhat the Service does (Section 3)\nHow to complain (Section 13)\n\n8.3 Consumer disputes\n\nMacedonian consumers may file complaints with:\n\nCommission for Consumer Protection (Комисија за заштита на потрошувачите)\nEU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr\n\nContact us at [CONTACT_EMAIL] or [CONTACT_ADDRESS] for service issues before you escalate where reasonable."
       },
       {
         "title": "9. Disclaimer of warranties",
@@ -375,11 +381,11 @@
       },
       {
         "title": "13. Dispute resolution and complaints",
-        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of North Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
+        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
       },
       {
         "title": "14. Governing law and jurisdiction",
-        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of North Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of North Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of North Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
+        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
       },
       {
         "title": "15. Force majeure",
@@ -387,11 +393,11 @@
       },
       {
         "title": "16. General provisions",
-        "body": "16.1 Entire agreement\n\nThese Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Chisto.mk.\n\n16.2 Severability\n\nIf any provision is found invalid or unenforceable, that provision shall be limited or eliminated to the minimum extent necessary, and remaining provisions remain in full effect.\n\n16.3 No waiver\n\nFailure to enforce any provision does not constitute a waiver of that provision or any other provision.\n\n16.4 Assignment\n\nYou may not assign these Terms without our prior written consent. We may assign our rights and obligations without restriction.\n\n16.5 Language\n\nThese Terms are executed in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in North Macedonia; the English version prevails for international disputes.\n\n16.6 Relationship\n\nNothing in these Terms creates a partnership, joint venture, employment, or agency relationship.\n\n16.7 Third-party rights\n\nThese Terms do not confer rights upon any third parties.\n\n16.8 Notices\n\nLegal notices must be sent to:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAddress: [REGISTERED_ADDRESS]\n\nNotices to you may be sent to your registered email address."
+        "body": "16.1 Entire agreement\n\nThese Terms, together with our Privacy Policy and Cookie Policy, constitute the entire agreement between you and Chisto.mk.\n\n16.2 Severability\n\nIf any provision is found invalid or unenforceable, that provision shall be limited or eliminated to the minimum extent necessary, and remaining provisions remain in full effect.\n\n16.3 No waiver\n\nFailure to enforce any provision does not constitute a waiver of that provision or any other provision.\n\n16.4 Assignment\n\nYou may not assign these Terms without our prior written consent. We may assign our rights and obligations without restriction.\n\n16.5 Language\n\nThese Terms are executed in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in Macedonia; the English version prevails for international disputes.\n\n16.6 Relationship\n\nNothing in these Terms creates a partnership, joint venture, employment, or agency relationship.\n\n16.7 Third-party rights\n\nThese Terms do not confer rights upon any third parties.\n\n16.8 Notices\n\nLegal notices must be sent to:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAddress: [REGISTERED_ADDRESS]\n\nNotices to you may be sent to your registered email address."
       },
       {
         "title": "17. Contact information",
-        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
+        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
       }
     ]
   },
@@ -405,7 +411,7 @@
     "sections": [
       {
         "title": "1. Introduction",
-        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of North Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
       },
       {
         "title": "2. Scope and application",
@@ -429,7 +435,7 @@
       },
       {
         "title": "7. International data transfers",
-        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of North Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
+        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
       },
       {
         "title": "8. Data retention",
@@ -437,7 +443,7 @@
       },
       {
         "title": "9. Your rights under GDPR",
-        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
+        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
       },
       {
         "title": "10. Data security",
@@ -461,7 +467,7 @@
       },
       {
         "title": "15. Specific provisions for Macedonian users",
-        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of North Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in North Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
+        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
       },
       {
         "title": "16. Contact us",
@@ -488,7 +494,7 @@
     "sections": [
       {
         "title": "1. Introduction",
-        "body": "Effective date: [EFFECTIVE_DATE].\n\n1.1 About this policy\n\nThis Cookie Policy explains how [LEGAL_ENTITY_NAME] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\") uses cookies and similar storage on the Chisto.mk marketing website. Mobile apps follow the Privacy Policy for device storage, push tokens, and map caches.\n\nRead this Policy together with:\n\n• Privacy Policy: [PRIVACY_POLICY_URL]\n• Terms of Use: [TERMS_URL]\n\n1.2 Legal framework\n\nWe comply with the ePrivacy framework as transposed in North Macedonia, the GDPR where it applies, the Law on Personal Data Protection (Official Gazette No. 42/2020), and the Law on Electronic Communications (Official Gazette No. 39/2014).\n\n1.3 Consent on the website\n\nStrictly necessary storage works without consent. Optional Vercel Web Analytics loads only if you accept analytics in our banner. You can reopen choices via Cookie settings in the footer ([COOKIE_PREFERENCES_URL])."
+        "body": "Effective date: [EFFECTIVE_DATE].\n\n1.1 About this policy\n\nThis Cookie Policy explains how [LEGAL_ENTITY_NAME] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\") uses cookies and similar storage on the Chisto.mk marketing website. Mobile apps follow the Privacy Policy for device storage, push tokens, and map caches.\n\nRead this Policy together with:\n\n• Privacy Policy: [PRIVACY_POLICY_URL]\n• Terms of Use: [TERMS_URL]\n\n1.2 Legal framework\n\nWe comply with the ePrivacy framework as transposed in Macedonia, the GDPR where it applies, the Law on Personal Data Protection (Official Gazette No. 42/2020), and the Law on Electronic Communications (Official Gazette No. 39/2014).\n\n1.3 Consent on the website\n\nStrictly necessary storage works without consent. Optional Vercel Web Analytics loads only if you accept analytics in our banner. You can reopen choices via Cookie settings in the footer ([COOKIE_PREFERENCES_URL])."
       },
       {
         "title": "2. What are cookies?",
@@ -524,7 +530,7 @@
       },
       {
         "title": "10. Your rights",
-        "body": "Under the GDPR and applicable local law, you have rights regarding data collected through cookies, including:\n\n• Right of access: Information about cookie-related data we hold\n• Right to erasure: Deletion of cookie data where applicable\n• Right to object: Object to processing based on legitimate interests where provided by law\n• Right to withdraw consent: At any time for non-essential cookies\n• Right to lodge a complaint: With a supervisory authority\n\nHow to exercise your rights:\n\n• Email: [PRIVACY_EMAIL]\n• Cookie settings: [COOKIE_PREFERENCES_URL]\n\nSupervisory authority (North Macedonia):\n\nAgency for Personal Data Protection. Website: https://www.dzlp.mk. Email: info@dzlp.mk"
+        "body": "Under the GDPR and applicable local law, you have rights regarding data collected through cookies, including:\n\n• Right of access: Information about cookie-related data we hold\n• Right to erasure: Deletion of cookie data where applicable\n• Right to object: Object to processing based on legitimate interests where provided by law\n• Right to withdraw consent: At any time for non-essential cookies\n• Right to lodge a complaint: With a supervisory authority\n\nHow to exercise your rights:\n\n• Email: [PRIVACY_EMAIL]\n• Cookie settings: [COOKIE_PREFERENCES_URL]\n\nSupervisory authority (Macedonia):\n\nAgency for Personal Data Protection. Website: https://www.dzlp.mk. Email: info@dzlp.mk"
       },
       {
         "title": "11. Children's privacy",
@@ -615,6 +621,1202 @@
       }
     ],
     "linkCookies": "Cookie policy"
+  },
+  "helpCentre": {
+    "common": {
+      "breadcrumbHome": "Home",
+      "breadcrumbHelp": "Help",
+      "readTimeFormatted": "{minutes, plural, one {# min read} other {# min read}}",
+      "lastUpdatedPrefix": "Updated",
+      "lastReviewedPrefix": "Reviewed",
+      "relatedTitle": "Related articles",
+      "tocLabel": "On this page",
+      "tocMobileTrigger": "Table of contents",
+      "calloutTip": "Tip",
+      "calloutNote": "Note",
+      "feedbackPrompt": "Did this article answer your question?",
+      "feedbackYes": "Yes",
+      "feedbackNo": "No",
+      "feedbackThanks": "Thanks. Your feedback helps us improve these guides.",
+      "feedbackNoFollowupTitle": "Tell us what was missing",
+      "feedbackNoFollowupHint": "Optional: one line about what felt unclear or incorrect. We do not collect personal data in this box.",
+      "feedbackReasonLabel": "Optional note",
+      "feedbackReasonPlaceholder": "Example: Step 3 does not match the screen I see after updating the app.",
+      "feedbackContactIntro": "Prefer a reply from the team?",
+      "feedbackContactLink": "Contact us",
+      "feedbackSubmit": "Send",
+      "feedbackSkipDetails": "Skip",
+      "copySectionLinkAria": "Copy link to this section",
+      "sectionLinkCopied": "Link copied",
+      "publisherName": "Chisto.mk"
+    },
+    "hub": {
+      "title": "Help centre",
+      "subtitle": "Practical guides for using Chisto.mk on the web and in the app: map and sites, reporting, cleanups, safety, offline use, your account, and fixes when something breaks.",
+      "searchPlaceholder": "Search guides",
+      "searchLabel": "Search help",
+      "clearSearch": "Clear",
+      "suggestedIntro": "Suggested next reads",
+      "empty": "No guides match that search. Try shorter words, or jump to a category below.",
+      "searchTipsTitle": "Search tips",
+      "searchTips": [
+        "Try everyday words: report, site, map, cleanup, account, password, notification.",
+        "If nothing matches, browse the topic cards by category.",
+        "Long guides have a table of contents at the top of the article."
+      ],
+      "searchResultsLabel": "Search results",
+      "searchAnnounceEmpty": "No guides match your search.",
+      "searchAnnounceResults": "{count, plural, one {# guide matches your search.} other {# guides match your search.}}",
+      "jumpToCategoryNav": "Jump to a category",
+      "jumpToCategoryLead": "Browse by topic",
+      "featuredTitle": "Start here",
+      "featuredIntro": "New to Chisto.mk? Open one of these first, then explore the rest at your pace.",
+      "catalogMetrics": "{count, plural, one {# guide · same terms as in the app} other {# guides · same terms as in the app}}",
+      "featuredSlugs": [
+        "getting-started",
+        "exploring-the-map",
+        "report-a-site"
+      ]
+    },
+    "categories": {
+      "basics": {
+        "label": "Getting started"
+      },
+      "reporting": {
+        "label": "Reporting"
+      },
+      "events": {
+        "label": "Cleanups"
+      },
+      "map": {
+        "label": "Map and sites"
+      }
+    },
+    "articles": {
+      "getting-started": {
+        "cardTitle": "Set up Chisto.mk",
+        "cardSummary": "Install the app, create your account, pick a language, and learn where notifications and privacy settings live.",
+        "title": "Set up Chisto.mk",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "16 April 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-04-16T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "download-the-app",
+            "title": "Download the app",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk runs on iOS and Android. Install from the App Store or Google Play, or tap the download buttons on the chisto.mk home page."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you install",
+                "items": [
+                  "Search the store for «Chisto.mk» and check the publisher matches our official listing.",
+                  "On a limited data plan, use Wi-Fi. The first launch may download map data.",
+                  "Keep the OS updated so the camera, maps, and security patches stay current."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "If the store page is unavailable in your region, open chisto.mk on a desktop browser and use the official store links from there."
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "In these guides, words like report, site, and cleanup follow the same meanings as in the app so you always know which screen we mean."
+              }
+            ]
+          },
+          {
+            "id": "create-your-account",
+            "title": "Create your account",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the app and complete sign up. You need a phone number you can verify by SMS (or a similar one-time code), an email you read regularly, your name, and a password that meets the app rules. The same expectations are spelled out in our Terms of use."
+              },
+              {
+                "type": "bullets",
+                "title": "What to prepare",
+                "items": [
+                  "A phone number you can access for the verification code.",
+                  "An email inbox you check regularly for account notices.",
+                  "A strong password that you do not reuse on other services."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Keep your device clock accurate. Large clock skew can sometimes interfere with code-based sign-in."
+              }
+            ]
+          },
+          {
+            "id": "language-and-region",
+            "title": "Language and region",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Where the app offers it, you can change the interface language. Map data focuses on Macedonia, but you still place each report exactly where it belongs."
+              },
+              {
+                "type": "bullets",
+                "title": "Good habits",
+                "items": [
+                  "Switch languages in settings if several people share one device.",
+                  "If text looks untranslated, update the app. Translations ship with releases.",
+                  "Drop the pin on the real location you mean, not a random city centre unless the whole area is affected."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "notifications-and-privacy",
+            "title": "Notifications and privacy",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You control whether the app may send push notifications in your device settings and in the app where offered. Our Privacy Policy explains how personal data is processed when you report issues or join events."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to look",
+                "items": [
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "In-app toggles may exist for specific categories such as events or report status."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Privacy policy"
+              }
+            ]
+          }
+        ]
+      },
+      "report-a-site": {
+        "cardTitle": "File a pollution report",
+        "cardSummary": "Capture useful photos, place the pin accurately, and follow the review journey after you send it.",
+        "title": "File a pollution report",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "16 April 2026",
+        "sections": [
+          {
+            "id": "before-you-start",
+            "title": "Before you start",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You get the best results on site with recent photos. Stay out of danger: traffic, unstable ground, and unknown liquids are never worth a closer shot."
+              },
+              {
+                "type": "bullets",
+                "title": "Safety checklist",
+                "items": [
+                  "Stand away from traffic, unstable edges, and unknown liquids or sharp metal.",
+                  "If wind or sun hurts readability, change angle rather than stepping closer to danger.",
+                  "If you only have old photos, say so in the description so moderators understand context."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Never enter private property without permission. Capture from a public vantage when possible."
+              }
+            ]
+          },
+          {
+            "id": "photos-and-description",
+            "title": "Photos and description",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Add up to five photos. Start wide for context, then move closer to the problem: piles, pipes, stains, or debris. Pair images with a short headline and a factual description."
+              },
+              {
+                "type": "bullets",
+                "title": "What moderators look for",
+                "items": [
+                  "Daylight and a steady hand make verification faster for moderators.",
+                  "Include scale cues when size is unclear, for example a common object or a person at safe distance.",
+                  "Mention smells, colours, or water flow only as observations, not medical claims."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "location-on-the-map",
+            "title": "Location on the map",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Move the pin to the exact polluted spot inside Macedonia. Zoom until the building, shoreline, or roadside matches what you see on the ground."
+              },
+              {
+                "type": "bullets",
+                "title": "Pin quality",
+                "items": [
+                  "GPS helps, but confirm visually because multipath errors happen near cliffs and tall buildings.",
+                  "If the address field exists, keep it consistent with the pin so partners can route field teams.",
+                  "When reporting a whole area, zoom out only as far as needed to describe the extent truthfully."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "after-you-submit",
+            "title": "After you submit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Every report is reviewed before it is shown publicly. Track status in My reports while moderators work through the queue."
+              },
+              {
+                "type": "bullets",
+                "title": "What to expect",
+                "items": [
+                  "Public pins help neighbours and organisers coordinate, but they do not force a municipality to act on a fixed schedule.",
+                  "Edits may be possible while moderation is open; check the row for the report in the app.",
+                  "If something urgent threatens health or safety, also use official emergency channels where appropriate."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "join-a-cleanup-event": {
+        "cardTitle": "Join a cleanup event",
+        "cardSummary": "Browse cleanups near you, RSVP, and follow organiser guidance before, during, and after the shift.",
+        "title": "Join a cleanup event",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "16 April 2026",
+        "sections": [
+          {
+            "id": "find-an-event",
+            "title": "Find an event",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the Events area in the app to browse cleanups in Macedonia, read organiser notes, and join when registration is open."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you travel",
+                "items": [
+                  "Confirm the meeting pin, start time in local time, and how long the shift runs.",
+                  "Check difficulty and terrain so clothing and footwear match the day.",
+                  "See whether registration closes early or needs extra details from you."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "join-and-reminders",
+            "title": "Join and reminders",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Tap Join on an open event to reserve a spot. Organisers may post updates or reminders through notifications."
+              },
+              {
+                "type": "bullets",
+                "title": "Stay on top of plans",
+                "items": [
+                  "Add the event to your calendar once you commit.",
+                  "Turn on notifications if the organiser posts last minute changes.",
+                  "Cancel your RSVP promptly if you cannot attend so headcounts stay accurate."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "during-the-cleanup",
+            "title": "During the cleanup",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Follow the organiser safety plan, respect private property, and keep the group aligned with public access rules."
+              },
+              {
+                "type": "bullets",
+                "title": "On site",
+                "items": [
+                  "Wear gloves or high vis gear only when the listing asks for them.",
+                  "Supervise children closely and keep phones away from heavy lifting unless photos are welcome.",
+                  "Ask before photographing people, vehicles, or homes."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "after-photos-and-feedback",
+            "title": "After photos and feedback",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "After the event, add after photos if the flow invites them and leave short feedback so future volunteers know what to expect."
+              },
+              {
+                "type": "bullets",
+                "title": "Wrap up well",
+                "items": [
+                  "Upload through the event flow when it is exposed in the app.",
+                  "Avoid faces or licence plates unless organisers explicitly allow them.",
+                  "Thank hosts through the in-app channel when one is available."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "account-and-data": {
+        "cardTitle": "Your account and data",
+        "cardSummary": "Protect your login, understand what we store, and use the right pages for privacy and data requests.",
+        "title": "Your account, privacy, and data requests",
+        "lastUpdated": "16 April 2026",
+        "lastReviewed": "16 April 2026",
+        "sections": [
+          {
+            "id": "what-the-app-stores",
+            "title": "What the app stores",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Your Chisto.mk account connects the reports you file, events you join, and notification preferences so civic work in Macedonia stays coherent."
+              },
+              {
+                "type": "bullets",
+                "title": "What may be linked to you",
+                "items": [
+                  "Sign in identifiers such as email or phone number.",
+                  "Approximate map pins and descriptions from reports you submit.",
+                  "RSVP status, attendance notes, and organiser messages for events you join."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "password-and-devices",
+            "title": "Passwords and devices",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Treat the account like a mailbox for civic issues. Strong access controls protect you and the map data others rely on."
+              },
+              {
+                "type": "bullets",
+                "title": "Everyday hygiene",
+                "items": [
+                  "Use a unique password or your OS password manager.",
+                  "Keep screen lock enabled on phones that leave the house with you.",
+                  "Sign out before handing a device to someone else."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "your-rights",
+            "title": "Access, correction, and deletion",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "You can ask what we hold, correct mistakes, export a copy, or request deletion, subject to lawful exceptions such as moderation records."
+              },
+              {
+                "type": "bullets",
+                "title": "How to start a request",
+                "items": [
+                  "Use in-app account settings wherever they are available.",
+                  "Email support if a control is missing or the flow errors.",
+                  "Expect identity checks when requests are sensitive or high risk."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Your data and account"
+              }
+            ]
+          },
+          {
+            "id": "legal-links",
+            "title": "Policies on this site",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Binding legal wording lives on dedicated pages. Read them when you need certainty beyond these guides."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to look",
+                "items": [
+                  "Privacy explains what we collect and why.",
+                  "Terms explain acceptable use of the platform.",
+                  "The data page summarises retention and rights paths in one place."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Your data and account"
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Privacy policy"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Terms of use"
+              }
+            ]
+          }
+        ]
+      },
+      "notifications-in-the-app": {
+        "cardTitle": "Notifications",
+        "cardSummary": "Choose which updates you get for reports, cleanup events, and account activity.",
+        "title": "Notifications in the app",
+        "lastUpdated": "16 April 2026",
+        "lastReviewed": "16 April 2026",
+        "sections": [
+          {
+            "id": "types-of-alerts",
+            "title": "What you might receive",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk can notify you when something important happens: for example a report you follow changes status, an event you joined is updated, or your account needs attention."
+              },
+              {
+                "type": "bullets",
+                "title": "Typical channels",
+                "items": [
+                  "Push notifications on your phone when you allow them.",
+                  "In-app banners or badges where the product surfaces them.",
+                  "Email or SMS for account security or things you explicitly opt into."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "system-settings",
+            "title": "OS and in-app controls",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Your phone always wins. If push is off at the OS level, Chisto.mk cannot override that. Use both OS settings and in-app toggles so alerts match how you work."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to look",
+                "items": [
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "Inside Chisto.mk, open settings and review each category you still want, such as events or report updates."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "respect-quiet-hours",
+            "title": "Quiet hours and courtesy",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Batching alerts keeps organisers from waking volunteers and keeps residents from feeling watched. Turn off what you do not need, especially overnight."
+              },
+              {
+                "type": "bullets",
+                "title": "Practical habits",
+                "items": [
+                  "Use Focus modes or Do not disturb on iOS, and similar modes on Android, before sleep.",
+                  "Mute long threads inside events if the organiser enables quieter updates.",
+                  "Re-enable notifications before big cleanup days so last minute changes reach you."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "email-and-sms",
+            "title": "Email and SMS",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Some messages are required for security, such as password resets or login codes. Marketing style messages only arrive when you clearly opt in."
+              },
+              {
+                "type": "bullets",
+                "title": "Stay in control",
+                "items": [
+                  "Keep your email inbox reachable so you can recover access if you lose your phone.",
+                  "If SMS codes stop arriving, check spam filters, carrier blocks, and whether roaming is on.",
+                  "For how data is processed, read the Privacy policy linked below."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Privacy policy"
+              }
+            ]
+          }
+        ]
+      },
+      "troubleshooting": {
+        "cardTitle": "Troubleshooting",
+        "cardSummary": "Fix sign-in, map location, camera uploads, and know when to update or contact support.",
+        "title": "Troubleshooting common issues",
+        "lastUpdated": "16 April 2026",
+        "lastReviewed": "16 April 2026",
+        "sections": [
+          {
+            "id": "cannot-sign-in",
+            "title": "Cannot sign in",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Most login issues come down to connectivity, clock skew, or an outdated build. Work through the list below before you assume the password is wrong."
+              },
+              {
+                "type": "bullets",
+                "title": "Try this first",
+                "items": [
+                  "Turn airplane mode off, wait a few seconds, then reconnect to Wi-Fi or mobile data.",
+                  "Set date and time to automatic. Large drift can break SMS or email codes.",
+                  "Request a fresh code, wait for it, and paste carefully. Codes expire quickly.",
+                  "Update Chisto.mk from the store, then restart the app."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "If the app crashes on launch, note your OS version and app version before you contact us. That detail speeds up support."
+              }
+            ]
+          },
+          {
+            "id": "location-permission",
+            "title": "Map or GPS issues",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The map needs location access when you place or verify pins. If the blue dot drifts or disappears, fix permissions before you file a report."
+              },
+              {
+                "type": "bullets",
+                "title": "Checklist",
+                "items": [
+                  "iOS: Settings → Privacy & Security → Location Services → Chisto.mk → While using the app.",
+                  "Android: Settings → Location → App permissions → Chisto.mk → Allow only while in use when possible.",
+                  "Open sky for a few seconds so GPS can settle, especially between tall buildings.",
+                  "Disable mock location or developer GPS spoofing tools while using Chisto.mk."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "If the pin still lands wrong after GPS settles, move it manually and describe why in the report text."
+              }
+            ]
+          },
+          {
+            "id": "photos-or-upload",
+            "title": "Camera or upload failures",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Large photos and weak networks do not mix. Give uploads time, or capture a smaller photo when the queue keeps failing."
+              },
+              {
+                "type": "bullets",
+                "title": "Try this first",
+                "items": [
+                  "Check that Chisto.mk has camera and photo library permission.",
+                  "Free a little storage space on the device.",
+                  "Switch to Wi-Fi for multi photo uploads.",
+                  "Force close the app once, reopen, and retry the same report draft if it is still there."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Avoid starting a second report for the same issue while the first upload still shows pending."
+              }
+            ]
+          },
+          {
+            "id": "still-stuck",
+            "title": "Still stuck?",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "When nothing above works, collect a short description and reach out. Reinstalling is a last resort because it can clear local drafts."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you write to us",
+                "items": [
+                  "Restart the phone once.",
+                  "Confirm you are on the latest Chisto.mk build from the official store.",
+                  "Capture screenshots of any error text (blur personal details first)."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact"
+              }
+            ]
+          }
+        ]
+      },
+      "exploring-the-map": {
+        "cardTitle": "Use the map and site pages",
+        "cardSummary": "Understand pins, open a site page, and read public information before you report or join a cleanup.",
+        "title": "Use the map and site pages",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "what-the-map-shows",
+            "title": "What the map shows",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "The map is a shared civic view of reported places in Macedonia. Each pin is a site where someone documented an environmental concern."
+              },
+              {
+                "type": "bullets",
+                "title": "Quick orientation",
+                "items": [
+                  "Zoom until street names and landmarks match what you see outside.",
+                  "Tap a pin to open the site page with photos, descriptions, and history when available.",
+                  "Newer activity may appear after moderation, so counts can change over time."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "site-detail-basics",
+            "title": "Site detail basics",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "A site page summarises what the community submitted. It is meant for transparency, not for assigning blame to individuals."
+              },
+              {
+                "type": "bullets",
+                "title": "What you can rely on",
+                "items": [
+                  "Photos and text come from contributors and moderators, not automated enforcement.",
+                  "Timestamps help you understand recency when they are shown.",
+                  "If something looks wrong, you can often add a new report rather than arguing in text."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Do not treat map pins as legal proof on their own. Use official channels for regulated decisions."
+              }
+            ]
+          },
+          {
+            "id": "moving-around-safely",
+            "title": "Moving around safely",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use the map while stationary or as a passenger. Keep awareness of traffic and private property boundaries."
+              },
+              {
+                "type": "bullets",
+                "title": "Good habits",
+                "items": [
+                  "Prefer daylight for first visits to unfamiliar industrial edges.",
+                  "If a path feels unsafe, step back and capture from a distance.",
+                  "Respect no entry signs even when rubbish is visible beyond them."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "when-to-file-a-report",
+            "title": "When to file a report",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open a report when you can add fresh evidence or correct a pin. Duplicates without new facts slow moderation for everyone."
+              },
+              {
+                "type": "bullets",
+                "title": "Before you start",
+                "items": [
+                  "Gather photos and a clear description of what changed since the last visit.",
+                  "Move the pin to the exact spot that needs attention.",
+                  "Mention safety limits you observed so organisers can plan."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "File a pollution report"
+              }
+            ]
+          }
+        ]
+      },
+      "trust-safety-and-moderation": {
+        "cardTitle": "Trust, safety, and moderation",
+        "cardSummary": "Why moderation exists, how to contribute respectfully, and where the binding legal text lives.",
+        "title": "Trust, safety, and moderation",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "why-moderation-exists",
+            "title": "Why moderation exists",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk publishes civic environmental signals. Moderation reduces spam, protects people from harassment, and keeps the map readable for partners and volunteers in Macedonia."
+              },
+              {
+                "type": "bullets",
+                "title": "What reviewers look for",
+                "items": [
+                  "Evidence that matches the location and time window you describe.",
+                  "Respectful language without personal attacks.",
+                  "Duplicates folded into the same site when that keeps the story clearer."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "respectful-contributions",
+            "title": "Respectful contributions",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Assume good intent from neighbours and organisers. Focus on conditions you can photograph or describe factually."
+              },
+              {
+                "type": "bullets",
+                "title": "Community norms",
+                "items": [
+                  "No doxxing: avoid posting private addresses for people instead of sites.",
+                  "No hate speech or coordinated brigading.",
+                  "Do not upload imagery that sexualises minors or glorifies self harm."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "If tempers rise, pause and capture facts only. Moderators prioritise safety over speed."
+              }
+            ]
+          },
+          {
+            "id": "duplicates-and-corrections",
+            "title": "Duplicates and corrections",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Multiple reports about the same place can help show persistence, but identical copies add noise. Prefer updates with new angles or dates."
+              },
+              {
+                "type": "bullets",
+                "title": "Practical guidance",
+                "items": [
+                  "If a pin is slightly wrong, file a correction through the reporting flow when the product allows it.",
+                  "If categories are wrong, choose the closest honest label and explain in text.",
+                  "Expect status labels to lag briefly while humans review."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "legal-detail-and-escalation",
+            "title": "Legal detail and escalation",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "This article summarises behaviour expectations. Binding rules sit in the legal pages linked below."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to read more",
+                "items": [
+                  "Privacy explains data categories and retention at a high level.",
+                  "Terms explain acceptable use and enforcement levers.",
+                  "The data page lists rights requests for account holders."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Privacy policy"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Terms of use"
+              }
+            ]
+          }
+        ]
+      },
+      "hosting-a-cleanup-event": {
+        "cardTitle": "Host a cleanup event",
+        "cardSummary": "Plan logistics, manage sign ups, keep people safe on the day, and close the loop afterwards.",
+        "title": "Host a cleanup event",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "plan-before-you-publish",
+            "title": "Plan before you publish",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Organisers set the tone. Clear logistics reduce no shows and keep volunteers safer around roads, water edges, and weather shifts in Macedonia."
+              },
+              {
+                "type": "bullets",
+                "title": "Checklist",
+                "items": [
+                  "Pick a meeting pin, duration, difficulty, and any kit you will supply.",
+                  "Confirm land access with owners or municipalities when required.",
+                  "Publish contact expectations, for example whether phones stay on silent."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "signups-and-messaging",
+            "title": "Sign ups and messaging",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Use notifications thoughtfully. Short updates beat long threads when plans change."
+              },
+              {
+                "type": "bullets",
+                "title": "Operational tips",
+                "items": [
+                  "Close registration early if capacity is limited.",
+                  "Send a reminder the evening before with parking and toilet notes.",
+                  "After cancellations, refresh headcounts so materials match reality."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/join-a-cleanup-event",
+                "label": "Join a cleanup event"
+              }
+            ]
+          },
+          {
+            "id": "day-of-safety",
+            "title": "Day of safety",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Brief everyone on hazards, buddy pairs, and what to do if someone feels unwell."
+              },
+              {
+                "type": "bullets",
+                "title": "On site leadership",
+                "items": [
+                  "Keep first aid basics and water visible.",
+                  "Rotate heavy lifting roles and watch for heat stress.",
+                  "Photograph results only where volunteers consent."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "For emergencies, use official emergency channels alongside any in-app notes."
+              }
+            ]
+          },
+          {
+            "id": "after-the-event",
+            "title": "After the event",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Close the loop with thank you notes, photo uploads if your flow supports them, and honest feedback for the next crew."
+              },
+              {
+                "type": "bullets",
+                "title": "Wrap up",
+                "items": [
+                  "Archive chat decisions so future hosts learn from your runbook.",
+                  "Log issues that need municipal follow up separately from volunteer chatter.",
+                  "Celebrate wins briefly so newcomers see momentum."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "offline-and-slow-networks": {
+        "cardTitle": "Offline and slow networks",
+        "cardSummary": "Understand pending uploads, retries, and when to wait instead of duplicating a report.",
+        "title": "Offline and slow networks",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "how-the-app-uses-network",
+            "title": "How the app uses the network",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Maps, photos, and submissions sync when connectivity returns. Some screens cache tiles so you can browse lightly offline."
+              },
+              {
+                "type": "bullets",
+                "title": "Expectations",
+                "items": [
+                  "Account actions usually need a live session.",
+                  "Draft fields may save locally until you submit.",
+                  "Large photos take longer on 3G; queue them instead of forcing retries in a tunnel."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "uploads-and-pending-states",
+            "title": "Uploads and pending states",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Pending means the device is still sending data or the server has not confirmed receipt. It is normal briefly after switching from Wi Fi to mobile data."
+              },
+              {
+                "type": "bullets",
+                "title": "If you are stuck",
+                "items": [
+                  "Open the report summary and look for retry or resume prompts.",
+                  "Avoid duplicating the same submission while pending is spinning.",
+                  "Capture smaller photos if uploads fail repeatedly."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "airplane-mode-and-roaming",
+            "title": "Airplane mode and roaming",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "International roaming can block background uploads. Toggle data for the app explicitly if your OS allows per app cellular control."
+              },
+              {
+                "type": "bullets",
+                "title": "Travel tips",
+                "items": [
+                  "Finish uploads before flights when possible.",
+                  "Reconnect to Wi Fi before editing long descriptions.",
+                  "If time zones shift, double check scheduled event reminders."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "when-to-stop-and-escalate",
+            "title": "When to stop and escalate",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "If the app crashes twice while uploading, pause and collect diagnostics such as OS version and app version before contacting support."
+              },
+              {
+                "type": "bullets",
+                "title": "Escalation",
+                "items": [
+                  "Try restarting the device once.",
+                  "Reinstall only after backing up credentials.",
+                  "Use the contact page on this site for persistent blockers."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Contact"
+              }
+            ]
+          }
+        ]
+      },
+      "partnerships-for-organisations": {
+        "cardTitle": "Partnerships for organisations",
+        "cardSummary": "How municipalities, NGOs, and journalists can collaborate with Chisto.mk without surprises.",
+        "title": "Partnerships for municipalities, NGOs, and media",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "who-this-guide-is-for",
+            "title": "Who this guide is for",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "This article is for organisations that want to use public map data, coordinate cleanups, or explore collaboration. It is not legal advice and does not replace your own counsel or procurement rules."
+              },
+              {
+                "type": "bullets",
+                "title": "Typical readers",
+                "items": [
+                  "Municipal environment desks planning field follow up.",
+                  "NGOs mapping volunteer capacity next to reported sites.",
+                  "Journalists verifying locations before publishing."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "before-you-contact-us",
+            "title": "Before you contact us",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Gather a short summary of your goal, the geography you care about, and any timeline. If you need bulk data or recurring exports, say how the public benefits and how you will protect personal data you might receive."
+              },
+              {
+                "type": "bullets",
+                "title": "Helpful attachments",
+                "items": [
+                  "Official letterhead or email from an organisational domain when possible.",
+                  "One paragraph on intended use of map or event information.",
+                  "Preferred language for replies: Macedonian, Albanian, or English."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Open the contact form"
+              }
+            ]
+          },
+          {
+            "id": "policies-and-public-data",
+            "title": "Policies and public data",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Binding rules live in our Terms, Privacy policy, and data pages. The help centre explains how the product behaves for residents; legal language stays on those policy pages."
+              },
+              {
+                "type": "bullets",
+                "title": "Where to read more",
+                "items": [
+                  "Use the data page for high level descriptions of what the platform publishes.",
+                  "Use the privacy page before you process any information that might identify individuals.",
+                  "Link staff to the help hub so field teams share the same vocabulary as app users."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Data overview"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Terms of use"
+              }
+            ]
+          }
+        ]
+      },
+      "verifying-sites-in-the-field": {
+        "cardTitle": "Verify sites in the field",
+        "cardSummary": "Plan a safe visit, compare the pin to what you see, and file a new report when the evidence clearly changed.",
+        "title": "Verifying pollution sites on the ground",
+        "lastUpdated": "15 April 2026",
+        "lastReviewed": "15 April 2026",
+        "sections": [
+          {
+            "id": "plan-the-visit",
+            "title": "Plan the visit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Open the site page in the app or website, note the pin, photos, and timestamps, then plan daylight access from a public vantage. Tell a colleague where you are going if you work alone."
+              },
+              {
+                "type": "bullets",
+                "title": "Checklist",
+                "items": [
+                  "Charge your phone and download offline tiles if connectivity is weak.",
+                  "Bring a notebook for observations you cannot photograph safely.",
+                  "Avoid private land unless you already have permission."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/exploring-the-map",
+                "label": "Use the map and site pages"
+              }
+            ]
+          },
+          {
+            "id": "compare-pin-to-reality",
+            "title": "Compare the pin to reality",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Stand where the map suggests and scan for the same cues shown in photos: kerb lines, trees, buildings, or shoreline bends. Small offsets happen; large mismatches deserve a careful new report rather than a comment alone."
+              },
+              {
+                "type": "bullets",
+                "title": "When to file again",
+                "items": [
+                  "The hazard moved materially since the last photos.",
+                  "The original pin sits on the wrong block or riverbank.",
+                  "You can document a regulated risk that was not visible earlier."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "File a pollution report"
+              }
+            ]
+          },
+          {
+            "id": "safety-and-respect",
+            "title": "Safety and respect",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Do not enter unstable piles, fast water, or industrial yards without training. Treat residents and workers courteously; the map is a civic space, not a place for confrontation."
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "If you discover an immediate danger to life, use official emergency channels first, then document for the map when it is safe."
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Trust, safety, and moderation"
+              }
+            ]
+          }
+        ]
+      }
+    }
   },
   "notFound": {
     "title": "Page not found",

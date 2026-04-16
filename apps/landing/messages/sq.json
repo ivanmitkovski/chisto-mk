@@ -7,7 +7,7 @@
     },
     "about": {
       "title": "Rreth nesh | Chisto.mk",
-      "description": "Aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoninë e Veriut."
+      "description": "Aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoni."
     },
     "contact": {
       "title": "Kontakt | Chisto.mk",
@@ -36,6 +36,10 @@
     "data": {
       "title": "Të dhënat dhe llogaria juaj | Chisto.mk",
       "description": "Si të kërkoni qasje, korrigjim ose fshirje të të dhënave personale dhe llogarisë në Chisto.mk."
+    },
+    "help": {
+      "title": "Qendra e ndihmës | Chisto.mk",
+      "description": "Mësoni si të përdorni Chisto.mk: fillimi, raportimi i ndotjes dhe bashkimin në aksione pastrimi."
     }
   },
   "nav": {
@@ -44,7 +48,8 @@
     "about": "Rreth nesh",
     "news": "Lajme",
     "press": "Media",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "help": "Ndihmë"
   },
   "common": {
     "download": "Shkarko",
@@ -194,6 +199,7 @@
     "linkNews": "Lajme",
     "linkPress": "Media",
     "linkContact": "Kontakt",
+    "linkHelp": "Qendra e ndihmës",
     "terms": "Kushtet e përdorimit",
     "privacy": "Politika e privatësisë",
     "cookies": "Politika e cookies",
@@ -242,7 +248,7 @@
   },
   "aboutPage": {
     "badge": "Rreth nesh",
-    "title": "Chisto.mk është aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoninë e Veriut.",
+    "title": "Chisto.mk është aplikacion qytetar për mbeturina dhe ajër të ndotur në Maqedoni.",
     "subtitle": "Raportoni mbeturina, hedhje të paligjshme ose ajër të ndotur me foto dhe pikë në hartë. I njëjti vend mbetet i dukshëm për të gjithë.",
     "creatorsPhotoPlaceholder": "Foto së shpejti",
     "creatorsSectionTitle": "Ekipi",
@@ -319,11 +325,11 @@
     "lastUpdatedLabel": "Përditësuar për herë të fundit",
     "lastUpdated": "28 mars 2026",
     "noticeTitle": "Para se të mbështeteni në këto kushte",
-    "noticeBody": "Plotësoni të gjitha fushat në kllapa me të dhëna të verifikuara ligjore dhe operative para se ta trajtoni këtë tekst si përfundimtar. Deklaratat e privatësisë në dyqanet e aplikacioneve duhet të përputhen me këtë dokument dhe aplikacionin e publikuar. Jo këshillë ligjore dhe nuk garanton miratimin në dyqan. Konsideroni rishikim nga këshilltar i kualifikuar në Maqedoninë e Veriut (dhe, për përdorues në EEA, në BE) ku është e përshtatshme.",
+    "noticeBody": "Plotësoni të gjitha fushat në kllapa me të dhëna të verifikuara ligjore dhe operative para se ta trajtoni këtë tekst si përfundimtar. Deklaratat e privatësisë në dyqanet e aplikacioneve duhet të përputhen me këtë dokument dhe aplikacionin e publikuar. Jo këshillë ligjore dhe nuk garanton miratimin në dyqan. Konsideroni rishikim nga këshilltar i kualifikuar në Maqedoni (dhe, për përdorues në EEA, në BE) ku është e përshtatshme.",
     "sections": [
       {
         "title": "Hyrje",
-        "body": "Këto Kushte të Përdorimit („Kushtet“) përbëjnë një marrëveshje ligjërisht detyruese midis jush („Përdoruesi“, „ju“ ose „tuaj“) dhe [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë së Veriut me numër regjistrimi [REGISTRATION_NUMBER], me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“).\n\nDuke hyrë ose përdorur aplikacionin celular dhe platformën web Chisto.mk (së bashku, „Platforma“), ju pranoni të detyroheni nga këto Kushte. Nëse nuk pajtoheni, duhet të ndaloni menjëherë përdorimin e Platformës.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE]."
+        "body": "Këto Kushte të Përdorimit („Kushtet“) përbëjnë një marrëveshje ligjërisht detyruese midis jush („Përdoruesi“, „ju“ ose „tuaj“) dhe [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë me numër regjistrimi [REGISTRATION_NUMBER], me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“).\n\nDuke hyrë ose përdorur aplikacionin celular dhe platformën web Chisto.mk (së bashku, „Platforma“), ju pranoni të detyroheni nga këto Kushte. Nëse nuk pajtoheni, duhet të ndaloni menjëherë përdorimin e Platformës.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE]."
       },
       {
         "title": "1. Përkufizimet",
@@ -331,7 +337,7 @@
       },
       {
         "title": "2. Kuadri ligjor dhe zbatimi",
-        "body": "2.1 Këto Kushte rregullohen nga:\n\nLigji për Marrëdhëniet e Detyrimeve i Republikës së Maqedonisë së Veriut (Gazeta Zyrtare Nr. 18/2001)\nLigji për Mbrojtjen e Konsumatorit (Gazeta Zyrtare Nr. 26/2023)\nLigji për Tregtinë Elektronike (Gazeta Zyrtare Nr. 39/2014)\nLigji për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679 (Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave - GDPR)\nDirektiva për të Drejtat e Konsumatorit 2011/83/BE\n\n2.2 Këto Kushte aplikohen për të gjithë përdoruesit që hyjnë në Platformë nga çdo juridiksion, me mbrojtje specifike konsumatori të zbatueshme për përdoruesit brenda Republikës së Maqedonisë së Veriut dhe Bashkimit Evropian."
+        "body": "2.1 Këto Kushte rregullohen nga:\n\nLigji për Marrëdhëniet e Detyrimeve i Republikës së Maqedonisë (Gazeta Zyrtare Nr. 18/2001)\nLigji për Mbrojtjen e Konsumatorit (Gazeta Zyrtare Nr. 26/2023)\nLigji për Tregtinë Elektronike (Gazeta Zyrtare Nr. 39/2014)\nLigji për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679 (Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave - GDPR)\nDirektiva për të Drejtat e Konsumatorit 2011/83/BE\n\n2.2 Këto Kushte aplikohen për të gjithë përdoruesit që hyjnë në Platformë nga çdo juridiksion, me mbrojtje specifike konsumatori të zbatueshme për përdoruesit brenda Republikës së Maqedonisë dhe Bashkimit Evropian."
       },
       {
         "title": "3. Përshkrimi dhe qëllimi i platformës",
@@ -355,7 +361,7 @@
       },
       {
         "title": "8. Të drejtat e konsumatorit (përdorues të BE-së dhe Maqedonisë)",
-        "body": "8.1 Shërbime digjitale dhe çmimi\n\nVeçoritë kryesore të hartës qytetare dhe raportimit ofrohen aktualisht pa pagesë. Ku nuk ju kërkojmë të paguani për qasje, shumë rregulla të kontratës në distancë për konsumatorët (përfshirë të drejtën 14-ditore të tërheqjes sipas Direktivës 2011/83/BE) shpesh nuk zbatohen njësoj si për përmbajtje digjitale të paguar. Asgjë në këtë Seksion nuk kufizon të drejta të detyrueshme që ju vlejnë sipas ligjit të Maqedonisë së Veriut ose të BE-së.\n\n8.2 Informacioni që ofrojmë\n\nSynojmë të japim informacion të qartë për:\n\nKush operon Platformën (Seksioni 17)\nÇfarë bën Shërbimi (Seksioni 3)\nSi të ankoheni (Seksioni 13)\n\n8.3 Mosmarrëveshje konsumatore\n\nKonsumatorët maqedonas mund të paraqesin ankesa te:\n\nKomisioni për Mbrojtjen e Konsumatorit\nPlatforma e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr\n\nNa kontaktoni në [CONTACT_EMAIL] ose [CONTACT_ADDRESS] për çështje shërbimi para eskalimit kur është e arsyeshme."
+        "body": "8.1 Shërbime digjitale dhe çmimi\n\nVeçoritë kryesore të hartës qytetare dhe raportimit ofrohen aktualisht pa pagesë. Ku nuk ju kërkojmë të paguani për qasje, shumë rregulla të kontratës në distancë për konsumatorët (përfshirë të drejtën 14-ditore të tërheqjes sipas Direktivës 2011/83/BE) shpesh nuk zbatohen njësoj si për përmbajtje digjitale të paguar. Asgjë në këtë Seksion nuk kufizon të drejta të detyrueshme që ju vlejnë sipas ligjit të Maqedonisë ose të BE-së.\n\n8.2 Informacioni që ofrojmë\n\nSynojmë të japim informacion të qartë për:\n\nKush operon Platformën (Seksioni 17)\nÇfarë bën Shërbimi (Seksioni 3)\nSi të ankoheni (Seksioni 13)\n\n8.3 Mosmarrëveshje konsumatore\n\nKonsumatorët maqedonas mund të paraqesin ankesa te:\n\nKomisioni për Mbrojtjen e Konsumatorit\nPlatforma e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr\n\nNa kontaktoni në [CONTACT_EMAIL] ose [CONTACT_ADDRESS] për çështje shërbimi para eskalimit kur është e arsyeshme."
       },
       {
         "title": "9. Mohimi i garancive",
@@ -375,11 +381,11 @@
       },
       {
         "title": "13. Zgjidhja e mosmarrëveshjeve dhe ankesat",
-        "body": "13.1 Procedura e ankesave\n\nPërpara fillimit të procedurave formale, ju inkurajojmë të na kontaktoni në:\n\nEmail: [CONTACT_EMAIL]\nAdresë: [CONTACT_ADDRESS]\nTelefon: [CONTACT_PHONE]\n\nDo të përpiqemi të zgjidhim ankesat brenda 30 ditësh nga marrja.\n\n13.2 Zgjidhje miqësore\n\nJemi të angazhuar për të zgjidhur mosmarrëveshjet në mënyrë miqësore dhe me besim të mirë.\n\n13.3 Ndërmjetësim\n\nNëse zgjidhja e drejtpërdrejtë dështon, palët mund të kërkojnë ndërmjetësim përmes shërbimeve të njohura të ndërmjetësimit në Republikën e Maqedonisë së Veriut.\n\n13.4 ADR konsumatore\n\nKonsumatorët e BE-së mund të përdorin platformën e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr"
+        "body": "13.1 Procedura e ankesave\n\nPërpara fillimit të procedurave formale, ju inkurajojmë të na kontaktoni në:\n\nEmail: [CONTACT_EMAIL]\nAdresë: [CONTACT_ADDRESS]\nTelefon: [CONTACT_PHONE]\n\nDo të përpiqemi të zgjidhim ankesat brenda 30 ditësh nga marrja.\n\n13.2 Zgjidhje miqësore\n\nJemi të angazhuar për të zgjidhur mosmarrëveshjet në mënyrë miqësore dhe me besim të mirë.\n\n13.3 Ndërmjetësim\n\nNëse zgjidhja e drejtpërdrejtë dështon, palët mund të kërkojnë ndërmjetësim përmes shërbimeve të njohura të ndërmjetësimit në Republikën e Maqedonisë.\n\n13.4 ADR konsumatore\n\nKonsumatorët e BE-së mund të përdorin platformën e BE-së për zgjidhjen e mosmarrëveshjeve online: https://ec.europa.eu/consumers/odr"
       },
       {
         "title": "14. Ligji rregullues dhe juridiksioni",
-        "body": "14.1 Ligji rregullues\n\nKëto Kushte rregullohen dhe interpretohen në përputhje me ligjet e Republikës së Maqedonisë së Veriut, pa marrë parasysh parimet e konfliktit të ligjeve.\n\n14.2 Juridiksioni\n\n14.2.1 Për mosmarrëveshje me konsumatorët: gjykatat kompetente në Republikën e Maqedonisë së Veriut siç përcaktohet nga ligjet e detyrueshme të mbrojtjes së konsumatorit (përgjithësisht, vendbanimi i konsumatorit).\n\n14.2.2 Për mosmarrëveshje me përdorues që nuk janë konsumatorë (p.sh. organizime që përdorin Platformën në cilësi profesionale): gjykatat e [COURT_LOCATION], Republika e Maqedonisë së Veriut, kanë juridiksion ekskluziv.\n\n14.3 Të drejta të detyrueshme konsumatore\n\nAsgjë në këtë seksion nuk kufizon të drejtat e detyrueshme të konsumatorit sipas ligjit të BE-së ose maqedonas, duke përfshirë të drejtën për të ngritur procedura në vendin e rezidencës së konsumatorit."
+        "body": "14.1 Ligji rregullues\n\nKëto Kushte rregullohen dhe interpretohen në përputhje me ligjet e Republikës së Maqedonisë, pa marrë parasysh parimet e konfliktit të ligjeve.\n\n14.2 Juridiksioni\n\n14.2.1 Për mosmarrëveshje me konsumatorët: gjykatat kompetente në Republikën e Maqedonisë siç përcaktohet nga ligjet e detyrueshme të mbrojtjes së konsumatorit (përgjithësisht, vendbanimi i konsumatorit).\n\n14.2.2 Për mosmarrëveshje me përdorues që nuk janë konsumatorë (p.sh. organizime që përdorin Platformën në cilësi profesionale): gjykatat e [COURT_LOCATION], Republika e Maqedonisë, kanë juridiksion ekskluziv.\n\n14.3 Të drejta të detyrueshme konsumatore\n\nAsgjë në këtë seksion nuk kufizon të drejtat e detyrueshme të konsumatorit sipas ligjit të BE-së ose maqedonas, duke përfshirë të drejtën për të ngritur procedura në vendin e rezidencës së konsumatorit."
       },
       {
         "title": "15. Forcë e madhe",
@@ -387,11 +393,11 @@
       },
       {
         "title": "16. Dispozita të përgjithshme",
-        "body": "16.1 Marrëveshja e plotë\n\nKëto Kushte, së bashku me Politikën tonë të Privatësisë dhe Politikën e cookies, përbëjnë marrëveshjen e plotë midis jush dhe Chisto.mk.\n\n16.2 Ndarje\n\nNëse ndonjë dispozitë gjendet e pavlefshme ose e pazbatueshme, ajo dispozitë do të kufizohet ose eliminohet në masën minimale të nevojshme, dhe dispozitat e mbetura mbeten në fuqi të plotë.\n\n16.3 Pa heqje dorë\n\nDështimi për të zbatuar ndonjë dispozitë nuk përbën heqje dorë nga ajo dispozitë ose ndonjë dispozitë tjetër.\n\n16.4 Caktimi\n\nJu nuk mund t'i caktoni këto Kushte pa pëlqimin tonë paraprak me shkrim. Ne mund t'i caktojmë të drejtat dhe detyrimet tona pa kufizime.\n\n16.5 Gjuha\n\nKëto Kushte ekzekutohen në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Maqedoninë e Veriut; versioni anglisht ka përparësi për mosmarrëveshje ndërkombëtare.\n\n16.6 Marrëdhënie\n\nAsgjë në këto Kushte nuk krijon partneritet, sipërmarrje të përbashkët, punësim ose marrëdhënie agjensie.\n\n16.7 Të drejtat e palëve të treta\n\nKëto Kushte nuk u japin të drejta palëve të treta.\n\n16.8 Njoftimet\n\nNjoftimet ligjore duhet të dërgohen në:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAdresë: [REGISTERED_ADDRESS]\n\nNjoftimet për ju mund të dërgohen në adresën tuaj të regjistruar me email."
+        "body": "16.1 Marrëveshja e plotë\n\nKëto Kushte, së bashku me Politikën tonë të Privatësisë dhe Politikën e cookies, përbëjnë marrëveshjen e plotë midis jush dhe Chisto.mk.\n\n16.2 Ndarje\n\nNëse ndonjë dispozitë gjendet e pavlefshme ose e pazbatueshme, ajo dispozitë do të kufizohet ose eliminohet në masën minimale të nevojshme, dhe dispozitat e mbetura mbeten në fuqi të plotë.\n\n16.3 Pa heqje dorë\n\nDështimi për të zbatuar ndonjë dispozitë nuk përbën heqje dorë nga ajo dispozitë ose ndonjë dispozitë tjetër.\n\n16.4 Caktimi\n\nJu nuk mund t'i caktoni këto Kushte pa pëlqimin tonë paraprak me shkrim. Ne mund t'i caktojmë të drejtat dhe detyrimet tona pa kufizime.\n\n16.5 Gjuha\n\nKëto Kushte ekzekutohen në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Maqedoni; versioni anglisht ka përparësi për mosmarrëveshje ndërkombëtare.\n\n16.6 Marrëdhënie\n\nAsgjë në këto Kushte nuk krijon partneritet, sipërmarrje të përbashkët, punësim ose marrëdhënie agjensie.\n\n16.7 Të drejtat e palëve të treta\n\nKëto Kushte nuk u japin të drejta palëve të treta.\n\n16.8 Njoftimet\n\nNjoftimet ligjore duhet të dërgohen në:\n\nEmail: [LEGAL_CONTACT_EMAIL]\nAdresë: [REGISTERED_ADDRESS]\n\nNjoftimet për ju mund të dërgohen në adresën tuaj të regjistruar me email."
       },
       {
         "title": "17. Informacioni i kontaktit",
-        "body": "Ofruesi i shërbimit:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nNumri i regjistrimit: [REGISTRATION_NUMBER]\nID-ja tatimore: [TAX_ID]\nAdresa e regjistruar: [REGISTERED_ADDRESS]\n\nKontakt:\n\nEmail: [CONTACT_EMAIL]\nTelefon: [CONTACT_PHONE]\nFaqja e internetit: [WEBSITE_URL]\n\nZyrtari për mbrojtjen e të dhënave (nëse aplikohet):\n\nEmail: [DPO_EMAIL]\n\nAutoriteti rregullator:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nFaqja e internetit: https://www.dzlp.mk\n\nDuke përdorur Platformën, ju pranoni se keni lexuar, kuptuar dhe pajtoheni të detyroheni nga këto Kushte të Përdorimit."
+        "body": "Ofruesi i shërbimit:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nNumri i regjistrimit: [REGISTRATION_NUMBER]\nID-ja tatimore: [TAX_ID]\nAdresa e regjistruar: [REGISTERED_ADDRESS]\n\nKontakt:\n\nEmail: [CONTACT_EMAIL]\nTelefon: [CONTACT_PHONE]\nFaqja e internetit: [WEBSITE_URL]\n\nZyrtari për mbrojtjen e të dhënave (nëse aplikohet):\n\nEmail: [DPO_EMAIL]\n\nAutoriteti rregullator:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë\nFaqja e internetit: https://www.dzlp.mk\n\nDuke përdorur Platformën, ju pranoni se keni lexuar, kuptuar dhe pajtoheni të detyroheni nga këto Kushte të Përdorimit."
       }
     ]
   },
@@ -405,7 +411,7 @@
     "sections": [
       {
         "title": "1. Hyrje",
-        "body": "1.1 Kush jemi ne\n\nKjo Politikë Privatësie përshkruan se si [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë së Veriut me numër regjistrimi [REGISTRATION_NUMBER] dhe me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“), mbledh, përdor, ruan dhe mbron të dhënat tuaja personale kur përdorni aplikacionet tona celulare (iOS dhe Android) dhe uebsajtin tonë publik (së bashku, „Platforma“).\n\nNe e operojmë Chisto.mk si një nismë qytetare mjedisore e fokusuar në transparencë dhe raportim komunitar për gjendjen vendore të mjedisit.\n\nShumica e veçorive të llogarisë, raportimit dhe ndërveprimit me hartën funksionojnë në aplikacione. Uebsajti është kryesisht marketing, informacion ligjor dhe kontakt; mund të përdorë pak cookies ose ruajtje lokale siç përshkruhet në Politikën tonë të cookies.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.2 Angazhimi ynë\n\nJemi të angazhuar për të mbrojtur privatësinë tuaj dhe për t'u përmbajtur ligjeve të zbatueshme për mbrojtjen e të dhënave, duke përfshirë:\n\nLigjin për Mbrojtjen e të Dhënave Personale të Republikës së Maqedonisë së Veriut (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679, Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave („GDPR“)\nLigji për Komunikimet Elektronike (Gazeta Zyrtare Nr. 39/2014)\n\n1.3 Informacioni i kontaktit\n\nKontrolluesi i të dhënave:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nTelefon: [CONTACT_PHONE]\nZyrtari për Mbrojtjen e të Dhënave (nëse aplikohet):\nEmail: [DPO_EMAIL]\nAutoriteti mbikëqyrës:\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+        "body": "1.1 Kush jemi ne\n\nKjo Politikë Privatësie përshkruan se si [LEGAL_ENTITY_NAME], një [ENTITY_TYPE] e regjistruar në Republikën e Maqedonisë me numër regjistrimi [REGISTRATION_NUMBER] dhe me seli në [REGISTERED_ADDRESS] („Chisto.mk“, „ne“, „na“ ose „tonë“), mbledh, përdor, ruan dhe mbron të dhënat tuaja personale kur përdorni aplikacionet tona celulare (iOS dhe Android) dhe uebsajtin tonë publik (së bashku, „Platforma“).\n\nNe e operojmë Chisto.mk si një nismë qytetare mjedisore e fokusuar në transparencë dhe raportim komunitar për gjendjen vendore të mjedisit.\n\nShumica e veçorive të llogarisë, raportimit dhe ndërveprimit me hartën funksionojnë në aplikacione. Uebsajti është kryesisht marketing, informacion ligjor dhe kontakt; mund të përdorë pak cookies ose ruajtje lokale siç përshkruhet në Politikën tonë të cookies.\n\nData e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.2 Angazhimi ynë\n\nJemi të angazhuar për të mbrojtur privatësinë tuaj dhe për t'u përmbajtur ligjeve të zbatueshme për mbrojtjen e të dhënave, duke përfshirë:\n\nLigjin për Mbrojtjen e të Dhënave Personale të Republikës së Maqedonisë (Gazeta Zyrtare Nr. 42/2020)\nRregullorja (BE) 2016/679, Rregullorja e Përgjithshme për Mbrojtjen e të Dhënave („GDPR“)\nLigji për Komunikimet Elektronike (Gazeta Zyrtare Nr. 39/2014)\n\n1.3 Informacioni i kontaktit\n\nKontrolluesi i të dhënave:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nTelefon: [CONTACT_PHONE]\nZyrtari për Mbrojtjen e të Dhënave (nëse aplikohet):\nEmail: [DPO_EMAIL]\nAutoriteti mbikëqyrës:\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk"
       },
       {
         "title": "2. Fusha dhe zbatimi",
@@ -429,7 +435,7 @@
       },
       {
         "title": "7. Transferet ndërkombëtare të të dhënave",
-        "body": "7.1 Vendndodhjet e ruajtjes së të dhënave\n\nTë dhënat tuaja personale ruhen kryesisht në servera të vendosur në [SERVER_COUNTRY/REGION].\n\n7.2 Transferet jashtë BE/EEA\n\nNëse transferojmë të dhëna në vende jashtë Zonës Ekonomike Evropiane që nuk kanë një vendim adekuatësie nga Komisioni Evropian, sigurohemi mbrojtje të përshtatshme:\n\nKlauzolat standarde kontraktore të BE-së (SCCs)\nRregullat korporative detyruese (ku aplikohet)\nCertifikimi i marrësit sipas kornizave të miratuara\nPëlqimi juaj eksplicit për transfere specifike\n\n7.3 Konteksti maqedonas\n\nSi vend kandidat për anëtarësim në BE, Republika e Maqedonisë së Veriut e harmonon kornizën e saj të mbrojtjes së të dhënave me standardet e BE-së. Ne e trajtojmë mbrojtjen e të dhënave me të njëjtën rreptësi si shtetet anëtare të BE-së."
+        "body": "7.1 Vendndodhjet e ruajtjes së të dhënave\n\nTë dhënat tuaja personale ruhen kryesisht në servera të vendosur në [SERVER_COUNTRY/REGION].\n\n7.2 Transferet jashtë BE/EEA\n\nNëse transferojmë të dhëna në vende jashtë Zonës Ekonomike Evropiane që nuk kanë një vendim adekuatësie nga Komisioni Evropian, sigurohemi mbrojtje të përshtatshme:\n\nKlauzolat standarde kontraktore të BE-së (SCCs)\nRregullat korporative detyruese (ku aplikohet)\nCertifikimi i marrësit sipas kornizave të miratuara\nPëlqimi juaj eksplicit për transfere specifike\n\n7.3 Konteksti maqedonas\n\nSi vend kandidat për anëtarësim në BE, Republika e Maqedonisë e harmonon kornizën e saj të mbrojtjes së të dhënave me standardet e BE-së. Ne e trajtojmë mbrojtjen e të dhënave me të njëjtën rreptësi si shtetet anëtare të BE-së."
       },
       {
         "title": "8. Ruajtja e të dhënave",
@@ -437,7 +443,7 @@
       },
       {
         "title": "9. Të drejtat tuaja sipas GDPR",
-        "body": "Sipas GDPR dhe ligjit maqedonas për mbrojtjen e të dhënave, keni të drejtat e mëposhtme:\n\n9.1 E drejta e aksesit (Neni 15)\n\nKeni të drejtë të merrni:\n\nKonfirmim nëse përpunojmë të dhënat tuaja personale\nNjë kopje të të dhënave tuaja personale\nInformacion mbi qëllimet e përpunimit, kategoritë, marrësit dhe periudhat e ruajtjes\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me subjekt „Kërkesë për akses në të dhëna“\nKoha e përgjigjes: Brenda 30 ditësh (mund të zgjatet deri në 60 ditë për kërkesa komplekse)\nKostoja: Falas për kërkesën e parë; tarifë e arsyeshme për kërkesa të tepërta\n\n9.2 E drejta e rektifikimit (Neni 16)\n\nKeni të drejtë të korrigjoni të dhëna personale të pasakta ose të paplota.\n\nSi ta ushtroni:\n\nPërditësoni drejtpërdrejt përmes cilësimeve të llogarisë në aplikacionet ku ofrohen\nEmail në [PRIVACY_EMAIL] me informacion të saktë\nKoha e përgjigjes: Pa vonesë të pajustifikueshme, maksimum 30 ditë\n\n9.3 E drejta e fshirjes / „E drejta për t'u harruar“ (Neni 17)\n\nKeni të drejtë të kërkoni fshirjen e të dhënave tuaja personale kur:\n\nTë dhënat nuk janë më të nevojshme për qëllimet origjinale\nE tërhiqni pëlqimin (ku pëlqimi ishte baza ligjore)\nI kundërshtoni përpunimit dhe nuk ka baza legjitime tejkaluese\nTë dhënat u përpunuan në mënyrë të paligjshme\nDetyrimi ligjor kërkon fshirje\n\nPërjashtimet: Mund të refuzojmë fshirjen kur kërkohet për:\n\nPajtueshmëri ligjore (p.sh., regjistrimet tatimore)\nMbrojtja e pretendimeve ligjore\nInteresi publik ose kërkimi shkencor\n\nSi ta ushtroni: Cilësimet e llogarisë > Fshij llogarinë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nKoha e përgjigjes: 30 ditë; të dhënat pastrohen brenda 90 ditësh duke përfshirë kopjet rezervë\n\n9.4 E drejta për kufizimin e përpunimit (Neni 18)\n\nKeni të drejtë të kufizoni përpunimin kur:\n\nKontestoni saktësinë e të dhënave (gjatë verifikimit)\nPërpunimi është i paligjshëm por i kundërshtoheni fshirjes\nNuk na nevojiten më të dhëna, por ju nevojiten për pretendime ligjore\nI kundërshtuat përpunimit (në pritje të verifikimit të bazave legjitime)\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kërkesë specifike kufizimi\nEfekti: Të dhënat shënohen dhe ruhen, por nuk përpunohen aktivisht\n\n9.5 E drejta e portabilitetit të të dhënave (Neni 20)\n\nKeni të drejtë të merrni të dhënat tuaja personale në një format të strukturuar, të përdorur zakonisht, të lexueshëm nga makina dhe t'i transmetoni te një kontrollues tjetër.\n\nAplikohet për:\n\nTë dhënat e ofruara nga ju\nPërpunimi bazuar në pëlqim ose kontratë\nPërpunimi i kryer me mjete të automatizuara\n\nSi ta ushtroni: Cilësimet e llogarisë > Eksporto të dhëna në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nFormati: JSON, CSV ose PDF\nKoha e përgjigjes: 30 ditë\n\n9.6 E drejta për t'u kundërshtuar (Neni 21)\n\n9.6.1 Marketingu\n\nKeni të drejtën absolute për t'u kundërshtuar marketingut të drejtpërdrejtë.\n\nSi ta ushtroni: Klikoni „Çregjistrohu“ në email, ose përditësoni preferencat në cilësimet e llogarisë në aplikacionet ku ofrohen\n\n9.6.2 Përpunimi i interesit legjitim\n\nKeni të drejtë për t'u kundërshtuar përpunimit bazuar në interesa legjitime.\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kundërshtim specifik\nEfekti: Do të ndalojmë përpunimin përveç nëse tregojmë baza legjitime bindëse\n\n9.6.3 Profilimi dhe vendimmarrja e automatizuar (Neni 22)\n\nAktualisht nuk angazhohemi në vendimmarrje të automatizuar me efekte ligjore ose të rëndësishme. Nëse kjo ndryshon, do të keni të drejtë:\n\nTë merrni ndërhyrje njerëzore\nTë shprehni pikëpamjen tuaj\nTë kontestoni vendimin\n\n9.7 E drejta për të tërhequr pëlqimin\n\nKu përpunimi bazohet në pëlqim, mund ta tërhiqni në çdo kohë pa prekur përpunimin e ligjshëm të mëparshëm.\n\nSi ta ushtroni: Cilësimet e llogarisë > Preferencat e privatësisë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\n\n9.8 E drejta për të paraqitur ankesë\n\nKeni të drejtë të paraqisni ankesë te autoriteti mbikëqyrës:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë së Veriut\nAdresa: [SUPERVISORY_AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\nTelefon: [SUPERVISORY_AUTHORITY_PHONE]\n\nPër banorët e BE-së: Gjithashtu mund të paraqisni ankesë te autoriteti mbikëqyrës në shtetin tuaj anëtar të BE-së të rezidencës."
+        "body": "Sipas GDPR dhe ligjit maqedonas për mbrojtjen e të dhënave, keni të drejtat e mëposhtme:\n\n9.1 E drejta e aksesit (Neni 15)\n\nKeni të drejtë të merrni:\n\nKonfirmim nëse përpunojmë të dhënat tuaja personale\nNjë kopje të të dhënave tuaja personale\nInformacion mbi qëllimet e përpunimit, kategoritë, marrësit dhe periudhat e ruajtjes\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me subjekt „Kërkesë për akses në të dhëna“\nKoha e përgjigjes: Brenda 30 ditësh (mund të zgjatet deri në 60 ditë për kërkesa komplekse)\nKostoja: Falas për kërkesën e parë; tarifë e arsyeshme për kërkesa të tepërta\n\n9.2 E drejta e rektifikimit (Neni 16)\n\nKeni të drejtë të korrigjoni të dhëna personale të pasakta ose të paplota.\n\nSi ta ushtroni:\n\nPërditësoni drejtpërdrejt përmes cilësimeve të llogarisë në aplikacionet ku ofrohen\nEmail në [PRIVACY_EMAIL] me informacion të saktë\nKoha e përgjigjes: Pa vonesë të pajustifikueshme, maksimum 30 ditë\n\n9.3 E drejta e fshirjes / „E drejta për t'u harruar“ (Neni 17)\n\nKeni të drejtë të kërkoni fshirjen e të dhënave tuaja personale kur:\n\nTë dhënat nuk janë më të nevojshme për qëllimet origjinale\nE tërhiqni pëlqimin (ku pëlqimi ishte baza ligjore)\nI kundërshtoni përpunimit dhe nuk ka baza legjitime tejkaluese\nTë dhënat u përpunuan në mënyrë të paligjshme\nDetyrimi ligjor kërkon fshirje\n\nPërjashtimet: Mund të refuzojmë fshirjen kur kërkohet për:\n\nPajtueshmëri ligjore (p.sh., regjistrimet tatimore)\nMbrojtja e pretendimeve ligjore\nInteresi publik ose kërkimi shkencor\n\nSi ta ushtroni: Cilësimet e llogarisë > Fshij llogarinë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nKoha e përgjigjes: 30 ditë; të dhënat pastrohen brenda 90 ditësh duke përfshirë kopjet rezervë\n\n9.4 E drejta për kufizimin e përpunimit (Neni 18)\n\nKeni të drejtë të kufizoni përpunimin kur:\n\nKontestoni saktësinë e të dhënave (gjatë verifikimit)\nPërpunimi është i paligjshëm por i kundërshtoheni fshirjes\nNuk na nevojiten më të dhëna, por ju nevojiten për pretendime ligjore\nI kundërshtuat përpunimit (në pritje të verifikimit të bazave legjitime)\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kërkesë specifike kufizimi\nEfekti: Të dhënat shënohen dhe ruhen, por nuk përpunohen aktivisht\n\n9.5 E drejta e portabilitetit të të dhënave (Neni 20)\n\nKeni të drejtë të merrni të dhënat tuaja personale në një format të strukturuar, të përdorur zakonisht, të lexueshëm nga makina dhe t'i transmetoni te një kontrollues tjetër.\n\nAplikohet për:\n\nTë dhënat e ofruara nga ju\nPërpunimi bazuar në pëlqim ose kontratë\nPërpunimi i kryer me mjete të automatizuara\n\nSi ta ushtroni: Cilësimet e llogarisë > Eksporto të dhëna në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\nFormati: JSON, CSV ose PDF\nKoha e përgjigjes: 30 ditë\n\n9.6 E drejta për t'u kundërshtuar (Neni 21)\n\n9.6.1 Marketingu\n\nKeni të drejtën absolute për t'u kundërshtuar marketingut të drejtpërdrejtë.\n\nSi ta ushtroni: Klikoni „Çregjistrohu“ në email, ose përditësoni preferencat në cilësimet e llogarisë në aplikacionet ku ofrohen\n\n9.6.2 Përpunimi i interesit legjitim\n\nKeni të drejtë për t'u kundërshtuar përpunimit bazuar në interesa legjitime.\n\nSi ta ushtroni: Email në [PRIVACY_EMAIL] me kundërshtim specifik\nEfekti: Do të ndalojmë përpunimin përveç nëse tregojmë baza legjitime bindëse\n\n9.6.3 Profilimi dhe vendimmarrja e automatizuar (Neni 22)\n\nAktualisht nuk angazhohemi në vendimmarrje të automatizuar me efekte ligjore ose të rëndësishme. Nëse kjo ndryshon, do të keni të drejtë:\n\nTë merrni ndërhyrje njerëzore\nTë shprehni pikëpamjen tuaj\nTë kontestoni vendimin\n\n9.7 E drejta për të tërhequr pëlqimin\n\nKu përpunimi bazohet në pëlqim, mund ta tërhiqni në çdo kohë pa prekur përpunimin e ligjshëm të mëparshëm.\n\nSi ta ushtroni: Cilësimet e llogarisë > Preferencat e privatësisë në aplikacionet ku ofrohen, ose email në [PRIVACY_EMAIL]\n\n9.8 E drejta për të paraqitur ankesë\n\nKeni të drejtë të paraqisni ankesë te autoriteti mbikëqyrës:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nRepublika e Maqedonisë\nAdresa: [SUPERVISORY_AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\nTelefon: [SUPERVISORY_AUTHORITY_PHONE]\n\nPër banorët e BE-së: Gjithashtu mund të paraqisni ankesë te autoriteti mbikëqyrës në shtetin tuaj anëtar të BE-së të rezidencës."
       },
       {
         "title": "10. Siguria e të dhënave",
@@ -461,7 +467,7 @@
       },
       {
         "title": "15. Dispozita specifike për përdoruesit maqedonas",
-        "body": "15.1 Gjuha\n\nKjo Politikë Privatësie ofrohet në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Republikën e Maqedonisë së Veriut.\n\n15.2 Autoriteti mbikëqyrës\n\nAutoriteti kompetent mbikëqyrës për çështjet e mbrojtjes së të dhënave në Maqedoninë e Veriut është:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nAdresa: [AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Baza ligjore\n\nPërpunimi i të dhënave personale kryhet në përputhje me:\n\nLigjin për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nParimet e GDPR të BE-së siç adoptohen në legjislacionin maqedonas"
+        "body": "15.1 Gjuha\n\nKjo Politikë Privatësie ofrohet në maqedonisht, anglisht dhe shqip. Në rast konflikti, versioni maqedonas ka përparësi për përdoruesit në Republikën e Maqedonisë.\n\n15.2 Autoriteti mbikëqyrës\n\nAutoriteti kompetent mbikëqyrës për çështjet e mbrojtjes së të dhënave në Maqedoni është:\n\nAgjencia për Mbrojtjen e të Dhënave Personale\nAdresa: [AUTHORITY_ADDRESS]\nFaqja e internetit: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Baza ligjore\n\nPërpunimi i të dhënave personale kryhet në përputhje me:\n\nLigjin për Mbrojtjen e të Dhënave Personale (Gazeta Zyrtare Nr. 42/2020)\nParimet e GDPR të BE-së siç adoptohen në legjislacionin maqedonas"
       },
       {
         "title": "16. Kontakt",
@@ -488,7 +494,7 @@
     "sections": [
       {
         "title": "1. Hyrje",
-        "body": "Data e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.1 Rreth kësaj politike\n\nKjo Politikë Cookies shpjegon se si [LEGAL_ENTITY_NAME] („Chisto.mk“, „ne“, „na“ ose „tonë“) përdor cookies dhe ruajtje të ngjashme në uebsajtin marketing të Chisto.mk. Aplikacionet celulare ndjekin Politikën e privatësisë për ruajtje në pajisje, token push dhe cache harte.\n\nLexojeni këtë Politikë së bashku me:\n\n• Politikën e privatësisë: [PRIVACY_POLICY_URL]\n• Kushtet e përdorimit: [TERMS_URL]\n\n1.2 Kuadri ligjor\n\nPërputhemi me kornizën ePrivacy siç është transponuar në Maqedoninë e Veriut, GDPR ku zbatohet, Ligjin për mbrojtjen e të dhënave personale (Gazeta Zyrtare Nr. 42/2020) dhe Ligjin për komunikimet elektronike (Gazeta Zyrtare Nr. 39/2014).\n\n1.3 Pëlqimi në uebsajt\n\nRuajtja striktisht e nevojshme funksionon pa pëlqim. Vercel Web Analytics opsionale ngarkohet vetëm nëse pranoni analitikë në banderolën tonë. Mund të rihapni zgjedhjet përmes Cilësime cookies në fund të faqes ([COOKIE_PREFERENCES_URL])."
+        "body": "Data e hyrjes në fuqi: [EFFECTIVE_DATE].\n\n1.1 Rreth kësaj politike\n\nKjo Politikë Cookies shpjegon se si [LEGAL_ENTITY_NAME] („Chisto.mk“, „ne“, „na“ ose „tonë“) përdor cookies dhe ruajtje të ngjashme në uebsajtin marketing të Chisto.mk. Aplikacionet celulare ndjekin Politikën e privatësisë për ruajtje në pajisje, token push dhe cache harte.\n\nLexojeni këtë Politikë së bashku me:\n\n• Politikën e privatësisë: [PRIVACY_POLICY_URL]\n• Kushtet e përdorimit: [TERMS_URL]\n\n1.2 Kuadri ligjor\n\nPërputhemi me kornizën ePrivacy siç është transponuar në Maqedoni, GDPR ku zbatohet, Ligjin për mbrojtjen e të dhënave personale (Gazeta Zyrtare Nr. 42/2020) dhe Ligjin për komunikimet elektronike (Gazeta Zyrtare Nr. 39/2014).\n\n1.3 Pëlqimi në uebsajt\n\nRuajtja striktisht e nevojshme funksionon pa pëlqim. Vercel Web Analytics opsionale ngarkohet vetëm nëse pranoni analitikë në banderolën tonë. Mund të rihapni zgjedhjet përmes Cilësime cookies në fund të faqes ([COOKIE_PREFERENCES_URL])."
       },
       {
         "title": "2. Çfarë janë cookies?",
@@ -524,7 +530,7 @@
       },
       {
         "title": "10. Të drejtat tuaja",
-        "body": "Sipas GDPR dhe ligjit vendor të zbatueshëm, keni të drejta për të dhënat e mbledhura përmes cookies, përfshirë:\n\n• E drejta e aksesit: informacion mbi të dhënat e lidhura me cookies që mbajmë\n• E drejta e fshirjes: fshirje e të dhënave cookies ku zbatohet\n• E drejta për t'u kundërshtuar: kundërshtim i përpunimit bazuar në interesa legjitime ku lejon ligji\n• E drejta për të tërhequr pëlqimin: në çdo kohë për cookies jo të nevojshme\n• E drejta për ankesë: te një autoritet mbikëqyrës\n\nSi t'i ushtroni:\n\n• Email: [PRIVACY_EMAIL]\n• Cilësimet e cookies: [COOKIE_PREFERENCES_URL]\n\nAutoriteti mbikëqyrës (Maqedonia e Veriut):\n\nAgjencia për Mbrojtjen e të Dhënave Personale. Faqja: https://www.dzlp.mk. Email: info@dzlp.mk"
+        "body": "Sipas GDPR dhe ligjit vendor të zbatueshëm, keni të drejta për të dhënat e mbledhura përmes cookies, përfshirë:\n\n• E drejta e aksesit: informacion mbi të dhënat e lidhura me cookies që mbajmë\n• E drejta e fshirjes: fshirje e të dhënave cookies ku zbatohet\n• E drejta për t'u kundërshtuar: kundërshtim i përpunimit bazuar në interesa legjitime ku lejon ligji\n• E drejta për të tërhequr pëlqimin: në çdo kohë për cookies jo të nevojshme\n• E drejta për ankesë: te një autoritet mbikëqyrës\n\nSi t'i ushtroni:\n\n• Email: [PRIVACY_EMAIL]\n• Cilësimet e cookies: [COOKIE_PREFERENCES_URL]\n\nAutoriteti mbikëqyrës (Maqedonia):\n\nAgjencia për Mbrojtjen e të Dhënave Personale. Faqja: https://www.dzlp.mk. Email: info@dzlp.mk"
       },
       {
         "title": "11. Privatësia e fëmijëve",
@@ -615,6 +621,1200 @@
       }
     ],
     "linkCookies": "Politika e cookies"
+  },
+  "helpCentre": {
+    "common": {
+      "breadcrumbHome": "Ballina",
+      "breadcrumbHelp": "Ndihmë",
+      "readTimeFormatted": "{minutes, plural, one {# min lexim} other {# min lexim}}",
+      "lastUpdatedPrefix": "Përditësuar",
+      "lastReviewedPrefix": "Rishikuar",
+      "relatedTitle": "Artikuj të lidhur",
+      "tocLabel": "Në këtë faqe",
+      "tocMobileTrigger": "Përmbajtja",
+      "calloutTip": "Këshillë",
+      "calloutNote": "Shënim",
+      "feedbackPrompt": "A ju ndihmoi ky artikull?",
+      "feedbackYes": "Po",
+      "feedbackNo": "Jo",
+      "feedbackThanks": "Faleminderit. Komenti juaj na ndihmon të përmirësojmë këto udhëzues.",
+      "feedbackNoFollowupTitle": "Na ndihmoni të përmirësojmë këtë faqe",
+      "feedbackNoFollowupHint": "Opsionale: një rresht për atë që mungonte ose ishte i paqartë. Këtu nuk mbledhim të dhëna personale.",
+      "feedbackReasonLabel": "Komente opsionale",
+      "feedbackReasonPlaceholder": "Për shembull: hapat nuk përputhen me atë që shoh në aplikacion.",
+      "feedbackContactIntro": "Preferoni një përgjigje nga ekipi?",
+      "feedbackContactLink": "Na shkruani",
+      "feedbackSubmit": "Dërgo komentin",
+      "feedbackSkipDetails": "Anashkalo",
+      "copySectionLinkAria": "Kopjo lidhjen te seksioni",
+      "sectionLinkCopied": "Lidhja u kopjua",
+      "publisherName": "Chisto.mk"
+    },
+    "hub": {
+      "title": "Qendra e ndihmës",
+      "subtitle": "Udhëzime praktike për përdorimin e Chisto.mk në sajt dhe në aplikacion: harta dhe vendet, raportimi, aksionet e pastrimit, siguria, përdorimi oflajn, llogaria juaj dhe çfarë të bëni kur diçka nuk funksionon.",
+      "searchPlaceholder": "Kërko në udhëzues",
+      "searchLabel": "Kërko në ndihmë",
+      "clearSearch": "Pastro",
+      "suggestedIntro": "Lexime të sugjeruara",
+      "empty": "Asnjë udhëzues nuk përputhet me këtë kërkim. Provoni fjalë më të shkurtra ose kaloni te një kategori më poshtë.",
+      "searchTipsTitle": "Si të kërkoni më mirë",
+      "searchTips": [
+        "Përdorni fjalë të përditshme: raport, vend, hartë, pastrim, llogari, fjalëkalim, njoftim.",
+        "Nëse asgjë nuk përputhet, shfletoni kartat sipas temës.",
+        "Artikujt e gjatë kanë përmbajtje në krye të faqes."
+      ],
+      "searchResultsLabel": "Rezultatet e kërkimit",
+      "searchAnnounceEmpty": "Asnjë udhëzues nuk përputhet me kërkimin tuaj.",
+      "searchAnnounceResults": "{count, plural, one {# udhëzues përputhet me kërkimin tuaj.} other {# udhëzues përputhen me kërkimin tuaj.}}",
+      "jumpToCategoryNav": "Kalo te një kategori",
+      "jumpToCategoryLead": "Shfletoni sipas temës",
+      "featuredTitle": "Filloni këtu",
+      "featuredIntro": "I ri në Chisto.mk? Hapni fillimisht një nga këta artikuj, pastaj eksploroni me ritmin tuaj.",
+      "catalogMetrics": "{count, plural, one {# udhëzues · të njëjtat terma si në aplikacion} other {# udhëzues · të njëjtat terma si në aplikacion}}",
+      "featuredSlugs": [
+        "getting-started",
+        "exploring-the-map",
+        "report-a-site"
+      ]
+    },
+    "categories": {
+      "basics": {
+        "label": "Hapat e parë"
+      },
+      "reporting": {
+        "label": "Raportimi"
+      },
+      "events": {
+        "label": "Aksione pastrimi"
+      },
+      "map": {
+        "label": "Harta dhe vendet"
+      }
+    },
+    "articles": {
+      "getting-started": {
+        "cardTitle": "Konfiguroni Chisto.mk",
+        "cardSummary": "Instaloni aplikacionin, krijoni llogarinë, zgjidhni gjuhën dhe mësoni ku janë njoftimet dhe cilësimet e privatësisë.",
+        "title": "Konfiguroni Chisto.mk",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "datePublished": "2024-01-01T00:00:00.000Z",
+        "dateModified": "2026-04-16T00:00:00.000Z",
+        "sections": [
+          {
+            "id": "download-the-app",
+            "title": "Shkarkoni aplikacionin",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk funksionon në iOS dhe Android. Instaloni nga App Store ose Google Play, ose prekni butonat e shkarkimit në faqen kryesore të chisto.mk."
+              },
+              {
+                "type": "bullets",
+                "title": "Para instalimit",
+                "items": [
+                  "Kërkoni «Chisto.mk» dhe verifikoni që botuesi përputhet me listimin zyrtar.",
+                  "Përdorni Wi-Fi nëse keni plan të kufizuar; hapja e parë mund të shkarkojë të dhëna harte.",
+                  "Mbajeni sistemin operativ të përditësuar që kamera, hartat dhe arnimet e sigurisë të mbeten aktuale."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse faqja e dyqanit nuk hapet në rajonin tuaj, hapni chisto.mk në shfletues desktopi dhe përdorni lidhjet zyrtare drejt dyqaneve."
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Në këta udhëzues, fjalët raport, vend dhe aksion pastrimi kanë të njëjtin kuptim si në aplikacion, që të dini gjithmonë cilin ekran po përmendim."
+              }
+            ]
+          },
+          {
+            "id": "create-your-account",
+            "title": "Krijoni llogarinë",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hapni aplikacionin dhe përfundoni regjistrimin. Ju duhet një numër telefoni që e verifikoni me SMS (ose kod njëpërdorimësh të ngjashëm), një email që e lexoni rregullisht, emri juaj dhe një fjalëkalim që plotëson rregullat e aplikacionit. Po ato pritshmëri janë të shpjeguara edhe te Kushtet e përdorimit."
+              },
+              {
+                "type": "bullets",
+                "title": "Çfarë të përgatisni",
+                "items": [
+                  "Numër telefoni ku arrini kodin e verifikimit.",
+                  "Email që e kontrolloni shpesh për njoftime llogarie.",
+                  "Fjalëkalim të fortë që nuk e përsërisni në shërbime të tjera."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Mbajeni orën e pajisjes të saktë. Devijime të mëdha ndonjëherë prishin hyrjen me kod."
+              }
+            ]
+          },
+          {
+            "id": "language-and-region",
+            "title": "Gjuha dhe rajoni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Ku ofrohet nga aplikacioni, mund të ndryshoni gjuhën e ndërfaqes. Të dhënat e hartës fokusohen në Maqedoni, por çdo raport e vendosni sërish pikërisht aty ku i përket."
+              },
+              {
+                "type": "bullets",
+                "title": "Zakon i mirë",
+                "items": [
+                  "Ndryshoni gjuhën nga cilësimet nëse disa persona përdorin të njëjtin pajisje.",
+                  "Nëse një tekst duket i papërkthyer, përditësoni aplikacionin; përkthimet vijnë me versionet.",
+                  "Vendoseni kunjin në vendin real që keni parasysh, jo në një qendër të rastit të qytetit përveç nëse e gjithë zona është e prekur."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "notifications-and-privacy",
+            "title": "Njoftimet dhe privatësia",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Ju vendosni nëse aplikacioni lejohet të dërgojë njoftime push, përmes cilësimeve të pajisjes dhe atyre në aplikacion ku ofrohet. Politika e privatësisë shpjegon si përpunohen të dhënat personale kur raportoni probleme ose bashkoheni në ngjarje."
+              },
+              {
+                "type": "bullets",
+                "title": "Ku të shikoni",
+                "items": [
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "Në aplikacion mund të ketë çelësa për kategori specifike, si ngjarje ose status raporti."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Politika e privatësisë"
+              }
+            ]
+          }
+        ]
+      },
+      "report-a-site": {
+        "cardTitle": "Paraqisni një raport ndotjeje",
+        "cardSummary": "Bëni foto të dobishme, vendoseni kunjin saktë dhe ndiqni moderimin pasi ta dërgoni.",
+        "title": "Paraqisni një raport ndotjeje",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "sections": [
+          {
+            "id": "before-you-start",
+            "title": "Para se të filloni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Rezultatet më të mira i merrni në vend me foto të freskëta. Mos u ekspozoni: trafiku, skajet e paqëndrueshme dhe lëngjet e panjohura nuk vlejnë për një kadër më afër."
+              },
+              {
+                "type": "bullets",
+                "title": "Lista e sigurisë",
+                "items": [
+                  "Qëndroni larg trafikut, skajeve të paqëndrueshme dhe lëngjeve të panjohura ose metalit të mprehtë.",
+                  "Nëse drita e keqe e fotos ju detyron të afroheni te rreziku, ndryshoni kënd në vend të afrojes.",
+                  "Nëse foto janë të vjetra, shkruajeni në përshkrim që moderatorët të kenë kontekst."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Mos hyni në pronë private pa leje. Fotografoni nga një pikë publike kur është e mundur."
+              }
+            ]
+          },
+          {
+            "id": "photos-and-description",
+            "title": "Fotografitë dhe përshkrimi",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Shtoni deri në pesë foto. Filloni me kornizë të gjerë, pastaj afër problemit: grumbuj, tuba, njolla. Bashkoni me titull të shkurtër dhe përshkrim faktik."
+              },
+              {
+                "type": "bullets",
+                "title": "Çfarë kërkojnë moderatorët",
+                "items": [
+                  "Drita e diellit dhe dora e qëndrueshme e bëjnë verifikimin më të shpejtë.",
+                  "Jepni shkallë kur madhësia nuk është e qartë, me një objekt të zakonshëm ose person në distancë të sigurt.",
+                  "Për erë, ngjyrë ose rrjedhë uji vetëm si vëzhgim, jo pretendime mjekësore."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "location-on-the-map",
+            "title": "Vendndodhja në hartë",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Vendosni kunjin te vendi i saktë i ndotjes në Maqedoni. Zmadhoni derisa ndërtesa ose rruga përputhet me atë që shihni."
+              },
+              {
+                "type": "bullets",
+                "title": "Cilësia e kunjit",
+                "items": [
+                  "GPS ndihmon, por konfirmoni vizualisht sepse gabimet shtohen pranë ndërtesave të larta.",
+                  "Nëse ka adresë, përputheni me kunjin për ekipet në terren.",
+                  "Për një zonë të tërë, zmadhoni vetëm sa duhet për përshkrim të ndershëm."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "after-you-submit",
+            "title": "Pas dërgimit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Çdo raport shqyrtohet para se të bëhet publik. Ndiqni statusin te Raportet e mia ndërsa moderatorët punojnë radhën."
+              },
+              {
+                "type": "bullets",
+                "title": "Çfarë të presësh",
+                "items": [
+                  "Kunjtë publikë ndihmojnë fqinjët dhe organizatorët të koordinohen, por nuk e detyrojnë bashkinë të veprojë brenda një afati fiks.",
+                  "Redaktimet mund të jenë të mundura ndërsa moderimi është i hapur; kontrolloni rreshtin e raportit në aplikacion.",
+                  "Për rrezik urgjent shëndetësor ose sigurie, përdorni edhe kanalet zyrtare emergjence ku duhet."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "join-a-cleanup-event": {
+        "cardTitle": "Bashkohuni në një aksion",
+        "cardSummary": "Shfletoni aksione pranë jush, konfirmoni pjesëmarrjen dhe ndiqni udhëzimet e organizatorit para, gjatë dhe pas turnit.",
+        "title": "Bashkohuni në një aksion pastrimi",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "sections": [
+          {
+            "id": "find-an-event",
+            "title": "Gjeni një ngjarje",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hapni zonën Ngjarje në aplikacion për të parë aksione pastrimi në Maqedoni, lexoni shënimet e organizatorit dhe bashkohuni kur regjistrimi është i hapur."
+              },
+              {
+                "type": "bullets",
+                "title": "Para se të udhëtoni",
+                "items": [
+                  "Konfirmoni pinin e takimit, orën lokale të fillimit dhe sa zgjat turni.",
+                  "Kontrolloni vështirësinë dhe terrenin që veshja dhe këpucët të përshtaten.",
+                  "Shihni nëse regjistrimi mbyllet herët ose kërkon të dhëna shtesë."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "join-and-reminders",
+            "title": "Regjistrimi dhe kujtuesit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Prekni Bashkohuni në një ngjarje të hapur për të rezervuar vend. Organizatori mund të postojë përditësime ose kujtues përmes njoftimeve."
+              },
+              {
+                "type": "bullets",
+                "title": "Mbajeni planin nën kontroll",
+                "items": [
+                  "Shtoni ngjarjen në kalendar pasi të jeni angazhuar.",
+                  "Ndizni njoftimet nëse organizatori poston ndryshime të fundit minutash.",
+                  "Anuloni RSVP në kohë nëse nuk mund të vini që numri të mbetet i saktë."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "during-the-cleanup",
+            "title": "Gjatë pastrimit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Ndiqni planin e sigurisë së organizatorit, respektoni pronën private dhe qëndroni brenda rregullave të aksesit publik."
+              },
+              {
+                "type": "bullets",
+                "title": "Në vend",
+                "items": [
+                  "Vishni doreza ose dukshmëri të lartë vetëm kur listimi e kërkon.",
+                  "Mbikëqyrni fëmijët nga afër dhe mbani telefonat larg punës së rëndë përveçse kur fotot janë të mirëpritura.",
+                  "Pyetni përpara se të fotografoni njerëz, automjete ose shtëpi."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "after-photos-and-feedback",
+            "title": "Foto pas dhe komente",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Pas ngjarjes shtoni foto pasuese nëse rrjedha në aplikacion e ofron atë dhe lini koment të shkurtër që vullnetarët e ardhshëm të dinë çfarë të presin."
+              },
+              {
+                "type": "bullets",
+                "title": "Mbyllje e mirë",
+                "items": [
+                  "Ngarkoni përmes rrjedhës së ngjarjes kur është e ekspozuar në aplikacion.",
+                  "Shmangni fytyrat ose tabelat e targave përveçse kur organizatori i lejon qartë.",
+                  "Falënderoni pritësit përmes kanalit në aplikacion kur ekziston."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "account-and-data": {
+        "cardTitle": "Llogaria dhe të dhënat tuaja",
+        "cardSummary": "Mbrojni hyrjen, kuptoni çfarë ruajmë dhe përdorni faqet e duhura për privatësi dhe kërkesa të dhënash.",
+        "title": "Llogaria, privatësia dhe kërkesat për të dhëna",
+        "lastUpdated": "16 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "sections": [
+          {
+            "id": "what-the-app-stores",
+            "title": "Çfarë ruan aplikacioni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Llogaria juaj në Chisto.mk lidh raportet që dërgoni, ngjarjet ku regjistroheni dhe preferencat e njoftimeve që puna qytetare në Maqedoni të mbetet e qartë."
+              },
+              {
+                "type": "bullets",
+                "title": "Çfarë mund të lidhet me ju",
+                "items": [
+                  "Identifikues për hyrje si email ose numër telefoni.",
+                  "Pina të përafërta në hartë dhe përshkrime nga raportet që parashtroni.",
+                  "Status RSVP, shënime pjesëmarrjeje dhe mesazhe organizatori për ngjarje."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "password-and-devices",
+            "title": "Fjalëkalimet dhe pajisjet",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Trajtoni llogarinë si një kutë postare për çështje qytetare. Kontrollet e forta të aksesit ju mbrojnin juve dhe të dhënat e hartës nga të cilët varen të tjerët."
+              },
+              {
+                "type": "bullets",
+                "title": "Higjienë e përditshme",
+                "items": [
+                  "Përdorni fjalëkalim unik ose menaxher fjalëkalimesh të sistemit operativ.",
+                  "Mbajeni aktiv kyçjen e ekranit në telefonat që dalin nga shtëpia.",
+                  "Dilni nga llogaria përpara se dikush tjetër të përdorë pajisjen tuaj."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "your-rights",
+            "title": "Qasje, korrigjim dhe fshirje",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mund të kërkoni çfarë mbajmë, të korrigjoni gabime, të eksportoni një kopje ose të kërkoni fshirje, me përjashtime ligjore si regjistrat e moderimit."
+              },
+              {
+                "type": "bullets",
+                "title": "Si të nisni një kërkesë",
+                "items": [
+                  "Përdorni cilësimet e llogarisë në aplikacion kur janë të disponueshme.",
+                  "Dërgoni email mbështetjes nëse mungon një kontroll ose rrjedha jep gabim.",
+                  "Pritni verifikim identiteti kur kërkesat janë të ndjeshme ose me rrezik të lartë."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Të dhënat dhe llogaria juaj"
+              }
+            ]
+          },
+          {
+            "id": "legal-links",
+            "title": "Politikat në këtë sajt",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Teksti ligjor zyrtar qëndron në faqe të dedikuara. Lexojini kur ju duhet siguri përtej këtyre udhëzuesve."
+              },
+              {
+                "type": "bullets",
+                "title": "Ku të shikoni",
+                "items": [
+                  "Privatësia shpjegon çfarë mbledhim dhe pse.",
+                  "Kushtet shpjegojnë përdorimin e lejuar të platformës.",
+                  "Faqja e të dhënave përmbledh mbajtjen dhe rrugët e të drejtave në një vend."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Të dhënat dhe llogaria juaj"
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Politika e privatësisë"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Kushtet e përdorimit"
+              }
+            ]
+          }
+        ]
+      },
+      "notifications-in-the-app": {
+        "cardTitle": "Njoftimet",
+        "cardSummary": "Zgjidhni cilat përditësime doni për raporte, aksione pastrimi dhe veprimtari të llogarisë.",
+        "title": "Njoftimet në aplikacion",
+        "lastUpdated": "16 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "sections": [
+          {
+            "id": "types-of-alerts",
+            "title": "Çfarë mund të merrni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk ju njofton kur ndodh diçka e rëndësishme: p.sh. ndryshim statusi të një raporti që ndiqni, përditësim të një ngjarjeje ku jeni regjistruar, ose diçka në llogari që kërkon vëmendjen tuaj."
+              },
+              {
+                "type": "bullets",
+                "title": "Kanalet e zakonshme",
+                "items": [
+                  "Njoftime push në telefon, nëse i lejoni.",
+                  "Mesazhe ose distinka në aplikacion ku i shfaq produkti.",
+                  "Email ose SMS për sigurinë e llogarisë ose gjëra ku keni pranuar qartë."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "system-settings",
+            "title": "Cilësimet e OS dhe të aplikacionit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Telefoni gjithmonë fiton. Nëse push është i fikur në nivel sistemi, Chisto.mk nuk e anashkalon dot atë. Përdorni njëkohësisht cilësimet e sistemit dhe ato brenda aplikacionit që njoftimet të përputhen me ritmin tuaj."
+              },
+              {
+                "type": "bullets",
+                "title": "Ku të shikoni",
+                "items": [
+                  "iOS: Settings → Notifications → Chisto.mk.",
+                  "Android: Settings → Apps → Chisto.mk → Notifications.",
+                  "Në Chisto.mk hapni cilësimet dhe kontrolloni çdo kategori që ju duhet ende, p.sh. ngjarje ose përditësime raportesh."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "respect-quiet-hours",
+            "title": "Qetësia dhe respekti",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Grupimi i njoftimeve mbron organizatorët nga zgjimet e vullnetarëve dhe banorët nga ndjesia se po ndiqen. Fikni atë që nuk ju duhet, veçanërisht natën."
+              },
+              {
+                "type": "bullets",
+                "title": "Zakon praktik",
+                "items": [
+                  "Përdorni Focus ose Mos shqetëso në iOS, dhe mënyra të ngjashme në Android, para gjumit.",
+                  "Ulni volumin e njoftimeve për biseda të gjata te ngjarjet nëse organizatori ofron përditësime më të qeta.",
+                  "Para ditëve të mëdha të pastrimit, ndizni përsëri njoftimet që të shihni ndryshimet e fundit."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "email-and-sms",
+            "title": "Email dhe SMS",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Disa mesazhe janë të nevojshëm për siguri, si rivendosja e fjalëkalimit ose kodi i hyrjes. Marketingu arrin vetëm kur keni pranuar qartë."
+              },
+              {
+                "type": "bullets",
+                "title": "Mbajeni kontrollin",
+                "items": [
+                  "Mbajeni email-in të arritshëm që të mund të rikuperoni qasjen nëse humbisni telefonin.",
+                  "Nëse SMS me kode nuk vjen më, kontrolloni filtrat, bllokimet te operatori dhe nëse roamingu është aktiv.",
+                  "Për përpunimin e të dhënave, lexoni Politikën e privatësisë më poshtë."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Politika e privatësisë"
+              }
+            ]
+          }
+        ]
+      },
+      "troubleshooting": {
+        "cardTitle": "Zgjidhja e problemeve",
+        "cardSummary": "Hapa për hyrje, vendndodhje, kamerë dhe kur të kërkoni ndihmë.",
+        "title": "Zgjidhja e problemeve të zakonshme",
+        "lastUpdated": "16 prill 2026",
+        "lastReviewed": "16 prill 2026",
+        "sections": [
+          {
+            "id": "cannot-sign-in",
+            "title": "Nuk mund të hyni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hyrja varet nga email i saktë, rrjet i qëndrueshëm dhe ora e telefonit që përputhet me realitetin. Nëse skadon kodi, kërkoni një të ri."
+              },
+              {
+                "type": "bullets",
+                "title": "Kontrolloni fillimisht",
+                "items": [
+                  "Shihni nëse jeni në Wi-Fi ose të dhëna celulare dhe nëse faqja e hyrjes hapet.",
+                  "Fikni VPN ose proxy që mund të bllokojnë mesazhet.",
+                  "Verifikoni orën automatike dhe zonën kohore; orë e gabuar shpesh prish kodet.",
+                  "Kontrolloni që email-i të jetë i saktë dhe nëse mesazhi ka përfunduar te spam ose promocione."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse përdorni llogari korpore, administratori mund të bllokojë postë nga jashtë. Provoni me një email personal."
+              }
+            ]
+          },
+          {
+            "id": "location-permission",
+            "title": "Harta ose GPS",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Harta mund të punojë edhe pa GPS të saktë, por për navigim te kunji dhe për raporte me vendndodhje ju duhet leja."
+              },
+              {
+                "type": "bullets",
+                "title": "Rregulloni lejen",
+                "items": [
+                  "iOS: Settings → Privacy & Security → Location Services → Chisto.mk.",
+                  "Android: Settings → Location → App permissions → Chisto.mk.",
+                  "Nëse keni zgjedhur «vetëm gjatë përdorimit», hapni përsëri aplikacionin para se të shtoni foto me vendndodhje."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse kunji «kërcet», fikni për një çast vendndodhjen e lartë të saktësisë dhe ndizeni përsëri për të rivendosur marrësin."
+              }
+            ]
+          },
+          {
+            "id": "photos-or-upload",
+            "title": "Kamera ose ngarkimi",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Kamera dhe galeria kanë nevojë për leje. Cilësia e rrjetit ndikon në shpejtësinë e ngarkimit."
+              },
+              {
+                "type": "bullets",
+                "title": "Ndryshime të zakonshme",
+                "items": [
+                  "Kontrolloni që Chisto.mk të ketë leje për kamerë dhe për foto.",
+                  "Ul numrin e skedarëve shumë të mëdhenj ose fikni Live Photo nëse ngarkimi ngec.",
+                  "Kaloni në Wi-Fi më të mirë ose prisni sinjal më të fortë para se të riprovoni."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse aplikacioni përplaset kur hapet kamera, rinisni telefonin dhe kontrolloni hapësirën e lirë."
+              }
+            ]
+          },
+          {
+            "id": "still-stuck",
+            "title": "Ende problem?",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Nëse provuat hapat më sipër dhe ende nuk punon, kërkoni ndihmë me detaje konkrete që ekipi të përgjigjet më shpejt."
+              },
+              {
+                "type": "bullets",
+                "title": "Përfshini në mesazh",
+                "items": [
+                  "Model telefoni dhe version i sistemit operativ.",
+                  "Version i Chisto.mk nga cilësimet ose dyqani.",
+                  "Përshkrim i shkurtër i hapave dhe mesazhi i gabimit, nëse shfaqet."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Kontakt"
+              }
+            ]
+          }
+        ]
+      },
+      "exploring-the-map": {
+        "cardTitle": "Lexoni hartën",
+        "cardSummary": "Çfarë do të thotë çdo kunj, si duket faqja e një vendi dhe çfarë është publikisht i dukshëm.",
+        "title": "Harta dhe faqet e vendeve",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "what-the-map-shows",
+            "title": "Çfarë tregon harta",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Harta është një pamje qytetare e vendeve të raportuara në Maqedoni. Çdo kunj përfaqëson një vend ku njerëzit dokumentuan një shqetësim mjedisor."
+              },
+              {
+                "type": "bullets",
+                "title": "Orientim i shpejtë",
+                "items": [
+                  "Zmadhoni derisa emrat e rrugëve dhe pikat e referencës përputhen me atë që shihni jashtë.",
+                  "Prekni një pin për të hapur faqen me foto, përshkrim dhe histori kur është e disponueshme.",
+                  "Pas moderimit aktiviteti mund të ndryshojë, ndaj numrat përditësohen me kohën."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "site-detail-basics",
+            "title": "Bazat e faqes së vendit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Faqja përmbledh atë që ka parashtruar komuniteti. Qëllimi është transparencë, jo fajësim i individëve."
+              },
+              {
+                "type": "bullets",
+                "title": "Mbi çfarë mund të mbështeteni",
+                "items": [
+                  "Fotot dhe teksti vijnë nga kontribues dhe moderatorë, jo nga zbatimi automatik.",
+                  "Vulat kohore ndihmojnë për freskinë kur shfaqen.",
+                  "Nëse diçka duket gabim, shpesh një raport i ri është më mirë se debate të gjata."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Mos i trajtoni pinat si provë ligjore vetë. Për vendime të rregulluara përdorni kanale zyrtare."
+              }
+            ]
+          },
+          {
+            "id": "moving-around-safely",
+            "title": "Lëvizje e sigurt",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Përdorni hartën në këmbë ose si pasagjer. Ruani vëmendjen për trafikun dhe kufijtë e pronës private."
+              },
+              {
+                "type": "bullets",
+                "title": "Zakonet e mira",
+                "items": [
+                  "Preferoni dritën e ditës për vizitat e para në skaje industriale të panjohura.",
+                  "Nëse rruga duket e pasigurt, hapni distancë dhe fotografoni nga larg.",
+                  "Respektoni sinjalet e ndalimit edhe kur mbeturinat duken përtej tyre."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "when-to-file-a-report",
+            "title": "Kur të parashtroni një raport",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hapni një raport kur keni prova të reja ose korrigjim të pin-it. Dublikatet pa fakte të reja e ngadalësojnë moderimin për të gjithë."
+              },
+              {
+                "type": "bullets",
+                "title": "Para se të filloni",
+                "items": [
+                  "Mblidhni foto dhe një përshkrim të qartë se çfarë ndryshoi që nga vizita e fundit.",
+                  "Zhvendosni pinin në pikën e saktë që kërkon vëmendje.",
+                  "Përmendni kufijtë e sigurisë që vëzhguat që organizatorët të planifikojnë."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Paraqisni një raport ndotjeje"
+              }
+            ]
+          }
+        ]
+      },
+      "trust-safety-and-moderation": {
+        "cardTitle": "Besim, siguri dhe moderim",
+        "cardSummary": "Si funksionon shqyrtimi, sjellja respektuese dhe ku janë politikat zyrtare.",
+        "title": "Besim, siguri dhe moderim",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "why-moderation-exists",
+            "title": "Pse ekziston moderimi",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Chisto.mk publikon sinjale qytetare mjedisore. Moderimi ul spam-in, mbron nga ngacmimi dhe e mban hartën të lexueshme për partnerë dhe vullnetarë në Maqedoni."
+              },
+              {
+                "type": "bullets",
+                "title": "Çfarë kërkojnë rishikuesit",
+                "items": [
+                  "Provë që përputhet me vendndodhjen dhe dritaren kohore që përshkruani.",
+                  "Gjuhë respektuese pa sulme personale.",
+                  "Dublikatet bashkohen në të njëjtin vend kur kjo e bën historinë më të qartë."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "respectful-contributions",
+            "title": "Kontribute respektuese",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Supozoni qëllim të mirë te fqinjët dhe organizatorët. Fokusohuni në kushte që mund t'i fotografoni ose përshkruani faktikisht."
+              },
+              {
+                "type": "bullets",
+                "title": "Normat e komunitetit",
+                "items": [
+                  "Pa doxxing: shmangni postimin e adresave private të njerëzve në vend të vendeve.",
+                  "Pa gjuhë urrejtjeje ose sulme të koordinuara.",
+                  "Mos ngarkoni përmbajtje që seksualizon fëmijët ose lavdëron vetëdëmtimin."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse tensioni rritet, pushoni dhe fiksoni vetëm fakte. Moderatorët vënë sigurinë para shpejtësisë."
+              }
+            ]
+          },
+          {
+            "id": "duplicates-and-corrections",
+            "title": "Dublikate dhe korrigjime",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Disa raporte për të njëjtin vend mund të tregojnë qëndresë, por kopje identike shtojnë zhurmë. Preferoni përditësime me kënd ose datë të re."
+              },
+              {
+                "type": "bullets",
+                "title": "Udhëzime praktike",
+                "items": [
+                  "Nëse pin-i është pak i gabuar, parashtroni korrigjim përmes rrjedhës së raportimit kur produkti lejon.",
+                  "Nëse kategoritë janë të gabuara, zgjidhni etiketën më të ndershme dhe shpjegoni në tekst.",
+                  "Pritni që etiketat e statusit të vonohen pak ndërsa njerëzit rishikojnë."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "legal-detail-and-escalation",
+            "title": "Detaje ligjore dhe eskalim",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Ky artikull përmbledh pritshmëritë e sjelljes. Rregullat zyrtare janë në faqet e lidhura më poshtë."
+              },
+              {
+                "type": "bullets",
+                "title": "Ku të lexoni më shumë",
+                "items": [
+                  "Privatësia shpjegon kategoritë e të dhënave dhe mbajtjen në nivel të lartë.",
+                  "Kushtet shpjegojnë përdorimin e lejuar dhe mekanizmat e zbatimit.",
+                  "Faqja e të dhënave liston kërkesat e të drejtave për mbajtësit e llogarive."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/privacy",
+                "label": "Politika e privatësisë"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Kushtet e përdorimit"
+              }
+            ]
+          }
+        ]
+      },
+      "hosting-a-cleanup-event": {
+        "cardTitle": "Organizoni një aksion pastrimi",
+        "cardSummary": "Planifikoni logjistikën, menaxhoni regjistrimet, mbani njerëzit të sigurt në ditën e ngjarjes dhe mbyllni ciklin më pas.",
+        "title": "Organizoni një aksion pastrimi",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "plan-before-you-publish",
+            "title": "Planifikoni para publikimit",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Organizatorët vendosin tonin. Logjistikë e qartë ul mungesat dhe i bën vullnetarët më të sigurt pranë rrugëve, ujit dhe ndryshimeve të motit në Maqedoni."
+              },
+              {
+                "type": "bullets",
+                "title": "Lista kontrolluese",
+                "items": [
+                  "Zgjidhni një pin takimi, kohëzgjatje, vështirësi dhe çfarë pajisjesh ofroni.",
+                  "Konfirmoni aksesin në tokë me pronarë ose bashki kur duhet.",
+                  "Publikoni pritshmëritë e kontaktit, për shembull nëse telefonat mbeten në heshtje."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "signups-and-messaging",
+            "title": "Regjistrime dhe mesazhe",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Përdorni njoftimet me mend. Përditësime të shkurtra janë më të mira se fije të gjata kur planet ndryshojnë."
+              },
+              {
+                "type": "bullets",
+                "title": "Këshilla operative",
+                "items": [
+                  "Mbyllni regjistrimin herët nëse kapaciteti është i kufizuar.",
+                  "Dërgoni një kujtues mbrëmjen para me parkim dhe tualet.",
+                  "Pas anulimeve rifreskoni numrat që materialet të përputhen me realitetin."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/join-a-cleanup-event",
+                "label": "Bashkohuni në një aksion pastrimi"
+              }
+            ]
+          },
+          {
+            "id": "day-of-safety",
+            "title": "Siguria në ditën e ngjarjes",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Informoni shkurt për rreziqet, çiftet e mbështetjes dhe çfarë të bëni nëse dikujt i përkeqësohet gjendja."
+              },
+              {
+                "type": "bullets",
+                "title": "Udhëheqje në vend",
+                "items": [
+                  "Mbajeni ndihmën e parë dhe ujin në dukje.",
+                  "Rrotulloni rolet e ngritjes së rëndë dhe vëzhgoni nxehtësinë.",
+                  "Fotografoni rezultatet vetëm kur vullnetarët bien dakord."
+                ]
+              },
+              {
+                "type": "callout",
+                "variant": "note",
+                "text": "Për emergjenca përdorni kanale zyrtare emergjence përveç shënimeve në aplikacion."
+              }
+            ]
+          },
+          {
+            "id": "after-the-event",
+            "title": "Pas ngjarjes",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mbyllni ciklin me falënderim, ngarkim fotografish nëse rrjedha e mbështet dhe komente të ndershme për ekipin tjetër."
+              },
+              {
+                "type": "bullets",
+                "title": "Përfundimi",
+                "items": [
+                  "Arkivoni vendimet e bisedave që hostët e ardhshëm të mësojnë nga dosja.",
+                  "Regjistroni çështjet që kërkin ndjekje bashkiake veç nga biseda vullnetare.",
+                  "Festoni shkurt fitimet që të rinjtë të shohin lëvizje përpara."
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "offline-and-slow-networks": {
+        "cardTitle": "Oflajn dhe rrjete të ngadalta",
+        "cardSummary": "Çfarë do të thotë në pritje, si provohen përsëri ngarkimet dhe kur të ndaloni raportimin.",
+        "title": "Oflajn dhe rrjete të ngadalta",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "how-the-app-uses-network",
+            "title": "Si aplikacioni përdor rrjetin",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hartat, fotot dhe parashtrimet sinkronizohen kur lidhja kthehet. Disa ekrane fshehin pllaka për shfletim të lehtë oflajn."
+              },
+              {
+                "type": "bullets",
+                "title": "Pritshmëritë",
+                "items": [
+                  "Veprimet e llogarisë zakonisht kërkojnë sesion të drejtpërdrejtë.",
+                  "Fushat e skicës mund të ruhen lokalisht derisa të parashtroni.",
+                  "Fotot e mëdha zgjasin më shumë në 3G; radhitja është më mirë se përpjekjet e detyruara në tunel."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "uploads-and-pending-states",
+            "title": "Ngarkime dhe gjendje në pritje",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Në pritje do të thotë pajisja ende po dërgon të dhëna ose serveri nuk ka konfirmuar marrjen. Një vonesë e shkurtër është normale pas kalimit nga Wi Fi në celular."
+              },
+              {
+                "type": "bullets",
+                "title": "Nëse jeni ngulur",
+                "items": [
+                  "Hapni përmbledhjen e raportit dhe kërkoni butona për riprovim ose vazhdim.",
+                  "Shmangni dublikimin e të njëjtit parashtrim ndërsa statusi po rrotullohet.",
+                  "Përdorni foto më të vogla nëse ngarkimet dështojnë vazhdimisht."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "airplane-mode-and-roaming",
+            "title": "Modaliteti avion dhe roamingu",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Roamingu ndërkombëtar mund të bllokojë ngarkimet në sfond. Aktivizoni qartë të dhënat për aplikacionin nëse OS lejon kontroll për aplikacion."
+              },
+              {
+                "type": "bullets",
+                "title": "Këshilla udhëtimi",
+                "items": [
+                  "Përfundoni ngarkimet para fluturimeve kur është e mundur.",
+                  "Rilidhuni me Wi Fi para redaktimit të gjatë të përshkrimeve.",
+                  "Nëse ndryshojnë zonat kohore, kontrolloni kujtuesit e ngjarjeve."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "when-to-stop-and-escalate",
+            "title": "Kur të ndaloni dhe të eskaloni",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Nëse aplikacioni bie dy herë gjatë ngarkimit, ndaloni dhe mblidhni diagnostikë si versioni i aplikacionit dhe OS para kontaktit me mbështetje."
+              },
+              {
+                "type": "bullets",
+                "title": "Eskalimi",
+                "items": [
+                  "Provoni një herë rinisjen e pajisjes.",
+                  "Rinstaloni vetëm pasi të keni rezervuar kredencialet.",
+                  "Përdorni faqen e kontaktit të sajtit për bllokime të qëndrueshme."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Kontakt"
+              }
+            ]
+          }
+        ]
+      },
+      "partnerships-for-organisations": {
+        "cardTitle": "Partneritete për organizata",
+        "cardSummary": "Si bashkitë, OJQ-të dhe mediat mund të punojnë me Chisto.mk me përgjegësi.",
+        "title": "Partneritete për bashki, OJQ dhe media",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "who-this-guide-is-for",
+            "title": "Për kë është ky udhëzues",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Artikulli është për organizata që duan të përdorin të dhëna publike të hartës, të koordinojnë pastrime ose të eksplorojnë bashkëpunim. Nuk është këshillë ligjore dhe nuk zëvendëson këshilltarin tuaj juridik ose rregullat e prokurimit."
+              },
+              {
+                "type": "bullets",
+                "title": "Lexues të zakonshëm",
+                "items": [
+                  "Zyra mjedisore në bashki që planifikojnë verifikim në terren.",
+                  "OJQ që përputhin hartën me kapacitetin vullnetar.",
+                  "Gazetarë që verifikojnë vendndodhjet para botimit."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "before-you-contact-us",
+            "title": "Para se të na shkruani",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Përgatitni një përmbledhje të shkurtër të qëllimit, gjeografisë dhe afatit. Nëse ju duhen eksporte të shumta ose të përsëritura, shpjegoni përfitimin publik dhe si do të mbrojnë të dhënat personale që mund të merrni."
+              },
+              {
+                "type": "bullets",
+                "title": "Bashkëngjitje të dobishme",
+                "items": [
+                  "Letër zyrtare ose email nga domeni i organizatës kur është e mundur.",
+                  "Një paragraf për përdorimin e të dhënave të hartës ose ngjarjeve.",
+                  "Gjuha e preferuar për përgjigje: maqedonisht, shqip ose anglisht."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/contact",
+                "label": "Hap formularin e kontaktit"
+              }
+            ]
+          },
+          {
+            "id": "policies-and-public-data",
+            "title": "Politikat dhe të dhënat publike",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Rregullat ligjore gjenden te Kushtet, Politika e privatësisë dhe faqja e të dhënave. Qendra e ndihmës shpjegon sjelljen e produktit për banorët; gjuhë juridike mbetet atje."
+              },
+              {
+                "type": "bullets",
+                "title": "Ku të lexoni më shumë",
+                "items": [
+                  "Faqja e të dhënave përmbledh çfarë publikon platforma.",
+                  "Politika e privatësisë para përpunimit të informacionit që mund të identifikojë persona.",
+                  "Udhëzoni ekipet në terren te qendra e ndihmës për të njëjtin fjalor me përdoruesit e aplikacionit."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/data",
+                "label": "Përmbledhje e të dhënave"
+              },
+              {
+                "type": "internalLink",
+                "href": "/terms",
+                "label": "Kushtet e përdorimit"
+              }
+            ]
+          }
+        ]
+      },
+      "verifying-sites-in-the-field": {
+        "cardTitle": "Verifikimi në terren",
+        "cardSummary": "Planifikoni vizitë të sigurt, krahasoni pinin me realitetin dhe kur një raport i ri është më i mirë se supozimi.",
+        "title": "Verifikimi i vendeve të ndotjes në terren",
+        "lastUpdated": "15 prill 2026",
+        "lastReviewed": "15 prill 2026",
+        "sections": [
+          {
+            "id": "plan-the-visit",
+            "title": "Planifikoni vizitën",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Hapni faqen e vendit në aplikacion ose në sajt, shënoni pinin, fotot dhe kohën, pastaj planifikoni hyrje ditore nga një pikë publike. Nëse punoni vetë, tregoni një kolegu ku shkoni."
+              },
+              {
+                "type": "bullets",
+                "title": "Lista e kontrollit",
+                "items": [
+                  "Mbushni telefonin dhe shkarkoni pllaka offline nëse lidhja është e dobët.",
+                  "Merrni një fletore për vëzhime që nuk fotografohen dot në mënyrë të sigurt.",
+                  "Mos hyni në tokë private pa leje."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/exploring-the-map",
+                "label": "Harta dhe faqet e vendeve"
+              }
+            ]
+          },
+          {
+            "id": "compare-pin-to-reality",
+            "title": "Krahasoni pinin me realitetin",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Qëndroni ku sugjeron harta dhe kërkoni të njëjtat tregues si në foto: bordurat, pemët, ndërtesat ose forma e bregut. Zhvendosje të vogla janë normale; mospërputhje të mëdha meritojnë një raport të ri të kujdesshëm, jo vetëm koment."
+              },
+              {
+                "type": "bullets",
+                "title": "Kur të raportoni përsëri",
+                "items": [
+                  "Rreziku është zhvenduar dukshëm që nga fotot e fundit.",
+                  "Kunji është në bllokun ose bregun e gabuar.",
+                  "Mund të dokumentoni një rrezik të rregulluar që nuk dukej më parë."
+                ]
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/report-a-site",
+                "label": "Paraqisni një raport ndotjeje"
+              }
+            ]
+          },
+          {
+            "id": "safety-and-respect",
+            "title": "Siguria dhe respekti",
+            "blocks": [
+              {
+                "type": "paragraph",
+                "text": "Mos hyni në grumbuj të paqëndrueshëm, ujë të shpejtë ose oborre industriale pa trajnim. Sillet me banorët dhe punonjësit me respekt; harta është hapësirë qytetare, jo vend për përballje."
+              },
+              {
+                "type": "callout",
+                "variant": "tip",
+                "text": "Nëse zbuloni rrezik të menjëhershëm për jetën, përdorni së pari kanalet zyrtare të emergjencës, pastaj dokumentoni për hartën kur është e sigurt."
+              },
+              {
+                "type": "internalLink",
+                "href": "/help/trust-safety-and-moderation",
+                "label": "Besimi, siguria dhe moderimi"
+              }
+            ]
+          }
+        ]
+      }
+    }
   },
   "notFound": {
     "title": "Faqja nuk u gjet",

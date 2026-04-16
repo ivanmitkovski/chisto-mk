@@ -53,6 +53,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Landing unit tests
+        run: pnpm --filter @chisto/landing test
+
+      - name: Help content lint
+        run: pnpm --filter @chisto/landing lint:help-content
+
       - name: Generate Prisma client
         run: pnpm --filter @chisto/api exec prisma generate
 
