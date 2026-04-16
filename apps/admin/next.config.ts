@@ -79,4 +79,6 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+/** Explicit type avoids TS4058: inferred default export type referencing pnpm-resolved `next` paths. */
+const nextConfigWithAnalyzer: NextConfig = withBundleAnalyzer(nextConfig);
+export default nextConfigWithAnalyzer;
