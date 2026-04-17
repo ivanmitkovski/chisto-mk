@@ -7,6 +7,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -187,9 +188,8 @@ class _OrganizerEventCompletionSheetBodyState
                 ),
                 child: Text(
                   l10n.eventsOrganizerCompletionAddPhotosNow,
-                  style: textTheme.titleMedium?.copyWith(
+                  style: AppTypography.eventsSecondaryCtaLabel(textTheme).copyWith(
                     color: AppColors.primaryDark,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
@@ -225,16 +225,13 @@ class _OrganizerEventCompletionSheetBodyState
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.eventsOrganizerThanksOrganizing,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTypography.eventsSheetTitle(textTheme),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               l10n.eventsOrganizerCompletionWhatNextIntro,
-              style: textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
+              style: AppTypography.eventsSupportingCaption(textTheme).copyWith(
                 height: 1.4,
               ),
               textAlign: TextAlign.center,
@@ -246,7 +243,7 @@ class _OrganizerEventCompletionSheetBodyState
             const SizedBox(height: AppSpacing.lg),
             Text(
               l10n.eventsOrganizerCompletionNextStepsHeading,
-              style: textTheme.labelSmall?.copyWith(
+              style: AppTypography.eventsMicroSectionHeading(textTheme).copyWith(
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.6,
                 color: AppColors.textSecondary,
@@ -298,10 +295,9 @@ class _MetricPill extends StatelessWidget {
         ),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
+          style: AppTypography.eventsGroupedRowPrimary(
+            Theme.of(context).textTheme,
+          ),
           textAlign: TextAlign.center,
         ),
       ),
@@ -345,17 +341,13 @@ class _NextStepRow extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     title,
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.eventsCalendarAgendaTitle(textTheme)
+                        .copyWith(fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     body,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                      height: 1.35,
-                    ),
+                    style: AppTypography.eventsSupportingCaption(textTheme),
                   ),
                 ],
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
 import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
@@ -19,11 +19,9 @@ class SectionHeader extends StatelessWidget {
         ),
         child: Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.2,
-              ),
+          style: AppTypography.eventsFeedSectionTitle(
+            Theme.of(context).textTheme,
+          ),
         ),
       ),
     );

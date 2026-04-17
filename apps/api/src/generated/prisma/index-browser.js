@@ -315,6 +315,7 @@ exports.Prisma.CleanupEventScalarFieldEnum = {
   category: 'category',
   scheduledAt: 'scheduledAt',
   endAt: 'endAt',
+  endSoonNotifiedForEndAt: 'endSoonNotifiedForEndAt',
   completedAt: 'completedAt',
   status: 'status',
   lifecycleStatus: 'lifecycleStatus',

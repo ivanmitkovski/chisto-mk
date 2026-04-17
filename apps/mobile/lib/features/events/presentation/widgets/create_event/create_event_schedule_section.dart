@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/time_range_picker.dart';
 
@@ -17,9 +19,14 @@ class CreateEventScheduleSection extends StatelessWidget {
     required this.endTime,
     required this.showValidationErrors,
     required this.isTimeRangeValid,
+    required this.scheduleIssue,
     required this.onDateSelected,
     required this.onStartChanged,
     required this.onEndChanged,
+    this.minimumStartPickerTime,
+    this.maximumStartPickerTime,
+    this.minimumEndPickerTime,
+    this.maximumEndPickerTime,
   });
 
   final Key sectionKey;
@@ -28,9 +35,14 @@ class CreateEventScheduleSection extends StatelessWidget {
   final EventTime endTime;
   final bool showValidationErrors;
   final bool isTimeRangeValid;
+  final ScheduleValidationIssue? scheduleIssue;
   final ValueChanged<DateTime> onDateSelected;
   final ValueChanged<EventTime> onStartChanged;
   final ValueChanged<EventTime> onEndChanged;
+  final DateTime? minimumStartPickerTime;
+  final DateTime? maximumStartPickerTime;
+  final DateTime? minimumEndPickerTime;
+  final DateTime? maximumEndPickerTime;
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +64,11 @@ class CreateEventScheduleSection extends StatelessWidget {
         TimeRangePicker(
           startTime: startTime.toTimeOfDay(),
           endTime: endTime.toTimeOfDay(),
-          hasError: showValidationErrors && !isTimeRangeValid,
+          hasError: showValidationErrors && (!isTimeRangeValid || scheduleIssue != null),
+          minimumStartPickerTime: minimumStartPickerTime,
+          maximumStartPickerTime: maximumStartPickerTime,
+          minimumEndPickerTime: minimumEndPickerTime,
+          maximumEndPickerTime: maximumEndPickerTime,
           onStartChanged: (TimeOfDay t) {
             onStartChanged(EventTimeUI.fromTimeOfDay(t));
           },
@@ -64,10 +80,38 @@ class CreateEventScheduleSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             context.l10n.createEventEndTimeError,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.accentDanger,
-                  fontWeight: FontWeight.w500,
-                ),
+            style: AppTypography.eventsCaptionStrong(
+              Theme.of(context).textTheme,
+              color: AppColors.accentDanger,
+            ).copyWith(fontWeight: FontWeight.w500),
+          ),
+        ],
+        if (showValidationErrors &&
+            isTimeRangeValid &&
+            scheduleIssue == ScheduleValidationIssue.startTooSoon) ...<Widget>[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            context.l10n.createEventScheduleStartInPast(
+              kEventScheduleMinLead.inMinutes,
+            ),
+            style: AppTypography.eventsCaptionStrong(
+              Theme.of(context).textTheme,
+              color: AppColors.accentDanger,
+            ).copyWith(fontWeight: FontWeight.w500),
+          ),
+        ],
+        if (showValidationErrors &&
+            isTimeRangeValid &&
+            scheduleIssue == ScheduleValidationIssue.endTooSoon) ...<Widget>[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            context.l10n.createEventScheduleEndInPast(
+              kEventScheduleMinLead.inMinutes,
+            ),
+            style: AppTypography.eventsCaptionStrong(
+              Theme.of(context).textTheme,
+              color: AppColors.accentDanger,
+            ).copyWith(fontWeight: FontWeight.w500),
           ),
         ],
       ],

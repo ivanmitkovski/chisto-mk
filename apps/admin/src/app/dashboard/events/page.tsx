@@ -2,8 +2,11 @@ import { cookies } from 'next/headers';
 import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import { SectionState } from '@/components/ui';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
 import { getCleanupEvents, getEventsStats } from '@/features/events/data/events-adapter';
 import { EventsWorkspace } from '@/features/events/components/events-workspace';
+import { SectionRefreshButton } from '@/features/events/components/section-refresh-button';
+import { canWriteCleanupEvents } from '@/features/events/lib/cleanup-events-write-access';
 
 type PageProps = {
   searchParams: Promise<{ status?: string; moderationStatus?: string; page?: string }>;
@@ -22,15 +25,22 @@ export default async function EventsPage(props: PageProps) {
 
   let result: Awaited<ReturnType<typeof getCleanupEvents>>;
   let stats: Awaited<ReturnType<typeof getEventsStats>>;
+  let canWriteCleanupEventsFlag = false;
   try {
-    [result, stats] = await Promise.all([
+    const [me, listResult, statsResult] = await Promise.all([
+      getMeProfile(),
       getCleanupEvents({ page, limit, ...(status ? { status } : {}), ...(moderationStatus ? { moderationStatus } : {}) }),
       getEventsStats(),
     ]);
+    canWriteCleanupEventsFlag = canWriteCleanupEvents(me.role);
+    result = listResult;
+    stats = statsResult;
   } catch {
     return (
       <AdminShell title="Cleanup events" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
-        <SectionState variant="error" message="Unable to load events." />
+        <SectionState variant="error" message="Unable to load events. Check your connection or sign in again.">
+          <SectionRefreshButton />
+        </SectionState>
       </AdminShell>
     );
   }
@@ -41,6 +51,7 @@ export default async function EventsPage(props: PageProps) {
         initialData={result.data}
         initialMeta={result.meta}
         initialStats={stats}
+        canWriteCleanupEvents={canWriteCleanupEventsFlag}
       />
     </AdminShell>
   );

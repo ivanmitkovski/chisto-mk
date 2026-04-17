@@ -1,4 +1,5 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:flutter/material.dart';
@@ -61,9 +62,9 @@ class EventCheckInQrCard extends StatelessWidget {
                   Text(
                     encodeErrorDescription,
                     textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
+                    style: AppTypography.eventsGridPropertyValue(
+                      Theme.of(context).textTheme,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   TextButton(

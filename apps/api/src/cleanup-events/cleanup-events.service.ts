@@ -1,6 +1,9 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { duplicateEventConflict } from '../event-schedule-conflict/duplicate-event-conflict.exception';
+import { EventScheduleConflictService } from '../event-schedule-conflict/event-schedule-conflict.service';
 import { CleanupEventStatus, EcoEventLifecycleStatus, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
+import { buildEventAnalyticsPayload } from '../events/event-analytics.aggregation';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { AuditService } from '../audit/audit.service';
 import {
@@ -18,12 +21,13 @@ const AUDIT_TRAIL_LIMIT = 50;
 
 @Injectable()
 export class CleanupEventsService {
-  constructor(
+   constructor(
     private readonly prisma: PrismaService,
     private readonly audit: AuditService,
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly uploads: ReportsUploadService,
     private readonly cleanupEventsSse: CleanupEventsEventsService,
+    private readonly scheduleConflict: EventScheduleConflictService,
   ) {}
 
   private eventInclude() {
@@ -170,50 +174,29 @@ export class CleanupEventsService {
   async getAnalytics(id: string) {
     const event = await this.prisma.cleanupEvent.findUnique({
       where: { id },
-      select: { participantCount: true, checkedInCount: true },
+      select: { participantCount: true },
     });
     if (event == null) {
       throw new NotFoundException({ code: 'CLEANUP_EVENT_NOT_FOUND', message: 'Cleanup event not found' });
     }
 
-    const participants = await this.prisma.eventParticipant.findMany({
-      where: { eventId: id },
-      select: { joinedAt: true },
-      orderBy: { joinedAt: 'asc' },
+    const [participants, checkIns] = await Promise.all([
+      this.prisma.eventParticipant.findMany({
+        where: { eventId: id },
+        select: { joinedAt: true },
+        orderBy: { joinedAt: 'asc' },
+      }),
+      this.prisma.eventCheckIn.findMany({
+        where: { eventId: id },
+        select: { checkedInAt: true },
+      }),
+    ]);
+
+    return buildEventAnalyticsPayload({
+      participantCount: event.participantCount,
+      participantsJoinedAt: participants.map((p) => p.joinedAt),
+      checkInsCheckedAt: checkIns.map((c) => c.checkedInAt),
     });
-
-    const joinersMap = new Map<string, number>();
-    for (const p of participants) {
-      const dateKey = p.joinedAt.toISOString().slice(0, 10);
-      joinersMap.set(dateKey, (joinersMap.get(dateKey) ?? 0) + 1);
-    }
-    const joinersOverTime = Array.from(joinersMap.entries()).map(([date, count]) => ({ date, count }));
-
-    const checkIns = await this.prisma.eventCheckIn.findMany({
-      where: { eventId: id },
-      select: { checkedInAt: true },
-    });
-
-    const hourMap = new Map<number, number>();
-    for (const c of checkIns) {
-      const hour = c.checkedInAt.getHours();
-      hourMap.set(hour, (hourMap.get(hour) ?? 0) + 1);
-    }
-    const checkInsByHour = Array.from(hourMap.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([hour, count]) => ({ hour, count }));
-
-    const totalJoiners = event.participantCount;
-    const checkedInCount = event.checkedInCount;
-    const attendanceRate = totalJoiners > 0 ? Math.round((checkedInCount / totalJoiners) * 100) : 0;
-
-    return {
-      totalJoiners,
-      checkedInCount,
-      attendanceRate,
-      joinersOverTime,
-      checkInsByHour,
-    };
   }
 
   async listAuditTrail(id: string, query: { page?: number; limit?: number }) {
@@ -253,10 +236,19 @@ export class CleanupEventsService {
       dto.recurrenceRule != null && dto.recurrenceRule.trim() !== ''
         ? dto.recurrenceRule.trim()
         : null;
+    const scheduledAtDate = new Date(dto.scheduledAt);
+    const conflict = await this.scheduleConflict.findConflictingEvent({
+      siteId: dto.siteId,
+      scheduledAt: scheduledAtDate,
+      endAt: null,
+    });
+    if (conflict != null) {
+      throw duplicateEventConflict(conflict);
+    }
     const e = await this.prisma.cleanupEvent.create({
       data: {
         siteId: dto.siteId,
-        scheduledAt: new Date(dto.scheduledAt),
+        scheduledAt: scheduledAtDate,
         completedAt,
         title,
         description,
@@ -346,6 +338,19 @@ export class CleanupEventsService {
         });
       }
       data.status = dto.status;
+    }
+
+    if (dto.scheduledAt != null) {
+      const nextStart = new Date(dto.scheduledAt);
+      const conflictPatch = await this.scheduleConflict.findConflictingEvent({
+        siteId: existing.siteId,
+        scheduledAt: nextStart,
+        endAt: existing.endAt,
+        excludeEventId: id,
+      });
+      if (conflictPatch != null) {
+        throw duplicateEventConflict(conflictPatch);
+      }
     }
 
     await this.prisma.$transaction(async (tx) => {

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class RecentSearchesShelf extends StatelessWidget {
   const RecentSearchesShelf({
@@ -32,10 +33,9 @@ class RecentSearchesShelf extends StatelessWidget {
         children: <Widget>[
           Text(
             context.l10n.eventsFeedRecentSearches,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTypography.eventsMicroSectionHeading(
+              Theme.of(context).textTheme,
+            ),
           ),
           const SizedBox(height: AppSpacing.xxs),
           SizedBox(

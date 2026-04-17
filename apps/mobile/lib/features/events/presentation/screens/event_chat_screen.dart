@@ -14,6 +14,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_chat_haptics.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
@@ -22,10 +23,14 @@ import 'package:chisto_mobile/features/events/data/chat/chat_diagnostics.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_upload_limits.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
+import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_read_cursor.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_chat_message_list_order.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_chat_search_merge.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_mime.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_source.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/event_chat_audio_playback_scope.dart';
@@ -121,8 +126,11 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
 
   bool _searchOpen = false;
   final TextEditingController _searchController = TextEditingController();
-  List<EventChatMessage> _searchHits = <EventChatMessage>[];
+  /// Last successful HTTP search page(s); merged with [_messages] for display.
+  List<EventChatMessage> _searchServerHits = <EventChatMessage>[];
   bool _searchLoading = false;
+  bool _searchError = false;
+  int _searchSerial = 0;
   String? _searchCursor;
   bool _searchHasMore = false;
   Timer? _searchDebounce;
@@ -141,6 +149,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   Timer? _reconnectDebounce;
 
   bool _sseHadConnected = false;
+
+  /// False when connectivity reports no usable network (attachments/voice need online upload).
+  bool _networkOnline = true;
 
   List<EventChatReadCursor> _readCursors = <EventChatReadCursor>[];
   final Map<String, EventChatTypingPeer> _typingPeers = <String, EventChatTypingPeer>{};
@@ -187,7 +198,23 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         }
       });
     });
+    unawaited(
+      Connectivity().checkConnectivity().then((List<ConnectivityResult> r) {
+        if (!mounted) {
+          return;
+        }
+        setState(() {
+          _networkOnline = r.any((ConnectivityResult e) => e != ConnectivityResult.none);
+        });
+      }),
+    );
     _netSub = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> r) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _networkOnline = r.any((ConnectivityResult e) => e != ConnectivityResult.none);
+      });
       if (r.any((ConnectivityResult e) => e != ConnectivityResult.none)) {
         unawaited(_flushOfflineQueue());
       }
@@ -354,7 +381,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       if (mounted) {
         setState(() => _pinned = list);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_load_pinned_failed');
+    }
   }
 
   EventChatMessage? get _latestPinned =>
@@ -442,17 +471,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         final Set<String> ids = _messages.map((EventChatMessage m) => m.id).toSet();
         for (final EventChatMessage m in incoming) {
           if (!ids.contains(m.id)) {
-            _messages.add(m);
+            insertEventChatMessageSorted(_messages, m);
             ids.add(m.id);
           }
         }
-        _messages.sort((EventChatMessage a, EventChatMessage b) {
-          final int c = a.createdAt.compareTo(b.createdAt);
-          if (c != 0) {
-            return c;
-          }
-          return a.id.compareTo(b.id);
-        });
       });
       if (kDebugMode && newIds.isNotEmpty) {
         final String sample = newIds.take(4).join(', ');
@@ -461,7 +483,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           'ids=[$sample${newIds.length > 4 ? ', …' : ''}]',
         );
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_merge_poll_failed');
+    }
     unawaited(_loadReadCursors());
     if (mounted) {
       unawaited(_pruneOutboxAgainstCommittedMessages());
@@ -474,7 +498,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       if (mounted) {
         setState(() => _readCursors = list);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_load_read_cursors_failed');
+    }
   }
 
   Future<void> _loadInitial() async {
@@ -507,6 +533,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       if (!mounted) {
         return;
       }
+      logEventsDiagnostic('chat_load_initial_failed');
       setState(() {
         _loading = false;
         _loadError = true;
@@ -532,12 +559,14 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           List<EventChatMessage>.from(result.messages.reversed);
       setState(() {
         _messages.insertAll(0, older);
+        _messages.sort(compareEventChatMessagesChronological);
         _nextOlderCursor = result.nextCursor;
         _hasMoreOlder = result.hasMore;
         _loadingOlder = false;
       });
     } on Object catch (_) {
       if (mounted) {
+        logEventsDiagnostic('chat_load_older_failed');
         setState(() => _loadingOlder = false);
       }
     }
@@ -754,14 +783,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           setState(() => _messages[pendingIdx] = m);
         } else {
           setState(() {
-            _messages.add(m);
-            _messages.sort((EventChatMessage a, EventChatMessage b) {
-              final int c = a.createdAt.compareTo(b.createdAt);
-              if (c != 0) {
-                return c;
-              }
-              return a.id.compareTo(b.id);
-            });
+            insertEventChatMessageSorted(_messages, m);
           });
           if (_nearBottom) {
             EventChatHaptics.liveMessageDelivered();
@@ -937,24 +959,47 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     }
   }
 
-  List<String> _activeTypingDisplayNames(BuildContext context) {
+  /// Active typists sorted by display name (same order as typing label / bubble).
+  List<({String userId, String displayName})> _activeTypingPeersSorted(
+    BuildContext context,
+  ) {
     final DateTime now = DateTime.now();
     final String? me = _auth?.userId;
-    final List<String> names = <String>[];
+    final List<({String userId, String displayName})> out =
+        <({String userId, String displayName})>[];
     for (final MapEntry<String, EventChatTypingPeer> e in _typingPeers.entries) {
       if (me != null && e.key == me) {
         continue;
       }
-      if (!now.isAfter(e.value.until)) {
-        String n = e.value.displayName.trim();
-        if (n.isEmpty) {
-          n = context.l10n.eventChatTypingUnknownParticipant;
-        }
-        names.add(n);
+      if (now.isAfter(e.value.until)) {
+        continue;
+      }
+      String n = e.value.displayName.trim();
+      if (n.isEmpty) {
+        n = context.l10n.eventChatTypingUnknownParticipant;
+      }
+      out.add((userId: e.key, displayName: n));
+    }
+    out.sort(
+      (({String userId, String displayName}) a,
+              ({String userId, String displayName}) b) =>
+          a.displayName.compareTo(b.displayName),
+    );
+    return out;
+  }
+
+  String? _lastKnownAvatarForUser(String userId) {
+    for (int i = _messages.length - 1; i >= 0; i--) {
+      final EventChatMessage m = _messages[i];
+      if (m.authorId != userId || m.isDeleted) {
+        continue;
+      }
+      final String? u = m.authorAvatarUrl?.trim();
+      if (u != null && u.isNotEmpty) {
+        return u;
       }
     }
-    names.sort();
-    return names;
+    return null;
   }
 
   void _dedupMessages() {
@@ -994,7 +1039,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     }
     try {
       await _repo.markRead(widget.eventId, last.id);
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_mark_read_failed');
+    }
   }
 
   /// If realtime missed messages, local last read lags the server — extend cursor to newest on server.
@@ -1013,7 +1060,9 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       if (_messageStrictlyAfter(serverNewest, localLast)) {
         await _repo.markRead(widget.eventId, serverNewest.id);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_sync_read_cursor_failed');
+    }
   }
 
   Future<void> _finalizeReadCursorOnExit() async {
@@ -1103,17 +1152,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         messageType: EventChatMessageType.text,
         clientMessageId: row.clientMessageId,
       );
-      _messages.add(optimistic);
+      insertEventChatMessageSorted(_messages, optimistic);
       changed = true;
     }
     if (changed) {
-      _messages.sort((EventChatMessage a, EventChatMessage b) {
-        final int c = a.createdAt.compareTo(b.createdAt);
-        if (c != 0) {
-          return c;
-        }
-        return a.id.compareTo(b.id);
-      });
       setState(() {});
     }
     unawaited(_flushOfflineQueue());
@@ -1157,7 +1199,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       clientMessageId: clientMessageId,
     );
     setState(() {
-      _messages.add(optimistic);
+      insertEventChatMessageSorted(_messages, optimistic);
       _replyTo = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
@@ -1374,7 +1416,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       clientMessageId: clientMessageId,
     );
     setState(() {
-      _messages.add(optimistic);
+      insertEventChatMessageSorted(_messages, optimistic);
       _replyTo = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
@@ -1500,6 +1542,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Future<void> _openLocationPicker() async {
+    if (!_networkOnline) {
+      AppSnack.show(context, message: context.l10n.eventChatAttachmentsNeedNetwork);
+      return;
+    }
     final Map<String, dynamic>? result = await showModalBottomSheet<Map<String, dynamic>>(
       context: context,
       isScrollControlled: true,
@@ -1517,7 +1563,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     final String? label = result['label'] as String?;
     if (lat == null || lng == null) return;
 
-    final String body = label ?? 'Shared location';
+    final String body = label ?? context.l10n.chatSharedLocation;
     final String clientMessageId = newChatClientMessageId();
     final String tempId = 'pending_${DateTime.now().microsecondsSinceEpoch}';
     final EventChatMessage optimistic = EventChatMessage(
@@ -1536,7 +1582,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       locationLabel: label,
       clientMessageId: clientMessageId,
     );
-    setState(() => _messages.add(optimistic));
+    setState(() => insertEventChatMessageSorted(_messages, optimistic));
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     EventChatHaptics.attachmentPickerTap(context);
     try {
@@ -1598,7 +1644,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       clientMessageId: clientMessageId,
     );
     setState(() {
-      _messages.add(optimistic);
+      insertEventChatMessageSorted(_messages, optimistic);
       _replyTo = null;
     });
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
@@ -1896,11 +1942,18 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     _searchDebounce?.cancel();
     final String q = text.trim();
     if (q.length < 2) {
-      if (_searchHits.isNotEmpty) {
+      _searchSerial++;
+      if (_searchServerHits.isNotEmpty ||
+          _searchError ||
+          _searchLoading ||
+          _lastSearchQuery.isNotEmpty) {
         setState(() {
-          _searchHits = <EventChatMessage>[];
+          _searchServerHits = <EventChatMessage>[];
           _searchCursor = null;
           _searchHasMore = false;
+          _searchError = false;
+          _searchLoading = false;
+          _lastSearchQuery = '';
         });
       }
       return;
@@ -1911,42 +1964,228 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Future<void> _runSearch(String q, {bool loadMore = false}) async {
-    if (q.length < 2) {
+    final String trimmed = q.trim();
+    if (trimmed.length < 2) {
       return;
     }
     if (!loadMore) {
-      _lastSearchQuery = q;
+      _searchSerial++;
+      final int serial = _searchSerial;
+      _lastSearchQuery = trimmed;
       setState(() {
         _searchLoading = true;
+        _searchError = false;
+        _searchServerHits = <EventChatMessage>[];
         _searchCursor = null;
         _searchHasMore = false;
       });
+      await _executeSearchRequest(trimmed, serial, loadMore: false);
+    } else {
+      if (_lastSearchQuery.length < 2) {
+        return;
+      }
+      setState(() => _searchLoading = true);
+      await _executeSearchRequest(_lastSearchQuery.trim(), _searchSerial, loadMore: true);
     }
+  }
+
+  Future<void> _executeSearchRequest(
+    String trimmed,
+    int serial, {
+    required bool loadMore,
+  }) async {
     try {
-      final r = await _repo.searchMessages(
+      final EventChatFetchResult r = await _repo.searchMessages(
         widget.eventId,
-        q,
+        trimmed,
         limit: 30,
         cursor: loadMore ? _searchCursor : null,
       );
-      if (!mounted || _lastSearchQuery != q) {
+      if (!mounted || _searchSerial != serial) {
+        return;
+      }
+      if (_lastSearchQuery != trimmed) {
         return;
       }
       setState(() {
+        _searchError = false;
         if (loadMore) {
-          _searchHits.addAll(r.messages.reversed);
+          final List<EventChatMessage> next = List<EventChatMessage>.from(_searchServerHits)
+            ..addAll(r.messages.reversed);
+          _searchServerHits = next;
         } else {
-          _searchHits = List<EventChatMessage>.from(r.messages.reversed);
+          _searchServerHits = List<EventChatMessage>.from(r.messages.reversed);
         }
         _searchCursor = r.nextCursor;
         _searchHasMore = r.hasMore;
-        _searchLoading = false;
       });
     } on Object catch (_) {
-      if (mounted) {
-        setState(() => _searchLoading = false);
+      if (!mounted || _searchSerial != serial) {
+        return;
+      }
+      setState(() {
+        _searchError = true;
+        if (!loadMore) {
+          _searchServerHits = <EventChatMessage>[];
+        }
+      });
+    } finally {
+      if (mounted && _searchSerial == serial) {
+        setState(() {
+          _searchLoading = false;
+        });
       }
     }
+  }
+
+  List<EventChatMessage> _mergedSearchHits() {
+    return mergeEventChatSearchHits(
+      serverHits: _searchServerHits,
+      allMessages: _messages,
+      query: _lastSearchQuery,
+    );
+  }
+
+  Widget _buildSearchPanel(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final List<EventChatMessage> merged = _mergedSearchHits();
+    final bool showLocalBanner = !_searchLoading &&
+        _lastSearchQuery.length >= 2 &&
+        eventChatSearchMergedIncludesLocalOnly(
+          serverHits: _searchServerHits,
+          merged: merged,
+        );
+
+    if (_searchLoading && merged.isEmpty && !_searchError) {
+      return const Center(
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: CircularProgressIndicator(strokeWidth: 3),
+        ),
+      );
+    }
+
+    if (_searchError && merged.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                context.l10n.eventChatSearchFailed,
+                textAlign: TextAlign.center,
+                style: AppTypography.eventsBodyMediumSecondary(textTheme),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              FilledButton(
+                onPressed: _lastSearchQuery.length >= 2
+                    ? () => unawaited(_runSearch(_lastSearchQuery))
+                    : null,
+                child: Text(context.l10n.eventsDetailRetryRefresh),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_lastSearchQuery.length < 2) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Text(
+            context.l10n.eventChatSearchMinChars,
+            textAlign: TextAlign.center,
+            style: AppTypography.eventsBodyMuted(textTheme),
+          ),
+        ),
+      );
+    }
+
+    if (!_searchLoading && merged.isEmpty) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Text(
+            context.l10n.eventChatSearchNoResults,
+            textAlign: TextAlign.center,
+            style: AppTypography.eventsBodyMuted(textTheme),
+          ),
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      itemCount:
+          merged.length + (_searchHasMore ? 1 : 0) + (showLocalBanner ? 1 : 0),
+      itemBuilder: (BuildContext context, int i) {
+        if (showLocalBanner && i == 0) {
+          return Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              AppSpacing.sm,
+            ),
+            child: Material(
+              color: AppColors.inputFill,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                child: Text(
+                  context.l10n.eventChatSearchIncludingLocalMatches,
+                  style: AppTypography.eventsCaptionStrong(
+                    textTheme,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+        final int offset = showLocalBanner ? 1 : 0;
+        final int j = i - offset;
+        if (j == merged.length) {
+          return Center(
+            child: TextButton(
+              onPressed: _searchLoading
+                  ? null
+                  : () => unawaited(_runSearch(_lastSearchQuery, loadMore: true)),
+              child: _searchLoading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(context.l10n.eventChatSearchLoadMore),
+            ),
+          );
+        }
+        final EventChatMessage m = merged[j];
+        return ChatSearchResultTile(
+          message: m,
+          query: _lastSearchQuery,
+          onTap: () {
+            _searchSerial++;
+            setState(() {
+              _searchOpen = false;
+              _searchServerHits = <EventChatMessage>[];
+              _searchController.clear();
+              _searchDebounce?.cancel();
+              _lastSearchQuery = '';
+              _searchError = false;
+            });
+            WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToMessageId(m.id));
+          },
+        );
+      },
+    );
   }
 
   bool _sameChatGroup(int a, int b) {
@@ -2001,6 +2240,21 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     _grouping = g;
   }
 
+  /// Vertical gap below message at [i] toward the next newer message (Instagram-style: tight in-cluster).
+  double _bubbleGapBelowMessageAtIndex(int i) {
+    if (i < 0 || i >= _messages.length - 1) {
+      return 0;
+    }
+    final bool newerOpensDay =
+        i + 1 < _grouping.length && _grouping[i + 1].showDate;
+    if (newerOpensDay) {
+      return ChatTheme.bubbleStackGapBetweenClusters;
+    }
+    return _sameChatGroup(i, i + 1)
+        ? ChatTheme.bubbleStackGapWithinCluster
+        : ChatTheme.bubbleStackGapBetweenClusters;
+  }
+
   bool _sameDay(DateTime a, DateTime b) {
     final DateTime la = a.toLocal();
     final DateTime lb = b.toLocal();
@@ -2028,11 +2282,14 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
                       _searchDebounce?.cancel();
+                      _searchSerial++;
                       setState(() {
                         _searchOpen = false;
-                        _searchHits = <EventChatMessage>[];
+                        _searchServerHits = <EventChatMessage>[];
                         _searchController.clear();
                         _lastSearchQuery = '';
+                        _searchError = false;
+                        _searchLoading = false;
                       });
                     },
                   ),
@@ -2091,6 +2348,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       leading: const AppBackButton(),
       title: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
+          final TextTheme appBarTextTheme = Theme.of(context).textTheme;
           final String effectiveTitle = _resolvedEventTitle.isNotEmpty
               ? _resolvedEventTitle
               : widget.eventTitle;
@@ -2136,18 +2394,14 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                               titleText,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              style: AppTypography.eventsListCardTitle(appBarTextTheme),
                             ),
                             if (count > 0)
                               Text(
                                 context.l10n.eventChatParticipantsCount(count),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                      color: AppColors.textMuted,
-                                    ),
+                                style: AppTypography.eventsChatTimestamp(appBarTextTheme),
                               ),
                           ],
                         ),
@@ -2182,6 +2436,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     _rebuildGrouping();
     final bool reconnecting = _bannerVisible && _conn == EventChatConnectionStatus.reconnecting;
     final bool disconnected = _bannerVisible && _conn == EventChatConnectionStatus.disconnected;
+    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
 
     return Scaffold(
       backgroundColor: ChatTheme.canvas,
@@ -2197,6 +2452,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
             reconnecting: reconnecting,
             disconnected: disconnected,
             showConnectedFlash: _showConnectedFlash,
+            reduceMotion: reduceMotion,
           ),
           ChatPinnedBar(
             latest: _latestPinned,
@@ -2227,44 +2483,8 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
               ),
               child: Stack(
                 children: <Widget>[
-                if (_searchOpen && _searchHits.isNotEmpty)
-                  ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                    itemCount: _searchHits.length + (_searchHasMore ? 1 : 0),
-                    itemBuilder: (BuildContext context, int i) {
-                      if (i == _searchHits.length) {
-                        return Center(
-                          child: TextButton(
-                            onPressed: _searchLoading
-                                ? null
-                                : () => unawaited(_runSearch(_lastSearchQuery, loadMore: true)),
-                            child: _searchLoading
-                                ? const SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(strokeWidth: 2),
-                                  )
-                                : Text(context.l10n.eventChatSearchAction),
-                          ),
-                        );
-                      }
-                      final EventChatMessage m = _searchHits[i];
-                      return ChatSearchResultTile(
-                        message: m,
-                        query: _lastSearchQuery,
-                        onTap: () {
-                          setState(() {
-                            _searchOpen = false;
-                            _searchHits = <EventChatMessage>[];
-                            _searchController.clear();
-                            _searchDebounce?.cancel();
-                          });
-                          WidgetsBinding.instance
-                              .addPostFrameCallback((_) => _scrollToMessageId(m.id));
-                        },
-                      );
-                    },
-                  )
+                if (_searchOpen)
+                  _buildSearchPanel(context)
                 else if (_loading)
                   const ChatMessageSkeletonList()
                 else if (_loadError)
@@ -2293,9 +2513,23 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                 else
                   ScrollConfiguration(
                     behavior: const EventChatScrollBehavior(),
-                    child: Builder(
+                    child: Semantics(
+                      container: true,
+                      explicitChildNodes: true,
+                      label: context.l10n.eventChatMessagesListSemantics,
+                      child: Builder(
                       builder: (BuildContext context) {
-                        final List<String> typingNames = _activeTypingDisplayNames(context);
+                        final List<({String userId, String displayName})> typingPeers =
+                            _activeTypingPeersSorted(context);
+                        final List<String> typingNames = typingPeers
+                            .map((({String userId, String displayName}) p) =>
+                                p.displayName)
+                            .toList(growable: false);
+                        final String? typingPrimaryId =
+                            typingPeers.isNotEmpty ? typingPeers.first.userId : null;
+                        final String? typingPrimaryAvatar = typingPrimaryId != null
+                            ? _lastKnownAvatarForUser(typingPrimaryId)
+                            : null;
                         final bool hasTyping = typingNames.isNotEmpty && !_searchOpen;
                         final int extraTop = hasTyping ? 1 : 0;
                         final int extraBottom = _loadingOlder ? 1 : 0;
@@ -2322,8 +2556,14 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                           itemBuilder: (BuildContext context, int ri) {
                             if (hasTyping && ri == 0) {
                               return Padding(
-                                padding: const EdgeInsets.only(bottom: ChatTheme.bubbleStackGap),
-                                child: ChatTypingBubble(displayNames: typingNames),
+                                padding: const EdgeInsets.only(
+                                  bottom: ChatTheme.bubbleStackGapBetweenClusters,
+                                ),
+                                child: ChatTypingBubble(
+                                  displayNames: typingNames,
+                                  primaryUserId: typingPrimaryId,
+                                  primaryAvatarUrl: typingPrimaryAvatar,
+                                ),
                               );
                             }
                             final int adjusted = ri - extraTop;
@@ -2333,7 +2573,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                                   AppSpacing.md,
                                   AppSpacing.md,
                                   AppSpacing.md,
-                                  ChatTheme.bubbleStackGap,
+                                  ChatTheme.bubbleStackGapBetweenClusters,
                                 ),
                                 child: const Center(
                                   child: SizedBox(
@@ -2349,7 +2589,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                         if (m.messageType == EventChatMessageType.system) {
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom: ri == 0 ? 0 : ChatTheme.bubbleStackGap,
+                              bottom: ri == 0 ? 0 : _bubbleGapBelowMessageAtIndex(i),
                             ),
                             child: ChatSystemMessage(message: m),
                           );
@@ -2365,7 +2605,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                         return RepaintBoundary(
                           child: Padding(
                           padding: EdgeInsets.only(
-                            bottom: ri == 0 ? 0 : ChatTheme.bubbleStackGap,
+                            bottom: ri == 0 ? 0 : _bubbleGapBelowMessageAtIndex(i),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -2427,23 +2667,12 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                           ),
                         ),
                         );
-                      },
-                    );
+                          },
+                        );
                       },
                     ),
                   ),
-                if (_searchOpen && !_searchLoading && _searchHits.isEmpty && _lastSearchQuery.length >= 2)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Text(
-                        context.l10n.eventChatSearchNoResults,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
-                      ),
-                    ),
-                  ),
+                ),
                 if (_showNewPill && !_loading && !_loadError && !_searchOpen)
                   Positioned(
                     bottom: AppSpacing.md,
@@ -2471,6 +2700,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
               onShareLocation: _openLocationPicker,
               onComposerTextChanged: _onComposerTextChanged,
               onComposerSendCompleted: _onComposerSendCompleted,
+              attachmentsNeedNetwork: !_networkOnline,
             ),
         ],
       ),

@@ -76,6 +76,19 @@ class _RateLimitedCheckInRepository extends ChangeNotifier implements CheckInRep
   Future<void> rotateSession(String eventId) async {}
 
   @override
+  Future<void> resolvePendingCheckIn({
+    required String eventId,
+    required String pendingId,
+    required bool approve,
+  }) async {}
+
+  @override
+  Future<String?> pollPendingStatus({
+    required String eventId,
+    required String pendingId,
+  }) async => 'expired';
+
+  @override
   List<CheckedInAttendee> checkedInAttendees(String eventId) => <CheckedInAttendee>[];
 
   @override

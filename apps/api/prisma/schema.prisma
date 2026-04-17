@@ -436,6 +436,8 @@ model CleanupEvent {
 
   scheduledAt DateTime
   endAt       DateTime?
+  /// When set to the same instant as [endAt], the organizer "cleanup ending soon" push was sent for that end time. Cleared when [endAt] changes (extension).
+  endSoonNotifiedForEndAt DateTime?
   completedAt DateTime?
 
   /// Moderation (admin approval for user-created events).
@@ -482,8 +484,10 @@ model CleanupEvent {
 
   @@index([siteId])
   @@index([scheduledAt])
+  @@index([siteId, scheduledAt])
   @@index([status])
   @@index([lifecycleStatus, scheduledAt])
+  @@index([lifecycleStatus, endAt])
   @@index([organizerId])
   @@index([parentEventId])
 }

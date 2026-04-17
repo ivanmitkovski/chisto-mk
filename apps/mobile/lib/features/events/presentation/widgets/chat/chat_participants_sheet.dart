@@ -4,6 +4,7 @@ import 'dart:math' as math;
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_participants.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -123,6 +124,7 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final double maxH = math.min(MediaQuery.sizeOf(context).height * 0.62, 520);
     return SafeArea(
       child: Padding(
@@ -149,13 +151,13 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
                   Expanded(
                     child: Text(
                       context.l10n.eventChatParticipantsSheetTitle,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                      style: AppTypography.eventsCalendarMonthTitle(textTheme),
                     ),
                   ),
                   if (_count > 0)
                     Text(
                       context.l10n.eventChatParticipantsCount(_count),
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(color: AppColors.textMuted),
+                      style: AppTypography.eventsChatTimestamp(textTheme),
                     ),
                 ],
               ),
@@ -169,7 +171,7 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
                     Text(
                       context.l10n.eventChatParticipantsLoadError,
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.eventsBodyMediumSecondary(textTheme),
                     ),
                     const SizedBox(height: AppSpacing.md),
                     FilledButton.tonal(
@@ -193,7 +195,7 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
                             Text(
                               context.l10n.eventChatParticipantsEmpty,
                               textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
+                              style: AppTypography.eventsBodyMediumSecondary(textTheme),
                             ),
                           ],
                         )
@@ -226,17 +228,13 @@ class _ChatParticipantsSheetBodyState extends State<_ChatParticipantsSheetBody> 
                                           p.displayName,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                                fontWeight: FontWeight.w600,
-                                              ),
+                                          style: AppTypography.eventsFormLeadHeading(textTheme),
                                         ),
                                         if (isMe)
                                           Text(
                                             context.l10n.eventChatParticipantsYouBadge,
-                                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                                  color: AppColors.primary,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                            style: AppTypography.eventsSheetTextLink(textTheme)
+                                                .copyWith(color: AppColors.primary),
                                           ),
                                       ],
                                     ),

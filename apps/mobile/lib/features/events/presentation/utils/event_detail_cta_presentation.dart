@@ -9,6 +9,7 @@ class EventDetailCtaPresentation {
     required this.primaryEnabled,
     required this.showsSecondaryRow,
     this.secondaryLabel,
+    this.secondaryIsExtendCleanupEnd = false,
   });
 
   final String primaryLabel;
@@ -17,6 +18,9 @@ class EventDetailCtaPresentation {
   /// When true, UI should stack a secondary outlined button under the primary.
   final bool showsSecondaryRow;
   final String? secondaryLabel;
+
+  /// When true, the secondary row is “extend planned end” (organizer in progress).
+  final bool secondaryIsExtendCleanupEnd;
 }
 
 /// Resolves labels and enabled flags from [event] and [l10n].
@@ -39,7 +43,9 @@ EventDetailCtaPresentation resolveEventDetailCtaPresentation({
       EcoEventStatus.inProgress => EventDetailCtaPresentation(
           primaryLabel: l10n.eventsCtaManageCheckIn,
           primaryEnabled: true,
-          showsSecondaryRow: false,
+          showsSecondaryRow: true,
+          secondaryLabel: l10n.eventsCtaExtendCleanupEnd,
+          secondaryIsExtendCleanupEnd: true,
         ),
       EcoEventStatus.completed => EventDetailCtaPresentation(
           primaryLabel: event.hasAfterImages
@@ -78,7 +84,7 @@ EventDetailCtaPresentation resolveEventDetailCtaPresentation({
     );
   }
 
-  if (event.isJoined) {
+  if (event.isJoined && !event.isLifecycleClosed) {
     return EventDetailCtaPresentation(
       primaryLabel: event.reminderEnabled
           ? l10n.eventsCtaTurnReminderOff
@@ -99,6 +105,13 @@ EventDetailCtaPresentation resolveEventDetailCtaPresentation({
   if (!event.isJoinable) {
     return EventDetailCtaPresentation(
       primaryLabel: event.status.localizedLabel(l10n),
+      primaryEnabled: false,
+      showsSecondaryRow: false,
+    );
+  }
+  if (!event.canVolunteerJoinNow) {
+    return EventDetailCtaPresentation(
+      primaryLabel: l10n.eventsCtaJoinEcoAction,
       primaryEnabled: false,
       showsSecondaryRow: false,
     );

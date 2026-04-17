@@ -15,6 +15,7 @@ import {
   Role,
 } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
+import { CheckEventConflictQueryDto } from '../../src/events/dto/check-event-conflict-query.dto';
 import { ListEventParticipantsQueryDto } from '../../src/events/dto/list-event-participants-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { PatchEventReminderDto } from '../../src/events/dto/patch-event-reminder.dto';
@@ -120,6 +121,7 @@ describe('EventsService', () => {
     emitCleanupEventCreated: jest.Mock;
     emitCleanupEventUpdated: jest.Mock;
   };
+  let scheduleConflict: { findConflictingEvent: jest.Mock };
   let service: EventsService;
 
   beforeEach(() => {
@@ -135,6 +137,10 @@ describe('EventsService', () => {
       emitCleanupEventCreated: jest.fn(),
       emitCleanupEventUpdated: jest.fn(),
     };
+    scheduleConflict = {
+      findConflictingEvent: jest.fn().mockResolvedValue(null),
+    };
+    const eventsTelemetry = { emitSpan: jest.fn() };
     prisma = {
       site: { findUnique: jest.fn() },
       user: { findUnique: jest.fn() },
@@ -172,6 +178,8 @@ describe('EventsService', () => {
       eventChat as never,
       new EventsMobileMapperService(prisma as never, uploads as never),
       cleanupEventsSse as never,
+      scheduleConflict as never,
+      eventsTelemetry as never,
     );
   });
 
@@ -260,6 +268,86 @@ describe('EventsService', () => {
           user('u1'),
         ),
       ).rejects.toBeInstanceOf(BadRequestException);
+    });
+
+    it('throws ConflictException when another active event overlaps', async () => {
+      prisma.site.findUnique.mockResolvedValue({ id: 'site-1' });
+      scheduleConflict.findConflictingEvent.mockResolvedValue({
+        id: 'other-evt',
+        title: 'Existing cleanup',
+        scheduledAt: new Date('2025-07-01T10:00:00.000Z'),
+      });
+      await expect(
+        service.create(
+          {
+            siteId: 'site-1',
+            title: 'My event',
+            description: 'Hello world cleanup',
+            category: 'generalCleanup',
+            scheduledAt: '2025-07-01T10:30:00.000Z',
+          },
+          user('u1', Role.USER),
+        ),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(prisma.cleanupEvent.create).not.toHaveBeenCalled();
+    });
+
+    it('throws ConflictException on series when a later occurrence conflicts', async () => {
+      prisma.site.findUnique.mockResolvedValue({ id: 'site-1' });
+      let call = 0;
+      scheduleConflict.findConflictingEvent.mockImplementation(async () => {
+        call += 1;
+        if (call >= 2) {
+          return {
+            id: 'blocker',
+            title: 'Blocked day',
+            scheduledAt: new Date('2025-07-03T10:00:00.000Z'),
+          };
+        }
+        return null;
+      });
+      await expect(
+        service.create(
+          {
+            siteId: 'site-1',
+            title: 'Series',
+            description: 'Hello world cleanup',
+            category: 'generalCleanup',
+            scheduledAt: '2025-07-01T10:00:00.000Z',
+            recurrenceRule: 'FREQ=DAILY;COUNT=4',
+            recurrenceCount: 4,
+          },
+          user('u1', Role.USER),
+        ),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(prisma.$transaction).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('checkScheduleConflictPreview', () => {
+    it('returns hasConflict false when no overlap', async () => {
+      const q = Object.assign(new CheckEventConflictQueryDto(), {
+        siteId: 'site-1',
+        scheduledAt: '2025-07-01T10:00:00.000Z',
+      });
+      const out = await service.checkScheduleConflictPreview(q);
+      expect(out.hasConflict).toBe(false);
+      expect(out.conflictingEvent).toBeUndefined();
+    });
+
+    it('returns conflictingEvent when overlap exists', async () => {
+      scheduleConflict.findConflictingEvent.mockResolvedValue({
+        id: 'e1',
+        title: 'T',
+        scheduledAt: new Date('2025-07-01T09:00:00.000Z'),
+      });
+      const q = Object.assign(new CheckEventConflictQueryDto(), {
+        siteId: 'site-1',
+        scheduledAt: '2025-07-01T10:00:00.000Z',
+      });
+      const out = await service.checkScheduleConflictPreview(q);
+      expect(out.hasConflict).toBe(true);
+      expect(out.conflictingEvent?.id).toBe('e1');
     });
   });
 
@@ -403,9 +491,36 @@ describe('EventsService', () => {
       await expect(service.join('evt-1', user('u2'))).rejects.toBeInstanceOf(ConflictException);
     });
 
+    it('rejects join before scheduledAt', async () => {
+      const future = new Date();
+      future.setFullYear(future.getFullYear() + 1);
+      prisma.cleanupEvent.findFirst.mockResolvedValue(
+        baseEvent({
+          organizerId: 'org-1',
+          participants: [],
+          scheduledAt: future,
+        }),
+      );
+
+      let thrown: unknown;
+      try {
+        await service.join('evt-1', user('u2'));
+      } catch (e) {
+        thrown = e;
+      }
+      expect(thrown).toBeInstanceOf(BadRequestException);
+      expect((thrown as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'EVENT_JOIN_NOT_YET_OPEN' }),
+      );
+    });
+
     it('returns pointsAwarded when join succeeds', async () => {
       prisma.cleanupEvent.findFirst.mockResolvedValue(
-        baseEvent({ organizerId: 'org-1', participants: [] }),
+        baseEvent({
+          organizerId: 'org-1',
+          participants: [],
+          scheduledAt: new Date('2020-01-01T09:00:00Z'),
+        }),
       );
       prisma.eventParticipant.create.mockResolvedValue({ id: 'part-new' });
       ecoEventPoints.creditIfNew.mockResolvedValue(5);
@@ -725,7 +840,6 @@ describe('EventsService', () => {
       prisma.cleanupEvent.findUnique.mockResolvedValue({
         organizerId: 'org-1',
         participantCount: 5,
-        checkedInCount: 2,
       });
       prisma.eventParticipant.findMany.mockResolvedValue([]);
       prisma.eventCheckIn.findMany.mockResolvedValue([]);
@@ -738,7 +852,6 @@ describe('EventsService', () => {
       prisma.cleanupEvent.findUnique.mockResolvedValue({
         organizerId: 'org-1',
         participantCount: 2,
-        checkedInCount: 1,
       });
       prisma.eventParticipant.findMany.mockResolvedValue([
         { joinedAt: new Date('2025-06-01T10:00:00Z') },
@@ -751,9 +864,11 @@ describe('EventsService', () => {
       expect(out.totalJoiners).toBe(2);
       expect(out.checkedInCount).toBe(1);
       expect(out.attendanceRate).toBe(50);
-      expect(out.joinersOverTime.length).toBeGreaterThan(0);
-      expect(out.checkInsByHour.length).toBe(1);
-      expect(out.checkInsByHour[0].count).toBe(1);
+      expect(out.joinersCumulative).toHaveLength(2);
+      expect(out.joinersCumulative[0].cumulativeJoiners).toBe(1);
+      expect(out.joinersCumulative[1].cumulativeJoiners).toBe(2);
+      expect(out.checkInsByHour).toHaveLength(24);
+      expect(out.checkInsByHour[11].count).toBe(1);
     });
   });
 
@@ -764,6 +879,72 @@ describe('EventsService', () => {
       await expect(
         service.patchEvent('evt-1', { title: 'Hijacked' }, user('u2')),
       ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('passes excludeEventId to schedule conflict when changing scheduledAt', async () => {
+      prisma.cleanupEvent.findUnique.mockResolvedValue(
+        baseEvent({ id: 'evt-1', organizerId: 'org-1', siteId: 'site-1' }),
+      );
+      prisma.cleanupEvent.update.mockResolvedValue(
+        baseEvent({
+          id: 'evt-1',
+          organizerId: 'org-1',
+          siteId: 'site-1',
+          scheduledAt: new Date('2025-08-01T10:00:00.000Z'),
+        }),
+      );
+      scheduleConflict.findConflictingEvent.mockResolvedValue(null);
+      await service.patchEvent(
+        'evt-1',
+        { scheduledAt: '2025-08-01T10:00:00.000Z' },
+        user('org-1'),
+      );
+      expect(scheduleConflict.findConflictingEvent).toHaveBeenCalledWith(
+        expect.objectContaining({
+          siteId: 'site-1',
+          excludeEventId: 'evt-1',
+        }),
+      );
+    });
+
+    it('throws ConflictException when new schedule conflicts with another event', async () => {
+      prisma.cleanupEvent.findUnique.mockResolvedValue(
+        baseEvent({ id: 'evt-1', organizerId: 'org-1', siteId: 'site-1' }),
+      );
+      scheduleConflict.findConflictingEvent.mockResolvedValue({
+        id: 'other',
+        title: 'Other',
+        scheduledAt: new Date('2025-08-01T12:00:00.000Z'),
+      });
+      await expect(
+        service.patchEvent(
+          'evt-1',
+          { scheduledAt: '2025-08-01T10:00:00.000Z' },
+          user('org-1'),
+        ),
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(prisma.cleanupEvent.update).not.toHaveBeenCalled();
+    });
+
+    it('rejects PATCH when lifecycle is completed', async () => {
+      prisma.cleanupEvent.findUnique.mockResolvedValue(
+        baseEvent({
+          organizerId: 'org-1',
+          lifecycleStatus: EcoEventLifecycleStatus.COMPLETED,
+        }),
+      );
+
+      let thrown: unknown;
+      try {
+        await service.patchEvent('evt-1', { title: 'New title' }, user('org-1'));
+      } catch (e) {
+        thrown = e;
+      }
+      expect(thrown).toBeInstanceOf(BadRequestException);
+      expect((thrown as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'EVENT_NOT_EDITABLE' }),
+      );
+      expect(prisma.cleanupEvent.update).not.toHaveBeenCalled();
     });
   });
 

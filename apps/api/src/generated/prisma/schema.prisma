@@ -434,9 +434,11 @@ model CleanupEvent {
   description String           @db.Text
   category    EcoEventCategory @default(GENERAL_CLEANUP)
 
-  scheduledAt DateTime
-  endAt       DateTime?
-  completedAt DateTime?
+  scheduledAt             DateTime
+  endAt                   DateTime?
+  /// When set to the same instant as [endAt], the organizer "cleanup ending soon" push was sent for that end time. Cleared when [endAt] changes (extension).
+  endSoonNotifiedForEndAt DateTime?
+  completedAt             DateTime?
 
   /// Moderation (admin approval for user-created events).
   status CleanupEventStatus @default(APPROVED)
@@ -482,8 +484,10 @@ model CleanupEvent {
 
   @@index([siteId])
   @@index([scheduledAt])
+  @@index([siteId, scheduledAt])
   @@index([status])
   @@index([lifecycleStatus, scheduledAt])
+  @@index([lifecycleStatus, endAt])
   @@index([organizerId])
   @@index([parentEventId])
 }

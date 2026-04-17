@@ -3,6 +3,7 @@ import 'dart:async' show unawaited;
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -118,7 +119,7 @@ class ChatLocationFullscreenScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Text(
                   label!.trim(),
-                  style: Theme.of(context).textTheme.bodyMedium,
+                  style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme),
                   textAlign: TextAlign.center,
                 ),
               ),

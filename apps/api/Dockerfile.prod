@@ -11,8 +11,8 @@ COPY apps/api/package.json ./apps/api/
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/api/node_modules ./apps/api/node_modules
+# Copy the full install tree so pnpm symlinks from apps/api into root .pnpm stay valid.
+COPY --from=deps /app ./
 COPY . .
 # prisma generate needs DATABASE_URL in config; use placeholder (not used for codegen)
 ENV DATABASE_URL="postgresql://build:build@localhost:5432/build"

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Tappable row inside [EventDetailGroupedPanel] to open event chat.
@@ -54,10 +55,9 @@ class EventDetailChatRow extends StatelessWidget {
                   ),
                   child: Text(
                     unreadCount > 99 ? '99+' : '$unreadCount',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textOnDark,
-                          fontWeight: FontWeight.w600,
-                        ),
+                    style: AppTypography.eventsUnreadCountBadge(
+                      Theme.of(context).textTheme,
+                    ),
                   ),
                 ),
               const SizedBox(width: 4),

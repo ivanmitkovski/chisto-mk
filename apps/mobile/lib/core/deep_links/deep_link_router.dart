@@ -26,6 +26,12 @@ final class DeepLinkHomeEvents extends DeepLinkRoute {
   const DeepLinkHomeEvents();
 }
 
+/// Loose UUID pattern (v1–v7, case-insensitive, with hyphens).
+final RegExp _uuidPattern = RegExp(
+  r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
+  caseSensitive: false,
+);
+
 /// Maps `https://chisto.mk/app/...`, `chisto://app/...`, and path-only variants to [AppRoutes].
 class DeepLinkRouter {
   DeepLinkRouter._();
@@ -37,12 +43,14 @@ class DeepLinkRouter {
 
     if (seg.length >= 3 && seg[0] == 'events' && seg[1] == 'detail') {
       final String id = seg[2].trim();
-      if (id.isEmpty) return null;
+      if (id.isEmpty || !_uuidPattern.hasMatch(id)) return null;
       return DeepLinkEventDetail(id);
     }
     if (seg.length >= 2 && seg[0] == 'events' && seg[1] == 'detail') {
       final String? id = uri.queryParameters['eventId'] ?? uri.queryParameters['id'];
-      if (id == null || id.trim().isEmpty) return null;
+      if (id == null || id.trim().isEmpty || !_uuidPattern.hasMatch(id.trim())) {
+        return null;
+      }
       return DeepLinkEventDetail(id.trim());
     }
     if (seg.length >= 2 && seg[0] == 'reports' && seg[1] == 'new') {

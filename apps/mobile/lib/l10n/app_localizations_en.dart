@@ -193,6 +193,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get semanticsClose => 'Close';
 
   @override
+  String get homeShellNavHome => 'Home';
+
+  @override
+  String get homeShellNavReports => 'Reports';
+
+  @override
+  String get homeShellNavMap => 'Map';
+
+  @override
+  String get homeShellNavEvents => 'Events';
+
+  @override
+  String semanticsReportPhotoNumber(int number) {
+    return 'Report photo $number';
+  }
+
+  @override
   String semanticsAboutStep(String title) {
     return 'About $title';
   }
@@ -1702,6 +1719,14 @@ class AppLocalizationsEn extends AppLocalizations {
       'You can start this eco action once the scheduled start time arrives.';
 
   @override
+  String get eventsJoinNotYetOpen =>
+      'Joining opens when the scheduled start time arrives.';
+
+  @override
+  String get errorEventEndAtTooFar =>
+      'The planned end cannot be that far after the start. Try a shorter extension.';
+
+  @override
   String get eventsAwaitingModerationCta => 'Awaiting approval';
 
   @override
@@ -1744,11 +1769,102 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsEditEventSave => 'Save changes';
 
   @override
+  String editEventTitleTooLong(int max) {
+    return 'Title must be at most $max characters.';
+  }
+
+  @override
+  String editEventDescriptionTooLong(int max) {
+    return 'Description must be at most $max characters.';
+  }
+
+  @override
+  String get editEventMaxParticipantsInvalid =>
+      'Enter a valid whole number of spots, or leave blank for no limit.';
+
+  @override
+  String editEventMaxParticipantsRange(int min, int max) {
+    return 'Team size must be between $min and $max, or leave blank for no limit.';
+  }
+
+  @override
+  String editEventGearLimitReached(int max) {
+    return 'You can select up to $max gear items.';
+  }
+
+  @override
+  String get editEventDiscardTitle => 'Discard changes?';
+
+  @override
+  String get editEventDiscardMessage =>
+      'You have unsaved changes. If you leave now, they will be lost.';
+
+  @override
+  String get editEventDiscardConfirm => 'Discard';
+
+  @override
+  String get editEventDiscardKeepEditing => 'Keep editing';
+
+  @override
+  String get editEventSchedulePreviewFailed =>
+      'Could not check for schedule conflicts. You can still save; the server will reject overlapping times.';
+
+  @override
+  String get editEventOfflineSave =>
+      'You appear to be offline. Connect and try again.';
+
+  @override
+  String get editEventHelpTitle => 'Editing your event';
+
+  @override
+  String get editEventHelpSubtitle => 'Schedule, volunteers, and moderation';
+
+  @override
+  String get editEventHelpButtonTooltip => 'Help';
+
+  @override
+  String get editEventDuplicateSubmitTitle => 'Schedule conflict';
+
+  @override
+  String editEventDuplicateSubmitBody(String title, String when) {
+    return '$title is already scheduled at $when. Adjust your times and try again.';
+  }
+
+  @override
+  String get editEventNoChangesToSave => 'Nothing to save.';
+
+  @override
+  String get editEventPendingModerationBanner =>
+      'This event is still awaiting moderator approval. Changes apply to your draft.';
+
+  @override
+  String get eventsEventNotEditable => 'This event can no longer be edited.';
+
+  @override
   String get eventsEventUpdated => 'Event updated';
 
   @override
   String get eventsMutationFailedGeneric =>
       'Something went wrong. Please try again.';
+
+  @override
+  String get eventsScheduleConflictPreviewTitle => 'Possible schedule overlap';
+
+  @override
+  String eventsScheduleConflictPreviewBody(String title, String when) {
+    return 'Another event at this site may overlap your time: $title at $when.';
+  }
+
+  @override
+  String get eventsScheduleConflictContinue => 'Continue anyway';
+
+  @override
+  String get eventsScheduleConflictAdjustTime => 'Change time';
+
+  @override
+  String eventsDuplicateEventBlocked(String title, String when) {
+    return 'This time overlaps \"$title\" ($when). Choose a different time.';
+  }
 
   @override
   String get eventsManualCheckInAdd => 'Add';
@@ -1994,6 +2110,37 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not start check-in. Confirm the event is in progress and try again.';
 
   @override
+  String get eventsOrganizerConfirmTitle => 'Confirm check-in';
+
+  @override
+  String get eventsOrganizerConfirmSubtitle =>
+      'Wants to check in to this event';
+
+  @override
+  String get eventsOrganizerConfirmApprove => 'Confirm';
+
+  @override
+  String get eventsOrganizerConfirmReject => 'Dismiss';
+
+  @override
+  String get eventsOrganizerConfirmExpired =>
+      'This check-in request has expired.';
+
+  @override
+  String get eventsVolunteerPendingTitle => 'Waiting for confirmation';
+
+  @override
+  String get eventsVolunteerPendingSubtitle =>
+      'The organizer needs to confirm your check-in...';
+
+  @override
+  String get eventsVolunteerRejected =>
+      'Check-in was not confirmed by the organizer.';
+
+  @override
+  String get eventsVolunteerExpired => 'Request expired. Please scan again.';
+
+  @override
   String get eventsOrganizerQrRetry => 'Try again';
 
   @override
@@ -2156,6 +2303,16 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get createEventEndTimeError =>
       'End time must be later than start time.';
+
+  @override
+  String createEventScheduleStartInPast(int minutes) {
+    return 'Choose a start time at least $minutes minutes from now.';
+  }
+
+  @override
+  String createEventScheduleEndInPast(int minutes) {
+    return 'Choose an end time at least $minutes minutes from now.';
+  }
 
   @override
   String get createEventFieldType => 'Event type';
@@ -2415,6 +2572,81 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsCtaManageCheckIn => 'Manage check-in';
 
   @override
+  String get eventsCtaExtendCleanupEnd => 'Extend planned end';
+
+  @override
+  String get eventsExtendEndSheetTitle => 'Extend cleanup';
+
+  @override
+  String eventsExtendEndSheetSubtitle(String time) {
+    return 'Current planned end is $time.';
+  }
+
+  @override
+  String eventsExtendEndCurrentChoice(String time) {
+    return 'New end: $time';
+  }
+
+  @override
+  String get eventsExtendEndPlus15 => '+15 min';
+
+  @override
+  String get eventsExtendEndPlus30 => '+30 min';
+
+  @override
+  String get eventsExtendEndPlus60 => '+1 hour';
+
+  @override
+  String get eventsExtendEndCustomTime => 'Custom time…';
+
+  @override
+  String get eventsExtendEndApply => 'Save new end time';
+
+  @override
+  String get eventsExtendEndSuccess => 'Planned end updated.';
+
+  @override
+  String get eventsExtendEndSameAsCurrent =>
+      'That is already the planned end time.';
+
+  @override
+  String get eventsExtendEndInvalidRange =>
+      'That end time is not valid for this cleanup.';
+
+  @override
+  String get eventsExtendEndTooSoon =>
+      'Choose an end time a little further ahead.';
+
+  @override
+  String get eventsEndSoonBannerTitle => 'Cleanup is ending soon';
+
+  @override
+  String get eventsEndSoonBannerBody =>
+      'You can extend the planned end or finish when you are ready.';
+
+  @override
+  String get eventsEndSoonBannerExtend => 'Extend';
+
+  @override
+  String get eventsOrganizerExtendEndSemantic =>
+      'Extend planned cleanup end time';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyTitle => 'Cleanup ending soon';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyBody =>
+      'Your cleanup is nearing its planned end. Tap to review.';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyChannelName =>
+      'Organizer cleanup reminders';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyChannelDescription =>
+      'Local reminders when a cleanup you run is nearing its planned end.';
+
+  @override
   String get eventsCtaEditAfterPhotos => 'Edit after photos';
 
   @override
@@ -2548,6 +2780,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsDetailShareSuccess => 'Event shared.';
 
   @override
+  String get eventsDetailShareFailed => 'Could not open share. Try again.';
+
+  @override
   String get eventsDetailCalendarAdded => 'Event added to your calendar.';
 
   @override
@@ -2640,7 +2875,26 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsEvidenceSaving => 'Saving...';
 
   @override
+  String get eventsEvidenceSaveInProgressHint =>
+      'Please wait until save finishes before leaving this screen.';
+
+  @override
   String get eventsEvidenceAfterPhotosSaved => 'After photos saved.';
+
+  @override
+  String get eventsEvidenceSaveSuccessTitle => 'Photos saved';
+
+  @override
+  String get eventsEvidenceSaveSuccessBody =>
+      'Your after photos are on the event page.';
+
+  @override
+  String get eventsEvidenceSaveFailureTitle => 'Could not save photos';
+
+  @override
+  String eventsEvidenceSaveFailureBody(String message) {
+    return '$message';
+  }
 
   @override
   String get eventsEvidenceNoChanges => 'No changes to save.';
@@ -3377,7 +3631,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String eventsParticipantsVolunteersJoined(int count) {
-    return '$count volunteers joined';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count volunteers joined',
+      one: '1 volunteer joined',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -3434,6 +3694,19 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventsImpactSummaryEmptyHint =>
       'Capture cleanup outcomes, effort, and lessons learned.';
+
+  @override
+  String get eventsCompletedBagsSectionTitle => 'Trash bags collected';
+
+  @override
+  String get eventsCompletedBagsSectionSubtitle =>
+      'How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.';
+
+  @override
+  String get eventsCompletedBagsSave => 'Save bag count';
+
+  @override
+  String get eventsCompletedBagsSaved => 'Bag count saved.';
 
   @override
   String eventsImpactBadgeRating(int rating) {
@@ -3507,6 +3780,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventsSearchEmptySubtitle =>
       'Try a different search term or check your spelling.';
+
+  @override
+  String get eventsSearchEmptyScopeHint =>
+      'Matches come from the server as you type and from events already loaded in this list.';
 
   @override
   String get eventsSitePickerTitle => 'Choose site';
@@ -3710,6 +3987,47 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventsCalendarNoEventsThisDay => 'No events on this day';
 
   @override
+  String get eventsCalendarIncompleteListHint =>
+      'More events may be available. Load the next page to fill this month.';
+
+  @override
+  String get eventsCalendarLoadMoreButton => 'Load more';
+
+  @override
+  String eventsCalendarDayA11yOutOfMonth(int day) {
+    return 'Day $day, not in this month';
+  }
+
+  @override
+  String eventsCalendarDayA11y(int day) {
+    return 'Day $day';
+  }
+
+  @override
+  String eventsCalendarDayA11yHasEvents(int day) {
+    return 'Day $day, has events';
+  }
+
+  @override
+  String eventsCalendarDayA11ySelected(int day) {
+    return 'Day $day, selected';
+  }
+
+  @override
+  String eventsCalendarDayA11ySelectedHasEvents(int day) {
+    return 'Day $day, selected, has events';
+  }
+
+  @override
+  String get eventsEmptyActionClearFilters => 'Clear filters';
+
+  @override
+  String get eventsEmptyActionCreateEvent => 'Create event';
+
+  @override
+  String get eventsSearchEmptyClearSearch => 'Clear search';
+
+  @override
   String siteCardPollutionSiteSemantic(String title) {
     return 'Pollution site: $title. Tap to open details.';
   }
@@ -3797,6 +4115,44 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsAnalyticsNoData => 'No data yet';
+
+  @override
+  String get eventsAnalyticsRefresh => 'Refresh analytics';
+
+  @override
+  String eventsAnalyticsCheckedInRatio(int checkedInCount, int totalJoiners) {
+    return '$checkedInCount of $totalJoiners checked in';
+  }
+
+  @override
+  String get eventsAnalyticsJoinersEmpty => 'No one has joined this event yet.';
+
+  @override
+  String get eventsAnalyticsCheckInsEmpty =>
+      'No check-ins yet. Hours are shown in UTC.';
+
+  @override
+  String eventsAnalyticsPeakCheckInsUtc(String hour) {
+    return 'Peak: $hour UTC';
+  }
+
+  @override
+  String eventsAnalyticsSemanticsJoinCurve(
+    int fromCount,
+    int toCount,
+    int steps,
+  ) {
+    return 'Join trend from $fromCount to $toCount participants, $steps data points.';
+  }
+
+  @override
+  String eventsAnalyticsSemanticsCheckInHeatmap(int peakCount, String hour) {
+    return 'Check-ins by hour in UTC. Peak $peakCount at $hour.';
+  }
+
+  @override
+  String get eventsAnalyticsSemanticsCheckInNoData =>
+      'Check-ins by hour in UTC. No check-ins recorded.';
 
   @override
   String get eventsOfflineSyncQueued => 'Saved. Will sync when back online.';
@@ -4156,6 +4512,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventChatInputSemantics => 'Chat message';
 
   @override
+  String get eventChatMessagesListSemantics => 'Messages list';
+
+  @override
+  String get eventChatAttachmentsNeedNetwork =>
+      'Photos, video, files, and voice require an internet connection.';
+
+  @override
   String get eventChatPushChannelName => 'Event chat';
 
   @override
@@ -4212,10 +4575,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get eventChatSearchHint => 'Search messages';
 
   @override
-  String get eventChatSearchNoResults => 'No messages found';
+  String get eventChatSearchNoResults => 'No matching messages';
 
   @override
   String get eventChatSearchAction => 'Search';
+
+  @override
+  String get eventChatSearchFailed =>
+      'Could not search messages. Check your connection and try again.';
+
+  @override
+  String get eventChatSearchMinChars => 'Type at least 2 characters to search.';
+
+  @override
+  String get eventChatSearchIncludingLocalMatches =>
+      'Including messages loaded on this device.';
+
+  @override
+  String get eventChatSearchLoadMore => 'Load more results';
 
   @override
   String eventChatParticipantsCount(int count) {
@@ -4447,4 +4824,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String unknownRouteDebugRoute(String routeName) {
     return 'Debug: route name was “$routeName”.';
   }
+
+  @override
+  String get chatShareLocation => 'Share Location';
+
+  @override
+  String get chatSharedLocation => 'Shared location';
 }

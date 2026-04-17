@@ -2,6 +2,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
+import { getMeProfile } from '@/features/auth/data/me-adapter';
+import { canWriteCleanupEvents } from '@/features/events/lib/cleanup-events-write-access';
 import { CreateEventForm } from './create-event-form';
 
 type PageProps = {
@@ -16,6 +18,17 @@ export default async function NewEventPage(props: PageProps) {
 
   if (!siteId) {
     redirect('/dashboard/sites');
+  }
+
+  let canWrite = false;
+  try {
+    const me = await getMeProfile();
+    canWrite = canWriteCleanupEvents(me.role);
+  } catch {
+    redirect('/dashboard/events');
+  }
+  if (!canWrite) {
+    redirect('/dashboard/events');
   }
 
   return (

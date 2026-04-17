@@ -16,19 +16,18 @@ import 'package:chisto_mobile/features/events/presentation/widgets/events_shared
 
 /// Analytics section visible to the event organizer on the detail screen.
 ///
-/// Shows:
-/// - Attendance rate ring chart
-/// - Joiners over time sparkline
-/// - Check-ins by hour bar chart
-///
-/// Hidden for non-organizers and upcoming events (no data yet).
+/// Shows attendance, cumulative join curve, and 24h UTC check-in distribution.
 class OrganizerAnalyticsSection extends StatefulWidget {
   const OrganizerAnalyticsSection({
     super.key,
     required this.event,
+    this.fetchAnalytics,
   });
 
   final EcoEvent event;
+
+  /// When set (e.g. tests), replaces the default API repository fetch.
+  final Future<EventAnalytics> Function(String eventId)? fetchAnalytics;
 
   @override
   State<OrganizerAnalyticsSection> createState() => _OrganizerAnalyticsSectionState();
@@ -37,40 +36,50 @@ class OrganizerAnalyticsSection extends StatefulWidget {
 class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
   EventAnalytics? _analytics;
   bool _loading = true;
+  bool _silentRefresh = false;
   bool _failed = false;
 
   @override
   void initState() {
     super.initState();
-    unawaited(_fetch());
+    unawaited(_fetch(silent: false));
   }
 
-  Future<void> _fetch() async {
+  Future<void> _fetch({required bool silent}) async {
+    if (!silent) {
+      setState(() {
+        _loading = true;
+        _failed = false;
+      });
+    } else {
+      setState(() => _silentRefresh = true);
+    }
     try {
-      final EventAnalytics data = await ServiceLocator.instance.eventAnalyticsRepository
-          .fetchAnalytics(widget.event.id);
+      final EventAnalytics data = widget.fetchAnalytics != null
+          ? await widget.fetchAnalytics!(widget.event.id)
+          : await ServiceLocator.instance.eventAnalyticsRepository.fetchAnalytics(widget.event.id);
       if (!mounted) return;
       setState(() {
         _analytics = data;
         _loading = false;
+        _silentRefresh = false;
         _failed = false;
       });
     } on Object {
       if (!mounted) return;
       setState(() {
         _loading = false;
-        _failed = true;
-        _analytics = null;
+        _silentRefresh = false;
+        if (!silent) {
+          _failed = true;
+          _analytics = null;
+        }
       });
     }
   }
 
   Future<void> _retry() async {
-    setState(() {
-      _failed = false;
-      _loading = true;
-    });
-    await _fetch();
+    await _fetch(silent: false);
   }
 
   @override
@@ -109,6 +118,11 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
   }
 
   Widget _buildContent(BuildContext context, EventAnalytics data) {
+    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
+    final int peakHour = _peakHour(data.checkInsByHour);
+    final int peakCount = data.checkInsByHour.isEmpty ? 0 : data.checkInsByHour[peakHour].count;
+    final String peakLabel = '${peakHour.toString().padLeft(2, '0')}:00';
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -116,100 +130,161 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // Top row: attendance ring + stats
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Semantics(
-                label:
-                    '${context.l10n.eventsAnalyticsAttendanceRate}, ${data.attendanceRate}%',
-                child: _AttendanceRing(
-                  rate: data.attendanceRate / 100.0,
-                  size: 72,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(
-                      context.l10n.eventsAnalyticsAttendanceRate,
-                      style: AppTypography.textTheme.labelMedium?.copyWith(
-                        color: AppColors.textMuted,
+                    Semantics(
+                      label:
+                          '${context.l10n.eventsAnalyticsAttendanceRate}, ${data.attendanceRate}%',
+                      child: _AttendanceRing(
+                        rate: data.attendanceRate / 100.0,
+                        size: 72,
                       ),
                     ),
-                    Text(
-                      '${data.attendanceRate}%',
-                      style: AppTypography.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.5,
-                        color: _rateColor(data.attendanceRate),
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${data.checkedInCount} / ${data.totalJoiners} joined',
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
+                    const SizedBox(width: AppSpacing.md),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            context.l10n.eventsAnalyticsAttendanceRate,
+                            style: AppTypography.eventsSheetDateTileLabel(
+                              Theme.of(context).textTheme,
+                            ),
+                          ),
+                          Text(
+                            '${data.attendanceRate}%',
+                            style: AppTypography.eventsAnalyticsHeroMetric(
+                              Theme.of(context).textTheme,
+                              color: _rateColor(data.attendanceRate),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            context.l10n.eventsAnalyticsCheckedInRatio(
+                              data.checkedInCount,
+                              data.totalJoiners,
+                            ),
+                            style: AppTypography.eventsListCardMeta(
+                              Theme.of(context).textTheme,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
+              if (widget.fetchAnalytics == null)
+                IconButton(
+                  tooltip: context.l10n.eventsAnalyticsRefresh,
+                  onPressed: (_loading || _silentRefresh)
+                      ? null
+                      : () => unawaited(_fetch(silent: true)),
+                  icon: _silentRefresh
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : Icon(Icons.refresh, color: AppColors.textMuted),
+                ),
             ],
           ),
 
-          if (data.joinersOverTime.isNotEmpty) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            const Divider(height: 1, thickness: 0.5),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              context.l10n.eventsAnalyticsJoiners,
-              style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w600,
-              ),
+          const SizedBox(height: AppSpacing.md),
+          const Divider(height: 1, thickness: 0.5),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            context.l10n.eventsAnalyticsJoiners,
+            style: AppTypography.eventsMicroSectionHeading(
+              Theme.of(context).textTheme,
             ),
-            const SizedBox(height: AppSpacing.xs),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          if (data.joinersCumulative.isEmpty)
+            _emptyCaption(context, context.l10n.eventsAnalyticsJoinersEmpty)
+          else
             Semantics(
-              label: context.l10n.eventsAnalyticsJoiners,
+              label: context.l10n.eventsAnalyticsSemanticsJoinCurve(
+                data.joinersCumulative.first.cumulativeJoiners,
+                data.joinersCumulative.last.cumulativeJoiners,
+                data.joinersCumulative.length,
+              ),
               child: SizedBox(
-                height: 48,
-                child: _Sparkline(
-                  data: data.joinersOverTime
-                      .map((JoinersOverTimeEntry e) => e.count.toDouble())
-                      .toList(),
+                height: 52,
+                child: _JoinCurveChart(
+                  cumulative: data.joinersCumulative.map((JoinersCumulativeEntry e) => e.cumulativeJoiners).toList(),
                   color: AppColors.primary,
+                  reduceMotion: reduceMotion,
                 ),
               ),
             ),
-          ],
 
-          if (data.checkInsByHour.isNotEmpty) ...<Widget>[
-            const SizedBox(height: AppSpacing.md),
-            const Divider(height: 1, thickness: 0.5),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              context.l10n.eventsAnalyticsCheckInsByHour,
-              style: AppTypography.textTheme.labelSmall?.copyWith(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w600,
+          const SizedBox(height: AppSpacing.md),
+          const Divider(height: 1, thickness: 0.5),
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            context.l10n.eventsAnalyticsCheckInsByHour,
+            style: AppTypography.eventsMicroSectionHeading(
+              Theme.of(context).textTheme,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          if (data.checkInsByHour.every((CheckInsByHourEntry e) => e.count == 0))
+            Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+              child: _emptyCaption(context, context.l10n.eventsAnalyticsCheckInsEmpty),
+            ),
+          Semantics(
+            label: peakCount > 0
+                ? context.l10n.eventsAnalyticsSemanticsCheckInHeatmap(peakCount, peakLabel)
+                : context.l10n.eventsAnalyticsSemanticsCheckInNoData,
+            child: SizedBox(
+              height: 56,
+              child: _BarChart(
+                data: data.checkInsByHour,
+                color: AppColors.primary,
+                peakHour: peakHour,
               ),
             ),
+          ),
+          if (peakCount > 0) ...<Widget>[
             const SizedBox(height: AppSpacing.xs),
-            Semantics(
-              label: context.l10n.eventsAnalyticsCheckInsByHour,
-              child: SizedBox(
-                height: 48,
-                child: _BarChart(
-                  data: data.checkInsByHour,
-                  color: AppColors.primary,
-                ),
+            Text(
+              context.l10n.eventsAnalyticsPeakCheckInsUtc(peakLabel),
+              style: AppTypography.eventsListCardMeta(
+                Theme.of(context).textTheme,
               ),
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  int _peakHour(List<CheckInsByHourEntry> hours) {
+    int bestH = 0;
+    int bestC = -1;
+    for (final CheckInsByHourEntry e in hours) {
+      if (e.count > bestC) {
+        bestC = e.count;
+        bestH = e.hour;
+      }
+    }
+    return bestH;
+  }
+
+  Widget _emptyCaption(BuildContext context, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+      child: Text(
+        text,
+        style: AppTypography.eventsListCardMeta(Theme.of(context).textTheme),
       ),
     );
   }
@@ -220,8 +295,6 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
     return AppColors.error;
   }
 }
-
-// ── Attendance ring ───────────────────────────────────────────────────────────
 
 class _AttendanceRing extends StatelessWidget {
   const _AttendanceRing({required this.rate, required this.size});
@@ -239,10 +312,9 @@ class _AttendanceRing extends StatelessWidget {
         child: Center(
           child: Text(
             '${(rate * 100).round()}%',
-            style: AppTypography.textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 13,
-            ),
+            style: AppTypography.eventsCaptionStrong(
+              Theme.of(context).textTheme,
+            ).copyWith(fontWeight: FontWeight.w700),
           ),
         ),
       ),
@@ -261,7 +333,6 @@ class _RingPainter extends CustomPainter {
     final Offset center = Offset(size.width / 2, size.height / 2);
     const double startAngle = -math.pi / 2;
 
-    // Track
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
       0,
@@ -274,7 +345,6 @@ class _RingPainter extends CustomPainter {
     );
 
     if (rate > 0) {
-      // Fill
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
         startAngle,
@@ -293,42 +363,81 @@ class _RingPainter extends CustomPainter {
   bool shouldRepaint(_RingPainter old) => old.rate != rate;
 }
 
-// ── Sparkline ─────────────────────────────────────────────────────────────────
+class _JoinCurveChart extends StatelessWidget {
+  const _JoinCurveChart({
+    required this.cumulative,
+    required this.color,
+    required this.reduceMotion,
+  });
 
-class _Sparkline extends StatelessWidget {
-  const _Sparkline({required this.data, required this.color});
-  final List<double> data;
+  final List<int> cumulative;
   final Color color;
+  final bool reduceMotion;
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const SizedBox.shrink();
+    if (cumulative.isEmpty) return const SizedBox.shrink();
     return CustomPaint(
-      painter: _SparklinePainter(data: data, color: color),
+      painter: _JoinCurvePainter(
+        data: cumulative.map((int v) => v.toDouble()).toList(growable: false),
+        color: color,
+        reduceMotion: reduceMotion,
+      ),
       size: Size.infinite,
     );
   }
 }
 
-class _SparklinePainter extends CustomPainter {
-  const _SparklinePainter({required this.data, required this.color});
+class _JoinCurvePainter extends CustomPainter {
+  const _JoinCurvePainter({
+    required this.data,
+    required this.color,
+    required this.reduceMotion,
+  });
+
   final List<double> data;
   final Color color;
+  final bool reduceMotion;
+
+  double _yFor(double v, double minV, double maxV, double height) {
+    if (maxV <= minV) {
+      return height * 0.18;
+    }
+    final double t = (v - minV) / (maxV - minV);
+    return height - t * (height * 0.82) - height * 0.08;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (data.length < 2) return;
-    final double maxVal = data.reduce(math.max);
-    if (maxVal == 0) return;
+    if (data.isEmpty) return;
+
+    final double minV = data.reduce(math.min);
+    final double maxV = data.reduce(math.max);
+
+    if (data.length == 1) {
+      final double cx = size.width / 2;
+      final double cy = _yFor(data[0], minV, maxV, size.height);
+      canvas.drawCircle(
+        Offset(cx, cy),
+        4,
+        Paint()..color = color,
+      );
+      canvas.drawLine(
+        Offset(cx, cy + 4),
+        Offset(cx, size.height - 2),
+        Paint()
+          ..color = color.withValues(alpha: 0.25)
+          ..strokeWidth = 1,
+      );
+      return;
+    }
 
     final double stepX = size.width / (data.length - 1);
-
-    // Area fill
     final Path areaPath = Path();
     areaPath.moveTo(0, size.height);
     for (int i = 0; i < data.length; i++) {
       final double x = i * stepX;
-      final double y = size.height - (data[i] / maxVal) * size.height;
+      final double y = _yFor(data[i], minV, maxV, size.height);
       if (i == 0) {
         areaPath.lineTo(x, y);
       } else {
@@ -337,16 +446,21 @@ class _SparklinePainter extends CustomPainter {
     }
     areaPath.lineTo((data.length - 1) * stepX, size.height);
     areaPath.close();
-    canvas.drawPath(
-      areaPath,
-      Paint()..color = color.withValues(alpha: 0.12),
-    );
 
-    // Line
+    final Paint fillPaint = reduceMotion
+        ? (Paint()..color = color.withValues(alpha: 0.12))
+        : (Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: <Color>[color.withValues(alpha: 0.22), color.withValues(alpha: 0.06)],
+          ).createShader(Rect.fromLTWH(0, 0, size.width, size.height)));
+    canvas.drawPath(areaPath, fillPaint);
+
     final Path linePath = Path();
     for (int i = 0; i < data.length; i++) {
       final double x = i * stepX;
-      final double y = size.height - (data[i] / maxVal) * size.height;
+      final double y = _yFor(data[i], minV, maxV, size.height);
       if (i == 0) {
         linePath.moveTo(x, y);
       } else {
@@ -365,64 +479,83 @@ class _SparklinePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_SparklinePainter old) => old.data != data;
+  bool shouldRepaint(_JoinCurvePainter old) =>
+      old.data != data || old.color != color || old.reduceMotion != reduceMotion;
 }
 
-// ── Bar chart ─────────────────────────────────────────────────────────────────
-
 class _BarChart extends StatelessWidget {
-  const _BarChart({required this.data, required this.color});
+  const _BarChart({
+    required this.data,
+    required this.color,
+    required this.peakHour,
+  });
+
   final List<CheckInsByHourEntry> data;
   final Color color;
+  final int peakHour;
 
   @override
   Widget build(BuildContext context) {
-    if (data.isEmpty) return const SizedBox.shrink();
     return CustomPaint(
-      painter: _BarChartPainter(data: data, color: color),
+      painter: _BarChartPainter(data: data, color: color, peakHour: peakHour),
       size: Size.infinite,
     );
   }
 }
 
 class _BarChartPainter extends CustomPainter {
-  const _BarChartPainter({required this.data, required this.color});
+  const _BarChartPainter({
+    required this.data,
+    required this.color,
+    required this.peakHour,
+  });
+
   final List<CheckInsByHourEntry> data;
   final Color color;
+  final int peakHour;
 
   @override
   void paint(Canvas canvas, Size size) {
     if (data.isEmpty) return;
+
     final int maxCount = data.map((CheckInsByHourEntry e) => e.count).reduce(math.max);
-    if (maxCount == 0) return;
+    final int n = data.length;
+    final double slotW = size.width / n;
+    final double barWidth = slotW * 0.62;
+    final double inset = (slotW - barWidth) / 2;
+    final Paint bg = Paint()..color = color.withValues(alpha: 0.08);
+    final Paint fill = Paint()..color = color.withValues(alpha: 0.72);
+    final Paint peakFill = Paint()..color = color.withValues(alpha: 0.95);
 
-    final double barWidth = (size.width / data.length) * 0.65;
-    final double gap = (size.width / data.length) * 0.35;
-    final Paint fill = Paint()..color = color.withValues(alpha: 0.7);
-    final Paint bg = Paint()..color = color.withValues(alpha: 0.1);
-
-    for (int i = 0; i < data.length; i++) {
-      final double x = i * (barWidth + gap);
-      final double barH = (data[i].count / maxCount) * size.height;
-
-      // Background bar
+    for (int i = 0; i < n; i++) {
+      final double x = i * slotW + inset;
       final RRect bgRect = RRect.fromRectAndRadius(
         Rect.fromLTWH(x, 0, barWidth, size.height),
         const Radius.circular(2),
       );
       canvas.drawRRect(bgRect, bg);
 
-      // Filled bar
+      final int count = data[i].count;
+      final double norm = maxCount > 0 ? count / maxCount : 0;
+      final double barH = norm * size.height;
       if (barH > 0) {
+        final Paint p = data[i].hour == peakHour && count == maxCount && maxCount > 0 ? peakFill : fill;
         final RRect filledRect = RRect.fromRectAndRadius(
           Rect.fromLTWH(x, size.height - barH, barWidth, barH),
           const Radius.circular(2),
         );
-        canvas.drawRRect(filledRect, fill);
+        canvas.drawRRect(filledRect, p);
       }
     }
+
+    canvas.drawLine(
+      Offset(0, size.height - 0.5),
+      Offset(size.width, size.height - 0.5),
+      Paint()..color = AppColors.divider.withValues(alpha: 0.35),
+    );
   }
 
   @override
-  bool shouldRepaint(_BarChartPainter old) => old.data != data;
+  bool shouldRepaint(_BarChartPainter old) =>
+      old.data != data || old.color != color || old.peakHour != peakHour;
 }

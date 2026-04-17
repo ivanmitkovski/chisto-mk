@@ -11,6 +11,11 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_i
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 
+/// Key for tests and accessibility drivers targeting the organizer edit control.
+const ValueKey<String> kEventDetailHeroEditKey = ValueKey<String>(
+  'event_detail_hero_edit',
+);
+
 /// Pinned, stretchable hero sliver for the event detail screen.
 ///
 /// The expanded state shows the cover image with a cinematic 3-stop gradient
@@ -25,10 +30,14 @@ class HeroImageBar extends StatelessWidget {
     required this.onShare,
     this.onEdit,
     this.enableThumbnailHero = false,
+    this.shareButtonKey,
   });
 
   final EcoEvent event;
   final VoidCallback onShare;
+
+  /// When set, pinned to the share action for [Share.shareUri] popover anchoring.
+  final GlobalKey? shareButtonKey;
 
   /// When false, skips [Hero] so route replacements between different event ids do not
   /// trip `_HeroFlight.divert` (see [EventDetailScreen.enableThumbnailHero]).
@@ -58,6 +67,7 @@ class HeroImageBar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.xs),
             child: _ActionChip(
+              key: kEventDetailHeroEditKey,
               icon: CupertinoIcons.pencil,
               tooltip: context.l10n.eventsEditEventTitle,
               onTap: onEdit!,
@@ -66,6 +76,7 @@ class HeroImageBar extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(right: AppSpacing.sm),
           child: _ActionChip(
+            key: shareButtonKey,
             icon: CupertinoIcons.share,
             tooltip: context.l10n.eventsShareEventTooltip,
             onTap: onShare,
@@ -121,7 +132,8 @@ class HeroImageBar extends StatelessWidget {
                         child: Row(
                           children: <Widget>[
                             _StatusPill(event: event),
-                            if (event.status == EcoEventStatus.upcoming) ...<Widget>[
+                            if (event.status ==
+                                EcoEventStatus.upcoming) ...<Widget>[
                               const SizedBox(width: AppSpacing.sm),
                               CountdownBadge(event: event),
                             ],
@@ -186,10 +198,7 @@ Widget _thumbnailHeroOrPlain({
   if (!enableHero) {
     return materialCover;
   }
-  return Hero(
-    tag: 'event-thumb-${event.id}',
-    child: materialCover,
-  );
+  return Hero(tag: 'event-thumb-${event.id}', child: materialCover);
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -210,18 +219,13 @@ class _CollapsedToolbarTitle extends StatelessWidget {
         theme.titleSmall ?? AppTypography.textTheme.titleSmall!;
     final Text text = Text(
       title,
-      style: baseTitleSmall.copyWith(
-        color: AppColors.textPrimary,
-      ),
+      style: baseTitleSmall.copyWith(color: AppColors.textPrimary),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
       textAlign: TextAlign.center,
     );
 
-    final Widget labeled = Semantics(
-      label: title,
-      child: text,
-    );
+    final Widget labeled = Semantics(label: title, child: text);
 
     if (title.characters.length <= _tooltipCharThreshold) {
       return labeled;
@@ -236,6 +240,7 @@ class _CollapsedToolbarTitle extends StatelessWidget {
 
 class _ActionChip extends StatelessWidget {
   const _ActionChip({
+    super.key,
     required this.icon,
     required this.tooltip,
     required this.onTap,
@@ -285,9 +290,7 @@ class _StatusPill extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.black.withValues(alpha: 0.32),
         borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-        border: Border.all(
-          color: AppColors.white.withValues(alpha: 0.18),
-        ),
+        border: Border.all(color: AppColors.white.withValues(alpha: 0.18)),
       ),
       child: Text(
         event.status.localizedLabel(context.l10n),
@@ -312,7 +315,10 @@ class CountdownBadge extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final String label = eventsCountdownLabel(context.l10n, event.startDateTime);
+    final String label = eventsCountdownLabel(
+      context.l10n,
+      event.startDateTime,
+    );
 
     return Semantics(
       label: context.l10n.eventsCountdownBadgeSemantic(label),
@@ -333,10 +339,9 @@ class CountdownBadge extends StatelessWidget {
             const SizedBox(width: AppSpacing.xs),
             Text(
               label,
-              style: AppTypography.textTheme.bodySmall?.copyWith(
-                fontWeight: FontWeight.w600,
+              style: AppTypography.eventsCaptionStrong(
+                Theme.of(context).textTheme,
                 color: AppColors.white,
-                fontSize: 12,
               ),
             ),
           ],

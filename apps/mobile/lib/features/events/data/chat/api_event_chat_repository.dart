@@ -116,15 +116,6 @@ class ApiEventChatRepository implements EventChatRepository {
     });
   }
 
-  // Hot reload can retain broadcast onListen/onCancel closures on old private names.
-  void _startWebSocket(String eventId, StreamController<EventChatStreamEvent> out) {
-    _startRealtime(eventId, out);
-  }
-
-  void _stopWebSocket(String eventId) {
-    _stopRealtime(eventId);
-  }
-
   void _startRealtime(String eventId, StreamController<EventChatStreamEvent> out) {
     _loopCancelled[eventId] = false;
     _chatLiveSessionGen[eventId] = (_chatLiveSessionGen[eventId] ?? 0) + 1;
@@ -406,7 +397,7 @@ class ApiEventChatRepository implements EventChatRepository {
       payload['location'] = <String, dynamic>{
         'lat': locationLat,
         'lng': locationLng,
-        if (locationLabel != null) 'label': locationLabel,
+        'label': ?locationLabel,
       };
     }
     final ApiResponse res = await _client.post('/events/$eventId/chat', body: payload);
@@ -701,7 +692,7 @@ class ApiEventChatRepository implements EventChatRepository {
         }
         continue;
       } on AppError catch (e) {
-        if (e.code == 'UNAUTHORIZED') {
+        if (e.code == 'UNAUTHORIZED' || e.code == 'FORBIDDEN') {
           emitConn(EventChatConnectionStatus.disconnected);
           return;
         }
@@ -756,6 +747,10 @@ class ApiEventChatRepository implements EventChatRepository {
       _authState.setUnauthenticated();
       emitConnectionStatus(EventChatConnectionStatus.disconnected);
       throw AppError.unauthorized();
+    }
+    if (res.statusCode == 403) {
+      emitConnectionStatus(EventChatConnectionStatus.disconnected);
+      throw AppError.forbidden(message: 'Chat SSE forbidden');
     }
     if (res.statusCode < 200 || res.statusCode >= 300) {
       if (kDebugMode) {

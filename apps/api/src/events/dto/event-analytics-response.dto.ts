@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class JoinersOverTimeEntryDto {
-  @ApiProperty({ description: 'ISO 8601 date' })
-  date!: string;
+export class JoinersCumulativeEntryDto {
+  @ApiProperty({ description: 'ISO-8601 instant when the participant joined' })
+  at!: string;
 
-  @ApiProperty()
-  count!: number;
+  @ApiProperty({ description: 'Running total of participants joined up to and including this point' })
+  cumulativeJoiners!: number;
 }
 
 export class CheckInsByHourEntryDto {
@@ -23,12 +23,18 @@ export class EventAnalyticsResponseDto {
   @ApiProperty()
   checkedInCount!: number;
 
-  @ApiProperty({ description: 'Attendance rate as a percentage (0–100)' })
+  @ApiProperty({ description: 'Attendance rate as a percentage (0–100), from check-in rows vs joiners' })
   attendanceRate!: number;
 
-  @ApiProperty({ type: [JoinersOverTimeEntryDto] })
-  joinersOverTime!: JoinersOverTimeEntryDto[];
+  @ApiProperty({
+    type: [JoinersCumulativeEntryDto],
+    description: 'One point per join, ordered by time, with running cumulative count',
+  })
+  joinersCumulative!: JoinersCumulativeEntryDto[];
 
-  @ApiProperty({ type: [CheckInsByHourEntryDto] })
+  @ApiProperty({
+    type: [CheckInsByHourEntryDto],
+    description: 'Exactly 24 entries (hours 0–23 UTC), zeros where no check-ins',
+  })
   checkInsByHour!: CheckInsByHourEntryDto[];
 }

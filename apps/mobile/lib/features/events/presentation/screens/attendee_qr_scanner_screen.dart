@@ -8,16 +8,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/check_in_repository_registry.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
+import 'package:chisto_mobile/features/events/data/socket_check_in_stream.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -25,10 +29,11 @@ import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 
 /// When set on [AttendeeQrScannerScreen], replaces [MobileScanner] for widget tests.
-typedef AttendeeQrScannerTestSlotBuilder = Widget Function(
-  BuildContext context,
-  void Function(String rawPayload) simulateScan,
-);
+typedef AttendeeQrScannerTestSlotBuilder =
+    Widget Function(
+      BuildContext context,
+      void Function(String rawPayload) simulateScan,
+    );
 
 String _attendeeQrScannerMobileScannerErrorBody(
   MobileScannerErrorCode code,
@@ -54,7 +59,10 @@ Widget attendeeQrScannerCameraErrorLayerForTesting(
 }) {
   final TextTheme textTheme = Theme.of(context).textTheme;
   final AppLocalizations l10n = context.l10n;
-  final String detail = _attendeeQrScannerMobileScannerErrorBody(errorCode, l10n);
+  final String detail = _attendeeQrScannerMobileScannerErrorBody(
+    errorCode,
+    l10n,
+  );
   return ColoredBox(
     color: AppColors.black,
     child: SafeArea(
@@ -77,7 +85,7 @@ Widget attendeeQrScannerCameraErrorLayerForTesting(
                   const SizedBox(height: AppSpacing.md),
                   Text(
                     l10n.qrScannerCameraErrorTitle,
-                    style: textTheme.titleMedium?.copyWith(
+                    style: AppTypography.eventsHeroCardTitle(textTheme).copyWith(
                       color: AppColors.textOnDark,
                       fontWeight: FontWeight.w600,
                     ),
@@ -86,7 +94,7 @@ Widget attendeeQrScannerCameraErrorLayerForTesting(
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     detail,
-                    style: textTheme.bodyMedium?.copyWith(
+                    style: AppTypography.eventsHeroCardMeta(textTheme).copyWith(
                       color: AppColors.textOnDarkMuted,
                       height: 1.4,
                     ),
@@ -107,13 +115,13 @@ Widget attendeeQrScannerCameraErrorLayerForTesting(
                   label: l10n.qrScannerRetryCamera,
                   child: CupertinoButton(
                     onPressed: onRetryCamera,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     child: Text(
                       l10n.qrScannerRetryCamera,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTypography.eventsTextLinkEmphasis(textTheme)
+                          .copyWith(color: AppColors.primary),
                     ),
                   ),
                 ),
@@ -122,13 +130,13 @@ Widget attendeeQrScannerCameraErrorLayerForTesting(
                   label: l10n.qrScannerEnterManually,
                   child: CupertinoButton(
                     onPressed: onEnterManually,
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
                     child: Text(
                       l10n.qrScannerEnterManually,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textOnDark,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTypography.eventsTextLinkEmphasis(textTheme)
+                          .copyWith(color: AppColors.textOnDark),
                     ),
                   ),
                 ),
@@ -187,6 +195,7 @@ class _SquareScanFramePainter extends CustomPainter {
   final double cornerRadius;
 
   static const double _innerInset = 15;
+
   /// Standard QR finder pattern (7×7, `true` = dark module).
   static const List<List<bool>> _finder7 = <List<bool>>[
     <bool>[true, true, true, true, true, true, true],
@@ -390,7 +399,10 @@ class _CheckmarkPainter extends CustomPainter {
     final List<ui.PathMetric> metrics = path.computeMetrics().toList();
     if (metrics.isEmpty) return;
 
-    final double totalLength = metrics.fold<double>(0, (double sum, ui.PathMetric m) => sum + m.length);
+    final double totalLength = metrics.fold<double>(
+      0,
+      (double sum, ui.PathMetric m) => sum + m.length,
+    );
     final double drawLength = totalLength * progress.clamp(0, 1);
 
     double accumulated = 0;
@@ -432,8 +444,9 @@ class _ManualEntrySheetHandle extends StatelessWidget {
           height: AppSpacing.sheetHandleHeight,
           decoration: BoxDecoration(
             color: AppColors.divider,
-            borderRadius:
-                BorderRadius.circular(AppSpacing.sheetHandleHeight / 2),
+            borderRadius: BorderRadius.circular(
+              AppSpacing.sheetHandleHeight / 2,
+            ),
           ),
         ),
       ),
@@ -531,8 +544,8 @@ class _AttendeeManualCodeEntrySheetState
                               children: <Widget>[
                                 Text(
                                   l10n.qrScannerManualEntryTitle,
-                                  style: textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.w700,
+                                  style: AppTypography.eventsScreenTitle(textTheme)
+                                      .copyWith(
                                     color: AppColors.textPrimary,
                                     letterSpacing: -0.2,
                                   ),
@@ -540,10 +553,8 @@ class _AttendeeManualCodeEntrySheetState
                                 const SizedBox(height: AppSpacing.xs),
                                 Text(
                                   l10n.qrScannerManualEntrySubtitle,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
+                                  style: AppTypography.eventsBodyMediumSecondary(textTheme)
+                                      .copyWith(height: 1.4),
                                 ),
                               ],
                             ),
@@ -574,17 +585,15 @@ class _AttendeeManualCodeEntrySheetState
                           horizontal: AppSpacing.md,
                           vertical: AppSpacing.md,
                         ),
-                        style: textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textPrimary,
-                          height: 1.35,
-                        ),
-                        placeholderStyle: textTheme.bodyLarge?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                        style: AppTypography.eventsEditFormFieldPrimary(textTheme)
+                            .copyWith(height: 1.35),
+                        placeholderStyle:
+                            AppTypography.eventsSearchFieldPlaceholder(textTheme),
                         decoration: BoxDecoration(
                           color: AppColors.inputFill,
-                          borderRadius:
-                              BorderRadius.circular(AppSpacing.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
                           border: Border.all(color: AppColors.inputBorder),
                         ),
                       ),
@@ -598,10 +607,8 @@ class _AttendeeManualCodeEntrySheetState
                         ),
                         label: Text(
                           l10n.qrScannerPasteButton,
-                          style: textTheme.labelLarge?.copyWith(
-                            color: AppColors.primaryDark,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTypography.eventsTextLinkEmphasis(textTheme)
+                              .copyWith(color: AppColors.primaryDark),
                         ),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primaryDark,
@@ -611,8 +618,9 @@ class _AttendeeManualCodeEntrySheetState
                             horizontal: AppSpacing.md,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusMd),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusMd,
+                            ),
                           ),
                         ),
                       ),
@@ -652,10 +660,8 @@ class _AttendeeManualCodeEntrySheetState
                             ),
                             child: Text(
                               l10n.commonCancel,
-                              style: textTheme.titleSmall?.copyWith(
-                                color: AppColors.primaryDark,
-                                fontWeight: FontWeight.w600,
-                              ),
+                              style: AppTypography.eventsSecondaryCtaLabel(textTheme)
+                                  .copyWith(color: AppColors.primaryDark),
                             ),
                           ),
                         ),
@@ -698,12 +704,14 @@ class AttendeeQrScannerScreen extends StatefulWidget {
   final AttendeeQrScannerTestSlotBuilder? scannerTestSlotBuilder;
 
   @override
-  State<AttendeeQrScannerScreen> createState() => _AttendeeQrScannerScreenState();
+  State<AttendeeQrScannerScreen> createState() =>
+      _AttendeeQrScannerScreenState();
 }
 
 class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     with SingleTickerProviderStateMixin, WidgetsBindingObserver {
-  final CheckInRepository _checkInRepository = CheckInRepositoryRegistry.instance;
+  final CheckInRepository _checkInRepository =
+      CheckInRepositoryRegistry.instance;
   final EventsRepository _eventsRepository = EventsRepositoryRegistry.instance;
   MobileScannerController? _controller;
   final TextEditingController _manualCodeController = TextEditingController();
@@ -716,6 +724,14 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
   DateTime? _checkedInAt;
   int _checkInPointsAwarded = 0;
   DateTime? _scanCooldownUntil;
+
+  // --- Pending confirmation state ---
+  bool _pendingConfirmation = false;
+  String? _pendingId;
+  SocketCheckInStream? _checkInWs;
+  StreamSubscription<CheckInStreamEvent>? _checkInWsSub;
+  Timer? _pendingTimeoutTimer;
+  Timer? _pendingPollTimer;
 
   late AnimationController _scanLineController;
 
@@ -746,7 +762,8 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     final double maxSide = math.min(280, width - AppSpacing.lg * 2);
     final double side = maxSide.clamp(208, 280);
     final double bottomBlock = bottomSafe + _bottomActionsReserve;
-    final double y = _topInstructionReserve +
+    final double y =
+        _topInstructionReserve +
         math.max(0, (height - _topInstructionReserve - bottomBlock - side) / 2);
     final double x = (width - side) / 2;
     return Rect.fromLTWH(x, y, side, side);
@@ -777,7 +794,8 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
         detectionSpeed: DetectionSpeed.unrestricted,
         facing: CameraFacing.back,
         autoZoom: !kIsWeb && defaultTargetPlatform == TargetPlatform.android,
-        cameraResolution: !kIsWeb && defaultTargetPlatform == TargetPlatform.android
+        cameraResolution:
+            !kIsWeb && defaultTargetPlatform == TargetPlatform.android
             ? const Size(1280, 720)
             : null,
       );
@@ -811,6 +829,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     _scanLineController.dispose();
     _manualCodeController.dispose();
     _controller?.dispose();
+    _pendingTimeoutTimer?.cancel();
+    _pendingPollTimer?.cancel();
+    _checkInWsSub?.cancel();
+    _checkInWs?.dispose();
     super.dispose();
   }
 
@@ -832,6 +854,9 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
         break;
       case AppLifecycleState.resumed:
         unawaited(_resumeCameraAfterLifecycle());
+        if (_pendingConfirmation && _pendingId != null) {
+          unawaited(_pollPendingStatus());
+        }
         break;
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
@@ -867,8 +892,36 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     }
   }
 
+  /// Keeps [EcoEvent.isCheckedIn] in sync so event detail CTAs refresh after check-in
+  /// (especially after organizer approves a pending request — no redeem HTTP body then).
+  void _markAttendeeCheckedInOnEventsStore(DateTime? checkedInAt) {
+    _eventsRepository.setAttendeeCheckInStatus(
+      eventId: widget.eventId,
+      status: AttendeeCheckInStatus.checkedIn,
+      checkedInAt: checkedInAt ?? DateTime.now(),
+    );
+    unawaited(_eventsRepository.prefetchEvent(widget.eventId, force: true));
+  }
+
+  /// Releases the camera and scan animation once check-in is done or while awaiting organizer.
+  Future<void> _suspendScanningHardware() async {
+    if (!mounted) {
+      return;
+    }
+    _scanLineController.stop();
+    final MobileScannerController? c = _controller;
+    if (c == null) {
+      return;
+    }
+    try {
+      await c.stop();
+    } on Object {
+      // Camera may already be stopped; ignore.
+    }
+  }
+
   void _handleBarcode(BarcodeCapture capture) {
-    if (_scanned || _processing) return;
+    if (_scanned || _processing || _pendingConfirmation) return;
     final DateTime now = DateTime.now();
     if (_scanCooldownUntil != null && now.isBefore(_scanCooldownUntil!)) {
       return;
@@ -883,7 +936,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
   static const Duration _kScanFailureCooldown = Duration(milliseconds: 1500);
 
   Future<void> _submitRawCode(String rawCode) async {
-    if (_scanned || _processing) {
+    if (_scanned || _processing || _pendingConfirmation) {
       return;
     }
     // Set synchronously so rapid [onDetect] bursts cannot enqueue overlapping submits.
@@ -907,54 +960,318 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     }
     if (result.isSuccess) {
       AppHaptics.success();
+      await _suspendScanningHardware();
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _scanned = true;
         _checkedInAt = result.checkedInAt;
         _checkInPointsAwarded = result.pointsAwarded;
         _processing = false;
       });
+      _markAttendeeCheckedInOnEventsStore(result.checkedInAt);
       widget.onCheckInSuccess?.call();
+      return;
+    }
+
+    if (result.isPendingConfirmation) {
+      AppHaptics.tap();
+      await _suspendScanningHardware();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _processing = false;
+        _pendingConfirmation = true;
+        _pendingId = result.pendingId;
+        _feedback = null;
+      });
+      _startPendingConfirmationFlow(result);
       return;
     }
 
     // Offline: treat as optimistic success (will sync when back online).
     if (result.status == CheckInSubmissionStatus.queuedOffline) {
       AppHaptics.success();
+      await _suspendScanningHardware();
+      if (!mounted) {
+        return;
+      }
       setState(() {
         _scanned = true;
         _checkedInAt = null;
         _processing = false;
         _feedback = l10n.eventsOfflineSyncQueued;
       });
+      _markAttendeeCheckedInOnEventsStore(DateTime.now());
+      return;
+    }
+
+    if (result.status == CheckInSubmissionStatus.alreadyCheckedIn) {
+      AppHaptics.success();
+      await _suspendScanningHardware();
+      if (!mounted) {
+        return;
+      }
+      setState(() {
+        _scanned = true;
+        _checkedInAt = result.checkedInAt ?? DateTime.now();
+        _checkInPointsAwarded = result.pointsAwarded;
+        _processing = false;
+        _feedback = null;
+      });
+      _markAttendeeCheckedInOnEventsStore(result.checkedInAt);
+      widget.onCheckInSuccess?.call();
       return;
     }
 
     AppHaptics.warning();
     final CheckInSubmissionStatus st = result.status;
-    // Unrestricted detection keeps firing on the same bad QR — throttle scans + haptics.
     _scanCooldownUntil = DateTime.now().add(_kScanFailureCooldown);
     setState(() {
       _processing = false;
       _lastFeedbackStatus = st;
       _feedback = switch (st) {
-        CheckInSubmissionStatus.invalidFormat => l10n.qrScannerErrorInvalidFormat,
+        CheckInSubmissionStatus.invalidFormat =>
+          l10n.qrScannerErrorInvalidFormat,
         CheckInSubmissionStatus.invalidQr => l10n.qrScannerErrorInvalidQr,
         CheckInSubmissionStatus.wrongEvent => l10n.qrScannerErrorWrongEvent,
-        CheckInSubmissionStatus.sessionClosed => l10n.qrScannerErrorSessionClosed,
-        CheckInSubmissionStatus.sessionExpired => l10n.qrScannerErrorSessionExpired,
-        CheckInSubmissionStatus.replayDetected => l10n.qrScannerErrorReplayDetected,
-        CheckInSubmissionStatus.alreadyCheckedIn => l10n.qrScannerErrorAlreadyCheckedIn,
+        CheckInSubmissionStatus.sessionClosed =>
+          l10n.qrScannerErrorSessionClosed,
+        CheckInSubmissionStatus.sessionExpired =>
+          l10n.qrScannerErrorSessionExpired,
+        CheckInSubmissionStatus.replayDetected =>
+          l10n.qrScannerErrorReplayDetected,
+        CheckInSubmissionStatus.alreadyCheckedIn =>
+          l10n.qrScannerErrorAlreadyCheckedIn,
         CheckInSubmissionStatus.requiresJoin => l10n.qrScannerErrorRequiresJoin,
         CheckInSubmissionStatus.checkInUnavailable =>
           l10n.qrScannerErrorCheckInUnavailable,
         CheckInSubmissionStatus.rateLimited => l10n.qrScannerErrorRateLimited,
         CheckInSubmissionStatus.success => null,
         CheckInSubmissionStatus.queuedOffline => l10n.eventsOfflineSyncQueued,
+        CheckInSubmissionStatus.pendingConfirmation => null,
       };
     });
     if (!_scanned && mounted) {
       _resumeScanLineAnimationIfNeeded();
     }
+  }
+
+  // --- Pending confirmation flow (volunteer side) ---
+
+  void _startPendingConfirmationFlow(CheckInSubmissionResult result) {
+    final ServiceLocator sl = ServiceLocator.instance;
+    _checkInWs = SocketCheckInStream(
+      baseUrl: sl.config.apiBaseUrl,
+      authState: sl.authState,
+    );
+    _checkInWsSub = _checkInWs!.stream.listen(_onPendingWsEvent);
+    _checkInWs!.connect(widget.eventId);
+
+    // Client-side timeout based on server expiresAt (fallback 60s).
+    final int timeoutMs = result.pendingExpiresAt != null
+        ? result.pendingExpiresAt!
+              .difference(DateTime.now())
+              .inMilliseconds
+              .clamp(5000, 120000)
+        : 60000;
+    _pendingTimeoutTimer = Timer(Duration(milliseconds: timeoutMs), () {
+      if (!mounted || !_pendingConfirmation) return;
+      _onPendingExpired();
+    });
+
+    // Fallback poll while waiting on organizer (tightens when WS is down).
+    _restartPendingPollTimer(fast: false);
+  }
+
+  void _restartPendingPollTimer({required bool fast}) {
+    _pendingPollTimer?.cancel();
+    _pendingPollTimer = Timer.periodic(Duration(seconds: fast ? 1 : 3), (_) {
+      if (!mounted || !_pendingConfirmation || _pendingId == null) return;
+      unawaited(_pollPendingStatus());
+    });
+  }
+
+  void _onPendingWsEvent(CheckInStreamEvent event) {
+    if (!mounted || !_pendingConfirmation) return;
+    if (event is CheckInConnectionChanged) {
+      if (event.status != CheckInWsConnectionStatus.connected) {
+        unawaited(_pollPendingStatus());
+        _restartPendingPollTimer(fast: true);
+      } else {
+        _restartPendingPollTimer(fast: false);
+      }
+      return;
+    }
+    if (event is CheckInConfirmedEvent && event.pendingId == _pendingId) {
+      _onPendingConfirmed(
+        checkedInAt: DateTime.tryParse(event.checkedInAt),
+        pointsAwarded: event.pointsAwarded,
+      );
+    } else if (event is CheckInRejectedEvent && event.pendingId == _pendingId) {
+      _onPendingRejected();
+    }
+  }
+
+  Future<void> _pollPendingStatus() async {
+    if (_pendingId == null) return;
+    final String? status = await _checkInRepository.pollPendingStatus(
+      eventId: widget.eventId,
+      pendingId: _pendingId!,
+    );
+    if (!mounted || !_pendingConfirmation) return;
+    if (status == 'expired') {
+      _onPendingExpired();
+    }
+  }
+
+  void _onPendingConfirmed({DateTime? checkedInAt, int pointsAwarded = 0}) {
+    _cleanupPendingState();
+    AppHaptics.success();
+    _markAttendeeCheckedInOnEventsStore(checkedInAt);
+    setState(() {
+      _pendingConfirmation = false;
+      _scanned = true;
+      _checkedInAt = checkedInAt;
+      _checkInPointsAwarded = pointsAwarded;
+    });
+    widget.onCheckInSuccess?.call();
+  }
+
+  void _onPendingRejected() {
+    _cleanupPendingState();
+    AppHaptics.warning();
+    setState(() {
+      _pendingConfirmation = false;
+      _feedback = context.l10n.eventsVolunteerRejected;
+    });
+    unawaited(_resumeCameraAfterLifecycle());
+    _resumeScanLineAnimationIfNeeded();
+  }
+
+  void _onPendingExpired() {
+    _cleanupPendingState();
+    AppHaptics.warning();
+    setState(() {
+      _pendingConfirmation = false;
+      _feedback = context.l10n.eventsVolunteerExpired;
+    });
+    unawaited(_resumeCameraAfterLifecycle());
+    _resumeScanLineAnimationIfNeeded();
+  }
+
+  void _cleanupPendingState() {
+    _pendingTimeoutTimer?.cancel();
+    _pendingTimeoutTimer = null;
+    _pendingPollTimer?.cancel();
+    _pendingPollTimer = null;
+    _checkInWsSub?.cancel();
+    _checkInWsSub = null;
+    _checkInWs?.dispose();
+    _checkInWs = null;
+    _pendingId = null;
+  }
+
+  Widget _buildPendingConfirmationScreen(
+    BuildContext context,
+    TextTheme textTheme,
+    double bottomSafe,
+  ) {
+    final AppLocalizations l10n = context.l10n;
+    final String eventTitle = _event?.title ?? l10n.qrScannerGenericEventTitle;
+    return Scaffold(
+      backgroundColor: AppColors.appBackground,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+          child: Semantics(
+            label: '${l10n.eventsVolunteerPendingTitle}. ${l10n.eventsVolunteerPendingSubtitle}',
+            liveRegion: true,
+            child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              const Spacer(),
+              TweenAnimationBuilder<double>(
+                tween: Tween<double>(begin: 0, end: 1),
+                duration: AppMotion.standard,
+                builder: (BuildContext ctx, double value, Widget? child) {
+                  return Opacity(
+                    opacity: value,
+                    child: Transform.scale(
+                      scale: 0.8 + 0.2 * value,
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary.withValues(alpha: 0.12),
+                  ),
+                  child: const Center(
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.xl),
+              Text(
+                l10n.eventsVolunteerPendingTitle,
+                style: AppTypography.eventsScreenTitle(textTheme)
+                    .copyWith(color: AppColors.textPrimary),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                l10n.eventsVolunteerPendingSubtitle,
+                style: AppTypography.eventsBodyMediumSecondary(textTheme).copyWith(
+                  height: 1.4,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                eventTitle,
+                style: AppTypography.eventsListCardMeta(textTheme),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const Spacer(),
+              Padding(
+                padding: EdgeInsets.only(bottom: bottomSafe + AppSpacing.md),
+                child: TextButton(
+                  onPressed: () {
+                    _cleanupPendingState();
+                    setState(() {
+                      _pendingConfirmation = false;
+                      _feedback = null;
+                    });
+                    unawaited(_resumeCameraAfterLifecycle());
+                    _resumeScanLineAnimationIfNeeded();
+                  },
+                  child: Text(
+                    MaterialLocalizations.of(context).cancelButtonLabel,
+                    style: AppTypography.eventsBodyMediumSecondary(textTheme),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _restartScanner() async {
@@ -1004,8 +1321,9 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
       builder: (BuildContext sheetContext) {
         // Bottom-sheet routes often inherit a [MediaQuery] where padding and
         // viewPadding are cleared; read the real display insets from the view.
-        final MediaQueryData viewMq =
-            MediaQueryData.fromView(View.of(sheetContext));
+        final MediaQueryData viewMq = MediaQueryData.fromView(
+          View.of(sheetContext),
+        );
         final EdgeInsets viewPad = viewMq.viewPadding;
         // Remove bottom viewInsets so the keyboard overlays the sheet rather
         // than shrinking it and pushing the pinned footer up.
@@ -1064,10 +1382,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               child: Text(
                 l10n.qrScannerCameraStarting,
-                style: textTheme.bodyMedium?.copyWith(
+                style: AppTypography.eventsChatMessageBody(
+                  textTheme,
                   color: AppColors.textOnDarkMuted,
-                  height: 1.35,
-                ),
+                ).copyWith(height: 1.35),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -1077,7 +1395,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     );
   }
 
-  Widget _scannerErrorLayer(BuildContext context, MobileScannerException error) {
+  Widget _scannerErrorLayer(
+    BuildContext context,
+    MobileScannerException error,
+  ) {
     return attendeeQrScannerCameraErrorLayerForTesting(
       context,
       errorCode: error.errorCode,
@@ -1109,11 +1430,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
             Expanded(
               child: Text(
                 text,
-                style: textTheme.bodyMedium?.copyWith(
+                style: AppTypography.eventsChatMessageBody(
+                  textTheme,
                   color: AppColors.textOnDark,
-                  height: 1.35,
-                  fontWeight: FontWeight.w500,
-                ),
+                ).copyWith(height: 1.35, fontWeight: FontWeight.w500),
               ),
             ),
           ],
@@ -1132,7 +1452,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     );
   }
 
-  Widget _glassScannerBottomPanel(BuildContext context, {required Widget child}) {
+  Widget _glassScannerBottomPanel(
+    BuildContext context, {
+    required Widget child,
+  }) {
     final bool reduceMotion = MediaQuery.of(context).disableAnimations;
     final Widget inner = DecoratedBox(
       decoration: BoxDecoration(
@@ -1179,11 +1502,10 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
             const SizedBox(height: AppSpacing.md),
             Text(
               l10n.qrScannerCheckingIn,
-              style: textTheme.bodyMedium?.copyWith(
+              style: AppTypography.eventsChatMessageBody(
+                textTheme,
                 color: AppColors.textOnDark,
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-              ),
+              ).copyWith(fontWeight: FontWeight.w600, height: 1.3),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1212,13 +1534,17 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     final TextTheme textTheme = Theme.of(context).textTheme;
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
 
+    if (_pendingConfirmation) {
+      return _buildPendingConfirmationScreen(context, textTheme, bottomSafe);
+    }
+
     if (_scanned) {
       final AppLocalizations l10n = context.l10n;
-      final String eventTitle = _event?.title ?? l10n.qrScannerGenericEventTitle;
+      final String eventTitle =
+          _event?.title ?? l10n.qrScannerGenericEventTitle;
       final String? checkedInTime = _checkedInAt == null
           ? null
-          : '${_checkedInAt!.hour.toString().padLeft(2, '0')}:'
-              '${_checkedInAt!.minute.toString().padLeft(2, '0')}';
+          : formatCheckInTime(_checkedInAt!);
       const double successMarkSize = 88;
       return Scaffold(
         backgroundColor: AppColors.appBackground,
@@ -1247,10 +1573,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                   builder: (BuildContext context, double scale, Widget? child) {
                     return Transform.scale(
                       scale: 0.92 + 0.08 * scale,
-                      child: Opacity(
-                        opacity: scale,
-                        child: child,
-                      ),
+                      child: Opacity(opacity: scale, child: child),
                     );
                   },
                   child: Container(
@@ -1272,16 +1595,24 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       tween: Tween<double>(begin: 0, end: 1),
                       duration: AppMotion.emphasizedDuration,
                       curve: AppMotion.emphasized,
-                      builder: (BuildContext context, double progress, Widget? child) {
-                        return CustomPaint(
-                          painter: _CheckmarkPainter(
-                            progress: progress,
-                            color: AppColors.primaryDark,
-                            strokeWidth: 4,
-                          ),
-                          size: const Size(successMarkSize, successMarkSize),
-                        );
-                      },
+                      builder:
+                          (
+                            BuildContext context,
+                            double progress,
+                            Widget? child,
+                          ) {
+                            return CustomPaint(
+                              painter: _CheckmarkPainter(
+                                progress: progress,
+                                color: AppColors.primaryDark,
+                                strokeWidth: 4,
+                              ),
+                              size: const Size(
+                                successMarkSize,
+                                successMarkSize,
+                              ),
+                            );
+                          },
                     ),
                   ),
                 ),
@@ -1303,8 +1634,8 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                     children: <Widget>[
                       Text(
                         l10n.qrScannerCheckedInTitle,
-                        style: textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w700,
+                        style: AppTypography.eventsDetailHeadline(textTheme).copyWith(
+                          fontSize: textTheme.headlineSmall?.fontSize,
                           color: AppColors.textPrimary,
                           letterSpacing: -0.3,
                         ),
@@ -1313,7 +1644,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         l10n.qrScannerWelcomeTo(eventTitle),
-                        style: textTheme.bodyLarge?.copyWith(
+                        style: AppTypography.eventsDetailAuxRowTitle(textTheme).copyWith(
                           color: AppColors.textSecondary,
                           height: 1.35,
                         ),
@@ -1323,10 +1654,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           l10n.qrScannerCheckedInAt(checkedInTime),
-                          style: textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                            height: 1.3,
-                          ),
+                          style: AppTypography.eventsListCardMeta(textTheme).copyWith(height: 1.3),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -1334,9 +1662,8 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                         const SizedBox(height: AppSpacing.md),
                         Text(
                           l10n.eventsCheckInPointsEarned(_checkInPointsAwarded),
-                          style: textTheme.titleMedium?.copyWith(
+                          style: AppTypography.eventsCalendarMonthTitle(textTheme).copyWith(
                             color: AppColors.primaryDark,
-                            fontWeight: FontWeight.w600,
                             height: 1.25,
                           ),
                           textAlign: TextAlign.center,
@@ -1362,239 +1689,251 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
       );
     }
 
-    return Scaffold(
-      backgroundColor: AppColors.black,
-      appBar: AppBar(
-        elevation: 0,
-        scrolledUnderElevation: 0,
+    return PopScope(
+      canPop: !_processing,
+      child: Scaffold(
         backgroundColor: AppColors.black,
-        foregroundColor: AppColors.white,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: AppSpacing.sm),
-          child: Center(
-            child: AppBackButton(
-              backgroundColor: AppColors.white.withValues(alpha: 0.14),
-              iconColor: AppColors.white,
+        appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          backgroundColor: AppColors.black,
+          foregroundColor: AppColors.white,
+          leading: Padding(
+            padding: const EdgeInsets.only(left: AppSpacing.sm),
+            child: Center(
+              child: AppBackButton(
+                backgroundColor: AppColors.white.withValues(alpha: 0.14),
+                iconColor: AppColors.white,
+              ),
+            ),
+          ),
+          title: Text(
+            context.l10n.qrScannerAppBarTitle,
+            style: AppTypography.eventsHeroCardTitle(textTheme).copyWith(
+              color: AppColors.textOnDark,
+              fontWeight: FontWeight.w600,
+              letterSpacing: -0.2,
             ),
           ),
         ),
-        title: Text(
-          context.l10n.qrScannerAppBarTitle,
-          style: textTheme.titleLarge?.copyWith(
-            color: AppColors.textOnDark,
-            fontWeight: FontWeight.w600,
-            letterSpacing: -0.2,
-          ),
-        ),
-      ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          final double w = constraints.maxWidth;
-          final double h = constraints.maxHeight;
-          final Rect scanRect = _stableScanRect(w, h, bottomSafe);
-          final double side = scanRect.width;
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final double w = constraints.maxWidth;
+            final double h = constraints.maxHeight;
+            final Rect scanRect = _stableScanRect(w, h, bottomSafe);
+            final double side = scanRect.width;
 
-          return Stack(
-            fit: StackFit.expand,
-            children: <Widget>[
-              if (widget.scannerTestSlotBuilder != null)
+            return Stack(
+              fit: StackFit.expand,
+              children: <Widget>[
+                if (widget.scannerTestSlotBuilder != null)
+                  Positioned.fill(
+                    child: ColoredBox(
+                      color: AppColors.black,
+                      child: widget.scannerTestSlotBuilder!(
+                        context,
+                        (String raw) => unawaited(_submitRawCode(raw)),
+                      ),
+                    ),
+                  )
+                else
+                  Semantics(
+                    label: context.l10n.qrScannerPointCameraHint,
+                    child: MobileScanner(
+                      controller: _controller!,
+                      onDetect: _handleBarcode,
+                      placeholderBuilder: _scannerLoadingLayer,
+                      errorBuilder: _scannerErrorLayer,
+                      tapToFocus: false,
+                      scanWindow: kIsWeb ? null : scanRect,
+                      scanWindowUpdateThreshold: 48,
+                    ),
+                  ),
                 Positioned.fill(
-                  child: ColoredBox(
-                    color: AppColors.black,
-                    child: widget.scannerTestSlotBuilder!(
-                      context,
-                      (String raw) => unawaited(_submitRawCode(raw)),
-                    ),
-                  ),
-                )
-              else
-                Semantics(
-                  label: context.l10n.qrScannerPointCameraHint,
-                  child: MobileScanner(
-                    controller: _controller!,
-                    onDetect: _handleBarcode,
-                    placeholderBuilder: _scannerLoadingLayer,
-                    errorBuilder: _scannerErrorLayer,
-                    tapToFocus: false,
-                    scanWindow: kIsWeb ? null : scanRect,
-                    scanWindowUpdateThreshold: 48,
-                  ),
-                ),
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: CustomPaint(
-                    painter: _DimOutsideScanPainter(
-                      scanRect: scanRect,
-                      overlayColor: AppColors.black.withValues(alpha: 0.5),
-                      holeRadius: _scanFrameCornerRadius,
+                  child: IgnorePointer(
+                    child: CustomPaint(
+                      painter: _DimOutsideScanPainter(
+                        scanRect: scanRect,
+                        overlayColor: AppColors.black.withValues(alpha: 0.5),
+                        holeRadius: _scanFrameCornerRadius,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: scanRect.left,
-                top: scanRect.top,
-                width: scanRect.width,
-                height: scanRect.height,
-                child: IgnorePointer(
-                  ignoringSemantics: false,
+                Positioned(
+                  left: scanRect.left,
+                  top: scanRect.top,
+                  width: scanRect.width,
+                  height: scanRect.height,
                   child: Semantics(
                     container: true,
                     label: context.l10n.qrScannerPointCameraHint,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: <Widget>[
-                        CustomPaint(
-                          size: Size.square(side),
-                          painter: _SquareScanFramePainter(
-                            color: AppColors.primary.withValues(alpha: 0.95),
-                            strokeWidth: 3,
-                            cornerRadius: _scanFrameCornerRadius,
+                    child: IgnorePointer(
+                      child: Stack(
+                        clipBehavior: Clip.none,
+                        children: <Widget>[
+                          CustomPaint(
+                            size: Size.square(side),
+                            painter: _SquareScanFramePainter(
+                              color: AppColors.primary.withValues(alpha: 0.95),
+                              strokeWidth: 3,
+                              cornerRadius: _scanFrameCornerRadius,
+                            ),
                           ),
-                        ),
-                        AnimatedBuilder(
-                          animation: _scanLineController,
-                          builder: (BuildContext context, Widget? child) {
-                            final double t = _scanLineController.value;
-                            const double inset = 10;
-                            final double travel = math.max(0, side - 2 * inset - 4);
-                            final double top = inset + t * travel;
-                            return Positioned(
-                              left: inset,
-                              right: inset,
-                              top: top,
-                              child: Container(
-                                height: 2,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.85),
-                                  boxShadow: <BoxShadow>[
-                                    BoxShadow(
-                                      color: AppColors.primary.withValues(alpha: 0.45),
-                                      blurRadius: 6,
-                                      spreadRadius: 1,
+                          AnimatedBuilder(
+                            animation: _scanLineController,
+                            builder: (BuildContext context, Widget? child) {
+                              final double t = _scanLineController.value;
+                              const double inset = 10;
+                              final double travel = math.max(
+                                0,
+                                side - 2 * inset - 4,
+                              );
+                              final double top = inset + t * travel;
+                              return Positioned(
+                                left: inset,
+                                right: inset,
+                                top: top,
+                                child: Container(
+                                  height: 2,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.85,
                                     ),
-                                  ],
+                                    boxShadow: <BoxShadow>[
+                                      BoxShadow(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.45,
+                                        ),
+                                        blurRadius: 6,
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                        ),
-                      ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: AppSpacing.lg,
-                right: AppSpacing.lg,
-                top: AppSpacing.md,
-                child: IgnorePointer(
-                  child: _glassScannerChip(
-                    context,
-                    icon: CupertinoIcons.qrcode_viewfinder,
-                    text: context.l10n.qrScannerPointCameraHint,
+                Positioned(
+                  left: AppSpacing.lg,
+                  right: AppSpacing.lg,
+                  top: AppSpacing.md,
+                  child: IgnorePointer(
+                    child: _glassScannerChip(
+                      context,
+                      icon: CupertinoIcons.qrcode_viewfinder,
+                      text: context.l10n.qrScannerPointCameraHint,
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                left: AppSpacing.lg,
-                right: AppSpacing.lg,
-                bottom: bottomSafe + AppSpacing.md,
-                child: SafeArea(
-                  top: false,
-                  child: _glassScannerBottomPanel(
-                    context,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        if (_feedback != null) ...<Widget>[
+                Positioned(
+                  left: AppSpacing.lg,
+                  right: AppSpacing.lg,
+                  bottom: bottomSafe + AppSpacing.md,
+                  child: SafeArea(
+                    top: false,
+                    child: _glassScannerBottomPanel(
+                      context,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          if (_feedback != null) ...<Widget>[
+                            Text(
+                              _feedback!,
+                              style: AppTypography.eventsChatMessageBody(textTheme).copyWith(
+                                color:
+                                    (_lastFeedbackStatus == null ||
+                                        _isRecoverableScannerStatus(
+                                          _lastFeedbackStatus!,
+                                        ))
+                                    ? AppColors.accentWarning
+                                    : AppColors.accentDanger,
+                                fontWeight: FontWeight.w600,
+                                height: 1.35,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: AppSpacing.sm),
+                          ],
+                          Wrap(
+                            alignment: WrapAlignment.center,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: AppSpacing.sm,
+                            runSpacing: AppSpacing.xs,
+                            children: <Widget>[
+                              Semantics(
+                                button: true,
+                                label: context.l10n.qrScannerEnterManually,
+                                child: CupertinoButton(
+                                  onPressed: _openManualEntry,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xs,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  child: Text(
+                                    context.l10n.qrScannerEnterManually,
+                                    style: AppTypography.eventsCaptionStrong(
+                                      textTheme,
+                                      color: AppColors.textOnDark,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                              Semantics(
+                                button: true,
+                                label: context.l10n.qrScannerRetryCamera,
+                                child: CupertinoButton(
+                                  onPressed: _restartScanner,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: AppSpacing.xs,
+                                  ),
+                                  minimumSize: Size.zero,
+                                  child: Text(
+                                    context.l10n.qrScannerRetryCamera,
+                                    style: AppTypography.eventsCaptionStrong(
+                                      textTheme,
+                                      color: AppColors.textOnDarkMuted,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
                           Text(
-                            _feedback!,
-                            style: textTheme.bodyMedium?.copyWith(
-                              color: (_lastFeedbackStatus == null ||
-                                      _isRecoverableScannerStatus(_lastFeedbackStatus!))
-                                  ? AppColors.accentWarning
-                                  : AppColors.accentDanger,
-                              fontWeight: FontWeight.w600,
+                            _cameraReady
+                                ? context.l10n.qrScannerHintFreshQr
+                                : context.l10n.qrScannerHintCameraBlocked,
+                            style: AppTypography.eventsHeroCardMeta(textTheme).copyWith(
+                              color: AppColors.white.withValues(alpha: 0.55),
                               height: 1.35,
                             ),
                             textAlign: TextAlign.center,
                           ),
-                          const SizedBox(height: AppSpacing.sm),
                         ],
-                        Wrap(
-                          alignment: WrapAlignment.center,
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: AppSpacing.sm,
-                          runSpacing: AppSpacing.xs,
-                          children: <Widget>[
-                            Semantics(
-                              button: true,
-                              label: context.l10n.qrScannerEnterManually,
-                              child: CupertinoButton(
-                                onPressed: _openManualEntry,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                                minimumSize: Size.zero,
-                                child: Text(
-                                  context.l10n.qrScannerEnterManually,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textOnDark,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                            Semantics(
-                              button: true,
-                              label: context.l10n.qrScannerRetryCamera,
-                              child: CupertinoButton(
-                                onPressed: _restartScanner,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
-                                minimumSize: Size.zero,
-                                child: Text(
-                                  context.l10n.qrScannerRetryCamera,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textOnDarkMuted,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          _cameraReady
-                              ? context.l10n.qrScannerHintFreshQr
-                              : context.l10n.qrScannerHintCameraBlocked,
-                          style: textTheme.bodySmall?.copyWith(
-                            color: AppColors.white.withValues(alpha: 0.55),
-                            height: 1.35,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              if (_processing)
-                Semantics(
-                  label: context.l10n.qrScannerCheckingIn,
-                  child: ColoredBox(
-                    color: AppColors.black.withValues(alpha: 0.52),
-                    child: Center(
-                      child: _processingHud(context),
+                if (_processing)
+                  Semantics(
+                    label: context.l10n.qrScannerCheckingIn,
+                    child: ColoredBox(
+                      color: AppColors.black.withValues(alpha: 0.52),
+                      child: Center(child: _processingHud(context)),
                     ),
                   ),
-                ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }

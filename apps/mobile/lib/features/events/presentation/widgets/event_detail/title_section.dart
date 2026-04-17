@@ -27,6 +27,9 @@ class TitleSection extends StatelessWidget {
           Text(
             event.title,
             style: AppTypography.eventsDetailHeadline(textTheme),
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+            softWrap: true,
           ),
           SizedBox(height: AppSpacing.xs),
           Semantics(
@@ -34,6 +37,9 @@ class TitleSection extends StatelessWidget {
             child: Text(
               scheduleSubtitle,
               style: AppTypography.eventsDetailScheduleLine(textTheme),
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
             ),
           ),
         ],

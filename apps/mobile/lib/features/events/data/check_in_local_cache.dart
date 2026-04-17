@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// PRIVACY: Stores attendee display names in SharedPreferences. Must be cleared on logout.
 class PersistedCheckInSession {
   const PersistedCheckInSession({
     required this.eventId,

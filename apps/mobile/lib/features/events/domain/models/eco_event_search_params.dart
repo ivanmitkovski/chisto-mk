@@ -36,6 +36,24 @@ class EcoEventSearchParams {
       dateFrom == null &&
       dateTo == null;
 
+  /// Stable suffix for [EventsLocalCache] keys when this query is non-[isEmpty].
+  /// Distinct filter combinations should map to distinct suffixes (collisions only
+  /// if [Object.hash] collides for different tuples—vanishingly rare for UI params).
+  String get offlineListCacheSuffix {
+    final List<String> categoryKeys = categories.map((EcoEventCategory c) => c.key).toList()
+      ..sort();
+    final List<String> statusKeys = statuses.map((EcoEventStatus s) => s.apiKey).toList()
+      ..sort();
+    final String q = (query ?? '').trim();
+    return 'f${Object.hash(
+          q,
+          categoryKeys.join(','),
+          statusKeys.join(','),
+          dateFrom?.millisecondsSinceEpoch,
+          dateTo?.millisecondsSinceEpoch,
+        ).toUnsigned(32).toRadixString(16)}';
+  }
+
   EcoEventSearchParams copyWith({
     String? query,
     Set<EcoEventCategory>? categories,

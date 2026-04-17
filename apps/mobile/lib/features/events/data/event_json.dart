@@ -4,7 +4,10 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 ///
 /// The API returns `scheduledAt` / `endAt` (ISO 8601); the mobile model uses
 /// calendar `date` plus `startTime` / `endTime` maps when decoding from cache.
-EcoEvent ecoEventFromJson(Map<String, dynamic> json) {
+///
+/// Returns `null` when [json] contains unparseable date strings that make the
+/// event meaningless (e.g. `scheduledAt` is a non-ISO value).
+EcoEvent? ecoEventFromJson(Map<String, dynamic> json) {
   final Map<String, dynamic> merged = Map<String, dynamic>.from(json);
 
   final bool hasScheduled = json['scheduledAt'] is String;
@@ -12,7 +15,10 @@ EcoEvent ecoEventFromJson(Map<String, dynamic> json) {
     merged['scheduledAtUtc'] = json['scheduledAt'];
   }
   if (hasScheduled && json['date'] == null) {
-    final DateTime start = DateTime.parse(json['scheduledAt'] as String).toLocal();
+    final DateTime? start =
+        DateTime.tryParse(json['scheduledAt'] as String)?.toLocal();
+    if (start == null) return null;
+
     merged['date'] = DateTime(start.year, start.month, start.day).toIso8601String();
 
     merged['startTime'] = <String, int>{
@@ -22,7 +28,8 @@ EcoEvent ecoEventFromJson(Map<String, dynamic> json) {
 
     DateTime end;
     if (json['endAt'] is String) {
-      end = DateTime.parse(json['endAt'] as String).toLocal();
+      end = DateTime.tryParse(json['endAt'] as String)?.toLocal() ??
+          start.add(const Duration(hours: 2));
     } else {
       end = start.add(const Duration(hours: 2));
     }
@@ -39,6 +46,7 @@ List<EcoEvent> ecoEventListFromJson(List<dynamic> list) {
   return list
       .whereType<Map<String, dynamic>>()
       .map(ecoEventFromJson)
+      .whereType<EcoEvent>()
       .toList(growable: false);
 }
 

@@ -19,6 +19,31 @@
 // - AppRoutes.events* (named routes + Cupertino transitions for check-in)
 //
 // -----------------------------------------------------------------------------
+// 1b) Typography — AppTypography.events* role map
+// -----------------------------------------------------------------------------
+// Prefer `Theme.of(context).textTheme` only inside `AppTypography` helpers so text scales.
+// Barrel import: `events_typography.dart` re-exports `app_typography.dart`.
+//
+// Discovery & cards: eventsListCardTitle, eventsListCardMeta, eventsHeroCardTitle,
+//   eventsHeroCardMeta, eventsCardBadgeAccent, eventsCardBadgeMuted.
+// Detail chrome: eventsDetailHeadline, eventsDetailScheduleLine, eventsSectionTitle,
+//   eventsBodyProse, eventsBodyMuted, eventsInlineLabel, eventsGridPropertyValue,
+//   eventsCaptionStrong, eventsMetricValue, eventsDisplayStat.
+// Sheets & filters: eventsSheetTitle, eventsSheetTextLink, eventsSheetSectionLabel,
+//   eventsSheetChipLabel, eventsSheetDateTileLabel, eventsSheetDateTileValue,
+//   eventsPrimaryButtonLabel.
+// Forms: eventsFormFieldValue, eventsFormSectionLabel, eventsFormFieldLabel, eventsFormError.
+// Chat: eventsChatMessageBody, eventsChatAuthorName, eventsChatTimestamp, eventsChatSystemLine
+//   (bubble colors: `.copyWith(color: …)` on top of these bases).
+// Check-in / QR: eventsQrCaption. Semantics: eventsDestructiveCaption, eventsWarningCaption.
+// Dense titles: eventsScreenTitle.
+// Feed & calendar: eventsFeedScreenTitle, eventsSearchFieldText, eventsSearchFieldPlaceholder,
+//   eventsInlineInfoBanner, eventsFeedSectionTitle, eventsMicroSectionHeading,
+//   eventsCalendarMonthTitle, eventsCalendarEmbeddedMonthTitle, eventsCalendarWeekdayLabel,
+//   eventsCalendarDayNumber, eventsCalendarSectionHeader, eventsCalendarAgendaTitle,
+//   eventsSupportingCaption, eventsEmptyStateTitle, eventsEmptyStateSubtitle.
+//
+// -----------------------------------------------------------------------------
 // 2) Mobile -> API surface matrix (current contracts)
 // -----------------------------------------------------------------------------
 // Events list/detail/lifecycle:
@@ -74,9 +99,10 @@
 // - recent_searches_shelf.dart, after_tab.dart (+ AddPhotosEmptyState strings)
 // - cleanup_fullscreen_gallery_page.dart (semantics)
 //
-// Participant roster: ParticipantsSection loads joiners via EventsRepository.fetchParticipants
-// (API: GET /events/:id/participants); checked-in badges on the sheet apply only to the
-// current user (no inferred check-in state for other rows).
+// Participant roster: ParticipantsSection peeks the first page of joiners via
+// EventsRepository.fetchParticipants (GET /events/:id/participants) for the avatar stack, and
+// the full sheet paginates the same endpoint; checked-in badges on the sheet apply only to
+// the current user (no inferred check-in state for other rows).
 //
 // Keep auditing for:
 // - newly introduced tooltip/title/snackbar strings in events/presentation
@@ -166,6 +192,8 @@
 // - analytics instrumentation for event funnel and check-in outcomes
 // - per-user privacy controls for roster visibility (if product requires)
 //
+// See docs/events-deferred-epics.md for epic-level notes and sign-off expectations.
+//
 // -----------------------------------------------------------------------------
 // 7) Create event screen (navigation + first paint)
 // -----------------------------------------------------------------------------
@@ -200,7 +228,10 @@
 // - Create event: Cupertino swipe-back vs dirty discard dialog; bootstrap skeleton timing
 // - Optional API smoke: integration_test/events_journey_smoke_test.dart and
 //   integration_test/event_chat_smoke_test.dart with --dart-define=API_URL and
-//   INTEGRATION_TEST_ACCESS_TOKEN (see docs/events-release-hardening.md).
+//   INTEGRATION_TEST_ACCESS_TOKEN (see docs/events-release-hardening.md). Optional
+//   curl preflight: scripts/events-staging-preflight.sh (same URL env as CI smoke).
+// - Diagnostics: failure paths above should emit stable codes only via
+//   logEventsDiagnostic (developer.log name `chisto.events`; no titles, ids, or queries).
 //
 // Performance budget (manual pass; mid-tier device, release build):
 // - Feed: first meaningful frame after cold open (skeleton → list or empty state) within ~2s on Wi‑Fi.
@@ -209,13 +240,19 @@
 // -----------------------------------------------------------------------------
 // 10) Known limitations (v1)
 // -----------------------------------------------------------------------------
-// - Filtered feed lists (chips + sheet) are not guaranteed offline: disk cache may
-//   hold only the last successful **unfiltered** global list; stale banner copy reflects that.
-// - Client-side search narrows the **current** in-memory list; it does not always
-//   imply a new server query (recent-search taps are local-only until debounced search fires).
-// - Detail refresh uses a short TTL on resume; very rapid moderator edits may not appear
-//   until pull-to-refresh or re-entry.
+// - Filtered feed lists: disk snapshots are keyed by merged [EcoEventSearchParams]
+//   (see EcoEventSearchParams.offlineListCacheSuffix); empty/global params still use the
+//   legacy global key. Airplane mode shows the last successful snapshot for that key.
+// - Search: the search field drives server `q=` on refresh; client-side filtering also
+//   narrows the current in-memory list — see SearchEmptyState scope hint (ARB
+//   eventsSearchEmptyScopeHint) when the query is non-trivial.
+// - Detail refresh uses a TTL on resume (shorter while check-in is open or the event is
+//   in progress); very rapid moderator edits may still lag until pull-to-refresh or re-entry.
 // - Check-in: QR session rotation vs offline redeem queue ordering is covered by unit tests,
 //   but extreme clock skew or multi-device races can still produce edge cases.
 // - Cleanup evidence: large batches and backgrounding mid-upload depend on OS process limits;
-//   users should stay on-screen until save completes when uploading many photos.
+//   back navigation is blocked while saving; a snack explains if the user tries to leave
+//   (eventsEvidenceSaveInProgressHint).
+//
+// Deferred epics (OS reminders, universal links, funnel analytics, roster privacy):
+// docs/events-deferred-epics.md

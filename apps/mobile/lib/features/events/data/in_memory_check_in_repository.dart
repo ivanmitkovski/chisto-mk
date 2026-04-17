@@ -262,6 +262,23 @@ class InMemoryCheckInRepository extends ChangeNotifier implements CheckInReposit
   }
 
   @override
+  Future<void> resolvePendingCheckIn({
+    required String eventId,
+    required String pendingId,
+    required bool approve,
+  }) async {
+    // In-memory repo has no pending flow; check-ins are instant.
+  }
+
+  @override
+  Future<String?> pollPendingStatus({
+    required String eventId,
+    required String pendingId,
+  }) async {
+    return 'expired';
+  }
+
+  @override
   Future<ManualCheckInResult> markAttendeeCheckedIn({
     required String eventId,
     required String attendeeId,

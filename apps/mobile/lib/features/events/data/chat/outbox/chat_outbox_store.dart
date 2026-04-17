@@ -4,6 +4,8 @@ import 'package:sqflite/sqflite.dart';
 /// Persisted queue for chat sends that failed or were deferred offline (text only for now).
 ///
 /// Same [clientMessageId] is kept across retries and app restarts for idempotent POSTs.
+///
+/// PRIVACY: Stores user-authored message bodies in SQLite. Must be cleared on logout.
 class ChatOutboxEntry {
   const ChatOutboxEntry({
     required this.eventId,
@@ -119,6 +121,24 @@ CREATE TABLE $_table (
       where: 'event_id = ? AND client_message_id = ?',
       whereArgs: <Object>[eventId, clientMessageId],
     );
+  }
+
+  /// Clears all queued messages and closes the DB handle. Call on logout (see [ApiAuthRepository]).
+  Future<void> clearAll() async {
+    try {
+      final Database db = await _database();
+      await db.delete(_table);
+    } on Object {
+      // Best-effort: storage unavailable, or table missing on a corrupted file.
+    }
+    if (_db != null) {
+      try {
+        await _db!.close();
+      } on Object {
+        // ignore
+      }
+      _db = null;
+    }
   }
 
   ChatOutboxEntry _rowToEntry(Map<String, Object?> row) {

@@ -194,6 +194,23 @@ class AppLocalizationsSq extends AppLocalizations {
   String get semanticsClose => 'Mbyll';
 
   @override
+  String get homeShellNavHome => 'Kreu';
+
+  @override
+  String get homeShellNavReports => 'Raportet';
+
+  @override
+  String get homeShellNavMap => 'Harta';
+
+  @override
+  String get homeShellNavEvents => 'Ngjarjet';
+
+  @override
+  String semanticsReportPhotoNumber(int number) {
+    return 'Foto e raportit $number';
+  }
+
+  @override
   String semanticsAboutStep(String title) {
     return 'Rreth $title';
   }
@@ -1713,6 +1730,14 @@ class AppLocalizationsSq extends AppLocalizations {
       'Mund ta nisni këtë veprim ekologjik pasi të arrijë koha e planifikuar e fillimit.';
 
   @override
+  String get eventsJoinNotYetOpen =>
+      'Bashkimi hapet kur arrin koha e planifikuar e fillimit.';
+
+  @override
+  String get errorEventEndAtTooFar =>
+      'Fundi i planifikuar nuk mund të jetë kaq larg nga fillimi. Provoni një zgjatje më të shkurtër.';
+
+  @override
   String get eventsAwaitingModerationCta => 'Në pritje të aprovimit';
 
   @override
@@ -1756,10 +1781,102 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsEditEventSave => 'Ruaj ndryshimet';
 
   @override
+  String editEventTitleTooLong(int max) {
+    return 'Titulli duhet të ketë së shumti $max karaktere.';
+  }
+
+  @override
+  String editEventDescriptionTooLong(int max) {
+    return 'Përshkrimi duhet të ketë së shumti $max karaktere.';
+  }
+
+  @override
+  String get editEventMaxParticipantsInvalid =>
+      'Shkruani një numër të plotë vendesh, ose lëreni bosh për pa kufi.';
+
+  @override
+  String editEventMaxParticipantsRange(int min, int max) {
+    return 'Madhësia e ekipit duhet të jetë midis $min dhe $max, ose bosh për pa kufi.';
+  }
+
+  @override
+  String editEventGearLimitReached(int max) {
+    return 'Mund të zgjidhni deri në $max artikuj pajisjesh.';
+  }
+
+  @override
+  String get editEventDiscardTitle => 'Të hidhen ndryshimet?';
+
+  @override
+  String get editEventDiscardMessage =>
+      'Keni ndryshime të paruajtura. Nëse largoheni tani, do të humbasin.';
+
+  @override
+  String get editEventDiscardConfirm => 'Hidhe';
+
+  @override
+  String get editEventDiscardKeepEditing => 'Vazhdo redaktimin';
+
+  @override
+  String get editEventSchedulePreviewFailed =>
+      'Nuk mund të kontrolloheshin përplasjet e orarit. Prapë mund të ruani; serveri do të refuzojë kohët që përputhen.';
+
+  @override
+  String get editEventOfflineSave =>
+      'Duket se jeni jashtë linje. Lidheni dhe provoni përsëri.';
+
+  @override
+  String get editEventHelpTitle => 'Redaktimi i ngjarjes suaj';
+
+  @override
+  String get editEventHelpSubtitle => 'Orari, vullnetarët dhe moderimi';
+
+  @override
+  String get editEventHelpButtonTooltip => 'Ndihmë';
+
+  @override
+  String get editEventDuplicateSubmitTitle => 'Konflikt orari';
+
+  @override
+  String editEventDuplicateSubmitBody(String title, String when) {
+    return '$title është planifikuar tashmë në $when. Rregulloni kohët dhe provoni përsëri.';
+  }
+
+  @override
+  String get editEventNoChangesToSave => 'Nuk ka asgjë për të ruajtur.';
+
+  @override
+  String get editEventPendingModerationBanner =>
+      'Ngjarja ende pret miratimin e moderatorit. Ndryshimet vlejnë për skicën tuaj.';
+
+  @override
+  String get eventsEventNotEditable => 'Kjo ngjarje nuk mund të redaktohet më.';
+
+  @override
   String get eventsEventUpdated => 'Ngjarja u përditësua';
 
   @override
   String get eventsMutationFailedGeneric => 'Diçka shkoi keq. Provo përsëri.';
+
+  @override
+  String get eventsScheduleConflictPreviewTitle =>
+      'Mund të ketë mbivendosje në orar';
+
+  @override
+  String eventsScheduleConflictPreviewBody(String title, String when) {
+    return 'Një ngjarje tjetër në këtë vend mund të mbivendoset me kohën tuaj: $title në $when.';
+  }
+
+  @override
+  String get eventsScheduleConflictContinue => 'Vazhdo gjithsesi';
+
+  @override
+  String get eventsScheduleConflictAdjustTime => 'Ndrysho kohën';
+
+  @override
+  String eventsDuplicateEventBlocked(String title, String when) {
+    return 'Kjo kohë mbivendoset me \"$title\" ($when). Zgjidh një kohë tjetër.';
+  }
 
   @override
   String get eventsManualCheckInAdd => 'Shto';
@@ -2011,6 +2128,37 @@ class AppLocalizationsSq extends AppLocalizations {
       'Nuk mund të nisej regjistrimi. Sigurohu që ngjarja është në vazhdim dhe provo përsëri.';
 
   @override
+  String get eventsOrganizerConfirmTitle => 'Konfirmo regjistrimin';
+
+  @override
+  String get eventsOrganizerConfirmSubtitle =>
+      'Dëshiron të regjistrohet në këtë ngjarje';
+
+  @override
+  String get eventsOrganizerConfirmApprove => 'Konfirmo';
+
+  @override
+  String get eventsOrganizerConfirmReject => 'Refuzo';
+
+  @override
+  String get eventsOrganizerConfirmExpired =>
+      'Kjo kërkesë regjistrimi ka skaduar.';
+
+  @override
+  String get eventsVolunteerPendingTitle => 'Duke pritur konfirmimin';
+
+  @override
+  String get eventsVolunteerPendingSubtitle =>
+      'Organizatori duhet të konfirmojë regjistrimin tuaj...';
+
+  @override
+  String get eventsVolunteerRejected =>
+      'Regjistrimi nuk u konfirmua nga organizatori.';
+
+  @override
+  String get eventsVolunteerExpired => 'Kërkesa skadoi. Skanoni përsëri.';
+
+  @override
   String get eventsOrganizerQrRetry => 'Provo përsëri';
 
   @override
@@ -2174,6 +2322,16 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get createEventEndTimeError =>
       'Koha e mbarimit duhet të jetë pas fillimit.';
+
+  @override
+  String createEventScheduleStartInPast(int minutes) {
+    return 'Zgjidh një orë fillimi të paktën $minutes minuta nga tani.';
+  }
+
+  @override
+  String createEventScheduleEndInPast(int minutes) {
+    return 'Zgjidh një orë mbarimi të paktën $minutes minuta nga tani.';
+  }
 
   @override
   String get createEventFieldType => 'Lloji i ngjarjes';
@@ -2438,6 +2596,81 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsCtaManageCheckIn => 'Menaxho regjistrimin';
 
   @override
+  String get eventsCtaExtendCleanupEnd => 'Zgjat fundin e planifikuar';
+
+  @override
+  String get eventsExtendEndSheetTitle => 'Zgjat pastrimin';
+
+  @override
+  String eventsExtendEndSheetSubtitle(String time) {
+    return 'Fundi aktual i planifikuar është $time.';
+  }
+
+  @override
+  String eventsExtendEndCurrentChoice(String time) {
+    return 'Fund i ri: $time';
+  }
+
+  @override
+  String get eventsExtendEndPlus15 => '+15 min';
+
+  @override
+  String get eventsExtendEndPlus30 => '+30 min';
+
+  @override
+  String get eventsExtendEndPlus60 => '+1 orë';
+
+  @override
+  String get eventsExtendEndCustomTime => 'Kohë e personalizuar…';
+
+  @override
+  String get eventsExtendEndApply => 'Ruaj fundin e ri';
+
+  @override
+  String get eventsExtendEndSuccess => 'Fundi i planifikuar u përditësua.';
+
+  @override
+  String get eventsExtendEndSameAsCurrent =>
+      'Kjo është tashmë fundi i planifikuar.';
+
+  @override
+  String get eventsExtendEndInvalidRange =>
+      'Ajo kohë fundi nuk është e vlefshme për këtë pastrim.';
+
+  @override
+  String get eventsExtendEndTooSoon => 'Zgjidhni një fund pak më larg në kohë.';
+
+  @override
+  String get eventsEndSoonBannerTitle => 'Pastrimi po përfundon së shpejti';
+
+  @override
+  String get eventsEndSoonBannerBody =>
+      'Mund ta zgjatni fundin e planifikuar ose të përfundoni kur të jeni gati.';
+
+  @override
+  String get eventsEndSoonBannerExtend => 'Zgjat';
+
+  @override
+  String get eventsOrganizerExtendEndSemantic =>
+      'Zgjat fundin e planifikuar të pastrimit';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyTitle =>
+      'Pastrimi po përfundon së shpejti';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyBody =>
+      'Pastrimi juaj po i afrohet fundit të planifikuar. Prekni për ta shqyrtuar.';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyChannelName =>
+      'Rikujtues lokalë për organizatorët';
+
+  @override
+  String get eventsOrganizerEndSoonNotifyChannelDescription =>
+      'Rikujtues lokalë kur pastrimi që drejtoni po i afrohet fundit të planifikuar.';
+
+  @override
   String get eventsCtaEditAfterPhotos => 'Ndrysho fotot pas';
 
   @override
@@ -2571,6 +2804,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsDetailShareSuccess => 'Ngjarja u nda.';
 
   @override
+  String get eventsDetailShareFailed => 'Nuk u hap ndarja. Provo përsëri.';
+
+  @override
   String get eventsDetailCalendarAdded => 'Ngjarja u shtua në kalendar.';
 
   @override
@@ -2663,7 +2899,26 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsEvidenceSaving => 'Duke u ruajtur...';
 
   @override
+  String get eventsEvidenceSaveInProgressHint =>
+      'Prit derisa të përfundojë ruajtja para se të largohesh nga kjo faqe.';
+
+  @override
   String get eventsEvidenceAfterPhotosSaved => 'Fotot pas u ruajtën.';
+
+  @override
+  String get eventsEvidenceSaveSuccessTitle => 'Fotot u ruajtën';
+
+  @override
+  String get eventsEvidenceSaveSuccessBody =>
+      'Fotot \"pas\" janë në faqen e ngjarjes.';
+
+  @override
+  String get eventsEvidenceSaveFailureTitle => 'Nuk mund të ruhen fotot';
+
+  @override
+  String eventsEvidenceSaveFailureBody(String message) {
+    return '$message';
+  }
 
   @override
   String get eventsEvidenceNoChanges => 'Nuk ka ndryshime për të ruajtur.';
@@ -3407,7 +3662,13 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String eventsParticipantsVolunteersJoined(int count) {
-    return '$count vullnetarë u bashkuan';
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count vullnetarë u bashkuan',
+      one: '1 vullnetar u bashkua',
+    );
+    return '$_temp0';
   }
 
   @override
@@ -3465,6 +3726,20 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventsImpactSummaryEmptyHint =>
       'Regjistroni rezultatet, përpjekjen dhe mësimet nga pastrimi.';
+
+  @override
+  String get eventsCompletedBagsSectionTitle =>
+      'Thesa me mbeturina të mbledhura';
+
+  @override
+  String get eventsCompletedBagsSectionSubtitle =>
+      'Sa thesa me mbeturina u mblodhën nga vullnetarët gjatë këtij pastrimi. Mund ta përditësoni kur të doni; përfshihet në përmbledhjen e ndikimit më poshtë.';
+
+  @override
+  String get eventsCompletedBagsSave => 'Ruaj numrin';
+
+  @override
+  String get eventsCompletedBagsSaved => 'Numri i thesave u ruajt.';
 
   @override
   String eventsImpactBadgeRating(int rating) {
@@ -3539,6 +3814,10 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventsSearchEmptySubtitle =>
       'Provo një fjalë tjetër kërkimi ose kontrollo drejtshkrimin.';
+
+  @override
+  String get eventsSearchEmptyScopeHint =>
+      'Rezultatet vijnë nga serveri gjatë shkrimit dhe nga ngjarjet tashmë të ngarkuara në këtë listë.';
 
   @override
   String get eventsSitePickerTitle => 'Zgjidh vendndodhjen';
@@ -3743,6 +4022,47 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventsCalendarNoEventsThisDay => 'Nuk ka ngjarje këtë ditë';
 
   @override
+  String get eventsCalendarIncompleteListHint =>
+      'Mund të ketë më shumë ngjarje. Ngarko faqen tjetër për këtë muaj.';
+
+  @override
+  String get eventsCalendarLoadMoreButton => 'Ngarko më shumë';
+
+  @override
+  String eventsCalendarDayA11yOutOfMonth(int day) {
+    return 'Dita $day, jo në këtë muaj';
+  }
+
+  @override
+  String eventsCalendarDayA11y(int day) {
+    return 'Dita $day';
+  }
+
+  @override
+  String eventsCalendarDayA11yHasEvents(int day) {
+    return 'Dita $day, ka ngjarje';
+  }
+
+  @override
+  String eventsCalendarDayA11ySelected(int day) {
+    return 'Dita $day, e zgjedhur';
+  }
+
+  @override
+  String eventsCalendarDayA11ySelectedHasEvents(int day) {
+    return 'Dita $day, e zgjedhur, ka ngjarje';
+  }
+
+  @override
+  String get eventsEmptyActionClearFilters => 'Pastro filtrat';
+
+  @override
+  String get eventsEmptyActionCreateEvent => 'Krijo ngjarje';
+
+  @override
+  String get eventsSearchEmptyClearSearch => 'Pastro kërkimin';
+
+  @override
   String siteCardPollutionSiteSemantic(String title) {
     return 'Vend i ndotur: $title. Prek për detaje.';
   }
@@ -3830,6 +4150,45 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsAnalyticsNoData => 'Nuk ka të dhëna ende';
+
+  @override
+  String get eventsAnalyticsRefresh => 'Rifresko analitikën';
+
+  @override
+  String eventsAnalyticsCheckedInRatio(int checkedInCount, int totalJoiners) {
+    return '$checkedInCount nga $totalJoiners u regjistruan';
+  }
+
+  @override
+  String get eventsAnalyticsJoinersEmpty =>
+      'Asnjëri nuk është bashkuar ende me këtë ngjarje.';
+
+  @override
+  String get eventsAnalyticsCheckInsEmpty =>
+      'Ende nuk ka regjistrime. Orët janë në UTC.';
+
+  @override
+  String eventsAnalyticsPeakCheckInsUtc(String hour) {
+    return 'Piku: $hour UTC';
+  }
+
+  @override
+  String eventsAnalyticsSemanticsJoinCurve(
+    int fromCount,
+    int toCount,
+    int steps,
+  ) {
+    return 'Trendi i bashkimeve nga $fromCount në $toCount pjesëmarrës, $steps pika të dhënash.';
+  }
+
+  @override
+  String eventsAnalyticsSemanticsCheckInHeatmap(int peakCount, String hour) {
+    return 'Regjistrimet sipas orës në UTC. Piku $peakCount në $hour.';
+  }
+
+  @override
+  String get eventsAnalyticsSemanticsCheckInNoData =>
+      'Regjistrimet sipas orës në UTC. Nuk ka regjistrime.';
 
   @override
   String get eventsOfflineSyncQueued =>
@@ -3938,7 +4297,7 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsCategoryAwarenessAndEducationDescription =>
-      'Workshop-e, biseda ose angazhim komuniteti mbi praktika ekologjike.';
+      'Seminare, biseda ose angazhim komuniteti për praktika ekologjike.';
 
   @override
   String get eventsCategoryOther => 'Tjetër';
@@ -4194,6 +4553,13 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventChatInputSemantics => 'Mesazh në bisedë';
 
   @override
+  String get eventChatMessagesListSemantics => 'Lista e mesazheve';
+
+  @override
+  String get eventChatAttachmentsNeedNetwork =>
+      'Fotot, video, skedarët dhe zëri kërkojnë lidhje me internetin.';
+
+  @override
   String get eventChatPushChannelName => 'Bisedë e ngjarjes';
 
   @override
@@ -4250,10 +4616,25 @@ class AppLocalizationsSq extends AppLocalizations {
   String get eventChatSearchHint => 'Kërko mesazhe';
 
   @override
-  String get eventChatSearchNoResults => 'Nuk u gjetën mesazhe';
+  String get eventChatSearchNoResults => 'Nuk ka mesazhe që përputhen';
 
   @override
   String get eventChatSearchAction => 'Kërko';
+
+  @override
+  String get eventChatSearchFailed =>
+      'Kërkimi dështoi. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get eventChatSearchMinChars =>
+      'Shkruaj të paktën 2 karaktere për të kërkuar.';
+
+  @override
+  String get eventChatSearchIncludingLocalMatches =>
+      'Përfshin mesazhe të ngarkuara në këtë pajisje.';
+
+  @override
+  String get eventChatSearchLoadMore => 'Ngarko më shumë rezultate';
 
   @override
   String eventChatParticipantsCount(int count) {
@@ -4488,4 +4869,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String unknownRouteDebugRoute(String routeName) {
     return 'Debug: emri i rrugës ishte \"$routeName\".';
   }
+
+  @override
+  String get chatShareLocation => 'Ndaj vendndodhjen';
+
+  @override
+  String get chatSharedLocation => 'Vendndodhje e ndarë';
 }

@@ -5,6 +5,7 @@ import { NotificationDispatcherService } from '../../src/notifications/notificat
 import { ChatEncryptionService } from '../../src/event-chat/chat-encryption.service';
 import { EventChatService } from '../../src/event-chat/event-chat.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
+import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 
 const baseMsgRow = {
@@ -56,6 +57,7 @@ describe('EventChatService', () => {
   };
   let sse: { emitEvent: jest.Mock };
   let dispatcher: { dispatchToUser: jest.Mock };
+  let telemetry: { emitMetric: jest.Mock; emitSpan: jest.Mock; emitAudit: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
@@ -86,6 +88,11 @@ describe('EventChatService', () => {
     };
     sse = { emitEvent: jest.fn() };
     dispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
+    telemetry = {
+      emitMetric: jest.fn(),
+      emitSpan: jest.fn(),
+      emitAudit: jest.fn(),
+    };
 
     const encryption = { enabled: false, encrypt: jest.fn((v: string) => v), decrypt: jest.fn((v: string) => v) };
     const chatUpload = {
@@ -102,6 +109,7 @@ describe('EventChatService', () => {
       encryption as unknown as ChatEncryptionService,
       chatUpload as never,
       uploads as never,
+      telemetry as unknown as EventChatTelemetryService,
     );
   });
 
@@ -170,6 +178,9 @@ describe('EventChatService', () => {
         type: 'message_created',
         message: expect.objectContaining({ id: 'm_new' }),
       }),
+    );
+    expect(telemetry.emitMetric).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'event_chat.message.sent', ok: true }),
     );
 
     await new Promise((r) => setTimeout(r, 0));
@@ -328,6 +339,10 @@ describe('EventChatService', () => {
     expect(sse.emitEvent).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'message_edited' }),
     );
+    expect(telemetry.emitAudit).toHaveBeenCalledWith(
+      'message_edited',
+      expect.objectContaining({ actorId: user.userId, messageId: 'm1', eventId }),
+    );
   });
 
   it('setMessagePin allows organizer and emits', async () => {
@@ -362,6 +377,10 @@ describe('EventChatService', () => {
     await service.setMessagePin(eventId, 'm1', user, { pinned: true } as never);
     expect(sse.emitEvent).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'message_pinned' }),
+    );
+    expect(telemetry.emitAudit).toHaveBeenCalledWith(
+      'message_pinned',
+      expect.objectContaining({ actorId: user.userId, messageId: 'm1', eventId }),
     );
   });
 
@@ -486,6 +505,10 @@ describe('EventChatService', () => {
     expect(sse.emitEvent).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'message_deleted', messageId: 'm1' }),
     );
+    expect(telemetry.emitAudit).toHaveBeenCalledWith(
+      'message_deleted',
+      expect.objectContaining({ actorId: user.userId, messageId: 'm1', eventId }),
+    );
   });
 
   it('unreadCount uses cursor ref', async () => {
@@ -601,6 +624,7 @@ describe('EventChatService', () => {
       encryption as unknown as ChatEncryptionService,
       chatUpload as never,
       uploads as never,
+      telemetry as unknown as EventChatTelemetryService,
     );
 
     prisma.eventChatMessage.findMany.mockResolvedValue([

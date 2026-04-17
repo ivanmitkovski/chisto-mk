@@ -186,6 +186,8 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
         final double sheetHeight =
             math.min(maxAllowed, math.max(280.0, desired));
 
+        final TextTheme textTheme = Theme.of(context).textTheme;
+
         return GestureDetector(
           onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
           behavior: HitTestBehavior.translucent,
@@ -236,20 +238,16 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                       children: <Widget>[
                                         Text(
                                           context.l10n.eventsManualCheckInTitle,
-                                          style: AppTypography.sheetTitle,
+                                          style: AppTypography.eventsSheetTitle(textTheme),
                                         ),
                                         const SizedBox(height: AppSpacing.xs),
                                         Text(
                                           context
                                               .l10n
                                               .eventsOrganizerManualCheckInSubtitle,
-                                          style: AppTypography
-                                              .textTheme
-                                              .bodySmall
-                                              ?.copyWith(
-                                                color: AppColors.textMuted,
-                                                height: 1.35,
-                                              ),
+                                          style: AppTypography.eventsSupportingCaption(
+                                            textTheme,
+                                          ).copyWith(height: 1.35),
                                         ),
                                       ],
                                     ),
@@ -336,13 +334,7 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                                 .l10n
                                                 .eventsOrganizerManualCheckInNoJoiners,
                                             textAlign: TextAlign.center,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: AppColors.textMuted,
-                                                  height: 1.35,
-                                                ),
+                                            style: AppTypography.eventsBodyMuted(textTheme),
                                           ),
                                         ),
                                       )
@@ -357,12 +349,7 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                                 .l10n
                                                 .eventsParticipantsNoSearchResults,
                                             textAlign: TextAlign.center,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodyMedium
-                                                ?.copyWith(
-                                                  color: AppColors.textMuted,
-                                                ),
+                                            style: AppTypography.eventsBodyMuted(textTheme),
                                           ),
                                         ),
                                       )
@@ -435,16 +422,10 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                                             overflow:
                                                                 TextOverflow
                                                                     .ellipsis,
-                                                            style: Theme.of(context)
-                                                                .textTheme
-                                                                .bodyMedium
-                                                                ?.copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w600,
-                                                                  color: AppColors
-                                                                      .textPrimary,
-                                                                ),
+                                                            style: AppTypography
+                                                                .eventsFormLeadHeading(
+                                                              textTheme,
+                                                            ),
                                                           ),
                                                         ),
                                                         if (selected)
@@ -508,13 +489,9 @@ class _ManualCheckInSheetState extends State<ManualCheckInSheet> {
                                   ),
                                   child: Text(
                                     context.l10n.commonCancel,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          color: AppColors.primaryDark,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    style: AppTypography.eventsSecondaryCtaLabel(
+                                      textTheme,
+                                    ).copyWith(color: AppColors.primaryDark),
                                   ),
                                 ),
                               ),

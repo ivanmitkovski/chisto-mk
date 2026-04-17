@@ -54,6 +54,9 @@ class _PulsingQRContainerState extends State<PulsingQRContainer>
         return widget.child;
       }
     }
+    if (MediaQuery.disableAnimationsOf(context)) {
+      return widget.child;
+    }
     return AnimatedBuilder(
       animation: _scaleAnimation,
       builder: (BuildContext context, Widget? child) {

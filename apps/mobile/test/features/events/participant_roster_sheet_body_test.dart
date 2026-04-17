@@ -4,10 +4,12 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/participants_section.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -28,6 +30,10 @@ class _DelayedParticipantsRepo implements EventsRepository {
 
   @override
   List<EcoEvent> get events => _inner.events;
+
+  @override
+  DateTime? get lastSuccessfulListRefreshAt =>
+      _inner.lastSuccessfulListRefreshAt;
 
   @override
   bool get hasMoreEvents => _inner.hasMoreEvents;
@@ -74,6 +80,20 @@ class _DelayedParticipantsRepo implements EventsRepository {
 
   @override
   Future<EcoEvent> create(EcoEvent event) => _inner.create(event);
+
+  @override
+  Future<EventScheduleConflictPreview> checkScheduleConflict({
+    required String siteId,
+    required DateTime scheduledAt,
+    DateTime? endAt,
+    String? excludeEventId,
+  }) =>
+      _inner.checkScheduleConflict(
+        siteId: siteId,
+        scheduledAt: scheduledAt,
+        endAt: endAt,
+        excludeEventId: excludeEventId,
+      );
 
   @override
   Future<EcoEvent> updateEventDetails(
@@ -197,4 +217,150 @@ void main() {
     expect(find.byType(CircularProgressIndicator), findsNothing);
     expect(find.text('Volunteer 1'), findsOneWidget);
   });
+
+  test('mergeParticipantPreviews skips API row that duplicates organizer id', () {
+    final EcoEvent event = store.findById('evt-1')!;
+    final List<EventParticipantRow> rows = <EventParticipantRow>[
+      EventParticipantRow(
+        userId: event.organizerId,
+        displayName: event.organizerName,
+        joinedAt: DateTime.utc(2024, 1, 1),
+      ),
+      EventParticipantRow(
+        userId: 'volunteer-extra',
+        displayName: 'Alex',
+        joinedAt: DateTime.utc(2024, 1, 2),
+      ),
+    ];
+    final List<AttendeePreview> merged = mergeParticipantPreviews(
+      event: event,
+      apiRows: rows,
+      youLabel: 'You',
+    );
+    expect(merged.length, 2);
+    expect(merged.where((AttendeePreview a) => a.userId == event.organizerId).length, 1);
+    expect(merged.any((AttendeePreview a) => a.userId == 'volunteer-extra'), isTrue);
+  });
+
+  test('orderPreviewsForAvatarStack puts joiners before organizers', () {
+    final EcoEvent event = store.findById('evt-1')!;
+    final List<AttendeePreview> merged = mergeParticipantPreviews(
+      event: event,
+      apiRows: <EventParticipantRow>[
+        EventParticipantRow(
+          userId: 'joiner-a',
+          displayName: 'Alex',
+          joinedAt: DateTime.utc(2024, 1, 2),
+        ),
+      ],
+      youLabel: 'You',
+    );
+    expect(merged.first.isOrganizer, isTrue);
+    final List<AttendeePreview> ordered = orderPreviewsForAvatarStack(merged);
+    expect(ordered.first.userId, 'joiner-a');
+    expect(ordered.last.isOrganizer, isTrue);
+  });
+
+  testWidgets('ParticipantsSection shows multiple avatars after participant peek', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = store.findById('evt-1')!;
+    expect(event.participantCount, greaterThan(1));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: ParticipantsSection(event: event),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 40));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(UserAvatarCircle), findsAtLeastNWidgets(2));
+  });
+
+  testWidgets('AvatarStack pads circles when count exceeds fetched preview rows', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent base = store.findById('evt-1')!;
+    final EcoEvent event = base.copyWith(participantCount: 2);
+    final List<AttendeePreview> previews = mergeParticipantPreviews(
+      event: event,
+      apiRows: const <EventParticipantRow>[],
+      youLabel: 'You',
+    );
+    expect(previews.length, 1);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: Scaffold(
+          body: Center(
+            child: AvatarStack(
+              count: 2,
+              event: event,
+              previews: previews,
+              isLoadingPeek: false,
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(UserAvatarCircle), findsNWidgets(2));
+  });
+
+  testWidgets(
+    'AvatarStack shows joiner and organizer when participantCount is one joiner',
+    (WidgetTester tester) async {
+      final EcoEvent base = store.findById('evt-1')!;
+      final EcoEvent event = base.copyWith(participantCount: 1);
+      final List<AttendeePreview> previews = mergeParticipantPreviews(
+        event: event,
+        apiRows: <EventParticipantRow>[
+          EventParticipantRow(
+            userId: 'joiner-sam',
+            displayName: 'Sam Joiner',
+            joinedAt: DateTime.utc(2024, 1, 3),
+          ),
+        ],
+        youLabel: 'You',
+      );
+      expect(previews.length, 2);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: Scaffold(
+            body: Center(
+              child: AvatarStack(
+                count: 1,
+                event: event,
+                previews: previews,
+                isLoadingPeek: false,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(UserAvatarCircle), findsNWidgets(2));
+      final List<UserAvatarCircle> avatars = tester
+          .widgetList<UserAvatarCircle>(find.byType(UserAvatarCircle))
+          .toList();
+      expect(avatars.first.displayName, 'Sam Joiner');
+    },
+  );
 }

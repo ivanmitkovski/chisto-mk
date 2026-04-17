@@ -262,7 +262,7 @@ class _LocationPickerState extends State<LocationPicker> {
 
     final bool atFence = _isAtFence(newCenter.latitude, newCenter.longitude);
     if (atFence && !_wasAtFenceLastMove) {
-      AppHaptics.boundaryLimitPulse();
+      AppHaptics.boundaryLimitPulse(context);
     }
     _wasAtFenceLastMove = atFence;
 

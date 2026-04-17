@@ -68,8 +68,11 @@ abstract final class ChatTheme {
   static const double avatarSize = 28;
   static const double avatarGap = AppSpacing.sm;
 
-  /// Space between consecutive rows in the reversed chat list (below older, above newer).
-  static const double bubbleStackGap = AppSpacing.md;
+  /// Tight vertical gap between consecutive bubbles from the same sender (Instagram-style stack).
+  static const double bubbleStackGapWithinCluster = AppSpacing.xxs;
+
+  /// Larger gap when the sender changes, around system messages, or after a day break (new “thread”).
+  static const double bubbleStackGapBetweenClusters = AppSpacing.sm;
 
   static BorderRadiusGeometry bubbleRadius({
     required bool own,

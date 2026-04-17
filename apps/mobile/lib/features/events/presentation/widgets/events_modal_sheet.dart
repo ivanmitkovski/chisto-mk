@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 
-/// Create-event pickers: draggable dismiss (swipe down), same scrim as other sheets.
-Future<T?> showCreateEventModalBottomSheet<T>({
+/// Event vertical bottom sheets: draggable dismiss, root navigator, shared scrim.
+///
+/// Use for create/edit pickers, help sheets, and event detail modals so nested
+/// navigators behave consistently.
+Future<T?> showEventsSurfaceModal<T>({
   required BuildContext context,
   required WidgetBuilder builder,
 }) {

@@ -2,11 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon, Input, Snack, type SnackState } from '@/components/ui';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
-import { ApiError } from '@/lib/api';
+import { cleanupEventMutationMessage } from '@/features/events/lib/cleanup-events-api-messages';
+import {
+  type CleanupEventFieldErrors,
+  validateCleanupEventDetailForm,
+  validateDeclineReason,
+} from '@/features/events/lib/admin-cleanup-event-validation';
 import type { CleanupEventDetail } from '@/features/events/data/events-adapter';
+import { parseDuplicateEventConflictFromApiError } from '@/features/events/lib/event-schedule-conflict-client';
+import { useScheduleConflictPreview } from '@/features/events/lib/use-schedule-conflict-preview';
 import styles from './event-detail.module.css';
 
 function formatDateTime(iso: string): string {
@@ -24,9 +31,10 @@ function toDatetimeLocal(iso: string): string {
 
 type EventDetailViewProps = {
   event: CleanupEventDetail;
+  canWriteCleanupEvents: boolean;
 };
 
-export function EventDetailView({ event }: EventDetailViewProps) {
+export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailViewProps) {
   const router = useRouter();
   const [title, setTitle] = useState(event.title);
   const [description, setDescription] = useState(event.description);
@@ -36,16 +44,110 @@ export function EventDetailView({ event }: EventDetailViewProps) {
   const [participantCount, setParticipantCount] = useState(event.participantCount);
   const [saving, setSaving] = useState(false);
   const [snack, setSnack] = useState<SnackState | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<CleanupEventFieldErrors>({});
+  const [duplicateModal, setDuplicateModal] = useState<{
+    id: string;
+    title: string;
+    scheduledAt: string;
+  } | null>(null);
+  const duplicateModalPrimaryRef = useRef<HTMLButtonElement>(null);
+  const [declineModalOpen, setDeclineModalOpen] = useState(false);
+  const [declineReason, setDeclineReason] = useState('');
+  const [declineReasonError, setDeclineReasonError] = useState<string | null>(null);
+  const declineReasonTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const site = event.site;
+
+  const scheduledAtIso = useMemo(() => {
+    if (!scheduledAt.trim()) {
+      return null;
+    }
+    const parsed = new Date(scheduledAt);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }, [scheduledAt]);
+
+  const { hint: scheduleConflictHint, checking: scheduleConflictChecking } = useScheduleConflictPreview({
+    siteId: site.id,
+    scheduledAtIso,
+    excludeEventId: event.id,
+  });
 
   const isCompleted = !!event.completedAt;
   const moderationStatus = (event as { status?: string }).status ?? 'APPROVED';
   const isPending = moderationStatus === 'PENDING';
-  const site = event.site;
 
   const gm = `https://www.google.com/maps?q=${site.latitude},${site.longitude}`;
   const am = `https://maps.apple.com/?q=${site.latitude},${site.longitude}`;
 
+  useEffect(() => {
+    if (!duplicateModal) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setDuplicateModal(null);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    const id = requestAnimationFrame(() => {
+      duplicateModalPrimaryRef.current?.focus();
+    });
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      cancelAnimationFrame(id);
+    };
+  }, [duplicateModal]);
+
+  useEffect(() => {
+    if (!declineModalOpen) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setDeclineModalOpen(false);
+        setDeclineReason('');
+        setDeclineReasonError(null);
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    const id = requestAnimationFrame(() => {
+      declineReasonTextareaRef.current?.focus();
+    });
+    return () => {
+      document.removeEventListener('keydown', onKeyDown);
+      cancelAnimationFrame(id);
+    };
+  }, [declineModalOpen]);
+
+  function clearFieldError(key: keyof CleanupEventFieldErrors) {
+    setFieldErrors((prev) => {
+      if (!prev[key]) {
+        return prev;
+      }
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }
+
   async function saveUpdates() {
+    const errors = validateCleanupEventDetailForm({
+      title,
+      description,
+      recurrenceRule,
+      scheduledAtValue: scheduledAt,
+      participantCount,
+      ...(isCompleted
+        ? { completedAtLocal: completedAt.trim() ? toDatetimeLocal(completedAt) : '' }
+        : {}),
+    });
+    setFieldErrors(errors);
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
     setSaving(true);
     setSnack(null);
     const body: {
@@ -73,8 +175,16 @@ export function EventDetailView({ event }: EventDetailViewProps) {
       setSnack({ tone: 'success', title: 'Saved', message: 'Event updated.' });
       router.refresh();
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : 'Update failed';
-      setSnack({ tone: 'warning', title: 'Error', message: msg });
+      const duplicate = parseDuplicateEventConflictFromApiError(e);
+      if (duplicate) {
+        setDuplicateModal(duplicate);
+        return;
+      }
+      setSnack({
+        tone: 'warning',
+        title: 'Error',
+        message: cleanupEventMutationMessage(e, 'Update failed'),
+      });
     } finally {
       setSaving(false);
     }
@@ -91,26 +201,45 @@ export function EventDetailView({ event }: EventDetailViewProps) {
       setSnack({ tone: 'success', title: 'Event approved', message: 'The event is now visible to users.' });
       router.refresh();
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : 'Approve failed';
-      setSnack({ tone: 'warning', title: 'Error', message: msg });
+      setSnack({
+        tone: 'warning',
+        title: 'Error',
+        message: cleanupEventMutationMessage(e, 'Approve failed'),
+      });
     } finally {
       setSaving(false);
     }
   }
 
-  async function decline() {
+  function openDeclineModal() {
+    setDeclineReason('');
+    setDeclineReasonError(null);
+    setDeclineModalOpen(true);
+  }
+
+  async function submitDecline() {
+    const reasonErr = validateDeclineReason(declineReason);
+    setDeclineReasonError(reasonErr);
+    if (reasonErr) {
+      return;
+    }
     setSaving(true);
     setSnack(null);
     try {
       await adminBrowserFetch(`/admin/cleanup-events/${event.id}`, {
         method: 'PATCH',
-        body: { status: 'DECLINED' },
+        body: { status: 'DECLINED', declineReason: declineReason.trim() },
       });
+      setDeclineModalOpen(false);
+      setDeclineReason('');
       setSnack({ tone: 'success', title: 'Event declined', message: 'The event has been declined.' });
       router.refresh();
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : 'Decline failed';
-      setSnack({ tone: 'warning', title: 'Error', message: msg });
+      setSnack({
+        tone: 'warning',
+        title: 'Error',
+        message: cleanupEventMutationMessage(e, 'Decline failed'),
+      });
     } finally {
       setSaving(false);
     }
@@ -132,12 +261,17 @@ export function EventDetailView({ event }: EventDetailViewProps) {
       setSnack({ tone: 'success', title: 'Event completed', message: 'Cleanup event marked as completed.' });
       router.refresh();
     } catch (e) {
-      const msg = e instanceof ApiError ? e.message : 'Update failed';
-      setSnack({ tone: 'warning', title: 'Error', message: msg });
+      setSnack({
+        tone: 'warning',
+        title: 'Error',
+        message: cleanupEventMutationMessage(e, 'Update failed'),
+      });
     } finally {
       setSaving(false);
     }
   }
+
+  const readOnly = !canWriteCleanupEvents;
 
   return (
     <div className={styles.layout}>
@@ -145,6 +279,13 @@ export function EventDetailView({ event }: EventDetailViewProps) {
         <Icon name="chevron-left" size={16} />
         Back to events
       </Link>
+
+      {readOnly ? (
+        <div className={styles.readOnlyBanner} role="status">
+          You are viewing this event with read-only access. Creating or editing cleanup events requires an admin
+          role.
+        </div>
+      ) : null}
 
       <section className={styles.sectionCard}>
         <span className={styles.sectionLabel}>Event status</span>
@@ -214,76 +355,155 @@ export function EventDetailView({ event }: EventDetailViewProps) {
 
       <section className={styles.sectionCard}>
         <span className={styles.sectionLabel}>Moderation</span>
-        {isPending && (
+        {isPending && canWriteCleanupEvents && (
           <div className={styles.approveDeclineBar}>
             <p className={styles.approveDeclineHint}>
-              This event was created by a user and awaits your review. Approve to make it visible to participants, or decline to reject it.
+              This event was created by a user and awaits your review. Approve to make it visible to participants, or
+              decline to reject it.
             </p>
             <div className={styles.approveDeclineActions}>
               <Button onClick={() => void approve()} disabled={saving}>
                 <Icon name="check" size={14} />
                 Approve
               </Button>
-              <Button variant="outline" onClick={() => void decline()} disabled={saving} className={styles.declineBtn}>
+              <Button variant="outline" onClick={openDeclineModal} disabled={saving} className={styles.declineBtn}>
                 Decline
               </Button>
             </div>
           </div>
         )}
+        {isPending && !canWriteCleanupEvents && (
+          <p className={styles.approveDeclineHint} role="note">
+            This event is pending approval. Only an admin can approve or decline it.
+          </p>
+        )}
         <p className={styles.moderationHint}>
           {isPending ? 'You can also edit details before approving.' : 'Edit event details. Changes are saved when you click Save.'}
         </p>
         <div className={styles.form}>
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="detail-event-title">
             <span className={styles.fieldLabel}>Title</span>
             <input
+              id="detail-event-title"
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              disabled={readOnly}
+              onChange={(e) => {
+                setTitle(e.target.value);
+                clearFieldError('title');
+              }}
               className={styles.input}
               maxLength={200}
+              aria-invalid={fieldErrors.title ? true : undefined}
+              aria-describedby={fieldErrors.title ? 'detail-event-title-err' : undefined}
             />
+            {fieldErrors.title ? (
+              <span id="detail-event-title-err" className={styles.fieldError} role="alert">
+                {fieldErrors.title}
+              </span>
+            ) : null}
           </label>
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="detail-event-description">
             <span className={styles.fieldLabel}>Description</span>
             <textarea
+              id="detail-event-description"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              disabled={readOnly}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                clearFieldError('description');
+              }}
               className={styles.textarea}
               rows={4}
               maxLength={10000}
+              aria-invalid={fieldErrors.description ? true : undefined}
+              aria-describedby={fieldErrors.description ? 'detail-event-description-err' : undefined}
             />
+            {fieldErrors.description ? (
+              <span id="detail-event-description-err" className={styles.fieldError} role="alert">
+                {fieldErrors.description}
+              </span>
+            ) : null}
           </label>
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="detail-event-rrule">
             <span className={styles.fieldLabel}>Recurrence (RRULE, optional)</span>
             <textarea
+              id="detail-event-rrule"
               value={recurrenceRule}
-              onChange={(e) => setRecurrenceRule(e.target.value)}
+              disabled={readOnly}
+              onChange={(e) => {
+                setRecurrenceRule(e.target.value);
+                clearFieldError('recurrenceRule');
+              }}
               className={styles.textarea}
               rows={2}
               placeholder="Leave empty to clear"
               maxLength={2048}
+              aria-invalid={fieldErrors.recurrenceRule ? true : undefined}
+              aria-describedby={fieldErrors.recurrenceRule ? 'detail-event-rrule-err' : undefined}
             />
             <span className={styles.fieldHint}>Clear the field and save to remove recurrence metadata.</span>
+            {fieldErrors.recurrenceRule ? (
+              <span id="detail-event-rrule-err" className={styles.fieldError} role="alert">
+                {fieldErrors.recurrenceRule}
+              </span>
+            ) : null}
           </label>
-          <label className={styles.field}>
+          <label className={styles.field} htmlFor="detail-event-scheduled">
             <span className={styles.fieldLabel}>Scheduled date & time</span>
             <input
+              id="detail-event-scheduled"
               type="datetime-local"
               value={toDatetimeLocal(scheduledAt)}
-              onChange={(e) => setScheduledAt(new Date(e.target.value).toISOString())}
+              disabled={readOnly}
+              onChange={(e) => {
+                setScheduledAt(new Date(e.target.value).toISOString());
+                clearFieldError('scheduledAt');
+              }}
               className={styles.input}
+              aria-invalid={fieldErrors.scheduledAt ? true : undefined}
+              aria-describedby={fieldErrors.scheduledAt ? 'detail-event-scheduled-err' : undefined}
             />
+            {fieldErrors.scheduledAt ? (
+              <span id="detail-event-scheduled-err" className={styles.fieldError} role="alert">
+                {fieldErrors.scheduledAt}
+              </span>
+            ) : null}
           </label>
-          <label className={styles.field}>
+          {scheduleConflictHint ? (
+            <div className={styles.conflictBanner} role="status">
+              {scheduleConflictChecking ? (
+                'Checking schedule…'
+              ) : (
+                <>
+                  Another event may overlap this time at this site:{' '}
+                  <strong>{scheduleConflictHint.title}</strong> ({formatDateTime(scheduleConflictHint.scheduledAt)}).{' '}
+                  <Link href={`/dashboard/events/${scheduleConflictHint.id}`}>Open event</Link>.
+                </>
+              )}
+            </div>
+          ) : null}
+          <label className={styles.field} htmlFor="detail-event-participants">
             <span className={styles.fieldLabel}>Participant count</span>
             <Input
+              id="detail-event-participants"
               type="number"
               min={0}
               value={String(participantCount)}
-              onChange={(e) => setParticipantCount(Math.max(0, parseInt(e.target.value, 10) || 0))}
+              disabled={readOnly}
+              onChange={(e) => {
+                setParticipantCount(Math.max(0, parseInt(e.target.value, 10) || 0));
+                clearFieldError('participantCount');
+              }}
               className={styles.inputNumber}
+              aria-invalid={fieldErrors.participantCount ? true : undefined}
+              aria-describedby={fieldErrors.participantCount ? 'detail-event-participants-err' : undefined}
             />
+            {fieldErrors.participantCount ? (
+              <span id="detail-event-participants-err" className={styles.fieldError} role="alert">
+                {fieldErrors.participantCount}
+              </span>
+            ) : null}
           </label>
           {!isCompleted && (
             <label className={styles.field}>
@@ -292,7 +512,7 @@ export function EventDetailView({ event }: EventDetailViewProps) {
                 variant="outline"
                 size="sm"
                 onClick={() => void markComplete()}
-                disabled={saving}
+                disabled={saving || readOnly}
               >
                 <Icon name="check" size={14} />
                 Mark completed
@@ -300,19 +520,31 @@ export function EventDetailView({ event }: EventDetailViewProps) {
             </label>
           )}
           {isCompleted && (
-            <label className={styles.field}>
+            <label className={styles.field} htmlFor="detail-event-completed">
               <span className={styles.fieldLabel}>Completed date & time</span>
               <input
+                id="detail-event-completed"
                 type="datetime-local"
                 value={completedAt ? toDatetimeLocal(completedAt) : ''}
-                onChange={(e) => setCompletedAt(e.target.value ? new Date(e.target.value).toISOString() : '')}
+                disabled={readOnly}
+                onChange={(e) => {
+                  setCompletedAt(e.target.value ? new Date(e.target.value).toISOString() : '');
+                  clearFieldError('completedAt');
+                }}
                 className={styles.input}
+                aria-invalid={fieldErrors.completedAt ? true : undefined}
+                aria-describedby={fieldErrors.completedAt ? 'detail-event-completed-err' : undefined}
               />
               <span className={styles.fieldHint}>You can adjust when the event was completed.</span>
+              {fieldErrors.completedAt ? (
+                <span id="detail-event-completed-err" className={styles.fieldError} role="alert">
+                  {fieldErrors.completedAt}
+                </span>
+              ) : null}
             </label>
           )}
           <div className={styles.formActions}>
-            <Button onClick={() => void saveUpdates()} disabled={saving}>
+            <Button onClick={() => void saveUpdates()} disabled={saving || readOnly}>
               {saving ? 'Saving…' : 'Save changes'}
             </Button>
           </div>
@@ -320,6 +552,113 @@ export function EventDetailView({ event }: EventDetailViewProps) {
       </section>
 
       <Snack snack={snack} onClose={() => setSnack(null)} />
+
+      {duplicateModal ? (
+        <div
+          className={styles.modalBackdrop}
+          role="presentation"
+          onClick={() => setDuplicateModal(null)}
+        >
+          <div
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="duplicate-event-modal-title"
+            aria-describedby="duplicate-event-modal-desc"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <h2 id="duplicate-event-modal-title" className={styles.modalTitle}>
+              Schedule conflict
+            </h2>
+            <p id="duplicate-event-modal-desc" className={styles.modalBody}>
+              {duplicateModal.title} is already scheduled for {formatDateTime(duplicateModal.scheduledAt)}. Adjust the
+              time or open the existing event.
+            </p>
+            <div className={styles.modalActions}>
+              <Button
+                ref={duplicateModalPrimaryRef}
+                type="button"
+                onClick={() => void router.push(`/dashboard/events/${duplicateModal.id}`)}
+              >
+                Open event
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setDuplicateModal(null)}>
+                Change time
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {declineModalOpen ? (
+        <div
+          className={styles.modalBackdrop}
+          role="presentation"
+          onClick={() => {
+            if (!saving) {
+              setDeclineModalOpen(false);
+              setDeclineReason('');
+              setDeclineReasonError(null);
+            }
+          }}
+        >
+          <div
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="decline-event-modal-title"
+            aria-describedby="decline-event-modal-desc"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <h2 id="decline-event-modal-title" className={styles.modalTitle}>
+              Decline event
+            </h2>
+            <p id="decline-event-modal-desc" className={styles.modalBody}>
+              Provide a short reason for declining. This is stored for audit purposes (1–2000 characters).
+            </p>
+            <label className={styles.field} htmlFor="decline-reason-text">
+              <span className={styles.fieldLabel}>Reason</span>
+              <textarea
+                id="decline-reason-text"
+                ref={declineReasonTextareaRef}
+                value={declineReason}
+                onChange={(e) => {
+                  setDeclineReason(e.target.value);
+                  setDeclineReasonError(null);
+                }}
+                className={styles.textarea}
+                rows={4}
+                maxLength={2000}
+                disabled={saving}
+                aria-invalid={declineReasonError ? true : undefined}
+                aria-describedby={declineReasonError ? 'decline-reason-err' : undefined}
+              />
+              {declineReasonError ? (
+                <span id="decline-reason-err" className={styles.fieldError} role="alert">
+                  {declineReasonError}
+                </span>
+              ) : null}
+            </label>
+            <div className={styles.modalActions}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={saving}
+                onClick={() => {
+                  setDeclineModalOpen(false);
+                  setDeclineReason('');
+                  setDeclineReasonError(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="button" disabled={saving} onClick={() => void submitDecline()}>
+                {saving ? 'Declining…' : 'Decline event'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

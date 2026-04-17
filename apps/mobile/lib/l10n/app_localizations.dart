@@ -448,6 +448,36 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get semanticsClose;
 
+  /// No description provided for @homeShellNavHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get homeShellNavHome;
+
+  /// No description provided for @homeShellNavReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get homeShellNavReports;
+
+  /// No description provided for @homeShellNavMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get homeShellNavMap;
+
+  /// No description provided for @homeShellNavEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Events'**
+  String get homeShellNavEvents;
+
+  /// No description provided for @semanticsReportPhotoNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Report photo {number}'**
+  String semanticsReportPhotoNumber(int number);
+
   /// No description provided for @semanticsAboutStep.
   ///
   /// In en, this message translates to:
@@ -2956,6 +2986,18 @@ abstract class AppLocalizations {
   /// **'You can start this eco action once the scheduled start time arrives.'**
   String get eventsStartEventTooEarly;
 
+  /// No description provided for @eventsJoinNotYetOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Joining opens when the scheduled start time arrives.'**
+  String get eventsJoinNotYetOpen;
+
+  /// No description provided for @errorEventEndAtTooFar.
+  ///
+  /// In en, this message translates to:
+  /// **'The planned end cannot be that far after the start. Try a shorter extension.'**
+  String get errorEventEndAtTooFar;
+
   /// No description provided for @eventsAwaitingModerationCta.
   ///
   /// In en, this message translates to:
@@ -3028,6 +3070,120 @@ abstract class AppLocalizations {
   /// **'Save changes'**
   String get eventsEditEventSave;
 
+  /// No description provided for @editEventTitleTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be at most {max} characters.'**
+  String editEventTitleTooLong(int max);
+
+  /// No description provided for @editEventDescriptionTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Description must be at most {max} characters.'**
+  String editEventDescriptionTooLong(int max);
+
+  /// No description provided for @editEventMaxParticipantsInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid whole number of spots, or leave blank for no limit.'**
+  String get editEventMaxParticipantsInvalid;
+
+  /// No description provided for @editEventMaxParticipantsRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Team size must be between {min} and {max}, or leave blank for no limit.'**
+  String editEventMaxParticipantsRange(int min, int max);
+
+  /// No description provided for @editEventGearLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'You can select up to {max} gear items.'**
+  String editEventGearLimitReached(int max);
+
+  /// No description provided for @editEventDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get editEventDiscardTitle;
+
+  /// No description provided for @editEventDiscardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. If you leave now, they will be lost.'**
+  String get editEventDiscardMessage;
+
+  /// No description provided for @editEventDiscardConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get editEventDiscardConfirm;
+
+  /// No description provided for @editEventDiscardKeepEditing.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get editEventDiscardKeepEditing;
+
+  /// No description provided for @editEventSchedulePreviewFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check for schedule conflicts. You can still save; the server will reject overlapping times.'**
+  String get editEventSchedulePreviewFailed;
+
+  /// No description provided for @editEventOfflineSave.
+  ///
+  /// In en, this message translates to:
+  /// **'You appear to be offline. Connect and try again.'**
+  String get editEventOfflineSave;
+
+  /// No description provided for @editEventHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing your event'**
+  String get editEventHelpTitle;
+
+  /// No description provided for @editEventHelpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule, volunteers, and moderation'**
+  String get editEventHelpSubtitle;
+
+  /// No description provided for @editEventHelpButtonTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get editEventHelpButtonTooltip;
+
+  /// No description provided for @editEventDuplicateSubmitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule conflict'**
+  String get editEventDuplicateSubmitTitle;
+
+  /// No description provided for @editEventDuplicateSubmitBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} is already scheduled at {when}. Adjust your times and try again.'**
+  String editEventDuplicateSubmitBody(String title, String when);
+
+  /// No description provided for @editEventNoChangesToSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to save.'**
+  String get editEventNoChangesToSave;
+
+  /// No description provided for @editEventPendingModerationBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'This event is still awaiting moderator approval. Changes apply to your draft.'**
+  String get editEventPendingModerationBanner;
+
+  /// No description provided for @eventsEventNotEditable.
+  ///
+  /// In en, this message translates to:
+  /// **'This event can no longer be edited.'**
+  String get eventsEventNotEditable;
+
   /// No description provided for @eventsEventUpdated.
   ///
   /// In en, this message translates to:
@@ -3039,6 +3195,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Please try again.'**
   String get eventsMutationFailedGeneric;
+
+  /// No description provided for @eventsScheduleConflictPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible schedule overlap'**
+  String get eventsScheduleConflictPreviewTitle;
+
+  /// No description provided for @eventsScheduleConflictPreviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Another event at this site may overlap your time: {title} at {when}.'**
+  String eventsScheduleConflictPreviewBody(String title, String when);
+
+  /// No description provided for @eventsScheduleConflictContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue anyway'**
+  String get eventsScheduleConflictContinue;
+
+  /// No description provided for @eventsScheduleConflictAdjustTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Change time'**
+  String get eventsScheduleConflictAdjustTime;
+
+  /// No description provided for @eventsDuplicateEventBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'This time overlaps \"{title}\" ({when}). Choose a different time.'**
+  String eventsDuplicateEventBlocked(String title, String when);
 
   /// No description provided for @eventsManualCheckInAdd.
   ///
@@ -3430,6 +3616,60 @@ abstract class AppLocalizations {
   /// **'Could not start check-in. Confirm the event is in progress and try again.'**
   String get eventsOrganizerSessionSetupFailed;
 
+  /// No description provided for @eventsOrganizerConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm check-in'**
+  String get eventsOrganizerConfirmTitle;
+
+  /// No description provided for @eventsOrganizerConfirmSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wants to check in to this event'**
+  String get eventsOrganizerConfirmSubtitle;
+
+  /// No description provided for @eventsOrganizerConfirmApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get eventsOrganizerConfirmApprove;
+
+  /// No description provided for @eventsOrganizerConfirmReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get eventsOrganizerConfirmReject;
+
+  /// No description provided for @eventsOrganizerConfirmExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This check-in request has expired.'**
+  String get eventsOrganizerConfirmExpired;
+
+  /// No description provided for @eventsVolunteerPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for confirmation'**
+  String get eventsVolunteerPendingTitle;
+
+  /// No description provided for @eventsVolunteerPendingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The organizer needs to confirm your check-in...'**
+  String get eventsVolunteerPendingSubtitle;
+
+  /// No description provided for @eventsVolunteerRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in was not confirmed by the organizer.'**
+  String get eventsVolunteerRejected;
+
+  /// No description provided for @eventsVolunteerExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Request expired. Please scan again.'**
+  String get eventsVolunteerExpired;
+
   /// No description provided for @eventsOrganizerQrRetry.
   ///
   /// In en, this message translates to:
@@ -3705,6 +3945,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'End time must be later than start time.'**
   String get createEventEndTimeError;
+
+  /// No description provided for @createEventScheduleStartInPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a start time at least {minutes} minutes from now.'**
+  String createEventScheduleStartInPast(int minutes);
+
+  /// No description provided for @createEventScheduleEndInPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an end time at least {minutes} minutes from now.'**
+  String createEventScheduleEndInPast(int minutes);
 
   /// No description provided for @createEventFieldType.
   ///
@@ -4168,6 +4420,132 @@ abstract class AppLocalizations {
   /// **'Manage check-in'**
   String get eventsCtaManageCheckIn;
 
+  /// No description provided for @eventsCtaExtendCleanupEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend planned end'**
+  String get eventsCtaExtendCleanupEnd;
+
+  /// No description provided for @eventsExtendEndSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend cleanup'**
+  String get eventsExtendEndSheetTitle;
+
+  /// No description provided for @eventsExtendEndSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Current planned end is {time}.'**
+  String eventsExtendEndSheetSubtitle(String time);
+
+  /// No description provided for @eventsExtendEndCurrentChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'New end: {time}'**
+  String eventsExtendEndCurrentChoice(String time);
+
+  /// No description provided for @eventsExtendEndPlus15.
+  ///
+  /// In en, this message translates to:
+  /// **'+15 min'**
+  String get eventsExtendEndPlus15;
+
+  /// No description provided for @eventsExtendEndPlus30.
+  ///
+  /// In en, this message translates to:
+  /// **'+30 min'**
+  String get eventsExtendEndPlus30;
+
+  /// No description provided for @eventsExtendEndPlus60.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 hour'**
+  String get eventsExtendEndPlus60;
+
+  /// No description provided for @eventsExtendEndCustomTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom time…'**
+  String get eventsExtendEndCustomTime;
+
+  /// No description provided for @eventsExtendEndApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Save new end time'**
+  String get eventsExtendEndApply;
+
+  /// No description provided for @eventsExtendEndSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Planned end updated.'**
+  String get eventsExtendEndSuccess;
+
+  /// No description provided for @eventsExtendEndSameAsCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'That is already the planned end time.'**
+  String get eventsExtendEndSameAsCurrent;
+
+  /// No description provided for @eventsExtendEndInvalidRange.
+  ///
+  /// In en, this message translates to:
+  /// **'That end time is not valid for this cleanup.'**
+  String get eventsExtendEndInvalidRange;
+
+  /// No description provided for @eventsExtendEndTooSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an end time a little further ahead.'**
+  String get eventsExtendEndTooSoon;
+
+  /// No description provided for @eventsEndSoonBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup is ending soon'**
+  String get eventsEndSoonBannerTitle;
+
+  /// No description provided for @eventsEndSoonBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can extend the planned end or finish when you are ready.'**
+  String get eventsEndSoonBannerBody;
+
+  /// No description provided for @eventsEndSoonBannerExtend.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend'**
+  String get eventsEndSoonBannerExtend;
+
+  /// No description provided for @eventsOrganizerExtendEndSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend planned cleanup end time'**
+  String get eventsOrganizerExtendEndSemantic;
+
+  /// No description provided for @eventsOrganizerEndSoonNotifyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleanup ending soon'**
+  String get eventsOrganizerEndSoonNotifyTitle;
+
+  /// No description provided for @eventsOrganizerEndSoonNotifyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your cleanup is nearing its planned end. Tap to review.'**
+  String get eventsOrganizerEndSoonNotifyBody;
+
+  /// No description provided for @eventsOrganizerEndSoonNotifyChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Organizer cleanup reminders'**
+  String get eventsOrganizerEndSoonNotifyChannelName;
+
+  /// No description provided for @eventsOrganizerEndSoonNotifyChannelDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Local reminders when a cleanup you run is nearing its planned end.'**
+  String get eventsOrganizerEndSoonNotifyChannelDescription;
+
   /// No description provided for @eventsCtaEditAfterPhotos.
   ///
   /// In en, this message translates to:
@@ -4408,6 +4786,12 @@ abstract class AppLocalizations {
   /// **'Event shared.'**
   String get eventsDetailShareSuccess;
 
+  /// No description provided for @eventsDetailShareFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open share. Try again.'**
+  String get eventsDetailShareFailed;
+
   /// No description provided for @eventsDetailCalendarAdded.
   ///
   /// In en, this message translates to:
@@ -4564,11 +4948,41 @@ abstract class AppLocalizations {
   /// **'Saving...'**
   String get eventsEvidenceSaving;
 
+  /// No description provided for @eventsEvidenceSaveInProgressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait until save finishes before leaving this screen.'**
+  String get eventsEvidenceSaveInProgressHint;
+
   /// No description provided for @eventsEvidenceAfterPhotosSaved.
   ///
   /// In en, this message translates to:
   /// **'After photos saved.'**
   String get eventsEvidenceAfterPhotosSaved;
+
+  /// No description provided for @eventsEvidenceSaveSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos saved'**
+  String get eventsEvidenceSaveSuccessTitle;
+
+  /// No description provided for @eventsEvidenceSaveSuccessBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your after photos are on the event page.'**
+  String get eventsEvidenceSaveSuccessBody;
+
+  /// No description provided for @eventsEvidenceSaveFailureTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save photos'**
+  String get eventsEvidenceSaveFailureTitle;
+
+  /// No description provided for @eventsEvidenceSaveFailureBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{message}'**
+  String eventsEvidenceSaveFailureBody(String message);
 
   /// No description provided for @eventsEvidenceNoChanges.
   ///
@@ -5741,7 +6155,7 @@ abstract class AppLocalizations {
   /// No description provided for @eventsParticipantsVolunteersJoined.
   ///
   /// In en, this message translates to:
-  /// **'{count} volunteers joined'**
+  /// **'{count, plural, one{1 volunteer joined} other{{count} volunteers joined}}'**
   String eventsParticipantsVolunteersJoined(int count);
 
   /// No description provided for @eventsParticipantsSpotsLeft.
@@ -5839,6 +6253,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Capture cleanup outcomes, effort, and lessons learned.'**
   String get eventsImpactSummaryEmptyHint;
+
+  /// No description provided for @eventsCompletedBagsSectionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trash bags collected'**
+  String get eventsCompletedBagsSectionTitle;
+
+  /// No description provided for @eventsCompletedBagsSectionSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.'**
+  String get eventsCompletedBagsSectionSubtitle;
+
+  /// No description provided for @eventsCompletedBagsSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save bag count'**
+  String get eventsCompletedBagsSave;
+
+  /// No description provided for @eventsCompletedBagsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Bag count saved.'**
+  String get eventsCompletedBagsSaved;
 
   /// No description provided for @eventsImpactBadgeRating.
   ///
@@ -5947,6 +6385,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try a different search term or check your spelling.'**
   String get eventsSearchEmptySubtitle;
+
+  /// No description provided for @eventsSearchEmptyScopeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Matches come from the server as you type and from events already loaded in this list.'**
+  String get eventsSearchEmptyScopeHint;
 
   /// No description provided for @eventsSitePickerTitle.
   ///
@@ -6272,6 +6716,66 @@ abstract class AppLocalizations {
   /// **'No events on this day'**
   String get eventsCalendarNoEventsThisDay;
 
+  /// No description provided for @eventsCalendarIncompleteListHint.
+  ///
+  /// In en, this message translates to:
+  /// **'More events may be available. Load the next page to fill this month.'**
+  String get eventsCalendarIncompleteListHint;
+
+  /// No description provided for @eventsCalendarLoadMoreButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more'**
+  String get eventsCalendarLoadMoreButton;
+
+  /// No description provided for @eventsCalendarDayA11yOutOfMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}, not in this month'**
+  String eventsCalendarDayA11yOutOfMonth(int day);
+
+  /// No description provided for @eventsCalendarDayA11y.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}'**
+  String eventsCalendarDayA11y(int day);
+
+  /// No description provided for @eventsCalendarDayA11yHasEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}, has events'**
+  String eventsCalendarDayA11yHasEvents(int day);
+
+  /// No description provided for @eventsCalendarDayA11ySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}, selected'**
+  String eventsCalendarDayA11ySelected(int day);
+
+  /// No description provided for @eventsCalendarDayA11ySelectedHasEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Day {day}, selected, has events'**
+  String eventsCalendarDayA11ySelectedHasEvents(int day);
+
+  /// No description provided for @eventsEmptyActionClearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear filters'**
+  String get eventsEmptyActionClearFilters;
+
+  /// No description provided for @eventsEmptyActionCreateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Create event'**
+  String get eventsEmptyActionCreateEvent;
+
+  /// No description provided for @eventsSearchEmptyClearSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear search'**
+  String get eventsSearchEmptyClearSearch;
+
   /// No description provided for @siteCardPollutionSiteSemantic.
   ///
   /// In en, this message translates to:
@@ -6427,6 +6931,58 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No data yet'**
   String get eventsAnalyticsNoData;
+
+  /// No description provided for @eventsAnalyticsRefresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh analytics'**
+  String get eventsAnalyticsRefresh;
+
+  /// No description provided for @eventsAnalyticsCheckedInRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'{checkedInCount} of {totalJoiners} checked in'**
+  String eventsAnalyticsCheckedInRatio(int checkedInCount, int totalJoiners);
+
+  /// No description provided for @eventsAnalyticsJoinersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No one has joined this event yet.'**
+  String get eventsAnalyticsJoinersEmpty;
+
+  /// No description provided for @eventsAnalyticsCheckInsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No check-ins yet. Hours are shown in UTC.'**
+  String get eventsAnalyticsCheckInsEmpty;
+
+  /// No description provided for @eventsAnalyticsPeakCheckInsUtc.
+  ///
+  /// In en, this message translates to:
+  /// **'Peak: {hour} UTC'**
+  String eventsAnalyticsPeakCheckInsUtc(String hour);
+
+  /// No description provided for @eventsAnalyticsSemanticsJoinCurve.
+  ///
+  /// In en, this message translates to:
+  /// **'Join trend from {fromCount} to {toCount} participants, {steps} data points.'**
+  String eventsAnalyticsSemanticsJoinCurve(
+    int fromCount,
+    int toCount,
+    int steps,
+  );
+
+  /// No description provided for @eventsAnalyticsSemanticsCheckInHeatmap.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins by hour in UTC. Peak {peakCount} at {hour}.'**
+  String eventsAnalyticsSemanticsCheckInHeatmap(int peakCount, String hour);
+
+  /// No description provided for @eventsAnalyticsSemanticsCheckInNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins by hour in UTC. No check-ins recorded.'**
+  String get eventsAnalyticsSemanticsCheckInNoData;
 
   /// No description provided for @eventsOfflineSyncQueued.
   ///
@@ -7052,6 +7608,18 @@ abstract class AppLocalizations {
   /// **'Chat message'**
   String get eventChatInputSemantics;
 
+  /// No description provided for @eventChatMessagesListSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Messages list'**
+  String get eventChatMessagesListSemantics;
+
+  /// No description provided for @eventChatAttachmentsNeedNetwork.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos, video, files, and voice require an internet connection.'**
+  String get eventChatAttachmentsNeedNetwork;
+
   /// No description provided for @eventChatPushChannelName.
   ///
   /// In en, this message translates to:
@@ -7163,7 +7731,7 @@ abstract class AppLocalizations {
   /// No description provided for @eventChatSearchNoResults.
   ///
   /// In en, this message translates to:
-  /// **'No messages found'**
+  /// **'No matching messages'**
   String get eventChatSearchNoResults;
 
   /// No description provided for @eventChatSearchAction.
@@ -7171,6 +7739,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get eventChatSearchAction;
+
+  /// No description provided for @eventChatSearchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not search messages. Check your connection and try again.'**
+  String get eventChatSearchFailed;
+
+  /// No description provided for @eventChatSearchMinChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Type at least 2 characters to search.'**
+  String get eventChatSearchMinChars;
+
+  /// No description provided for @eventChatSearchIncludingLocalMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Including messages loaded on this device.'**
+  String get eventChatSearchIncludingLocalMatches;
+
+  /// No description provided for @eventChatSearchLoadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load more results'**
+  String get eventChatSearchLoadMore;
 
   /// No description provided for @eventChatParticipantsCount.
   ///
@@ -7561,6 +8153,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Debug: route name was “{routeName}”.'**
   String unknownRouteDebugRoute(String routeName);
+
+  /// No description provided for @chatShareLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Share Location'**
+  String get chatShareLocation;
+
+  /// No description provided for @chatSharedLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared location'**
+  String get chatSharedLocation;
 }
 
 class _AppLocalizationsDelegate

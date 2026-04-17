@@ -11,6 +11,7 @@ void main() {
         category: EcoEventCategory.generalCleanup,
         titleTrimmed: 'abc',
         timeRangeValid: true,
+        scheduleValid: true,
       ),
       isTrue,
     );
@@ -21,6 +22,7 @@ void main() {
         category: EcoEventCategory.generalCleanup,
         titleTrimmed: 'abc',
         timeRangeValid: true,
+        scheduleValid: true,
       ),
       isFalse,
     );
@@ -31,6 +33,7 @@ void main() {
         category: null,
         titleTrimmed: 'abc',
         timeRangeValid: true,
+        scheduleValid: true,
       ),
       isFalse,
     );
@@ -41,6 +44,18 @@ void main() {
         category: EcoEventCategory.generalCleanup,
         titleTrimmed: 'ab',
         timeRangeValid: true,
+        scheduleValid: true,
+      ),
+      isFalse,
+    );
+    expect(
+      createEventFormIsSubmittable(
+        hasSite: true,
+        hasDate: true,
+        category: EcoEventCategory.generalCleanup,
+        titleTrimmed: 'abc',
+        timeRangeValid: true,
+        scheduleValid: false,
       ),
       isFalse,
     );
@@ -54,6 +69,7 @@ void main() {
         category: null,
         titleTrimmed: '',
         timeRangeValid: false,
+        scheduleValid: false,
       ),
       1,
     );
@@ -64,8 +80,20 @@ void main() {
         category: EcoEventCategory.generalCleanup,
         titleTrimmed: 'abc',
         timeRangeValid: true,
+        scheduleValid: true,
       ),
       5,
+    );
+    expect(
+      createEventFormCompletedSteps(
+        hasSite: true,
+        hasDate: true,
+        category: EcoEventCategory.generalCleanup,
+        titleTrimmed: 'abc',
+        timeRangeValid: true,
+        scheduleValid: false,
+      ),
+      4,
     );
   });
 }

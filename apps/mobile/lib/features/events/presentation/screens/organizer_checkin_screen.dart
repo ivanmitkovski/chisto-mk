@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -18,18 +19,22 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/events/data/check_in_repository_registry.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
+import 'package:chisto_mobile/features/events/data/socket_check_in_stream.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/organizer_end_soon_local_controller.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/extend_event_end_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/organizer_checkin/organizer_checkin_widgets.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/organizer_checkin/organizer_event_completion_sheet.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 /// Organizer check-in screen: displays a QR code attendees scan.
 /// After each scan the QR regenerates. Checked-in names appear in the list.
@@ -42,30 +47,44 @@ class OrganizerCheckInScreen extends StatefulWidget {
   State<OrganizerCheckInScreen> createState() => _OrganizerCheckInScreenState();
 }
 
-class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
+class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
+    with WidgetsBindingObserver {
   final EventsRepository _eventsRepository = EventsRepositoryRegistry.instance;
   final CheckInRepository _checkInRepository =
       CheckInRepositoryRegistry.instance;
+  final OrganizerEndSoonLocalController _organizerEndSoonLocal =
+      OrganizerEndSoonLocalController();
   final Random _rnd = Random();
   CheckInQrPayload? _payload;
   Timer? _refreshTicker;
+  Timer? _attendeePollTimer;
+
+  /// Decouples QR countdown UI from full-screen [setState] on every tick.
+  final ValueNotifier<int> _countdownSeconds = ValueNotifier<int>(0);
   String? _qrLoadError;
   bool _isIssuingPayload = false;
-  bool _earlyRefreshIssued = false;
   // IDs optimistically hidden while an async removal is in-flight.
   // Prevents Dismissible from asserting the widget is still in the tree.
   final Set<String> _dismissedAttendeeIds = {};
 
-  static const int _qrRefreshLeadMs = 8000;
+  static const int _attendeeListPollIntervalSeconds = 12;
+
+  // --- Organizer confirmation via WebSocket ---
+  SocketCheckInStream? _checkInWs;
+  StreamSubscription<CheckInStreamEvent>? _checkInWsSub;
+  final List<CheckInRequestEvent> _pendingConfirmQueue =
+      <CheckInRequestEvent>[];
+  bool _isShowingConfirmSheet = false;
+  bool _isResolvingPending = false;
 
   EcoEvent? get _eventOrNull => _eventsRepository.findById(widget.eventId);
 
   EcoEvent get _event => _eventOrNull!;
 
-  List<CheckedInAttendee> get _attendees =>
-      _checkInRepository.checkedInAttendees(_event.id)
-          .where((CheckedInAttendee a) => !_dismissedAttendeeIds.contains(a.id))
-          .toList(growable: false);
+  List<CheckedInAttendee> get _attendees => _checkInRepository
+      .checkedInAttendees(_event.id)
+      .where((CheckedInAttendee a) => !_dismissedAttendeeIds.contains(a.id))
+      .toList(growable: false);
 
   int get _deadlineMs {
     final CheckInQrPayload? payload = _payload;
@@ -86,6 +105,35 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
 
   int get _remainingPayloadSeconds => (_remainingPayloadMs / 1000).ceil();
 
+  void _syncCountdownNotifier() {
+    if (_payload == null) {
+      if (_countdownSeconds.value != 0) {
+        _countdownSeconds.value = 0;
+      }
+      return;
+    }
+    final int next = _remainingPayloadSeconds;
+    if (next != _countdownSeconds.value) {
+      _countdownSeconds.value = next;
+    }
+  }
+
+  void _startAttendeePollTimer() {
+    _attendeePollTimer?.cancel();
+    _attendeePollTimer = Timer.periodic(
+      const Duration(seconds: _attendeeListPollIntervalSeconds),
+      (_) {
+        if (!context.mounted) {
+          return;
+        }
+        final EcoEvent? ev = _eventOrNull;
+        if (ev != null && ev.isCheckInOpen) {
+          unawaited(_checkInRepository.refreshAttendees(ev.id));
+        }
+      },
+    );
+  }
+
   double _qrDisplaySize(BuildContext context) {
     final double shortest = MediaQuery.sizeOf(context).shortestSide;
     return (shortest * 0.62).clamp(260.0, 320.0);
@@ -98,7 +146,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         setState(() {
           _payload = null;
           _qrLoadError = null;
-          _earlyRefreshIssued = false;
         });
       }
       return;
@@ -124,27 +171,32 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         setState(() {
           _payload = next;
           _qrLoadError = null;
-          _earlyRefreshIssued = false;
         });
+        _syncCountdownNotifier();
       }
     } on AppError catch (e) {
+      logEventsDiagnostic('organizer_checkin_qr_issue_failed');
       if (context.mounted) {
+        final String msg = e.code == 'TOO_MANY_REQUESTS'
+            ? l10n.eventsOrganizerQrRateLimited
+            : (e.message.isNotEmpty
+                  ? e.message
+                  : l10n.eventsOrganizerQrLoadFailedGeneric);
         setState(() {
-          _payload = null;
-          _earlyRefreshIssued = false;
-          _qrLoadError = e.code == 'TOO_MANY_REQUESTS'
-              ? l10n.eventsOrganizerQrRateLimited
-              : (e.message.isNotEmpty
-                    ? e.message
-                    : l10n.eventsOrganizerQrLoadFailedGeneric);
+          _qrLoadError = msg;
+          if (_remainingPayloadMs <= 0) {
+            _payload = null;
+          }
         });
       }
     } on Object {
+      logEventsDiagnostic('organizer_checkin_qr_issue_failed');
       if (context.mounted) {
         setState(() {
-          _payload = null;
-          _earlyRefreshIssued = false;
           _qrLoadError = l10n.eventsOrganizerQrLoadFailedGeneric;
+          if (_remainingPayloadMs <= 0) {
+            _payload = null;
+          }
         });
       }
     } finally {
@@ -165,8 +217,8 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
           setState(() {
             _payload = null;
             _qrLoadError = null;
-            _earlyRefreshIssued = false;
           });
+          _syncCountdownNotifier();
         }
         return;
       }
@@ -174,26 +226,15 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         setState(() {});
         return;
       }
-      if (_payload != null && _remainingPayloadMs > _qrRefreshLeadMs) {
-        _earlyRefreshIssued = false;
-      }
       if (_payload == null && _qrLoadError == null && !_isIssuingPayload) {
         unawaited(_issueNewPayload());
         return;
       }
       if (_payload != null && _remainingPayloadMs <= 0) {
-        _earlyRefreshIssued = false;
         unawaited(_issueNewPayload());
         return;
       }
-      if (_payload != null &&
-          _remainingPayloadMs <= _qrRefreshLeadMs &&
-          !_earlyRefreshIssued) {
-        _earlyRefreshIssued = true;
-        unawaited(_issueNewPayload());
-        return;
-      }
-      setState(() {});
+      _syncCountdownNotifier();
     });
   }
 
@@ -211,14 +252,18 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       }
       await _issueNewPayload();
     } on AppError catch (e) {
+      logEventsDiagnostic('organizer_checkin_session_setup_failed');
       if (!context.mounted) {
         return;
       }
       AppHaptics.warning();
       setState(() {
-        _qrLoadError = e.message.isNotEmpty ? e.message : l10n.eventsOrganizerSessionSetupFailed;
+        _qrLoadError = e.message.isNotEmpty
+            ? e.message
+            : l10n.eventsOrganizerSessionSetupFailed;
       });
     } on Object {
+      logEventsDiagnostic('organizer_checkin_session_setup_failed');
       if (!context.mounted) {
         return;
       }
@@ -271,7 +316,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       return;
     }
     _showSubmissionFeedback(result, name);
-    if (result.isSuccess) {
+    if (result.isSuccess ||
+        result.isPendingConfirmation ||
+        result.status == CheckInSubmissionStatus.alreadyCheckedIn) {
       await _issueNewPayload();
     }
   }
@@ -304,11 +351,12 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
       return;
     }
     try {
-      final ManualCheckInResult added = await _checkInRepository.markAttendeeCheckedIn(
-        eventId: _event.id,
-        attendeeId: picked.userId,
-        attendeeName: picked.displayName,
-      );
+      final ManualCheckInResult added = await _checkInRepository
+          .markAttendeeCheckedIn(
+            eventId: _event.id,
+            attendeeId: picked.userId,
+            attendeeName: picked.displayName,
+          );
       if (!context.mounted) {
         return;
       }
@@ -524,6 +572,26 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     );
   }
 
+  bool _shouldShowOrganizerEndSoonBanner(EcoEvent event) {
+    if (event.status != EcoEventStatus.inProgress) {
+      return false;
+    }
+    final DateTime threshold =
+        event.endDateTime.subtract(const Duration(minutes: 10));
+    return !DateTime.now().isBefore(threshold);
+  }
+
+  void _openExtendEnd(EcoEvent event) {
+    AppHaptics.tap();
+    unawaited(
+      showExtendEventEndSheet(
+        context: context,
+        event: event,
+        eventsRepository: _eventsRepository,
+      ),
+    );
+  }
+
   Future<void> _showOrganizerMoreActions() async {
     AppHaptics.tap();
     await showModalBottomSheet<void>(
@@ -587,7 +655,8 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                   unawaited(_onCancelEventChosenFromMenu());
                 },
               ),
-              if (kDebugMode && _checkInRepository.supportsOrganizerSimulate) ...<Widget>[
+              if (kDebugMode &&
+                  _checkInRepository.supportsOrganizerSimulate) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
                 ReportActionTile(
                   icon: Icons.developer_mode_rounded,
@@ -807,11 +876,11 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     AppHaptics.success();
     final OrganizerEventCompletionAction action =
         await showOrganizerEventCompletionSheet(
-      context: context,
-      checkedInCount: _attendees.length,
-      participantCount: _event.participantCount,
-      maxParticipants: _event.maxParticipants,
-    );
+          context: context,
+          checkedInCount: _attendees.length,
+          participantCount: _event.participantCount,
+          maxParticipants: _event.maxParticipants,
+        );
     if (!context.mounted) {
       return;
     }
@@ -824,10 +893,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         if (!context.mounted) {
           return;
         }
-        EventsNavigation.openCleanupEvidence(
-          context,
-          eventId: _event.id,
-        );
+        EventsNavigation.openCleanupEvidence(context, eventId: _event.id);
       });
     }
   }
@@ -885,9 +951,10 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
   void _showSubmissionFeedback(CheckInSubmissionResult result, String name) {
     final AppLocalizations l10n = context.l10n;
     final String message = switch (result.status) {
-      CheckInSubmissionStatus.success => result.pointsAwarded > 0
-          ? l10n.eventsManualCheckInWithPoints(name, result.pointsAwarded)
-          : l10n.eventsOrganizerFeedbackCheckedIn(name),
+      CheckInSubmissionStatus.success =>
+        result.pointsAwarded > 0
+            ? l10n.eventsManualCheckInWithPoints(name, result.pointsAwarded)
+            : l10n.eventsOrganizerFeedbackCheckedIn(name),
       CheckInSubmissionStatus.invalidFormat =>
         l10n.eventsOrganizerFeedbackInvalidQr,
       CheckInSubmissionStatus.invalidQr =>
@@ -908,8 +975,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
         l10n.eventsOrganizerFeedbackCheckInUnavailable,
       CheckInSubmissionStatus.rateLimited =>
         l10n.eventsOrganizerFeedbackRateLimited,
-      CheckInSubmissionStatus.queuedOffline =>
-        l10n.eventsOfflineSyncQueued,
+      CheckInSubmissionStatus.queuedOffline => l10n.eventsOfflineSyncQueued,
+      CheckInSubmissionStatus.pendingConfirmation =>
+        l10n.eventsVolunteerPendingSubtitle,
     };
     if (result.isSuccess) {
       AppHaptics.success();
@@ -942,21 +1010,186 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _eventsRepository.loadInitialIfNeeded();
     _eventsRepository.addListener(_onRepoChanged);
     _checkInRepository.addListener(_onRepoChanged);
+    _connectCheckInWs();
     if (_eventOrNull != null) {
-      unawaited(_ensureSession());
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        unawaited(_ensureSession());
+      });
     }
     _startRefreshTicker();
+    _startAttendeePollTimer();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _eventsRepository.removeListener(_onRepoChanged);
     _checkInRepository.removeListener(_onRepoChanged);
     _refreshTicker?.cancel();
+    _attendeePollTimer?.cancel();
+    _countdownSeconds.dispose();
+    _checkInWsSub?.cancel();
+    _checkInWs?.dispose();
+    if (ServiceLocator.instance.isInitialized) {
+      unawaited(
+        _organizerEndSoonLocal.dispose(
+          ServiceLocator.instance.pushNotificationService,
+        ),
+      );
+    }
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      final EcoEvent? ev = _eventOrNull;
+      if (ev != null) {
+        unawaited(_checkInRepository.refreshAttendees(ev.id));
+      }
+      _syncCountdownNotifier();
+    }
+  }
+
+  void _connectCheckInWs() {
+    final ServiceLocator sl = ServiceLocator.instance;
+    _checkInWs = SocketCheckInStream(
+      baseUrl: sl.config.apiBaseUrl,
+      authState: sl.authState,
+    );
+    _checkInWsSub = _checkInWs!.stream.listen(_onCheckInWsEvent);
+    _checkInWs!.connect(widget.eventId);
+  }
+
+  void _onCheckInWsEvent(CheckInStreamEvent event) {
+    if (!mounted) return;
+    if (event is CheckInRequestEvent && event.eventId == widget.eventId) {
+      setState(() {
+        _pendingConfirmQueue.add(event);
+      });
+      AppHaptics.medium();
+      _showNextConfirmSheet();
+      _refreshQrAfterVolunteerScan();
+    }
+  }
+
+  /// Volunteer scan records a one-time JTI; issue a new QR so the next person does not reuse it.
+  void _refreshQrAfterVolunteerScan() {
+    if (!mounted || !_checkInRepository.isOpen(_event.id)) {
+      return;
+    }
+    unawaited(_issueNewPayload());
+  }
+
+  void _showNextConfirmSheet() {
+    if (_isShowingConfirmSheet || _pendingConfirmQueue.isEmpty || !mounted) {
+      return;
+    }
+    _isShowingConfirmSheet = true;
+    final CheckInRequestEvent request = _pendingConfirmQueue.removeAt(0);
+    _showConfirmationBottomSheet(request);
+  }
+
+  void _showConfirmationBottomSheet(CheckInRequestEvent request) {
+    final DateTime? expiresAt = DateTime.tryParse(request.expiresAt);
+    final int timeoutMs = expiresAt != null
+        ? expiresAt.difference(DateTime.now()).inMilliseconds
+        : 60000;
+    Timer? autoExpireTimer;
+
+    showModalBottomSheet<bool>(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext sheetContext) {
+        return StatefulBuilder(
+          builder: (BuildContext ctx, StateSetter setSheetState) {
+            autoExpireTimer?.cancel();
+            if (timeoutMs > 0) {
+              autoExpireTimer = Timer(
+                Duration(milliseconds: timeoutMs.clamp(0, 120000)),
+                () {
+                  if (Navigator.of(ctx).canPop()) {
+                    Navigator.of(ctx).pop(false);
+                  }
+                },
+              );
+            }
+            final String fullName = '${request.firstName} ${request.lastName}'
+                .trim();
+            return _CheckInConfirmSheet(
+              fullName: fullName,
+              avatarUrl: request.avatarUrl,
+              avatarSeed: request.userId,
+              isResolving: _isResolvingPending,
+              onConfirm: () async {
+                setSheetState(() => _isResolvingPending = true);
+                try {
+                  await _checkInRepository.resolvePendingCheckIn(
+                    eventId: widget.eventId,
+                    pendingId: request.pendingId,
+                    approve: true,
+                  );
+                  AppHaptics.success();
+                  if (Navigator.of(ctx).canPop()) {
+                    Navigator.of(ctx).pop(true);
+                  }
+                } on Object {
+                  AppHaptics.warning();
+                  if (ctx.mounted) {
+                    AppSnack.show(
+                      ctx,
+                      message: ctx.l10n.eventsOrganizerConfirmExpired,
+                      type: AppSnackType.warning,
+                    );
+                  }
+                  if (Navigator.of(ctx).canPop()) {
+                    Navigator.of(ctx).pop(false);
+                  }
+                } finally {
+                  _isResolvingPending = false;
+                }
+              },
+              onReject: () async {
+                setSheetState(() => _isResolvingPending = true);
+                try {
+                  await _checkInRepository.resolvePendingCheckIn(
+                    eventId: widget.eventId,
+                    pendingId: request.pendingId,
+                    approve: false,
+                  );
+                } on Object {
+                  // Expired or already resolved — dismiss silently.
+                }
+                _isResolvingPending = false;
+                if (Navigator.of(ctx).canPop()) {
+                  Navigator.of(ctx).pop(false);
+                }
+              },
+            );
+          },
+        );
+      },
+    ).then((bool? approved) {
+      autoExpireTimer?.cancel();
+      _isShowingConfirmSheet = false;
+      if (approved == true) {
+        unawaited(_checkInRepository.refreshAttendees(widget.eventId));
+      }
+      if (mounted) {
+        setState(() {});
+        _showNextConfirmSheet();
+      }
+    });
   }
 
   @override
@@ -977,9 +1210,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                     padding: const EdgeInsets.all(AppSpacing.lg),
                     child: Text(
                       context.l10n.eventsEventNotFoundBody,
-                      style: AppTypography.textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                      ),
+                      style: AppTypography.eventsBodyProse(
+                        Theme.of(context).textTheme,
+                      ).copyWith(color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -996,6 +1229,16 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
     final double qrSize = _qrDisplaySize(context);
     final AppLocalizations l10n = context.l10n;
 
+    if (ServiceLocator.instance.isInitialized) {
+      unawaited(
+        _organizerEndSoonLocal.sync(
+          event: event,
+          push: ServiceLocator.instance.pushNotificationService,
+          l10n: l10n,
+        ),
+      );
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.appBackground,
@@ -1011,6 +1254,23 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  if (event.status == EcoEventStatus.inProgress)
+                    Semantics(
+                      label: l10n.eventsOrganizerExtendEndSemantic,
+                      button: true,
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 44,
+                          minHeight: 44,
+                        ),
+                        icon: const Icon(
+                          CupertinoIcons.clock_fill,
+                          color: AppColors.primaryDark,
+                        ),
+                        onPressed: () => _openExtendEnd(event),
+                      ),
+                    ),
                   Semantics(
                     label: isOpen
                         ? l10n.eventsOrganizerPauseCheckIn
@@ -1050,6 +1310,34 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                 ],
               ),
             ),
+            if (_shouldShowOrganizerEndSoonBanner(event)) ...<Widget>[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  AppSpacing.lg,
+                  0,
+                  AppSpacing.lg,
+                  AppSpacing.sm,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    ReportInfoBanner(
+                      title: l10n.eventsEndSoonBannerTitle,
+                      message: l10n.eventsEndSoonBannerBody,
+                      icon: CupertinoIcons.clock_fill,
+                      tone: ReportSurfaceTone.accent,
+                    ),
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: TextButton(
+                        onPressed: () => _openExtendEnd(event),
+                        child: Text(l10n.eventsEndSoonBannerExtend),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             Expanded(
               child: CustomScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -1119,11 +1407,12 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                         context
                                             .l10n
                                             .eventsOrganizerQrRefreshHelp,
-                                        style: AppTypography.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: AppColors.textSecondary,
-                                              height: 1.45,
-                                            ),
+                                        style: AppTypography.eventsBodyProse(
+                                          textTheme,
+                                        ).copyWith(
+                                          color: AppColors.textSecondary,
+                                          height: 1.45,
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -1134,192 +1423,240 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                           const SizedBox(height: AppSpacing.lg),
                           Text(
                             context.l10n.eventsOrganizerHoldPhoneForScan,
-                            style: AppTypography.textTheme.bodyLarge?.copyWith(
-                              color: AppColors.textSecondary,
-                              fontWeight: FontWeight.w500,
+                            style: AppTypography.eventsBodyMediumSecondary(
+                              textTheme,
                             ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: AppSpacing.xl),
-                          PulsingQRContainer(
-                            isActive: isOpen && _payload != null,
-                            pulseOnlyNearExpiry: true,
-                            remainingSecondsUntilExpiry:
-                                isOpen && _payload != null
-                                ? _remainingPayloadSeconds
-                                : null,
-                            child: Container(
-                              padding: const EdgeInsets.all(AppSpacing.lg),
-                              decoration: BoxDecoration(
-                                color: AppColors.panelBackground,
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusCard,
-                                ),
-                                border: Border.all(
-                                  color: AppColors.divider.withValues(
-                                    alpha: 0.65,
-                                  ),
-                                ),
-                                boxShadow: <BoxShadow>[
-                                  BoxShadow(
-                                    color: AppColors.shadowLight,
-                                    blurRadius: AppSpacing.md,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                  BoxShadow(
-                                    color: AppColors.shadowMedium,
-                                    blurRadius: AppSpacing.lg,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                ],
-                              ),
-                              child: AnimatedSwitcher(
-                                duration: AppMotion.standard,
-                                switchInCurve: AppMotion.emphasized,
-                                switchOutCurve: AppMotion.emphasized,
-                                child: !isOpen
-                                    ? SizedBox(
-                                        key: const ValueKey<String>(
-                                          'qr_paused',
+                          RepaintBoundary(
+                            child: ValueListenableBuilder<int>(
+                              valueListenable: _countdownSeconds,
+                              builder: (BuildContext context, int sec, Widget? _) {
+                                return PulsingQRContainer(
+                                  isActive: isOpen && _payload != null,
+                                  pulseOnlyNearExpiry: true,
+                                  remainingSecondsUntilExpiry:
+                                      isOpen && _payload != null ? sec : null,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.lg,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.panelBackground,
+                                      borderRadius: BorderRadius.circular(
+                                        AppSpacing.radiusCard,
+                                      ),
+                                      border: Border.all(
+                                        color: AppColors.divider.withValues(
+                                          alpha: 0.65,
                                         ),
-                                        width: qrSize,
-                                        height: qrSize,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            Icon(
-                                              CupertinoIcons.pause_circle_fill,
-                                              size: 42,
-                                              color: AppColors.textMuted
-                                                  .withValues(alpha: 0.6),
-                                            ),
-                                            const SizedBox(
-                                              height: AppSpacing.sm,
-                                            ),
-                                            Text(
-                                              l10n.eventsOrganizerPausedLabel,
-                                              style: textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                    color: AppColors.textMuted,
-                                                    fontWeight: FontWeight.w600,
+                                      ),
+                                      boxShadow: <BoxShadow>[
+                                        BoxShadow(
+                                          color: AppColors.shadowLight,
+                                          blurRadius: AppSpacing.md,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                        BoxShadow(
+                                          color: AppColors.shadowMedium,
+                                          blurRadius: AppSpacing.lg,
+                                          offset: const Offset(0, 10),
+                                        ),
+                                      ],
+                                    ),
+                                    child: AnimatedSwitcher(
+                                      duration: AppMotion.standard,
+                                      switchInCurve: AppMotion.emphasized,
+                                      switchOutCurve: AppMotion.emphasized,
+                                      child: !isOpen
+                                          ? SizedBox(
+                                              key: const ValueKey<String>(
+                                                'qr_paused',
+                                              ),
+                                              width: qrSize,
+                                              height: qrSize,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  Icon(
+                                                    CupertinoIcons
+                                                        .pause_circle_fill,
+                                                    size: 42,
+                                                    color: AppColors.textMuted
+                                                        .withValues(alpha: 0.6),
                                                   ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : _qrLoadError != null && _payload == null
-                                    ? SizedBox(
-                                        key: ValueKey<String>(
-                                          'qr_err_$_qrLoadError',
-                                        ),
-                                        width: qrSize,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            Icon(
-                                              CupertinoIcons
-                                                  .exclamationmark_circle,
-                                              size: 40,
-                                              color:
-                                                  AppColors.accentWarningDark,
-                                            ),
-                                            const SizedBox(
-                                              height: AppSpacing.sm,
-                                            ),
-                                            Text(
-                                              _qrLoadError!,
-                                              style: textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                    color:
-                                                        AppColors.textSecondary,
+                                                  const SizedBox(
+                                                    height: AppSpacing.sm,
                                                   ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                            const SizedBox(
-                                              height: AppSpacing.md,
-                                            ),
-                                            CupertinoButton(
-                                              onPressed: () {
-                                                AppHaptics.tap();
-                                                unawaited(_issueNewPayload());
-                                              },
-                                              child: Text(
-                                                l10n.eventsOrganizerQrRetry,
-                                                style: textTheme.bodyMedium
-                                                    ?.copyWith(
-                                                      color:
-                                                          AppColors.primaryDark,
-                                                      fontWeight:
-                                                          FontWeight.w600,
+                                                  Text(
+                                                    l10n.eventsOrganizerPausedLabel,
+                                                    style: textTheme.bodyMedium
+                                                        ?.copyWith(
+                                                          color: AppColors
+                                                              .textMuted,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : _qrLoadError != null &&
+                                                _payload == null
+                                          ? SizedBox(
+                                              key: ValueKey<String>(
+                                                'qr_err_$_qrLoadError',
+                                              ),
+                                              width: qrSize,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: <Widget>[
+                                                  Icon(
+                                                    CupertinoIcons
+                                                        .exclamationmark_circle,
+                                                    size: 40,
+                                                    color: AppColors
+                                                        .accentWarningDark,
+                                                  ),
+                                                  const SizedBox(
+                                                    height: AppSpacing.sm,
+                                                  ),
+                                                  Text(
+                                                    _qrLoadError!,
+                                                    style: textTheme.bodyMedium
+                                                        ?.copyWith(
+                                                          color: AppColors
+                                                              .textSecondary,
+                                                        ),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                  const SizedBox(
+                                                    height: AppSpacing.md,
+                                                  ),
+                                                  CupertinoButton(
+                                                    onPressed: () {
+                                                      AppHaptics.tap();
+                                                      unawaited(
+                                                        _issueNewPayload(),
+                                                      );
+                                                    },
+                                                    child: Text(
+                                                      l10n.eventsOrganizerQrRetry,
+                                                      style: textTheme
+                                                          .bodyMedium
+                                                          ?.copyWith(
+                                                            color: AppColors
+                                                                .primaryDark,
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          : _payload != null
+                                          ? TweenAnimationBuilder<double>(
+                                              key: ValueKey<String>(
+                                                _payload!.nonce,
+                                              ),
+                                              tween: Tween<double>(
+                                                begin: 0.92,
+                                                end: 1,
+                                              ),
+                                              duration:
+                                                  MediaQuery.disableAnimationsOf(
+                                                    context,
+                                                  )
+                                                  ? Duration.zero
+                                                  : AppMotion.standard,
+                                              curve: AppMotion.emphasized,
+                                              builder:
+                                                  (
+                                                    BuildContext context,
+                                                    double value,
+                                                    Widget? child,
+                                                  ) {
+                                                    return Transform.scale(
+                                                      scale: value,
+                                                      child: Opacity(
+                                                        opacity: value,
+                                                        child: child,
+                                                      ),
+                                                    );
+                                                  },
+                                              child: EventCheckInQrCard(
+                                                key: ValueKey<String>(
+                                                  _payload!.nonce,
+                                                ),
+                                                payload: _payload!,
+                                                qrSize: qrSize,
+                                                semanticsLabel: l10n
+                                                    .eventsOrganizerQrSemantics(
+                                                      sec.clamp(0, 9999),
+                                                    ),
+                                                encodeErrorDescription: l10n
+                                                    .eventsOrganizerQrEncodeError,
+                                                retryLabel:
+                                                    l10n.eventsOrganizerQrRetry,
+                                                onRetryAfterEncodeError: () {
+                                                  AppHaptics.tap();
+                                                  unawaited(_issueNewPayload());
+                                                },
+                                              ),
+                                            )
+                                          : SizedBox(
+                                              key: const ValueKey<String>(
+                                                'qr_loading',
+                                              ),
+                                              width: qrSize,
+                                              height: qrSize,
+                                              child: const Center(
+                                                child:
+                                                    CupertinoActivityIndicator(
+                                                      radius: 16,
                                                     ),
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      )
-                                    : _payload != null
-                                    ? TweenAnimationBuilder<double>(
-                                        key: ValueKey<String>(_payload!.nonce),
-                                        tween: Tween<double>(
-                                          begin: 0.92,
-                                          end: 1,
-                                        ),
-                                        duration: AppMotion.standard,
-                                        curve: AppMotion.emphasized,
-                                        builder:
-                                            (
-                                              BuildContext context,
-                                              double value,
-                                              Widget? child,
-                                            ) {
-                                              return Transform.scale(
-                                                scale: value,
-                                                child: Opacity(
-                                                  opacity: value,
-                                                  child: child,
-                                                ),
-                                              );
-                                            },
-                                        child: EventCheckInQrCard(
-                                          key: ValueKey<String>(
-                                            _payload!.nonce,
-                                          ),
-                                          payload: _payload!,
-                                          qrSize: qrSize,
-                                          semanticsLabel: l10n
-                                              .eventsOrganizerQrSemantics(
-                                                _remainingPayloadSeconds.clamp(
-                                                  0,
-                                                  9999,
-                                                ),
-                                              ),
-                                          encodeErrorDescription:
-                                              l10n.eventsOrganizerQrEncodeError,
-                                          retryLabel:
-                                              l10n.eventsOrganizerQrRetry,
-                                          onRetryAfterEncodeError: () {
-                                            AppHaptics.tap();
-                                            unawaited(_issueNewPayload());
-                                          },
-                                        ),
-                                      )
-                                    : SizedBox(
-                                        key: const ValueKey<String>(
-                                          'qr_loading',
-                                        ),
-                                        width: qrSize,
-                                        height: qrSize,
-                                        child: const Center(
-                                          child: CupertinoActivityIndicator(
-                                            radius: 16,
-                                          ),
-                                        ),
-                                      ),
-                              ),
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                           ),
                           const SizedBox(height: AppSpacing.sm),
+                          if (isOpen &&
+                              _payload != null &&
+                              _qrLoadError != null)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.xs,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  Icon(
+                                    CupertinoIcons.exclamationmark_triangle,
+                                    size: 14,
+                                    color: AppColors.accentWarningDark,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Flexible(
+                                    child: Text(
+                                      l10n.eventsOrganizerQrLoadFailedGeneric,
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: AppColors.accentWarningDark,
+                                        fontSize: 11,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           if (isOpen && _payload != null)
                             Padding(
                               padding: const EdgeInsets.symmetric(
@@ -1356,16 +1693,21 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                       if (isOpen &&
                                           _payload != null) ...<Widget>[
                                         const SizedBox(width: AppSpacing.sm),
-                                        StatusPill(
-                                          label: l10n
-                                              .eventsOrganizerRefreshInSeconds(
-                                                _remainingPayloadSeconds,
-                                              ),
-                                          color: _remainingPayloadSeconds <= 3
-                                              ? AppColors.accentDanger
-                                              : _remainingPayloadSeconds <= 10
-                                              ? AppColors.accentWarningDark
-                                              : AppColors.textPrimary,
+                                        ValueListenableBuilder<int>(
+                                          valueListenable: _countdownSeconds,
+                                          builder: (BuildContext context, int sec, Widget? _) {
+                                            return StatusPill(
+                                              label: l10n
+                                                  .eventsOrganizerRefreshInSeconds(
+                                                    sec,
+                                                  ),
+                                              color: sec <= 3
+                                                  ? AppColors.accentDanger
+                                                  : sec <= 10
+                                                  ? AppColors.accentWarningDark
+                                                  : AppColors.textPrimary,
+                                            );
+                                          },
                                         ),
                                       ],
                                     ],
@@ -1377,11 +1719,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                 isOpen
                                     ? l10n.eventsOrganizerQrRefreshesWhenOpen
                                     : l10n.eventsOrganizerResumeForFreshQr,
-                                style: AppTypography.textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.textMuted,
-                                      height: 1.35,
-                                    ),
+                                style: AppTypography.eventsSupportingCaption(
+                                  textTheme,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -1399,19 +1739,17 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                   onPressed: _addManualAttendee,
                                   child: Text(
                                     context.l10n.eventsOrganizerManualOverride,
-                                    style: AppTypography.textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: AppColors.primaryDark,
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    style: AppTypography.eventsCaptionStrong(
+                                      textTheme,
+                                      color: AppColors.primaryDark,
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
                               if (_payload != null)
                                 Semantics(
-                                  label:
-                                      context.l10n.eventsOrganizerCopyQrText,
+                                  label: context.l10n.eventsOrganizerCopyQrText,
                                   button: true,
                                   child: CupertinoButton(
                                     padding: EdgeInsets.zero,
@@ -1419,11 +1757,10 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                                         unawaited(_copyQrToClipboard()),
                                     child: Text(
                                       context.l10n.eventsOrganizerCopyQrText,
-                                      style: AppTypography.textTheme.bodySmall
-                                          ?.copyWith(
-                                            color: AppColors.primaryDark,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      style: AppTypography.eventsCaptionStrong(
+                                        textTheme,
+                                        color: AppColors.primaryDark,
+                                      ),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -1448,11 +1785,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                         children: <Widget>[
                           Text(
                             context.l10n.eventsOrganizerCheckedInHeading,
-                            style: AppTypography.textTheme.titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textPrimary,
-                                ),
+                            style: AppTypography.eventsCalendarMonthTitle(
+                              textTheme,
+                            ).copyWith(color: AppColors.textPrimary),
                           ),
                           Container(
                             padding: const EdgeInsets.symmetric(
@@ -1513,21 +1848,17 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                               const SizedBox(height: AppSpacing.md),
                               Text(
                                 context.l10n.eventsOrganizerEmptyListTitle,
-                                style: AppTypography.textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: AppColors.textSecondary,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                style: AppTypography.eventsFeedSectionTitle(
+                                  textTheme,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: AppSpacing.sm),
                               Text(
                                 context.l10n.eventsOrganizerEmptyListSubtitle,
-                                style: AppTypography.textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.textMuted,
-                                      height: 1.35,
-                                    ),
+                                style: AppTypography.eventsSupportingCaption(
+                                  textTheme,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -1550,7 +1881,6 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
                             attendee: attendee,
                             onRemove: () =>
                                 unawaited(_removeAttendee(attendee)),
-                            avatarIndex: index,
                           );
                         }, childCount: attendees.length),
                       ),
@@ -1567,6 +1897,131 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Modal sheet shown to the organizer when a volunteer scans the QR and needs confirmation.
+class _CheckInConfirmSheet extends StatelessWidget {
+  const _CheckInConfirmSheet({
+    required this.fullName,
+    required this.avatarSeed,
+    this.avatarUrl,
+    required this.isResolving,
+    required this.onConfirm,
+    required this.onReject,
+  });
+
+  final String fullName;
+  final String avatarSeed;
+  final String? avatarUrl;
+  final bool isResolving;
+  final VoidCallback onConfirm;
+  final VoidCallback onReject;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final double bottomPadding = MediaQuery.paddingOf(context).bottom;
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(24, 24, 24, bottomPadding + 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Container(
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.outlineVariant,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          const SizedBox(height: 20),
+          UserAvatarCircle(
+            displayName: fullName,
+            imageUrl: avatarUrl,
+            size: 80,
+            seed: avatarSeed,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.eventsOrganizerConfirmTitle,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            fullName,
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 6),
+          Text(
+            l10n.eventsOrganizerConfirmSubtitle,
+            style: textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 28),
+          Row(
+            children: <Widget>[
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: isResolving ? null : onReject,
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                  child: Text(l10n.eventsOrganizerConfirmReject),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                flex: 2,
+                child: FilledButton(
+                  onPressed: isResolving ? null : onConfirm,
+                  style: FilledButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    backgroundColor: AppColors.primary,
+                  ),
+                  child: isResolving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Text(
+                          l10n.eventsOrganizerConfirmApprove,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 16,
+                          ),
+                        ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

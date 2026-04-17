@@ -9,9 +9,12 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/cleanup_evidence/cleanup_evidence_save_result_dialog.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/cleanup_evidence/cleanup_evidence_widgets.dart';
 import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -167,8 +170,9 @@ class _EventCleanupEvidenceScreenState
         _selectedIndex = _selectedIndex.clamp(0, _afterImages.length - 1);
         _isPicking = false;
       });
-    } catch (e) {
+    } on Object catch (_) {
       if (!mounted) return;
+      logEventsDiagnostic('cleanup_evidence_pick_failed');
       setState(() => _isPicking = false);
       AppSnack.show(
         context,
@@ -279,22 +283,33 @@ class _EventCleanupEvidenceScreenState
             );
     } on AppError catch (e) {
       if (!mounted) return;
+      logEventsDiagnostic('cleanup_evidence_save_failed');
       setState(() => _isSaving = false);
-      AppHaptics.warning();
-      AppSnack.show(
-        context,
-        message: e.message.isNotEmpty ? e.message : context.l10n.eventsMutationFailedGeneric,
-        type: AppSnackType.warning,
+      final String detail = e.message.isNotEmpty
+          ? e.message
+          : context.l10n.eventsMutationFailedGeneric;
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: AppColors.overlay,
+        builder: (BuildContext ctx) => CleanupEvidenceSaveResultDialog(
+          outcome: CleanupEvidenceSaveOutcome.failure,
+          failureDetail: detail,
+        ),
       );
       return;
     } on Object {
       if (!mounted) return;
+      logEventsDiagnostic('cleanup_evidence_save_failed');
       setState(() => _isSaving = false);
-      AppHaptics.warning();
-      AppSnack.show(
-        context,
-        message: context.l10n.eventsMutationFailedGeneric,
-        type: AppSnackType.warning,
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        barrierColor: AppColors.overlay,
+        builder: (BuildContext ctx) => CleanupEvidenceSaveResultDialog(
+          outcome: CleanupEvidenceSaveOutcome.failure,
+          failureDetail: context.l10n.eventsMutationFailedGeneric,
+        ),
       );
       return;
     }
@@ -322,26 +337,32 @@ class _EventCleanupEvidenceScreenState
       deleteReportUploadTempFiles(pathsBeforeSync);
     }
 
-    AppHaptics.success();
-    AppSnack.show(
-      context,
-      message: changed
-          ? context.l10n.eventsEvidenceAfterPhotosSaved
-          : context.l10n.eventsEvidenceNoChanges,
-      type: AppSnackType.success,
-    );
-
-    if (!changed || !mounted) {
+    if (!changed) {
+      AppHaptics.success();
+      AppSnack.show(
+        context,
+        message: context.l10n.eventsEvidenceNoChanges,
+        type: AppSnackType.success,
+      );
       return;
     }
 
-    // Pop after rebuild so [PopScope.canPop] reflects synced state.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) {
-        return;
-      }
-      Navigator.of(context).maybePop();
-    });
+    if (!mounted) {
+      return;
+    }
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: AppColors.overlay,
+      builder: (BuildContext ctx) => const CleanupEvidenceSaveResultDialog(
+        outcome: CleanupEvidenceSaveOutcome.success,
+      ),
+    );
+    if (!mounted) {
+      return;
+    }
+    Navigator.of(context).maybePop();
   }
 
   Widget _buildImage(String path, {double? height, BoxFit fit = BoxFit.cover}) {
@@ -404,16 +425,36 @@ class _EventCleanupEvidenceScreenState
     final bool canSave = hasPendingChanges && !_isSaving;
 
     return PopScope(
-      canPop: !hasPendingChanges,
+      canPop: !hasPendingChanges && !_isSaving,
       onPopInvokedWithResult: (bool didPop, dynamic result) {
-        if (didPop) return;
-        _showDiscardDialog(context);
+        if (didPop) {
+          return;
+        }
+        if (_isSaving) {
+          AppSnack.show(
+            context,
+            message: context.l10n.eventsEvidenceSaveInProgressHint,
+            type: AppSnackType.warning,
+          );
+          return;
+        }
+        if (hasPendingChanges) {
+          _showDiscardDialog(context);
+        }
       },
       child: Scaffold(
         backgroundColor: AppColors.appBackground,
         appBar: AppBar(
           backgroundColor: AppColors.appBackground,
           leading: AppBackButton(onPressed: () {
+            if (_isSaving) {
+              AppSnack.show(
+                context,
+                message: context.l10n.eventsEvidenceSaveInProgressHint,
+                type: AppSnackType.warning,
+              );
+              return;
+            }
             if (hasPendingChanges) {
               _showDiscardDialog(context);
             } else {
@@ -422,7 +463,9 @@ class _EventCleanupEvidenceScreenState
           }),
           title: Text(
             context.l10n.eventsEvidenceAppBarTitle,
-            style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.eventsCalendarMonthTitle(textTheme).copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
         ),
       body: Column(
@@ -439,10 +482,7 @@ class _EventCleanupEvidenceScreenState
               children: <Widget>[
                 Text(
                   context.l10n.eventsEvidenceScreenSubtitle,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    height: 1.35,
-                  ),
+                  style: AppTypography.eventsSupportingCaption(textTheme),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ValueListenableBuilder<String>(
@@ -503,8 +543,8 @@ class _EventCleanupEvidenceScreenState
                         _afterImages.length,
                         _maxAfterImages,
                       ),
-                      style: textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
+                      style: AppTypography.eventsCaptionStrong(
+                        textTheme,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -577,14 +617,12 @@ class _EventCleanupEvidenceScreenState
                             const SizedBox(width: AppSpacing.sm),
                             Text(
                               context.l10n.eventsEvidenceSaving,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelLarge
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0.1,
-                                    color: AppColors.textPrimary,
-                                  ),
+                              style: AppTypography.eventsCalendarAgendaTitle(
+                                Theme.of(context).textTheme,
+                              ).copyWith(
+                                letterSpacing: 0.1,
+                                color: AppColors.textPrimary,
+                              ),
                             ),
                           ],
                         ),

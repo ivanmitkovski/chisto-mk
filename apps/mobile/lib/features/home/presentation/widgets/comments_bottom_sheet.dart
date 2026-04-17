@@ -1,10 +1,10 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 /// Instagram-style comments bottom sheet: header + scrollable list + sticky input bar.
@@ -122,7 +122,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         return;
       }
       final List<Comment> before = _cloneComments(_comments);
-      HapticFeedback.selectionClick();
+      AppHaptics.tap(context);
       setState(() {
         _commentActionStates[editingCommentId] = _CommentActionState.editing;
         _updateCommentNode(_comments, editingCommentId, (node) => node.copyWith(text: text));
@@ -158,7 +158,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     final String? parentId = _replyToCommentId;
     final String localId = 'local-${DateTime.now().microsecondsSinceEpoch}';
 
-    HapticFeedback.lightImpact();
+    AppHaptics.light(context);
     setState(() {
       final newComment = Comment(
         id: localId,
@@ -326,13 +326,13 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
       );
     });
     FocusScope.of(context).requestFocus(_commentFocusNode);
-    HapticFeedback.selectionClick();
+    AppHaptics.tap(context);
   }
 
   Future<void> _deleteComment(Comment comment) async {
     if (_isCommentBusy(comment.id)) return;
     if (!mounted) return;
-    HapticFeedback.mediumImpact();
+    AppHaptics.medium(context);
     final List<Comment> before = _cloneComments(_comments);
     setState(() {
       _commentActionStates[comment.id] = _CommentActionState.deleting;
@@ -344,7 +344,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     try {
       await widget.onCommentDeleted?.call(comment.id);
       if (!mounted) return;
-      HapticFeedback.lightImpact();
+      AppHaptics.light(context);
       AppSnack.show(
         context,
         message: context.l10n.commentsDeletedSnack,
@@ -393,7 +393,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
         ? _safeLikeCount(current) + 1
         : (_safeLikeCount(current) - 1).clamp(0, 9999);
 
-    HapticFeedback.selectionClick();
+    AppHaptics.tap(context);
     setState(() {
       _commentActionStates[commentId] = _CommentActionState.liking;
       _updateCommentNode(_comments, commentId, (Comment node) {

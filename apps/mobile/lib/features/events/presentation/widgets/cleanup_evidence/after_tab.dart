@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 import 'dashed_border_painter.dart';
 
@@ -125,14 +124,12 @@ class AfterTab extends StatelessWidget {
               Expanded(
                 child: Text(
                   context.l10n.eventsCleanupAfterUploadMoreTitle,
-                  style: textTheme.bodyLarge
-                      ?.copyWith(fontWeight: FontWeight.w700),
+                  style: AppTypography.eventsPanelTitle(textTheme),
                 ),
               ),
               Text(
                 context.l10n.eventsCleanupAfterUploadedCount(afterImages.length),
-                style: textTheme.bodySmall
-                    ?.copyWith(color: AppColors.textMuted),
+                style: AppTypography.eventsListCardMeta(textTheme),
               ),
             ],
           ),
@@ -141,8 +138,7 @@ class AfterTab extends StatelessWidget {
               padding: const EdgeInsets.only(top: AppSpacing.xxs / 2),
               child: Text(
                 context.l10n.eventsCleanupAfterSlotsRemaining(remaining),
-                style: textTheme.bodySmall
-                    ?.copyWith(color: AppColors.textMuted),
+                style: AppTypography.eventsListCardMeta(textTheme),
               ),
             ),
           const SizedBox(height: AppSpacing.md),
@@ -204,22 +200,14 @@ class AfterTab extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(AppSpacing.radius10),
-                          child: Image(
-                            image: path.startsWith('assets/')
-                                ? AssetImage(path) as ImageProvider
-                                : FileImage(File(path)),
-                            fit: BoxFit.cover,
-                            errorBuilder: (BuildContext context, Object error,
-                                StackTrace? stackTrace) {
-                              return Container(
-                                color: AppColors.inputFill,
-                                child: const Icon(
-                                  CupertinoIcons.photo,
-                                  size: 18,
-                                  color: AppColors.textMuted,
-                                ),
-                              );
-                            },
+                          child: SizedBox(
+                            width: thumbSize,
+                            height: thumbSize,
+                            child: buildImage(
+                              path,
+                              height: thumbSize,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
                       ),
@@ -327,8 +315,6 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
 
   @override
   Widget build(BuildContext context) {
-    final TextTheme textTheme = widget.textTheme;
-
     return GestureDetector(
       onTapDown: (_) => setState(() => _pressed = true),
       onTapUp: (_) => setState(() => _pressed = false),
@@ -379,20 +365,13 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
                   const SizedBox(height: AppSpacing.lg),
                   Text(
                     widget.emptyTitle,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.2,
-                    ),
-                    textAlign: TextAlign.center,
+                    style: AppTypography.eventsSheetTitle(widget.textTheme),
                   ),
                   const SizedBox(height: AppSpacing.xs),
                   Text(
                     widget.emptyMaxPhotosLine,
-                    style: textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                      height: 1.4,
-                    ),
+                    style: AppTypography.eventsSupportingCaption(widget.textTheme)
+                        .copyWith(height: 1.4),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: AppSpacing.sm),
@@ -407,9 +386,9 @@ class _AddPhotosEmptyStateState extends State<AddPhotosEmptyState>
                       const SizedBox(width: AppSpacing.xs),
                       Text(
                         widget.emptyTapHint,
-                        style: textTheme.bodySmall?.copyWith(
+                        style: AppTypography.eventsSheetTextLink(widget.textTheme)
+                            .copyWith(
                           color: AppColors.primaryDark,
-                          fontWeight: FontWeight.w600,
                           fontSize: 13,
                         ),
                       ),

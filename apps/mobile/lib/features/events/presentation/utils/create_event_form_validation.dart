@@ -8,12 +8,14 @@ bool createEventFormIsSubmittable({
   required EcoEventCategory? category,
   required String titleTrimmed,
   required bool timeRangeValid,
+  required bool scheduleValid,
 }) {
   return hasSite &&
       hasDate &&
       category != null &&
       titleTrimmed.length >= 3 &&
-      timeRangeValid;
+      timeRangeValid &&
+      scheduleValid;
 }
 
 /// Milestones: site, date, valid time range, title (≥3 chars), category.
@@ -23,6 +25,7 @@ int createEventFormCompletedSteps({
   required EcoEventCategory? category,
   required String titleTrimmed,
   required bool timeRangeValid,
+  required bool scheduleValid,
 }) {
   int n = 0;
   if (hasSite) {
@@ -31,7 +34,7 @@ int createEventFormCompletedSteps({
   if (hasDate) {
     n++;
   }
-  if (timeRangeValid) {
+  if (timeRangeValid && scheduleValid) {
     n++;
   }
   if (titleTrimmed.length >= 3) {

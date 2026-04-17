@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart' hide TextDirection;
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
@@ -20,6 +21,7 @@ class ChatSearchResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final String body = (message.body ?? '').trim();
     final String time = DateFormat.jm().format(message.createdAt.toLocal());
     final String date = DateFormat.MMMd().format(message.createdAt.toLocal());
@@ -54,21 +56,17 @@ class ChatSearchResultTile extends StatelessWidget {
                           message.authorName,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
+                          style: AppTypography.eventsChatAuthorName(textTheme),
                         ),
                       ),
                       Text(
                         '$date, $time',
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
+                        style: AppTypography.eventsChatTimestamp(textTheme),
                       ),
                     ],
                   ),
                   const SizedBox(height: 2),
-                  _HighlightedBody(body: body, query: query),
+                  _HighlightedBody(body: body, query: query, textTheme: textTheme),
                 ],
               ),
             ),
@@ -80,50 +78,59 @@ class ChatSearchResultTile extends StatelessWidget {
 }
 
 class _HighlightedBody extends StatelessWidget {
-  const _HighlightedBody({required this.body, required this.query});
+  const _HighlightedBody({
+    required this.body,
+    required this.query,
+    required this.textTheme,
+  });
 
   final String body;
   final String query;
+  final TextTheme textTheme;
 
   @override
   Widget build(BuildContext context) {
-    if (query.isEmpty) {
+    final String trimmed = query.trim();
+    if (trimmed.isEmpty) {
       return Text(
         body,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
-            ),
+        style: AppTypography.eventsGridPropertyValue(textTheme),
       );
     }
-    final String lowerBody = body.toLowerCase();
-    final String lowerQuery = query.toLowerCase();
+    final String escaped = RegExp.escape(trimmed);
+    if (escaped.isEmpty) {
+      return Text(
+        body,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: AppTypography.eventsGridPropertyValue(textTheme),
+      );
+    }
+    final RegExp pattern = RegExp(escaped, caseSensitive: false);
     final List<TextSpan> spans = <TextSpan>[];
     int start = 0;
-
-    while (start < body.length) {
-      final int idx = lowerBody.indexOf(lowerQuery, start);
-      if (idx < 0) {
-        spans.add(TextSpan(text: body.substring(start)));
-        break;
+    for (final Match m in pattern.allMatches(body)) {
+      if (m.start > start) {
+        spans.add(TextSpan(text: body.substring(start, m.start)));
       }
-      if (idx > start) {
-        spans.add(TextSpan(text: body.substring(start, idx)));
-      }
-      spans.add(TextSpan(
-        text: body.substring(idx, idx + query.length),
-        style: TextStyle(
-          fontWeight: FontWeight.w700,
-          color: AppColors.primary,
+      spans.add(
+        TextSpan(
+          text: body.substring(m.start, m.end),
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            color: AppColors.primary,
+          ),
         ),
-      ));
-      start = idx + query.length;
+      );
+      start = m.end;
+    }
+    if (start < body.length) {
+      spans.add(TextSpan(text: body.substring(start)));
     }
 
-    final TextStyle? base = Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: AppColors.textSecondary,
-        );
+    final TextStyle base = AppTypography.eventsGridPropertyValue(textTheme);
 
     return RichText(
       maxLines: 2,

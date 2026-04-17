@@ -31,6 +31,7 @@ class _PrimaryButtonState extends State<PrimaryButton> {
   Widget build(BuildContext context) {
     final bool busy = widget.isLoading && widget.enabled;
     final bool canPress = widget.enabled && !busy && widget.onPressed != null;
+    final bool inactive = !widget.enabled || widget.onPressed == null;
 
     return AnimatedScale(
       scale: _pressed && canPress ? 0.985 : 1,
@@ -52,10 +53,15 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             style: ElevatedButton.styleFrom(
               elevation: 0,
               alignment: Alignment.center,
-              backgroundColor: widget.enabled
+              backgroundColor: busy
                   ? AppColors.primary
-                  : AppColors.primary.withValues(alpha: 0.42),
-              foregroundColor: AppColors.textPrimary,
+                  : (inactive ? AppColors.inputFill : AppColors.primary),
+              foregroundColor: busy
+                  ? AppColors.textPrimary
+                  : (inactive ? AppColors.textSecondary : AppColors.textPrimary),
+              side: inactive && !busy
+                  ? const BorderSide(color: AppColors.inputBorder)
+                  : BorderSide.none,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
               ),
@@ -72,7 +78,9 @@ class _PrimaryButtonState extends State<PrimaryButton> {
                 : Text(
                     widget.label,
                     textAlign: TextAlign.center,
-                    style: AppTypography.buttonLabel,
+                    style: AppTypography.buttonLabel.copyWith(
+                      color: inactive ? AppColors.textSecondary : AppColors.textPrimary,
+                    ),
                   ),
           ),
         ),

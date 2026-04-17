@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
@@ -94,10 +95,9 @@ class CategorySection extends StatelessWidget {
                       Expanded(
                         child: Text(
                           event.category.localizedLabel(context.l10n),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
+                          style: AppTypography.eventsGroupedRowPrimary(
+                            Theme.of(context).textTheme,
+                          ),
                         ),
                       ),
                       const Icon(
@@ -124,10 +124,9 @@ class CategorySection extends StatelessWidget {
                       Expanded(
                         child: Text(
                           event.category.localizedLabel(context.l10n),
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textSecondary,
-                              ),
+                          style: AppTypography.eventsBodyMediumSecondary(
+                            Theme.of(context).textTheme,
+                          ),
                         ),
                       ),
                       const Icon(

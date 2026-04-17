@@ -75,5 +75,13 @@ void main() {
 
       expect(result.length, lessThanOrEqualTo(8));
     });
+
+    test('calendar view preference defaults false and round-trips', () async {
+      expect(await prefs.readCalendarViewPreferred(), isFalse);
+      await prefs.writeCalendarViewPreferred(true);
+      expect(await prefs.readCalendarViewPreferred(), isTrue);
+      await prefs.writeCalendarViewPreferred(false);
+      expect(await prefs.readCalendarViewPreferred(), isFalse);
+    });
   });
 }

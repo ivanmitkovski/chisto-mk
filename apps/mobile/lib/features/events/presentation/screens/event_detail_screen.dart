@@ -1,14 +1,14 @@
-// Guards use context.mounted after awaits; analyzer still flags AppSnack/Navigation patterns.
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/organizer_end_soon_local_controller.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/extend_event_end_sheet.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -21,13 +21,14 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_export.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_share_payload.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/after_photos_gallery.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_content.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/feedback_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_detail_cta_presentation.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/hero_image_bar.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_not_found_view.dart';
@@ -69,8 +70,17 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     with WidgetsBindingObserver {
   EventsRepository get _eventsStore =>
       widget.eventsRepository ?? EventsRepositoryRegistry.instance;
-  final EventFeedbackLocalCache _feedbackCache = const EventFeedbackLocalCache();
-  static const Duration _detailRefreshTtl = Duration(seconds: 45);
+  final EventFeedbackLocalCache _feedbackCache =
+      const EventFeedbackLocalCache();
+  static const Duration _detailResumeRefreshTtlDefault = Duration(seconds: 45);
+  static const Duration _detailResumeRefreshTtlHot = Duration(seconds: 15);
+
+  Duration _detailResumeRefreshTtl(EcoEvent event) {
+    if (event.isCheckInOpen || event.status == EcoEventStatus.inProgress) {
+      return _detailResumeRefreshTtlHot;
+    }
+    return _detailResumeRefreshTtlDefault;
+  }
   EventFeedbackSnapshot? _feedbackSnapshot;
   bool _detailPrefetchDone = false;
   bool _detailMissing = false;
@@ -78,6 +88,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   Future<void>? _detailPrefetchInFlight;
   bool _ctaMutationBusy = false;
   int _chatUnreadCount = 0;
+  final OrganizerEndSoonLocalController _organizerEndSoonLocal =
+      OrganizerEndSoonLocalController();
+  Timer? _joinWindowTicker;
+  final GlobalKey _shareActionKey = GlobalKey();
 
   /// True when a forced refresh failed while we still show a cached [EcoEvent].
   bool _localDetailRefreshFailed = false;
@@ -101,32 +115,36 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       if (mounted) {
         setState(() => _chatUnreadCount = c);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('detail_chat_unread_fetch_failed');
+    }
   }
 
   void _openEventChat(EcoEvent event) {
     final Completer<void> readSync = Completer<void>();
     Navigator.of(context)
         .pushNamed(
-      AppRoutes.eventChat,
-      arguments: EventChatRouteArguments(
-        eventId: event.id,
-        eventTitle: event.title,
-        isOrganizer: event.isOrganizer,
-        readSyncCompleter: readSync,
-      ),
-    )
+          AppRoutes.eventChat,
+          arguments: EventChatRouteArguments(
+            eventId: event.id,
+            eventTitle: event.title,
+            isOrganizer: event.isOrganizer,
+            readSyncCompleter: readSync,
+          ),
+        )
         .then((_) async {
-      if (!mounted) {
-        return;
-      }
-      try {
-        await readSync.future.timeout(const Duration(seconds: 8));
-      } on Object catch (_) {}
-      if (mounted) {
-        unawaited(_refreshChatUnread(event));
-      }
-    });
+          if (!mounted) {
+            return;
+          }
+          try {
+            await readSync.future.timeout(const Duration(seconds: 8));
+          } on Object catch (_) {
+            logEventsDiagnostic('detail_chat_read_sync_timeout');
+          }
+          if (mounted) {
+            unawaited(_refreshChatUnread(event));
+          }
+        });
   }
 
   Future<void> _withCtaMutationBusy(Future<void> Function() action) async {
@@ -181,6 +199,43 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
   }
 
+  void _ensureJoinWindowTicker() {
+    if (!mounted) {
+      return;
+    }
+    final EcoEvent? e = _eventsStore.findById(widget.eventId);
+    final bool needTicker = e != null &&
+        !e.isOrganizer &&
+        e.isJoinable &&
+        !e.isJoined &&
+        e.isBeforeScheduledStart;
+    if (!needTicker) {
+      _joinWindowTicker?.cancel();
+      _joinWindowTicker = null;
+      return;
+    }
+    if (_joinWindowTicker != null) {
+      return;
+    }
+    _joinWindowTicker = Timer.periodic(const Duration(seconds: 20), (_) {
+      if (!mounted) {
+        return;
+      }
+      final EcoEvent? cur = _eventsStore.findById(widget.eventId);
+      final bool stillNeed = cur != null &&
+          !cur.isOrganizer &&
+          cur.isJoinable &&
+          !cur.isJoined &&
+          cur.isBeforeScheduledStart;
+      if (!stillNeed) {
+        _joinWindowTicker?.cancel();
+        _joinWindowTicker = null;
+        return;
+      }
+      setState(() {});
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -189,12 +244,25 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     _eventsStore.addListener(_onStoreChanged);
     _loadFeedback();
     unawaited(_prefetchDetailDeduped());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _ensureJoinWindowTicker();
+      }
+    });
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _eventsStore.removeListener(_onStoreChanged);
+    if (ServiceLocator.instance.isInitialized) {
+      unawaited(
+        _organizerEndSoonLocal.dispose(
+          ServiceLocator.instance.pushNotificationService,
+        ),
+      );
+    }
+    _joinWindowTicker?.cancel();
     super.dispose();
   }
 
@@ -202,19 +270,22 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       unawaited(_refreshDetailIfStale());
+      _ensureJoinWindowTicker();
     }
   }
 
   void _onStoreChanged() {
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     void applyUpdate() {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       setState(() {});
+      _ensureJoinWindowTicker();
     }
+
     if (SchedulerBinding.instance.schedulerPhase != SchedulerPhase.idle) {
       WidgetsBinding.instance.addPostFrameCallback((_) => applyUpdate());
       return;
@@ -223,9 +294,10 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   Future<void> _loadFeedback() async {
-    final EventFeedbackSnapshot? snapshot =
-        await _feedbackCache.read(widget.eventId);
-    if (!context.mounted) {
+    final EventFeedbackSnapshot? snapshot = await _feedbackCache.read(
+      widget.eventId,
+    );
+    if (!mounted) {
       return;
     }
     setState(() {
@@ -350,7 +422,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
     final DateTime? lastRefresh = _lastDetailRefreshAt;
     if (lastRefresh != null &&
-        DateTime.now().difference(lastRefresh) < _detailRefreshTtl) {
+        DateTime.now().difference(lastRefresh) < _detailResumeRefreshTtl(event)) {
       return;
     }
     try {
@@ -374,13 +446,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
   Future<void> _editFeedback(EcoEvent event) async {
     final EventFeedbackSnapshot? current = _feedbackSnapshot;
-    final EventFeedbackSnapshot? updated =
-        await _showFeedbackSheet(event, current);
-    if (!context.mounted || updated == null) {
+    final EventFeedbackSnapshot? updated = await _showFeedbackSheet(
+      event,
+      current,
+    );
+    if (!mounted || updated == null) {
       return;
     }
     await _feedbackCache.write(updated);
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     setState(() {
@@ -395,14 +469,38 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     );
   }
 
+  Future<void> _saveBagsCollected(EcoEvent event, int bagsCollected) async {
+    final int clamped = bagsCollected.clamp(0, 9999);
+    final EventFeedbackSnapshot? cur = _feedbackSnapshot;
+    final EventFeedbackSnapshot next = EventFeedbackSnapshot(
+      eventId: event.id,
+      rating: cur?.rating ?? 5,
+      bagsCollected: clamped,
+      volunteerHours: cur?.volunteerHours ?? 2.0,
+      notes: cur?.notes ?? '',
+      createdAt: cur?.createdAt ?? DateTime.now(),
+    );
+    await _feedbackCache.write(next);
+    if (!mounted) {
+      return;
+    }
+    setState(() {
+      _feedbackSnapshot = next;
+    });
+    AppHaptics.success();
+    AppSnack.show(
+      context,
+      message: context.l10n.eventsCompletedBagsSaved,
+      type: AppSnackType.success,
+    );
+  }
+
   Future<EventFeedbackSnapshot?> _showFeedbackSheet(
     EcoEvent event,
     EventFeedbackSnapshot? current,
   ) async {
-    return showModalBottomSheet<EventFeedbackSnapshot>(
+    return showEventsSurfaceModal<EventFeedbackSnapshot>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
       builder: (BuildContext sheetCtx) {
         return Padding(
           padding: EdgeInsets.only(
@@ -412,40 +510,80 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             title: sheetCtx.l10n.eventsFeedbackSheetTitle,
             subtitle: event.title,
             maxHeightFactor: 0.92,
-            child: FeedbackSheetContent(
-              event: event,
-              current: current,
-            ),
+            child: FeedbackSheetContent(event: event, current: current),
           ),
         );
       },
     );
   }
 
+  Rect _shareSheetOrigin(BuildContext context) {
+    final BuildContext? keyContext = _shareActionKey.currentContext;
+    if (keyContext != null) {
+      final RenderObject? ro = keyContext.findRenderObject();
+      if (ro is RenderBox && ro.hasSize && ro.attached) {
+        final Offset topLeft = ro.localToGlobal(Offset.zero);
+        return topLeft & ro.size;
+      }
+    }
+    return sharePopoverOrigin(context);
+  }
+
   Future<void> _handleShare(EcoEvent event) async {
     AppHaptics.tap();
+    if (!mounted) {
+      return;
+    }
     final String baseUrl = AppConfig.shareBaseUrlFromEnvironment;
-    final String deepLink = '$baseUrl/events/${event.id}';
-    final String text =
-        '${event.title}\n${formatEventCalendarDate(context, event.date)} (${event.formattedTimeRange})\n${event.siteName}\n\n$deepLink';
-    await Share.share(
-      text,
-      subject: event.title,
-      sharePositionOrigin: sharePopoverOrigin(context),
-    );
-    if (context.mounted) {
-      AppSnack.show(
-        context,
-        message: context.l10n.eventsDetailShareSuccess,
-        type: AppSnackType.success,
-      );
+    final Rect origin = _shareSheetOrigin(context);
+    try {
+      final Uri? uri = eventShareHttpsUri(baseUrl, event.id);
+      final ShareResult result;
+      if (uri != null) {
+        result = await Share.shareUri(uri, sharePositionOrigin: origin);
+      } else {
+        final String text = buildEventSharePlainText(context, event, baseUrl);
+        result = await Share.share(
+          text,
+          subject: event.title,
+          sharePositionOrigin: origin,
+        );
+      }
+      if (!mounted) {
+        return;
+      }
+      if (result.status == ShareResultStatus.success) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsDetailShareSuccess,
+          type: AppSnackType.success,
+        );
+      }
+    } on PlatformException catch (_) {
+      logEventsDiagnostic('events_detail_share_failed');
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsDetailShareFailed,
+          type: AppSnackType.warning,
+        );
+      }
+    } on Object catch (_) {
+      logEventsDiagnostic('events_detail_share_failed');
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsDetailShareFailed,
+          type: AppSnackType.warning,
+        );
+      }
     }
   }
 
   Future<void> _handleStartEvent(EcoEvent event) async {
     if (event.isBeforeScheduledStart) {
       AppHaptics.warning();
-      if (context.mounted) {
+      if (mounted) {
         AppSnack.show(
           context,
           message: context.l10n.eventsStartEventTooEarly,
@@ -456,11 +594,13 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
     await _withCtaMutationBusy(() async {
       try {
-        final bool changed =
-            await _eventsStore.updateStatus(event.id, EcoEventStatus.inProgress);
+        final bool changed = await _eventsStore.updateStatus(
+          event.id,
+          EcoEventStatus.inProgress,
+        );
         if (!changed) {
           AppHaptics.warning();
-          if (context.mounted) {
+          if (mounted) {
             AppSnack.show(
               context,
               message: context.l10n.eventsUnableToStartEventGeneric,
@@ -471,7 +611,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
       } on AppError catch (e) {
         AppHaptics.warning();
-        if (context.mounted) {
+        if (mounted) {
           AppSnack.show(
             context,
             message: localizedAppErrorMessage(context.l10n, e),
@@ -480,10 +620,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
         return;
       }
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
-      final EcoEvent startedEvent = _eventsStore.findById(event.id) ??
+      final EcoEvent startedEvent =
+          _eventsStore.findById(event.id) ??
           event.copyWith(status: EcoEventStatus.inProgress);
       EventsNavigation.openOrganizerCheckIn(context, eventId: startedEvent.id);
     });
@@ -512,6 +653,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   Future<void> _handleToggleJoin(EcoEvent event) async {
+    if (!event.isJoined && !event.canVolunteerJoinNow) {
+      AppHaptics.warning();
+      AppSnack.show(
+        context,
+        message: context.l10n.eventsJoinNotYetOpen,
+        type: AppSnackType.warning,
+      );
+      return;
+    }
     if (!event.isJoined &&
         event.maxParticipants != null &&
         event.participantCount >= event.maxParticipants!) {
@@ -524,13 +674,14 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       return;
     }
     await _withCtaMutationBusy(() async {
-      EcoEventJoinToggleResult joinResult =
-          const EcoEventJoinToggleResult(changed: false);
+      EcoEventJoinToggleResult joinResult = const EcoEventJoinToggleResult(
+        changed: false,
+      );
       try {
         joinResult = await _eventsStore.toggleJoin(event.id);
         if (!joinResult.changed) {
           AppHaptics.warning();
-          if (context.mounted) {
+          if (mounted) {
             AppSnack.show(
               context,
               message: context.l10n.eventsParticipationUpdateFailed,
@@ -541,7 +692,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
       } on AppError catch (e) {
         AppHaptics.warning();
-        if (context.mounted) {
+        if (mounted) {
           AppSnack.show(
             context,
             message: localizedAppErrorMessage(context.l10n, e),
@@ -550,7 +701,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
         return;
       }
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       final EcoEvent? updated = _eventsStore.findById(event.id);
@@ -561,13 +712,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       final String message = !joined
           ? context.l10n.eventsLeftEcoAction
           : joinResult.pointsAwarded > 0
-              ? context.l10n.eventsJoinPointsEarned(joinResult.pointsAwarded)
-              : context.l10n.eventsJoinedEcoAction;
-      AppSnack.show(
-        context,
-        message: message,
-        type: AppSnackType.success,
-      );
+          ? context.l10n.eventsJoinPointsEarned(joinResult.pointsAwarded)
+          : context.l10n.eventsJoinedEcoAction;
+      AppSnack.show(context, message: message, type: AppSnackType.success);
     });
   }
 
@@ -590,7 +737,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             reminderAt: null,
           );
           if (changed) {
-            if (context.mounted) {
+            if (mounted) {
               AppSnack.show(
                 context,
                 message: context.l10n.eventsReminderDisabled,
@@ -599,7 +746,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
             }
           }
         } on AppError catch (e) {
-          if (context.mounted) {
+          if (mounted) {
             AppSnack.show(
               context,
               message: localizedAppErrorMessage(context.l10n, e),
@@ -615,9 +762,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   Future<void> _handleEnableReminder(EcoEvent event) async {
-    final DateTime? selectedReminder =
-        await ReminderPickerSheet.show(context, event);
-    if (!context.mounted || selectedReminder == null) {
+    final DateTime? selectedReminder = await ReminderPickerSheet.show(
+      context,
+      event,
+    );
+    if (!mounted || selectedReminder == null) {
       return;
     }
     await _withCtaMutationBusy(() async {
@@ -631,7 +780,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
           return;
         }
       } on AppError catch (e) {
-        if (context.mounted) {
+        if (mounted) {
           AppSnack.show(
             context,
             message: localizedAppErrorMessage(context.l10n, e),
@@ -640,7 +789,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         }
         return;
       }
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       AppSnack.show(
@@ -654,20 +803,37 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   void _openEditEvent(EcoEvent event) {
-    showModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.transparent,
-      barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
       builder: (BuildContext sheetCtx) => EditEventSheet(event: event),
     );
+  }
+
+  void _openExtendCleanupEnd(EcoEvent event) {
+    AppHaptics.tap();
+    unawaited(
+      showExtendEventEndSheet(
+        context: context,
+        event: event,
+        eventsRepository: _eventsStore,
+      ),
+    );
+  }
+
+  bool _shouldShowOrganizerEndSoonBanner(EcoEvent event) {
+    if (!event.isOrganizer || event.status != EcoEventStatus.inProgress) {
+      return false;
+    }
+    final DateTime threshold =
+        event.endDateTime.subtract(const Duration(minutes: 10));
+    return !DateTime.now().isBefore(threshold);
   }
 
   Future<void> _handleAddToCalendar(EcoEvent event) async {
     AppHaptics.softTransition();
     try {
       await EventCalendarExport.addToCalendar(event);
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       AppHaptics.light();
@@ -677,7 +843,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         type: AppSnackType.success,
       );
     } catch (_) {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       AppHaptics.warning();
@@ -711,7 +877,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       context,
       eventId: event.id,
     );
-    if (!context.mounted || success != true) {
+    if (!mounted || success != true) {
       return;
     }
     AppSnack.show(
@@ -721,14 +887,16 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     );
   }
 
-  void _openFullscreenGallery(BuildContext context, EcoEvent event, int initialIndex) {
+  void _openFullscreenGallery(
+    BuildContext context,
+    EcoEvent event,
+    int initialIndex,
+  ) {
     AppHaptics.softTransition();
     Navigator.of(context).push(
       CupertinoPageRoute<void>(
-        builder: (BuildContext context) => FullscreenGalleryPage(
-          event: event,
-          initialIndex: initialIndex,
-        ),
+        builder: (BuildContext context) =>
+            FullscreenGalleryPage(event: event, initialIndex: initialIndex),
       ),
     );
   }
@@ -766,122 +934,160 @@ class _EventDetailScreenState extends State<EventDetailScreen>
 
     final double scrollBottomInset = _scrollBottomInset(context, event);
 
+    if (ServiceLocator.instance.isInitialized) {
+      unawaited(
+        _organizerEndSoonLocal.sync(
+          event: event,
+          push: ServiceLocator.instance.pushNotificationService,
+          l10n: context.l10n,
+        ),
+      );
+    }
+
     return Scaffold(
       backgroundColor: AppColors.appBackground,
       body: Semantics(
         label: context.l10n.eventsDetailSemanticsLabel(event.title),
         child: Stack(
-        children: <Widget>[
-          RefreshIndicator(
-            onRefresh: _handlePullToRefresh,
-            child: CustomScrollView(
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              slivers: <Widget>[
-              HeroImageBar(
-                event: event,
-                enableThumbnailHero: widget.enableThumbnailHero,
-                onShare: () => _handleShare(event),
-                onEdit: event.isOrganizer &&
-                        (event.status == EcoEventStatus.upcoming ||
-                            event.status == EcoEventStatus.inProgress)
-                    ? () {
-                        AppHaptics.tap();
-                        _openEditEvent(event);
-                      }
-                    : null,
-              ),
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    kEventDetailBodyHorizontalGutter,
-                    kEventDetailBodyHorizontalGutter,
-                    kEventDetailBodyHorizontalGutter,
-                    scrollBottomInset,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      if (_showStaleDetailBanner) ...<Widget>[
-                        Semantics(
-                          container: true,
-                          label:
-                              '${context.l10n.eventsDetailCouldNotRefresh}. ${context.l10n.eventsDetailRetryRefresh}',
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: <Widget>[
-                              ReportInfoBanner(
-                                message:
-                                    context.l10n.eventsDetailCouldNotRefresh,
-                                icon: CupertinoIcons.exclamationmark_circle_fill,
-                                tone: ReportSurfaceTone.warning,
-                              ),
-                              Align(
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: TextButton(
-                                  onPressed: () =>
-                                      unawaited(_retryDetailRefresh()),
-                                  child: Text(
-                                    context.l10n.eventsDetailRetryRefresh,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                      ],
-                      if (!event.moderationApproved && event.isOrganizer) ...<Widget>[
-                        ReportInfoBanner(
-                          title: context.l10n.eventsModerationBannerTitle,
-                          message: context.l10n.eventsModerationBannerBody,
-                          icon: CupertinoIcons.info_circle_fill,
-                          tone: ReportSurfaceTone.accent,
-                        ),
-                        const SizedBox(height: AppSpacing.lg),
-                      ],
-                      DetailContent(
-                        event: event,
-                        onToggleReminder: () => _handleToggleReminder(event),
-                        onExportCalendar: () => _handleAddToCalendar(event),
-                        feedbackSnapshot: _feedbackSnapshot,
-                        onEditFeedback: () => _editFeedback(event),
-                        onImageTap: (int index) =>
-                            _openFullscreenGallery(context, event, index),
-                        onOpenSeriesOccurrence: (String id) {
-                          if (id == widget.eventId) {
-                            return;
-                          }
-                          EventsNavigation.replaceDetail(
-                            context,
-                            eventId: id,
-                          );
-                        },
-                        onOpenEventChat: _canOpenEventChat(event)
-                            ? () => _openEventChat(event)
-                            : null,
-                        eventChatUnreadCount: _chatUnreadCount,
-                      ),
-                    ],
-                  ),
+          children: <Widget>[
+            RefreshIndicator(
+              onRefresh: _handlePullToRefresh,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
                 ),
+                slivers: <Widget>[
+                  HeroImageBar(
+                    event: event,
+                    enableThumbnailHero: widget.enableThumbnailHero,
+                    shareButtonKey: _shareActionKey,
+                    onShare: () => _handleShare(event),
+                    onEdit:
+                        event.isOrganizer &&
+                            (event.status == EcoEventStatus.upcoming ||
+                                event.status == EcoEventStatus.inProgress)
+                        ? () {
+                            AppHaptics.tap();
+                            _openEditEvent(event);
+                          }
+                        : null,
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        kEventDetailBodyHorizontalGutter,
+                        kEventDetailBodyHorizontalGutter,
+                        kEventDetailBodyHorizontalGutter,
+                        scrollBottomInset,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          if (_showStaleDetailBanner) ...<Widget>[
+                            Semantics(
+                              container: true,
+                              label:
+                                  '${context.l10n.eventsDetailCouldNotRefresh}. ${context.l10n.eventsDetailRetryRefresh}',
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: <Widget>[
+                                  ReportInfoBanner(
+                                    message: context
+                                        .l10n
+                                        .eventsDetailCouldNotRefresh,
+                                    icon: CupertinoIcons
+                                        .exclamationmark_circle_fill,
+                                    tone: ReportSurfaceTone.warning,
+                                  ),
+                                  Align(
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    child: TextButton(
+                                      onPressed: () =>
+                                          unawaited(_retryDetailRefresh()),
+                                      child: Text(
+                                        context.l10n.eventsDetailRetryRefresh,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                          ],
+                          if (!event.moderationApproved &&
+                              event.isOrganizer) ...<Widget>[
+                            ReportInfoBanner(
+                              title: context.l10n.eventsModerationBannerTitle,
+                              message: context.l10n.eventsModerationBannerBody,
+                              icon: CupertinoIcons.info_circle_fill,
+                              tone: ReportSurfaceTone.accent,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
+                          if (_shouldShowOrganizerEndSoonBanner(event)) ...<Widget>[
+                            ReportInfoBanner(
+                              title: context.l10n.eventsEndSoonBannerTitle,
+                              message: context.l10n.eventsEndSoonBannerBody,
+                              icon: CupertinoIcons.clock_fill,
+                              tone: ReportSurfaceTone.accent,
+                            ),
+                            Align(
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: TextButton(
+                                onPressed: () => _openExtendCleanupEnd(event),
+                                child: Text(context.l10n.eventsEndSoonBannerExtend),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.md),
+                          ],
+                          DetailContent(
+                            event: event,
+                            onToggleReminder: () =>
+                                _handleToggleReminder(event),
+                            onExportCalendar: () => _handleAddToCalendar(event),
+                            feedbackSnapshot: _feedbackSnapshot,
+                            onEditFeedback: () => _editFeedback(event),
+                            onImageTap: (int index) =>
+                                _openFullscreenGallery(context, event, index),
+                            onOpenSeriesOccurrence: (String id) {
+                              if (id == widget.eventId) {
+                                return;
+                              }
+                              EventsNavigation.replaceDetail(
+                                context,
+                                eventId: id,
+                              );
+                            },
+                            onOpenEventChat: _canOpenEventChat(event)
+                                ? () => _openEventChat(event)
+                                : null,
+                            eventChatUnreadCount: _chatUnreadCount,
+                            onSaveBagsCollected:
+                                event.isOrganizer &&
+                                    event.status == EcoEventStatus.completed
+                                ? (int bags) => _saveBagsCollected(event, bags)
+                                : null,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
             ),
-          ),
-          StickyBottomCTA(
-            event: event,
-            isPrimaryLoading: _ctaMutationBusy,
-            onToggleJoin: () => _handleToggleJoin(event),
-            onToggleReminder: () => _handleToggleReminder(event),
-            onStartEvent: () => _handleStartEvent(event),
-            onManageCheckIn: () => _handleManageCheckIn(event),
-            onOpenAttendeeCheckIn: () => _handleOpenAttendeeCheckIn(event),
-            onOpenCleanupEvidence: () => _handleOpenCleanupEvidence(event),
-          ),
-        ],
-      ),
+            StickyBottomCTA(
+              event: event,
+              isPrimaryLoading: _ctaMutationBusy,
+              onToggleJoin: () => _handleToggleJoin(event),
+              onToggleReminder: () => _handleToggleReminder(event),
+              onStartEvent: () => _handleStartEvent(event),
+              onManageCheckIn: () => _handleManageCheckIn(event),
+              onOpenAttendeeCheckIn: () => _handleOpenAttendeeCheckIn(event),
+              onOpenCleanupEvidence: () => _handleOpenCleanupEvidence(event),
+              onExtendCleanupEnd: () => _openExtendCleanupEnd(event),
+            ),
+          ],
+        ),
       ),
     );
   }

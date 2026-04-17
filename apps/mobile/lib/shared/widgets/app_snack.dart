@@ -1,7 +1,8 @@
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 enum AppSnackType {
   info,
@@ -19,7 +20,7 @@ class AppSnack {
     AppSnackType type = AppSnackType.info,
       Duration duration = const Duration(milliseconds: 2600),
   }) {
-    _triggerHaptic(type);
+    _triggerHaptic(context, type);
     // Platform-adaptive behavior:
     // - iOS/macOS: lightweight top banner (Apple-style).
     // - Android/others: Material floating SnackBar from bottom.
@@ -33,7 +34,7 @@ class AppSnack {
         barrierDismissible: true,
         barrierLabel: 'app_snack',
         barrierColor: AppColors.transparent,
-        transitionDuration: const Duration(milliseconds: 220),
+        transitionDuration: AppMotion.medium,
         pageBuilder: (
           BuildContext dialogContext,
           Animation<double> animation,
@@ -102,16 +103,16 @@ class AppSnack {
     );
   }
 
-  static void _triggerHaptic(AppSnackType type) {
+  static void _triggerHaptic(BuildContext context, AppSnackType type) {
     switch (type) {
       case AppSnackType.info:
-        HapticFeedback.selectionClick();
+        AppHaptics.tap(context);
       case AppSnackType.success:
-        HapticFeedback.lightImpact();
+        AppHaptics.success(context);
       case AppSnackType.warning:
-        HapticFeedback.mediumImpact();
+        AppHaptics.warning(context);
       case AppSnackType.error:
-        HapticFeedback.heavyImpact();
+        AppHaptics.error(context);
     }
   }
 }

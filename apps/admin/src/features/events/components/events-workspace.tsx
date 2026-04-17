@@ -40,12 +40,15 @@ type EventsWorkspaceProps = {
   initialData: CleanupEventRow[];
   initialMeta: { total: number; page: number; limit: number };
   initialStats: EventsStats;
+  /** True when the signed-in user may POST/PATCH cleanup events (ADMIN / SUPER_ADMIN). */
+  canWriteCleanupEvents: boolean;
 };
 
 export function EventsWorkspace({
   initialData,
   initialMeta,
   initialStats,
+  canWriteCleanupEvents,
 }: EventsWorkspaceProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -163,9 +166,16 @@ export function EventsWorkspace({
       <Card className={styles.tableCard}>
         <div className={styles.toolbar}>
           <div className={styles.filters}>
-            <Link href="/dashboard/sites" className={styles.createHint}>
-              Create event from site
-            </Link>
+            <div className={styles.createHintBlock}>
+              <Link href="/dashboard/sites" className={styles.createHint}>
+                Create event from site
+              </Link>
+              {!canWriteCleanupEvents ? (
+                <p className={styles.readOnlyHint} role="note">
+                  Your role can view events; only admins can create or edit cleanup events.
+                </p>
+              ) : null}
+            </div>
             <select
               value={status}
               onChange={(e) => handleStatusChange(e.target.value)}

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 
@@ -52,18 +53,12 @@ class ReminderSection extends StatelessWidget {
               children: <Widget>[
                 Text(
                   context.l10n.eventsReminderSectionTitle,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: AppTypography.eventsGroupedRowPrimary(textTheme),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   reminderState,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    fontSize: 13,
-                  ),
+                  style: AppTypography.eventsListCardMeta(textTheme),
                 ),
               ],
             ),
@@ -76,10 +71,7 @@ class ReminderSection extends StatelessWidget {
               event.reminderEnabled
                   ? context.l10n.eventsReminderSectionDisable
                   : context.l10n.eventsReminderSectionEnable,
-              style: textTheme.bodyMedium?.copyWith(
-                color: AppColors.primaryDark,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.eventsTextLinkEmphasis(textTheme),
             ),
           ),
         ],

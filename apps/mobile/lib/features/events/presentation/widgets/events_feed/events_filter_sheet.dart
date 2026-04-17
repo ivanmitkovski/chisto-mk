@@ -204,9 +204,8 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
                     Expanded(
                       child: Text(
                         context.l10n.eventsFilterSheetTitle,
-                        style: AppTypography.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: -0.3,
+                        style: AppTypography.eventsSheetTitle(
+                          Theme.of(context).textTheme,
                         ),
                       ),
                     ),
@@ -220,9 +219,8 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
                         onPressed: _clearAll,
                         child: Text(
                           context.l10n.eventsFilterSheetClearAll,
-                          style: AppTypography.textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.w600,
+                          style: AppTypography.eventsSheetTextLink(
+                            Theme.of(context).textTheme,
                           ),
                         ),
                       ),
@@ -343,9 +341,8 @@ class _EventsFilterSheetState extends State<EventsFilterSheet> {
                     _activeCount > 0
                         ? context.l10n.eventsFilterSheetActiveCount(_activeCount)
                         : context.l10n.eventsFilterSheetShowResults,
-                    style: AppTypography.textTheme.labelLarge?.copyWith(
-                      color: AppColors.white,
-                      fontWeight: FontWeight.w600,
+                    style: AppTypography.eventsPrimaryButtonLabel(
+                      Theme.of(context).textTheme,
                     ),
                   ),
                 ),
@@ -371,10 +368,8 @@ class _SectionLabel extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: AppTypography.textTheme.labelMedium?.copyWith(
-          color: AppColors.textMuted,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.4,
+        style: AppTypography.eventsSheetSectionLabel(
+          Theme.of(context).textTheme,
         ),
       ),
     );
@@ -407,7 +402,9 @@ class _FilterChip extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 44),
           child: AnimatedContainer(
-            duration: AppMotion.fast,
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : AppMotion.fast,
             curve: AppMotion.emphasized,
             alignment: Alignment.center,
             padding: const EdgeInsets.symmetric(
@@ -450,9 +447,10 @@ class _FilterChip extends StatelessWidget {
                 ],
                 Text(
                   label,
-                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                    color: selected ? accent : AppColors.textSecondary,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                  style: AppTypography.eventsSheetChipLabel(
+                    Theme.of(context).textTheme,
+                    selected: selected,
+                    accent: accent,
                   ),
                 ),
               ],
@@ -513,19 +511,16 @@ class _DatePickerTile extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         label,
-                        style: AppTypography.textTheme.labelSmall?.copyWith(
-                          color: AppColors.textMuted,
+                        style: AppTypography.eventsSheetDateTileLabel(
+                          Theme.of(context).textTheme,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xxs / 2),
                       Text(
                         value,
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: hasValue
-                              ? AppColors.textPrimary
-                              : AppColors.textMuted,
-                          fontWeight:
-                              hasValue ? FontWeight.w600 : FontWeight.w400,
+                        style: AppTypography.eventsSheetDateTileValue(
+                          Theme.of(context).textTheme,
+                          hasValue: hasValue,
                         ),
                       ),
                     ],

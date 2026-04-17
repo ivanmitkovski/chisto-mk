@@ -20,22 +20,9 @@ class HeroEventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final String countdownLabel = eventsCountdownLabel(context.l10n, event.startDateTime);
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween<double>(begin: 0.96, end: 1),
-      duration: AppMotion.standard,
-      curve: AppMotion.emphasized,
-      builder: (BuildContext context, double value, Widget? child) {
-        return Opacity(
-          opacity: value.clamp(0.0, 1.0),
-          child: Transform.scale(
-            scale: value,
-            alignment: Alignment.topCenter,
-            child: child,
-          ),
-        );
-      },
-      child: Semantics(
+    final Widget card = Semantics(
         button: true,
         label: '${context.l10n.eventsCardOpenTitle}: ${event.title}',
         child: GestureDetector(
@@ -111,8 +98,8 @@ class HeroEventCard extends StatelessWidget {
                       ),
                       child: Text(
                         countdownLabel,
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+                        style: AppTypography.eventsCaptionStrong(
+                          textTheme,
                           color: AppColors.white,
                         ),
                       ),
@@ -170,8 +157,28 @@ class HeroEventCard extends StatelessWidget {
             ],
           ),
         ),
-        ),
       ),
+    );
+
+    if (reduceMotion) {
+      return card;
+    }
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(begin: 0.96, end: 1),
+      duration: AppMotion.standard,
+      curve: AppMotion.emphasized,
+      builder: (BuildContext context, double value, Widget? child) {
+        return Opacity(
+          opacity: value.clamp(0.0, 1.0),
+          child: Transform.scale(
+            scale: value,
+            alignment: Alignment.topCenter,
+            child: child,
+          ),
+        );
+      },
+      child: card,
     );
   }
 }

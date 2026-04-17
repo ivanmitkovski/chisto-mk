@@ -25,7 +25,13 @@ class _WeeklyRankingsSkeletonState extends State<WeeklyRankingsSkeleton>
     _shimmer = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
   }
 
   @override

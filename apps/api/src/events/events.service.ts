@@ -23,11 +23,15 @@ import {
   REASON_EVENT_JOINED,
 } from '../gamification/gamification.constants';
 import { CleanupEventsEventsService } from '../admin-events/cleanup-events-events.service';
+import { duplicateEventConflict } from '../event-schedule-conflict/duplicate-event-conflict.exception';
+import { EventScheduleConflictService } from '../event-schedule-conflict/event-schedule-conflict.service';
 import { EventChatService } from '../event-chat/event-chat.service';
 import { EcoEventPointsService } from '../gamification/eco-event-points.service';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { buildEventAnalyticsPayload } from './event-analytics.aggregation';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import { CheckEventConflictQueryDto } from './dto/check-event-conflict-query.dto';
 import { CreatePublicEventDto } from './dto/create-public-event.dto';
 import { ListEventParticipantsQueryDto } from './dto/list-event-participants-query.dto';
 import { ListEventsQueryDto } from './dto/list-events-query.dto';
@@ -50,8 +54,10 @@ import {
   encodeCursor,
   encodeParticipantCursor,
 } from './events-cursors.util';
+import { PUBLIC_EVENT_MAX_END_AFTER_START_MS } from './event-schedule-policy.constants';
 import { canTransitionLifecycle } from './events-lifecycle.util';
 import { EventsMobileMapperService } from './events-mobile-mapper.service';
+import { EventsTelemetryService } from './events-telemetry.service';
 import {
   eventIncludeForViewer,
   participantDisplayName,
@@ -70,6 +76,8 @@ export class EventsService {
     private readonly eventChat: EventChatService,
     private readonly mobileMapper: EventsMobileMapperService,
     private readonly cleanupEventsSse: CleanupEventsEventsService,
+    private readonly scheduleConflict: EventScheduleConflictService,
+    private readonly eventsTelemetry: EventsTelemetryService,
   ) {}
 
   private isStaff(user: AuthenticatedUser): boolean {
@@ -77,6 +85,7 @@ export class EventsService {
   }
 
   async list(user: AuthenticatedUser, query: ListEventsQueryDto) {
+    const t0 = Date.now();
     const limit = query.getLimit();
     const lifecycleFilter = parseLifecycleFilterList(query.status);
     if (query.status != null && query.status.trim() !== '' && lifecycleFilter == null) {
@@ -169,6 +178,13 @@ export class EventsService {
 
     const data = await Promise.all(page.map((row) => this.mobileMapper.toMobileEvent(row)));
 
+    this.eventsTelemetry.emitSpan('events.list', {
+      duration_ms: Date.now() - t0,
+      limit,
+      hasMore,
+      returned: data.length,
+    });
+
     return {
       data,
       meta: {
@@ -179,6 +195,7 @@ export class EventsService {
   }
 
   async findOne(id: string, user: AuthenticatedUser) {
+    const t0 = Date.now();
     const row = await this.prisma.cleanupEvent.findFirst({
       where: {
         id,
@@ -192,7 +209,11 @@ export class EventsService {
         message: 'Event not found',
       });
     }
-    return this.mobileMapper.toMobileEvent(row);
+    const payload = await this.mobileMapper.toMobileEvent(row);
+    this.eventsTelemetry.emitSpan('events.find_one', {
+      duration_ms: Date.now() - t0,
+    });
+    return payload;
   }
 
   /**
@@ -204,6 +225,7 @@ export class EventsService {
     user: AuthenticatedUser,
     query: ListEventParticipantsQueryDto,
   ) {
+    const t0 = Date.now();
     const visible = await this.prisma.cleanupEvent.findFirst({
       where: {
         id,
@@ -262,11 +284,63 @@ export class EventsService {
       })),
     );
 
+    this.eventsTelemetry.emitSpan('events.list_participants', {
+      duration_ms: Date.now() - t0,
+      limit,
+      hasMore,
+      returned: data.length,
+    });
+
     return {
       data,
       meta: {
         hasMore,
         nextCursor,
+      },
+    };
+  }
+
+  /**
+   * Read-only preview for create/edit forms; does not return 409.
+   */
+  async checkScheduleConflictPreview(query: CheckEventConflictQueryDto): Promise<{
+    hasConflict: boolean;
+    conflictingEvent?: { id: string; title: string; scheduledAt: string };
+  }> {
+    const scheduledAt = new Date(query.scheduledAt);
+    if (Number.isNaN(scheduledAt.getTime())) {
+      throw new BadRequestException({
+        code: 'INVALID_SCHEDULED_AT',
+        message: 'Invalid scheduledAt',
+      });
+    }
+    let endAt: Date | null = null;
+    if (query.endAt != null && query.endAt.trim() !== '') {
+      endAt = new Date(query.endAt);
+      if (Number.isNaN(endAt.getTime()) || endAt.getTime() <= scheduledAt.getTime()) {
+        throw new BadRequestException({
+          code: 'INVALID_END_AT',
+          message: 'endAt must be after scheduledAt',
+        });
+      }
+    }
+    const row = await this.scheduleConflict.findConflictingEvent({
+      siteId: query.siteId,
+      scheduledAt,
+      endAt,
+      ...(query.excludeEventId != null && query.excludeEventId !== ''
+        ? { excludeEventId: query.excludeEventId }
+        : {}),
+    });
+    if (row == null) {
+      return { hasConflict: false };
+    }
+    return {
+      hasConflict: true,
+      conflictingEvent: {
+        id: row.id,
+        title: row.title,
+        scheduledAt: row.scheduledAt.toISOString(),
       },
     };
   }
@@ -336,6 +410,15 @@ export class EventsService {
       return this.createSeries(dto, createData, user, scheduledAt, endAt);
     }
 
+    const conflictSingle = await this.scheduleConflict.findConflictingEvent({
+      siteId: dto.siteId,
+      scheduledAt,
+      endAt,
+    });
+    if (conflictSingle != null) {
+      throw duplicateEventConflict(conflictSingle);
+    }
+
     const created = await this.prisma.cleanupEvent.create({
       data: createData,
     });
@@ -391,6 +474,20 @@ export class EventsService {
     }
 
     const durationMs = parentEnd != null ? parentEnd.getTime() - parentStart.getTime() : 0;
+
+    const siteId = baseData.siteId as string;
+    for (const d of dates) {
+      const occEnd =
+        durationMs > 0 ? new Date(d.getTime() + durationMs) : parentEnd;
+      const conflictOcc = await this.scheduleConflict.findConflictingEvent({
+        siteId,
+        scheduledAt: d,
+        endAt: occEnd,
+      });
+      if (conflictOcc != null) {
+        throw duplicateEventConflict(conflictOcc);
+      }
+    }
 
     const mobileEvent = await this.prisma.$transaction(async (tx) => {
       // Create the parent event (index 0).
@@ -459,6 +556,16 @@ export class EventsService {
       });
     }
 
+    if (
+      existing.lifecycleStatus === EcoEventLifecycleStatus.COMPLETED ||
+      existing.lifecycleStatus === EcoEventLifecycleStatus.CANCELLED
+    ) {
+      throw new BadRequestException({
+        code: 'EVENT_NOT_EDITABLE',
+        message: 'This event can no longer be edited.',
+      });
+    }
+
     const data: Prisma.CleanupEventUpdateInput = {};
     if (dto.title != null) {
       data.title = dto.title.trim();
@@ -491,6 +598,7 @@ export class EventsService {
     }
 
     if (dto.endAt !== undefined) {
+      data.endSoonNotifiedForEndAt = null;
       if (dto.endAt == null || dto.endAt === '') {
         data.endAt = null;
       } else {
@@ -499,6 +607,12 @@ export class EventsService {
           throw new BadRequestException({
             code: 'INVALID_END_AT',
             message: 'endAt must be after scheduledAt',
+          });
+        }
+        if (end.getTime() - nextScheduled.getTime() > PUBLIC_EVENT_MAX_END_AFTER_START_MS) {
+          throw new BadRequestException({
+            code: 'EVENT_END_AT_TOO_FAR',
+            message: 'End time is too far from the event start.',
           });
         }
         data.endAt = end;
@@ -530,6 +644,25 @@ export class EventsService {
         });
       }
       data.difficulty = d;
+    }
+
+    if (dto.scheduledAt != null || dto.endAt !== undefined) {
+      let nextEndForConflict: Date | null;
+      if (dto.endAt !== undefined) {
+        nextEndForConflict =
+          dto.endAt == null || dto.endAt === '' ? null : new Date(dto.endAt);
+      } else {
+        nextEndForConflict = existing.endAt;
+      }
+      const conflictPatch = await this.scheduleConflict.findConflictingEvent({
+        siteId: existing.siteId,
+        scheduledAt: nextScheduled,
+        endAt: nextEndForConflict,
+        excludeEventId: id,
+      });
+      if (conflictPatch != null) {
+        throw duplicateEventConflict(conflictPatch);
+      }
     }
 
     const updated = await this.prisma.cleanupEvent.update({
@@ -765,6 +898,12 @@ export class EventsService {
         message: 'Organizers join implicitly; use the organizer tools instead',
       });
     }
+    if (existing.scheduledAt.getTime() > Date.now()) {
+      throw new BadRequestException({
+        code: 'EVENT_JOIN_NOT_YET_OPEN',
+        message: 'Joining opens when the scheduled start time arrives.',
+      });
+    }
     if (
       existing.maxParticipants != null &&
       existing.participantCount >= existing.maxParticipants
@@ -998,7 +1137,7 @@ export class EventsService {
   async getAnalytics(id: string, user: AuthenticatedUser) {
     const event = await this.prisma.cleanupEvent.findUnique({
       where: { id },
-      select: { organizerId: true, participantCount: true, checkedInCount: true },
+      select: { organizerId: true, participantCount: true },
     });
     if (event == null) {
       throw new NotFoundException({ code: 'EVENT_NOT_FOUND', message: 'Event not found' });
@@ -1010,49 +1149,22 @@ export class EventsService {
       });
     }
 
-    // Joiners over time: group EventParticipant rows by joinedAt date.
-    const participants = await this.prisma.eventParticipant.findMany({
-      where: { eventId: id },
-      select: { joinedAt: true },
-      orderBy: { joinedAt: 'asc' },
+    const [participants, checkIns] = await Promise.all([
+      this.prisma.eventParticipant.findMany({
+        where: { eventId: id },
+        select: { joinedAt: true },
+        orderBy: { joinedAt: 'asc' },
+      }),
+      this.prisma.eventCheckIn.findMany({
+        where: { eventId: id },
+        select: { checkedInAt: true },
+      }),
+    ]);
+
+    return buildEventAnalyticsPayload({
+      participantCount: event.participantCount,
+      participantsJoinedAt: participants.map((p) => p.joinedAt),
+      checkInsCheckedAt: checkIns.map((c) => c.checkedInAt),
     });
-
-    const joinersMap = new Map<string, number>();
-    for (const p of participants) {
-      const dateKey = p.joinedAt.toISOString().slice(0, 10);
-      joinersMap.set(dateKey, (joinersMap.get(dateKey) ?? 0) + 1);
-    }
-    const joinersOverTime = Array.from(joinersMap.entries()).map(([date, count]) => ({
-      date,
-      count,
-    }));
-
-    // Check-ins by hour.
-    const checkIns = await this.prisma.eventCheckIn.findMany({
-      where: { eventId: id },
-      select: { checkedInAt: true },
-    });
-
-    const hourMap = new Map<number, number>();
-    for (const c of checkIns) {
-      const hour = c.checkedInAt.getHours();
-      hourMap.set(hour, (hourMap.get(hour) ?? 0) + 1);
-    }
-    const checkInsByHour = Array.from(hourMap.entries())
-      .sort(([a], [b]) => a - b)
-      .map(([hour, count]) => ({ hour, count }));
-
-    const totalJoiners = event.participantCount;
-    const checkedInCount = event.checkedInCount;
-    const attendanceRate =
-      totalJoiners > 0 ? Math.round((checkedInCount / totalJoiners) * 100) : 0;
-
-    return {
-      totalJoiners,
-      checkedInCount,
-      attendanceRate,
-      joinersOverTime,
-      checkInsByHour,
-    };
   }
 }

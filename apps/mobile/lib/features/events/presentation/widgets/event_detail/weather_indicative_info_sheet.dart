@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -28,8 +27,7 @@ Future<void> showWeatherIndicativeInfoSheet(BuildContext context) {
         ),
         child: Text(
           ctx.l10n.eventsWeatherIndicativeNote,
-          style: AppTypography.textTheme.bodyMedium?.copyWith(
-            color: AppColors.textMuted,
+          style: AppTypography.eventsBodyMuted(Theme.of(ctx).textTheme).copyWith(
             height: 1.45,
           ),
         ),

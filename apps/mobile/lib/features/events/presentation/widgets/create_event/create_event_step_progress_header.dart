@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 /// Pinned sliver header: step label + progress for the create-event flow.
 class CreateEventStepProgressDelegate extends SliverPersistentHeaderDelegate {
@@ -41,10 +42,9 @@ class CreateEventStepProgressDelegate extends SliverPersistentHeaderDelegate {
             children: <Widget>[
               Text(
                 context.l10n.createEventStepProgress(steps),
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                      fontSize: 13,
-                    ),
+                style: AppTypography.eventsListCardMeta(
+                  Theme.of(context).textTheme,
+                ),
               ),
               const SizedBox(width: AppSpacing.sm),
               Expanded(

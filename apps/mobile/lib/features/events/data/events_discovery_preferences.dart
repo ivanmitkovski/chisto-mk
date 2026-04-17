@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// PRIVACY: Stores user search history in SharedPreferences. Must be cleared on logout.
 class EventsDiscoveryPreferences {
   const EventsDiscoveryPreferences();
 
   static const String _recentSearchesKey = 'events_discovery_recent_searches_v1';
   static const String _pinnedFiltersKey = 'events_discovery_pinned_filters_v1';
+  static const String _calendarViewPreferredKey =
+      'events_discovery_calendar_view_preferred_v1';
   static const int _maxRecentSearches = 8;
 
   Future<List<String>> readRecentSearches() async {
@@ -100,6 +103,17 @@ class EventsDiscoveryPreferences {
         .toSet()
         .toList(growable: false);
     await prefs.setString(_pinnedFiltersKey, jsonEncode(names));
+  }
+
+  /// Whether the events feed should open in calendar mode (default: list).
+  Future<bool> readCalendarViewPreferred() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_calendarViewPreferredKey) ?? false;
+  }
+
+  Future<void> writeCalendarViewPreferred(bool value) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_calendarViewPreferredKey, value);
   }
 
   EcoEventFilter? _filterFromName(String name) {

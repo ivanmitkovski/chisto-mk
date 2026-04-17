@@ -5,6 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
+import 'package:timezone/timezone.dart' as tz;
 import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
 
 @pragma('vm:entry-point')
@@ -19,6 +21,9 @@ class PushNotificationService {
   final NotificationsRepository _repository;
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
+  bool _localNotificationsInitialized = false;
+  bool _timezoneInitialized = false;
+  static const String _organizerEndSoonChannelId = 'chisto_organizer_cleanup_ending_soon';
   bool _initialized = false;
   bool _firebaseReady = false;
   String? _lastInitReason;
@@ -61,6 +66,9 @@ class PushNotificationService {
   }
 
   Future<void> _initLocalNotifications() async {
+    if (_localNotificationsInitialized) {
+      return;
+    }
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'chisto_default',
       'Chisto Notifications',
@@ -100,6 +108,93 @@ class PushNotificationService {
         debugPrint('[Push] Local notification tapped: ${response.payload}');
       },
     );
+    _localNotificationsInitialized = true;
+  }
+
+  Future<void> _ensureTimezoneInitialized() async {
+    if (_timezoneInitialized) {
+      return;
+    }
+    tzdata.initializeTimeZones();
+    _timezoneInitialized = true;
+  }
+
+  int _organizerEndSoonNotificationId(String eventId) {
+    final String hex = eventId.replaceAll('-', '');
+    if (hex.length >= 8) {
+      return int.parse(hex.substring(0, 8), radix: 16);
+    }
+    return eventId.hashCode & 0x3fffffff;
+  }
+
+  Future<void> scheduleOrganizerCleanupEndingSoon({
+    required String eventId,
+    required DateTime fireAtUtc,
+    required String title,
+    required String body,
+    required String channelName,
+    required String channelDescription,
+  }) async {
+    try {
+      await _initLocalNotifications();
+      await _ensureTimezoneInitialized();
+      final DateTime utcNow = DateTime.now().toUtc();
+      if (!fireAtUtc.toUtc().isAfter(utcNow.add(const Duration(seconds: 2)))) {
+        return;
+      }
+      if (Platform.isAndroid) {
+        final AndroidFlutterLocalNotificationsPlugin? android =
+            _localNotifications.resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin>();
+        await android?.createNotificationChannel(
+          AndroidNotificationChannel(
+            _organizerEndSoonChannelId,
+            channelName,
+            description: channelDescription,
+            importance: Importance.defaultImportance,
+          ),
+        );
+      }
+      final int id = _organizerEndSoonNotificationId(eventId);
+      final tz.TZDateTime scheduled =
+          tz.TZDateTime.from(fireAtUtc.toUtc(), tz.UTC);
+      await _localNotifications.zonedSchedule(
+        id,
+        title,
+        body,
+        scheduled,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            _organizerEndSoonChannelId,
+            channelName,
+            channelDescription: channelDescription,
+            importance: Importance.defaultImportance,
+            priority: Priority.defaultPriority,
+          ),
+          iOS: const DarwinNotificationDetails(
+            presentAlert: true,
+            presentBadge: true,
+            presentSound: true,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation:
+            UILocalNotificationDateInterpretation.absoluteTime,
+        payload: eventId,
+      );
+    } on Object catch (e) {
+      debugPrint('[Push] Organizer end-soon schedule failed: $e');
+    }
+  }
+
+  Future<void> cancelOrganizerCleanupEndingSoon(String eventId) async {
+    try {
+      await _initLocalNotifications();
+      final int id = _organizerEndSoonNotificationId(eventId);
+      await _localNotifications.cancel(id);
+    } on Object catch (e) {
+      debugPrint('[Push] Organizer end-soon cancel failed: $e');
+    }
   }
 
   Future<void> _requestPermission() async {

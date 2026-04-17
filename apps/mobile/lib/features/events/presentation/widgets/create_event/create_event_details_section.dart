@@ -8,6 +8,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_form_picker_tile.dart';
 
 class CreateEventDetailsSection extends StatelessWidget {
   const CreateEventDetailsSection({
@@ -65,7 +66,7 @@ class CreateEventDetailsSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         KeyedSubtree(
           key: categorySectionKey,
-          child: _CreateEventPickerTile(
+          child: EventFormPickerTile(
             label: context.l10n.createEventFieldType,
             value: selectedCategory?.localizedLabel(context.l10n),
             icon: selectedCategory?.icon,
@@ -76,7 +77,7 @@ class CreateEventDetailsSection extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        _CreateEventPickerTile(
+        EventFormPickerTile(
           key: const ValueKey<String>('create_event_volunteer_cap'),
           label: context.l10n.createEventFieldVolunteerCap,
           value: maxParticipants == null
@@ -87,7 +88,7 @@ class CreateEventDetailsSection extends StatelessWidget {
           onTap: onVolunteerCapTap,
         ),
         const SizedBox(height: AppSpacing.md),
-        _CreateEventPickerTile(
+        EventFormPickerTile(
           label: context.l10n.createEventFieldTeamSize,
           value: selectedScale?.localizedLabel(context.l10n),
           icon: Icons.groups_rounded,
@@ -95,7 +96,7 @@ class CreateEventDetailsSection extends StatelessWidget {
           onTap: onScaleTap,
         ),
         const SizedBox(height: AppSpacing.md),
-        _CreateEventPickerTile(
+        EventFormPickerTile(
           label: context.l10n.createEventFieldDifficulty,
           value: selectedDifficulty?.localizedLabel(context.l10n),
           icon: CupertinoIcons.shield,
@@ -104,10 +105,7 @@ class CreateEventDetailsSection extends StatelessWidget {
           onTap: onDifficultyTap,
         ),
         const SizedBox(height: AppSpacing.md),
-        _CreateEventGearTile(
-          selectedGear: selectedGear,
-          onTap: onGearTap,
-        ),
+        EventFormGearSummaryTile(selectedGear: selectedGear, onTap: onGearTap),
         const SizedBox(height: AppSpacing.lg),
         _CreateEventDescriptionField(
           controller: descriptionController,
@@ -139,9 +137,7 @@ class _CreateEventTitleField extends StatelessWidget {
       children: <Widget>[
         Text(
           context.l10n.createEventTitleLabel,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: AppTypography.eventsFormLeadHeading(Theme.of(context).textTheme),
         ),
         const SizedBox(height: AppSpacing.sm),
         TextField(
@@ -165,23 +161,22 @@ class _CreateEventTitleField extends StatelessWidget {
                   label: label,
                   child: Text(
                     label,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: currentLength >= max * 0.9
-                              ? AppColors.accentDanger
-                              : AppColors.textMuted,
-                          fontSize: 12,
-                        ),
+                    style: AppTypography.eventsListCardMeta(
+                      Theme.of(context).textTheme,
+                    ).copyWith(
+                      color: currentLength >= max * 0.9
+                          ? AppColors.accentDanger
+                          : AppColors.textMuted,
+                    ),
                   ),
                 );
               },
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textPrimary,
-              ),
+          style: AppTypography.eventsSearchFieldText(Theme.of(context).textTheme),
           decoration: InputDecoration(
             hintText: context.l10n.createEventTitleHint,
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            hintStyle: AppTypography.eventsSearchFieldPlaceholder(
+              Theme.of(context).textTheme,
+            ),
             filled: true,
             fillColor: titleError
                 ? AppColors.accentDanger.withValues(alpha: 0.04)
@@ -222,230 +217,12 @@ class _CreateEventTitleField extends StatelessWidget {
               trimmed.isEmpty
                   ? context.l10n.createEventTitleRequired
                   : context.l10n.createEventTitleMinLength,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: AppTypography.eventsCaptionStrong(
+                Theme.of(context).textTheme,
+                color: AppColors.accentDanger,
+              ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),
-      ],
-    );
-  }
-}
-
-class _CreateEventPickerTile extends StatelessWidget {
-  const _CreateEventPickerTile({
-    super.key,
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.placeholder,
-    required this.onTap,
-    this.trailingDot,
-    this.hasError = false,
-    this.errorText,
-  });
-
-  final String label;
-  final String? value;
-  final IconData? icon;
-  final String placeholder;
-  final VoidCallback onTap;
-  final Color? trailingDot;
-  final bool hasError;
-  final String? errorText;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasValue = value != null;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Semantics(
-          button: true,
-          label: label,
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 14,
-              ),
-              decoration: BoxDecoration(
-                color: hasError
-                    ? AppColors.accentDanger.withValues(alpha: 0.04)
-                    : AppColors.panelBackground,
-                borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                border: Border.all(
-                  color: hasError
-                      ? AppColors.accentDanger
-                      : (hasValue
-                          ? AppColors.primary.withValues(alpha: 0.3)
-                          : AppColors.divider),
-                ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  if (icon != null && hasValue) ...<Widget>[
-                    Icon(icon, size: 18, color: AppColors.primaryDark),
-                    const SizedBox(width: 10),
-                  ],
-                  Expanded(
-                    child: Text(
-                      hasValue ? value! : placeholder,
-                      style: AppTypography.eventsFormFieldValue(
-                        Theme.of(context).textTheme,
-                        hasValue: hasValue,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  if (trailingDot != null && hasValue) ...<Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: trailingDot,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                  ],
-                  const Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 18,
-                    color: AppColors.textMuted,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (hasError && errorText != null)
-          Padding(
-            padding: const EdgeInsets.only(top: AppSpacing.xs),
-            child: Text(
-              errorText!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-          ),
-      ],
-    );
-  }
-}
-
-class _CreateEventGearTile extends StatelessWidget {
-  const _CreateEventGearTile({
-    required this.selectedGear,
-    required this.onTap,
-  });
-
-  final Set<EventGear> selectedGear;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool hasGear = selectedGear.isNotEmpty;
-    final String summary = hasGear
-        ? selectedGear.map((EventGear g) => g.localizedLabel(context.l10n)).join(', ')
-        : context.l10n.createEventGearPlaceholderQuestion;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text(
-          context.l10n.createEventGearLabel,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Semantics(
-          button: true,
-          label: context.l10n.createEventSelectGearSemantic,
-          child: GestureDetector(
-            onTap: onTap,
-            child: Container(
-              width: double.infinity,
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 14,
-              ),
-              decoration: BoxDecoration(
-                color: AppColors.panelBackground,
-                borderRadius: BorderRadius.circular(AppSpacing.radius14),
-                border: Border.all(
-                  color: hasGear
-                      ? AppColors.primary.withValues(alpha: 0.3)
-                      : AppColors.divider,
-                ),
-              ),
-              child: Row(
-                children: <Widget>[
-                  if (hasGear) ...<Widget>[
-                    const Icon(
-                      CupertinoIcons.bag_fill,
-                      size: 18,
-                      color: AppColors.primaryDark,
-                    ),
-                    const SizedBox(width: 10),
-                  ],
-                  Expanded(
-                    child: Text(
-                      summary,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTypography.eventsFormFieldValue(
-                        Theme.of(context).textTheme,
-                        hasValue: hasGear,
-                      ),
-                    ),
-                  ),
-                  if (hasGear) ...<Widget>[
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 2,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radius10,
-                        ),
-                      ),
-                      child: Text(
-                        '${selectedGear.length}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontWeight: FontWeight.w700,
-                              color: AppColors.primaryDark,
-                            ),
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                  ],
-                  const Icon(
-                    CupertinoIcons.chevron_down,
-                    size: 18,
-                    color: AppColors.textMuted,
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -467,16 +244,12 @@ class _CreateEventDescriptionField extends StatelessWidget {
       children: <Widget>[
         Text(
           context.l10n.createEventDescriptionLabel,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: AppTypography.eventsFormLeadHeading(Theme.of(context).textTheme),
         ),
         const SizedBox(height: AppSpacing.xxs),
         Text(
           context.l10n.createEventDescriptionSubtitle,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
-              ),
+          style: AppTypography.eventsListCardMeta(Theme.of(context).textTheme),
         ),
         const SizedBox(height: AppSpacing.sm),
         TextField(
@@ -487,19 +260,17 @@ class _CreateEventDescriptionField extends StatelessWidget {
           textCapitalization: TextCapitalization.sentences,
           keyboardType: TextInputType.multiline,
           onChanged: onChanged,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textPrimary,
-              ),
+          style: AppTypography.eventsSearchFieldText(Theme.of(context).textTheme),
           decoration: InputDecoration(
             hintText: context.l10n.createEventDescriptionHint,
-            hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            hintStyle: AppTypography.eventsSearchFieldPlaceholder(
+              Theme.of(context).textTheme,
+            ),
             filled: true,
             fillColor: AppColors.panelBackground,
-            counterStyle: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            counterStyle: AppTypography.eventsListCardMeta(
+              Theme.of(context).textTheme,
+            ),
             contentPadding: const EdgeInsets.all(AppSpacing.md),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(AppSpacing.radius14),

@@ -1,7 +1,9 @@
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/edit_event_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/hero_image_bar.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail_skeleton.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/title_section.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
@@ -55,7 +57,9 @@ void main() {
       siteLat: siteLat,
       siteLng: siteLng,
       organizerId: organizerId,
-      organizerName: organizerId == 'current_user' ? 'You' : 'Another organizer',
+      organizerName: organizerId == 'current_user'
+          ? 'You'
+          : 'Another organizer',
       date: DateTime.now().add(const Duration(days: 1)),
       startTime: const EventTime(hour: 10, minute: 0),
       endTime: const EventTime(hour: 12, minute: 0),
@@ -74,30 +78,31 @@ void main() {
     );
   }
 
-  testWidgets('joined attendee sees reminder action and leave secondary action', (
-    WidgetTester tester,
-  ) async {
-    final EcoEvent event = buildEvent(
-      id: 'evt-detail-joined',
-      status: EcoEventStatus.upcoming,
-      isJoined: true,
-      organizerId: 'someone_else',
-    );
-    await store.create(event);
+  testWidgets(
+    'joined attendee sees reminder action and leave secondary action',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-detail-joined',
+        status: EcoEventStatus.upcoming,
+        isJoined: true,
+        organizerId: 'someone_else',
+      );
+      await store.create(event);
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
-      ),
-    );
-    await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    expect(find.text('Set reminder'), findsOneWidget);
-    expect(find.text('Leave event'), findsOneWidget);
-  });
+      expect(find.text('Set reminder'), findsOneWidget);
+      expect(find.text('Leave event'), findsOneWidget);
+    },
+  );
 
   testWidgets('in-progress attendee sees scan to check in action', (
     WidgetTester tester,
@@ -269,7 +274,10 @@ void main() {
             size: Size(400, 800),
             disableAnimations: true,
           ),
-          child: EventDetailScreen(eventsRepository: store, eventId: 'does-not-exist'),
+          child: EventDetailScreen(
+            eventsRepository: store,
+            eventId: 'does-not-exist',
+          ),
         ),
       ),
     );
@@ -327,6 +335,76 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Retry'), findsOneWidget);
+
+    store.simulateDetailPrefetchFailureOnForce = false;
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsNothing);
+  });
+
+  testWidgets('organizer opens edit event sheet from hero edit control', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-organizer-edit',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'current_user',
+      moderationApproved: true,
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(kEventDetailHeroEditKey));
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(EditEventSheet), findsOneWidget);
+  });
+
+  testWidgets('pull to refresh clears stale banner when prefetch succeeds', (
+    WidgetTester tester,
+  ) async {
+    store.simulateDetailPrefetchFailureOnForce = true;
+    final EcoEvent event = buildEvent(
+      id: 'evt-pull-refresh-stale',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsOneWidget);
+
+    store.simulateDetailPrefetchFailureOnForce = false;
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 320));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Retry'), findsNothing);
   });
 
   testWidgets('detail renders at increased text scale without throwing', (
@@ -383,6 +461,57 @@ void main() {
 
     expect(find.text('Upload after photos'), findsOneWidget);
   });
+
+  testWidgets(
+    'organizer on completed event sees trash bags collected section',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-completed-bags-ui',
+        status: EcoEventStatus.completed,
+        isJoined: true,
+        organizerId: 'current_user',
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trash bags collected'), findsOneWidget);
+      expect(find.text('Save bag count'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'completed non-organizer does not see organizer trash bags section',
+    (WidgetTester tester) async {
+      final EcoEvent event = buildEvent(
+        id: 'evt-completed-attendee-bags',
+        status: EcoEventStatus.completed,
+        isJoined: true,
+        organizerId: 'someone_else',
+      );
+      await store.create(event);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Trash bags collected'), findsNothing);
+    },
+  );
 
   testWidgets('detail renders when MediaQuery disableAnimations is true', (
     WidgetTester tester,

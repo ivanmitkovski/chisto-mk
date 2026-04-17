@@ -7,6 +7,8 @@ import 'package:chisto_mobile/l10n/app_localizations_en.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'recording_events_repository.dart';
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -53,5 +55,83 @@ void main() {
     await Future<void>.delayed(Duration.zero);
     expect(c.filteredEvents(l10n), isEmpty);
     expect(c.heroEvent, heroAll);
+  });
+
+  test('applySearchSuggestion syncs server params via refreshEvents', () async {
+    final RecordingEventsRepository repo = RecordingEventsRepository();
+    final EventsFeedController c = EventsFeedController(repository: repo);
+    addTearDown(c.dispose);
+
+    await c.applySearchSuggestion('  river cleanup  ');
+
+    expect(repo.refreshCallCount, greaterThan(0));
+    expect(repo.lastRefreshParams?.query, 'river cleanup');
+    expect(c.searchQuery, 'river cleanup');
+    expect(c.activeSearchParams.query, 'river cleanup');
+  });
+
+  test('userPullRefresh returns false when refresh fails', () async {
+    final RecordingEventsRepository repo = RecordingEventsRepository();
+    repo.refreshShouldThrow = true;
+    final EventsFeedController c = EventsFeedController(repository: repo);
+    addTearDown(c.dispose);
+
+    final bool ok = await c.userPullRefresh();
+
+    expect(ok, isFalse);
+    expect(repo.refreshCallCount, 1);
+  });
+
+  test('resetAllDiscoveryFilters clears all state and refreshes', () async {
+    final RecordingEventsRepository repo = RecordingEventsRepository();
+    final EventsFeedController c = EventsFeedController(repository: repo);
+    addTearDown(c.dispose);
+
+    await c.setActiveFilter(EcoEventFilter.nearby);
+    await c.applySearchSuggestion('test');
+    final int countBefore = repo.refreshCallCount;
+
+    await c.resetAllDiscoveryFilters();
+
+    expect(c.activeFilter, EcoEventFilter.all);
+    expect(c.searchQuery, isEmpty);
+    expect(c.activeSearchParams.query, isNull);
+    expect(repo.refreshCallCount, greaterThan(countBefore));
+  });
+
+  test('setCalendarView toggles and memoization resets', () async {
+    final EventsFeedController c = EventsFeedController(repository: store);
+    addTearDown(c.dispose);
+
+    expect(c.calendarView, isFalse);
+    c.setCalendarView(true);
+    expect(c.calendarView, isTrue);
+    c.setCalendarView(true);
+    expect(c.calendarView, isTrue);
+    c.setCalendarView(false);
+    expect(c.calendarView, isFalse);
+  });
+
+  test('feedPhase returns loading, error, content correctly', () async {
+    final RecordingEventsRepository repo = RecordingEventsRepository();
+    final EventsFeedController c = EventsFeedController(repository: repo);
+    addTearDown(c.dispose);
+
+    expect(c.feedPhase(), 'loading');
+
+    await c.loadInitial(initialListEmptyErrorMessage: 'fail');
+    expect(c.feedPhase(), 'content');
+  });
+
+  test('hasActiveFilters detects active state', () async {
+    final RecordingEventsRepository repo = RecordingEventsRepository();
+    final EventsFeedController c = EventsFeedController(repository: repo);
+    addTearDown(c.dispose);
+
+    expect(c.hasActiveFilters, isFalse);
+    await c.setActiveFilter(EcoEventFilter.nearby);
+    expect(c.hasActiveFilters, isTrue);
+    await c.resetAllDiscoveryFilters();
+    expect(c.hasActiveFilters, isFalse);
   });
 }

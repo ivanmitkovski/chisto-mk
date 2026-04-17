@@ -40,10 +40,13 @@ function resolveChatWsCorsOrigin(): boolean | string | string[] {
 export class EventChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  private static readonly WS_TYPING_MIN_INTERVAL_MS = 2500;
+
   @WebSocketServer()
   server!: Server;
 
   private readonly logger = new Logger(EventChatGateway.name);
+  private readonly lastWsTypingEmitAt = new Map<string, number>();
 
   constructor(
     private readonly config: ConfigService,
@@ -198,6 +201,17 @@ export class EventChatGateway
     }
     const room = `event:${eventId}`;
     const typing = o.typing === true;
+    const throttleKey = `${socketData.userId}:${eventId}`;
+    const now = Date.now();
+    if (typing) {
+      const last = this.lastWsTypingEmitAt.get(throttleKey) ?? 0;
+      if (now - last < EventChatGateway.WS_TYPING_MIN_INTERVAL_MS) {
+        return;
+      }
+      this.lastWsTypingEmitAt.set(throttleKey, now);
+    } else {
+      this.lastWsTypingEmitAt.delete(throttleKey);
+    }
     client.to(room).emit('typing:update', {
       eventId,
       userId: socketData.userId,

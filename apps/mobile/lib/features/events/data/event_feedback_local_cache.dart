@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// PRIVACY: Stores user-authored feedback notes in SharedPreferences. Must be cleared on logout.
 class EventFeedbackSnapshot {
   const EventFeedbackSnapshot({
     required this.eventId,

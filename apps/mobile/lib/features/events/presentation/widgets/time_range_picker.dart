@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class TimeRangePicker extends StatelessWidget {
@@ -15,6 +16,11 @@ class TimeRangePicker extends StatelessWidget {
     required this.onStartChanged,
     required this.onEndChanged,
     this.hasError = false,
+    /// Shell date `2000-01-01` + time; passed to [CupertinoDatePicker.minimumDate].
+    this.minimumStartPickerTime,
+    this.maximumStartPickerTime,
+    this.minimumEndPickerTime,
+    this.maximumEndPickerTime,
   });
 
   final TimeOfDay startTime;
@@ -22,17 +28,47 @@ class TimeRangePicker extends StatelessWidget {
   final ValueChanged<TimeOfDay> onStartChanged;
   final ValueChanged<TimeOfDay> onEndChanged;
   final bool hasError;
+  final DateTime? minimumStartPickerTime;
+  final DateTime? maximumStartPickerTime;
+  final DateTime? minimumEndPickerTime;
+  final DateTime? maximumEndPickerTime;
 
   String _formatTime(TimeOfDay t) =>
       '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  DateTime _shellFromTimeOfDay(TimeOfDay t) =>
+      DateTime(2000, 1, 1, t.hour, t.minute);
+
+  TimeOfDay _clampInitialTimeOfDay(
+    TimeOfDay initial, {
+    DateTime? minimumDate,
+    DateTime? maximumDate,
+  }) {
+    DateTime dt = _shellFromTimeOfDay(initial);
+    if (minimumDate != null && dt.isBefore(minimumDate)) {
+      dt = minimumDate;
+    }
+    if (maximumDate != null && dt.isAfter(maximumDate)) {
+      dt = maximumDate;
+    }
+    return TimeOfDay(hour: dt.hour, minute: dt.minute);
+  }
 
   Future<void> _pickTime(
     BuildContext context, {
     required TimeOfDay initial,
     required ValueChanged<TimeOfDay> onChanged,
+    DateTime? minimumDate,
+    DateTime? maximumDate,
   }) async {
     AppHaptics.tap();
-    TimeOfDay picked = initial;
+    final TimeOfDay clampedInitial = _clampInitialTimeOfDay(
+      initial,
+      minimumDate: minimumDate,
+      maximumDate: maximumDate,
+    );
+    TimeOfDay picked = clampedInitial;
+    final DateTime initialDateTime = _shellFromTimeOfDay(clampedInitial);
 
     await showModalBottomSheet<void>(
       context: context,
@@ -60,9 +96,9 @@ class TimeRangePicker extends StatelessWidget {
                   child: CupertinoDatePicker(
                     mode: CupertinoDatePickerMode.time,
                     use24hFormat: true,
-                    initialDateTime: DateTime(
-                      2000, 1, 1, initial.hour, initial.minute,
-                    ),
+                    initialDateTime: initialDateTime,
+                    minimumDate: minimumDate,
+                    maximumDate: maximumDate,
                     onDateTimeChanged: (DateTime dt) {
                       picked = TimeOfDay(hour: dt.hour, minute: dt.minute);
                     },
@@ -91,9 +127,9 @@ class TimeRangePicker extends StatelessWidget {
                       ),
                       child: Text(
                         ctx.l10n.eventsTimePickerConfirm,
-                        style: Theme.of(ctx).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
+                        style: AppTypography.eventsFormLeadHeading(
+                          Theme.of(ctx).textTheme,
+                        ),
                       ),
                     ),
                   ),
@@ -115,7 +151,7 @@ class TimeRangePicker extends StatelessWidget {
       children: <Widget>[
         Text(
           context.l10n.eventsTimePickerSelectTime,
-          style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+          style: AppTypography.eventsFormLeadHeading(textTheme),
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
@@ -153,6 +189,8 @@ class TimeRangePicker extends StatelessWidget {
                   context,
                   initial: startTime,
                   onChanged: onStartChanged,
+                  minimumDate: minimumStartPickerTime,
+                  maximumDate: maximumStartPickerTime,
                 ),
               ),
               Padding(
@@ -174,6 +212,8 @@ class TimeRangePicker extends StatelessWidget {
                   context,
                   initial: endTime,
                   onChanged: onEndChanged,
+                  minimumDate: minimumEndPickerTime,
+                  maximumDate: maximumEndPickerTime,
                 ),
               ),
             ],
@@ -214,20 +254,19 @@ class _TimeBlock extends StatelessWidget {
             children: <Widget>[
               Text(
                 label,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 13,
-                    ),
+                style: AppTypography.eventsCaptionStrong(
+                  Theme.of(context).textTheme,
+                  color: AppColors.primary,
+                ).copyWith(fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: AppSpacing.xxs),
               AnimatedDefaultTextStyle(
-                duration: AppMotion.fast,
-                style: Theme.of(context).textTheme.headlineLarge!.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
-                    ),
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : AppMotion.fast,
+                style: AppTypography.eventsTimePickerClockValue(
+                  Theme.of(context).textTheme,
+                ),
                 child: Text(value),
               ),
             ],

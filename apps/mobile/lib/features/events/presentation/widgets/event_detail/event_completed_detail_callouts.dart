@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 
@@ -32,10 +33,9 @@ class EventCompletedDetailCallouts extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             context.l10n.eventsAfterPhotosOrganizerEmptyHint,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                  height: 1.35,
-                ),
+            style: AppTypography.eventsSupportingCaption(
+              Theme.of(context).textTheme,
+            ),
           ),
         ],
       );
@@ -55,17 +55,16 @@ class EventCompletedDetailCallouts extends StatelessWidget {
           children: <Widget>[
             Text(
               context.l10n.eventsAttendeeCompletedTitle,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: AppTypography.eventsSheetTitle(
+                Theme.of(context).textTheme,
+              ),
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               context.l10n.eventsAttendeeCompletedBody,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                    height: 1.35,
-                  ),
+              style: AppTypography.eventsBodyMuted(
+                Theme.of(context).textTheme,
+              ),
             ),
           ],
         ),

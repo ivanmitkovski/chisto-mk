@@ -13,8 +13,10 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/voice_recording_meter.dart';
@@ -34,6 +36,7 @@ class ChatInputBar extends StatefulWidget {
     this.onSendImages,
     this.onSendVoice,
     this.onShareLocation,
+    this.attachmentsNeedNetwork = false,
   });
 
   final Future<void> Function(String text) onSend;
@@ -47,6 +50,8 @@ class ChatInputBar extends StatefulWidget {
   /// When set, releasing the mic opens a review row (X / Send) instead of sending immediately.
   final Future<void> Function(XFile file, Duration recordedLength)? onSendVoice;
   final VoidCallback? onShareLocation;
+  /// When true, blocks attachment / voice flows that require upload (text-only offline queue remains available).
+  final bool attachmentsNeedNetwork;
 
   @override
   State<ChatInputBar> createState() => _ChatInputBarState();
@@ -160,7 +165,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                           clipBehavior: Clip.none,
                           children: <Widget>[
                             ...previous,
-                            if (current != null) current,
+                            ?current,
                           ],
                         );
                       },
@@ -193,13 +198,20 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                     children: <Widget>[
                       if (widget.editingMessage == null && widget.onSendImages != null) ...<Widget>[
                         GestureDetector(
-                          onTap: _showAttachmentMenu,
+                          onTap: () {
+                            if (_mediaBlockedByNetwork()) {
+                              return;
+                            }
+                            _showAttachmentMenu();
+                          },
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 10, right: AppSpacing.xs),
                             child: Icon(
                               CupertinoIcons.plus_circle_fill,
                               size: 28,
-                              color: AppColors.primary.withValues(alpha: 0.75),
+                              color: AppColors.primary.withValues(
+                                alpha: widget.attachmentsNeedNetwork ? 0.35 : 0.75,
+                              ),
                             ),
                           ),
                         ),
@@ -270,13 +282,14 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                       padding: const EdgeInsets.only(top: AppSpacing.xxs, left: AppSpacing.md),
                       child: Text(
                         context.l10n.eventChatCharCountHint(len),
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: dangerLimit
-                                  ? AppColors.accentDanger
-                                  : nearLimit
-                                      ? AppColors.accentWarning
-                                      : AppColors.textMuted,
-                            ),
+                        style: AppTypography.eventsCaptionStrong(
+                          Theme.of(context).textTheme,
+                          color: dangerLimit
+                              ? AppColors.accentDanger
+                              : nearLimit
+                                  ? AppColors.accentWarning
+                                  : AppColors.textMuted,
+                        ),
                       ),
                     ),
                 ],
@@ -348,19 +361,15 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.primary,
-                        ),
+                    style: AppTypography.eventsSheetTextLink(Theme.of(context).textTheme)
+                        .copyWith(color: AppColors.primary),
                   ),
                   if (previewLine.isNotEmpty)
                     Text(
                       previewLine,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
+                      style: AppTypography.eventsCalloutSubtitle(Theme.of(context).textTheme),
                     ),
                 ],
               ),
@@ -420,14 +429,12 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
               children: <Widget>[
                 Text(
                   context.l10n.eventChatVoicePreviewHint,
-                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
+                  style: AppTypography.eventsTextLinkEmphasis(Theme.of(context).textTheme)
+                      .copyWith(color: AppColors.primary),
                 ),
                 Text(
                   _formatVoiceDuration(_voiceReviewLength),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.eventsGridPropertyValue(Theme.of(context).textTheme),
                 ),
               ],
             ),
@@ -525,7 +532,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     final double borderWidth = _voiceCancelled ? 2 : (cancelT > 0.06 ? 1 + cancelT * 0.6 : 0);
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 180),
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
         color: bgColor,
@@ -603,28 +612,28 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                                 _voiceCancelled
                                     ? context.l10n.eventChatReleaseToCancel
                                     : context.l10n.eventChatRecording,
-                                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                                      color: _voiceCancelled ? danger : AppColors.textPrimary,
-                                      fontWeight: FontWeight.w700,
-                                      letterSpacing: -0.2,
-                                    ),
+                                style: AppTypography.eventsCaptionStrong(
+                                  Theme.of(context).textTheme,
+                                  color: _voiceCancelled ? danger : AppColors.textPrimary,
+                                ).copyWith(
+                                  fontSize: Theme.of(context).textTheme.labelLarge?.fontSize,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: -0.2,
+                                ),
                               ),
                               if (!_voiceCancelled)
                                 Text(
                                   context.l10n.eventChatSlideToCancel,
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                        color: AppColors.textMuted,
-                                        height: 1.25,
-                                      ),
+                                  style: AppTypography.eventsChatSystemLine(Theme.of(context).textTheme)
+                                      .copyWith(height: 1.25),
                                 )
                               else
                                 Text(
                                   context.l10n.eventChatVoiceDiscard,
-                                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                        color: danger.withValues(alpha: 0.88),
-                                        height: 1.25,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  style: AppTypography.eventsCaptionStrong(
+                                    Theme.of(context).textTheme,
+                                    color: danger.withValues(alpha: 0.88),
+                                  ).copyWith(height: 1.25),
                                 ),
                             ],
                           ),
@@ -636,7 +645,7 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   _voiceRecordingDurationLabel(),
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  style: AppTypography.eventsListCardTitle(Theme.of(context).textTheme).copyWith(
                         fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
                         fontWeight: FontWeight.w700,
                         color: _voiceCancelled ? danger : AppColors.textPrimary,
@@ -790,7 +799,21 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     _voicePressHeld = false;
   }
 
+  bool _mediaBlockedByNetwork() {
+    if (!widget.attachmentsNeedNetwork) {
+      return false;
+    }
+    if (!mounted) {
+      return true;
+    }
+    AppSnack.show(context, message: context.l10n.eventChatAttachmentsNeedNetwork);
+    return true;
+  }
+
   void _onVoiceLongPressStart(LongPressStartDetails details) {
+    if (_mediaBlockedByNetwork()) {
+      return;
+    }
     if (!_voiceAttachAvailable || _sending || _voiceReviewFile != null) {
       return;
     }
@@ -1027,6 +1050,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
   }
 
   void _showAttachmentMenu() {
+    if (_mediaBlockedByNetwork()) {
+      return;
+    }
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.panelBackground,
@@ -1095,7 +1121,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       if (widget.onSendImages != null) {
         await widget.onSendImages!(<XFile>[video]);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_pick_video_failed');
+    }
   }
 
   Future<void> _pickDocument() async {
@@ -1111,7 +1139,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       if (widget.onSendImages != null) {
         await widget.onSendImages!(<XFile>[XFile(pf.path!, name: pf.name)]);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_pick_document_failed');
+    }
   }
 
   Future<void> _pickAudio() async {
@@ -1127,7 +1157,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
       if (widget.onSendImages != null) {
         await widget.onSendImages!(<XFile>[XFile(pf.path!, name: pf.name)]);
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_pick_audio_failed');
+    }
   }
 
   Future<void> _pickImages(ImageSource source) async {
@@ -1145,7 +1177,9 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
           if (_stagedImages.length < 5) _stagedImages.add(photo);
         });
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_pick_images_failed');
+    }
   }
 
   Widget _buildThumbnailStrip() {
@@ -1160,7 +1194,8 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: _stagedImages.length,
-            separatorBuilder: (_, __) => const SizedBox(width: AppSpacing.xs),
+            separatorBuilder: (BuildContext _, int _) =>
+                const SizedBox(width: AppSpacing.xs),
             itemBuilder: (BuildContext context, int i) {
               return Stack(
                 clipBehavior: Clip.none,
@@ -1269,7 +1304,8 @@ class _AttachOptionRow extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
+                style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme)
+                    .copyWith(fontWeight: FontWeight.w500),
               ),
             ),
           ],

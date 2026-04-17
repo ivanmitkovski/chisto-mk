@@ -1,4 +1,4 @@
-export 'create_event_modal_sheet.dart';
+export 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 export 'create_event_async_site_picker.dart';
 export 'create_event_screen_skeleton.dart';
 export 'create_event_details_section.dart';

@@ -14,6 +14,14 @@ function chatEventVisibilityWhere(userId: string): Prisma.CleanupEventWhereInput
 
 /**
  * Shared organizer/participant check for REST ([`EventChatAccessGuard`]) and WebSocket room join/typing.
+ *
+ * **Authorization invariants**
+ * - Every chat mutation path used by clients must enforce access through this service (or equivalent
+ *   `assertCanAccessEventChat`) after authentication — never trust `eventId` from the body alone for authorization.
+ * - REST routes rely on [`EventChatAccessGuard`] (runs after JWT); the chat gateway calls the same primitive on
+ *   `join` and `typing` after deriving `userId` from the verified JWT — never from client-supplied user id fields.
+ * - `eventId` in URL params is the sole event scope for REST; WebSocket payloads must still supply `eventId` for
+ *   room targeting, but access is always re-checked server-side.
  */
 @Injectable()
 export class EventChatAccessService {

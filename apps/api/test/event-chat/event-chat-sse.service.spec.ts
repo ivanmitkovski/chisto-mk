@@ -1,6 +1,7 @@
 import { EventChatClusterConfig } from '../../src/event-chat/event-chat-cluster.config';
 import { EventChatGateway } from '../../src/event-chat/event-chat.gateway';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
+import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
 
 describe('EventChatSseService', () => {
   const originalRedis = process.env.REDIS_URL;
@@ -18,7 +19,8 @@ describe('EventChatSseService', () => {
     const gateway = { server: {}, emitToRoom: jest.fn() } as unknown as EventChatGateway;
     const cluster = new EventChatClusterConfig();
     cluster.setSocketIoClustered(true);
-    const svc = new EventChatSseService(gateway, cluster);
+    const telemetry = new EventChatTelemetryService();
+    const svc = new EventChatSseService(gateway, cluster, telemetry);
 
     const payload = JSON.stringify({
       streamEventId: 'se-1',
@@ -39,7 +41,8 @@ describe('EventChatSseService', () => {
     const gateway = { server: {}, emitToRoom: jest.fn() } as unknown as EventChatGateway;
     const cluster = new EventChatClusterConfig();
     cluster.setSocketIoClustered(false);
-    const svc = new EventChatSseService(gateway, cluster);
+    const telemetry = new EventChatTelemetryService();
+    const svc = new EventChatSseService(gateway, cluster, telemetry);
 
     const payload = JSON.stringify({
       streamEventId: 'se-2',

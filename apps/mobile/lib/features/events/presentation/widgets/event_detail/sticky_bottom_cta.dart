@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_detail_cta_presentation.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
@@ -21,6 +22,7 @@ class StickyBottomCTA extends StatelessWidget {
     required this.onManageCheckIn,
     required this.onOpenAttendeeCheckIn,
     required this.onOpenCleanupEvidence,
+    required this.onExtendCleanupEnd,
     this.isPrimaryLoading = false,
   });
 
@@ -31,6 +33,7 @@ class StickyBottomCTA extends StatelessWidget {
   final VoidCallback onManageCheckIn;
   final VoidCallback onOpenAttendeeCheckIn;
   final VoidCallback onOpenCleanupEvidence;
+  final VoidCallback onExtendCleanupEnd;
 
   /// Primary action is awaiting a network mutation (join, reminder, start, …).
   final bool isPrimaryLoading;
@@ -70,6 +73,7 @@ class StickyBottomCTA extends StatelessWidget {
           onManageCheckIn: onManageCheckIn,
           onOpenAttendeeCheckIn: onOpenAttendeeCheckIn,
           onOpenCleanupEvidence: onOpenCleanupEvidence,
+          onExtendCleanupEnd: onExtendCleanupEnd,
         ),
       ),
     );
@@ -107,6 +111,7 @@ class _CtaContent extends StatelessWidget {
     required this.onManageCheckIn,
     required this.onOpenAttendeeCheckIn,
     required this.onOpenCleanupEvidence,
+    required this.onExtendCleanupEnd,
   });
 
   final EcoEvent event;
@@ -117,6 +122,7 @@ class _CtaContent extends StatelessWidget {
   final VoidCallback onManageCheckIn;
   final VoidCallback onOpenAttendeeCheckIn;
   final VoidCallback onOpenCleanupEvidence;
+  final VoidCallback onExtendCleanupEnd;
 
   @override
   Widget build(BuildContext context) {
@@ -150,10 +156,9 @@ class _CtaContent extends StatelessWidget {
               ),
               child: Text(
                 state.secondaryLabel!,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: AppTypography.eventsSecondaryCtaLabel(
+                  Theme.of(context).textTheme,
+                ),
               ),
             ),
           ),
@@ -182,6 +187,9 @@ class _CtaContent extends StatelessWidget {
         EcoEventStatus.completed => onOpenCleanupEvidence,
         _ => null,
       };
+      if (presentation.secondaryIsExtendCleanupEnd) {
+        onSecondary = onExtendCleanupEnd;
+      }
     } else if (event.status == EcoEventStatus.inProgress && event.isJoined) {
       if (event.canOpenAttendeeCheckIn && !event.isCheckedIn) {
         onPrimary = onOpenAttendeeCheckIn;

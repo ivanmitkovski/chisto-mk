@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
@@ -35,7 +36,8 @@ class LocationChip extends StatelessWidget {
     );
     Navigator.of(context).push(
       CupertinoPageRoute<void>(
-        builder: (BuildContext context) => PollutionSiteDetailScreen(site: site),
+        builder: (BuildContext context) =>
+            PollutionSiteDetailScreen(site: site),
       ),
     );
   }
@@ -77,8 +79,9 @@ class LocationChip extends StatelessWidget {
                             showEventLocationDetailSheet(context, event: event),
                           );
                         },
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLg,
+                        ),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: <Widget>[
@@ -95,11 +98,10 @@ class LocationChip extends StatelessWidget {
                                 children: <Widget>[
                                   Text(
                                     event.siteName,
-                                    maxLines: 1,
+                                    maxLines: 2,
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodyMedium?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.textPrimary,
+                                    style: AppTypography.eventsGroupedRowPrimary(
+                                      textTheme,
                                     ),
                                   ),
                                   const SizedBox(height: AppSpacing.xxs),
@@ -109,9 +111,7 @@ class LocationChip extends StatelessWidget {
                                     ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
-                                    style: textTheme.bodySmall?.copyWith(
-                                      color: AppColors.textMuted,
-                                    ),
+                                    style: AppTypography.eventsListCardMeta(textTheme),
                                   ),
                                 ],
                               ),
@@ -161,8 +161,9 @@ class LocationChip extends StatelessWidget {
                       color: AppColors.transparent,
                       child: InkWell(
                         onTap: () => _openSite(context),
-                        borderRadius:
-                            BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusMd,
+                        ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.sm,
@@ -170,8 +171,9 @@ class LocationChip extends StatelessWidget {
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withValues(alpha: 0.06),
-                            borderRadius:
-                                BorderRadius.circular(AppSpacing.radiusMd),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusMd,
+                            ),
                             border: Border.all(
                               color: AppColors.primary.withValues(alpha: 0.15),
                             ),
@@ -189,10 +191,9 @@ class LocationChip extends StatelessWidget {
                                   event.siteName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    color: AppColors.primaryDark,
-                                  ),
+                                  style: AppTypography.eventsGroupedRowPrimary(
+                                    textTheme,
+                                  ).copyWith(color: AppColors.primaryDark),
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.xs),
@@ -200,9 +201,7 @@ class LocationChip extends StatelessWidget {
                                 context.l10n.eventsLocationDotKm(
                                   event.siteDistanceKm.toStringAsFixed(1),
                                 ),
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textMuted,
-                                ),
+                                style: AppTypography.eventsListCardMeta(textTheme),
                               ),
                               const SizedBox(width: AppSpacing.xxs),
                               const Icon(

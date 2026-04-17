@@ -2,11 +2,16 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
 import 'package:flutter/foundation.dart';
 
 abstract class EventsRepository implements Listenable {
   List<EcoEvent> get events;
+
+  /// Last time a list page fetch completed successfully ([refreshEvents] / [loadMore]).
+  /// Null when unknown (tests); used for optional tab-revisit refresh throttling.
+  DateTime? get lastSuccessfulListRefreshAt;
 
   /// Whether more pages can be loaded ([loadMore]). Always false for in-memory store.
   bool get hasMoreEvents;
@@ -51,6 +56,14 @@ abstract class EventsRepository implements Listenable {
 
   /// Organizer-only partial update (`PATCH /events/:id`).
   Future<EcoEvent> updateEventDetails(String eventId, EventUpdatePayload payload);
+
+  /// Read-only overlap check (`GET /events/check-conflict`). In-memory store returns no conflict.
+  Future<EventScheduleConflictPreview> checkScheduleConflict({
+    required String siteId,
+    required DateTime scheduledAt,
+    DateTime? endAt,
+    String? excludeEventId,
+  });
 
   Future<bool> updateStatus(String id, EcoEventStatus status);
 

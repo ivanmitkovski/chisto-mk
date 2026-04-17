@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
 
 class ImpactSummarySection extends StatelessWidget {
@@ -34,7 +35,7 @@ class ImpactSummarySection extends StatelessWidget {
             children: <Widget>[
               Text(
                 context.l10n.eventsImpactSummaryTitle,
-                style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                style: AppTypography.eventsPanelTitle(textTheme),
               ),
               const Spacer(),
               CupertinoButton(
@@ -52,7 +53,7 @@ class ImpactSummarySection extends StatelessWidget {
           if (data == null) ...<Widget>[
             Text(
               context.l10n.eventsImpactSummaryEmptyHint,
-              style: textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
+              style: AppTypography.eventsBodyMuted(textTheme),
             ),
           ] else ...<Widget>[
             Wrap(
@@ -78,9 +79,9 @@ class ImpactSummarySection extends StatelessWidget {
                 data.estimatedKg.toStringAsFixed(1),
                 data.estimatedCo2SavedKg.toStringAsFixed(1),
               ),
-              style: textTheme.bodySmall?.copyWith(
+              style: AppTypography.eventsCaptionStrong(
+                textTheme,
                 color: AppColors.primaryDark,
-                fontWeight: FontWeight.w600,
               ),
             ),
             if (data.notes.isNotEmpty) ...<Widget>[
@@ -89,7 +90,7 @@ class ImpactSummarySection extends StatelessWidget {
                 data.notes,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                style: AppTypography.eventsGridPropertyValue(textTheme),
               ),
             ],
           ],
@@ -114,10 +115,10 @@ class ImpactBadge extends StatelessWidget {
       ),
       child: Text(
         label,
-        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.primaryDark,
-              fontWeight: FontWeight.w600,
-            ),
+        style: AppTypography.eventsCaptionStrong(
+          Theme.of(context).textTheme,
+          color: AppColors.primaryDark,
+        ),
       ),
     );
   }

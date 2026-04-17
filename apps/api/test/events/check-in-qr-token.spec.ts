@@ -56,4 +56,18 @@ describe('check-in-qr-token', () => {
       expect(v.reason).toBe('EXPIRED');
     }
   });
+
+  it('accepts token at exp boundary (clock alignment with server second)', () => {
+    const nowSec = 1_700_000_000;
+    const exp = nowSec + 30;
+    const token = signCheckInQrToken(secret, {
+      e: 'evt_1',
+      s: 'sess_1',
+      j: 'jti_1',
+      iat: nowSec,
+      exp,
+    });
+    const v = verifyCheckInQrToken(secret, token, exp);
+    expect(v.ok).toBe(true);
+  });
 });
