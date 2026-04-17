@@ -4,8 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/site_picker_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -100,9 +100,7 @@ class _CreateEventAsyncSitePickerState extends State<CreateEventAsyncSitePicker>
                 Text(
                   context.l10n.createEventSitePickerLoading,
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: AppTypography.eventsBodyMuted(Theme.of(context).textTheme),
                 ),
               ],
             ),

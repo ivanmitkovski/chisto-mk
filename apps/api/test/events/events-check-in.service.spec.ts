@@ -4,6 +4,7 @@ import {
   BadRequestException,
   ConflictException,
   ForbiddenException,
+  GoneException,
   NotFoundException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -20,6 +21,10 @@ import {
   signCheckInQrToken,
 } from '../../src/events/check-in-qr-token';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
+import {
+  POINTS_EVENT_CHECK_IN,
+  REASON_EVENT_CHECK_IN,
+} from '../../src/gamification/gamification.constants';
 
 function user(id: string, role: Role = Role.USER): AuthenticatedUser {
   return {
@@ -41,6 +46,7 @@ describe('EventsCheckInService', () => {
     };
     eventCheckIn: {
       findMany: jest.Mock;
+      findUnique: jest.Mock;
       deleteMany: jest.Mock;
     };
     eventParticipant: { findUnique: jest.Mock };
@@ -49,6 +55,19 @@ describe('EventsCheckInService', () => {
   };
   let config: { get: jest.Mock };
   let ecoEventPoints: { creditIfNew: jest.Mock };
+  let pendingCheckIn: {
+    createPending: jest.Mock;
+    getPending: jest.Mock;
+    deletePending: jest.Mock;
+    confirmTtlSec: number;
+  };
+  let checkInGateway: { emitToRoom: jest.Mock };
+  let reportsUpload: { signPrivateObjectKey: jest.Mock };
+  let checkInTelemetry: {
+    emitMetric: jest.Mock;
+    emitSpan: jest.Mock;
+    emitAudit: jest.Mock;
+  };
   let service: EventsCheckInService;
 
   const approvedInProgressEvent = {
@@ -69,6 +88,28 @@ describe('EventsCheckInService', () => {
       }),
     };
     ecoEventPoints = { creditIfNew: jest.fn().mockResolvedValue(5) };
+    pendingCheckIn = {
+      createPending: jest.fn().mockResolvedValue({
+        pendingId: 'pending-1',
+        eventId: 'evt-1',
+        userId: 'att-1',
+        firstName: 'Test',
+        lastName: 'User',
+        avatarUrl: null,
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      }),
+      getPending: jest.fn(),
+      deletePending: jest.fn().mockResolvedValue(undefined),
+      confirmTtlSec: 60,
+    };
+    checkInGateway = { emitToRoom: jest.fn() };
+    reportsUpload = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) };
+    checkInTelemetry = {
+      emitMetric: jest.fn(),
+      emitSpan: jest.fn(),
+      emitAudit: jest.fn(),
+    };
     prisma = {
       cleanupEvent: {
         findFirst: jest.fn(),
@@ -77,16 +118,25 @@ describe('EventsCheckInService', () => {
       },
       eventCheckIn: {
         findMany: jest.fn().mockResolvedValue([]),
+        findUnique: jest.fn().mockResolvedValue(null),
         deleteMany: jest.fn(),
       },
       eventParticipant: { findUnique: jest.fn() },
-      user: { findUnique: jest.fn() },
+      user: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ firstName: 'Test', lastName: 'User', avatarObjectKey: null }),
+      },
       $transaction: jest.fn(),
     };
     service = new EventsCheckInService(
       prisma as never,
       config as unknown as ConfigService,
       ecoEventPoints as never,
+      pendingCheckIn as never,
+      checkInGateway as never,
+      reportsUpload as never,
+      checkInTelemetry as never,
     );
   });
 
@@ -165,13 +215,20 @@ describe('EventsCheckInService', () => {
           userId: 'u1',
           guestDisplayName: null,
           checkedInAt: new Date('2026-01-01T12:00:00Z'),
-          user: { firstName: 'Ann', lastName: 'Bee' },
+          user: {
+            firstName: 'Ann',
+            lastName: 'Bee',
+            avatarObjectKey: 'avatars/u1.jpg',
+          },
         },
       ]);
+      reportsUpload.signPrivateObjectKey.mockResolvedValue('https://signed.example/a.jpg');
       const out = await service.listAttendees('evt-1', user('org-1'));
       expect(out.data).toHaveLength(1);
       expect(out.data[0].name).toBe('Ann Bee');
       expect(out.data[0].checkedInAt).toBe('2026-01-01T12:00:00.000Z');
+      expect(out.data[0].avatarUrl).toBe('https://signed.example/a.jpg');
+      expect(reportsUpload.signPrivateObjectKey).toHaveBeenCalledWith('avatars/u1.jpg');
     });
   });
 
@@ -239,6 +296,16 @@ describe('EventsCheckInService', () => {
       expect(out.id).toBe('cin-1');
       expect(out.pointsAwarded).toBe(7);
       expect(out.name).toBe('Vol One');
+      expect(ecoEventPoints.creditIfNew).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          userId: 'vol-1',
+          delta: POINTS_EVENT_CHECK_IN,
+          reasonCode: REASON_EVENT_CHECK_IN,
+          referenceType: 'CleanupEvent',
+          referenceId: 'evt-1',
+        }),
+      );
     });
   });
 
@@ -305,12 +372,13 @@ describe('EventsCheckInService', () => {
       ).rejects.toBeInstanceOf(ForbiddenException);
     });
 
-    it('returns checkedInAt and points on success', async () => {
+    it('returns pending_confirmation on valid redeem', async () => {
       prisma.cleanupEvent.findFirst.mockResolvedValue({
         ...approvedInProgressEvent,
         organizerId: 'org-1',
       });
       prisma.eventParticipant.findUnique.mockResolvedValue({ id: 'part-1' });
+      prisma.eventCheckIn.findUnique.mockResolvedValue(null);
       const nowSec = Math.floor(Date.now() / 1000);
       const jti = newCheckInJti();
       const qr = signCheckInQrToken(TEST_SECRET, {
@@ -320,26 +388,66 @@ describe('EventsCheckInService', () => {
         iat: nowSec,
         exp: nowSec + CHECK_IN_QR_TTL_SEC,
       });
-      const checkedAt = new Date('2026-03-01T15:00:00Z');
       prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
         const tx = {
           eventCheckInRedemption: {
             create: jest.fn().mockResolvedValue({}),
           },
-          eventCheckIn: {
-            findUnique: jest.fn().mockResolvedValue(null),
-            create: jest
-              .fn()
-              .mockResolvedValue({ id: 'row-1', checkedInAt: checkedAt }),
-          },
-          cleanupEvent: { update: jest.fn().mockResolvedValue({}) },
         };
-        ecoEventPoints.creditIfNew.mockResolvedValue(12);
         return fn(tx as never);
       });
       const out = await service.redeem('evt-1', user('att-1'), qr);
-      expect(out.pointsAwarded).toBe(12);
+      expect(out.status).toBe('pending_confirmation');
+      expect(out.pendingId).toBe('pending-1');
+      expect(out.expiresAt).toBeTruthy();
+      expect(pendingCheckIn.createPending).toHaveBeenCalledWith(
+        'evt-1',
+        'att-1',
+        'Test',
+        'User',
+        null,
+      );
+      expect(checkInGateway.emitToRoom).toHaveBeenCalledWith(
+        'evt-1',
+        'checkin:request',
+        expect.objectContaining({
+          pendingId: 'pending-1',
+          eventId: 'evt-1',
+          userId: 'att-1',
+          avatarUrl: null,
+        }),
+      );
+    });
+
+    it('returns already_checked_in when user has existing check-in', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue({
+        ...approvedInProgressEvent,
+        organizerId: 'org-1',
+      });
+      prisma.eventParticipant.findUnique.mockResolvedValue({ id: 'part-1' });
+      const checkedAt = new Date('2026-03-01T15:00:00Z');
+      prisma.eventCheckIn.findUnique.mockResolvedValue({ checkedInAt: checkedAt });
+      const nowSec = Math.floor(Date.now() / 1000);
+      const qr = signCheckInQrToken(TEST_SECRET, {
+        e: 'evt-1',
+        s: 'session-stable-id',
+        j: newCheckInJti(),
+        iat: nowSec,
+        exp: nowSec + CHECK_IN_QR_TTL_SEC,
+      });
+      prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
+        const tx = {
+          eventCheckInRedemption: {
+            create: jest.fn().mockResolvedValue({}),
+          },
+        };
+        return fn(tx as never);
+      });
+      const out = await service.redeem('evt-1', user('att-1'), qr);
+      expect(out.status).toBe('already_checked_in');
       expect(out.checkedInAt).toBe(checkedAt.toISOString());
+      expect(out.pointsAwarded).toBe(0);
+      expect(pendingCheckIn.createPending).not.toHaveBeenCalled();
     });
 
     it('throws ConflictException on replay (redemption jti duplicate)', async () => {
@@ -391,6 +499,198 @@ describe('EventsCheckInService', () => {
       await expect(service.redeem('evt-1', user('att-1'), qr)).rejects.toMatchObject({
         response: expect.objectContaining({ code: 'CHECK_IN_SESSION_MISMATCH' }),
       });
+    });
+  });
+
+  describe('resolveCheckIn', () => {
+    it('throws GoneException when pending is expired', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
+      pendingCheckIn.getPending.mockResolvedValue(null);
+      await expect(
+        service.resolveCheckIn('evt-1', 'expired-id', user('org-1'), 'approve'),
+      ).rejects.toBeInstanceOf(GoneException);
+    });
+
+    it('throws NotFoundException when pending belongs to another event', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'other-event',
+        userId: 'att-1',
+        firstName: 'Test',
+        lastName: 'User',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      await expect(
+        service.resolveCheckIn('evt-1', 'p1', user('org-1'), 'approve'),
+      ).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('reject emits checkin:rejected and deletes pending', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-1',
+        userId: 'att-1',
+        firstName: 'Test',
+        lastName: 'User',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      const result = await service.resolveCheckIn('evt-1', 'p1', user('org-1'), 'reject');
+      expect(result).toBeNull();
+      expect(pendingCheckIn.deletePending).toHaveBeenCalledWith('p1');
+      expect(checkInGateway.emitToRoom).toHaveBeenCalledWith(
+        'evt-1',
+        'checkin:rejected',
+        expect.objectContaining({ pendingId: 'p1', userId: 'att-1' }),
+      );
+    });
+
+    it('approve creates check-in, awards points, emits checkin:confirmed', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-1',
+        userId: 'att-1',
+        firstName: 'Test',
+        lastName: 'User',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      const checkedAt = new Date('2026-04-16T12:00:30Z');
+      prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
+        const tx = {
+          eventCheckIn: {
+            findUnique: jest.fn().mockResolvedValue(null),
+            create: jest.fn().mockResolvedValue({ id: 'cin-1', checkedInAt: checkedAt }),
+          },
+          cleanupEvent: { update: jest.fn().mockResolvedValue({}) },
+        };
+        ecoEventPoints.creditIfNew.mockResolvedValue(POINTS_EVENT_CHECK_IN);
+        return fn(tx as never);
+      });
+      const result = await service.resolveCheckIn('evt-1', 'p1', user('org-1'), 'approve');
+      expect(result).not.toBeNull();
+      expect(result!.checkedInAt).toBe(checkedAt.toISOString());
+      expect(result!.pointsAwarded).toBe(POINTS_EVENT_CHECK_IN);
+      expect(result!.userId).toBe('att-1');
+      expect(result!.displayName).toBe('Test User');
+      expect(pendingCheckIn.deletePending).toHaveBeenCalledWith('p1');
+      expect(checkInGateway.emitToRoom).toHaveBeenCalledWith(
+        'evt-1',
+        'checkin:confirmed',
+        expect.objectContaining({
+          pendingId: 'p1',
+          userId: 'att-1',
+          pointsAwarded: POINTS_EVENT_CHECK_IN,
+        }),
+      );
+      expect(ecoEventPoints.creditIfNew).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({
+          userId: 'att-1',
+          delta: POINTS_EVENT_CHECK_IN,
+          reasonCode: REASON_EVENT_CHECK_IN,
+          referenceType: 'CleanupEvent',
+          referenceId: 'evt-1',
+        }),
+      );
+    });
+
+    it('approve is idempotent when user already checked in', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-1',
+        userId: 'att-1',
+        firstName: 'Test',
+        lastName: 'User',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      const existingCheckedAt = new Date('2026-04-16T11:50:00Z');
+      prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
+        const tx = {
+          eventCheckIn: {
+            findUnique: jest.fn().mockResolvedValue({
+              id: 'cin-existing',
+              checkedInAt: existingCheckedAt,
+            }),
+          },
+        };
+        return fn(tx as never);
+      });
+      const result = await service.resolveCheckIn('evt-1', 'p1', user('org-1'), 'approve');
+      expect(result).not.toBeNull();
+      expect(result!.pointsAwarded).toBe(0);
+      expect(ecoEventPoints.creditIfNew).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('getPendingStatus', () => {
+    it('returns expired when pending is missing', async () => {
+      pendingCheckIn.getPending.mockResolvedValue(null);
+      await expect(service.getPendingStatus('evt-1', 'p1', user('att-1'))).resolves.toEqual({
+        status: 'expired',
+      });
+    });
+
+    it('returns pending when event id and caller match the stored pending row', async () => {
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-1',
+        userId: 'att-1',
+        firstName: 'A',
+        lastName: 'B',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      await expect(service.getPendingStatus('evt-1', 'p1', user('att-1'))).resolves.toEqual({
+        status: 'pending',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+    });
+
+    it('throws NotFound when pending belongs to another event', async () => {
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-other',
+        userId: 'att-1',
+        firstName: 'A',
+        lastName: 'B',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      let err: unknown;
+      try {
+        await service.getPendingStatus('evt-1', 'p1', user('att-1'));
+      } catch (e) {
+        err = e;
+      }
+      expect(err).toBeInstanceOf(NotFoundException);
+      expect((err as NotFoundException).getResponse()).toEqual(
+        expect.objectContaining({
+          code: 'CHECK_IN_REQUEST_NOT_FOUND',
+          message: 'Pending check-in request not found',
+        }),
+      );
+    });
+
+    it('throws NotFound when pending user does not match caller', async () => {
+      pendingCheckIn.getPending.mockResolvedValue({
+        pendingId: 'p1',
+        eventId: 'evt-1',
+        userId: 'other-user',
+        firstName: 'A',
+        lastName: 'B',
+        createdAt: '2026-04-16T12:00:00.000Z',
+        expiresAt: '2026-04-16T12:01:00.000Z',
+      });
+      await expect(service.getPendingStatus('evt-1', 'p1', user('att-1'))).rejects.toBeInstanceOf(
+        NotFoundException,
+      );
     });
   });
 });

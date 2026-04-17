@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
@@ -47,10 +48,7 @@ class GearSection extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xs),
                 Text(
                   context.l10n.eventsGearNoneNeeded,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: AppTypography.eventsCardBadgeMuted(textTheme),
                 ),
               ],
             ),
@@ -79,10 +77,7 @@ class GearSection extends StatelessWidget {
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       gear.localizedLabel(context.l10n),
-                      style: textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textPrimary,
-                      ),
+                      style: AppTypography.eventsCaptionStrong(textTheme),
                     ),
                   ],
                 ),

@@ -1,5 +1,14 @@
+import 'package:intl/intl.dart' hide TextDirection;
+
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+
+/// Formats a [DateTime] as locale-aware `HH:mm` (24h). Ensures `.toLocal()`
+/// so UTC timestamps from the API never leak raw UTC hours into the UI.
+String formatCheckInTime(DateTime dt) {
+  final DateTime local = dt.toLocal();
+  return DateFormat.Hm().format(local);
+}
 
 String eventsCountdownLabel(AppLocalizations l10n, DateTime start) {
   final Duration diff = start.difference(DateTime.now());

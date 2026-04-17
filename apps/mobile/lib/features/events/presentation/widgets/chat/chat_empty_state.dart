@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 class ChatEmptyState extends StatefulWidget {
   const ChatEmptyState({super.key, this.onSayHello});
@@ -87,17 +88,13 @@ class _ChatEmptyStateState extends State<ChatEmptyState> with SingleTickerProvid
             const SizedBox(height: AppSpacing.lg),
             Text(
               context.l10n.eventChatEmptyTitle,
-              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: AppTypography.eventsListCardTitle(Theme.of(context).textTheme),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.xs),
             Text(
               context.l10n.eventChatEmptyBody,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+              style: AppTypography.eventsCalloutSubtitle(Theme.of(context).textTheme),
               textAlign: TextAlign.center,
             ),
             if (widget.onSayHello != null) ...<Widget>[

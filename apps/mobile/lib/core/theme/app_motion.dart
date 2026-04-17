@@ -10,6 +10,51 @@ class AppMotion {
   static const Duration emphasizedDuration = Duration(milliseconds: 420);
   static const Duration slow = Duration(milliseconds: 700);
 
+  /// Full rotation of the branded loading ring overlay.
+  static const Duration loadingOverlayLoop = Duration(milliseconds: 1200);
+
+  /// Checkmark draw phase inside success dialogs.
+  static const Duration successCheckReveal = Duration(milliseconds: 500);
+
+  /// Repeating skeleton shimmer: snaps to [staticValue] when reduce motion is on.
+  static void syncRepeatingShimmer(
+    AnimationController controller,
+    BuildContext context, {
+    double staticValue = 0.5,
+  }) {
+    assert(staticValue >= 0 && staticValue <= 1);
+    if (!context.mounted) return;
+    if (MediaQuery.disableAnimationsOf(context)) {
+      controller.stop();
+      controller.value = staticValue;
+      return;
+    }
+    if (!controller.isAnimating) {
+      controller.repeat();
+    }
+  }
+
+  /// Loading overlay ring: static pose when reduce motion is on.
+  static void syncLoadingRing(
+    AnimationController controller,
+    BuildContext context, {
+    required bool visible,
+    double staticValue = 0.25,
+  }) {
+    assert(staticValue >= 0 && staticValue <= 1);
+    if (!context.mounted) return;
+    if (!visible) {
+      controller.stop();
+      return;
+    }
+    if (MediaQuery.disableAnimationsOf(context)) {
+      controller.stop();
+      controller.value = staticValue;
+      return;
+    }
+    controller.repeat();
+  }
+
   /// One full three-dot typing wave (event chat).
   static const Duration chatTypingCycle = Duration(milliseconds: 1500);
 

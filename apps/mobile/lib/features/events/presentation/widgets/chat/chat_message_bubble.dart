@@ -10,6 +10,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_source.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_document_open_flow.dart';
@@ -331,8 +332,9 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
     Color fg,
     String timeStr,
   ) {
-    final TextStyle? metaStyle =
-        Theme.of(context).textTheme.labelSmall?.copyWith(color: ChatTheme.metaText);
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final TextStyle metaStyle =
+        AppTypography.eventsChatTimestamp(textTheme, color: ChatTheme.metaText);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,8 +343,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
         if (widget.showAuthorName && !own) ...<Widget>[
           Text(
             m.authorName,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
+            style: AppTypography.eventsChatAuthorName(textTheme).copyWith(
                   color: ChatTheme.avatarColor(m.authorId),
                 ),
           ),
@@ -367,10 +368,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                     m.replyToSnippet!,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.eventsGridPropertyValue(textTheme),
                   ),
                 ),
               ),
@@ -400,7 +398,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
               if (m.body != null && m.body!.isNotEmpty)
                 ChatLinkifiedText(
                   text: m.body!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+                  style: AppTypography.eventsChatMessageBody(textTheme),
                 ),
               const SizedBox(height: AppSpacing.xxs),
               Row(
@@ -410,10 +408,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   const SizedBox(width: AppSpacing.xxs),
                   Text(
                     context.l10n.eventChatSendFailed,
-                    style: Theme.of(context)
-                        .textTheme
-                        .labelSmall
-                        ?.copyWith(color: AppColors.accentDanger),
+                    style: AppTypography.eventsDestructiveCaption(textTheme),
                   ),
                 ],
               ),
@@ -422,15 +417,16 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
         else if (m.isDeleted)
           Text(
             context.l10n.eventChatMessageRemoved,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            style: AppTypography.eventsChatMessageBody(
+                  textTheme,
                   color: AppColors.textMuted,
-                  fontStyle: FontStyle.italic,
-                ),
+                )
+                .copyWith(fontStyle: FontStyle.italic),
           )
         else if (m.body != null && m.body!.isNotEmpty)
           ChatLinkifiedText(
             text: m.body!,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: fg),
+            style: AppTypography.eventsChatMessageBody(textTheme, color: fg),
           ),
         if (m.pending)
           Padding(
@@ -1098,7 +1094,8 @@ class _ChatAudioTimeline extends StatelessWidget {
     final Color trackBg =
         own ? AppColors.primary.withValues(alpha: 0.22) : AppColors.inputFill;
     final Color trackFg = AppColors.primary;
-    final TextStyle timeStyle = Theme.of(context).textTheme.labelMedium!.copyWith(
+    final TextTheme audioTextTheme = Theme.of(context).textTheme;
+    final TextStyle timeStyle = AppTypography.eventsChatTimestamp(audioTextTheme).copyWith(
           fontWeight: FontWeight.w600,
           color: timeColor,
           fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
@@ -1285,17 +1282,12 @@ class _DocumentPreview extends StatelessWidget {
                         attachment.fileName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium
-                            ?.copyWith(fontWeight: FontWeight.w600),
+                        style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme)
+                            .copyWith(fontWeight: FontWeight.w600),
                       ),
                       Text(
                         _humanSize(attachment.sizeBytes),
-                        style: Theme.of(context)
-                            .textTheme
-                            .labelSmall
-                            ?.copyWith(color: AppColors.textMuted),
+                        style: AppTypography.eventsChatTimestamp(Theme.of(context).textTheme),
                       ),
                     ],
                   ),
@@ -1420,9 +1412,7 @@ class _LocationPreview extends StatelessWidget {
                                 : context.l10n.eventsDetailOpenInMaps,
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textSecondary,
-                                ),
+                            style: AppTypography.eventsGridPropertyValue(Theme.of(context).textTheme),
                           ),
                         ),
                         Icon(Icons.open_in_new, size: 14, color: AppColors.textMuted),
@@ -1469,10 +1459,8 @@ class _ActionRow extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: fg,
-                      fontWeight: FontWeight.w500,
-                    ),
+                style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme, color: fg)
+                    .copyWith(fontWeight: FontWeight.w500),
               ),
             ),
           ],

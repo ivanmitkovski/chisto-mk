@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// A single pending offline check-in payload waiting for network connectivity.
@@ -45,51 +46,73 @@ class CheckInSyncQueue {
 
   static const String _prefKey = 'chk_sync_queue_v1';
 
-  /// Appends an entry to the queue. Safe to call from any isolate-safe context.
-  Future<void> enqueue(CheckInQueueEntry entry) async {
+  /// Serializes concurrent access to the queue storage.
+  Completer<void>? _lock;
+
+  Future<T> _serialized<T>(Future<T> Function() fn) async {
+    while (_lock != null) {
+      await _lock!.future;
+    }
+    _lock = Completer<void>();
+    try {
+      return await fn();
+    } finally {
+      final Completer<void> c = _lock!;
+      _lock = null;
+      c.complete();
+    }
+  }
+
+  /// Appends an entry to the queue.
+  Future<void> enqueue(CheckInQueueEntry entry) => _serialized(() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<CheckInQueueEntry> current = await _load(prefs);
-    // De-duplicate: don't enqueue the same qrPayload twice.
+    final List<CheckInQueueEntry> current = _load(prefs);
     if (current.any((CheckInQueueEntry e) => e.qrPayload == entry.qrPayload)) {
       return;
     }
     current.add(entry);
     await _save(prefs, current);
-  }
+  });
 
   /// Returns all pending entries (oldest first).
-  Future<List<CheckInQueueEntry>> peek() async {
+  Future<List<CheckInQueueEntry>> peek() => _serialized(() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     return _load(prefs);
-  }
+  });
 
   /// Removes a specific entry by [qrPayload] after a successful or terminal sync.
-  Future<void> remove(String qrPayload) async {
+  Future<void> remove(String qrPayload) => _serialized(() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final List<CheckInQueueEntry> current = await _load(prefs);
+    final List<CheckInQueueEntry> current = _load(prefs);
     current.removeWhere((CheckInQueueEntry e) => e.qrPayload == qrPayload);
     await _save(prefs, current);
-  }
+  });
 
   /// Removes all entries. Use with caution (testing / logout).
-  Future<void> clear() async {
+  Future<void> clear() => _serialized(() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove(_prefKey);
-  }
+  });
 
-  Future<List<CheckInQueueEntry>> _load(SharedPreferences prefs) {
+  List<CheckInQueueEntry> _load(SharedPreferences prefs) {
     final String? raw = prefs.getString(_prefKey);
-    if (raw == null || raw.isEmpty) return Future<List<CheckInQueueEntry>>.value(<CheckInQueueEntry>[]);
+    if (raw == null || raw.isEmpty) return <CheckInQueueEntry>[];
     try {
       final List<dynamic> list = jsonDecode(raw) as List<dynamic>;
-      return Future<List<CheckInQueueEntry>>.value(
-        list
-            .whereType<Map<String, dynamic>>()
-            .map(CheckInQueueEntry.fromJson)
-            .toList(),
-      );
-    } on Object {
-      return Future<List<CheckInQueueEntry>>.value(<CheckInQueueEntry>[]);
+      final List<CheckInQueueEntry> entries = <CheckInQueueEntry>[];
+      for (final dynamic item in list) {
+        if (item is Map<String, dynamic>) {
+          try {
+            entries.add(CheckInQueueEntry.fromJson(item));
+          } on Object catch (_) {
+            logEventsDiagnostic('check_in_queue_entry_corrupt');
+          }
+        }
+      }
+      return entries;
+    } on Object catch (_) {
+      logEventsDiagnostic('check_in_queue_json_corrupt');
+      return <CheckInQueueEntry>[];
     }
   }
 

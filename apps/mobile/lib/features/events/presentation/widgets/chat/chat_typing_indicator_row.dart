@@ -3,13 +3,26 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 /// Typing indicator that renders as a ghost peer bubble inside the message list.
 class ChatTypingBubble extends StatelessWidget {
-  const ChatTypingBubble({super.key, required this.displayNames});
+  const ChatTypingBubble({
+    super.key,
+    required this.displayNames,
+    this.primaryUserId,
+    this.primaryAvatarUrl,
+  });
 
   final List<String> displayNames;
+
+  /// User id of the peer shown first (same sort order as [displayNames]). Used for avatar seed + cache.
+  final String? primaryUserId;
+
+  /// Profile image URL for [primaryUserId] when known (e.g. from recent messages).
+  final String? primaryAvatarUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +51,11 @@ class ChatTypingBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              _TypingAvatar(name: firstName),
+              _TypingAvatar(
+                displayName: firstName,
+                userId: primaryUserId,
+                imageUrl: primaryAvatarUrl,
+              ),
               const SizedBox(width: ChatTheme.avatarGap),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,9 +63,7 @@ class ChatTypingBubble extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     label,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                    style: AppTypography.eventsChatTimestamp(Theme.of(context).textTheme),
                   ),
                   const SizedBox(height: 2),
                   Container(
@@ -79,35 +94,47 @@ class ChatTypingBubble extends StatelessWidget {
 }
 
 class _TypingAvatar extends StatelessWidget {
-  const _TypingAvatar({required this.name});
-  final String name;
+  const _TypingAvatar({
+    required this.displayName,
+    this.userId,
+    this.imageUrl,
+  });
+
+  final String displayName;
+  final String? userId;
+  final String? imageUrl;
 
   @override
   Widget build(BuildContext context) {
-    final String initial = name.isNotEmpty ? name.substring(0, 1).toUpperCase() : '?';
-    final Color color = ChatTheme.avatarColor(name);
-    return SizedBox(
-      width: ChatTheme.avatarSize,
-      height: ChatTheme.avatarSize,
-      child: Container(
-        decoration: BoxDecoration(shape: BoxShape.circle, color: color.withValues(alpha: 0.18)),
-        alignment: Alignment.center,
-        child: Text(
-          initial,
-          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color),
-        ),
-      ),
+    return UserAvatarCircle(
+      displayName: displayName,
+      imageUrl: imageUrl,
+      size: ChatTheme.avatarSize,
+      seed: userId,
+      fallbackStyle: UserAvatarFallbackStyle.softTint,
     );
   }
 }
 
 /// Kept as a backward-compatible alias.
 class ChatTypingIndicatorRow extends StatelessWidget {
-  const ChatTypingIndicatorRow({super.key, required this.displayNames});
+  const ChatTypingIndicatorRow({
+    super.key,
+    required this.displayNames,
+    this.primaryUserId,
+    this.primaryAvatarUrl,
+  });
+
   final List<String> displayNames;
+  final String? primaryUserId;
+  final String? primaryAvatarUrl;
 
   @override
-  Widget build(BuildContext context) => ChatTypingBubble(displayNames: displayNames);
+  Widget build(BuildContext context) => ChatTypingBubble(
+        displayNames: displayNames,
+        primaryUserId: primaryUserId,
+        primaryAvatarUrl: primaryAvatarUrl,
+      );
 }
 
 class ChatTypingDots extends StatefulWidget {

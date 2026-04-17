@@ -20,8 +20,13 @@ class _EventsFeedSkeletonState extends State<EventsFeedSkeleton>
   @override
   void initState() {
     super.initState();
-    _shimmer = AnimationController(vsync: this, duration: AppMotion.slow)
-      ..repeat();
+    _shimmer = AnimationController(vsync: this, duration: AppMotion.slow);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
   }
 
   @override

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class HomeBottomNavBar extends StatelessWidget {
   const HomeBottomNavBar({
@@ -18,21 +20,21 @@ class HomeBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const List<_NavItemConfig> items = <_NavItemConfig>[
+    final List<_NavItemConfig> items = <_NavItemConfig>[
       _NavItemConfig(
-        label: 'Home',
+        label: context.l10n.homeShellNavHome,
         iconAsset: AppAssets.navHome,
       ),
       _NavItemConfig(
-        label: 'Reports',
+        label: context.l10n.homeShellNavReports,
         iconAsset: AppAssets.navReports,
       ),
       _NavItemConfig(
-        label: 'Map',
+        label: context.l10n.homeShellNavMap,
         iconAsset: AppAssets.navMap,
       ),
       _NavItemConfig(
-        label: 'Events',
+        label: context.l10n.homeShellNavEvents,
         iconAsset: AppAssets.navEvents,
       ),
     ];
@@ -126,39 +128,44 @@ class _BottomNavItemState extends State<_BottomNavItem> {
   Widget build(BuildContext context) {
     final Color color = _isSelected ? AppColors.primary : AppColors.textMuted;
 
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _pressed = true),
-      onTapUp: (_) => setState(() => _pressed = false),
-      onTapCancel: () => setState(() => _pressed = false),
-      onTap: () {
-        HapticFeedback.selectionClick();
-        widget.onTap(widget.index);
-      },
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedScale(
-        scale: _pressed ? 0.94 : 1.0,
-        duration: const Duration(milliseconds: 160),
-        curve: Curves.easeOutCubic,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            SvgPicture.asset(
-              widget.config.iconAsset,
-              width: 26,
-              height: 26,
-              colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-            ),
-            const SizedBox(height: AppSpacing.xxs),
-            Text(
-              widget.config.label,
-              style: AppTypography.badgeLabel.copyWith(
-                height: 1.1,
-                fontWeight: _isSelected ? FontWeight.w600 : FontWeight.w500,
-                color: color,
+    return Semantics(
+      button: true,
+      selected: _isSelected,
+      label: widget.config.label,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTap: () {
+          AppHaptics.tap(context);
+          widget.onTap(widget.index);
+        },
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedScale(
+          scale: _pressed ? 0.94 : 1.0,
+          duration: AppMotion.xFast,
+          curve: AppMotion.emphasized,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              SvgPicture.asset(
+                widget.config.iconAsset,
+                width: 26,
+                height: 26,
+                colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
               ),
-            ),
-          ],
+              const SizedBox(height: AppSpacing.xxs),
+              Text(
+                widget.config.label,
+                style: AppTypography.badgeLabel.copyWith(
+                  height: 1.1,
+                  fontWeight: _isSelected ? FontWeight.w600 : FontWeight.w500,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

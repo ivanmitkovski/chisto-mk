@@ -23,7 +23,13 @@ class _ProfileScreenSkeletonState extends State<ProfileScreenSkeleton>
     _shimmer = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
   }
 
   @override
@@ -104,7 +110,13 @@ class _ProfileReportCreditsSkeletonState extends State<ProfileReportCreditsSkele
     _shimmer = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
   }
 
   @override

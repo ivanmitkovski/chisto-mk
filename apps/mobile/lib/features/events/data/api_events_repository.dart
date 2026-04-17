@@ -10,8 +10,10 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:flutter/foundation.dart';
 
 /// Server-backed [EventsRepository] using `/events` REST endpoints.
@@ -29,6 +31,38 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   bool _loadingMore = false;
   bool _lastGlobalListLoadFailed = false;
   bool _isShowingStaleCachedEvents = false;
+  DateTime? _lastSuccessfulListRefreshAt;
+
+  Future<void> _persistEventsDisk() async {
+    await _cache.writeEvents(_events, forActiveListParams: _activeParams);
+  }
+
+  /// When a list fetch fails and memory is empty, restore the last successful
+  /// snapshot for the same server params (if any).
+  Future<void> _tryHydrateFromDiskAfterListFailure(
+    EcoEventSearchParams? attemptedParams,
+  ) async {
+    if (_events.isNotEmpty) {
+      return;
+    }
+    final List<EcoEvent>? recovered = await _cache.readEvents(
+      forActiveListParams: attemptedParams,
+    );
+    if (recovered != null && recovered.isNotEmpty) {
+      _events = recovered;
+      _nextCursor = null;
+      _hasMore = false;
+    }
+  }
+
+  /// Coalesces overlapping [refreshEvents] calls into a single network request.
+  Future<void>? _activeRefresh;
+
+  /// Guards optimistic mutations against double-submit from rapid taps.
+  final Set<String> _mutationsInFlight = <String>{};
+
+  @override
+  DateTime? get lastSuccessfulListRefreshAt => _lastSuccessfulListRefreshAt;
 
   @override
   bool get hasMoreEvents => _hasMore;
@@ -62,12 +96,14 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   Future<void> _bootstrap() async {
     try {
       await _fetchPage(replace: true);
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       _lastGlobalListLoadFailed = false;
       _isShowingStaleCachedEvents = false;
     } on Object catch (_) {
       _lastGlobalListLoadFailed = true;
-      final List<EcoEvent>? stale = await _cache.readEvents();
+      final List<EcoEvent>? stale = await _cache.readEvents(
+        forActiveListParams: null,
+      );
       if (stale != null && stale.isNotEmpty) {
         _events = stale;
         _isShowingStaleCachedEvents = true;
@@ -165,12 +201,25 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     }
     _nextCursor = next;
     _hasMore = hasMore;
+    _lastSuccessfulListRefreshAt = DateTime.now();
     notifyListeners();
   }
 
   @override
   Future<void> refreshEvents({EcoEventSearchParams? params}) async {
-    // When params change, reset pagination state.
+    if (_activeRefresh != null) {
+      return _activeRefresh!;
+    }
+    final Future<void> work = _doRefreshEvents(params: params);
+    _activeRefresh = work;
+    try {
+      await work;
+    } finally {
+      _activeRefresh = null;
+    }
+  }
+
+  Future<void> _doRefreshEvents({EcoEventSearchParams? params}) async {
     if (params != _activeParams) {
       _activeParams = params;
       _nextCursor = null;
@@ -178,15 +227,13 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     }
     try {
       await _fetchPage(replace: true, params: params);
-      // Only persist unfiltered lists to the disk cache.
-      if (params == null || params.isEmpty) {
-        await _cache.writeEvents(_events);
-      }
+      await _persistEventsDisk();
       _lastGlobalListLoadFailed = false;
       _isShowingStaleCachedEvents = false;
       notifyListeners();
     } on Object catch (e, st) {
       _lastGlobalListLoadFailed = true;
+      await _tryHydrateFromDiskAfterListFailure(params);
       if (_events.isNotEmpty) {
         _isShowingStaleCachedEvents = true;
       }
@@ -211,9 +258,17 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     try {
       // Preserve active params so paginated pages stay filtered.
       await _fetchPage(replace: false, cursor: c, params: _activeParams);
-      if (_activeParams == null || _activeParams!.isEmpty) {
-        await _cache.writeEvents(_events);
+      await _persistEventsDisk();
+    } on Object catch (e, st) {
+      _lastGlobalListLoadFailed = true;
+      if (_events.isNotEmpty) {
+        _isShowingStaleCachedEvents = true;
       }
+      notifyListeners();
+      if (e is AppError) {
+        Error.throwWithStackTrace(e, st);
+      }
+      Error.throwWithStackTrace(AppError.unknown(cause: e), st);
     } finally {
       _loadingMore = false;
     }
@@ -230,13 +285,16 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       if (json == null) {
         return false;
       }
-      final EcoEvent event = ecoEventFromJson(json);
+      final EcoEvent? event = ecoEventFromJson(json);
+      if (event == null) return false;
       _upsert(event);
       notifyListeners();
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       return true;
     } on AppError catch (e) {
       if (e.code == 'NOT_FOUND') {
+        _events = _events.where((EcoEvent e) => e.id != id).toList(growable: false);
+        notifyListeners();
         return false;
       }
       rethrow;
@@ -310,9 +368,9 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       final List<EcoEvent> page = ecoEventListFromJson(raw);
       _mergeListPage(page);
       notifyListeners();
-      await _cache.writeEvents(_events);
-    } on Object {
-      // Site tab still shows whatever the global list already had.
+      await _persistEventsDisk();
+    } on Object catch (_) {
+      logEventsDiagnostic('prefetch_events_for_site_failed');
     }
   }
 
@@ -335,10 +393,11 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     if (json == null) {
       throw AppError.unknown();
     }
-    final EcoEvent updated = ecoEventFromJson(json);
+    final EcoEvent? updated = ecoEventFromJson(json);
+    if (updated == null) throw AppError.unknown();
     _replaceById(eventId, updated);
     notifyListeners();
-    await _cache.writeEvents(_events);
+    await _persistEventsDisk();
     return updated;
   }
 
@@ -393,6 +452,38 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   }
 
   @override
+  Future<EventScheduleConflictPreview> checkScheduleConflict({
+    required String siteId,
+    required DateTime scheduledAt,
+    DateTime? endAt,
+    String? excludeEventId,
+  }) async {
+    final Map<String, String> query = <String, String>{
+      'siteId': siteId,
+      'scheduledAt': scheduledAt.toUtc().toIso8601String(),
+    };
+    if (endAt != null) {
+      query['endAt'] = endAt.toUtc().toIso8601String();
+    }
+    if (excludeEventId != null && excludeEventId.isNotEmpty) {
+      query['excludeEventId'] = excludeEventId;
+    }
+    final String qs = Uri(queryParameters: query).query;
+    final ApiResponse response = await _client.get('/events/check-conflict?$qs');
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) {
+      throw AppError.unknown();
+    }
+    final bool hasConflict = json['hasConflict'] == true;
+    final ConflictingEventInfo? conflicting =
+        conflictingEventFromNestedJson(json['conflictingEvent']);
+    return EventScheduleConflictPreview(
+      hasConflict: hasConflict,
+      conflictingEvent: conflicting,
+    );
+  }
+
+  @override
   Future<EcoEvent> create(EcoEvent event) async {
     final ApiResponse response =
         await _client.post('/events', body: _createBody(event));
@@ -400,10 +491,11 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     if (json == null) {
       throw AppError.unknown();
     }
-    final EcoEvent created = ecoEventFromJson(json);
+    final EcoEvent? created = ecoEventFromJson(json);
+    if (created == null) throw AppError.unknown();
     _upsert(created);
     notifyListeners();
-    await _cache.writeEvents(_events);
+    await _persistEventsDisk();
     return created;
   }
 
@@ -411,6 +503,9 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
   Future<bool> updateStatus(String id, EcoEventStatus status) async {
     final EcoEvent? current = findById(id);
     if (current == null || !current.canTransitionTo(status)) {
+      return false;
+    }
+    if (!_mutationsInFlight.add('updateStatus:$id')) {
       return false;
     }
 
@@ -435,11 +530,12 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       );
       final ApiResponse refreshed = await _client.get('/events/$id');
       final Map<String, dynamic>? json = refreshed.json;
-      if (json != null) {
-        _replaceById(id, ecoEventFromJson(json));
+      final EcoEvent? fresh = json == null ? null : ecoEventFromJson(json);
+      if (fresh != null) {
+        _replaceById(id, fresh);
         notifyListeners();
       }
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       return true;
     } on AppError {
       _events = previous;
@@ -449,6 +545,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       _events = previous;
       notifyListeners();
       Error.throwWithStackTrace(AppError.unknown(cause: e), st);
+    } finally {
+      _mutationsInFlight.remove('updateStatus:$id');
     }
   }
 
@@ -464,9 +562,15 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     if (event == null || !event.isJoinable) {
       return const EcoEventJoinToggleResult(changed: false);
     }
+    if (!event.isJoined && !event.canVolunteerJoinNow) {
+      return const EcoEventJoinToggleResult(changed: false);
+    }
     if (!event.isJoined &&
         event.maxParticipants != null &&
         event.participantCount >= event.maxParticipants!) {
+      return const EcoEventJoinToggleResult(changed: false);
+    }
+    if (!_mutationsInFlight.add('toggleJoin:$id')) {
       return const EcoEventJoinToggleResult(changed: false);
     }
 
@@ -494,11 +598,12 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       }
       final ApiResponse refreshed = await _client.get('/events/$id');
       final Map<String, dynamic>? json = refreshed.json;
-      if (json != null) {
-        _replaceById(id, ecoEventFromJson(json));
+      final EcoEvent? fresh = json == null ? null : ecoEventFromJson(json);
+      if (fresh != null) {
+        _replaceById(id, fresh);
         notifyListeners();
       }
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       return EcoEventJoinToggleResult(changed: true, pointsAwarded: pointsAwarded);
     } on AppError {
       _events = previous;
@@ -508,6 +613,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       _events = previous;
       notifyListeners();
       Error.throwWithStackTrace(AppError.unknown(cause: e), st);
+    } finally {
+      _mutationsInFlight.remove('toggleJoin:$id');
     }
   }
 
@@ -525,7 +632,7 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     }
     _replaceById(eventId, current.copyWith(isCheckInOpen: isOpen));
     notifyListeners();
-    unawaited(_cache.writeEvents(_events));
+    unawaited(_persistEventsDisk());
     return true;
   }
 
@@ -546,7 +653,7 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       current.copyWith(activeCheckInSessionId: sessionId),
     );
     notifyListeners();
-    unawaited(_cache.writeEvents(_events));
+    unawaited(_persistEventsDisk());
     return true;
   }
 
@@ -555,7 +662,17 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     required String eventId,
     required int checkedInCount,
   }) {
-    return false;
+    final EcoEvent? current = findById(eventId);
+    if (current == null) {
+      return false;
+    }
+    if (current.checkedInCount == checkedInCount) {
+      return false;
+    }
+    _replaceById(eventId, current.copyWith(checkedInCount: checkedInCount));
+    notifyListeners();
+    unawaited(_persistEventsDisk());
+    return true;
   }
 
   @override
@@ -564,7 +681,25 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     required AttendeeCheckInStatus status,
     DateTime? checkedInAt,
   }) {
-    return false;
+    final EcoEvent? current = findById(eventId);
+    if (current == null) {
+      return false;
+    }
+    if (current.attendeeCheckInStatus == status &&
+        current.attendeeCheckedInAt == checkedInAt) {
+      return false;
+    }
+    _replaceById(
+      eventId,
+      current.copyWith(
+        attendeeCheckInStatus: status,
+        attendeeCheckedInAt: checkedInAt,
+        clearAttendeeCheckedInAt: checkedInAt == null,
+      ),
+    );
+    notifyListeners();
+    unawaited(_persistEventsDisk());
+    return true;
   }
 
   @override
@@ -579,6 +714,9 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     }
     if (event.reminderEnabled == enabled && event.reminderAt == reminderAt) {
       return true;
+    }
+    if (!_mutationsInFlight.add('setReminder:$eventId')) {
+      return false;
     }
 
     final List<EcoEvent> previous = List<EcoEvent>.from(_events);
@@ -605,11 +743,12 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       );
       final ApiResponse refreshed = await _client.get('/events/$eventId');
       final Map<String, dynamic>? json = refreshed.json;
-      if (json != null) {
-        _replaceById(eventId, ecoEventFromJson(json));
+      final EcoEvent? fresh = json == null ? null : ecoEventFromJson(json);
+      if (fresh != null) {
+        _replaceById(eventId, fresh);
         notifyListeners();
       }
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       return true;
     } on AppError {
       _events = previous;
@@ -619,6 +758,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       _events = previous;
       notifyListeners();
       Error.throwWithStackTrace(AppError.unknown(cause: e), st);
+    } finally {
+      _mutationsInFlight.remove('setReminder:$eventId');
     }
   }
 
@@ -650,11 +791,12 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
       }
       final ApiResponse refreshed = await _client.get('/events/$eventId');
       final Map<String, dynamic>? json = refreshed.json;
-      if (json != null) {
-        _replaceById(eventId, ecoEventFromJson(json));
+      final EcoEvent? fresh = json == null ? null : ecoEventFromJson(json);
+      if (fresh != null) {
+        _replaceById(eventId, fresh);
         notifyListeners();
       }
-      await _cache.writeEvents(_events);
+      await _persistEventsDisk();
       return true;
     } on AppError {
       _events = previous;

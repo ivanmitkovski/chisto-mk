@@ -58,6 +58,18 @@
   "reportReviewAfterSubmitIncomplete": "Довршете ги чекорите погоре.",
   "reportSubmitSentPending": "Испратено",
   "semanticsClose": "Затвори",
+  "homeShellNavHome": "Почетна",
+  "homeShellNavReports": "Пријави",
+  "homeShellNavMap": "Мапа",
+  "homeShellNavEvents": "Настани",
+  "semanticsReportPhotoNumber": "Фотографија од пријавата {number}",
+  "@semanticsReportPhotoNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "semanticsAboutStep": "За {title}",
   "@semanticsAboutStep": {
     "placeholders": {
@@ -849,6 +861,8 @@
   "eventsWeatherRetry": "Обиди се повторно",
   "eventsUnableToStartEventGeneric": "Не можевме да го започнеме настанот. Проверете ја врската и обидете се повторно.",
   "eventsStartEventTooEarly": "Можете да го започнете ова еко дејство откако ќе настапи закажаното време на почеток.",
+  "eventsJoinNotYetOpen": "Приклучувањето се отвора кога ќе настапи закажаното време на почеток.",
+  "errorEventEndAtTooFar": "Планираниот крај не може да биде толку далеку од почетокот. Обидете се со пократко продолжување.",
   "eventsAwaitingModerationCta": "Чека одобрување",
   "eventsModerationBannerTitle": "Чека одобрување",
   "eventsModerationBannerBody": "Оваа акција е видлива за вас како организатор. Волонтерите ќе можат да се придружат откако модераторите ќе ја одобрат.",
@@ -861,8 +875,93 @@
   "eventsOrganizerQrRotateFailed": "Не можевме да ги инвалидираме кодовите. Обидете се повторно.",
   "eventsEditEventTitle": "Уреди настан",
   "eventsEditEventSave": "Зачувај промени",
+  "editEventTitleTooLong": "Насловот смее да има најмногу {max} знаци.",
+  "@editEventTitleTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventDescriptionTooLong": "Описот смее да има најмногу {max} знаци.",
+  "@editEventDescriptionTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventMaxParticipantsInvalid": "Внесете цел број места или оставете празно за без ограничување.",
+  "editEventMaxParticipantsRange": "Големината на тимот мора да биде помеѓу {min} и {max}, или празно за без ограничување.",
+  "@editEventMaxParticipantsRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventGearLimitReached": "Можете да изберете најмногу {max} ставки опрема.",
+  "@editEventGearLimitReached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventDiscardTitle": "Да се отфрлат промените?",
+  "editEventDiscardMessage": "Имате незачувани промени. Ако заминете сега, ќе се изгубат.",
+  "editEventDiscardConfirm": "Отфрли",
+  "editEventDiscardKeepEditing": "Продолжи со уредување",
+  "editEventSchedulePreviewFailed": "Не можеше да се провери распоредот. Сè уште можете да зачувате; серверот ќе ги одбие преклопувањата.",
+  "editEventOfflineSave": "Изгледа дека сте офлајн. Поврзете се и обидете повторно.",
+  "editEventHelpTitle": "Уредување на настан",
+  "editEventHelpSubtitle": "Распоред, волонтери и модерација",
+  "editEventHelpButtonTooltip": "Помош",
+  "editEventDuplicateSubmitTitle": "Конфликт во распоредот",
+  "editEventDuplicateSubmitBody": "{title} веќе е закажан во {when}. Прилагодете ги времињата и обидете се повторно.",
+  "@editEventDuplicateSubmitBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "editEventNoChangesToSave": "Нема што да се зачува.",
+  "editEventPendingModerationBanner": "Настанот сè уште чека одобрување од модератор. Промените важат за вашата нацрт-верзија.",
+  "eventsEventNotEditable": "Овој настан повеќе не може да се уредува.",
   "eventsEventUpdated": "Настанот е ажуриран",
   "eventsMutationFailedGeneric": "Нешто не е во ред. Обидете се повторно.",
+  "eventsScheduleConflictPreviewTitle": "Можен преклоп на термин",
+  "eventsScheduleConflictPreviewBody": "Друг настан на ова место може да се преклопува со вашиот термин: {title} во {when}.",
+  "@eventsScheduleConflictPreviewBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsScheduleConflictContinue": "Сепак продолжи",
+  "eventsScheduleConflictAdjustTime": "Промени време",
+  "eventsDuplicateEventBlocked": "Овој термин се преклопува со „{title}“ ({when}). Изберете друго време.",
+  "@eventsDuplicateEventBlocked": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "eventsManualCheckInAdd": "Додај",
   "eventsManualCheckInTitle": "Рачен check-in",
   "eventsCheckInTitle": "Check-in",
@@ -917,7 +1016,7 @@
       }
     }
   },
-  "eventsOrganizerUploadAfterPhotosHint": "Поставете ги фотографиите „после“ од деталите за настанот.",
+  "eventsOrganizerUploadAfterPhotosHint": "Поставете ги фотографиите „потоа“ од деталите за настанот.",
   "eventsOrganizerCompletionCheckedInNone": "Никој не се чекирал.",
   "eventsOrganizerCompletionJoinedLine": "{count} доброволци се пријавиле",
   "@eventsOrganizerCompletionJoinedLine": {
@@ -943,18 +1042,18 @@
   "eventsOrganizerCompletionAddPhotosNow": "Додај фотографии сега",
   "eventsOrganizerCompletionWhatNextIntro": "Завршете на страницата на настанот: документирајте резултати и споделете го влијанието.",
   "eventsOrganizerCompletionNextStepsHeading": "СЛЕДНИ ЧЕКОРИ",
-  "eventsOrganizerCompletionStepPhotosTitle": "Додајте фотографии „после“",
+  "eventsOrganizerCompletionStepPhotosTitle": "Додајте фотографии „потоа“",
   "eventsOrganizerCompletionStepPhotosBody": "Покажете ја разликата. Тие се гледаат на страницата на настанот за сите.",
   "eventsOrganizerCompletionStepImpactTitle": "Запишете го влијанието",
   "eventsOrganizerCompletionStepImpactBody": "Забележете торби, волонтерски часови и проценки од страницата на настанот.",
   "eventsOrganizerCompletionStepVisibilityTitle": "Изградете доверба",
   "eventsOrganizerCompletionStepVisibilityBody": "Фотографиите им помагаат на модераторите и инспирираат идни акции.",
-  "eventsOrganizerDetailPendingAfterPhotosTitle": "Фотографии „после“",
+  "eventsOrganizerDetailPendingAfterPhotosTitle": "Фотографии „потоа“",
   "eventsOrganizerDetailPendingAfterPhotosMessage": "Поставете фотографии по чистењето за да ги видат доброволците и модераторите. Користете го копчето подолу.",
   "eventsAttendeeCompletedTitle": "Ви благодариме",
   "eventsAttendeeCompletedBody": "Оваа еко-акција е завршена. Ви благодариме што дојдовте.",
-  "eventsAfterPhotosOrganizerEmptyHint": "Сè уште нема фотографии „после“. Користете го копчето подолу за да додадете.",
-  "eventsEvidenceScreenSubtitle": "Фотографиите „после“ го документираат резултатот и се појавуваат на страницата на настанот.",
+  "eventsAfterPhotosOrganizerEmptyHint": "Сè уште нема фотографии „потоа“. Користете го копчето подолу за да додадете.",
+  "eventsEvidenceScreenSubtitle": "Фотографиите „потоа“ го документираат резултатот и се појавуваат на страницата на настанот.",
   "eventsEvidencePhotoCountChip": "{current} од {max} фотографии",
   "@eventsEvidencePhotoCountChip": {
     "placeholders": {
@@ -966,8 +1065,8 @@
       }
     }
   },
-  "eventsEvidenceBeforeAfterTabsSemantic": "Фотографии пред и после",
-  "eventsEvidenceSavingSemantic": "Се зачувуваат фотографиите „после“",
+  "eventsEvidenceBeforeAfterTabsSemantic": "Фотографии пред и потоа",
+  "eventsEvidenceSavingSemantic": "Се зачувуваат фотографиите „потоа“",
   "eventsOrganizerCheckInPausedSnack": "Пријавата е паузирана.",
   "eventsOrganizerCheckInResumedSnack": "Пријавата е активна повторно.",
   "eventsOrganizerUnableCancelEvent": "Не можеше да се откаже настанот.",
@@ -1011,6 +1110,15 @@
   "eventsOrganizerQrLoadFailedGeneric": "Не можеше да се вчита код за пријава. Проверете ја врската и обидете се повторно.",
   "eventsOrganizerQrRateLimited": "Премногу обиди за освежување. Почекајте малку и обидете се повторно.",
   "eventsOrganizerSessionSetupFailed": "Не можевме да започнеме евиденција. Потврдете дека настанот е во тек и обидете се повторно.",
+  "eventsOrganizerConfirmTitle": "Потврди пријавување",
+  "eventsOrganizerConfirmSubtitle": "Сака да се пријави на овој настан",
+  "eventsOrganizerConfirmApprove": "Потврди",
+  "eventsOrganizerConfirmReject": "Одбиј",
+  "eventsOrganizerConfirmExpired": "Ова барање за пријавување е истечено.",
+  "eventsVolunteerPendingTitle": "Се чека потврда",
+  "eventsVolunteerPendingSubtitle": "Организаторот треба да го потврди вашето пријавување...",
+  "eventsVolunteerRejected": "Пријавувањето не беше потврдено од организаторот.",
+  "eventsVolunteerExpired": "Барањето е истечено. Скенирајте повторно.",
   "eventsOrganizerQrRetry": "Обиди повторно",
   "eventsOrganizerQrBrightnessHint": "Совет: зголемете ја осветленоста на екранот за полесно скенирање.",
   "eventsOrganizerQrSemantics": "QR-код за пријава. Се освежува за околу {seconds} секунди.",
@@ -1078,6 +1186,22 @@
     }
   },
   "createEventEndTimeError": "Крајот мора да биде подоцна од почетокот.",
+  "createEventScheduleStartInPast": "Изберете почеток најмалку {minutes} минути од сега.",
+  "@createEventScheduleStartInPast": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventScheduleEndInPast": "Изберете крај најмалку {minutes} минути од сега.",
+  "@createEventScheduleEndInPast": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "createEventFieldType": "Тип на настан",
   "createEventPlaceholderType": "Изберете тип",
   "createEventFieldTeamSize": "Големина на тим",
@@ -1168,7 +1292,7 @@
   "createEventDescriptionHint": "Опишете што да очекуваат, место на собирање итн.",
   "eventsEventNotFoundShort": "Настанот не е пронајден.",
   "eventsBeforeLabel": "Пред",
-  "eventsAfterLabel": "По",
+  "eventsAfterLabel": "Потоа",
   "eventsDiscardChangesTitle": "Да се отфрлат промените?",
   "eventsDiscardChangesBody": "Имате незачувани фотографии. Дали сигурно сакате да излезете?",
   "eventsSetCover": "Постави како насловна",
@@ -1189,8 +1313,43 @@
   },
   "eventsCtaStartEvent": "Започни настан",
   "eventsCtaManageCheckIn": "Управувај со пријава",
-  "eventsCtaEditAfterPhotos": "Уреди фотографии после",
-  "eventsCtaUploadAfterPhotos": "Прикачи фотографии после",
+  "eventsCtaExtendCleanupEnd": "Продолжи планиран крај",
+  "eventsExtendEndSheetTitle": "Продолжи чистење",
+  "eventsExtendEndSheetSubtitle": "Моментално планиран крај е {time}.",
+  "@eventsExtendEndSheetSubtitle": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsExtendEndCurrentChoice": "Нов крај: {time}",
+  "@eventsExtendEndCurrentChoice": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsExtendEndPlus15": "+15 мин",
+  "eventsExtendEndPlus30": "+30 мин",
+  "eventsExtendEndPlus60": "+1 час",
+  "eventsExtendEndCustomTime": "Сопствено време…",
+  "eventsExtendEndApply": "Зачувај нов крај",
+  "eventsExtendEndSuccess": "Планираниот крај е ажуриран.",
+  "eventsExtendEndSameAsCurrent": "Тоа веќе е планираниот крај.",
+  "eventsExtendEndInvalidRange": "Тоа време на крај не е валидно за ова чистење.",
+  "eventsExtendEndTooSoon": "Изберете крај малку подалеку напред.",
+  "eventsEndSoonBannerTitle": "Чистењето наскоро завршува",
+  "eventsEndSoonBannerBody": "Можете да го продолжите планираниот крај или да завршите кога сте подготвени.",
+  "eventsEndSoonBannerExtend": "Продолжи",
+  "eventsOrganizerExtendEndSemantic": "Продолжи го планираниот крај на чистењето",
+  "eventsOrganizerEndSoonNotifyTitle": "Чистењето наскоро завршува",
+  "eventsOrganizerEndSoonNotifyBody": "Вашето чистење се приближува до планираниот крај. Допрете за преглед.",
+  "eventsOrganizerEndSoonNotifyChannelName": "Локални потсетници за организатори",
+  "eventsOrganizerEndSoonNotifyChannelDescription": "Локални потсетници кога чистењето што го водите се приближува до планираниот крај.",
+  "eventsCtaEditAfterPhotos": "Уреди фотографии потоа",
+  "eventsCtaUploadAfterPhotos": "Прикачи фотографии потоа",
   "eventsCtaCheckedIn": "Пријавени",
   "eventsCtaScanToCheckIn": "Скенирај за пријава",
   "eventsCtaCheckInPaused": "Пријавата е паузирана",
@@ -1217,21 +1376,31 @@
   "eventsCountdownDaysHours": "Почнува за {days}д {hours}ч",
   "@eventsCountdownDaysHours": {
     "placeholders": {
-      "days": { "type": "int" },
-      "hours": { "type": "int" }
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "eventsCountdownHoursMinutes": "Почнува за {hours}ч {minutes}м",
   "@eventsCountdownHoursMinutes": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "eventsCountdownMinutes": "Почнува за {minutes}м",
   "@eventsCountdownMinutes": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "eventsShareEventTooltip": "Сподели настан",
@@ -1245,12 +1414,15 @@
   "eventsAttendeeBannerSubtitleCheckedInAt": "Пријавени во {time}",
   "@eventsAttendeeBannerSubtitleCheckedInAt": {
     "placeholders": {
-      "time": { "type": "String" }
+      "time": {
+        "type": "String"
+      }
     }
   },
   "eventsAttendeeBannerSubtitleScanQr": "Скенирајте го QR-кодот на организаторот",
   "eventsAttendeeBannerSubtitlePaused": "Пријавата е привремено паузирана",
   "eventsDetailShareSuccess": "Настанот е споделен.",
+  "eventsDetailShareFailed": "Не можеше да се отвори споделувањето. Обидете се повторно.",
   "eventsDetailCalendarAdded": "Настанот е додаден во календарот.",
   "eventsDetailCalendarFailed": "Не можеше да се додаде во календарот. Обидете се повторно.",
   "eventsDetailRefreshFailed": "Не можеше да се освежи настанот. Обидете се повторно.",
@@ -1259,7 +1431,9 @@
   "eventsDetailCoverSemantic": "Насловна слика за {title}",
   "@eventsDetailCoverSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "eventsDetailGroupedPanelSemantic": "Локација, распоред и детали",
@@ -1274,39 +1448,59 @@
   "eventsReminderSetSnack": "Потсетникот е поставен за {when}.",
   "@eventsReminderSetSnack": {
     "placeholders": {
-      "when": { "type": "String" }
+      "when": {
+        "type": "String"
+      }
     }
   },
-  "eventsFeedbackSheetTitle": "Повратна информација после настанот",
+  "eventsFeedbackSheetTitle": "Повратна информација по настанот",
   "eventsFeedbackHowWasEvent": "Како помина настанот?",
   "eventsFeedbackRatingStars": "{rating}★",
   "@eventsFeedbackRatingStars": {
     "placeholders": {
-      "rating": { "type": "int" }
+      "rating": {
+        "type": "int"
+      }
     }
   },
   "eventsFeedbackBagsCollected": "Собрани ќесиња",
   "eventsFeedbackVolunteerHours": "Волонтерски часови: {hours}ч",
   "@eventsFeedbackVolunteerHours": {
     "placeholders": {
-      "hours": { "type": "String" }
+      "hours": {
+        "type": "String"
+      }
     }
   },
   "eventsFeedbackNotesHint": "Што добро помина? Белешки за следниот пат?",
   "eventsEvidenceMaxPhotosSnack": "Максимум {max} фотографии.",
   "@eventsEvidenceMaxPhotosSnack": {
     "placeholders": {
-      "max": { "type": "int" }
+      "max": {
+        "type": "int"
+      }
     }
   },
   "eventsEvidencePickFailedSnack": "Не можеше да се изберат фотографии. Проверете дозволи.",
   "eventsEvidenceRemoveAction": "Отстрани",
   "eventsEvidenceAppBarTitle": "Докази од чистење",
   "eventsEvidenceSaving": "Се зачувува...",
-  "eventsEvidenceAfterPhotosSaved": "Фотографиите после се зачувани.",
+  "eventsEvidenceSaveInProgressHint": "Почекајте додека не заврши зачувувањето пред да ја напуштите оваа страница.",
+  "eventsEvidenceAfterPhotosSaved": "Фотографиите потоа се зачувани.",
+  "eventsEvidenceSaveSuccessTitle": "Фотографиите се зачувани",
+  "eventsEvidenceSaveSuccessBody": "Фотографиите „потоа“ се на страницата на настанот.",
+  "eventsEvidenceSaveFailureTitle": "Не може да се зачуваат фотографиите",
+  "eventsEvidenceSaveFailureBody": "{message}",
+  "@eventsEvidenceSaveFailureBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "eventsEvidenceNoChanges": "Нема промени за зачувување.",
   "eventsSiteReferencePhotoTitle": "Референтна фотографија од локацијата",
-  "eventsSiteReferencePhotoBody": "Референца пред чистење. Користете јазичето После за фотографии од исчистената локација.",
+  "eventsSiteReferencePhotoBody": "Референца пред чистење. Користете јазичето Потоа за фотографии од исчистената локација.",
   "eventsManageCheckInOnlyInProgress": "Пријавата е достапна само додека настанот е во тек.",
   "eventsEventFull": "Овој настан е полн.",
   "eventsParticipationUpdateFailed": "Не можевме да ја ажурираме учеството. Обидете се повторно.",
@@ -1314,21 +1508,29 @@
   "eventsJoinPointsEarned": "+{points} поени — добредојдовте!",
   "@eventsJoinPointsEarned": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsLeftEcoAction": "Се одјавивте од оваа еколошка акција.",
   "eventsCheckInPointsEarned": "+{points} поени — регистрирани сте!",
   "@eventsCheckInPointsEarned": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsManualCheckInWithPoints": "{name} е регистриран/а · +{points} поени за нив",
   "@eventsManualCheckInWithPoints": {
     "placeholders": {
-      "name": { "type": "String" },
-      "points": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsJoinFirstForReminders": "Прво се придружете на настанот за да поставите потсетници.",
@@ -1628,8 +1830,12 @@
   "eventsAfterPhotoSemantic": "Прикажи фотографија по чистење {index} од {total}",
   "@eventsAfterPhotoSemantic": {
     "placeholders": {
-      "index": { "type": "int" },
-      "total": { "type": "int" }
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsFilterAll": "Сите",
@@ -1642,32 +1848,44 @@
   "eventsParticipantsViewSemantic": "Прикажи {count} учесници",
   "@eventsParticipantsViewSemantic": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsYouAndOthers": "Вие и уште {count} се приклучивте",
   "@eventsParticipantsYouAndOthers": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-  "eventsParticipantsVolunteersJoined": "{count} волонтери се приклучија",
+  "eventsParticipantsVolunteersJoined": "{count, plural, one{1 волонтер се приклучи} other{{count} волонтери се приклучија}}",
   "@eventsParticipantsVolunteersJoined": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsSpotsLeft": "Останати места: {count}",
   "@eventsParticipantsSpotsLeft": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsCheckedInCount": "{checkedIn} од {total} се пријавени",
   "@eventsParticipantsCheckedInCount": {
     "placeholders": {
-      "checkedIn": { "type": "int" },
-      "total": { "type": "int" }
+      "checkedIn": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsSearchPlaceholder": "Пребарај учесник",
@@ -1684,6 +1902,10 @@
   "eventsImpactSummaryAdd": "Додај",
   "eventsImpactSummaryEdit": "Уреди",
   "eventsImpactSummaryEmptyHint": "Забележете ги резултатите, напорот и поуките од чистењето.",
+  "eventsCompletedBagsSectionTitle": "Собрани ќесии со отпад",
+  "eventsCompletedBagsSectionSubtitle": "Колку ќесии со отпад собраа волонтерите на ова чистење. Можете да го менувате кога сакате; се вклучува во прегледот на ефект подолу.",
+  "eventsCompletedBagsSave": "Зачувај број",
+  "eventsCompletedBagsSaved": "Бројот на ќесии е зачуван.",
   "eventsImpactBadgeRating": "{rating}★ оценка",
   "eventsImpactBadgeBags": "{count} ќесии",
   "eventsImpactBadgeHours": "{hours}ч",
@@ -1702,6 +1924,7 @@
   "eventsEmptyMyEventsSubtitle": "Придружете се или создадете настан за да го видите тука.",
   "eventsSearchEmptyTitle": "Нема резултати за „{query}“",
   "eventsSearchEmptySubtitle": "Обидете се со друг термин или проверете го правописот.",
+  "eventsSearchEmptyScopeHint": "Резултатите доаѓаат од серверот додека пишувате и од настаните веќе вчитани во оваа листа.",
   "eventsSitePickerTitle": "Изберете локација",
   "eventsSitePickerSubtitle": "Поврзете го настанот со една локација за чистење.",
   "eventsSitePickerSearchPlaceholder": "Пребарај по име или опис",
@@ -1717,8 +1940,12 @@
   "eventsTimePickerTimeBlockSemantic": "{role}, {time}",
   "@eventsTimePickerTimeBlockSemantic": {
     "placeholders": {
-      "role": { "type": "String" },
-      "time": { "type": "String" }
+      "role": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
     }
   },
   "eventsFeedRecentSearches": "Неодамнешни пребарувања",
@@ -1737,7 +1964,9 @@
   "eventsDateRelativeDaysAgo": "Пред {days} дена",
   "@eventsDateRelativeDaysAgo": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "eventsDateRelativeToday": "Денес",
@@ -1745,22 +1974,30 @@
   "eventsDateRelativeInDays": "За {days} дена",
   "@eventsDateRelativeInDays": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "eventsDateInfoSheetTitle": "Датум и време",
   "eventsDateInfoSemantic": "{date}, {timeRange}",
   "@eventsDateInfoSemantic": {
     "placeholders": {
-      "date": { "type": "String" },
-      "timeRange": { "type": "String" }
+      "date": {
+        "type": "String"
+      },
+      "timeRange": {
+        "type": "String"
+      }
     }
   },
   "eventsCategorySheetTitle": "Категорија",
   "eventsCategorySemantic": "Категорија на настан: {label}",
   "@eventsCategorySemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizerSheetTitle": "Организатор",
@@ -1769,15 +2006,23 @@
   "eventsOrganizerCreatedOn": "Настанот е креиран на {day}/{month}/{year}",
   "@eventsOrganizerCreatedOn": {
     "placeholders": {
-      "day": { "type": "int" },
-      "month": { "type": "int" },
-      "year": { "type": "int" }
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerSemantic": "Организатор: {name}",
   "@eventsOrganizerSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizedByLabel": "Организирано од",
@@ -1795,10 +2040,57 @@
   "eventsCalendarDaySemantic": "Ден {day}",
   "@eventsCalendarDaySemantic": {
     "placeholders": {
-      "day": { "type": "int" }
+      "day": {
+        "type": "int"
+      }
     }
   },
   "eventsCalendarNoEventsThisDay": "Нема настани за овој ден",
+  "eventsCalendarIncompleteListHint": "Можеби има повеќе настани. Вчитајте наредна страница за овој месец.",
+  "eventsCalendarLoadMoreButton": "Вчитај повеќе",
+  "eventsCalendarDayA11yOutOfMonth": "Ден {day}, не е од овој месец",
+  "@eventsCalendarDayA11yOutOfMonth": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11y": "Ден {day}",
+  "@eventsCalendarDayA11y": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11yHasEvents": "Ден {day}, има настани",
+  "@eventsCalendarDayA11yHasEvents": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11ySelected": "Ден {day}, избрано",
+  "@eventsCalendarDayA11ySelected": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11ySelectedHasEvents": "Ден {day}, избрано, има настани",
+  "@eventsCalendarDayA11ySelectedHasEvents": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsEmptyActionClearFilters": "Исчисти филтри",
+  "eventsEmptyActionCreateEvent": "Креирај настан",
+  "eventsSearchEmptyClearSearch": "Исчисти пребарување",
   "siteCardPollutionSiteSemantic": "Загадено место: {title}. Допри за детали.",
   "@siteCardPollutionSiteSemantic": {
     "placeholders": {
@@ -1826,7 +2118,9 @@
   "eventsFilterSheetActiveCount": "{count} активни",
   "@eventsFilterSheetActiveCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerDashboardTitle": "Мои настани",
@@ -1839,14 +2133,20 @@
   "eventsOrganizerDashboardParticipants": "{count}/{max} учесници",
   "@eventsOrganizerDashboardParticipants": {
     "placeholders": {
-      "count": { "type": "int" },
-      "max": { "type": "String" }
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizerDashboardParticipantsUnlimited": "{count} учесници",
   "@eventsOrganizerDashboardParticipantsUnlimited": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerDashboardEvidenceAction": "Докази",
@@ -1855,6 +2155,54 @@
   "eventsAnalyticsJoiners": "Приклучени со текот на времето",
   "eventsAnalyticsCheckInsByHour": "Пријави по час",
   "eventsAnalyticsNoData": "Сè уште нема податоци",
+  "eventsAnalyticsRefresh": "Освежи аналитика",
+  "eventsAnalyticsCheckedInRatio": "{checkedInCount} од {totalJoiners} се пријавија",
+  "@eventsAnalyticsCheckedInRatio": {
+    "placeholders": {
+      "checkedInCount": {
+        "type": "int"
+      },
+      "totalJoiners": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsAnalyticsJoinersEmpty": "Сè уште никој не се приклучил на настанот.",
+  "eventsAnalyticsCheckInsEmpty": "Сè уште нема пријави. Часовите се во UTC.",
+  "eventsAnalyticsPeakCheckInsUtc": "Врв: {hour} UTC",
+  "@eventsAnalyticsPeakCheckInsUtc": {
+    "placeholders": {
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsJoinCurve": "Тренд на приклучувања од {fromCount} до {toCount} учесници, {steps} точки.",
+  "@eventsAnalyticsSemanticsJoinCurve": {
+    "placeholders": {
+      "fromCount": {
+        "type": "int"
+      },
+      "toCount": {
+        "type": "int"
+      },
+      "steps": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsCheckInHeatmap": "Пријави по час во UTC. Врв {peakCount} во {hour}.",
+  "@eventsAnalyticsSemanticsCheckInHeatmap": {
+    "placeholders": {
+      "peakCount": {
+        "type": "int"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsCheckInNoData": "Пријави по час во UTC. Нема записани пријави.",
   "eventsOfflineSyncQueued": "Зачувано. Ќе се синхронизира кога ќе се поврзете.",
   "eventsOfflineSyncFailed": "Синхронизацијата не успеа. Ќе се обиде повторно.",
   "eventsWeatherForecast": "Прогноза за времето",
@@ -1862,14 +2210,18 @@
   "eventsWeatherPrecipitationMm": "{amount} мм врнежи",
   "@eventsWeatherPrecipitationMm": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "eventsWeatherNoPrecipitation": "Без значителни врнежи",
   "eventsWeatherPrecipChance": "{percent}% веројатност за врнежи",
   "@eventsWeatherPrecipChance": {
     "placeholders": {
-      "percent": { "type": "int" }
+      "percent": {
+        "type": "int"
+      }
     }
   },
   "eventsWeatherIndicativeNote": "Индикативна прогноза од Open-Meteo; вистинските услови може да се разликуваат.",
@@ -1882,15 +2234,21 @@
   "eventsRecurrenceOccurrences": "{count} повторувања",
   "@eventsRecurrenceOccurrences": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsRecurrencePartOfSeries": "Дел од серија",
   "eventsRecurrenceSeriesLabel": "Настан {index} од {total}",
   "@eventsRecurrenceSeriesLabel": {
     "placeholders": {
-      "index": { "type": "int" },
-      "total": { "type": "int" }
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsRecurrenceDone": "Готово",
@@ -1905,7 +2263,7 @@
   "eventsCategoryHazardousRemoval": "Опасен отпад",
   "eventsCategoryHazardousRemovalDescription": "Безбедно собирање на хемикалии, гуми, батерии или азбест.",
   "eventsCategoryAwarenessAndEducation": "Свест и едукација",
-  "eventsCategoryAwarenessAndEducationDescription": "Рабилници, предавања или вклучување на заедницата.",
+  "eventsCategoryAwarenessAndEducationDescription": "Работилници, предавања или заедничка ангажираност за еколошки практики.",
   "eventsCategoryOther": "Друго",
   "eventsCategoryOtherDescription": "Прилагоден настан што не се вклопува во горните категории.",
   "eventsGearTrashBags": "Џувалја за отпад",
@@ -1939,10 +2297,12 @@
   "homeSiteCleaningVolunteersJoined": "{count, plural, one{1 волонтер се приклучи} other{{count} волонтери се приклучија}}",
   "@homeSiteCleaningVolunteersJoined": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-  "homeSiteCleaningOrganizerHint": "Вие ја организирате оваа акција. Поставете „после“ фотографии откако ќе заврши.",
+  "homeSiteCleaningOrganizerHint": "Вие ја организирате оваа акција. Поставете „потоа“ фотографии откако ќе заврши.",
   "homeSiteCleaningVolunteerHint": "Приклучете се на акцијата за да помогнете да се исчисти локацијата.",
   "homeSiteCleaningJoinAction": "Приклучи се",
   "homeSiteCleaningEventUnavailable": "Деталите за настанот моментално не се достапни.",
@@ -1983,24 +2343,36 @@
   "eventChatReplyingTo": "Одговор на {name}",
   "@eventChatReplyingTo": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatCharCountHint": "{count} / 2000",
   "@eventChatCharCountHint": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatSemanticsBubble": "{author}, {time}. {body}",
   "@eventChatSemanticsBubble": {
     "placeholders": {
-      "author": { "type": "String" },
-      "time": { "type": "String" },
-      "body": { "type": "String" }
+      "author": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "body": {
+        "type": "String"
+      }
     }
   },
   "eventChatInputSemantics": "Порака во разговорот",
+  "eventChatMessagesListSemantics": "Листа на пораки",
+  "eventChatAttachmentsNeedNetwork": "Фотографии, видео, датотеки и гласовни пораки бараат интернет врска.",
   "eventChatPushChannelName": "Разговор на настан",
   "eventChatEdited": "(изменето)",
   "eventChatEditMessage": "Уреди",
@@ -2012,7 +2384,9 @@
   "eventChatPinnedBy": "Закачено од {name}",
   "@eventChatPinnedBy": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatPinnedMessagesTitle": "Закачени пораки",
@@ -2024,20 +2398,30 @@
   "eventChatReconnecting": "Повторно поврзување…",
   "eventChatConnected": "Поврзано",
   "eventChatSearchHint": "Пребарај пораки",
-  "eventChatSearchNoResults": "Нема пораки",
+  "eventChatSearchNoResults": "Нема совпаѓања за пребарувањето",
   "eventChatSearchAction": "Пребарај",
+  "eventChatSearchFailed": "Пребарувањето не успеа. Провери ја врската и обиди се повторно.",
+  "eventChatSearchMinChars": "Внеси барем 2 знаци за пребарување.",
+  "eventChatSearchIncludingLocalMatches": "Вклучува пораки вчитани на овој уред.",
+  "eventChatSearchLoadMore": "Вчитај повеќе резултати",
   "eventChatParticipantsCount": "{count} учесници",
   "@eventChatParticipantsCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatParticipantsSheetTitle": "Луѓе во овој разговор",
   "eventChatParticipantsTitleSemantic": "{eventTitle}, {count} учесници",
   "@eventChatParticipantsTitleSemantic": {
     "placeholders": {
-      "eventTitle": { "type": "String" },
-      "count": { "type": "int" }
+      "eventTitle": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatParticipantsLoadError": "Не можеше да се вчитаат учесниците.",
@@ -2046,13 +2430,17 @@
   "eventChatSystemUserJoined": "{name} се придружи на настанот",
   "@eventChatSystemUserJoined": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatSystemUserLeft": "{name} го напушти настанот",
   "@eventChatSystemUserLeft": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatSystemEventUpdated": "Деталите за настанот се ажурирани",
@@ -2069,34 +2457,50 @@
   "eventChatSeenBy": "Видено од {names}",
   "@eventChatSeenBy": {
     "placeholders": {
-      "names": { "type": "String" }
+      "names": {
+        "type": "String"
+      }
     }
   },
   "eventChatSeenByTruncated": "Видено од {names} +{count}",
   "@eventChatSeenByTruncated": {
     "placeholders": {
-      "names": { "type": "String" },
-      "count": { "type": "int" }
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatTypingOne": "{name} пишува…",
   "@eventChatTypingOne": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatTypingTwo": "{first} и {second} пишуваат…",
   "@eventChatTypingTwo": {
     "placeholders": {
-      "first": { "type": "String" },
-      "second": { "type": "String" }
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
     }
   },
   "eventChatTypingMany": "{name} и уште {count} пишуваат…",
   "@eventChatTypingMany": {
     "placeholders": {
-      "name": { "type": "String" },
-      "count": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatOpenMapsFailed": "Не можев да го отворам Maps. Обиди се повторно.",
@@ -2104,8 +2508,12 @@
   "eventChatImageViewerPage": "{current} од {total}",
   "@eventChatImageViewerPage": {
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventChatVideoViewerTitle": "Видео",
@@ -2149,7 +2557,11 @@
   "unknownRouteDebugRoute": "Дебаг: името на рутата беше „{routeName}“.",
   "@unknownRouteDebugRoute": {
     "placeholders": {
-      "routeName": { "type": "String" }
+      "routeName": {
+        "type": "String"
+      }
     }
-  }
+  },
+  "chatShareLocation": "Сподели локација",
+  "chatSharedLocation": "Споделена локација"
 }

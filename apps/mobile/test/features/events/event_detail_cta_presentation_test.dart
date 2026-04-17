@@ -46,12 +46,26 @@ void main() {
       status: EcoEventStatus.upcoming,
       organizerId: 'other',
       isJoined: false,
-    );
+    ).copyWith(scheduledAtUtc: DateTime.utc(2020, 6, 1, 8, 0));
     final EventDetailCtaPresentation p =
         resolveEventDetailCtaPresentation(event: event, l10n: l10n);
     expect(p.primaryEnabled, isTrue);
     expect(p.showsSecondaryRow, isFalse);
     expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
+  });
+
+  test('joinable guest before scheduled start: Join disabled', () {
+    final EcoEvent event = base(
+      id: 'join-future',
+      status: EcoEventStatus.upcoming,
+      organizerId: 'other',
+      isJoined: false,
+    ).copyWith(scheduledAtUtc: DateTime.utc(2035, 6, 1, 8, 0));
+    final EventDetailCtaPresentation p =
+        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
+    expect(p.primaryEnabled, isFalse);
+    expect(p.showsSecondaryRow, isFalse);
   });
 
   test('joined upcoming: reminder primary and leave secondary', () {
@@ -80,6 +94,21 @@ void main() {
     expect(p.primaryEnabled, isFalse);
   });
 
+  test('organizer in progress: manage check-in primary and extend secondary', () {
+    final EcoEvent event = base(
+      id: 'org-live',
+      status: EcoEventStatus.inProgress,
+      organizerId: 'current_user',
+    );
+    final EventDetailCtaPresentation p =
+        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    expect(p.primaryLabel, l10n.eventsCtaManageCheckIn);
+    expect(p.primaryEnabled, isTrue);
+    expect(p.showsSecondaryRow, isTrue);
+    expect(p.secondaryIsExtendCleanupEnd, isTrue);
+    expect(p.secondaryLabel, l10n.eventsCtaExtendCleanupEnd);
+  });
+
   test('organizer upcoming after scheduled start: start enabled', () {
     final EcoEvent event = base(
       id: 'org-past',
@@ -90,5 +119,31 @@ void main() {
         resolveEventDetailCtaPresentation(event: event, l10n: l10n);
     expect(p.primaryLabel, l10n.eventsCtaStartEvent);
     expect(p.primaryEnabled, isTrue);
+  });
+
+  test('cancelled event with isJoined does not show leave/reminder CTA', () {
+    final EcoEvent event = base(
+      id: 'cancelled-joined',
+      status: EcoEventStatus.cancelled,
+      organizerId: 'other',
+      isJoined: true,
+    );
+    final EventDetailCtaPresentation p =
+        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    expect(p.primaryEnabled, isFalse);
+    expect(p.showsSecondaryRow, isFalse);
+  });
+
+  test('completed event with isJoined does not show leave/reminder CTA', () {
+    final EcoEvent event = base(
+      id: 'completed-joined',
+      status: EcoEventStatus.completed,
+      organizerId: 'other',
+      isJoined: true,
+    );
+    final EventDetailCtaPresentation p =
+        resolveEventDetailCtaPresentation(event: event, l10n: l10n);
+    expect(p.primaryEnabled, isFalse);
+    expect(p.showsSecondaryRow, isFalse);
   });
 }

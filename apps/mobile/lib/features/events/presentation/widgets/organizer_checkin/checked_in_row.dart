@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show CustomSemanticsAction;
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
@@ -6,6 +7,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
+import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 
 /// Checked-in attendee row.
 /// Swipe left to remove. No persistent buttons to avoid the "tick does
@@ -15,19 +17,13 @@ class CheckedInRow extends StatelessWidget {
     super.key,
     required this.attendee,
     required this.onRemove,
-    required this.avatarIndex,
   });
 
   final CheckedInAttendee attendee;
   final VoidCallback onRemove;
-  final int avatarIndex;
 
   @override
   Widget build(BuildContext context) {
-    final Color avatarColor =
-        AppColors.avatarPalette[avatarIndex % AppColors.avatarPalette.length];
-    final String initial =
-        attendee.name.isNotEmpty ? attendee.name[0].toUpperCase() : '?';
     final String time =
         '${attendee.checkedInAt.hour.toString().padLeft(2, '0')}:'
         '${attendee.checkedInAt.minute.toString().padLeft(2, '0')}';
@@ -85,8 +81,8 @@ class CheckedInRow extends StatelessWidget {
                     Container(
                       width: 44,
                       height: 44,
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: avatarColor,
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.white, width: 2),
                         boxShadow: <BoxShadow>[
@@ -97,14 +93,14 @@ class CheckedInRow extends StatelessWidget {
                           ),
                         ],
                       ),
-                      alignment: Alignment.center,
-                      child: Text(
-                        initial,
-                        style: AppTypography.badgeLabel.copyWith(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.white,
-                        ),
+                      clipBehavior: Clip.none,
+                      child: UserAvatarCircle(
+                        displayName: attendee.name,
+                        imageUrl: attendee.avatarUrl,
+                        size: 40,
+                        seed: attendee.userId != null && attendee.userId!.isNotEmpty
+                            ? attendee.userId
+                            : attendee.id,
                       ),
                     ),
                     Positioned(
@@ -139,9 +135,8 @@ class CheckedInRow extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         attendee.name,
-                        style: AppTypography.textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                        style: AppTypography.eventsFormLeadHeading(
+                          Theme.of(context).textTheme,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -149,10 +144,9 @@ class CheckedInRow extends StatelessWidget {
                       const SizedBox(height: AppSpacing.xxs / 2),
                       Text(
                         time,
-                        style: AppTypography.textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppTypography.eventsListCardMeta(
+                          Theme.of(context).textTheme,
+                        ).copyWith(fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),

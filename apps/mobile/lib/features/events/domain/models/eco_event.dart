@@ -241,6 +241,10 @@ class EcoEvent {
       moderationApproved &&
       status != EcoEventStatus.completed &&
       status != EcoEventStatus.cancelled;
+
+  /// New joins allowed (server: not before [scheduledAtUtc] / [startDateTime]).
+  bool get canVolunteerJoinNow => isJoinable && !isBeforeScheduledStart;
+
   bool get isLifecycleClosed =>
       status == EcoEventStatus.completed || status == EcoEventStatus.cancelled;
   bool get isCheckedIn => attendeeCheckInStatus == AttendeeCheckInStatus.checkedIn;
@@ -296,11 +300,13 @@ class EcoEvent {
     String? siteImageUrl,
     double? siteDistanceKm,
     String? organizerAvatarUrl,
+    bool clearOrganizerAvatarUrl = false,
     DateTime? date,
     EventTime? startTime,
     EventTime? endTime,
     int? participantCount,
     int? maxParticipants,
+    bool clearMaxParticipants = false,
     EcoEventStatus? status,
     bool? isJoined,
     String? activeCheckInSessionId,
@@ -316,7 +322,9 @@ class EcoEvent {
     List<String>? afterImagePaths,
     List<EventGear>? gear,
     CleanupScale? scale,
+    bool clearScale = false,
     EventDifficulty? difficulty,
+    bool clearDifficulty = false,
     bool? moderationApproved,
     DateTime? scheduledAtUtc,
     int? recurrenceSeriesTotal,
@@ -336,12 +344,16 @@ class EcoEvent {
       siteDistanceKm: siteDistanceKm ?? this.siteDistanceKm,
       organizerId: organizerId,
       organizerName: organizerName,
-      organizerAvatarUrl: organizerAvatarUrl ?? this.organizerAvatarUrl,
+      organizerAvatarUrl: clearOrganizerAvatarUrl
+          ? null
+          : organizerAvatarUrl ?? this.organizerAvatarUrl,
       date: date ?? this.date,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       participantCount: participantCount ?? this.participantCount,
-      maxParticipants: maxParticipants ?? this.maxParticipants,
+      maxParticipants: clearMaxParticipants
+          ? null
+          : maxParticipants ?? this.maxParticipants,
       status: status ?? this.status,
       isJoined: isJoined ?? this.isJoined,
       activeCheckInSessionId: clearActiveCheckInSessionId
@@ -359,14 +371,14 @@ class EcoEvent {
       afterImagePaths: afterImagePaths ?? this.afterImagePaths,
       createdAt: createdAt,
       gear: gear ?? this.gear,
-      scale: scale ?? this.scale,
-      difficulty: difficulty ?? this.difficulty,
+      scale: clearScale ? null : scale ?? this.scale,
+      difficulty: clearDifficulty ? null : difficulty ?? this.difficulty,
       moderationApproved: moderationApproved ?? this.moderationApproved,
-      siteLat: siteLat ?? this.siteLat,
-      siteLng: siteLng ?? this.siteLng,
-      recurrenceRule: recurrenceRule ?? this.recurrenceRule,
-      parentEventId: parentEventId ?? this.parentEventId,
-      recurrenceIndex: recurrenceIndex ?? this.recurrenceIndex,
+      siteLat: siteLat,
+      siteLng: siteLng,
+      recurrenceRule: recurrenceRule,
+      parentEventId: parentEventId,
+      recurrenceIndex: recurrenceIndex,
       scheduledAtUtc: scheduledAtUtc ?? this.scheduledAtUtc,
       recurrenceSeriesTotal: recurrenceSeriesTotal ?? this.recurrenceSeriesTotal,
       recurrenceSeriesPosition:
@@ -408,6 +420,9 @@ class EcoEvent {
   int get hashCode => Object.hash(
         id,
         title,
+        description,
+        category,
+        siteId,
         status,
         isJoined,
         participantCount,
@@ -419,6 +434,8 @@ class EcoEvent {
         startTime,
         endTime,
         scheduledAtUtc,
+        Object.hashAll(afterImagePaths),
+        Object.hashAll(gear),
         moderationApproved,
       );
 
@@ -428,6 +445,11 @@ class EcoEvent {
       for (final T value in values) {
         if (value.name == name) return value;
       }
+      assert(() {
+        debugPrint('[EcoEvent] Unknown enum value "$name" for '
+            '${fallback.runtimeType}, falling back to ${fallback.name}');
+        return true;
+      }());
       return fallback;
     }
 
@@ -489,18 +511,19 @@ class EcoEvent {
       ),
       attendeeCheckedInAt: json['attendeeCheckedInAt'] == null
           ? null
-          : parseDate(json['attendeeCheckedInAt'], now),
+          : parseDate(json['attendeeCheckedInAt'], now).toLocal(),
       reminderEnabled: (json['reminderEnabled'] as bool?) ?? false,
       reminderAt: json['reminderAt'] == null
           ? null
-          : parseDate(json['reminderAt'], now),
+          : parseDate(json['reminderAt'], now).toLocal(),
       afterImagePaths: (json['afterImagePaths'] as List<dynamic>? ?? const <dynamic>[])
           .whereType<String>()
           .toList(growable: false),
       gear: (json['gear'] as List<dynamic>? ?? const <dynamic>[])
-          .map((dynamic raw) => enumByNameOr<EventGear>(
+          .whereType<String>()
+          .map((String raw) => enumByNameOr<EventGear>(
                 EventGear.values,
-                raw as String?,
+                raw,
                 EventGear.trashBags,
               ))
           .toSet()

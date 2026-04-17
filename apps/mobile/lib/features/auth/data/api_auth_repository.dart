@@ -7,6 +7,7 @@ import 'package:chisto_mobile/core/storage/secure_token_storage.dart';
 import 'package:chisto_mobile/features/auth/data/access_token_expiry.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
+import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -209,6 +210,7 @@ class ApiAuthRepository implements AuthRepository {
     profileAvatarState.setRemoteUrl(null);
     profileAvatarState.clearLocalPath();
     await _tokenStorage.clearTokens();
+    await ChatOutboxStore.shared.clearAll();
   }
 
   Future<void> _performLocalLogout() async {

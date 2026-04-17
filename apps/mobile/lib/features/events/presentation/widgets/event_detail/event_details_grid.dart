@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
@@ -54,8 +55,7 @@ class EventDetailsGrid extends StatelessWidget {
               Text(
                 description,
                 textAlign: TextAlign.center,
-                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTypography.eventsBodyMuted(Theme.of(ctx).textTheme).copyWith(
                   height: 1.5,
                 ),
               ),
@@ -207,10 +207,7 @@ class _GroupedPanelDetailsRow extends StatelessWidget {
                       applyHeightToLastDescent: true,
                       leadingDistribution: TextLeadingDistribution.even,
                     ),
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimary,
-                    ),
+                    style: AppTypography.eventsGroupedRowPrimary(textTheme),
                   ),
                 ),
                 const Icon(
@@ -271,8 +268,8 @@ class DetailChip extends StatelessWidget {
                     label,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontWeight: FontWeight.w600,
+                    style: AppTypography.eventsCaptionStrong(
+                      Theme.of(context).textTheme,
                       color: color,
                     ),
                   ),

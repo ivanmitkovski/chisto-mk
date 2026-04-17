@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class EventCalendar extends StatefulWidget {
@@ -55,7 +56,17 @@ class _EventCalendarState extends State<EventCalendar> {
     }
   }
 
+  bool get _canGoToPreviousMonth {
+    final DateTime firstAllowed = DateTime(_today.year, _today.month);
+    final DateTime candidate =
+        DateTime(_focusedMonth.year, _focusedMonth.month - 1);
+    return !candidate.isBefore(firstAllowed);
+  }
+
   void _goToPreviousMonth() {
+    if (!_canGoToPreviousMonth) {
+      return;
+    }
     AppHaptics.tap();
     setState(() {
       _focusedMonth = DateTime(_focusedMonth.year, _focusedMonth.month - 1);
@@ -128,16 +139,18 @@ class _EventCalendarState extends State<EventCalendar> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Semantics(
-          button: true,
+          button: _canGoToPreviousMonth,
           label: context.l10n.eventsCalendarPreviousMonth,
           child: IconButton(
-            onPressed: _goToPreviousMonth,
+            onPressed: _canGoToPreviousMonth ? _goToPreviousMonth : null,
             splashRadius: 20,
             tooltip: context.l10n.eventsCalendarPreviousMonth,
-            icon: const Icon(
+            icon: Icon(
               CupertinoIcons.chevron_left_circle_fill,
               size: 28,
-              color: AppColors.primary,
+              color: _canGoToPreviousMonth
+                  ? AppColors.primary
+                  : AppColors.textMuted.withValues(alpha: 0.35),
             ),
           ),
         ),
@@ -146,10 +159,9 @@ class _EventCalendarState extends State<EventCalendar> {
           children: <Widget>[
             Text(
               localizations.formatMonthYear(_focusedMonth),
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                  ),
+              style: AppTypography.eventsCalendarEmbeddedMonthTitle(
+                Theme.of(context).textTheme,
+              ),
             ),
           ],
         ),
@@ -184,10 +196,9 @@ class _EventCalendarState extends State<EventCalendar> {
           child: Center(
             child: Text(
               label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textMuted,
-                  ),
+              style: AppTypography.eventsCalendarWeekdayLabel(
+                Theme.of(context).textTheme,
+              ),
             ),
           ),
         );
@@ -224,7 +235,9 @@ class _EventCalendarState extends State<EventCalendar> {
                       },
                 customBorder: const CircleBorder(),
                 child: AnimatedContainer(
-                  duration: AppMotion.fast,
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : AppMotion.fast,
                   curve: AppMotion.emphasized,
                   height: 40,
                   margin: const EdgeInsets.all(AppSpacing.xxs / 2),
@@ -237,7 +250,8 @@ class _EventCalendarState extends State<EventCalendar> {
                   alignment: Alignment.center,
                   child: Text(
                     '${date.day}',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    style: AppTypography.eventsCalendarDayNumber(
+                      Theme.of(context).textTheme,
                       fontWeight: isSelected || isToday
                           ? FontWeight.w700
                           : FontWeight.w400,

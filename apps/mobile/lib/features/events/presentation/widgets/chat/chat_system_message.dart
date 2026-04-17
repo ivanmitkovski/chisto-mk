@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 
 /// Centered informational line for server system messages (join/leave/updates).
@@ -41,9 +41,7 @@ class ChatSystemMessage extends StatelessWidget {
           child: Text(
             text,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            style: AppTypography.eventsChatSystemLine(Theme.of(context).textTheme),
           ),
         ),
       ),

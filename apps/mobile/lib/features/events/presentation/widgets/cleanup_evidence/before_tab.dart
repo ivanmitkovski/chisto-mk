@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 
 class BeforeTab extends StatelessWidget {
@@ -37,13 +37,12 @@ class BeforeTab extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Text(
             context.l10n.eventsSiteReferencePhotoTitle,
-            style:
-                textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.eventsCalendarMonthTitle(textTheme),
           ),
           const SizedBox(height: AppSpacing.xs),
           Text(
             context.l10n.eventsSiteReferencePhotoBody,
-            style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+            style: AppTypography.eventsListCardMeta(textTheme),
           ),
         ],
       ),

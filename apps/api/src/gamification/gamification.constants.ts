@@ -7,8 +7,8 @@ export const POINTS_EVENT_ORGANIZER_APPROVED = 10;
 /** Participant joins an approved event (one grant per user per event; may be reversed on completion if no check-in). */
 export const POINTS_EVENT_JOINED = 5;
 
-/** Successful check-in (QR redeem or organizer manual check-in for that user). */
-export const POINTS_EVENT_CHECK_IN = 15;
+/** Successful check-in (QR redeem or organizer manual check-in for that user). Higher than {@link POINTS_FIRST_REPORT} — field attendance costs more effort than reporting. */
+export const POINTS_EVENT_CHECK_IN = 35;
 
 /** Checked-in participants when organizer marks the event COMPLETED. */
 export const POINTS_EVENT_COMPLETED = 30;

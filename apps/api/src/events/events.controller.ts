@@ -14,6 +14,7 @@ import {
 import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiConsumes,
   ApiOkResponse,
@@ -24,6 +25,7 @@ import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/current-user.decorator';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
+import { CheckEventConflictQueryDto } from './dto/check-event-conflict-query.dto';
 import { CreatePublicEventDto } from './dto/create-public-event.dto';
 import { EventAnalyticsResponseDto } from './dto/event-analytics-response.dto';
 import { ListEventParticipantsResponseDto } from './dto/event-participant-row.dto';
@@ -50,6 +52,23 @@ export class EventsController {
   @ApiOkResponse({ description: 'Paginated events' })
   list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListEventsQueryDto) {
     return this.eventsService.list(user, query);
+  }
+
+  @Get('check-conflict')
+  @Throttle({ default: { ttl: 60_000, limit: 60 } })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Preview duplicate schedule at a site (buffered overlap; excludes cancelled/completed)',
+  })
+  @ApiOkResponse({
+    description: '{ hasConflict, conflictingEvent? }',
+  })
+  checkConflict(
+    @CurrentUser() _user: AuthenticatedUser,
+    @Query() query: CheckEventConflictQueryDto,
+  ) {
+    return this.eventsService.checkScheduleConflictPreview(query);
   }
 
   @Get(':id/participants')
@@ -105,6 +124,15 @@ export class EventsController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Join event' })
+  @ApiBadRequestResponse({
+    description: 'Join not allowed (e.g. before scheduledAt, organizer, or not approved)',
+    schema: {
+      example: {
+        code: 'EVENT_JOIN_NOT_YET_OPEN',
+        message: 'Joining opens when the scheduled start time arrives.',
+      },
+    },
+  })
   @ApiOkResponse({
     description: 'Event payload (same as GET /events/:id) plus pointsAwarded for this join',
   })

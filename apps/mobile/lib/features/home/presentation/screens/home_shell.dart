@@ -15,7 +15,8 @@ import 'package:chisto_mobile/features/home/presentation/widgets/home_bottom_nav
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
-import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/events_feed_screen.dart'
+    show EventsFeedScreen, EventsFeedScreenState;
 import 'package:chisto_mobile/features/reports/presentation/screens/reports_list_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/photo_review_sheet.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -44,7 +45,8 @@ class _HomeShellState extends State<HomeShell> {
   int _reportsRefreshTrigger = 0;
   final ImagePicker _imagePicker = ImagePicker();
   final GlobalKey _feedKey = GlobalKey();
-  final GlobalKey _eventsFeedKey = GlobalKey();
+  final GlobalKey<EventsFeedScreenState> _eventsFeedKey =
+      GlobalKey<EventsFeedScreenState>();
   bool _isLaunchingReportFlow = false;
 
   bool _hasVisitedMap = false;
@@ -150,8 +152,8 @@ class _HomeShellState extends State<HomeShell> {
         final dynamic state = _feedKey.currentState;
         if (state != null) state.scrollToTop();
       } else if (index == 3) {
-        final dynamic state = _eventsFeedKey.currentState;
-        if (state != null) state.scrollToTop();
+        final EventsFeedScreenState? state = _eventsFeedKey.currentState;
+        state?.scrollToTop();
       }
       return;
     }
@@ -168,8 +170,9 @@ class _HomeShellState extends State<HomeShell> {
       });
     } else if (index == 3) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final dynamic state = _eventsFeedKey.currentState;
-        if (state != null) state.scrollToTop();
+        final EventsFeedScreenState? state = _eventsFeedKey.currentState;
+        state?.scrollToTop();
+        state?.silentRefreshIfStale();
       });
     }
   }

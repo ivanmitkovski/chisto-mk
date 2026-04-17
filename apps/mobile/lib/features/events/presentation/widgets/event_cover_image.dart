@@ -92,8 +92,9 @@ class EcoEventCoverImage extends StatelessWidget {
     int? frame,
     bool wasSynchronouslyLoaded,
   ) {
-    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
-    if (wasSynchronouslyLoaded || frame != null) {
+    if (wasSynchronouslyLoaded ||
+        frame != null ||
+        MediaQuery.disableAnimationsOf(context)) {
       return child;
     }
     return _loadingPlaceholder();

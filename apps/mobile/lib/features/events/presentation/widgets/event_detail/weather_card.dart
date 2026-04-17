@@ -100,10 +100,12 @@ class _WeatherCardState extends State<WeatherCard> {
             Expanded(
               child: Text(
                 context.l10n.eventsWeatherUnavailableBody,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                      height: 1.35,
-                    ),
+                style: AppTypography.eventsBodyProse(
+                  Theme.of(context).textTheme,
+                ).copyWith(
+                  color: AppColors.textSecondary,
+                  height: 1.35,
+                ),
               ),
             ),
           ],
@@ -211,16 +213,15 @@ class _WeatherCardState extends State<WeatherCard> {
             children: <Widget>[
               Text(
                 description,
-                style: AppTypography.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.2,
+                style: AppTypography.eventsSectionTitle(
+                  Theme.of(context).textTheme,
                 ),
               ),
               const SizedBox(height: 2),
               Text(
                 detail,
-                style: AppTypography.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTypography.eventsListCardMeta(
+                  Theme.of(context).textTheme,
                 ),
               ),
             ],

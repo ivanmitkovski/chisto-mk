@@ -3,6 +3,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 
 /// Status strip under the app bar when the chat stream is recovering.
 class ChatConnectionBanner extends StatelessWidget {
@@ -11,25 +12,36 @@ class ChatConnectionBanner extends StatelessWidget {
     required this.reconnecting,
     this.disconnected = false,
     this.showConnectedFlash = false,
+    this.reduceMotion = false,
+    this.liveRegion = true,
   });
 
   final bool reconnecting;
   final bool disconnected;
   final bool showConnectedFlash;
+  /// When true (e.g. system Reduce Motion), skip slide/fade durations.
+  final bool reduceMotion;
+  /// Announces connection changes to accessibility services.
+  final bool liveRegion;
 
   @override
   Widget build(BuildContext context) {
     final bool visible = reconnecting || disconnected || showConnectedFlash;
+    final Duration animDuration = reduceMotion ? Duration.zero : AppMotion.medium;
     return AnimatedSlide(
       offset: visible ? Offset.zero : const Offset(0, -1),
-      duration: AppMotion.medium,
+      duration: animDuration,
       curve: AppMotion.smooth,
       child: AnimatedOpacity(
         opacity: visible ? 1.0 : 0.0,
-        duration: AppMotion.medium,
+        duration: animDuration,
         curve: AppMotion.smooth,
         child: visible
-            ? _content(context)
+            ? Semantics(
+                liveRegion: liveRegion,
+                container: true,
+                child: _content(context),
+              )
             : const SizedBox(height: 0, width: double.infinity),
       ),
     );
@@ -75,9 +87,10 @@ class ChatConnectionBanner extends StatelessWidget {
             Expanded(
               child: Text(
                 text,
-                style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                style: AppTypography.eventsCaptionStrong(
+                  Theme.of(context).textTheme,
+                  color: AppColors.textSecondary,
+                ),
               ),
             ),
           ],

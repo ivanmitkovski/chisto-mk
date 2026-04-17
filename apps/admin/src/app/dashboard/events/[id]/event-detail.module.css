@@ -322,3 +322,76 @@
   align-items: center;
   gap: var(--space-2);
 }
+
+.readOnlyBanner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(8, 54, 39, 0.12);
+  background: rgba(36, 172, 249, 0.08);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(8, 54, 39, 0.88);
+  margin-bottom: var(--space-2);
+}
+
+.fieldError {
+  margin: var(--space-1) 0 0;
+  font-size: 0.8125rem;
+  color: var(--color-error);
+}
+
+.conflictBanner {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: rgba(180, 120, 0, 0.1);
+  border: 1px solid rgba(180, 120, 0, 0.35);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: rgba(8, 54, 39, 0.92);
+  margin-bottom: var(--space-4);
+}
+
+.conflictBanner a {
+  font-weight: 600;
+  color: var(--color-green-700);
+}
+
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 54, 39, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 80;
+  padding: var(--space-4);
+}
+
+.modalCard {
+  max-width: 22rem;
+  width: 100%;
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+  background: #fff;
+  box-shadow: 0 16px 48px rgba(8, 54, 39, 0.18);
+}
+
+.modalTitle {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-3);
+  color: rgba(8, 54, 39, 0.95);
+}
+
+.modalBody {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: rgba(8, 54, 39, 0.8);
+  margin: 0 0 var(--space-5);
+}
+
+.modalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}

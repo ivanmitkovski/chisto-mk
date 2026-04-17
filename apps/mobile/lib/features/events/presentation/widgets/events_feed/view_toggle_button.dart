@@ -36,7 +36,9 @@ class ViewToggleButton extends StatelessWidget {
               borderRadius: BorderRadius.circular(AppSpacing.radius10),
             ),
             child: AnimatedContainer(
-              duration: AppMotion.fast,
+              duration: MediaQuery.disableAnimationsOf(context)
+                  ? Duration.zero
+                  : AppMotion.fast,
               curve: AppMotion.emphasized,
               width: 44,
               height: 44,

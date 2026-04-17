@@ -29,6 +29,7 @@ import {
   type EventChatMessageRow,
 } from './event-chat-message.select';
 import { EventChatSseService } from './event-chat-sse.service';
+import { EventChatTelemetryService } from './event-chat-telemetry.service';
 import { EventChatUploadService } from './event-chat-upload.service';
 
 const CHAT_PUSH_DEBOUNCE_MS = 30_000;
@@ -49,6 +50,7 @@ export class EventChatService {
     private readonly encryption: ChatEncryptionService,
     private readonly chatUpload: EventChatUploadService,
     private readonly uploads: ReportsUploadService,
+    private readonly telemetry: EventChatTelemetryService,
   ) {}
 
   async listMessages(
@@ -59,6 +61,7 @@ export class EventChatService {
     data: EventChatMessageResponseDto[];
     meta: { timestamp: string; hasMore: boolean; nextCursor: string | null };
   }> {
+    const t0 = Date.now();
     const limit = query.limit;
     const where: Prisma.EventChatMessageWhereInput = { eventId };
 
@@ -94,6 +97,11 @@ export class EventChatService {
     const data = await Promise.all(
       page.map((r) => this.finalizeMessageDto(r, user.userId)),
     );
+    this.telemetry.emitSpan('event_chat.list_messages', {
+      duration_ms: Date.now() - t0,
+      hasMore,
+      limit,
+    });
     return {
       data,
       meta: {
@@ -262,6 +270,7 @@ export class EventChatService {
       thumbnailUrl: a.thumbnailUrl ?? null,
     }));
 
+    const sendStarted = Date.now();
     const clientId = dto.clientMessageId?.trim() ?? '';
     if (clientId) {
       const existing = await this.prisma.eventChatMessage.findFirst({
@@ -322,6 +331,11 @@ export class EventChatService {
           };
         }
       }
+      this.telemetry.emitMetric({
+        name: 'event_chat.message.send_failed',
+        ok: false,
+        reason: e instanceof Prisma.PrismaClientKnownRequestError ? e.code : 'unknown',
+      });
       throw e;
     }
 
@@ -339,9 +353,18 @@ export class EventChatService {
     });
 
     this.logger.log(
-      `eventChat.sendMessage eventId=${eventId} messageId=${created.id} userId=${user.userId} type=${messageType}` +
-        (clientId ? ` clientMessageId=${clientId}` : ''),
+      `eventChat.sendMessage eventId=${eventId} messageId=${created.id} userId=${user.userId} type=${messageType}`,
     );
+
+    this.telemetry.emitMetric({
+      name: 'event_chat.message.sent',
+      ok: true,
+      duration_ms: Date.now() - sendStarted,
+    });
+    this.telemetry.emitSpan('event_chat.send_message', {
+      ok: true,
+      duration_ms: Date.now() - sendStarted,
+    });
 
     return {
       data: await this.finalizeMessageDto(created, user.userId),
@@ -441,6 +464,12 @@ export class EventChatService {
       message: streamPayload as unknown as Record<string, unknown>,
     });
 
+    this.telemetry.emitAudit('message_edited', {
+      actorId: user.userId,
+      messageId,
+      eventId,
+    });
+
     return {
       data: await this.finalizeMessageDto(updated, user.userId),
       meta: { timestamp: new Date().toISOString() },
@@ -513,6 +542,11 @@ export class EventChatService {
         type: 'message_pinned',
         message: streamPayload as unknown as Record<string, unknown>,
       });
+      this.telemetry.emitAudit('message_pinned', {
+        actorId: user.userId,
+        messageId,
+        eventId,
+      });
       return {
         data: await this.finalizeMessageDto(updated, user.userId),
         meta: { timestamp: new Date().toISOString() },
@@ -535,6 +569,11 @@ export class EventChatService {
       eventId,
       type: 'message_unpinned',
       message: streamUnpin as unknown as Record<string, unknown>,
+    });
+    this.telemetry.emitAudit('message_unpinned', {
+      actorId: user.userId,
+      messageId,
+      eventId,
     });
     return {
       data: await this.finalizeMessageDto(updated, user.userId),
@@ -725,6 +764,12 @@ export class EventChatService {
       eventId,
       type: 'message_deleted',
       messageId,
+    });
+
+    this.telemetry.emitAudit('message_deleted', {
+      actorId: user.userId,
+      messageId,
+      eventId,
     });
 
     return { data: { ok: true }, meta: { timestamp: new Date().toISOString() } };

@@ -1,10 +1,28 @@
 import 'package:chisto_mobile/features/events/data/event_json.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('formatCheckInTime', () {
+    test('formats UTC DateTime as local HH:mm', () {
+      final DateTime utc = DateTime.utc(2026, 6, 15, 13, 1);
+      final String formatted = formatCheckInTime(utc);
+      final DateTime local = utc.toLocal();
+      final String expected =
+          '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+      expect(formatted, expected);
+    });
+
+    test('formats already-local DateTime correctly', () {
+      final DateTime local = DateTime(2026, 6, 15, 15, 5);
+      final String formatted = formatCheckInTime(local);
+      expect(formatted, '15:05');
+    });
+  });
+
   group('EventTime', () {
     test('equality works', () {
       const EventTime a = EventTime(hour: 10, minute: 30);
@@ -111,6 +129,21 @@ void main() {
       expect(pastUtc.isBeforeScheduledStart, isFalse);
     });
 
+    test('canVolunteerJoinNow is false before scheduledAtUtc when otherwise joinable', () {
+      final EcoEvent e = buildEvent().copyWith(
+        scheduledAtUtc: DateTime.utc(2035, 1, 1, 12),
+      );
+      expect(e.isJoinable, isTrue);
+      expect(e.canVolunteerJoinNow, isFalse);
+    });
+
+    test('canVolunteerJoinNow is true when joinable and start has passed', () {
+      final EcoEvent e = buildEvent().copyWith(
+        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12),
+      );
+      expect(e.canVolunteerJoinNow, isTrue);
+    });
+
     test('isValidRange validates time ranges', () {
       expect(
         EcoEvent.isValidRange(
@@ -172,7 +205,7 @@ void main() {
     });
 
     test('ecoEventFromJson sets scheduledAtUtc from scheduledAt', () {
-      final EcoEvent e = ecoEventFromJson(<String, dynamic>{
+      final EcoEvent? e = ecoEventFromJson(<String, dynamic>{
         'id': 'api-1',
         'title': 'Clean',
         'description': '',
@@ -188,7 +221,8 @@ void main() {
         'createdAt': '2025-06-01T00:00:00.000Z',
         'scheduledAt': '2025-06-15T10:00:00.000Z',
       });
-      expect(e.scheduledAtUtc, isNotNull);
+      expect(e, isNotNull);
+      expect(e!.scheduledAtUtc, isNotNull);
       expect(
         e.scheduledAtUtc!.toUtc().toIso8601String(),
         '2025-06-15T10:00:00.000Z',
@@ -198,6 +232,155 @@ void main() {
     test('formattedTimeRange', () {
       final EcoEvent event = buildEvent();
       expect(event.formattedTimeRange, '10:00 - 12:00');
+    });
+
+    test('copyWith clear flags set nullable fields to null', () {
+      final EcoEvent event = buildEvent().copyWith(
+        maxParticipants: 50,
+        scale: CleanupScale.large,
+        difficulty: EventDifficulty.hard,
+        organizerAvatarUrl: 'https://example.com/a.png',
+      );
+
+      expect(event.maxParticipants, 50);
+      expect(event.scale, CleanupScale.large);
+      expect(event.difficulty, EventDifficulty.hard);
+      expect(event.organizerAvatarUrl, isNotNull);
+
+      final EcoEvent cleared = event.copyWith(
+        clearMaxParticipants: true,
+        clearScale: true,
+        clearDifficulty: true,
+        clearOrganizerAvatarUrl: true,
+      );
+
+      expect(cleared.maxParticipants, isNull);
+      expect(cleared.scale, isNull);
+      expect(cleared.difficulty, isNull);
+      expect(cleared.organizerAvatarUrl, isNull);
+    });
+
+    test('hashCode is consistent with == for equal events', () {
+      final EcoEvent a = buildEvent().copyWith(
+        gear: <EventGear>[EventGear.gloves],
+        afterImagePaths: <String>['a.jpg', 'b.jpg'],
+      );
+      final EcoEvent b = buildEvent().copyWith(
+        gear: <EventGear>[EventGear.gloves],
+        afterImagePaths: <String>['a.jpg', 'b.jpg'],
+      );
+
+      expect(a, equals(b));
+      expect(a.hashCode, equals(b.hashCode));
+    });
+
+    test('hashCode differs when == fields differ', () {
+      final EcoEvent a = buildEvent();
+      final EcoEvent b = buildEvent().copyWith(description: 'Different');
+
+      expect(a, isNot(equals(b)));
+      expect(a.hashCode, isNot(equals(b.hashCode)));
+    });
+
+    test('fromJson filters non-String gear items instead of throwing', () {
+      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+        'id': 'evt-gear',
+        'title': 'T',
+        'description': 'D',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Site',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'date': '2026-06-15T00:00:00.000Z',
+        'participantCount': 0,
+        'status': 'upcoming',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'gear': <dynamic>['gloves', 42, null, 'rakes'],
+      });
+
+      expect(event.gear.length, 2);
+      expect(event.gear, contains(EventGear.gloves));
+      expect(event.gear, contains(EventGear.rakes));
+    });
+
+    test('fromJson falls back gracefully for unknown enum values', () {
+      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+        'id': 'evt-unk',
+        'title': 'T',
+        'description': 'D',
+        'category': 'futureCategory',
+        'siteId': 's1',
+        'siteName': 'Site',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'date': '2026-06-15T00:00:00.000Z',
+        'participantCount': 0,
+        'status': 'futureStatus',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'difficulty': 'extreme',
+        'scale': 'gigantic',
+        'gear': <String>['jetpack'],
+      });
+
+      expect(event.category, EcoEventCategory.generalCleanup);
+      expect(event.status, EcoEventStatus.upcoming);
+      expect(event.difficulty, EventDifficulty.easy);
+      expect(event.scale, CleanupScale.small);
+      expect(event.gear, contains(EventGear.trashBags));
+    });
+
+    test('fromJson converts UTC attendeeCheckedInAt to local time', () {
+      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+        'id': 'evt-tz',
+        'title': 'TZ',
+        'description': 'D',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Site',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'date': '2026-06-15T00:00:00.000Z',
+        'participantCount': 0,
+        'status': 'inProgress',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'attendeeCheckInStatus': 'checkedIn',
+        'attendeeCheckedInAt': '2026-06-15T13:01:00.000Z',
+      });
+
+      expect(event.attendeeCheckedInAt, isNotNull);
+      expect(event.attendeeCheckedInAt!.isUtc, isFalse);
+      final DateTime utcBack = event.attendeeCheckedInAt!.toUtc();
+      expect(utcBack.hour, 13);
+      expect(utcBack.minute, 1);
+    });
+
+    test('fromJson converts UTC reminderAt to local time', () {
+      final EcoEvent event = EcoEvent.fromJson(<String, dynamic>{
+        'id': 'evt-rem-tz',
+        'title': 'TZ',
+        'description': 'D',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Site',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'date': '2026-06-15T00:00:00.000Z',
+        'participantCount': 0,
+        'status': 'upcoming',
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'reminderAt': '2026-06-15T07:30:00.000Z',
+      });
+
+      expect(event.reminderAt, isNotNull);
+      expect(event.reminderAt!.isUtc, isFalse);
+      final DateTime utcBack = event.reminderAt!.toUtc();
+      expect(utcBack.hour, 7);
+      expect(utcBack.minute, 30);
     });
   });
 
@@ -255,6 +438,19 @@ void main() {
       final CheckedInAttendee? decoded =
           CheckedInAttendee.fromJson(original.toJson());
       expect(decoded?.userId, 'usr_abc');
+    });
+
+    test('toJson and fromJson preserves avatarUrl when set', () {
+      final CheckedInAttendee original = CheckedInAttendee(
+        id: 'row-1',
+        name: 'Bob',
+        checkedInAt: DateTime(2025, 6, 15, 11, 0),
+        userId: 'usr_abc',
+        avatarUrl: 'https://example.com/a.jpg',
+      );
+      final CheckedInAttendee? decoded =
+          CheckedInAttendee.fromJson(original.toJson());
+      expect(decoded?.avatarUrl, 'https://example.com/a.jpg');
     });
 
     test('equality is based on id', () {

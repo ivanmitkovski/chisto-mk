@@ -1,16 +1,27 @@
 import 'dart:convert';
 
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsLocalCache {
   const EventsLocalCache();
 
-  static const String _eventsCacheKey = 'events_cache_v1';
+  /// Unfiltered global list (backward compatible with older app versions).
+  static const String legacyEventsCacheKey = 'events_cache_v1';
 
-  Future<List<EcoEvent>?> readEvents() async {
+  /// Disk key for the active merged server params (null / empty → [legacyEventsCacheKey]).
+  static String storageKeyForListParams(EcoEventSearchParams? params) {
+    if (params == null || params.isEmpty) {
+      return legacyEventsCacheKey;
+    }
+    return '${legacyEventsCacheKey}_${params.offlineListCacheSuffix}';
+  }
+
+  Future<List<EcoEvent>?> readEvents({EcoEventSearchParams? forActiveListParams}) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String? raw = prefs.getString(_eventsCacheKey);
+    final String key = storageKeyForListParams(forActiveListParams);
+    final String? raw = prefs.getString(key);
     if (raw == null || raw.isEmpty) {
       return null;
     }
@@ -30,15 +41,24 @@ class EventsLocalCache {
         .toList(growable: false);
   }
 
-  Future<void> writeEvents(List<EcoEvent> events) async {
+  Future<void> writeEvents(
+    List<EcoEvent> events, {
+    EcoEventSearchParams? forActiveListParams,
+  }) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String key = storageKeyForListParams(forActiveListParams);
     final List<Map<String, dynamic>> payload =
         events.map((EcoEvent event) => event.toJson()).toList(growable: false);
-    await prefs.setString(_eventsCacheKey, jsonEncode(payload));
+    await prefs.setString(key, jsonEncode(payload));
   }
 
   Future<void> clear() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_eventsCacheKey);
+    await prefs.remove(legacyEventsCacheKey);
+    for (final String key in prefs.getKeys()) {
+      if (key.startsWith('${legacyEventsCacheKey}_')) {
+        await prefs.remove(key);
+      }
+    }
   }
 }

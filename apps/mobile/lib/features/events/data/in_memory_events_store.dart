@@ -8,6 +8,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggle_result.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_update_payload.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:flutter/foundation.dart';
@@ -31,6 +32,9 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
 
   @override
   List<EcoEvent> get events => List<EcoEvent>.unmodifiable(_events);
+
+  @override
+  DateTime? get lastSuccessfulListRefreshAt => null;
 
   @override
   bool get hasMoreEvents => false;
@@ -115,6 +119,15 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   @override
+  Future<EventScheduleConflictPreview> checkScheduleConflict({
+    required String siteId,
+    required DateTime scheduledAt,
+    DateTime? endAt,
+    String? excludeEventId,
+  }) async =>
+      const EventScheduleConflictPreview(hasConflict: false);
+
+  @override
   Future<EcoEvent> updateEventDetails(
     String eventId,
     EventUpdatePayload payload,
@@ -154,9 +167,12 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
       );
     }
     if (patch.containsKey('maxParticipants')) {
-      next = next.copyWith(
-        maxParticipants: patch['maxParticipants'] as int?,
-      );
+      final Object? raw = patch['maxParticipants'];
+      if (raw == null) {
+        next = next.copyWith(clearMaxParticipants: true);
+      } else {
+        next = next.copyWith(maxParticipants: raw as int);
+      }
     }
     if (patch.containsKey('gear')) {
       final List<dynamic> raw = patch['gear'] as List<dynamic>;
@@ -243,6 +259,9 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
         return event;
       }
       if (!event.isJoined && event.maxParticipants != null && event.participantCount >= event.maxParticipants!) {
+        return event;
+      }
+      if (!event.isJoined && !event.canVolunteerJoinNow) {
         return event;
       }
       changed = true;
@@ -440,7 +459,9 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
 
   Future<void> _hydrateFromCache() async {
     try {
-      final List<EcoEvent>? cached = await _localCache.readEvents();
+      final List<EcoEvent>? cached = await _localCache.readEvents(
+        forActiveListParams: null,
+      );
       if (cached != null && cached.isNotEmpty) {
         _events = cached;
         notifyListeners();
@@ -453,6 +474,6 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   }
 
   void _persistSnapshot() {
-    unawaited(_localCache.writeEvents(_events));
+    unawaited(_localCache.writeEvents(_events, forActiveListParams: null));
   }
 }

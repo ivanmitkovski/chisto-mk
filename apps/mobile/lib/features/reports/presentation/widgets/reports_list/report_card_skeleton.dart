@@ -21,7 +21,13 @@ class _ReportCardSkeletonState extends State<ReportCardSkeleton>
     _shimmer = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
-    )..repeat();
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    AppMotion.syncRepeatingShimmer(_shimmer, context);
   }
 
   @override

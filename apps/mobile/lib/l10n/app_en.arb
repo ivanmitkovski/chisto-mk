@@ -58,6 +58,18 @@
   "reportReviewAfterSubmitIncomplete": "Finish steps above.",
   "reportSubmitSentPending": "Sent",
   "semanticsClose": "Close",
+  "homeShellNavHome": "Home",
+  "homeShellNavReports": "Reports",
+  "homeShellNavMap": "Map",
+  "homeShellNavEvents": "Events",
+  "semanticsReportPhotoNumber": "Report photo {number}",
+  "@semanticsReportPhotoNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "semanticsAboutStep": "About {title}",
   "@semanticsAboutStep": {
     "placeholders": {
@@ -849,6 +861,8 @@
   "eventsWeatherRetry": "Try again",
   "eventsUnableToStartEventGeneric": "Could not start the event. Check your connection and try again.",
   "eventsStartEventTooEarly": "You can start this eco action once the scheduled start time arrives.",
+  "eventsJoinNotYetOpen": "Joining opens when the scheduled start time arrives.",
+  "errorEventEndAtTooFar": "The planned end cannot be that far after the start. Try a shorter extension.",
   "eventsAwaitingModerationCta": "Awaiting approval",
   "eventsModerationBannerTitle": "Awaiting approval",
   "eventsModerationBannerBody": "This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.",
@@ -861,8 +875,93 @@
   "eventsOrganizerQrRotateFailed": "Could not invalidate codes. Try again.",
   "eventsEditEventTitle": "Edit event",
   "eventsEditEventSave": "Save changes",
+  "editEventTitleTooLong": "Title must be at most {max} characters.",
+  "@editEventTitleTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventDescriptionTooLong": "Description must be at most {max} characters.",
+  "@editEventDescriptionTooLong": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventMaxParticipantsInvalid": "Enter a valid whole number of spots, or leave blank for no limit.",
+  "editEventMaxParticipantsRange": "Team size must be between {min} and {max}, or leave blank for no limit.",
+  "@editEventMaxParticipantsRange": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventGearLimitReached": "You can select up to {max} gear items.",
+  "@editEventGearLimitReached": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "editEventDiscardTitle": "Discard changes?",
+  "editEventDiscardMessage": "You have unsaved changes. If you leave now, they will be lost.",
+  "editEventDiscardConfirm": "Discard",
+  "editEventDiscardKeepEditing": "Keep editing",
+  "editEventSchedulePreviewFailed": "Could not check for schedule conflicts. You can still save; the server will reject overlapping times.",
+  "editEventOfflineSave": "You appear to be offline. Connect and try again.",
+  "editEventHelpTitle": "Editing your event",
+  "editEventHelpSubtitle": "Schedule, volunteers, and moderation",
+  "editEventHelpButtonTooltip": "Help",
+  "editEventDuplicateSubmitTitle": "Schedule conflict",
+  "editEventDuplicateSubmitBody": "{title} is already scheduled at {when}. Adjust your times and try again.",
+  "@editEventDuplicateSubmitBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "editEventNoChangesToSave": "Nothing to save.",
+  "editEventPendingModerationBanner": "This event is still awaiting moderator approval. Changes apply to your draft.",
+  "eventsEventNotEditable": "This event can no longer be edited.",
   "eventsEventUpdated": "Event updated",
   "eventsMutationFailedGeneric": "Something went wrong. Please try again.",
+  "eventsScheduleConflictPreviewTitle": "Possible schedule overlap",
+  "eventsScheduleConflictPreviewBody": "Another event at this site may overlap your time: {title} at {when}.",
+  "@eventsScheduleConflictPreviewBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsScheduleConflictContinue": "Continue anyway",
+  "eventsScheduleConflictAdjustTime": "Change time",
+  "eventsDuplicateEventBlocked": "This time overlaps \"{title}\" ({when}). Choose a different time.",
+  "@eventsDuplicateEventBlocked": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
   "eventsManualCheckInAdd": "Add",
   "eventsManualCheckInTitle": "Manual check-in",
   "eventsCheckInTitle": "Check-in",
@@ -1011,6 +1110,15 @@
   "eventsOrganizerQrLoadFailedGeneric": "Could not load a check-in code. Check your connection and try again.",
   "eventsOrganizerQrRateLimited": "Too many refresh attempts. Wait a moment and try again.",
   "eventsOrganizerSessionSetupFailed": "Could not start check-in. Confirm the event is in progress and try again.",
+  "eventsOrganizerConfirmTitle": "Confirm check-in",
+  "eventsOrganizerConfirmSubtitle": "Wants to check in to this event",
+  "eventsOrganizerConfirmApprove": "Confirm",
+  "eventsOrganizerConfirmReject": "Dismiss",
+  "eventsOrganizerConfirmExpired": "This check-in request has expired.",
+  "eventsVolunteerPendingTitle": "Waiting for confirmation",
+  "eventsVolunteerPendingSubtitle": "The organizer needs to confirm your check-in...",
+  "eventsVolunteerRejected": "Check-in was not confirmed by the organizer.",
+  "eventsVolunteerExpired": "Request expired. Please scan again.",
   "eventsOrganizerQrRetry": "Try again",
   "eventsOrganizerQrBrightnessHint": "Tip: turn up screen brightness so the code is easier to scan.",
   "eventsOrganizerQrSemantics": "Check-in QR code. Refreshes in about {seconds} seconds.",
@@ -1050,7 +1158,9 @@
   "eventsOrganizerRemoveAttendeeSemantic": "Remove {name} from check-in",
   "@eventsOrganizerRemoveAttendeeSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizerSimulateCheckInDev": "Simulate check-in (dev)",
@@ -1083,6 +1193,22 @@
     }
   },
   "createEventEndTimeError": "End time must be later than start time.",
+  "createEventScheduleStartInPast": "Choose a start time at least {minutes} minutes from now.",
+  "@createEventScheduleStartInPast": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "createEventScheduleEndInPast": "Choose an end time at least {minutes} minutes from now.",
+  "@createEventScheduleEndInPast": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "createEventFieldType": "Event type",
   "createEventPlaceholderType": "Select event type",
   "createEventFieldTeamSize": "Team size",
@@ -1194,6 +1320,41 @@
   },
   "eventsCtaStartEvent": "Start event",
   "eventsCtaManageCheckIn": "Manage check-in",
+  "eventsCtaExtendCleanupEnd": "Extend planned end",
+  "eventsExtendEndSheetTitle": "Extend cleanup",
+  "eventsExtendEndSheetSubtitle": "Current planned end is {time}.",
+  "@eventsExtendEndSheetSubtitle": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsExtendEndCurrentChoice": "New end: {time}",
+  "@eventsExtendEndCurrentChoice": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsExtendEndPlus15": "+15 min",
+  "eventsExtendEndPlus30": "+30 min",
+  "eventsExtendEndPlus60": "+1 hour",
+  "eventsExtendEndCustomTime": "Custom time…",
+  "eventsExtendEndApply": "Save new end time",
+  "eventsExtendEndSuccess": "Planned end updated.",
+  "eventsExtendEndSameAsCurrent": "That is already the planned end time.",
+  "eventsExtendEndInvalidRange": "That end time is not valid for this cleanup.",
+  "eventsExtendEndTooSoon": "Choose an end time a little further ahead.",
+  "eventsEndSoonBannerTitle": "Cleanup is ending soon",
+  "eventsEndSoonBannerBody": "You can extend the planned end or finish when you are ready.",
+  "eventsEndSoonBannerExtend": "Extend",
+  "eventsOrganizerExtendEndSemantic": "Extend planned cleanup end time",
+  "eventsOrganizerEndSoonNotifyTitle": "Cleanup ending soon",
+  "eventsOrganizerEndSoonNotifyBody": "Your cleanup is nearing its planned end. Tap to review.",
+  "eventsOrganizerEndSoonNotifyChannelName": "Organizer cleanup reminders",
+  "eventsOrganizerEndSoonNotifyChannelDescription": "Local reminders when a cleanup you run is nearing its planned end.",
   "eventsCtaEditAfterPhotos": "Edit after photos",
   "eventsCtaUploadAfterPhotos": "Upload after photos",
   "eventsCtaCheckedIn": "Checked in",
@@ -1222,21 +1383,31 @@
   "eventsCountdownDaysHours": "Starts in {days}d {hours}h",
   "@eventsCountdownDaysHours": {
     "placeholders": {
-      "days": { "type": "int" },
-      "hours": { "type": "int" }
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "eventsCountdownHoursMinutes": "Starts in {hours}h {minutes}m",
   "@eventsCountdownHoursMinutes": {
     "placeholders": {
-      "hours": { "type": "int" },
-      "minutes": { "type": "int" }
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "eventsCountdownMinutes": "Starts in {minutes}m",
   "@eventsCountdownMinutes": {
     "placeholders": {
-      "minutes": { "type": "int" }
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "eventsShareEventTooltip": "Share event",
@@ -1250,12 +1421,15 @@
   "eventsAttendeeBannerSubtitleCheckedInAt": "Checked in at {time}",
   "@eventsAttendeeBannerSubtitleCheckedInAt": {
     "placeholders": {
-      "time": { "type": "String" }
+      "time": {
+        "type": "String"
+      }
     }
   },
   "eventsAttendeeBannerSubtitleScanQr": "Scan the organizer's QR to check in",
   "eventsAttendeeBannerSubtitlePaused": "Check-in is temporarily paused",
   "eventsDetailShareSuccess": "Event shared.",
+  "eventsDetailShareFailed": "Could not open share. Try again.",
   "eventsDetailCalendarAdded": "Event added to your calendar.",
   "eventsDetailCalendarFailed": "Could not add to calendar. Try again.",
   "eventsDetailRefreshFailed": "Could not refresh this event. Try again.",
@@ -1264,7 +1438,9 @@
   "eventsDetailCoverSemantic": "Cover image for {title}",
   "@eventsDetailCoverSemantic": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "eventsDetailGroupedPanelSemantic": "Location, schedule, and details",
@@ -1279,7 +1455,9 @@
   "eventsReminderSetSnack": "Reminder set for {when}.",
   "@eventsReminderSetSnack": {
     "placeholders": {
-      "when": { "type": "String" }
+      "when": {
+        "type": "String"
+      }
     }
   },
   "eventsFeedbackSheetTitle": "Post-event feedback",
@@ -1288,21 +1466,37 @@
   "eventsFeedbackVolunteerHours": "Volunteer hours: {hours}h",
   "@eventsFeedbackVolunteerHours": {
     "placeholders": {
-      "hours": { "type": "String" }
+      "hours": {
+        "type": "String"
+      }
     }
   },
   "eventsFeedbackNotesHint": "What worked well? Any notes for next time?",
   "eventsEvidenceMaxPhotosSnack": "Maximum {max} photos reached.",
   "@eventsEvidenceMaxPhotosSnack": {
     "placeholders": {
-      "max": { "type": "int" }
+      "max": {
+        "type": "int"
+      }
     }
   },
   "eventsEvidencePickFailedSnack": "Could not pick photos. Check permissions.",
   "eventsEvidenceRemoveAction": "Remove",
   "eventsEvidenceAppBarTitle": "Cleanup evidence",
   "eventsEvidenceSaving": "Saving...",
+  "eventsEvidenceSaveInProgressHint": "Please wait until save finishes before leaving this screen.",
   "eventsEvidenceAfterPhotosSaved": "After photos saved.",
+  "eventsEvidenceSaveSuccessTitle": "Photos saved",
+  "eventsEvidenceSaveSuccessBody": "Your after photos are on the event page.",
+  "eventsEvidenceSaveFailureTitle": "Could not save photos",
+  "eventsEvidenceSaveFailureBody": "{message}",
+  "@eventsEvidenceSaveFailureBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
   "eventsEvidenceNoChanges": "No changes to save.",
   "eventsSiteReferencePhotoTitle": "Site reference photo",
   "eventsSiteReferencePhotoBody": "Reference taken before cleanup. Use the After tab to add photos of the cleaned site.",
@@ -1313,21 +1507,29 @@
   "eventsJoinPointsEarned": "+{points} points — you're in!",
   "@eventsJoinPointsEarned": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsLeftEcoAction": "You left this eco action.",
   "eventsCheckInPointsEarned": "+{points} points — checked in!",
   "@eventsCheckInPointsEarned": {
     "placeholders": {
-      "points": { "type": "int" }
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsManualCheckInWithPoints": "{name} checked in · +{points} pts for them",
   "@eventsManualCheckInWithPoints": {
     "placeholders": {
-      "name": { "type": "String" },
-      "points": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "points": {
+        "type": "int"
+      }
     }
   },
   "eventsJoinFirstForReminders": "Join the event first to set reminders.",
@@ -1336,8 +1538,12 @@
   "eventsReminderSheetSubtitle": "Event starts at {timeRange} on {date}.",
   "@eventsReminderSheetSubtitle": {
     "placeholders": {
-      "timeRange": { "type": "String" },
-      "date": { "type": "String" }
+      "timeRange": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
     }
   },
   "eventsReminderPreset1Day": "1 day before",
@@ -1352,32 +1558,44 @@
   "eventsCardParticipantsMore": "+{count} more",
   "@eventsCardParticipantsMore": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsCardParticipantsCountMax": "{count} / {max}",
   "@eventsCardParticipantsCountMax": {
     "placeholders": {
-      "count": { "type": "int" },
-      "max": { "type": "int" }
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
     }
   },
   "eventsCardParticipantsJoined": "{count} joined",
   "@eventsCardParticipantsJoined": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsDetailSemanticsLabel": "Event detail: {title}",
   "@eventsDetailSemanticsLabel": {
     "placeholders": {
-      "title": { "type": "String" }
+      "title": {
+        "type": "String"
+      }
     }
   },
   "eventsCountdownBadgeSemantic": "Time until event starts: {label}",
   "@eventsCountdownBadgeSemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "eventsEvidenceThumbnailMenuTitle": "Photo",
@@ -1659,8 +1877,12 @@
   "eventsAfterPhotoSemantic": "View after cleanup photo {index} of {total}",
   "@eventsAfterPhotoSemantic": {
     "placeholders": {
-      "index": { "type": "int" },
-      "total": { "type": "int" }
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsFilterAll": "All",
@@ -1673,32 +1895,44 @@
   "eventsParticipantsViewSemantic": "View {count} attendees",
   "@eventsParticipantsViewSemantic": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsYouAndOthers": "You and {count} others joined",
   "@eventsParticipantsYouAndOthers": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
-  "eventsParticipantsVolunteersJoined": "{count} volunteers joined",
+  "eventsParticipantsVolunteersJoined": "{count, plural, one{1 volunteer joined} other{{count} volunteers joined}}",
   "@eventsParticipantsVolunteersJoined": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsSpotsLeft": "{count} spots left",
   "@eventsParticipantsSpotsLeft": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsCheckedInCount": "{checkedIn} of {total} checked in",
   "@eventsParticipantsCheckedInCount": {
     "placeholders": {
-      "checkedIn": { "type": "int" },
-      "total": { "type": "int" }
+      "checkedIn": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsParticipantsSearchPlaceholder": "Search attendee",
@@ -1715,41 +1949,59 @@
   "eventsImpactSummaryAdd": "Add",
   "eventsImpactSummaryEdit": "Edit",
   "eventsImpactSummaryEmptyHint": "Capture cleanup outcomes, effort, and lessons learned.",
+  "eventsCompletedBagsSectionTitle": "Trash bags collected",
+  "eventsCompletedBagsSectionSubtitle": "How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.",
+  "eventsCompletedBagsSave": "Save bag count",
+  "eventsCompletedBagsSaved": "Bag count saved.",
   "eventsImpactBadgeRating": "{rating}★ rating",
   "@eventsImpactBadgeRating": {
     "placeholders": {
-      "rating": { "type": "int" }
+      "rating": {
+        "type": "int"
+      }
     }
   },
   "eventsImpactBadgeBags": "{count} bags",
   "@eventsImpactBadgeBags": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsImpactBadgeHours": "{hours}h",
   "@eventsImpactBadgeHours": {
     "placeholders": {
-      "hours": { "type": "String" }
+      "hours": {
+        "type": "String"
+      }
     }
   },
   "eventsImpactEstimatedLine": "{kg} kg removed · {co2} kg CO2e avoided",
   "@eventsImpactEstimatedLine": {
     "placeholders": {
-      "kg": { "type": "String" },
-      "co2": { "type": "String" }
+      "kg": {
+        "type": "String"
+      },
+      "co2": {
+        "type": "String"
+      }
     }
   },
   "eventsLocationSiteSemantic": "View pollution site, {distanceKm} km away",
   "@eventsLocationSiteSemantic": {
     "placeholders": {
-      "distanceKm": { "type": "String" }
+      "distanceKm": {
+        "type": "String"
+      }
     }
   },
   "eventsLocationDotKm": "· {distanceKm} km",
   "@eventsLocationDotKm": {
     "placeholders": {
-      "distanceKm": { "type": "String" }
+      "distanceKm": {
+        "type": "String"
+      }
     }
   },
   "eventsEmptyAllTitle": "No eco events yet",
@@ -1765,32 +2017,45 @@
   "eventsSearchEmptyTitle": "No results for \"{query}\"",
   "@eventsSearchEmptyTitle": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
   "eventsSearchEmptySubtitle": "Try a different search term or check your spelling.",
+  "eventsSearchEmptyScopeHint": "Matches come from the server as you type and from events already loaded in this list.",
   "eventsSitePickerTitle": "Choose site",
   "eventsSitePickerSubtitle": "Anchor this event to one cleanup location.",
   "eventsSitePickerSearchPlaceholder": "Search by name or description",
   "eventsSitePickerNoMatch": "No sites match \"{query}\"",
   "@eventsSitePickerNoMatch": {
     "placeholders": {
-      "query": { "type": "String" }
+      "query": {
+        "type": "String"
+      }
     }
   },
   "eventsSitePickerRowKmDesc": "{km} km away · {desc}",
   "@eventsSitePickerRowKmDesc": {
     "placeholders": {
-      "km": { "type": "String" },
-      "desc": { "type": "String" }
+      "km": {
+        "type": "String"
+      },
+      "desc": {
+        "type": "String"
+      }
     }
   },
   "eventsSuccessDialogTitle": "Event created",
   "eventsSuccessDialogBody": "{title} at {siteName} is ready. Share it with your community to get volunteers on board.",
   "@eventsSuccessDialogBody": {
     "placeholders": {
-      "title": { "type": "String" },
-      "siteName": { "type": "String" }
+      "title": {
+        "type": "String"
+      },
+      "siteName": {
+        "type": "String"
+      }
     }
   },
   "eventsSuccessDialogOpenEvent": "Open event",
@@ -1801,14 +2066,20 @@
   "eventsTimePickerTimeBlockSemantic": "{role}, {time}",
   "@eventsTimePickerTimeBlockSemantic": {
     "placeholders": {
-      "role": { "type": "String" },
-      "time": { "type": "String" }
+      "role": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
     }
   },
   "eventsFeedbackRatingStars": "{rating}★",
   "@eventsFeedbackRatingStars": {
     "placeholders": {
-      "rating": { "type": "int" }
+      "rating": {
+        "type": "int"
+      }
     }
   },
   "eventsFeedRecentSearches": "Recent searches",
@@ -1818,13 +2089,17 @@
   "eventsCleanupAfterUploadedCount": "{count} uploaded",
   "@eventsCleanupAfterUploadedCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsCleanupAfterSlotsRemaining": "{count, plural, one{1 more slot available} other{{count} more slots available}}",
   "@eventsCleanupAfterSlotsRemaining": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsCleanupAfterAddMoreSemantic": "Add more photos",
@@ -1833,7 +2108,9 @@
   "eventsCleanupAfterEmptyMaxPhotos": "Up to {max} photos",
   "@eventsCleanupAfterEmptyMaxPhotos": {
     "placeholders": {
-      "max": { "type": "int" }
+      "max": {
+        "type": "int"
+      }
     }
   },
   "eventsCleanupAfterEmptyTapGallery": "Tap to select from gallery",
@@ -1842,7 +2119,9 @@
   "eventsDateRelativeDaysAgo": "{days} days ago",
   "@eventsDateRelativeDaysAgo": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "eventsDateRelativeToday": "Today",
@@ -1850,22 +2129,30 @@
   "eventsDateRelativeInDays": "In {days} days",
   "@eventsDateRelativeInDays": {
     "placeholders": {
-      "days": { "type": "int" }
+      "days": {
+        "type": "int"
+      }
     }
   },
   "eventsDateInfoSheetTitle": "Date and time",
   "eventsDateInfoSemantic": "{date}, {timeRange}",
   "@eventsDateInfoSemantic": {
     "placeholders": {
-      "date": { "type": "String" },
-      "timeRange": { "type": "String" }
+      "date": {
+        "type": "String"
+      },
+      "timeRange": {
+        "type": "String"
+      }
     }
   },
   "eventsCategorySheetTitle": "Category",
   "eventsCategorySemantic": "Event category: {label}",
   "@eventsCategorySemantic": {
     "placeholders": {
-      "label": { "type": "String" }
+      "label": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizerSheetTitle": "Organizer",
@@ -1874,15 +2161,23 @@
   "eventsOrganizerCreatedOn": "Event created on {day}/{month}/{year}",
   "@eventsOrganizerCreatedOn": {
     "placeholders": {
-      "day": { "type": "int" },
-      "month": { "type": "int" },
-      "year": { "type": "int" }
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "int"
+      },
+      "year": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerSemantic": "Organizer: {name}",
   "@eventsOrganizerSemantic": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizedByLabel": "Organized by",
@@ -1900,10 +2195,57 @@
   "eventsCalendarDaySemantic": "Day {day}",
   "@eventsCalendarDaySemantic": {
     "placeholders": {
-      "day": { "type": "int" }
+      "day": {
+        "type": "int"
+      }
     }
   },
   "eventsCalendarNoEventsThisDay": "No events on this day",
+  "eventsCalendarIncompleteListHint": "More events may be available. Load the next page to fill this month.",
+  "eventsCalendarLoadMoreButton": "Load more",
+  "eventsCalendarDayA11yOutOfMonth": "Day {day}, not in this month",
+  "@eventsCalendarDayA11yOutOfMonth": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11y": "Day {day}",
+  "@eventsCalendarDayA11y": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11yHasEvents": "Day {day}, has events",
+  "@eventsCalendarDayA11yHasEvents": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11ySelected": "Day {day}, selected",
+  "@eventsCalendarDayA11ySelected": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsCalendarDayA11ySelectedHasEvents": "Day {day}, selected, has events",
+  "@eventsCalendarDayA11ySelectedHasEvents": {
+    "placeholders": {
+      "day": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsEmptyActionClearFilters": "Clear filters",
+  "eventsEmptyActionCreateEvent": "Create event",
+  "eventsSearchEmptyClearSearch": "Clear search",
   "siteCardPollutionSiteSemantic": "Pollution site: {title}. Tap to open details.",
   "@siteCardPollutionSiteSemantic": {
     "placeholders": {
@@ -1931,7 +2273,9 @@
   "eventsFilterSheetActiveCount": "{count} active",
   "@eventsFilterSheetActiveCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerDashboardTitle": "My events",
@@ -1944,14 +2288,20 @@
   "eventsOrganizerDashboardParticipants": "{count}/{max} participants",
   "@eventsOrganizerDashboardParticipants": {
     "placeholders": {
-      "count": { "type": "int" },
-      "max": { "type": "String" }
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "String"
+      }
     }
   },
   "eventsOrganizerDashboardParticipantsUnlimited": "{count} participants",
   "@eventsOrganizerDashboardParticipantsUnlimited": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsOrganizerDashboardEvidenceAction": "Evidence",
@@ -1960,6 +2310,54 @@
   "eventsAnalyticsJoiners": "Joiners over time",
   "eventsAnalyticsCheckInsByHour": "Check-ins by hour",
   "eventsAnalyticsNoData": "No data yet",
+  "eventsAnalyticsRefresh": "Refresh analytics",
+  "eventsAnalyticsCheckedInRatio": "{checkedInCount} of {totalJoiners} checked in",
+  "@eventsAnalyticsCheckedInRatio": {
+    "placeholders": {
+      "checkedInCount": {
+        "type": "int"
+      },
+      "totalJoiners": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsAnalyticsJoinersEmpty": "No one has joined this event yet.",
+  "eventsAnalyticsCheckInsEmpty": "No check-ins yet. Hours are shown in UTC.",
+  "eventsAnalyticsPeakCheckInsUtc": "Peak: {hour} UTC",
+  "@eventsAnalyticsPeakCheckInsUtc": {
+    "placeholders": {
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsJoinCurve": "Join trend from {fromCount} to {toCount} participants, {steps} data points.",
+  "@eventsAnalyticsSemanticsJoinCurve": {
+    "placeholders": {
+      "fromCount": {
+        "type": "int"
+      },
+      "toCount": {
+        "type": "int"
+      },
+      "steps": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsCheckInHeatmap": "Check-ins by hour in UTC. Peak {peakCount} at {hour}.",
+  "@eventsAnalyticsSemanticsCheckInHeatmap": {
+    "placeholders": {
+      "peakCount": {
+        "type": "int"
+      },
+      "hour": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsAnalyticsSemanticsCheckInNoData": "Check-ins by hour in UTC. No check-ins recorded.",
   "eventsOfflineSyncQueued": "Saved. Will sync when back online.",
   "eventsOfflineSyncFailed": "Sync failed. Will retry automatically.",
   "eventsWeatherForecast": "Weather forecast",
@@ -1967,14 +2365,18 @@
   "eventsWeatherPrecipitationMm": "{amount} mm precipitation",
   "@eventsWeatherPrecipitationMm": {
     "placeholders": {
-      "amount": { "type": "String" }
+      "amount": {
+        "type": "String"
+      }
     }
   },
   "eventsWeatherNoPrecipitation": "No measurable precipitation",
   "eventsWeatherPrecipChance": "{percent}% chance of precipitation",
   "@eventsWeatherPrecipChance": {
     "placeholders": {
-      "percent": { "type": "int" }
+      "percent": {
+        "type": "int"
+      }
     }
   },
   "eventsWeatherIndicativeNote": "Indicative forecast from Open-Meteo; actual conditions may differ.",
@@ -1987,15 +2389,21 @@
   "eventsRecurrenceOccurrences": "{count} occurrences",
   "@eventsRecurrenceOccurrences": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventsRecurrencePartOfSeries": "Part of a series",
   "eventsRecurrenceSeriesLabel": "Event {index} of {total}",
   "@eventsRecurrenceSeriesLabel": {
     "placeholders": {
-      "index": { "type": "int" },
-      "total": { "type": "int" }
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventsRecurrenceDone": "Done",
@@ -2044,7 +2452,9 @@
   "homeSiteCleaningVolunteersJoined": "{count, plural, one{1 volunteer joined} other{{count} volunteers joined}}",
   "@homeSiteCleaningVolunteersJoined": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "homeSiteCleaningOrganizerHint": "You're organizing this action. Upload \"after\" photos once it's completed.",
@@ -2089,24 +2499,36 @@
   "eventChatReplyingTo": "Replying to {name}",
   "@eventChatReplyingTo": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatCharCountHint": "{count} / 2000",
   "@eventChatCharCountHint": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatSemanticsBubble": "{author}, {time}. {body}",
   "@eventChatSemanticsBubble": {
     "placeholders": {
-      "author": { "type": "String" },
-      "time": { "type": "String" },
-      "body": { "type": "String" }
+      "author": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "body": {
+        "type": "String"
+      }
     }
   },
   "eventChatInputSemantics": "Chat message",
+  "eventChatMessagesListSemantics": "Messages list",
+  "eventChatAttachmentsNeedNetwork": "Photos, video, files, and voice require an internet connection.",
   "eventChatPushChannelName": "Event chat",
   "eventChatEdited": "(edited)",
   "eventChatEditMessage": "Edit",
@@ -2118,7 +2540,9 @@
   "eventChatPinnedBy": "Pinned by {name}",
   "@eventChatPinnedBy": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatPinnedMessagesTitle": "Pinned messages",
@@ -2130,20 +2554,30 @@
   "eventChatReconnecting": "Reconnecting…",
   "eventChatConnected": "Connected",
   "eventChatSearchHint": "Search messages",
-  "eventChatSearchNoResults": "No messages found",
+  "eventChatSearchNoResults": "No matching messages",
   "eventChatSearchAction": "Search",
+  "eventChatSearchFailed": "Could not search messages. Check your connection and try again.",
+  "eventChatSearchMinChars": "Type at least 2 characters to search.",
+  "eventChatSearchIncludingLocalMatches": "Including messages loaded on this device.",
+  "eventChatSearchLoadMore": "Load more results",
   "eventChatParticipantsCount": "{count} participants",
   "@eventChatParticipantsCount": {
     "placeholders": {
-      "count": { "type": "int" }
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatParticipantsSheetTitle": "People in this chat",
   "eventChatParticipantsTitleSemantic": "{eventTitle}, {count} participants",
   "@eventChatParticipantsTitleSemantic": {
     "placeholders": {
-      "eventTitle": { "type": "String" },
-      "count": { "type": "int" }
+      "eventTitle": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatParticipantsLoadError": "Couldn’t load participants.",
@@ -2152,13 +2586,17 @@
   "eventChatSystemUserJoined": "{name} joined the event",
   "@eventChatSystemUserJoined": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatSystemUserLeft": "{name} left the event",
   "@eventChatSystemUserLeft": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatSystemEventUpdated": "Event details were updated",
@@ -2175,42 +2613,62 @@
   "eventChatSeenBy": "Seen by {names}",
   "@eventChatSeenBy": {
     "placeholders": {
-      "names": { "type": "String" }
+      "names": {
+        "type": "String"
+      }
     }
   },
   "eventChatSeenByTruncated": "Seen by {names} +{count}",
   "@eventChatSeenByTruncated": {
     "placeholders": {
-      "names": { "type": "String" },
-      "count": { "type": "int" }
+      "names": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatTypingOne": "{name} is typing…",
   "@eventChatTypingOne": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "eventChatTypingTwo": "{first} and {second} are typing…",
   "@eventChatTypingTwo": {
     "placeholders": {
-      "first": { "type": "String" },
-      "second": { "type": "String" }
+      "first": {
+        "type": "String"
+      },
+      "second": {
+        "type": "String"
+      }
     }
   },
   "eventChatTypingMany": "{name} and {count} others are typing…",
   "@eventChatTypingMany": {
     "placeholders": {
-      "name": { "type": "String" },
-      "count": { "type": "int" }
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
     }
   },
   "eventChatImageViewerTitle": "Photo",
   "eventChatImageViewerPage": "{current} of {total}",
   "@eventChatImageViewerPage": {
     "placeholders": {
-      "current": { "type": "int" },
-      "total": { "type": "int" }
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
     }
   },
   "eventChatVideoViewerTitle": "Video",
@@ -2254,7 +2712,11 @@
   "unknownRouteDebugRoute": "Debug: route name was “{routeName}”.",
   "@unknownRouteDebugRoute": {
     "placeholders": {
-      "routeName": { "type": "String" }
+      "routeName": {
+        "type": "String"
+      }
     }
-  }
+  },
+  "chatShareLocation": "Share Location",
+  "chatSharedLocation": "Shared location"
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
@@ -64,9 +65,9 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
         children: <Widget>[
           Text(
             context.l10n.eventsFeedbackHowWasEvent,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTypography.eventsCalendarAgendaTitle(
+              Theme.of(context).textTheme,
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Wrap(
@@ -83,9 +84,9 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
           const SizedBox(height: AppSpacing.md),
           Text(
             context.l10n.eventsFeedbackBagsCollected,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTypography.eventsCalendarAgendaTitle(
+              Theme.of(context).textTheme,
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           Row(
@@ -96,7 +97,9 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
               ),
               Text(
                 '$_bags',
-                style: Theme.of(context).textTheme.titleSmall,
+                style: AppTypography.eventsFormCounterValue(
+                  Theme.of(context).textTheme,
+                ),
               ),
               IconButton(
                 onPressed: () => setState(() => _bags += 1),
@@ -107,9 +110,9 @@ class _FeedbackSheetContentState extends State<FeedbackSheetContent> {
           const SizedBox(height: AppSpacing.sm),
           Text(
             context.l10n.eventsFeedbackVolunteerHours(_hours.toStringAsFixed(1)),
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: AppTypography.eventsCalendarAgendaTitle(
+              Theme.of(context).textTheme,
+            ),
           ),
           Slider(
             value: _hours,

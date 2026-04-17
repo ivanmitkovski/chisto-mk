@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -92,9 +93,7 @@ class ChatPinnedBar extends StatelessWidget {
                         line,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: AppColors.textSecondary,
-                            ),
+                        style: AppTypography.eventsCalloutSubtitle(Theme.of(context).textTheme),
                       ),
                     ),
                   ),

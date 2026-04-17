@@ -118,9 +118,8 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                 ),
                 child: Text(
                   'Repeat',
-                  style: AppTypography.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
+                  style: AppTypography.eventsSheetTitle(
+                    Theme.of(context).textTheme,
                   ),
                 ),
               ),
@@ -143,7 +142,10 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                         Expanded(
                           child: Text(
                             r.label(context),
-                            style: AppTypography.textTheme.bodyMedium?.copyWith(
+                            style: AppTypography.eventsFormFieldValue(
+                              Theme.of(context).textTheme,
+                              hasValue: selected,
+                            ).copyWith(
                               color: selected
                                   ? AppColors.primaryDark
                                   : AppColors.textPrimary,
@@ -176,8 +178,8 @@ class _RecurrencePickerSheetState extends State<RecurrencePickerSheet> {
                       Expanded(
                         child: Text(
                           context.l10n.eventsRecurrenceOccurrences(_occurrences),
-                          style: AppTypography.textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
+                          style: AppTypography.eventsCalendarAgendaTitle(
+                            Theme.of(context).textTheme,
                           ),
                         ),
                       ),

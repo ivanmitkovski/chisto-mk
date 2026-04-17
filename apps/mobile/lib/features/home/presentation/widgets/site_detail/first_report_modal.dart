@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
@@ -32,7 +33,7 @@ class FirstReportModal extends StatelessWidget {
       (MapEntry<int, ImageProvider> e) => GalleryImageItem(
         image: e.value,
         heroTag: 'first-report-${report.id}-${e.key}',
-        semanticLabel: 'Report photo ${e.key + 1}',
+        semanticLabel: context.l10n.semanticsReportPhotoNumber(e.key + 1),
       ),
     ).toList();
 

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sites_map.dart';
 
@@ -37,9 +38,7 @@ class CreateEventSiteSection extends StatelessWidget {
       children: <Widget>[
         Text(
           context.l10n.createEventCleanupSiteTitle,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: AppTypography.eventsFormLeadHeading(Theme.of(context).textTheme),
         ),
         const SizedBox(height: AppSpacing.sm),
         Container(
@@ -94,13 +93,10 @@ class CreateEventSiteSection extends StatelessWidget {
                               Text(
                                 site?.title ??
                                     context.l10n.createEventChooseSitePlaceholder,
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                      color: site == null
-                                          ? AppColors.textMuted
-                                          : AppColors.textPrimary,
-                                    ),
+                                style: AppTypography.eventsFormFieldValue(
+                                  Theme.of(context).textTheme,
+                                  hasValue: site != null,
+                                ).copyWith(fontWeight: FontWeight.w600),
                               ),
                               const SizedBox(height: AppSpacing.xxs),
                               Text(
@@ -110,11 +106,9 @@ class CreateEventSiteSection extends StatelessWidget {
                                         site!.distanceKm.toStringAsFixed(1),
                                         site!.description,
                                       ),
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: AppColors.textMuted,
-                                      height: 1.35,
-                                    ),
+                                style: AppTypography.eventsSupportingCaption(
+                                  Theme.of(context).textTheme,
+                                ),
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -162,10 +156,10 @@ class CreateEventSiteSection extends StatelessWidget {
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
               context.l10n.createEventSiteRequiredError,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: AppTypography.eventsCaptionStrong(
+                Theme.of(context).textTheme,
+                color: AppColors.accentDanger,
+              ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),
       ],

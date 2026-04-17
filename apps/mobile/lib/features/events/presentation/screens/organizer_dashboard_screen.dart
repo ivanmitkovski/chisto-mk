@@ -129,9 +129,8 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                     Expanded(
                       child: Text(
                         context.l10n.eventsOrganizerDashboardTitle,
-                        style: AppTypography.textTheme.headlineMedium?.copyWith(
-                          letterSpacing: -0.5,
-                          fontWeight: FontWeight.w700,
+                        style: AppTypography.eventsDetailHeadline(
+                          Theme.of(context).textTheme,
                         ),
                       ),
                     ),
@@ -162,8 +161,8 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         context.l10n.eventsFeedInitialLoadFailed,
-                        style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textMuted,
+                        style: AppTypography.eventsBodyMuted(
+                          Theme.of(context).textTheme,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -199,8 +198,8 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
                       const SizedBox(height: AppSpacing.md),
                       Text(
                         context.l10n.eventsOrganizerDashboardEmpty,
-                        style: AppTypography.textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textMuted,
+                        style: AppTypography.eventsBodyMuted(
+                          Theme.of(context).textTheme,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -265,12 +264,9 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
             ),
             child: Text(
               label,
-              style: AppTypography.textTheme.titleSmall?.copyWith(
-                color: AppColors.textMuted,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 0.3,
-                fontSize: 12,
-              ),
+              style: AppTypography.eventsMicroSectionHeading(
+                Theme.of(context).textTheme,
+              ).copyWith(letterSpacing: 0.3, fontWeight: FontWeight.w700),
             ),
           ),
           ...events.map((EcoEvent event) => OrganizerEventSummaryCard(

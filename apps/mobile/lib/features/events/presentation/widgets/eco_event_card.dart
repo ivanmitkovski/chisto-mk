@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -10,6 +11,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_share_payload.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -22,6 +24,7 @@ class EcoEventCard extends StatefulWidget {
     super.key,
     required this.event,
     required this.onTap,
+
     /// When true, the thumbnail uses a [Hero] for transitions (off by default: unstable with
     /// [SliverAppBar] + route replacement; see `hero_image_bar.dart`).
     this.enableThumbnailHero = false,
@@ -54,21 +57,20 @@ class _EcoEventCardState extends State<EcoEventCard> {
     final TextTheme textTheme = Theme.of(context).textTheme;
     final bool isCancelled = event.status == EcoEventStatus.cancelled;
 
+    final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+
+    final Color dividerEdge = AppColors.divider.withValues(alpha: 0.75);
+    final BorderRadius cardRadius =
+        BorderRadius.circular(AppSpacing.radiusCard);
+    final bool liveAccent = event.status == EcoEventStatus.inProgress;
+
     Widget card = AnimatedContainer(
-      duration: AppMotion.xFast,
+      duration: reduceMotion ? Duration.zero : AppMotion.xFast,
       curve: AppMotion.emphasized,
-      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-        border: event.status == EcoEventStatus.inProgress
-            ? Border(
-                left: BorderSide(
-                  color: event.status.color.withValues(alpha: 0.5),
-                  width: 3,
-                ),
-              )
-            : null,
+        borderRadius: cardRadius,
+        border: Border.all(color: dividerEdge),
         boxShadow: <BoxShadow>[
           BoxShadow(
             color: AppColors.shadowLight,
@@ -83,13 +85,32 @@ class _EcoEventCardState extends State<EcoEventCard> {
             ),
         ],
       ),
-      child: Opacity(
-        opacity: isCancelled ? 0.55 : 1.0,
-        child: Row(
+      child: ClipRRect(
+        borderRadius: cardRadius,
+        child: Stack(
+          fit: StackFit.passthrough,
+          children: <Widget>[
+            if (liveAccent)
+              Positioned(
+                left: 0,
+                top: 0,
+                bottom: 0,
+                child: ColoredBox(
+                  color: event.status.color.withValues(alpha: 0.55),
+                  child: const SizedBox(width: 3),
+                ),
+              ),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Opacity(
+                opacity: isCancelled ? 0.55 : 1.0,
+                child: Row(
           children: <Widget>[
             _Thumbnail(
               imageAsset: event.siteImageUrl,
-              heroTag: widget.enableThumbnailHero ? 'event-thumb-${event.id}' : null,
+              heroTag: widget.enableThumbnailHero
+                  ? 'event-thumb-${event.id}'
+                  : null,
             ),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
@@ -109,7 +130,9 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(
                         child: Text(
-                          event.formattedTimeRange,
+                          '${formatEventCalendarDate(context, event.date)} · ${event.formattedTimeRange}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: AppTypography.eventsListCardMeta(textTheme),
                         ),
                       ),
@@ -125,13 +148,15 @@ class _EcoEventCardState extends State<EcoEventCard> {
                       Expanded(
                         child: Text(
                           event.title,
-                          maxLines: 2,
+                          maxLines: 3,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTypography.eventsListCardTitle(textTheme).copyWith(
-                            decoration:
-                                isCancelled ? TextDecoration.lineThrough : null,
-                            decorationColor: AppColors.textMuted,
-                          ),
+                          style: AppTypography.eventsListCardTitle(textTheme)
+                              .copyWith(
+                                decoration: isCancelled
+                                    ? TextDecoration.lineThrough
+                                    : null,
+                                decorationColor: AppColors.textMuted,
+                              ),
                         ),
                       ),
                       if (event.isRecurring) ...<Widget>[
@@ -147,10 +172,16 @@ class _EcoEventCardState extends State<EcoEventCard> {
                   const SizedBox(height: AppSpacing.xs),
                   Row(
                     children: <Widget>[
+                      Icon(
+                        CupertinoIcons.location_solid,
+                        size: 14,
+                        color: AppColors.textMuted.withValues(alpha: 0.9),
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
                       Expanded(
                         child: Text(
                           event.siteName,
-                          maxLines: 1,
+                          maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppTypography.eventsListCardMeta(textTheme),
                         ),
@@ -172,14 +203,17 @@ class _EcoEventCardState extends State<EcoEventCard> {
                     const SizedBox(height: AppSpacing.xxs),
                     Row(
                       children: <Widget>[
-                        const Icon(CupertinoIcons.checkmark_circle_fill, size: 14, color: AppColors.primaryDark),
+                        const Icon(
+                          CupertinoIcons.checkmark_circle_fill,
+                          size: 14,
+                          color: AppColors.primaryDark,
+                        ),
                         const SizedBox(width: AppSpacing.xxs),
                         Text(
                           context.l10n.eventsCheckedInBadge,
-                          style: textTheme.bodySmall?.copyWith(
+                          style: AppTypography.eventsCardBadgeAccent(
+                            textTheme,
                             color: AppColors.primaryDark,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
                           ),
                         ),
                       ],
@@ -189,22 +223,26 @@ class _EcoEventCardState extends State<EcoEventCard> {
                     const SizedBox(height: AppSpacing.xxs),
                     Row(
                       children: <Widget>[
-                        const Icon(CupertinoIcons.camera_fill, size: 13, color: AppColors.textMuted),
+                        const Icon(
+                          CupertinoIcons.camera_fill,
+                          size: 13,
+                          color: AppColors.textMuted,
+                        ),
                         const SizedBox(width: AppSpacing.xxs),
                         Text(
                           context.l10n.eventsCleanupPhotosCount(
                             event.afterImagePaths.length,
                           ),
-                          style: textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
-                          ),
+                          style: AppTypography.eventsCardBadgeMuted(textTheme),
                         ),
                       ],
                     ),
                   ],
                 ],
+              ),
+            ),
+          ],
+        ),
               ),
             ),
           ],
@@ -266,8 +304,11 @@ class _EcoEventCardState extends State<EcoEventCard> {
                 onTap: () {
                   Clipboard.setData(
                     ClipboardData(
-                      text:
-                          '${event.title}\n${formatEventCalendarDate(sheetCtx, event.date)} (${event.formattedTimeRange})\n${event.siteName}',
+                      text: buildEventSharePlainText(
+                        sheetCtx,
+                        event,
+                        AppConfig.shareBaseUrlFromEnvironment,
+                      ),
                     ),
                   );
                   Navigator.of(sheetCtx).pop();
@@ -311,12 +352,10 @@ class _EcoEventCardState extends State<EcoEventCard> {
 }
 
 class _Thumbnail extends StatelessWidget {
-  const _Thumbnail({
-    required this.imageAsset,
-    required this.heroTag,
-  });
+  const _Thumbnail({required this.imageAsset, required this.heroTag});
 
   final String imageAsset;
+
   /// When null, no [Hero] — avoids duplicate `event-thumb-*` tags on the feed.
   final String? heroTag;
 
@@ -329,10 +368,7 @@ class _Thumbnail extends StatelessWidget {
         height: 80,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
-          border: Border.all(
-            color: AppColors.white,
-            width: 2,
-          ),
+          border: Border.all(color: AppColors.white, width: 2),
           boxShadow: <BoxShadow>[
             BoxShadow(
               color: AppColors.black.withValues(alpha: 0.08),
@@ -364,19 +400,13 @@ class _Thumbnail extends StatelessWidget {
 
     return Hero(
       tag: heroTag!,
-      child: Material(
-        type: MaterialType.transparency,
-        child: image,
-      ),
+      child: Material(type: MaterialType.transparency, child: image),
     );
   }
 }
 
 class _StatusChip extends StatefulWidget {
-  const _StatusChip({
-    required this.status,
-    this.isLive = false,
-  });
+  const _StatusChip({required this.status, this.isLive = false});
 
   final EcoEventStatus status;
   final bool isLive;
@@ -409,7 +439,10 @@ class _StatusChipState extends State<_StatusChip>
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs / 2,
+      ),
       decoration: BoxDecoration(
         color: widget.status.color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -453,7 +486,10 @@ class _StartingSoonBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs / 2,
+      ),
       decoration: BoxDecoration(
         color: AppColors.accentWarning.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -506,7 +542,9 @@ class _ParticipantRow extends StatelessWidget {
                 Positioned(
                   left: i * miniStride,
                   child: _MiniAvatar(
-                    label: i == 0 ? organizerName : String.fromCharCode(0x40 + i),
+                    label: i == 0
+                        ? organizerName
+                        : String.fromCharCode(0x40 + i),
                     imageUrl: i == 0 ? organizerAvatarUrl : null,
                     seed: i == 0 ? organizerId : '${organizerId}_mini_$i',
                   ),
@@ -519,8 +557,11 @@ class _ParticipantRow extends StatelessWidget {
           overflow > 0
               ? context.l10n.eventsCardParticipantsMore(overflow)
               : maxParticipants != null
-                  ? context.l10n.eventsCardParticipantsCountMax(count, maxParticipants!)
-                  : context.l10n.eventsCardParticipantsJoined(count),
+              ? context.l10n.eventsCardParticipantsCountMax(
+                  count,
+                  maxParticipants!,
+                )
+              : context.l10n.eventsCardParticipantsJoined(count),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontWeight: FontWeight.w500,
             color: AppColors.textMuted,
@@ -532,11 +573,7 @@ class _ParticipantRow extends StatelessWidget {
 }
 
 class _MiniAvatar extends StatelessWidget {
-  const _MiniAvatar({
-    required this.label,
-    this.imageUrl,
-    required this.seed,
-  });
+  const _MiniAvatar({required this.label, this.imageUrl, required this.seed});
 
   final String label;
   final String? imageUrl;
@@ -580,7 +617,10 @@ class _DistanceBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs / 2),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs / 2,
+      ),
       decoration: BoxDecoration(
         color: AppColors.textMuted.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
@@ -633,4 +673,3 @@ class _MoreButton extends StatelessWidget {
     );
   }
 }
-

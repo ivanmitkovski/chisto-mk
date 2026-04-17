@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sites_map.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -134,11 +135,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                     ),
                     child: Text(
                       context.l10n.createEventSitePickerTabList,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.25,
-                            fontSize: 15,
-                          ),
+                      style: AppTypography.eventsGroupedRowPrimary(
+                        Theme.of(context).textTheme,
+                      ).copyWith(letterSpacing: -0.25),
                     ),
                   ),
                   _modeMap: Padding(
@@ -147,11 +146,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                     ),
                     child: Text(
                       context.l10n.createEventSitePickerTabMap,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.25,
-                            fontSize: 15,
-                          ),
+                      style: AppTypography.eventsGroupedRowPrimary(
+                        Theme.of(context).textTheme,
+                      ).copyWith(letterSpacing: -0.25),
                     ),
                   ),
                 },
@@ -175,15 +172,12 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
           CupertinoSearchTextField(
             controller: _searchController,
             placeholder: context.l10n.eventsSitePickerSearchPlaceholder,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontSize: 16,
-                  letterSpacing: -0.2,
-                ),
-            placeholderStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                  fontSize: 16,
-                ),
+            style: AppTypography.eventsSearchFieldText(
+              Theme.of(context).textTheme,
+            ).copyWith(letterSpacing: -0.2),
+            placeholderStyle: AppTypography.eventsSearchFieldPlaceholder(
+              Theme.of(context).textTheme,
+            ),
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
               borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
@@ -227,9 +221,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                       const SizedBox(height: AppSpacing.sm),
                       Text(
                         context.l10n.createEventSitePickerMapEmpty,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.textMuted,
-                            ),
+                        style: AppTypography.eventsBodyMuted(
+                          Theme.of(context).textTheme,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ],
@@ -259,12 +253,12 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                         const SizedBox(height: AppSpacing.sm),
                         Text(
                           context.l10n.createEventSitePickerMapHint,
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textMuted,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: -0.1,
-                                  ),
+                          style: AppTypography.eventsListCardMeta(
+                            Theme.of(context).textTheme,
+                          ).copyWith(
+                            fontWeight: FontWeight.w500,
+                            letterSpacing: -0.1,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.md),
                         if (filtered.isEmpty)
@@ -285,12 +279,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                                   const SizedBox(height: AppSpacing.sm),
                                   Text(
                                     context.l10n.eventsSitePickerNoMatch(_query),
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyMedium
-                                        ?.copyWith(
-                                          color: AppColors.textMuted,
-                                        ),
+                                    style: AppTypography.eventsBodyMuted(
+                                      Theme.of(context).textTheme,
+                                    ),
                                     textAlign: TextAlign.center,
                                   ),
                                 ],
@@ -340,9 +331,9 @@ class _SitePickerSheetState extends State<SitePickerSheet> {
                     const SizedBox(height: AppSpacing.sm),
                     Text(
                       context.l10n.eventsSitePickerNoMatch(_query),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
+                      style: AppTypography.eventsBodyMuted(
+                        Theme.of(context).textTheme,
+                      ),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -460,11 +451,9 @@ class _SitePickerLocationRow extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         title,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
+                        style: AppTypography.eventsListCardTitle(textTheme).copyWith(
                           letterSpacing: -0.35,
                           height: 1.25,
-                          color: AppColors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: AppSpacing.xxs),
@@ -472,10 +461,8 @@ class _SitePickerLocationRow extends StatelessWidget {
                         subtitle,
                         maxLines: 3,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
+                        style: AppTypography.eventsListCardMeta(textTheme).copyWith(
                           height: 1.38,
-                          fontWeight: FontWeight.w400,
                         ),
                       ),
                     ],

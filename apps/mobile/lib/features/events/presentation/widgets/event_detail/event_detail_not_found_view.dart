@@ -35,9 +35,7 @@ class EventDetailNotFoundView extends StatelessWidget {
               child: Text(
                 context.l10n.eventsEventNotFoundTitle,
                 textAlign: TextAlign.center,
-                style: AppTypography.textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+                style: AppTypography.eventsEmptyStateTitle(textTheme),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -50,7 +48,7 @@ class EventDetailNotFoundView extends StatelessWidget {
             Text(
               context.l10n.eventsEventNotFoundBody,
               textAlign: TextAlign.center,
-              style: textTheme.bodyLarge?.copyWith(
+              style: AppTypography.eventsBodyProse(textTheme).copyWith(
                 color: AppColors.textSecondary,
                 height: 1.45,
               ),

@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
@@ -90,10 +92,7 @@ class AttendeeCheckInBanner extends StatelessWidget {
                         event.isCheckedIn
                             ? l10n.eventsAttendeeBannerTitleCheckedIn
                             : l10n.eventsAttendeeBannerTitleInProgress,
-                        style: textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTypography.eventsCalloutTitle(textTheme),
                       ),
                       const SizedBox(height: AppSpacing.xxs / 2),
                       Text(
@@ -101,18 +100,14 @@ class AttendeeCheckInBanner extends StatelessWidget {
                             ? (event.attendeeCheckedInAt == null
                                 ? l10n.eventsAttendeeBannerSubtitleAttendanceConfirmed
                                 : l10n.eventsAttendeeBannerSubtitleCheckedInAt(
-                                    '${event.attendeeCheckedInAt!.hour.toString().padLeft(2, '0')}:'
-                                    '${event.attendeeCheckedInAt!.minute.toString().padLeft(2, '0')}',
+                                    formatCheckInTime(event.attendeeCheckedInAt!),
                                   ))
                             : (event.canOpenAttendeeCheckIn
                                 ? l10n.eventsAttendeeBannerSubtitleScanQr
                                 : l10n.eventsAttendeeBannerSubtitlePaused),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: 13,
-                        ),
+                        style: AppTypography.eventsCalloutSubtitle(textTheme),
                       ),
                     ],
                   ),

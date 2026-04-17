@@ -25,23 +25,20 @@ class _LoadingOverlayState extends State<LoadingOverlay> with SingleTickerProvid
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: AppMotion.loadingOverlayLoop,
     );
 
-    // Only animate when the overlay is actually visible to avoid
-    // unnecessary work and to keep widget tests from hanging.
-    if (widget.visible) {
-      _controller.repeat();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      AppMotion.syncLoadingRing(_controller, context, visible: widget.visible);
+    });
   }
 
   @override
   void didUpdateWidget(covariant LoadingOverlay oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (!oldWidget.visible && widget.visible) {
-      _controller.repeat();
-    } else if (oldWidget.visible && !widget.visible) {
-      _controller.stop();
+    if (oldWidget.visible != widget.visible) {
+      AppMotion.syncLoadingRing(_controller, context, visible: widget.visible);
     }
   }
 

@@ -45,6 +45,20 @@ abstract class CheckInRepository implements Listenable {
   /// Server: `POST /events/:id/check-in/session/rotate`. No-op for in-memory when not implemented.
   Future<void> rotateSession(String eventId);
 
+  /// Organizer approves or rejects a pending QR check-in request.
+  Future<void> resolvePendingCheckIn({
+    required String eventId,
+    required String pendingId,
+    required bool approve,
+  });
+
+  /// Volunteer fallback poll for pending check-in status.
+  /// Returns `'pending'`, `'expired'`, or `null` on network failure.
+  Future<String?> pollPendingStatus({
+    required String eventId,
+    required String pendingId,
+  });
+
   List<CheckedInAttendee> checkedInAttendees(String eventId);
   int checkedInCount(String eventId);
   bool isOpen(String eventId);

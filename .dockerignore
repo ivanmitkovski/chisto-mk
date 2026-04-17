@@ -1,4 +1,8 @@
-node_modules
+# Root-only `node_modules` is not enough: Docker's pattern matches the path
+# relative to context root, so nested dirs like `apps/api/node_modules` would
+# still be sent and would overwrite pnpm's install from the deps stage (breaking
+# symlinks into root `.pnpm`, e.g. `@nestjs/cli` during `nest build`).
+**/node_modules
 .git
 .env
 .env.*

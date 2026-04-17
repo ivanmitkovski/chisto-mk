@@ -7,17 +7,20 @@ import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
+import 'package:chisto_mobile/features/events/domain/models/event_schedule_conflict_preview.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/create_event_form_validation.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_async_site_picker.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_modal_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_details_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_help_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_schedule_section.dart';
@@ -34,6 +37,7 @@ import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart' hide TextDirection;
 
 class CreateEventSheet extends StatefulWidget {
   const CreateEventSheet({
@@ -81,7 +85,44 @@ class _CreateEventSheetState extends State<CreateEventSheet>
   final GlobalKey _titleFieldKey = GlobalKey();
   final GlobalKey _categorySectionKey = GlobalKey();
 
+  Timer? _scheduleConflictTimer;
+  ConflictingEventInfo? _scheduleConflictHint;
+  int _scheduleConflictRequestId = 0;
+
   bool get _isTimeRangeValid => EcoEvent.isValidRange(_startTime, _endTime);
+
+  ScheduleValidationIssue? _createScheduleIssue() {
+    final DateTime? d = _selectedDate;
+    if (d == null) {
+      return null;
+    }
+    return validateCreateOrUpcomingEditSchedule(
+      dateOnly: DateUtils.dateOnly(d),
+      start: _startTime,
+      end: _endTime,
+      now: DateTime.now(),
+    );
+  }
+
+  bool get _isScheduleValid => _createScheduleIssue() == null;
+
+  ({DateTime? minStart, DateTime? minEnd}) _schedulePickerBounds() {
+    final DateTime? d = _selectedDate;
+    if (d == null) {
+      return (minStart: null, minEnd: null);
+    }
+    final DateTime dateOnly = DateUtils.dateOnly(d);
+    final DateTime now = DateTime.now();
+    return (
+      minStart: pickerMinimumForStart(dateOnly: dateOnly, now: now),
+      minEnd: pickerMinimumForEnd(
+        dateOnly: dateOnly,
+        start: _startTime,
+        now: now,
+        editStatus: null,
+      ),
+    );
+  }
 
   bool get _isValid => createEventFormIsSubmittable(
         hasSite: _selectedSite != null,
@@ -89,6 +130,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
         category: _selectedCategory,
         titleTrimmed: _titleController.text.trim(),
         timeRangeValid: _isTimeRangeValid,
+        scheduleValid: _isScheduleValid,
       );
 
   bool get _isDirty => !_initialSnapshot.matches(this);
@@ -104,8 +146,10 @@ class _CreateEventSheetState extends State<CreateEventSheet>
       siteDistanceKm: widget.preselectedSiteDistanceKm,
     );
     _selectedDate = DateUtils.dateOnly(now);
-    _startTime = const EventTime(hour: 10, minute: 0);
-    _endTime = const EventTime(hour: 12, minute: 0);
+    final ({EventTime start, EventTime end}) slot =
+        defaultStartEndForDate(dateOnly: _selectedDate!, now: now);
+    _startTime = slot.start;
+    _endTime = slot.end;
     _initialSnapshot = _CreateEventFormSnapshot.capture(this);
     _sectionEntranceController = AnimationController(
       vsync: this,
@@ -133,6 +177,8 @@ class _CreateEventSheetState extends State<CreateEventSheet>
     if (localized != null) {
       setState(() => _selectedSite = localized);
     }
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _scheduleConflictPreviewDebounced());
   }
 
   Future<void> _completeBootstrapSkeleton() async {
@@ -152,6 +198,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
     } else {
       unawaited(_sectionEntranceController.forward(from: 0));
     }
+    _scheduleConflictPreviewDebounced();
   }
 
   /// Progress milestones match [_isValid].
@@ -161,14 +208,76 @@ class _CreateEventSheetState extends State<CreateEventSheet>
         category: _selectedCategory,
         titleTrimmed: _titleController.text.trim(),
         timeRangeValid: _isTimeRangeValid,
+        scheduleValid: _isScheduleValid,
       );
 
   @override
   void dispose() {
+    _scheduleConflictTimer?.cancel();
     _sectionEntranceController.dispose();
     _descriptionController.dispose();
     _titleController.dispose();
     super.dispose();
+  }
+
+  String _formatConflictWhen(BuildContext context, DateTime at) {
+    return DateFormat.yMMMd(Localizations.localeOf(context).toLanguageTag())
+        .add_jm()
+        .format(at.toLocal());
+  }
+
+  void _scheduleConflictPreviewDebounced() {
+    _scheduleConflictTimer?.cancel();
+    final EventSiteSummary? site = _selectedSite;
+    final DateTime? date = _selectedDate;
+    if (site == null || date == null || !_isScheduleValid) {
+      if (_scheduleConflictHint != null) {
+        setState(() => _scheduleConflictHint = null);
+      }
+      return;
+    }
+    _scheduleConflictTimer = Timer(const Duration(milliseconds: 480), () {
+      if (!mounted) {
+        return;
+      }
+      final int token = ++_scheduleConflictRequestId;
+      final DateTime startLocal = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        _startTime.hour,
+        _startTime.minute,
+      );
+      final DateTime endLocal = DateTime(
+        date.year,
+        date.month,
+        date.day,
+        _endTime.hour,
+        _endTime.minute,
+      );
+      unawaited(() async {
+        try {
+          final EventScheduleConflictPreview preview =
+              await EventsRepositoryRegistry.instance.checkScheduleConflict(
+            siteId: site.id,
+            scheduledAt: startLocal.toUtc(),
+            endAt: endLocal.toUtc(),
+          );
+          if (!mounted || token != _scheduleConflictRequestId) {
+            return;
+          }
+          setState(() {
+            _scheduleConflictHint =
+                preview.hasConflict ? preview.conflictingEvent : null;
+          });
+        } on Object {
+          if (!mounted || token != _scheduleConflictRequestId) {
+            return;
+          }
+          setState(() => _scheduleConflictHint = null);
+        }
+      }());
+    });
   }
 
   Widget _sectionGroupCaption(BuildContext context, String text) {
@@ -176,11 +285,9 @@ class _CreateEventSheetState extends State<CreateEventSheet>
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Text(
         text.toUpperCase(),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.7,
-            ),
+        style: AppTypography.eventsMicroSectionHeading(
+          Theme.of(context).textTheme,
+        ).copyWith(letterSpacing: 0.7),
       ),
     );
   }
@@ -255,6 +362,36 @@ class _CreateEventSheetState extends State<CreateEventSheet>
         _scrollToFirstInvalid();
       });
       return;
+    }
+
+    if (_scheduleConflictHint != null) {
+      final ConflictingEventInfo hint = _scheduleConflictHint!;
+      final bool? goAhead = await showCupertinoDialog<bool>(
+        context: context,
+        builder: (BuildContext ctx) => CupertinoAlertDialog(
+          title: Text(ctx.l10n.eventsScheduleConflictPreviewTitle),
+          content: Text(
+            ctx.l10n.eventsScheduleConflictPreviewBody(
+              hint.title,
+              _formatConflictWhen(ctx, hint.scheduledAt),
+            ),
+          ),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(ctx.l10n.eventsScheduleConflictAdjustTime),
+            ),
+            CupertinoDialogAction(
+              isDefaultAction: true,
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(ctx.l10n.eventsScheduleConflictContinue),
+            ),
+          ],
+        ),
+      );
+      if (goAhead != true || !mounted) {
+        return;
+      }
     }
 
     final DateTime now = DateTime.now();
@@ -453,7 +590,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
       _ensureSectionVisible(_scheduleSectionKey);
       return;
     }
-    if (!_isTimeRangeValid) {
+    if (!_isTimeRangeValid || !_isScheduleValid) {
       _ensureSectionVisible(_scheduleSectionKey);
       return;
     }
@@ -468,7 +605,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showSitePicker({bool showMapTab = false}) {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return CreateEventAsyncSitePicker(
@@ -478,6 +615,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
           onSelect: (EventSiteSummary site) {
             AppHaptics.tap();
             setState(() => _selectedSite = site);
+            _scheduleConflictPreviewDebounced();
             Navigator.of(ctx).pop();
           },
           onClose: () => Navigator.of(ctx).pop(),
@@ -488,7 +626,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showVolunteerCapPicker() {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return _VolunteerCapPickerSheet(
@@ -504,7 +642,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showCategoryPicker() {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
@@ -565,7 +703,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showGearPicker() {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return StatefulBuilder(
@@ -679,7 +817,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showScalePicker() {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
@@ -740,7 +878,7 @@ class _CreateEventSheetState extends State<CreateEventSheet>
 
   void _showDifficultyPicker() {
     AppHaptics.tap();
-    showCreateEventModalBottomSheet<void>(
+    showEventsSurfaceModal<void>(
       context: context,
       builder: (BuildContext ctx) {
         return ReportSheetScaffold(
@@ -922,20 +1060,85 @@ class _CreateEventSheetState extends State<CreateEventSheet>
                         context,
                         context.l10n.createEventSectionScheduleCaption,
                       ),
-                      CreateEventScheduleSection(
-                        sectionKey: _scheduleSectionKey,
-                        selectedDate: _selectedDate,
-                        startTime: _startTime,
-                        endTime: _endTime,
-                        showValidationErrors: _showValidationErrors,
-                        isTimeRangeValid: _isTimeRangeValid,
-                        onDateSelected: (DateTime date) =>
-                            setState(() => _selectedDate = date),
-                        onStartChanged: (EventTime t) =>
-                            setState(() => _startTime = t),
-                        onEndChanged: (EventTime t) =>
-                            setState(() => _endTime = t),
+                      Builder(
+                        builder: (BuildContext context) {
+                          final ({DateTime? minStart, DateTime? minEnd}) b =
+                              _schedulePickerBounds();
+                          return CreateEventScheduleSection(
+                            sectionKey: _scheduleSectionKey,
+                            selectedDate: _selectedDate,
+                            startTime: _startTime,
+                            endTime: _endTime,
+                            showValidationErrors: _showValidationErrors,
+                            isTimeRangeValid: _isTimeRangeValid,
+                            scheduleIssue: _createScheduleIssue(),
+                            minimumStartPickerTime: b.minStart,
+                            minimumEndPickerTime: b.minEnd,
+                            onDateSelected: (DateTime date) {
+                              setState(() {
+                                _selectedDate = date;
+                                final ({EventTime start, EventTime end}) clamped =
+                                    clampCreateOrUpcomingSchedule(
+                                  dateOnly: DateUtils.dateOnly(date),
+                                  start: _startTime,
+                                  end: _endTime,
+                                  now: DateTime.now(),
+                                );
+                                _startTime = clamped.start;
+                                _endTime = clamped.end;
+                              });
+                              _scheduleConflictPreviewDebounced();
+                            },
+                            onStartChanged: (EventTime t) {
+                              setState(() {
+                                _startTime = t;
+                                final DateTime? d = _selectedDate;
+                                if (d != null &&
+                                    !EcoEvent.isValidRange(_startTime, _endTime)) {
+                                  final DateTime sdt = eventScheduleInstantLocal(
+                                    DateUtils.dateOnly(d),
+                                    _startTime,
+                                  );
+                                  _endTime = eventTimeFromDateTime(
+                                    sdt.add(const Duration(hours: 2)),
+                                  );
+                                }
+                              });
+                              _scheduleConflictPreviewDebounced();
+                            },
+                            onEndChanged: (EventTime t) {
+                              setState(() => _endTime = t);
+                              _scheduleConflictPreviewDebounced();
+                            },
+                          );
+                        },
                       ),
+                      if (_scheduleConflictHint != null) ...<Widget>[
+                        const SizedBox(height: AppSpacing.sm),
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: AppColors.accentWarning.withValues(alpha: 0.12),
+                            borderRadius:
+                                BorderRadius.circular(AppSpacing.radiusMd),
+                            border: Border.all(
+                              color: AppColors.accentWarning.withValues(alpha: 0.45),
+                            ),
+                          ),
+                          child: Text(
+                            context.l10n.eventsScheduleConflictPreviewBody(
+                              _scheduleConflictHint!.title,
+                              _formatConflictWhen(
+                                context,
+                                _scheduleConflictHint!.scheduledAt,
+                              ),
+                            ),
+                            style: AppTypography.eventsSupportingCaption(
+                              Theme.of(context).textTheme,
+                            ).copyWith(color: AppColors.textPrimary),
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -998,9 +1201,9 @@ class _CreateEventSheetState extends State<CreateEventSheet>
           Expanded(
             child: Text(
               context.l10n.createEventAppBarTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+              style: AppTypography.eventsFormLeadHeading(
+                Theme.of(context).textTheme,
+              ),
               textAlign: TextAlign.center,
             ),
           ),
@@ -1169,9 +1372,7 @@ class _VolunteerCapPickerBodyState extends State<_VolunteerCapPickerBody> {
         const SizedBox(height: AppSpacing.md),
         Text(
           context.l10n.createEventVolunteerCapCustomLabel,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: AppTypography.eventsFormLeadHeading(Theme.of(context).textTheme),
         ),
         const SizedBox(height: AppSpacing.sm),
         TextField(
@@ -1204,10 +1405,10 @@ class _VolunteerCapPickerBodyState extends State<_VolunteerCapPickerBody> {
             padding: const EdgeInsets.only(top: AppSpacing.xs),
             child: Text(
               _customError!,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.accentDanger,
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: AppTypography.eventsCaptionStrong(
+                Theme.of(context).textTheme,
+                color: AppColors.accentDanger,
+              ).copyWith(fontWeight: FontWeight.w500),
             ),
           ),
         const SizedBox(height: AppSpacing.md),

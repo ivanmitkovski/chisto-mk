@@ -1,6 +1,9 @@
+import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/data/chat/in_memory_event_chat_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_chat_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_message_bubble.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_search_result_tile.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -33,6 +36,23 @@ Future<void> _settle(WidgetTester tester) async {
   await tester.pump();
   await tester.pump();
   await tester.pump();
+}
+
+/// HTTP search always empty; history still loads from the same in-memory store.
+class _EmptySearchInMemoryRepo extends InMemoryEventChatRepository {
+  @override
+  Future<EventChatFetchResult> searchMessages(
+    String eventId,
+    String query, {
+    String? cursor,
+    int limit = 20,
+  }) async {
+    return const EventChatFetchResult(
+      messages: <EventChatMessage>[],
+      hasMore: false,
+      nextCursor: null,
+    );
+  }
 }
 
 void main() {
@@ -208,6 +228,65 @@ void main() {
       final Finder closeButton = find.byIcon(Icons.close);
       expect(closeButton, findsWidgets);
     }
+    repo.dispose();
+  });
+
+  testWidgets('search mode does not show main chat bubbles', (WidgetTester tester) async {
+    final InMemoryEventChatRepository repo = InMemoryEventChatRepository();
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'u1',
+      authorName: 'Pat',
+      body: 'Visible in transcript',
+    );
+
+    await tester.pumpWidget(_app(
+      child: EventChatScreen(
+        eventId: 'e1',
+        eventTitle: 'Test',
+        isOrganizer: false,
+        repository: repo,
+      ),
+    ));
+
+    await _settle(tester);
+    expect(find.byType(ChatMessageBubble), findsWidgets);
+
+    await tester.tap(find.byIcon(Icons.search).first);
+    await _settle(tester);
+
+    expect(find.byType(ChatMessageBubble), findsNothing);
+    repo.dispose();
+  });
+
+  testWidgets('search shows local matches when API search returns empty', (WidgetTester tester) async {
+    final _EmptySearchInMemoryRepo repo = _EmptySearchInMemoryRepo();
+    await repo.seedOtherMessage(
+      'e1',
+      authorId: 'u1',
+      authorName: 'Pat',
+      body: 'ZetaQuery99 unique',
+    );
+
+    await tester.pumpWidget(_app(
+      child: EventChatScreen(
+        eventId: 'e1',
+        eventTitle: 'Test',
+        isOrganizer: false,
+        repository: repo,
+      ),
+    ));
+
+    await _settle(tester);
+    await tester.tap(find.byIcon(Icons.search).first);
+    await _settle(tester);
+
+    await tester.enterText(find.byType(TextField), '99');
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(ChatMessageBubble), findsNothing);
+    expect(find.byType(ChatSearchResultTile), findsOneWidget);
     repo.dispose();
   });
 }

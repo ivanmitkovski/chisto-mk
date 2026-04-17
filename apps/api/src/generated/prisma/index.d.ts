@@ -23342,6 +23342,7 @@ export namespace Prisma {
     category: $Enums.EcoEventCategory | null
     scheduledAt: Date | null
     endAt: Date | null
+    endSoonNotifiedForEndAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus | null
     lifecycleStatus: $Enums.EcoEventLifecycleStatus | null
@@ -23368,6 +23369,7 @@ export namespace Prisma {
     category: $Enums.EcoEventCategory | null
     scheduledAt: Date | null
     endAt: Date | null
+    endSoonNotifiedForEndAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus | null
     lifecycleStatus: $Enums.EcoEventLifecycleStatus | null
@@ -23394,6 +23396,7 @@ export namespace Prisma {
     category: number
     scheduledAt: number
     endAt: number
+    endSoonNotifiedForEndAt: number
     completedAt: number
     status: number
     lifecycleStatus: number
@@ -23438,6 +23441,7 @@ export namespace Prisma {
     category?: true
     scheduledAt?: true
     endAt?: true
+    endSoonNotifiedForEndAt?: true
     completedAt?: true
     status?: true
     lifecycleStatus?: true
@@ -23464,6 +23468,7 @@ export namespace Prisma {
     category?: true
     scheduledAt?: true
     endAt?: true
+    endSoonNotifiedForEndAt?: true
     completedAt?: true
     status?: true
     lifecycleStatus?: true
@@ -23490,6 +23495,7 @@ export namespace Prisma {
     category?: true
     scheduledAt?: true
     endAt?: true
+    endSoonNotifiedForEndAt?: true
     completedAt?: true
     status?: true
     lifecycleStatus?: true
@@ -23605,6 +23611,7 @@ export namespace Prisma {
     category: $Enums.EcoEventCategory
     scheduledAt: Date
     endAt: Date | null
+    endSoonNotifiedForEndAt: Date | null
     completedAt: Date | null
     status: $Enums.CleanupEventStatus
     lifecycleStatus: $Enums.EcoEventLifecycleStatus
@@ -23652,6 +23659,7 @@ export namespace Prisma {
     category?: boolean
     scheduledAt?: boolean
     endAt?: boolean
+    endSoonNotifiedForEndAt?: boolean
     completedAt?: boolean
     status?: boolean
     lifecycleStatus?: boolean
@@ -23691,6 +23699,7 @@ export namespace Prisma {
     category?: boolean
     scheduledAt?: boolean
     endAt?: boolean
+    endSoonNotifiedForEndAt?: boolean
     completedAt?: boolean
     status?: boolean
     lifecycleStatus?: boolean
@@ -23722,6 +23731,7 @@ export namespace Prisma {
     category?: boolean
     scheduledAt?: boolean
     endAt?: boolean
+    endSoonNotifiedForEndAt?: boolean
     completedAt?: boolean
     status?: boolean
     lifecycleStatus?: boolean
@@ -23753,6 +23763,7 @@ export namespace Prisma {
     category?: boolean
     scheduledAt?: boolean
     endAt?: boolean
+    endSoonNotifiedForEndAt?: boolean
     completedAt?: boolean
     status?: boolean
     lifecycleStatus?: boolean
@@ -23771,7 +23782,7 @@ export namespace Prisma {
     recurrenceIndex?: boolean
   }
 
-  export type CleanupEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "title" | "description" | "category" | "scheduledAt" | "endAt" | "completedAt" | "status" | "lifecycleStatus" | "organizerId" | "participantCount" | "gear" | "scale" | "difficulty" | "afterImageKeys" | "maxParticipants" | "checkInSessionId" | "checkInOpen" | "checkedInCount" | "recurrenceRule" | "parentEventId" | "recurrenceIndex", ExtArgs["result"]["cleanupEvent"]>
+  export type CleanupEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "siteId" | "title" | "description" | "category" | "scheduledAt" | "endAt" | "endSoonNotifiedForEndAt" | "completedAt" | "status" | "lifecycleStatus" | "organizerId" | "participantCount" | "gear" | "scale" | "difficulty" | "afterImageKeys" | "maxParticipants" | "checkInSessionId" | "checkInOpen" | "checkedInCount" | "recurrenceRule" | "parentEventId" | "recurrenceIndex", ExtArgs["result"]["cleanupEvent"]>
   export type CleanupEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     site?: boolean | SiteDefaultArgs<ExtArgs>
     organizer?: boolean | CleanupEvent$organizerArgs<ExtArgs>
@@ -23820,6 +23831,10 @@ export namespace Prisma {
       category: $Enums.EcoEventCategory
       scheduledAt: Date
       endAt: Date | null
+      /**
+       * When set to the same instant as [endAt], the organizer "cleanup ending soon" push was sent for that end time. Cleared when [endAt] changes (extension).
+       */
+      endSoonNotifiedForEndAt: Date | null
       completedAt: Date | null
       /**
        * Moderation (admin approval for user-created events).
@@ -24300,6 +24315,7 @@ export namespace Prisma {
     readonly category: FieldRef<"CleanupEvent", 'EcoEventCategory'>
     readonly scheduledAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly endAt: FieldRef<"CleanupEvent", 'DateTime'>
+    readonly endSoonNotifiedForEndAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly completedAt: FieldRef<"CleanupEvent", 'DateTime'>
     readonly status: FieldRef<"CleanupEvent", 'CleanupEventStatus'>
     readonly lifecycleStatus: FieldRef<"CleanupEvent", 'EcoEventLifecycleStatus'>
@@ -43269,6 +43285,7 @@ export namespace Prisma {
     category: 'category',
     scheduledAt: 'scheduledAt',
     endAt: 'endAt',
+    endSoonNotifiedForEndAt: 'endSoonNotifiedForEndAt',
     completedAt: 'completedAt',
     status: 'status',
     lifecycleStatus: 'lifecycleStatus',
@@ -45163,6 +45180,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
+    endSoonNotifiedForEndAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
@@ -45201,6 +45219,7 @@ export namespace Prisma {
     category?: SortOrder
     scheduledAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
+    endSoonNotifiedForEndAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     status?: SortOrder
     lifecycleStatus?: SortOrder
@@ -45242,6 +45261,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
+    endSoonNotifiedForEndAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
@@ -45280,6 +45300,7 @@ export namespace Prisma {
     category?: SortOrder
     scheduledAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
+    endSoonNotifiedForEndAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
     status?: SortOrder
     lifecycleStatus?: SortOrder
@@ -45316,6 +45337,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeWithAggregatesFilter<"CleanupEvent"> | Date | string
     endAt?: DateTimeNullableWithAggregatesFilter<"CleanupEvent"> | Date | string | null
+    endSoonNotifiedForEndAt?: DateTimeNullableWithAggregatesFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusWithAggregatesFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusWithAggregatesFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
@@ -47957,6 +47979,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -47993,6 +48016,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -48027,6 +48051,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -48063,6 +48088,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -48098,6 +48124,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -48125,6 +48152,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -48151,6 +48179,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -50737,6 +50766,7 @@ export namespace Prisma {
     category?: SortOrder
     scheduledAt?: SortOrder
     endAt?: SortOrder
+    endSoonNotifiedForEndAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
     lifecycleStatus?: SortOrder
@@ -50772,6 +50802,7 @@ export namespace Prisma {
     category?: SortOrder
     scheduledAt?: SortOrder
     endAt?: SortOrder
+    endSoonNotifiedForEndAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
     lifecycleStatus?: SortOrder
@@ -50798,6 +50829,7 @@ export namespace Prisma {
     category?: SortOrder
     scheduledAt?: SortOrder
     endAt?: SortOrder
+    endSoonNotifiedForEndAt?: SortOrder
     completedAt?: SortOrder
     status?: SortOrder
     lifecycleStatus?: SortOrder
@@ -55458,6 +55490,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -55493,6 +55526,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -56286,6 +56320,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFilter<"CleanupEvent"> | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFilter<"CleanupEvent"> | Date | string
     endAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
+    endSoonNotifiedForEndAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"CleanupEvent"> | Date | string | null
     status?: EnumCleanupEventStatusFilter<"CleanupEvent"> | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFilter<"CleanupEvent"> | $Enums.EcoEventLifecycleStatus
@@ -57641,6 +57676,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -57675,6 +57711,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -59889,6 +59926,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -59924,6 +59962,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -59962,6 +60001,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -59997,6 +60037,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -60319,6 +60360,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -60354,6 +60396,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -60403,6 +60446,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -60438,6 +60482,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -60592,6 +60637,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -60627,6 +60673,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -60771,6 +60818,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -60806,6 +60854,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -61204,6 +61253,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -61239,6 +61289,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -61702,6 +61753,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -61737,6 +61789,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -61891,6 +61944,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -61926,6 +61980,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62070,6 +62125,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62105,6 +62161,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62259,6 +62316,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62294,6 +62352,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62438,6 +62497,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62473,6 +62533,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62627,6 +62688,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62662,6 +62724,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62806,6 +62869,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62841,6 +62905,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -62890,6 +62955,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -62925,6 +62991,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -65471,6 +65538,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -66113,6 +66181,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66148,6 +66217,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66182,6 +66252,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66469,6 +66540,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -66591,6 +66663,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66625,6 +66698,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66659,6 +66733,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -66982,6 +67057,7 @@ export namespace Prisma {
     category?: $Enums.EcoEventCategory
     scheduledAt: Date | string
     endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
     completedAt?: Date | string | null
     status?: $Enums.CleanupEventStatus
     lifecycleStatus?: $Enums.EcoEventLifecycleStatus
@@ -67183,6 +67259,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -67218,6 +67295,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
@@ -67252,6 +67330,7 @@ export namespace Prisma {
     category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
     scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
     lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus

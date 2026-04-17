@@ -79,4 +79,5 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+const exportedConfig: NextConfig = withBundleAnalyzer(nextConfig);
+export default exportedConfig;

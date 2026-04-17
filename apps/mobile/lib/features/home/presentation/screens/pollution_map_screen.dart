@@ -513,7 +513,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       _searchController.clear();
       _searchFocusNode.unfocus();
     });
-    AppHaptics.pinSelect();
+    AppHaptics.pinSelect(context);
     _animatedMapController.animateTo(
       dest: point,
       zoom: 14.5.clamp(3, 18).toDouble(),
@@ -617,7 +617,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         _activeStatuses.add(status);
       }
     });
-    AppHaptics.light();
+    AppHaptics.light(context);
   }
 
   void _togglePollutionType(String type) {
@@ -629,11 +629,11 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         _activePollutionTypes.add(type);
       }
     });
-    AppHaptics.light();
+    AppHaptics.light(context);
   }
 
   void _openSearchModal() {
-    AppHaptics.light();
+    AppHaptics.light(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,
@@ -650,7 +650,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   }
 
   void _openFilterModal() {
-    AppHaptics.light();
+    AppHaptics.light(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,
@@ -675,7 +675,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         _animatedMapController.animatedRotateReset();
       }
     });
-    AppHaptics.light();
+    AppHaptics.light(context);
   }
 
   @override
@@ -722,11 +722,11 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
               rotationLocked: _rotationLocked,
               onToggleHeatmap: () {
                 setState(() => _showHeatmap = !_showHeatmap);
-                AppHaptics.light();
+                AppHaptics.light(context);
               },
               onToggleDarkTiles: () {
                 setState(() => _useDarkTiles = !_useDarkTiles);
-                AppHaptics.light();
+                AppHaptics.light(context);
               },
               onZoomToFit: _handleZoomToFitAll,
               onToggleRotationLock: _toggleRotationLock,
@@ -783,7 +783,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
                                       return MapCompassButton(
                                         rotationDegrees: rotation,
                                         onReset: () {
-                                          AppHaptics.settle();
+                                          AppHaptics.settle(context);
                                           _animatedMapController
                                               .animatedRotateReset();
                                         },
@@ -871,7 +871,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
                       onViewDetails: () => _openSiteDetail(_selectedSite!),
                       onDismiss: () {
                         setState(() => _selectedSite = null);
-                        AppHaptics.sheetDismiss();
+                        AppHaptics.sheetDismiss(context);
                       },
                     ),
             ),
@@ -917,7 +917,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         onMapEvent: (MapEvent event) {
           _onMapInteractionMayHaveTiles(event);
           if (event is MapEventDoubleTapZoom) {
-            AppHaptics.tap();
+            AppHaptics.tap(context);
           }
           if (event is MapEventMove) {
             _viewportMoveDebounce?.cancel();
@@ -943,7 +943,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         onTap: (TapPosition pos, LatLng point) {
           if (_selectedSite != null) {
             setState(() => _selectedSite = null);
-            AppHaptics.pinDeselect();
+            AppHaptics.pinDeselect(context);
           }
         },
       ),
@@ -995,7 +995,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
                 _activePollutionTypes = _canonicalPollutionTypes.toSet();
                 _searchController.clear();
               });
-              AppHaptics.light();
+              AppHaptics.light(context);
             },
           ),
         Builder(
@@ -1198,7 +1198,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
               animate: !reduceAnimations,
               pulseEnabled: !reduceAnimations && count <= 28,
               onTap: () {
-                AppHaptics.clusterExpand();
+                AppHaptics.clusterExpand(context);
                 final List<LatLng> points = bucket.sites
                     .map((PollutionSite s) => _getSiteCoordinates(s.id))
                     .whereType<LatLng>()
@@ -1243,7 +1243,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   }
 
   Future<void> _openSiteDetail(PollutionSite site) async {
-    AppHaptics.softTransition();
+    AppHaptics.softTransition(context);
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (_) => PollutionSiteDetailScreen(site: site),
@@ -1260,8 +1260,9 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
     try {
       final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
-        AppHaptics.gpsFailed();
-        if (mounted) setState(() => _isLocating = false);
+        if (!mounted) return;
+        AppHaptics.gpsFailed(context);
+        setState(() => _isLocating = false);
         return;
       }
 
@@ -1271,8 +1272,9 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
-        AppHaptics.gpsFailed();
-        if (mounted) setState(() => _isLocating = false);
+        if (!mounted) return;
+        AppHaptics.gpsFailed(context);
+        setState(() => _isLocating = false);
         return;
       }
 
@@ -1290,7 +1292,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
         _locationJustFound = true;
       });
 
-      AppHaptics.gpsFound();
+      AppHaptics.gpsFound(context);
       await _animatedMapController.animateTo(
         dest: location,
         zoom: 16.5.clamp(3, 18).toDouble(),
@@ -1301,14 +1303,14 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       if (mounted) setState(() => _locationJustFound = false);
     } catch (_) {
       if (!mounted) return;
-      AppHaptics.gpsFailed();
+      AppHaptics.gpsFailed(context);
       setState(() => _isLocating = false);
     }
   }
 
   void _handleSelectSite(PollutionSite site, LatLng point) {
     setState(() => _selectedSite = site);
-    AppHaptics.pinSelect();
+    AppHaptics.pinSelect(context);
     _animatedMapController.animateTo(
       dest: point,
       zoom: 14.5.clamp(3, 18).toDouble(),
@@ -1318,7 +1320,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   void _openDirectionsForSite(PollutionSite site) {
     final LatLng? point = _getSiteCoordinates(site.id);
     if (point == null) return;
-    AppHaptics.light();
+    AppHaptics.light(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: AppColors.transparent,
@@ -1326,12 +1328,12 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
       builder: (BuildContext context) {
         return DirectionsSheet(
           onAppleMapsTap: () {
-            AppHaptics.light();
+            AppHaptics.light(context);
             Navigator.of(context).pop();
             _launchDirections(site, useAppleMaps: true);
           },
           onGoogleMapsTap: () {
-            AppHaptics.light();
+            AppHaptics.light(context);
             Navigator.of(context).pop();
             _launchDirections(site, useAppleMaps: false);
           },
@@ -1380,7 +1382,7 @@ class _PollutionMapScreenState extends State<PollutionMapScreen>
   }
 
   void _handleZoomToFitAll() {
-    AppHaptics.light();
+    AppHaptics.light(context);
     _animatedMapController.animatedFitCamera(
       cameraFit: CameraFit.bounds(
         bounds: _macedoniaBounds,

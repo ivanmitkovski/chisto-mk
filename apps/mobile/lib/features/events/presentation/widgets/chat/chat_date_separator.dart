@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:intl/intl.dart';
 
 class ChatDateSeparator extends StatelessWidget {
@@ -42,8 +43,7 @@ class ChatDateSeparator extends StatelessWidget {
           ),
           child: Text(
             label,
-            style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                  color: AppColors.textMuted,
+            style: AppTypography.eventsChatTimestamp(Theme.of(context).textTheme).copyWith(
                   fontWeight: FontWeight.w500,
                   letterSpacing: 0.1,
                 ),

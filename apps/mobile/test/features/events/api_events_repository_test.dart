@@ -167,4 +167,48 @@ void main() {
     expect(repo.findById('evt-list')?.title, 'Listed');
     expect(repo.lastGlobalListLoadFailed, isFalse);
   });
+
+  test('loadMore failure marks stale when list is non-empty', () async {
+    final _PagingFakeApiClient client = _PagingFakeApiClient();
+    final ApiEventsRepository repo = ApiEventsRepository(client: client);
+    repo.loadInitialIfNeeded();
+    await repo.ready;
+
+    expect(repo.events, hasLength(1));
+    expect(repo.hasMoreEvents, isTrue);
+    expect(repo.isShowingStaleCachedEvents, isFalse);
+
+    await expectLater(
+      repo.loadMore(),
+      throwsA(isA<AppError>()),
+    );
+
+    expect(repo.events, hasLength(1));
+    expect(repo.lastGlobalListLoadFailed, isTrue);
+    expect(repo.isShowingStaleCachedEvents, isTrue);
+  });
+}
+
+/// First `/events?limit=50` page has more; second page request throws.
+class _PagingFakeApiClient extends _FakeApiClient {
+  @override
+  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
+    getCalls += 1;
+    if (path.contains('cursor=c2')) {
+      throw const AppError(code: 'SERVER', message: 'page failed');
+    }
+    if (path.startsWith('/events?limit=50')) {
+      return ApiResponse(
+        statusCode: 200,
+        json: <String, dynamic>{
+          'data': <dynamic>[_eventJson(id: 'evt-1', title: 'One')],
+          'meta': <String, dynamic>{
+            'hasMore': true,
+            'nextCursor': 'c2',
+          },
+        },
+      );
+    }
+    return super.get(path, headers: headers);
+  }
 }

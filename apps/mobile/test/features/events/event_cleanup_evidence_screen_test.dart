@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
@@ -5,6 +6,7 @@ import 'package:chisto_mobile/features/events/data/events_repository_registry.da
 import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_cleanup_evidence_screen.dart';
+import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/primary_button.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -93,7 +95,7 @@ void main() {
     expect(node.getSemanticsData().hasAction(SemanticsAction.tap), isTrue);
   });
 
-  testWidgets('pick (test hook), save, pop and success snack', (WidgetTester tester) async {
+  testWidgets('pick (test hook), save shows success dialog then dismisses', (WidgetTester tester) async {
     const String assetPhoto =
         'assets/images/references/onboarding_reference.png';
 
@@ -113,11 +115,14 @@ void main() {
     expect(find.text('Save'), findsOneWidget);
     final Finder saveKey = find.byKey(const ValueKey<String>('cleanupEvidenceSave'));
     await tester.ensureVisible(saveKey);
-    await tester.tap(saveKey);
+    await tester.pump();
+    await tester.tapAt(tester.getCenter(saveKey));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 800));
 
-    expect(find.text('After photos saved.'), findsOneWidget);
+    expect(find.text('Photos saved'), findsOneWidget);
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
   });
 
   testWidgets('save failure then retry succeeds', (WidgetTester tester) async {
@@ -154,10 +159,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 800));
     expect(find.text('Upload failed'), findsOneWidget);
-
-    // iOS-style [AppSnack] uses a short-lived overlay; wait for it to dismiss
-    // so the second Save tap is not obscured.
-    await tester.pump(const Duration(seconds: 4));
+    await tester.tap(find.text('Try again'));
     await tester.pumpAndSettle();
     expect(saveKey, findsOneWidget);
     final PrimaryButton saveBtn = tester.widget<PrimaryButton>(saveKey);
@@ -168,7 +170,48 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 800));
     expect(attempts, 2);
-    expect(find.text('After photos saved.'), findsOneWidget);
+    expect(find.text('Photos saved'), findsOneWidget);
+    await tester.tap(find.text('Got it'));
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('tapping back while saving shows in-progress hint', (WidgetTester tester) async {
+    const String assetPhoto =
+        'assets/images/references/onboarding_reference.png';
+    final Completer<bool> gate = Completer<bool>();
+
+    await tester.pumpWidget(
+      _reduceMotionApp(
+        EventCleanupEvidenceScreen(
+          eventId: event.id,
+          testPickAfterImagePathsOverride: () async => <String>[assetPhoto],
+          testSetAfterImagesOverride:
+              ({required String eventId, required List<String> imagePaths}) async {
+            await gate.future;
+            return store.setAfterImages(eventId: eventId, imagePaths: imagePaths);
+          },
+        ),
+      ),
+    );
+    await _pumpUi(tester);
+    await tester.tap(find.text('Add photos of the cleaned site'));
+    await _pumpUi(tester);
+
+    final Finder saveKey = find.byKey(const ValueKey<String>('cleanupEvidenceSave'));
+    await tester.ensureVisible(saveKey);
+    await tester.tapAt(tester.getCenter(saveKey));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    await tester.tap(find.byType(AppBackButton));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text('Please wait until save finishes before leaving this screen.'), findsOneWidget);
+
+    gate.complete(true);
+    await tester.pump(const Duration(milliseconds: 800));
+    await tester.pumpAndSettle();
   });
 
   testWidgets('save button exposes save semantics with hint', (WidgetTester tester) async {

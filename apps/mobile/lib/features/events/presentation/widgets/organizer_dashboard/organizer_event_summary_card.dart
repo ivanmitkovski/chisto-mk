@@ -30,6 +30,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     final int current = event.participantCount;
     final int? max = event.maxParticipants;
     final double fillRatio = max != null && max > 0
@@ -38,9 +39,34 @@ class OrganizerEventSummaryCard extends StatelessWidget {
     final bool isFull = max != null && current >= max;
     final Color statusColor = Color(event.status.colorValue);
 
+    final String participantsLine = max != null && max > 0
+        ? context.l10n.eventsOrganizerDashboardParticipants(
+            current,
+            max.toString(),
+          )
+        : context.l10n.eventsOrganizerDashboardParticipantsUnlimited(current);
+    final StringBuffer sem = StringBuffer()
+      ..write(event.title)
+      ..write('. ')
+      ..write(formatEventCalendarDate(context, event.date))
+      ..write('. ')
+      ..write(participantsLine);
+    if (event.status == EcoEventStatus.upcoming ||
+        event.status == EcoEventStatus.inProgress) {
+      sem
+        ..write('. ')
+        ..write(context.l10n.eventsCheckInTitle);
+      if (event.status == EcoEventStatus.inProgress) {
+        sem
+          ..write('. ')
+          ..write(context.l10n.eventsOrganizerDashboardEvidenceAction);
+      }
+    }
+    final String semanticsLabel = sem.toString();
+
     return Semantics(
       button: true,
-      label: event.title,
+      label: semanticsLabel,
       child: GestureDetector(
         onTap: () {
           AppHaptics.tap();
@@ -67,8 +93,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       event.title,
-                      style: AppTypography.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
+                      style: AppTypography.eventsListCardTitle(textTheme).copyWith(
                         letterSpacing: -0.2,
                       ),
                       maxLines: 2,
@@ -93,9 +118,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   const SizedBox(width: AppSpacing.xxs),
                   Text(
                     formatEventCalendarDate(context, event.date),
-                    style: AppTypography.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                    style: AppTypography.eventsListCardMeta(textTheme),
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   const Icon(
@@ -107,9 +130,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       event.siteName,
-                      style: AppTypography.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                      style: AppTypography.eventsListCardMeta(textTheme),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -144,11 +165,11 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                         current,
                         max.toString(),
                       ),
-                      style: AppTypography.textTheme.labelSmall?.copyWith(
+                      style: AppTypography.eventsCaptionStrong(
+                        textTheme,
                         color: isFull
                             ? const Color(0xFFF5A623)
                             : AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
@@ -159,9 +180,7 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                   context.l10n.eventsOrganizerDashboardParticipantsUnlimited(
                     current,
                   ),
-                  style: AppTypography.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+                  style: AppTypography.eventsListCardMeta(textTheme),
                 ),
               ],
 
@@ -203,6 +222,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
@@ -212,11 +232,10 @@ class _StatusPill extends StatelessWidget {
       ),
       child: Text(
         status.localizedLabel(context.l10n),
-        style: AppTypography.textTheme.labelSmall?.copyWith(
+        style: AppTypography.eventsCaptionStrong(
+          textTheme,
           color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 11,
-        ),
+        ).copyWith(fontSize: 11),
       ),
     );
   }
@@ -235,6 +254,7 @@ class _QuickActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Semantics(
       button: true,
       label: label,
@@ -271,11 +291,10 @@ class _QuickActionButton extends StatelessWidget {
                   const SizedBox(width: AppSpacing.xxs),
                   Text(
                     label,
-                    style: AppTypography.textTheme.labelSmall?.copyWith(
+                    style: AppTypography.eventsCaptionStrong(
+                      textTheme,
                       color: AppColors.primaryDark,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 12,
-                    ),
+                    ).copyWith(fontSize: 12),
                   ),
                 ],
               ),

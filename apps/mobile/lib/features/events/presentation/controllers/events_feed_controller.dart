@@ -215,14 +215,24 @@ class EventsFeedController extends ChangeNotifier {
     }
   }
 
-  void applySearchSuggestion(String suggestion) {
-    searchController.text = suggestion;
-    searchController.selection = TextSelection.collapsed(offset: suggestion.length);
+  /// Applies a recent-search chip: syncs [searchController], client [_searchQuery],
+  /// persisted recents, and server [EcoEventSearchParams.query] (same as debounced typing).
+  Future<bool> applySearchSuggestion(String suggestion) async {
+    final String trimmed = suggestion.trim();
+    searchController.text = trimmed;
+    searchController.selection =
+        TextSelection.collapsed(offset: searchController.text.length);
     _debounce?.cancel();
-    _searchQuery = suggestion;
+    _searchQuery = trimmed;
     _invalidateDerived();
     notifyListeners();
-    unawaited(rememberSearch(suggestion));
+    await rememberSearch(trimmed);
+    return setSearchParams(
+      _activeSearchParams.copyWith(
+        query: trimmed.isEmpty ? null : trimmed,
+        clearQuery: trimmed.isEmpty,
+      ),
+    );
   }
 
   void setCalendarView(bool value) {
@@ -231,10 +241,37 @@ class EventsFeedController extends ChangeNotifier {
     }
     _calendarView = value;
     notifyListeners();
+    unawaited(_discoveryPreferences.writeCalendarViewPreferred(value));
+  }
+
+  Future<void> loadCalendarViewPreference() async {
+    final bool preferred = await _discoveryPreferences.readCalendarViewPreferred();
+    if (_calendarView == preferred) {
+      return;
+    }
+    _calendarView = preferred;
+    notifyListeners();
   }
 
   Future<bool> setActiveFilter(EcoEventFilter filter) async {
     _activeFilter = filter;
+    _invalidateDerived();
+    notifyListeners();
+    try {
+      await refreshMergedList();
+      return true;
+    } on Object catch (_) {
+      return false;
+    }
+  }
+
+  /// Resets chip to [EcoEventFilter.all], clears advanced sheet params, and clears search.
+  Future<bool> resetAllDiscoveryFilters() async {
+    _debounce?.cancel();
+    _activeFilter = EcoEventFilter.all;
+    _activeSearchParams = const EcoEventSearchParams();
+    _searchQuery = '';
+    searchController.clear();
     _invalidateDerived();
     notifyListeners();
     try {

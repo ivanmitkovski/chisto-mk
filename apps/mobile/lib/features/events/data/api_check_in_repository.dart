@@ -134,6 +134,37 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
         body: <String, dynamic>{'qrPayload': rawPayload.trim()},
       );
       final Map<String, dynamic>? json = response.json;
+
+      final String? responseStatus = json?['status'] as String?;
+
+      if (responseStatus == 'pending_confirmation') {
+        final String? pendingId = json?['pendingId'] as String?;
+        final String? expiresAtIso = json?['expiresAt'] as String?;
+        final DateTime? expiresAt = expiresAtIso != null
+            ? DateTime.tryParse(expiresAtIso)?.toLocal()
+            : null;
+        return CheckInSubmissionResult(
+          status: CheckInSubmissionStatus.pendingConfirmation,
+          pendingId: pendingId,
+          pendingExpiresAt: expiresAt,
+        );
+      }
+
+      if (responseStatus == 'already_checked_in') {
+        final DateTime? at = _redeemResponseCheckedInAt(json);
+        _events.setAttendeeCheckInStatus(
+          eventId: expectedEventId,
+          status: AttendeeCheckInStatus.checkedIn,
+          checkedInAt: at ?? DateTime.now(),
+        );
+        return CheckInSubmissionResult(
+          status: CheckInSubmissionStatus.alreadyCheckedIn,
+          checkedInAt: at,
+          pointsAwarded: 0,
+        );
+      }
+
+      // Legacy direct-check-in path (should not happen with new API).
       final DateTime? at = _redeemResponseCheckedInAt(json);
       if (at == null) {
         return const CheckInSubmissionResult(
@@ -141,34 +172,36 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
         );
       }
       final int pointsAwarded = parsePointsAwardedFromJson(json);
-      await _events.prefetchEvent(expectedEventId, force: true);
-      await refreshAttendees(expectedEventId);
-      return CheckInSubmissionResult(
+      final CheckInSubmissionResult result = CheckInSubmissionResult(
         status: CheckInSubmissionStatus.success,
         checkedInAt: at,
         pointsAwarded: pointsAwarded,
       );
-    } on SocketException {
-      // No network — queue for offline sync and show optimistic success.
-      await CheckInSyncQueue.instance.enqueue(
-        CheckInQueueEntry(
-          eventId: expectedEventId,
-          qrPayload: rawPayload.trim(),
-          enqueuedAt: DateTime.now(),
-        ),
+      _events.setAttendeeCheckInStatus(
+        eventId: expectedEventId,
+        status: AttendeeCheckInStatus.checkedIn,
+        checkedInAt: at,
       );
+      try {
+        await refreshAttendees(expectedEventId);
+      } on Object {
+        // List may lag until organizer polling.
+      }
+      unawaited(_events.prefetchEvent(expectedEventId, force: true));
+      return result;
+    } on SocketException {
+      await _enqueueOfflineAndSetOptimistic(expectedEventId, rawPayload);
+      return const CheckInSubmissionResult(
+        status: CheckInSubmissionStatus.queuedOffline,
+      );
+    } on TimeoutException {
+      await _enqueueOfflineAndSetOptimistic(expectedEventId, rawPayload);
       return const CheckInSubmissionResult(
         status: CheckInSubmissionStatus.queuedOffline,
       );
     } on AppError catch (e) {
-      if (e.code == 'no_internet' || e.code == 'network') {
-        await CheckInSyncQueue.instance.enqueue(
-          CheckInQueueEntry(
-            eventId: expectedEventId,
-            qrPayload: rawPayload.trim(),
-            enqueuedAt: DateTime.now(),
-          ),
-        );
+      if (_isQueuedOfflineTransportError(e)) {
+        await _enqueueOfflineAndSetOptimistic(expectedEventId, rawPayload);
         return const CheckInSubmissionResult(
           status: CheckInSubmissionStatus.queuedOffline,
         );
@@ -184,6 +217,36 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
   CheckInSubmissionStatus submissionStatusForAppError(AppError e) =>
       _statusForAppError(e);
 
+  Future<void> _enqueueOfflineAndSetOptimistic(
+    String eventId,
+    String rawPayload,
+  ) async {
+    await CheckInSyncQueue.instance.enqueue(
+      CheckInQueueEntry(
+        eventId: eventId,
+        qrPayload: rawPayload.trim(),
+        enqueuedAt: DateTime.now(),
+      ),
+    );
+    _events.setAttendeeCheckInStatus(
+      eventId: eventId,
+      status: AttendeeCheckInStatus.checkedIn,
+      checkedInAt: DateTime.now(),
+    );
+  }
+
+  bool _isQueuedOfflineTransportError(AppError e) {
+    switch (e.code) {
+      case 'NETWORK_ERROR':
+      case 'TIMEOUT':
+      case 'no_internet':
+      case 'network':
+        return true;
+      default:
+        return false;
+    }
+  }
+
   CheckInSubmissionStatus _statusForAppError(AppError e) {
     switch (e.code) {
       case 'CHECK_IN_WRONG_EVENT':
@@ -193,6 +256,7 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
         return CheckInSubmissionStatus.sessionClosed;
       case 'CHECK_IN_QR_EXPIRED':
       case 'CHECK_IN_SESSION_MISMATCH':
+      case 'CHECK_IN_REQUEST_EXPIRED':
         return CheckInSubmissionStatus.sessionExpired;
       case 'CHECK_IN_REPLAY':
         return CheckInSubmissionStatus.replayDetected;
@@ -210,6 +274,9 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
       case 'CHECK_IN_LIFECYCLE':
       case 'EVENT_NOT_FOUND':
       case 'CHECK_IN_NOT_FOUND':
+      case 'CHECK_IN_REQUEST_NOT_FOUND':
+      case 'CHECK_IN_FORBIDDEN':
+      case 'CHECK_IN_MISCONFIG':
         return CheckInSubmissionStatus.checkInUnavailable;
       case 'TOO_MANY_REQUESTS':
         return CheckInSubmissionStatus.rateLimited;
@@ -261,34 +328,24 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
 
   @override
   Future<bool> pauseSession(String eventId) async {
-    try {
-      await _client.patch(
-        '/events/$eventId/check-in',
-        body: <String, dynamic>{'isOpen': false},
-      );
-      // [prefetchEvent] skips the network when the event is already cached, so
-      // the PATCH would not be reflected in [EcoEvent.isCheckInOpen] without this.
-      _events.setCheckInOpen(eventId: eventId, isOpen: false);
-      unawaited(_events.prefetchEvent(eventId, force: true));
-      return true;
-    } on Object {
-      return false;
-    }
+    await _client.patch(
+      '/events/$eventId/check-in',
+      body: <String, dynamic>{'isOpen': false},
+    );
+    _events.setCheckInOpen(eventId: eventId, isOpen: false);
+    unawaited(_events.prefetchEvent(eventId, force: true));
+    return true;
   }
 
   @override
   Future<bool> resumeSession(String eventId) async {
-    try {
-      await _client.patch(
-        '/events/$eventId/check-in',
-        body: <String, dynamic>{'isOpen': true},
-      );
-      _events.setCheckInOpen(eventId: eventId, isOpen: true);
-      unawaited(_events.prefetchEvent(eventId, force: true));
-      return true;
-    } on Object {
-      return false;
-    }
+    await _client.patch(
+      '/events/$eventId/check-in',
+      body: <String, dynamic>{'isOpen': true},
+    );
+    _events.setCheckInOpen(eventId: eventId, isOpen: true);
+    unawaited(_events.prefetchEvent(eventId, force: true));
+    return true;
   }
 
   @override
@@ -307,6 +364,44 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
       body: <String, dynamic>{},
     );
     await _events.prefetchEvent(id, force: true);
+  }
+
+  @override
+  Future<void> resolvePendingCheckIn({
+    required String eventId,
+    required String pendingId,
+    required bool approve,
+  }) async {
+    await _client.post(
+      '/events/$eventId/check-in/pending/$pendingId/resolve',
+      body: <String, dynamic>{
+        'action': approve ? 'approve' : 'reject',
+      },
+    );
+    if (approve) {
+      try {
+        await refreshAttendees(eventId);
+      } on Object {
+        // Will be picked up by the next poll.
+      }
+      unawaited(_events.prefetchEvent(eventId, force: true));
+    }
+  }
+
+  @override
+  Future<String?> pollPendingStatus({
+    required String eventId,
+    required String pendingId,
+  }) async {
+    try {
+      final ApiResponse response = await _client.get(
+        '/events/$eventId/check-in/pending/$pendingId',
+      );
+      final Map<String, dynamic>? json = response.json;
+      return json?['status'] as String?;
+    } on Object {
+      return null;
+    }
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 
@@ -46,7 +47,7 @@ Future<void> showChatPinnedMessagesSheet({
                 padding: const EdgeInsets.all(AppSpacing.md),
                 child: Text(
                   context.l10n.eventChatPinnedMessagesTitle,
-                  style: Theme.of(ctx).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                  style: AppTypography.eventsCalendarMonthTitle(Theme.of(ctx).textTheme),
                 ),
               ),
               if (pinned.isEmpty)
@@ -55,10 +56,7 @@ Future<void> showChatPinnedMessagesSheet({
                   child: Text(
                     context.l10n.eventChatNoPinnedMessages,
                     textAlign: TextAlign.center,
-                    style: Theme.of(ctx)
-                        .textTheme
-                        .bodyMedium
-                        ?.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.eventsBodyMediumSecondary(Theme.of(ctx).textTheme),
                   ),
                 )
               else
@@ -67,7 +65,8 @@ Future<void> showChatPinnedMessagesSheet({
                   child: ListView.separated(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     itemCount: pinned.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
+                    separatorBuilder: (BuildContext _, int _) =>
+                        const SizedBox(height: AppSpacing.sm),
                     itemBuilder: (BuildContext c, int i) {
                       final EventChatMessage m = pinned[i];
                       final Widget bubble = _PinnedMiniBubble(
@@ -155,8 +154,7 @@ class _PinnedMiniBubble extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xxs),
                 Text(
                   message.authorName,
-                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
+                  style: AppTypography.eventsChatAuthorName(Theme.of(context).textTheme).copyWith(
                         color: ChatTheme.avatarColor(message.authorId),
                       ),
                 ),
@@ -165,9 +163,7 @@ class _PinnedMiniBubble extends StatelessWidget {
                   const Spacer(),
                   Text(
                     context.l10n.eventChatPinnedBy(message.pinnedByDisplayName!),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: AppColors.textMuted,
-                        ),
+                    style: AppTypography.eventsChatTimestamp(Theme.of(context).textTheme),
                   ),
                 ],
                 if (isOrganizer && onUnpin != null) ...<Widget>[
@@ -189,7 +185,7 @@ class _PinnedMiniBubble extends StatelessWidget {
               text,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(context).textTheme.bodySmall,
+              style: AppTypography.eventsSupportingCaption(Theme.of(context).textTheme),
             ),
           ],
         ),

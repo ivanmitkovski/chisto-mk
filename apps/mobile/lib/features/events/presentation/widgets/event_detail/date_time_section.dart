@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -67,9 +68,7 @@ class DateTimeSection extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 '$relative · ${event.formattedTimeRange}',
-                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                style: AppTypography.eventsBodyMuted(Theme.of(ctx).textTheme),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.lg),
@@ -81,7 +80,10 @@ class DateTimeSection extends StatelessWidget {
                     Navigator.of(ctx).pop();
                     onExportCalendar();
                   },
-                  icon: const Icon(CupertinoIcons.calendar_badge_plus, size: 18),
+                  icon: const Icon(
+                    CupertinoIcons.calendar_badge_plus,
+                    size: 18,
+                  ),
                   label: Text(ctx.l10n.eventsAddToCalendar),
                   style: OutlinedButton.styleFrom(
                     side: const BorderSide(color: AppColors.divider),
@@ -133,16 +135,15 @@ class DateTimeSection extends StatelessWidget {
                           children: <Widget>[
                             Text(
                               formatEventCalendarDate(context, event.date),
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
+                              style: AppTypography.eventsGroupedRowPrimary(textTheme),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             Text(
                               event.formattedTimeRange,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: AppColors.textMuted,
-                              ),
+                              style: AppTypography.eventsListCardMeta(textTheme),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),
@@ -176,7 +177,9 @@ class DateTimeSection extends StatelessWidget {
                         height: AppSpacing.avatarMd,
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          borderRadius: BorderRadius.circular(
+                            AppSpacing.radiusMd,
+                          ),
                         ),
                         child: const Icon(
                           CupertinoIcons.calendar,
@@ -191,17 +194,16 @@ class DateTimeSection extends StatelessWidget {
                           children: <Widget>[
                             Text(
                               formatEventCalendarDate(context, event.date),
-                              style: textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppColors.textPrimary,
-                              ),
+                              style: AppTypography.eventsGroupedRowPrimary(textTheme),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: AppSpacing.xxs / 2),
                             Text(
                               event.formattedTimeRange,
-                              style: textTheme.bodySmall?.copyWith(
-                                color: AppColors.textMuted,
-                              ),
+                              style: AppTypography.eventsListCardMeta(textTheme),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ],
                         ),

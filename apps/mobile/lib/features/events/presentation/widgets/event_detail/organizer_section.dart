@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -38,9 +39,7 @@ class OrganizerSection extends StatelessWidget {
                 event.isOrganizer
                     ? ctx.l10n.eventsOrganizerYouOwnThis
                     : ctx.l10n.eventsOrganizerRoleLabel,
-                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+                style: AppTypography.eventsBodyMuted(Theme.of(ctx).textTheme),
               ),
               const SizedBox(height: AppSpacing.lg),
               Container(
@@ -64,8 +63,8 @@ class OrganizerSection extends StatelessWidget {
                           event.createdAt.month,
                           event.createdAt.year,
                         ),
-                        style: Theme.of(ctx).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textSecondary,
+                        style: AppTypography.eventsGridPropertyValue(
+                          Theme.of(ctx).textTheme,
                         ),
                       ),
                     ),
@@ -108,14 +107,11 @@ class OrganizerSection extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         context.l10n.eventsOrganizedByLabel,
-                        style: textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+                        style: AppTypography.eventsListCardMeta(textTheme),
                       ),
                       Text(
                         event.organizerName,
-                        style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
+                        style: AppTypography.eventsGroupedRowPrimary(textTheme),
                       ),
                     ],
                   ),

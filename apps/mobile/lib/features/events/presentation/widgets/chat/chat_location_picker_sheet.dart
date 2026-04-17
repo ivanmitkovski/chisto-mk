@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/src/misc/position.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart' as geo;
 import 'package:latlong2/latlong.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 
 class ChatLocationPickerSheet extends StatefulWidget {
@@ -84,7 +85,9 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
         ];
         setState(() => _label = parts.join(', '));
       }
-    } on Object catch (_) {}
+    } on Object catch (_) {
+      logEventsDiagnostic('chat_reverse_geocode_failed');
+    }
   }
 
   void _onMapPositionChanged(MapPosition position, bool hasGesture) {
@@ -119,8 +122,8 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
             Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: Text(
-                'Share Location',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+                context.l10n.chatShareLocation,
+                style: AppTypography.eventsCalendarMonthTitle(Theme.of(context).textTheme),
               ),
             ),
             Expanded(
@@ -205,7 +208,7 @@ class _ChatLocationPickerSheetState extends State<ChatLocationPickerSheet>
                         _label!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+                        style: AppTypography.eventsGridPropertyValue(Theme.of(context).textTheme),
                       ),
                     ),
                   ],

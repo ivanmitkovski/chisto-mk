@@ -5,6 +5,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_section_header.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -41,7 +42,9 @@ class _DescriptionSectionState extends State<DescriptionSection> {
     }
     _lastMeasuredWidth = availableWidth;
 
-    final TextStyle? style = Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.55);
+    final TextStyle style = AppTypography.eventsBodyProseRelaxed(
+      Theme.of(context).textTheme,
+    );
     final TextPainter tp = TextPainter(
       text: TextSpan(text: widget.event.description, style: style),
       maxLines: _collapsedMaxLines,
@@ -80,11 +83,15 @@ class _DescriptionSectionState extends State<DescriptionSection> {
                     widget.event.description,
                     maxLines: _collapsedMaxLines,
                     overflow: TextOverflow.ellipsis,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.55),
+                    style: AppTypography.eventsBodyProseRelaxed(
+                      Theme.of(context).textTheme,
+                    ),
                   ),
                   secondChild: Text(
                     widget.event.description,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(height: 1.55),
+                    style: AppTypography.eventsBodyProseRelaxed(
+                      Theme.of(context).textTheme,
+                    ),
                   ),
                 ),
                 if (_needsExpansion)
@@ -99,10 +106,10 @@ class _DescriptionSectionState extends State<DescriptionSection> {
                       _expanded
                           ? context.l10n.eventsDescriptionShowLess
                           : context.l10n.eventsDescriptionReadMore,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primaryDark,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      style: AppTypography.eventsCaptionStrong(
+                        Theme.of(context).textTheme,
+                        color: AppColors.primaryDark,
+                      ),
                     ),
                   ),
               ],

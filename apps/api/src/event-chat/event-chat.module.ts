@@ -11,12 +11,16 @@ import { EventChatService } from './event-chat.service';
 import { EventChatSseService } from './event-chat-sse.service';
 import { EventChatUploadService } from './event-chat-upload.service';
 import { EventChatClusterConfig } from './event-chat-cluster.config';
+import { EventChatTelemetryService } from './event-chat-telemetry.service';
+import { EventChatThrottlerGuard } from './event-chat-throttler.guard';
 
 @Module({
   imports: [PrismaModule, NotificationsModule, ReportsUploadModule],
   controllers: [EventChatController],
   providers: [
     EventChatClusterConfig,
+    EventChatTelemetryService,
+    EventChatThrottlerGuard,
     EventChatService,
     EventChatSseService,
     EventChatGateway,

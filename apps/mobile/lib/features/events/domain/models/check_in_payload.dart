@@ -176,6 +176,8 @@ enum CheckInSubmissionStatus {
   rateLimited,
   /// No network connection — payload has been queued for offline sync.
   queuedOffline,
+  /// QR validated; awaiting organizer confirmation via WebSocket.
+  pendingConfirmation,
 }
 
 class CheckInSubmissionResult {
@@ -183,6 +185,8 @@ class CheckInSubmissionResult {
     required this.status,
     this.checkedInAt,
     this.pointsAwarded = 0,
+    this.pendingId,
+    this.pendingExpiresAt,
   });
 
   final CheckInSubmissionStatus status;
@@ -191,7 +195,15 @@ class CheckInSubmissionResult {
   /// Gamification: server points for this check-in (0 if none or offline queue).
   final int pointsAwarded;
 
+  /// Non-null when [status] is [CheckInSubmissionStatus.pendingConfirmation].
+  final String? pendingId;
+
+  /// When the pending request will expire (server wall-clock). Drives the client-side timeout.
+  final DateTime? pendingExpiresAt;
+
   bool get isSuccess => status == CheckInSubmissionStatus.success;
+  bool get isPendingConfirmation =>
+      status == CheckInSubmissionStatus.pendingConfirmation;
 
   @override
   bool operator ==(Object other) =>
@@ -199,10 +211,11 @@ class CheckInSubmissionResult {
       other is CheckInSubmissionResult &&
           status == other.status &&
           checkedInAt == other.checkedInAt &&
-          pointsAwarded == other.pointsAwarded;
+          pointsAwarded == other.pointsAwarded &&
+          pendingId == other.pendingId;
 
   @override
-  int get hashCode => Object.hash(status, checkedInAt, pointsAwarded);
+  int get hashCode => Object.hash(status, checkedInAt, pointsAwarded, pendingId);
 }
 
 /// Result of organizer manual check-in for a joined volunteer.
@@ -224,6 +237,7 @@ class CheckedInAttendee {
     required this.name,
     required this.checkedInAt,
     this.userId,
+    this.avatarUrl,
   });
 
   final String id;
@@ -233,12 +247,22 @@ class CheckedInAttendee {
   /// Present when check-in is tied to an app user (`u:<userId>`); null for legacy guest rows.
   final String? userId;
 
-  Map<String, dynamic> toJson() => <String, dynamic>{
-        'id': id,
-        'name': name,
-        'checkedInAt': checkedInAt.millisecondsSinceEpoch,
-        if (userId != null) 'userId': userId,
-      };
+  /// Signed profile image URL from GET check-in attendees (when user has an avatar).
+  final String? avatarUrl;
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> map = <String, dynamic>{
+      'id': id,
+      'name': name,
+      'checkedInAt': checkedInAt.millisecondsSinceEpoch,
+      if (userId != null) 'userId': userId,
+    };
+    final String? av = avatarUrl;
+    if (av != null && av.isNotEmpty) {
+      map['avatarUrl'] = av;
+    }
+    return map;
+  }
 
   static CheckedInAttendee? fromJson(Map<String, dynamic> json) {
     final String? id = json['id'] as String?;
@@ -248,11 +272,13 @@ class CheckedInAttendee {
       return null;
     }
     final String? uid = json['userId'] as String?;
+    final String? av = json['avatarUrl'] as String?;
     return CheckedInAttendee(
       id: id,
       name: name,
       checkedInAt: DateTime.fromMillisecondsSinceEpoch(checkedInAtMs),
       userId: uid != null && uid.isNotEmpty ? uid : null,
+      avatarUrl: av != null && av.trim().isNotEmpty ? av.trim() : null,
     );
   }
 
@@ -273,11 +299,13 @@ class CheckedInAttendee {
       return null;
     }
     final String? uid = json['userId'] as String?;
+    final String? av = json['avatarUrl'] as String?;
     return CheckedInAttendee(
       id: id,
       name: name,
       checkedInAt: at.toLocal(),
       userId: uid != null && uid.isNotEmpty ? uid : null,
+      avatarUrl: av != null && av.trim().isNotEmpty ? av.trim() : null,
     );
   }
 

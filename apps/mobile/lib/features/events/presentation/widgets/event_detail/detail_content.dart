@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_recurrence_rrule_summary.dart';
@@ -22,6 +23,7 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/participants_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/organizer_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/after_photos_gallery.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/completed_trash_bags_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_completed_detail_callouts.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/impact_summary_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/reminder_section.dart';
@@ -35,7 +37,7 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 /// title → contextual banners → grouped metadata (where / when / category / …) →
 /// weather (when coordinates exist) → gear → description → participation block
 /// (check-in + reminder when joined) → participants → organizer → organizer
-/// analytics (non-upcoming) → after photos → impact summary (completed).
+/// analytics (non-upcoming) → after photos → trash bags (organizer, completed) → impact summary (completed).
 class DetailContent extends StatelessWidget {
   const DetailContent({
     super.key,
@@ -48,6 +50,7 @@ class DetailContent extends StatelessWidget {
     this.onOpenSeriesOccurrence,
     this.onOpenEventChat,
     this.eventChatUnreadCount = 0,
+    this.onSaveBagsCollected,
   });
 
   final EcoEvent event;
@@ -60,8 +63,14 @@ class DetailContent extends StatelessWidget {
   final VoidCallback? onOpenEventChat;
   final int eventChatUnreadCount;
 
+  /// When non-null and the event is completed + organizer, shows inline trash-bag count.
+  final Future<void> Function(int bagsCollected)? onSaveBagsCollected;
+
   @override
   Widget build(BuildContext context) {
+    final Future<void> Function(int bagsCollected)? saveBags =
+        onSaveBagsCollected;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -123,24 +132,15 @@ class DetailContent extends StatelessWidget {
             delay: EventDetailStagger.groupedPanel,
             child: EventDetailGroupedPanel(
               children: <Widget>[
-                LocationChip(
-                  event: event,
-                  embeddedInGroupedPanel: true,
-                ),
+                LocationChip(event: event, embeddedInGroupedPanel: true),
                 DateTimeSection(
                   event: event,
                   onExportCalendar: onExportCalendar,
                   embeddedInGroupedPanel: true,
                 ),
-                CategorySection(
-                  event: event,
-                  embeddedInGroupedPanel: true,
-                ),
+                CategorySection(event: event, embeddedInGroupedPanel: true),
                 if (event.scale != null || event.difficulty != null)
-                  EventDetailsGrid(
-                    event: event,
-                    embeddedInGroupedPanel: true,
-                  ),
+                  EventDetailsGrid(event: event, embeddedInGroupedPanel: true),
                 if (event.isRecurring)
                   _RecurrenceRow(
                     event: event,
@@ -210,7 +210,8 @@ class DetailContent extends StatelessWidget {
           delay: EventDetailStagger.organizer,
           child: OrganizerSection(event: event),
         ),
-        if (event.isOrganizer && event.status != EcoEventStatus.upcoming) ...<Widget>[
+        if (event.isOrganizer &&
+            event.status != EcoEventStatus.upcoming) ...<Widget>[
           const SizedBox(height: AppSpacing.lg),
           StaggeredSection(
             delay: EventDetailStagger.organizerAnalytics,
@@ -223,12 +224,21 @@ class DetailContent extends StatelessWidget {
           label: context.l10n.eventsAfterCleanupTitle,
           child: StaggeredSection(
             delay: EventDetailStagger.afterPhotos,
-            child: AfterPhotosGallery(
-              event: event,
-              onImageTap: onImageTap,
-            ),
+            child: AfterPhotosGallery(event: event, onImageTap: onImageTap),
           ),
         ),
+        if (event.status == EcoEventStatus.completed &&
+            event.isOrganizer &&
+            saveBags != null) ...<Widget>[
+          const SizedBox(height: AppSpacing.lg),
+          StaggeredSection(
+            delay: EventDetailStagger.afterPhotos + 2,
+            child: CompletedTrashBagsSection(
+              initialBags: feedbackSnapshot?.bagsCollected ?? 0,
+              onSave: saveBags,
+            ),
+          ),
+        ],
         if (event.status == EcoEventStatus.completed) ...<Widget>[
           const SizedBox(height: AppSpacing.lg),
           StaggeredSection(
@@ -246,10 +256,7 @@ class DetailContent extends StatelessWidget {
 
 /// Embedded row inside [EventDetailGroupedPanel] for recurring series context.
 class _RecurrenceRow extends StatelessWidget {
-  const _RecurrenceRow({
-    required this.event,
-    this.onOpenSeriesOccurrence,
-  });
+  const _RecurrenceRow({required this.event, this.onOpenSeriesOccurrence});
 
   final EcoEvent event;
   final ValueChanged<String>? onOpenSeriesOccurrence;
@@ -261,8 +268,10 @@ class _RecurrenceRow extends StatelessWidget {
     final String primaryLabel = total != null && pos != null && total > 1
         ? context.l10n.eventsRecurrenceSeriesLabel(pos, total)
         : context.l10n.eventsRecurrencePartOfSeries;
-    final String? rruleLine =
-        summarizeRecurrenceRule(event.recurrenceRule, context.l10n);
+    final String? rruleLine = summarizeRecurrenceRule(
+      event.recurrenceRule,
+      context.l10n,
+    );
     final String? prevId = event.recurrencePrevEventId;
     final String? nextId = event.recurrenceNextEventId;
     final bool canNavigate = onOpenSeriesOccurrence != null;
@@ -318,25 +327,26 @@ class _RecurrenceRow extends StatelessWidget {
       children: <Widget>[
         Text(
           primaryLabel,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-              ),
+          style: AppTypography.eventsGroupedRowPrimary(
+            Theme.of(context).textTheme,
+          ),
         ),
         if (rruleLine != null) ...<Widget>[
           const SizedBox(height: 2),
           Text(
             rruleLine,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            style: AppTypography.eventsListCardMeta(
+              Theme.of(context).textTheme,
+            ),
           ),
         ],
       ],
     );
 
     return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: kEventDetailGroupedRowMinHeight),
+      constraints: const BoxConstraints(
+        minHeight: kEventDetailGroupedRowMinHeight,
+      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,

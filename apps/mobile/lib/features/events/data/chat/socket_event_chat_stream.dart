@@ -126,7 +126,7 @@ class SocketEventChatStream {
       ..onConnectError((dynamic data) {
         if (kDebugMode) {
           debugPrint(
-            '[chat:ws] connect_error host=$debugHost event=$eventId detail=$data',
+            '[chat:ws] connect_error host=$debugHost event=$eventId type=${data.runtimeType}',
           );
         }
         _emitStatus(EventChatConnectionStatus.reconnecting);
@@ -134,7 +134,7 @@ class SocketEventChatStream {
       ..onReconnectError((dynamic data) {
         if (kDebugMode) {
           debugPrint(
-            '[chat:ws] reconnect_error host=$debugHost event=$eventId detail=$data',
+            '[chat:ws] reconnect_error host=$debugHost event=$eventId type=${data.runtimeType}',
           );
         }
       })
@@ -147,7 +147,7 @@ class SocketEventChatStream {
       ..onError((dynamic err) {
         if (kDebugMode) {
           debugPrint(
-            '[chat:ws] engine error host=$debugHost event=$eventId detail=$err',
+            '[chat:ws] engine error host=$debugHost event=$eventId type=${err.runtimeType}',
           );
         }
         _emitStatus(EventChatConnectionStatus.reconnecting);

@@ -11,6 +11,7 @@ class EventUpdatePayload {
     this.scheduledAtUtc,
     this.endAtUtc,
     this.maxParticipants,
+    this.includeMaxParticipantsInBody = false,
     this.gear,
     this.scale,
     this.difficulty,
@@ -21,7 +22,11 @@ class EventUpdatePayload {
   final EcoEventCategory? category;
   final DateTime? scheduledAtUtc;
   final DateTime? endAtUtc;
+  /// New cap, or `null` to clear the cap when [includeMaxParticipantsInBody] is true.
   final int? maxParticipants;
+
+  /// When true, PATCH includes `maxParticipants` even when the value is `null` (clears limit).
+  final bool includeMaxParticipantsInBody;
   final List<EventGear>? gear;
   final CleanupScale? scale;
   final EventDifficulty? difficulty;
@@ -43,7 +48,9 @@ class EventUpdatePayload {
     if (endAtUtc != null) {
       body['endAt'] = endAtUtc!.toUtc().toIso8601String();
     }
-    if (maxParticipants != null) {
+    if (includeMaxParticipantsInBody) {
+      body['maxParticipants'] = maxParticipants;
+    } else if (maxParticipants != null) {
       body['maxParticipants'] = maxParticipants;
     }
     if (gear != null) {

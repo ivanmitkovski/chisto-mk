@@ -31,6 +31,11 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Events API preflight (health/ready on smoke target)
+        env:
+          INTEGRATION_TEST_API_URL: ${{ secrets.INTEGRATION_TEST_API_URL }}
+        run: bash ../../scripts/events-staging-preflight.sh
+
       - name: Run integration smoke tests (with retries)
         env:
           INTEGRATION_TEST_API_URL: ${{ secrets.INTEGRATION_TEST_API_URL }}

@@ -3,6 +3,7 @@ import Redis from 'ioredis';
 import { Observable, Subject } from 'rxjs';
 import { EventChatGateway } from './event-chat.gateway';
 import { EventChatClusterConfig } from './event-chat-cluster.config';
+import { EventChatTelemetryService } from './event-chat-telemetry.service';
 
 export type ChatStreamEventType =
   | 'message_created'
@@ -52,6 +53,7 @@ export class EventChatSseService implements OnModuleDestroy {
     @Inject(forwardRef(() => EventChatGateway))
     private readonly gateway: EventChatGateway,
     private readonly clusterConfig: EventChatClusterConfig,
+    private readonly telemetry: EventChatTelemetryService,
   ) {
     this.initRedis();
   }
@@ -106,9 +108,25 @@ export class EventChatSseService implements OnModuleDestroy {
       return;
     }
     const channel = `${EventChatSseService.REDIS_PREFIX}${event.eventId}`;
-    void this.publisher.publish(channel, JSON.stringify(event)).catch((error: unknown) => {
-      this.logger.warn(`Redis publish failed (local SSE already emitted): ${String(error)}`);
-    });
+    const payload = JSON.stringify(event);
+    const started = Date.now();
+    void this.publisher
+      .publish(channel, payload)
+      .then(() => {
+        this.telemetry.emitMetric({
+          name: 'event_chat.redis_publish_latency_ms',
+          duration_ms: Date.now() - started,
+          ok: true,
+        });
+      })
+      .catch((error: unknown) => {
+        this.logger.warn(`Redis publish failed (local SSE already emitted): ${String(error)}`);
+        this.telemetry.emitMetric({
+          name: 'event_chat.redis_publish_failed',
+          ok: false,
+          error: error instanceof Error ? error.name : 'unknown',
+        });
+      });
   }
 
   private getOrCreateRoom(eventId: string): ChatRoom {

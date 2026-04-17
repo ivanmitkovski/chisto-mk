@@ -39,7 +39,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
     );
     _checkController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: AppMotion.successCheckReveal,
     );
 
     _scaleAnimation = CurvedAnimation(
@@ -55,9 +55,18 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
       curve: AppMotion.emphasized,
     );
 
-    _containerController.forward().then((_) {
-      _checkController.forward();
-      AppHaptics.success();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (MediaQuery.disableAnimationsOf(context)) {
+        _containerController.value = 1.0;
+        _checkController.value = 1.0;
+        AppHaptics.success(context);
+      } else {
+        _containerController.forward().then((_) {
+          _checkController.forward();
+          AppHaptics.success(context);
+        });
+      }
     });
   }
 
