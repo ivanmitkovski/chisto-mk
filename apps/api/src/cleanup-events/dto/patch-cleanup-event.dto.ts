@@ -38,7 +38,8 @@ export class PatchCleanupEventDto {
     description: 'Empty string clears endAt (legacy rows only).',
   })
   @IsOptional()
-  @ValidateIf((_: unknown, o: PatchCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
+  /** class-validator calls `(object, value)`; use the object, not the property value. */
+  @ValidateIf((o: PatchCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
   @IsDateString()
   endAt?: string;
 

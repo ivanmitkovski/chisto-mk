@@ -32,7 +32,8 @@ export class CreateCleanupEventDto {
       'When omitted, end is set to the same local wall time on the next calendar day (Europe/Skopje).',
   })
   @IsOptional()
-  @ValidateIf((_: unknown, o: CreateCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
+  /** class-validator calls `(object, value)`; use the object, not the property value. */
+  @ValidateIf((o: CreateCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
   @IsDateString()
   endAt?: string;
 
