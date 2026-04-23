@@ -41,8 +41,6 @@ class ProfilePointsHistoryScreen extends StatefulWidget {
 }
 
 class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen> {
-  final ScrollController _scrollController = ScrollController();
-
   bool _loading = true;
   bool _loadingMore = false;
   AppError? _error;
@@ -53,24 +51,21 @@ class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen>
   @override
   void initState() {
     super.initState();
-    _scrollController.addListener(_onScroll);
     _loadInitial();
   }
 
-  @override
-  void dispose() {
-    _scrollController.removeListener(_onScroll);
-    _scrollController.dispose();
-    super.dispose();
-  }
-
-  void _onScroll() {
-    if (_loadingMore || _nextCursor == null || _error != null) return;
-    if (!_scrollController.hasClients) return;
-    final ScrollPosition p = _scrollController.position;
-    if (p.pixels >= p.maxScrollExtent - 220) {
+  /// Uses [ScrollNotification] instead of a [ScrollController] so this screen
+  /// stays valid while [AnimatedPhaseSwitcher] briefly stacks two phases:
+  /// a controller must never attach to two scroll views at once.
+  bool _onScrollNotification(ScrollNotification n) {
+    if (n.metrics.axis != Axis.vertical) return false;
+    if (_loadingMore || _nextCursor == null || _error != null) return false;
+    final double maxExtent = n.metrics.maxScrollExtent;
+    if (!maxExtent.isFinite || maxExtent <= 0) return false;
+    if (n.metrics.pixels >= maxExtent - 220) {
       _loadMore();
     }
+    return false;
   }
 
   Future<void> _loadInitial() async {
@@ -292,15 +287,16 @@ class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen>
         ),
         const SizedBox(height: AppSpacing.md),
         Expanded(
-          child: RefreshIndicator(
-            color: AppColors.primary,
-            onRefresh: _loadInitial,
-            child: CustomScrollView(
-              controller: _scrollController,
-              physics: const AlwaysScrollableScrollPhysics(
-                parent: BouncingScrollPhysics(),
-              ),
-              slivers: <Widget>[
+          child: NotificationListener<ScrollNotification>(
+            onNotification: _onScrollNotification,
+            child: RefreshIndicator(
+              color: AppColors.primary,
+              onRefresh: _loadInitial,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                slivers: <Widget>[
                 if (milestonesNewestFirst.isNotEmpty)
                   SliverToBoxAdapter(
                     child: Padding(
@@ -453,7 +449,8 @@ class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen>
                           (_loadingMore && _nextCursor != null ? 1 : 0),
                     ),
                   ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

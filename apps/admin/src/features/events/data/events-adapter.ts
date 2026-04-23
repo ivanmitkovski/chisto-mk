@@ -11,10 +11,14 @@ export type EcoEventLifecycleStatusKey =
 
 export type CleanupEventRow = {
   id: string;
+  /** ISO8601; present from API for moderation queue ordering. */
+  createdAt?: string;
   title: string;
   description: string;
   siteId: string;
   scheduledAt: string;
+  /** ISO8601 when set; legacy rows may omit null. */
+  endAt?: string | null;
   completedAt: string | null;
   organizerId: string | null;
   participantCount: number;
@@ -40,6 +44,25 @@ export type EventsStats = {
   completed: number;
   pending: number;
   totalParticipants: number;
+};
+
+export type CheckInRiskSignalRow = {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  eventId: string;
+  eventTitle: string;
+  userId: string;
+  userDisplayName: string;
+  signalType: string;
+  metadata: unknown;
+};
+
+export type CheckInRiskSignalsResponse = {
+  data: CheckInRiskSignalRow[];
+  page: number;
+  limit: number;
+  total: number;
 };
 
 type ListResponse = {
@@ -92,4 +115,24 @@ export async function getCleanupEventDetail(id: string): Promise<CleanupEventDet
     method: 'GET',
     authToken: token,
   });
+}
+
+export async function getCheckInRiskSignals(params?: {
+  page?: number;
+  limit?: number;
+}): Promise<CheckInRiskSignalsResponse> {
+  const token = await getAdminAuthTokenFromCookies();
+  const page = params?.page ?? 1;
+  const limit = Math.min(100, Math.max(1, params?.limit ?? 50));
+  const search = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  return apiFetch<CheckInRiskSignalsResponse>(
+    `/admin/cleanup-events/check-in-risk-signals?${search.toString()}`,
+    {
+      method: 'GET',
+      authToken: token,
+    },
+  );
 }

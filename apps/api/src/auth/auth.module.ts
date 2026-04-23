@@ -6,6 +6,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt.strategy';
 import { OptionalJwtAuthGuard } from './optional-jwt-auth.guard';
+import { OrganizerCertificationService } from './organizer-certification.service';
 import { RolesGuard } from './roles.guard';
 import { OtpModule } from '../otp/otp.module';
 import { AuditModule } from '../audit/audit.module';
@@ -34,7 +35,7 @@ import { GamificationModule } from '../gamification/gamification.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RolesGuard, OptionalJwtAuthGuard],
+  providers: [AuthService, JwtStrategy, RolesGuard, OptionalJwtAuthGuard, OrganizerCertificationService],
   // Re-export AuditModule so RolesGuard (AuditService) resolves in every feature module that uses @UseGuards(RolesGuard).
   exports: [AuthService, RolesGuard, OptionalJwtAuthGuard, AuditModule],
 })

@@ -28,11 +28,14 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
   const defaultDate = new Date();
   defaultDate.setDate(defaultDate.getDate() + 7);
   defaultDate.setHours(10, 0, 0, 0);
+  const defaultEndDate = new Date(defaultDate);
+  defaultEndDate.setDate(defaultEndDate.getDate() + 1);
 
   const [title, setTitle] = useState('Cleanup event');
   const [description, setDescription] = useState('');
   const [recurrenceRule, setRecurrenceRule] = useState('');
   const [scheduledAt, setScheduledAt] = useState(toDatetimeLocal(defaultDate));
+  const [endAt, setEndAt] = useState(toDatetimeLocal(defaultEndDate));
   const [participantCount, setParticipantCount] = useState(0);
   const [createAsPending, setCreateAsPending] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -53,9 +56,18 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
     return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
   }, [scheduledAt]);
 
+  const endAtIso = useMemo(() => {
+    if (!endAt.trim()) {
+      return null;
+    }
+    const parsed = new Date(endAt);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }, [endAt]);
+
   const { hint: scheduleConflictHint, checking: scheduleConflictChecking } = useScheduleConflictPreview({
     siteId,
     scheduledAtIso,
+    endAtIso,
   });
 
   useEffect(() => {
@@ -95,6 +107,7 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
       description,
       recurrenceRule,
       scheduledAtRaw: scheduledAt,
+      endAtRaw: endAt,
       participantCount,
     });
     setFieldErrors(errors);
@@ -113,6 +126,7 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
           description: description.trim(),
           ...(recurrenceRule.trim() ? { recurrenceRule: recurrenceRule.trim() } : {}),
           scheduledAt: new Date(scheduledAt).toISOString(),
+          endAt: new Date(endAt).toISOString(),
           participantCount,
           ...(createAsPending ? { status: 'PENDING' } : {}),
         },
@@ -224,7 +238,7 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
             ) : null}
           </label>
           <label className={styles.field} htmlFor="create-event-scheduled">
-            <span className={styles.fieldLabel}>Scheduled date & time</span>
+            <span className={styles.fieldLabel}>Start date & time</span>
             <input
               id="create-event-scheduled"
               type="datetime-local"
@@ -240,6 +254,27 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
             {fieldErrors.scheduledAt ? (
               <span id="create-event-scheduled-err" className={styles.fieldError} role="alert">
                 {fieldErrors.scheduledAt}
+              </span>
+            ) : null}
+          </label>
+          <label className={styles.field} htmlFor="create-event-end">
+            <span className={styles.fieldLabel}>End date & time</span>
+            <span className={styles.fieldHint}>Must be on the same calendar day as the start, by 23:59 at the latest.</span>
+            <input
+              id="create-event-end"
+              type="datetime-local"
+              value={endAt}
+              onChange={(e) => {
+                setEndAt(e.target.value);
+                clearFieldError('endAt');
+              }}
+              className={styles.input}
+              aria-invalid={fieldErrors.endAt ? true : undefined}
+              aria-describedby={fieldErrors.endAt ? 'create-event-end-err' : undefined}
+            />
+            {fieldErrors.endAt ? (
+              <span id="create-event-end-err" className={styles.fieldError} role="alert">
+                {fieldErrors.endAt}
               </span>
             ) : null}
           </label>

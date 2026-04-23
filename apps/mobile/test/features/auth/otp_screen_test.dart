@@ -2,7 +2,7 @@ import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/core/validation/phone_display_formatter.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/otp_screen.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
-import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
+import '../../shared/widget_test_bootstrap.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 

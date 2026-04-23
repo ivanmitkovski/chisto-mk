@@ -24,12 +24,18 @@ class SecureTokenStorage {
   static const String _keyUserId = 'chisto_user_id';
   static const String _keyDisplayName = 'chisto_display_name';
   static const String _keyPhoneNumber = 'chisto_phone_number';
+  static const String _keyOrganizerCertifiedAt = 'chisto_organizer_certified_at';
 
   Future<String?> get accessToken => _storage.read(key: _keyAccessToken);
   Future<String?> get refreshToken => _storage.read(key: _keyRefreshToken);
   Future<String?> get userId => _storage.read(key: _keyUserId);
   Future<String?> get displayName => _storage.read(key: _keyDisplayName);
   Future<String?> get phoneNumber => _storage.read(key: _keyPhoneNumber);
+
+  /// ISO-8601 timestamp from `/auth/me` or organizer quiz; used to hydrate
+  /// certification before `/auth/me` succeeds on cold start.
+  Future<String?> get organizerCertifiedAtIso =>
+      _storage.read(key: _keyOrganizerCertifiedAt);
 
   Future<void> saveTokens({
     required String accessToken,
@@ -56,6 +62,18 @@ class SecureTokenStorage {
     await Future.wait(writes);
   }
 
+  /// Persists or clears organizer certification time (mirrors server field).
+  Future<void> writeOrganizerCertifiedAt(DateTime? at) async {
+    if (at == null) {
+      await _storage.delete(key: _keyOrganizerCertifiedAt);
+      return;
+    }
+    await _storage.write(
+      key: _keyOrganizerCertifiedAt,
+      value: at.toUtc().toIso8601String(),
+    );
+  }
+
   Future<void> clearTokens() async {
     await Future.wait(<Future<void>>[
       _storage.delete(key: _keyAccessToken),
@@ -63,6 +81,7 @@ class SecureTokenStorage {
       _storage.delete(key: _keyUserId),
       _storage.delete(key: _keyDisplayName),
       _storage.delete(key: _keyPhoneNumber),
+      _storage.delete(key: _keyOrganizerCertifiedAt),
     ]);
   }
 }

@@ -20,6 +20,9 @@ enum OrganizerEventCompletionAction {
 
   /// User chose to open cleanup evidence after the check-in screen is popped.
   openEvidence,
+
+  /// User chose to open the impact receipt after the check-in screen is popped.
+  openImpactReceipt,
 }
 
 /// Premium completion sheet after ending an event: metrics, next steps, CTAs.
@@ -170,6 +173,29 @@ class _OrganizerEventCompletionSheetBodyState
                 AppHaptics.tap(context);
                 Navigator.of(context).pop(OrganizerEventCompletionAction.dismissed);
               },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: OutlinedButton(
+                onPressed: () {
+                  AppHaptics.tap(context);
+                  Navigator.of(context).pop(OrganizerEventCompletionAction.openImpactReceipt);
+                },
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: AppColors.divider),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                  ),
+                ),
+                child: Text(
+                  l10n.eventsOrganizerCompletionViewReceipt,
+                  style: AppTypography.eventsSecondaryCtaLabel(textTheme).copyWith(
+                    color: AppColors.primaryDark,
+                  ),
+                ),
+              ),
             ),
             const SizedBox(height: AppSpacing.sm),
             SizedBox(

@@ -15,6 +15,7 @@ export type CleanupEventFieldKey =
   | 'description'
   | 'recurrenceRule'
   | 'scheduledAt'
+  | 'endAt'
   | 'completedAt'
   | 'participantCount'
   | 'declineReason';
@@ -78,6 +79,47 @@ export function validateScheduledAtInput(raw: string): string | null {
   return null;
 }
 
+/** Start/end are browser-local `datetime-local` values or ISO strings parseable by `Date`. */
+export function validateScheduleStartEndWindow(input: {
+  scheduledAtRaw: string;
+  endAtRaw: string;
+}): Pick<CleanupEventFieldErrors, 'scheduledAt' | 'endAt'> {
+  const out: Pick<CleanupEventFieldErrors, 'scheduledAt' | 'endAt'> = {};
+  const schedErr = validateScheduledAtInput(input.scheduledAtRaw);
+  if (schedErr) {
+    out.scheduledAt = schedErr;
+    return out;
+  }
+  if (!input.endAtRaw.trim()) {
+    out.endAt = 'End date and time are required.';
+    return out;
+  }
+  const start = parseValidDate(input.scheduledAtRaw);
+  const end = parseValidDate(input.endAtRaw);
+  if (!end) {
+    out.endAt = 'End date and time are not valid.';
+    return out;
+  }
+  if (start != null && end.getTime() <= start.getTime()) {
+    out.endAt = 'End must be after start.';
+    return out;
+  }
+  if (start != null) {
+    const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDay = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    if (endDay.getTime() !== startDay.getTime()) {
+      out.endAt = 'Event must end on the same calendar day as the start.';
+    } else {
+      const endOfStartDay = new Date(startDay);
+      endOfStartDay.setHours(23, 59, 59, 999);
+      if (end.getTime() > endOfStartDay.getTime()) {
+        out.endAt = 'Event must not end after 23:59 on the start day.';
+      }
+    }
+  }
+  return out;
+}
+
 /** ISO string from API or local datetime string. */
 export function validateScheduledAtIsoOrLocal(raw: string): string | null {
   if (!raw.trim()) {
@@ -117,6 +159,7 @@ export function validateCleanupEventForm(input: {
   description: string;
   recurrenceRule: string;
   scheduledAtRaw: string;
+  endAtRaw: string;
   participantCount: number;
 }): CleanupEventFieldErrors {
   const errors: CleanupEventFieldErrors = {};
@@ -132,10 +175,11 @@ export function validateCleanupEventForm(input: {
   if (rrErr) {
     errors.recurrenceRule = rrErr;
   }
-  const schedErr = validateScheduledAtInput(input.scheduledAtRaw);
-  if (schedErr) {
-    errors.scheduledAt = schedErr;
-  }
+  const windowErrs = validateScheduleStartEndWindow({
+    scheduledAtRaw: input.scheduledAtRaw,
+    endAtRaw: input.endAtRaw,
+  });
+  Object.assign(errors, windowErrs);
   const pcErr = validateParticipantCount(input.participantCount);
   if (pcErr) {
     errors.participantCount = pcErr;
@@ -148,6 +192,8 @@ export function validateCleanupEventDetailForm(input: {
   description: string;
   recurrenceRule: string;
   scheduledAtValue: string;
+  /** When provided (upcoming edit), enforces multi-day span with [scheduledAtValue]. */
+  endAtValue?: string;
   participantCount: number;
   completedAtLocal?: string;
 }): CleanupEventFieldErrors {
@@ -164,9 +210,17 @@ export function validateCleanupEventDetailForm(input: {
   if (rrErr) {
     errors.recurrenceRule = rrErr;
   }
-  const schedErr = validateScheduledAtIsoOrLocal(input.scheduledAtValue);
-  if (schedErr) {
-    errors.scheduledAt = schedErr;
+  if (input.endAtValue !== undefined) {
+    const windowErrs = validateScheduleStartEndWindow({
+      scheduledAtRaw: input.scheduledAtValue,
+      endAtRaw: input.endAtValue,
+    });
+    Object.assign(errors, windowErrs);
+  } else {
+    const schedErr = validateScheduledAtIsoOrLocal(input.scheduledAtValue);
+    if (schedErr) {
+      errors.scheduledAt = schedErr;
+    }
   }
   const pcErr = validateParticipantCount(input.participantCount);
   if (pcErr) {

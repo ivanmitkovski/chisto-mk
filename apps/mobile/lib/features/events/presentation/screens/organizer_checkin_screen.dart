@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'dart:async';
 import 'dart:math';
 
@@ -11,6 +9,7 @@ import 'package:flutter/services.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -118,12 +117,20 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
     }
   }
 
+  String _mapCheckInAppError(AppError e) {
+    final AppLocalizations l10n = context.l10n;
+    if (e.code == 'UNAUTHORIZED') {
+      return l10n.errorUserUnauthorized;
+    }
+    return localizedAppErrorMessage(l10n, e);
+  }
+
   void _startAttendeePollTimer() {
     _attendeePollTimer?.cancel();
     _attendeePollTimer = Timer.periodic(
       const Duration(seconds: _attendeeListPollIntervalSeconds),
       (_) {
-        if (!context.mounted) {
+        if (!mounted) {
           return;
         }
         final EcoEvent? ev = _eventOrNull;
@@ -142,7 +149,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
   Future<void> _issueNewPayload() async {
     final AppLocalizations l10n = context.l10n;
     if (!_checkInRepository.isOpen(_event.id)) {
-      if (context.mounted) {
+      if (mounted) {
         setState(() {
           _payload = null;
           _qrLoadError = null;
@@ -150,7 +157,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       }
       return;
     }
-    if (context.mounted) {
+    if (mounted) {
       setState(() {
         _isIssuingPayload = true;
         _qrLoadError = null;
@@ -167,7 +174,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
           sessionId: next.sessionId,
         );
       }
-      if (context.mounted) {
+      if (mounted) {
         setState(() {
           _payload = next;
           _qrLoadError = null;
@@ -176,12 +183,14 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       }
     } on AppError catch (e) {
       logEventsDiagnostic('organizer_checkin_qr_issue_failed');
-      if (context.mounted) {
+      if (mounted) {
         final String msg = e.code == 'TOO_MANY_REQUESTS'
             ? l10n.eventsOrganizerQrRateLimited
-            : (e.message.isNotEmpty
-                  ? e.message
-                  : l10n.eventsOrganizerQrLoadFailedGeneric);
+            : (e.code == 'UNAUTHORIZED'
+                  ? l10n.errorUserUnauthorized
+                  : (e.message.isNotEmpty
+                        ? e.message
+                        : l10n.eventsOrganizerQrLoadFailedGeneric));
         setState(() {
           _qrLoadError = msg;
           if (_remainingPayloadMs <= 0) {
@@ -191,7 +200,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       }
     } on Object {
       logEventsDiagnostic('organizer_checkin_qr_issue_failed');
-      if (context.mounted) {
+      if (mounted) {
         setState(() {
           _qrLoadError = l10n.eventsOrganizerQrLoadFailedGeneric;
           if (_remainingPayloadMs <= 0) {
@@ -200,7 +209,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
         });
       }
     } finally {
-      if (context.mounted) {
+      if (mounted) {
         setState(() => _isIssuingPayload = false);
       }
     }
@@ -209,7 +218,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
   void _startRefreshTicker() {
     _refreshTicker?.cancel();
     _refreshTicker = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       if (!_event.isCheckInOpen) {
@@ -247,24 +256,24 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
     try {
       await _checkInRepository.ensureSession(event: ev);
       await _checkInRepository.refreshAttendees(ev.id);
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       await _issueNewPayload();
     } on AppError catch (e) {
       logEventsDiagnostic('organizer_checkin_session_setup_failed');
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       AppHaptics.warning();
       setState(() {
-        _qrLoadError = e.message.isNotEmpty
-            ? e.message
-            : l10n.eventsOrganizerSessionSetupFailed;
+        final String m = _mapCheckInAppError(e);
+        _qrLoadError =
+            m.trim().isNotEmpty ? m : l10n.eventsOrganizerSessionSetupFailed;
       });
     } on Object {
       logEventsDiagnostic('organizer_checkin_session_setup_failed');
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       AppHaptics.warning();
@@ -312,7 +321,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       attendeeId: attendeeId,
       attendeeName: name,
     );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     _showSubmissionFeedback(result, name);
@@ -344,7 +353,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
             );
           },
         );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     if (picked == null) {
@@ -357,7 +366,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
             attendeeId: picked.userId,
             attendeeName: picked.displayName,
           );
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       if (!added.recorded) {
@@ -385,7 +394,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       );
       await _issueNewPayload();
     } on AppError catch (e) {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       if (e.code == 'CHECK_IN_REQUIRES_JOIN') {
@@ -396,10 +405,11 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
         );
         return;
       }
+      final String mapped = _mapCheckInAppError(e);
       AppSnack.show(
         context,
-        message: e.message.isNotEmpty
-            ? e.message
+        message: mapped.trim().isNotEmpty
+            ? mapped
             : context.l10n.eventsOrganizerUnableCompleteEvent,
         type: AppSnackType.warning,
       );
@@ -415,7 +425,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       eventId: _event.id,
       attendeeId: attendee.id,
     );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     if (!removed) {
@@ -562,7 +572,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       return;
     }
     await Clipboard.setData(ClipboardData(text: payload.encode()));
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     AppSnack.show(
@@ -861,7 +871,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       _event.id,
       EcoEventStatus.completed,
     );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     if (!changed) {
@@ -881,19 +891,26 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
           participantCount: _event.participantCount,
           maxParticipants: _event.maxParticipants,
         );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     Navigator.of(context).pop();
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     if (action == OrganizerEventCompletionAction.openEvidence) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!context.mounted) {
+        if (!mounted) {
           return;
         }
         EventsNavigation.openCleanupEvidence(context, eventId: _event.id);
+      });
+    } else if (action == OrganizerEventCompletionAction.openImpactReceipt) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        EventsNavigation.openImpactReceipt(context, eventId: _event.id);
       });
     }
   }
@@ -911,7 +928,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
     if (!isOpen) {
       await _issueNewPayload();
     }
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     AppSnack.show(
@@ -929,7 +946,7 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
       _event.id,
       EcoEventStatus.cancelled,
     );
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     if (!changed) {
@@ -990,11 +1007,11 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
   }
 
   void _onRepoChanged() {
-    if (!context.mounted) {
+    if (!mounted) {
       return;
     }
     void applyUpdate() {
-      if (!context.mounted) {
+      if (!mounted) {
         return;
       }
       setState(() {});
@@ -1140,18 +1157,22 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
                     approve: true,
                   );
                   AppHaptics.success();
+                  if (!ctx.mounted) {
+                    return;
+                  }
                   if (Navigator.of(ctx).canPop()) {
                     Navigator.of(ctx).pop(true);
                   }
                 } on Object {
                   AppHaptics.warning();
-                  if (ctx.mounted) {
-                    AppSnack.show(
-                      ctx,
-                      message: ctx.l10n.eventsOrganizerConfirmExpired,
-                      type: AppSnackType.warning,
-                    );
+                  if (!ctx.mounted) {
+                    return;
                   }
+                  AppSnack.show(
+                    ctx,
+                    message: ctx.l10n.eventsOrganizerConfirmExpired,
+                    type: AppSnackType.warning,
+                  );
                   if (Navigator.of(ctx).canPop()) {
                     Navigator.of(ctx).pop(false);
                   }
@@ -1171,6 +1192,9 @@ class _OrganizerCheckInScreenState extends State<OrganizerCheckInScreen>
                   // Expired or already resolved — dismiss silently.
                 }
                 _isResolvingPending = false;
+                if (!ctx.mounted) {
+                  return;
+                }
                 if (Navigator.of(ctx).canPop()) {
                   Navigator.of(ctx).pop(false);
                 }

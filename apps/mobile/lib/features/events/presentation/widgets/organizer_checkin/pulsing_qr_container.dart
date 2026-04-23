@@ -31,10 +31,47 @@ class _PulsingQRContainerState extends State<PulsingQRContainer>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    );
     _scaleAnimation = Tween<double>(begin: 1.0, end: 1.01).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _syncPulseToContext();
+  }
+
+  @override
+  void didUpdateWidget(covariant PulsingQRContainer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _syncPulseToContext();
+  }
+
+  /// Avoids running [AnimationController.repeat] when reduce motion is on (battery + §9 QA).
+  void _syncPulseToContext() {
+    if (!mounted) {
+      return;
+    }
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _controller.stop();
+      return;
+    }
+    if (!widget.isActive) {
+      _controller.stop();
+      return;
+    }
+    if (widget.pulseOnlyNearExpiry) {
+      final int? sec = widget.remainingSecondsUntilExpiry;
+      if (sec == null || sec > 10) {
+        _controller.stop();
+        return;
+      }
+    }
+    if (!_controller.isAnimating) {
+      _controller.repeat(reverse: true);
+    }
   }
 
   @override

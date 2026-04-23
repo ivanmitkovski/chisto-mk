@@ -89,7 +89,8 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      resizeToAvoidBottomInset: false,
+      // Avoid nested [Scaffold] keyboard inset (Events tab gray band above keyboard).
+      resizeToAvoidBottomInset: true,
       body: IndexedStack(
         index: _currentIndex,
         children: <Widget>[

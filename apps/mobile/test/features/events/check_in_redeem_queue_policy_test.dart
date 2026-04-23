@@ -13,6 +13,12 @@ void main() {
       'CHECK_IN_SESSION_MISMATCH',
       'CHECK_IN_INVALID_QR',
       'CHECK_IN_WRONG_EVENT',
+      'CHECK_IN_LIFECYCLE',
+      'CHECK_IN_SESSION_CLOSED',
+      'CHECK_IN_NO_SESSION',
+      'CHECK_IN_NOT_FOUND',
+      'CHECK_IN_REQUEST_EXPIRED',
+      'CHECK_IN_REQUEST_NOT_FOUND',
     ];
     for (final String code in codes) {
       expect(

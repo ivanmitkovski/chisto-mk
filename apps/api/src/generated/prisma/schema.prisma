@@ -38,6 +38,8 @@ model User {
   totpSecret     String? // Base32-encoded TOTP secret when 2FA enabled
   mfaBackupCodes String[] @default([]) // Hashed backup codes
 
+  organizerCertifiedAt DateTime? // Set on organizer toolkit quiz pass; gates event creation
+
   reports                     Report[]                     @relation("ReporterReports")
   moderatedReports            Report[]                     @relation("ModeratorReports")
   adminNotifications          AdminNotification[]
@@ -63,6 +65,9 @@ model User {
   eventChatPinnedMessages     EventChatMessage[]           @relation("EventChatPinnedBy")
   eventChatMutes              EventChatMute[]              @relation("EventChatMutes")
   reportSubmitIdempotencyKeys ReportSubmitIdempotency[]
+  eventEvidencePhotosUploaded EventEvidencePhoto[]
+  routeSegmentsClaimed        EventRouteSegment[]          @relation("RouteSegmentClaims")
+  checkInRiskSignals          CheckInRiskSignal[]
 
   @@index([role])
   @@index([status])
@@ -469,6 +474,10 @@ model CleanupEvent {
   chatMessages       EventChatMessage[]
   chatReadCursors    EventChatReadCursor[]
   chatMutes          EventChatMute[]
+  liveMetric         EventLiveMetric?
+  evidencePhotos     EventEvidencePhoto[]
+  routeSegments      EventRouteSegment[]
+  checkInRiskSignals CheckInRiskSignal[]
 
   /// RFC 5545 RRULE string (e.g. FREQ=WEEKLY;COUNT=8;BYDAY=SA).
   /// Null for non-recurring events.
@@ -650,6 +659,95 @@ model EventCheckInRedemption {
   jti String @unique
 
   @@index([eventId])
+}
+
+/// Denormalized organizer-reported live counters (pulse); aggregates also read from [CleanupEvent].
+model EventLiveMetric {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String       @unique
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  reportedBagsCollected Int @default(0)
+}
+
+enum EventEvidenceKind {
+  BEFORE
+  AFTER
+  FIELD
+}
+
+model EventEvidencePhoto {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  kind         EventEvidenceKind
+  objectKey    String
+  caption      String?
+  uploadedById String
+  uploadedBy   User              @relation(fields: [uploadedById], references: [id], onDelete: Cascade)
+
+  @@index([eventId, kind, createdAt])
+}
+
+enum RouteSegmentStatus {
+  OPEN
+  CLAIMED
+  COMPLETED
+}
+
+model EventRouteSegment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  sortOrder Int
+  label     String?
+  latitude  Float
+  longitude Float
+
+  status RouteSegmentStatus @default(OPEN)
+
+  claimedByUserId String?
+  claimedBy       User?     @relation("RouteSegmentClaims", fields: [claimedByUserId], references: [id], onDelete: SetNull)
+  claimedAt       DateTime?
+  completedAt     DateTime?
+
+  @@index([eventId, sortOrder])
+  @@index([claimedByUserId])
+}
+
+enum CheckInRiskSignalType {
+  FAR_FROM_SITE
+}
+
+model CheckInRiskSignal {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  expiresAt DateTime
+
+  eventId String
+  event   CleanupEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  signalType CheckInRiskSignalType
+  metadata   Json?
+
+  @@index([eventId, createdAt])
+  @@index([userId, createdAt])
+  @@index([expiresAt])
 }
 
 model SiteVote {
@@ -846,4 +944,18 @@ model NotificationOutbox {
   @@index([deliveredAt, failedPermanently, attempts])
   @@index([processingAt, nextRetryAt])
   @@index([createdAt])
+}
+
+/// Records client-supplied job ids for idempotent admin bulk mutations (e.g. bulk approve/decline).
+model AdminMutationIdempotency {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  actorUserId String
+  purpose     String
+  clientJobId String
+
+  @@unique([actorUserId, purpose, clientJobId])
+  @@index([createdAt])
+  @@map("admin_mutation_idempotency")
 }

@@ -20,6 +20,7 @@ import {
   newCheckInJti,
   signCheckInQrToken,
 } from '../../src/events/check-in-qr-token';
+import { CheckInRepository } from '../../src/events/check-in.repository';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
 import {
   POINTS_EVENT_CHECK_IN,
@@ -44,6 +45,7 @@ describe('EventsCheckInService', () => {
       findUnique: jest.Mock;
       update: jest.Mock;
     };
+    checkInRiskSignal: { create: jest.Mock };
     eventCheckIn: {
       findMany: jest.Mock;
       findUnique: jest.Mock;
@@ -51,6 +53,7 @@ describe('EventsCheckInService', () => {
     };
     eventParticipant: { findUnique: jest.Mock };
     user: { findUnique: jest.Mock };
+    $queryRaw: jest.Mock;
     $transaction: jest.Mock;
   };
   let config: { get: jest.Mock };
@@ -68,6 +71,7 @@ describe('EventsCheckInService', () => {
     emitSpan: jest.Mock;
     emitAudit: jest.Mock;
   };
+  let liveImpact: { notifyListeners: jest.Mock };
   let service: EventsCheckInService;
 
   const approvedInProgressEvent = {
@@ -104,6 +108,7 @@ describe('EventsCheckInService', () => {
       confirmTtlSec: 60,
     };
     checkInGateway = { emitToRoom: jest.fn() };
+    liveImpact = { notifyListeners: jest.fn() };
     reportsUpload = { signPrivateObjectKey: jest.fn().mockResolvedValue(null) };
     checkInTelemetry = {
       emitMetric: jest.fn(),
@@ -122,21 +127,24 @@ describe('EventsCheckInService', () => {
         deleteMany: jest.fn(),
       },
       eventParticipant: { findUnique: jest.fn() },
+      checkInRiskSignal: { create: jest.fn().mockResolvedValue({}) },
       user: {
         findUnique: jest
           .fn()
           .mockResolvedValue({ firstName: 'Test', lastName: 'User', avatarObjectKey: null }),
       },
+      $queryRaw: jest.fn().mockResolvedValue([{ d: 50 }]),
       $transaction: jest.fn(),
     };
     service = new EventsCheckInService(
-      prisma as never,
+      new CheckInRepository(prisma as never),
       config as unknown as ConfigService,
       ecoEventPoints as never,
       pendingCheckIn as never,
       checkInGateway as never,
       reportsUpload as never,
       checkInTelemetry as never,
+      liveImpact as never,
     );
   });
 
@@ -202,6 +210,16 @@ describe('EventsCheckInService', () => {
       expect(out.qrPayload).toContain('chisto:evt:v2:');
       expect(out.sessionId).toBe('session-stable-id');
       expect(out.expiresAt).toBeTruthy();
+    });
+
+    it('throws EVENT_NOT_APPROVED when event is pending even if check-in is open', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue({
+        ...approvedInProgressEvent,
+        status: CleanupEventStatus.PENDING,
+      });
+      await expect(service.getQrPayload('evt-1', user('org-1'))).rejects.toMatchObject({
+        response: expect.objectContaining({ code: 'EVENT_NOT_APPROVED' }),
+      });
     });
   });
 

@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/events/domain/discovery_skopje_week.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 
 /// Parameters driving the server-side events list query.
@@ -88,4 +89,22 @@ class EcoEventSearchParams {
 
   static bool _setsEqual<T>(Set<T> a, Set<T> b) =>
       a.length == b.length && a.containsAll(b);
+
+  /// Discovery preset: **Monday–Sunday (Skopje)** containing [referenceUtc], with
+  /// lifecycle [statuses] (default: upcoming + in progress).
+  factory EcoEventSearchParams.discoveryThisSkopjeCalendarWeek(
+    DateTime referenceUtc, {
+    Set<EcoEventStatus> statuses = const <EcoEventStatus>{
+      EcoEventStatus.upcoming,
+      EcoEventStatus.inProgress,
+    },
+  }) {
+    final ({DateTime dateFrom, DateTime dateTo}) bounds =
+        skopjeCalendarWeekBoundsInclusive(referenceUtc);
+    return EcoEventSearchParams(
+      dateFrom: bounds.dateFrom,
+      dateTo: bounds.dateTo,
+      statuses: statuses,
+    );
+  }
 }

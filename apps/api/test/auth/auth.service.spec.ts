@@ -31,6 +31,7 @@ const mockUser = {
   lastActiveAt: null,
   avatarObjectKey: null,
   avatarUpdatedAt: null,
+  organizerCertifiedAt: null,
 };
 
 const mockAdmin = {
@@ -335,6 +336,7 @@ describe('AuthService', () => {
       expect(result.refreshToken).toBeDefined();
       expect(result.refreshToken).toContain('.');
       expect(result.user.avatarUrl).toBeNull();
+      expect(result.user.organizerCertifiedAt).toBeNull();
       expect(prisma.userSession.findUnique).toHaveBeenCalledWith({
         where: { tokenId },
         include: { user: true },
@@ -343,6 +345,29 @@ describe('AuthService', () => {
         where: { id: 'session-1' },
         data: { revokedAt: expect.any(Date) },
       });
+    });
+
+    it('includes organizerCertifiedAt ISO string when user is certified', async () => {
+      const tokenId = 'a1b2c3d4e5f6';
+      const fullToken = `${tokenId}.secretpart`;
+      const hash = await bcrypt.hash(fullToken, 4);
+      const certifiedAt = new Date('2026-04-21T19:46:29.350Z');
+
+      prisma.userSession.findUnique.mockResolvedValue({
+        id: 'session-1',
+        userId: 'user-1',
+        tokenId,
+        refreshTokenHash: hash,
+        expiresAt: new Date(Date.now() + 86400000),
+        revokedAt: null,
+        user: { ...mockUser, organizerCertifiedAt: certifiedAt },
+      });
+      prisma.userSession.update.mockResolvedValue({});
+      prisma.userSession.create.mockResolvedValue({});
+
+      const result = await service.refresh(fullToken);
+
+      expect(result.user.organizerCertifiedAt).toBe(certifiedAt.toISOString());
     });
 
     it('rejects refresh token without tokenId format', async () => {

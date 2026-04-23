@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('AppTheme', () {
     test('light returns a ThemeData', () {
       final theme = AppTheme.light;
@@ -21,6 +23,13 @@ void main() {
       final theme = AppTheme.light;
 
       expect(theme.useMaterial3, isTrue);
+    });
+
+    test('text theme uses Roboto', () {
+      final ThemeData theme = AppTheme.light;
+
+      expect(theme.textTheme.bodyMedium?.fontFamily, contains('Roboto'));
+      expect(theme.textTheme.headlineMedium?.fontFamily, contains('Roboto'));
     });
   });
 }

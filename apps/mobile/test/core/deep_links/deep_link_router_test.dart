@@ -1,20 +1,34 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
 
+const String _kEventUuid = '550e8400-e29b-41d4-a716-446655440000';
+
 void main() {
   group('DeepLinkRouter.parse', () {
     test('parses /app/events/detail/:id', () {
-      final Uri u = Uri.parse('https://chisto.mk/app/events/detail/evt-42');
+      final Uri u = Uri.parse('https://chisto.mk/app/events/detail/$_kEventUuid');
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkEventDetail>());
-      expect((r as DeepLinkEventDetail).eventId, 'evt-42');
+      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
+    });
+
+    test('parses HTTPS /events/:id share path on trusted host', () {
+      final Uri u = Uri.parse('https://chisto.mk/events/$_kEventUuid');
+      final DeepLinkRoute? r = DeepLinkRouter.parse(u);
+      expect(r, isA<DeepLinkEventDetail>());
+      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
+    });
+
+    test('rejects /events/:id on untrusted host', () {
+      final Uri u = Uri.parse('https://evil.example/events/$_kEventUuid');
+      expect(DeepLinkRouter.parse(u), isNull);
     });
 
     test('parses events/detail with query eventId', () {
-      final Uri u = Uri.parse('chisto://app/events/detail?eventId=evt-9');
+      final Uri u = Uri.parse('chisto://app/events/detail?eventId=$_kEventUuid');
       final DeepLinkRoute? r = DeepLinkRouter.parse(u);
       expect(r, isA<DeepLinkEventDetail>());
-      expect((r as DeepLinkEventDetail).eventId, 'evt-9');
+      expect((r as DeepLinkEventDetail).eventId, _kEventUuid);
     });
 
     test('parses reports/new', () {

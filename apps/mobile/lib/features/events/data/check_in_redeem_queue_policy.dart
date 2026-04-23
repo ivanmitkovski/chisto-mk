@@ -14,6 +14,12 @@ bool shouldRemoveQueuedCheckInAfterRedeemError(AppError error) {
     case 'CHECK_IN_SESSION_MISMATCH':
     case 'CHECK_IN_INVALID_QR':
     case 'CHECK_IN_WRONG_EVENT':
+    case 'CHECK_IN_LIFECYCLE':
+    case 'CHECK_IN_SESSION_CLOSED':
+    case 'CHECK_IN_NO_SESSION':
+    case 'CHECK_IN_NOT_FOUND':
+    case 'CHECK_IN_REQUEST_EXPIRED':
+    case 'CHECK_IN_REQUEST_NOT_FOUND':
       return true;
     default:
       return false;

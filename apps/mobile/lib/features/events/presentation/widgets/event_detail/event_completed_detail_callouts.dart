@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 
 /// Completed-event callouts: organizer pending after-photos, attendee thank-you.
@@ -45,17 +45,13 @@ class EventCompletedDetailCallouts extends StatelessWidget {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          border: Border.all(color: AppColors.divider.withValues(alpha: 0.85)),
-        ),
+        decoration: EventDetailSurfaceDecoration.detailModule(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
               context.l10n.eventsAttendeeCompletedTitle,
-              style: AppTypography.eventsSheetTitle(
+              style: AppTypography.eventsSectionTitle(
                 Theme.of(context).textTheme,
               ),
             ),

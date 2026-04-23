@@ -173,7 +173,10 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         _locationAvailable = false;
         return;
       }
-      final LocationPermission permission = await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         _userLatitude = null;
@@ -181,12 +184,28 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
         _locationAvailable = false;
         return;
       }
-      final Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium,
-      );
-      _userLatitude = position.latitude;
-      _userLongitude = position.longitude;
-      _locationAvailable = true;
+      // `getCurrentPosition` can hang indefinitely on emulators / weak GPS with no fix.
+      // Cap wait so the feed still loads (API works without lat/lng).
+      try {
+        final Position position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.medium,
+          timeLimit: const Duration(seconds: 12),
+        );
+        _userLatitude = position.latitude;
+        _userLongitude = position.longitude;
+        _locationAvailable = true;
+      } on Object catch (_) {
+        final Position? last = await Geolocator.getLastKnownPosition();
+        if (last != null) {
+          _userLatitude = last.latitude;
+          _userLongitude = last.longitude;
+          _locationAvailable = true;
+        } else {
+          _userLatitude = null;
+          _userLongitude = null;
+          _locationAvailable = false;
+        }
+      }
     } catch (_) {
       _userLatitude = null;
       _userLongitude = null;

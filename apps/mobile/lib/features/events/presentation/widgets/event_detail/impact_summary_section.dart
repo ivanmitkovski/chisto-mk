@@ -6,6 +6,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 
 class ImpactSummarySection extends StatelessWidget {
   const ImpactSummarySection({
@@ -23,11 +24,7 @@ class ImpactSummarySection extends StatelessWidget {
     final EventFeedbackSnapshot? data = snapshot;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.panelBackground,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: AppColors.divider),
-      ),
+      decoration: EventDetailSurfaceDecoration.detailModule(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

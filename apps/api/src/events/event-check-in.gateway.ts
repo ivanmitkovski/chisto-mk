@@ -8,12 +8,13 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { forwardRef, Inject, Logger, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
-import { PrismaService } from '../prisma/prisma.service';
 import { UserStatus } from '../generated/prisma';
 import * as jwt from 'jsonwebtoken';
+import { CheckInRepository } from './check-in.repository';
+import { EventLiveImpactService } from './event-live-impact.service';
 
 interface CheckInSocketData {
   userId: string;
@@ -54,7 +55,9 @@ export class EventCheckInGateway
 
   constructor(
     private readonly config: ConfigService,
-    private readonly prisma: PrismaService,
+    private readonly checkInRepository: CheckInRepository,
+    @Inject(forwardRef(() => EventLiveImpactService))
+    private readonly liveImpact: EventLiveImpactService,
   ) {}
 
   afterInit(server: Server): void {
@@ -87,10 +90,7 @@ export class EventCheckInGateway
         email: string;
       };
 
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-        select: { id: true, firstName: true, lastName: true, status: true },
-      });
+      const user = await this.checkInRepository.findUserForCheckInWebsocket(payload.sub);
 
       if (!user || user.status !== UserStatus.ACTIVE) {
         throw new UnauthorizedException('User not active');
@@ -145,6 +145,47 @@ export class EventCheckInGateway
     return typeof raw === 'string' && raw.length > 0 ? raw : null;
   }
 
+  private parseLiveImpactPublish(
+    data: unknown,
+  ): { eventId: string; reportedBagsCollected: number } | null {
+    const coerced = this.coerceMessageBody(data);
+    if (coerced === null || typeof coerced !== 'object') {
+      return null;
+    }
+    const o = coerced as { eventId?: unknown; reportedBagsCollected?: unknown };
+    const eventId = typeof o.eventId === 'string' && o.eventId.length > 0 ? o.eventId : null;
+    if (eventId == null) {
+      return null;
+    }
+    const bagsRaw = o.reportedBagsCollected;
+    const reportedBagsCollected =
+      typeof bagsRaw === 'number' && Number.isFinite(bagsRaw) ? bagsRaw : null;
+    if (reportedBagsCollected == null) {
+      return null;
+    }
+    return { eventId, reportedBagsCollected };
+  }
+
+  @SubscribeMessage('live_impact_publish')
+  async handleLiveImpactPublish(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() data: unknown,
+  ): Promise<void> {
+    const parsed = this.parseLiveImpactPublish(data);
+    if (parsed == null) {
+      return;
+    }
+    const userId = (client.data as CheckInSocketData).userId;
+    if (!userId) {
+      return;
+    }
+    await this.liveImpact.publishFromOrganizerSocket(
+      parsed.eventId,
+      userId,
+      parsed.reportedBagsCollected,
+    );
+  }
+
   @SubscribeMessage('join')
   async handleJoin(
     @ConnectedSocket() client: Socket,
@@ -160,7 +201,10 @@ export class EventCheckInGateway
       return;
     }
 
-    const allowed = await this.isEventParticipantOrOrganizer(userId, eventId);
+    const allowed = await this.checkInRepository.isEventParticipantOrOrganizer(
+      userId,
+      eventId,
+    );
     if (!allowed) {
       client.emit('error', {
         code: 'CHECK_IN_FORBIDDEN',
@@ -205,21 +249,4 @@ export class EventCheckInGateway
     this.server.to(room).emit(eventType, payload);
   }
 
-  private async isEventParticipantOrOrganizer(
-    userId: string,
-    eventId: string,
-  ): Promise<boolean> {
-    const event = await this.prisma.cleanupEvent.findFirst({
-      where: { id: eventId },
-      select: { organizerId: true },
-    });
-    if (event?.organizerId === userId) {
-      return true;
-    }
-    const participant = await this.prisma.eventParticipant.findUnique({
-      where: { eventId_userId: { eventId, userId } },
-      select: { id: true },
-    });
-    return participant != null;
-  }
 }

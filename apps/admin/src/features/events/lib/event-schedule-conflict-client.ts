@@ -15,12 +15,17 @@ export type CheckScheduleConflictResponse = {
 export async function fetchEventScheduleConflict(params: {
   siteId: string;
   scheduledAtIso: string;
+  /** When set, must match public create / preview semantics (multi-day span). */
+  endAtIso?: string;
   excludeEventId?: string;
 }): Promise<CheckScheduleConflictResponse> {
   const q = new URLSearchParams({
     siteId: params.siteId,
     scheduledAt: params.scheduledAtIso,
   });
+  if (params.endAtIso != null && params.endAtIso.trim() !== '') {
+    q.set('endAt', params.endAtIso);
+  }
   if (params.excludeEventId != null && params.excludeEventId !== '') {
     q.set('excludeEventId', params.excludeEventId);
   }

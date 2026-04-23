@@ -1723,8 +1723,20 @@ class AppLocalizationsEn extends AppLocalizations {
       'Joining opens when the scheduled start time arrives.';
 
   @override
+  String get eventsJoinWindowClosed =>
+      'You can no longer join this action. Joining stayed open until 15 minutes after the scheduled start.';
+
+  @override
   String get errorEventEndAtTooFar =>
       'The planned end cannot be that far after the start. Try a shorter extension.';
+
+  @override
+  String get errorEventsEndDifferentSkopjeCalendarDay =>
+      'The end time must be on the same calendar day as the start (Europe/Skopje).';
+
+  @override
+  String get errorEventsEndAfterSkopjeLocalDay =>
+      'The event must end by 23:59 on the start day.';
 
   @override
   String get eventsAwaitingModerationCta => 'Awaiting approval';
@@ -1735,6 +1747,29 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventsModerationBannerBody =>
       'This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.';
+
+  @override
+  String get eventsAttendeeModerationBannerTitle => 'Awaiting approval';
+
+  @override
+  String get eventsAttendeeModerationBannerBody =>
+      'Moderators are reviewing this action. You can open it, but joining opens only after approval.';
+
+  @override
+  String get eventsDeclinedBannerTitle => 'Not approved';
+
+  @override
+  String get eventsDeclinedBannerBody =>
+      'This event did not meet the criteria. Edit and resubmit to try again.';
+
+  @override
+  String get eventsDeclinedResubmitCta => 'Edit & resubmit';
+
+  @override
+  String get eventsDeclinedDashboardPill => 'Declined';
+
+  @override
+  String get eventsPendingDashboardPill => 'Under review';
 
   @override
   String get eventsEventPendingPublicCta => 'Not open for joining yet';
@@ -1994,6 +2029,83 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get eventsOrganizerCompletionStepVisibilityBody =>
       'Photos help moderators verify the cleanup and inspire future actions in your community.';
+
+  @override
+  String get eventsOrganizerCompletionViewReceipt => 'View impact receipt';
+
+  @override
+  String get eventsImpactReceiptScreenTitle => 'Impact receipt';
+
+  @override
+  String eventsImpactReceiptHeroSemantic(String title) {
+    return 'Impact receipt for $title';
+  }
+
+  @override
+  String get eventsImpactReceiptMetricCheckIns => 'Check-ins';
+
+  @override
+  String get eventsImpactReceiptMetricParticipants => 'Joined';
+
+  @override
+  String get eventsImpactReceiptMetricBags => 'Bags (reported)';
+
+  @override
+  String get eventsImpactReceiptProofHeading => 'Proof';
+
+  @override
+  String get eventsImpactReceiptNoMediaHint =>
+      'Add after photos or structured evidence from the event page when you can.';
+
+  @override
+  String eventsImpactReceiptAsOf(String timestamp) {
+    return 'Updated $timestamp';
+  }
+
+  @override
+  String get eventsImpactReceiptCompletenessInProgress => 'In progress';
+
+  @override
+  String get eventsImpactReceiptCompletenessFull => 'Complete record';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialAfter =>
+      'After photos pending';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialEvidence =>
+      'Structured evidence pending';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialBoth =>
+      'After photos and evidence pending';
+
+  @override
+  String get eventsImpactReceiptShare => 'Share';
+
+  @override
+  String get eventsImpactReceiptCopyLink => 'Copy link';
+
+  @override
+  String get eventsImpactReceiptLinkCopied => 'Link copied';
+
+  @override
+  String get eventsImpactReceiptViewCta => 'Impact receipt';
+
+  @override
+  String get eventsImpactReceiptRetry => 'Try again';
+
+  @override
+  String get eventsImpactReceiptLoadFailed => 'Could not load receipt.';
+
+  @override
+  String eventsImpactReceiptShareSummary(int checkIns, int bags, int joined) {
+    return '$checkIns check-ins · $bags bags · $joined joined';
+  }
+
+  @override
+  String get errorEventsImpactReceiptNotAvailable =>
+      'Impact receipt is not available for this event yet.';
 
   @override
   String get eventsOrganizerDetailPendingAfterPhotosTitle => 'After photos';
@@ -2315,6 +2427,13 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get createEventScheduleDateLabel => 'Event date';
+
+  @override
+  String get createEventScheduleEndAfterDayError =>
+      'The event must end by 23:59 on the same day.';
+
+  @override
   String get createEventFieldType => 'Event type';
 
   @override
@@ -2358,7 +2477,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createEventHelpBulletSchedule =>
-      'Set the date and time span so calendars and reminders stay clear.';
+      'Pick the event date, then start and end times on that same day.';
+
+  @override
+  String get createEventHelpBulletSameDay =>
+      'The event must finish on the same calendar day and by 23:59 at the latest.';
 
   @override
   String get createEventHelpBulletSubmit =>
@@ -2809,6 +2932,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Location, schedule, and details';
 
   @override
+  String eventsHeroChatSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Group chat, $count unread',
+      one: 'Group chat, 1 unread',
+      zero: 'Group chat',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get eventsDetailParticipationSemantic => 'Your participation';
 
   @override
@@ -2995,6 +3130,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String eventsCardParticipantsJoined(int count) {
     return '$count joined';
   }
+
+  @override
+  String get eventsDiscoveryThisWeekRetryHint =>
+      'We couldn’t load this week’s picks.';
+
+  @override
+  String get eventsDiscoveryThisWeekRetry => 'Retry';
 
   @override
   String eventsDetailSemanticsLabel(String title) {
@@ -3693,17 +3835,160 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsImpactSummaryEmptyHint =>
-      'Capture cleanup outcomes, effort, and lessons learned.';
+      'Note results and lessons from this cleanup.';
+
+  @override
+  String get eventsLivePulseTitle => 'Live impact';
+
+  @override
+  String eventsLivePulseVolunteers(int count) {
+    return '$count joined';
+  }
+
+  @override
+  String eventsLivePulseCheckIns(int count) {
+    return '$count checked in';
+  }
+
+  @override
+  String eventsLivePulseBags(int count, String kg) {
+    return '$count bags · est. $kg kg';
+  }
+
+  @override
+  String get eventsEvidenceStripTitle => 'Field proof';
+
+  @override
+  String get eventsEvidenceStripSubtitle =>
+      'Photos from the cleanup evidence feed.';
+
+  @override
+  String get eventsEvidenceStripSemantic =>
+      'Before, after, and field photos from the evidence feed';
+
+  @override
+  String get eventsEvidenceKindBefore => 'Before';
+
+  @override
+  String get eventsEvidenceKindAfter => 'After';
+
+  @override
+  String get eventsEvidenceKindField => 'Field';
+
+  @override
+  String eventsEvidenceStripTileSemantic(int index, int total, String kind) {
+    return 'Photo $index of $total, $kind';
+  }
+
+  @override
+  String get eventsRouteProgressTitle => 'Route';
+
+  @override
+  String eventsFieldModeRowServerError(String code) {
+    return 'Server: $code';
+  }
+
+  @override
+  String get eventsFieldModeTitle => 'Field mode';
+
+  @override
+  String get eventsFieldModeSync => 'Sync now';
+
+  @override
+  String get eventsFieldModeEmpty => 'Nothing queued offline.';
+
+  @override
+  String get eventsFieldModeSynced => 'Queue synced.';
+
+  @override
+  String get eventsFieldModeSyncFailed =>
+      'Could not sync. Try again when online.';
+
+  @override
+  String eventsFieldModeSyncPartial(int synced, int failed) {
+    return 'Synced $synced update(s). $failed still in the offline queue.';
+  }
+
+  @override
+  String eventsFieldModeRowLiveImpactBags(int count) {
+    return 'Live impact · $count bags';
+  }
+
+  @override
+  String get eventsFieldModeRowUnknown => 'Offline change';
+
+  @override
+  String get eventsFieldModeRowStatusPending => 'Pending';
+
+  @override
+  String get eventsFieldModeRowStatusSyncing => 'Syncing';
+
+  @override
+  String get eventsOfflineWorkHubTitle => 'Offline work';
+
+  @override
+  String get eventsOfflineWorkHubSemanticSheet =>
+      'Offline work summary and sync actions';
+
+  @override
+  String get eventsOfflineWorkSubtitle =>
+      'Queued changes across check-ins, field updates, and chat.';
+
+  @override
+  String get eventsOfflineWorkSectionCheckIns => 'Check-ins';
+
+  @override
+  String get eventsOfflineWorkSectionField => 'Field updates';
+
+  @override
+  String get eventsOfflineWorkSectionChat => 'Chat';
+
+  @override
+  String eventsOfflineWorkCountPending(int count) {
+    return '$count pending';
+  }
+
+  @override
+  String eventsOfflineWorkCountFailed(int count) {
+    return '$count need attention';
+  }
+
+  @override
+  String get eventsOfflineWorkSyncNow => 'Sync now';
+
+  @override
+  String get eventsOfflineWorkOpenFieldQueue => 'Open field queue';
+
+  @override
+  String get eventsOfflineWorkOpenChat => 'Open event chat';
+
+  @override
+  String get eventsOfflineWorkRetryFailedChat => 'Retry failed chat sends';
+
+  @override
+  String get eventsOfflineWorkResolveInChat =>
+      'Open the chat and fix or delete the message that could not be sent.';
+
+  @override
+  String get eventsOfflineWorkSyncDone => 'Sync finished';
+
+  @override
+  String get eventsOfflineWorkSyncing => 'Syncing…';
+
+  @override
+  String get eventsOfflineWorkDrainFailed =>
+      'Could not finish syncing. Try again when you are online.';
+
+  @override
+  String eventsChatOutboxFull(int max) {
+    return 'Too many messages are waiting to send offline (limit $max). Go online to send pending messages, then try again.';
+  }
 
   @override
   String get eventsCompletedBagsSectionTitle => 'Trash bags collected';
 
   @override
-  String get eventsCompletedBagsSectionSubtitle =>
-      'How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.';
-
-  @override
-  String get eventsCompletedBagsSave => 'Save bag count';
+  String get eventsCompletedBagsSave => 'Save';
 
   @override
   String get eventsCompletedBagsSaved => 'Bag count saved.';
@@ -3816,6 +4101,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eventsSuccessDialogOpenEvent => 'Open event';
+
+  @override
+  String get eventsSuccessDialogViewEvent => 'View event';
+
+  @override
+  String get eventsSuccessDialogPendingTitle => 'Submitted for review';
+
+  @override
+  String eventsSuccessDialogPendingBody(String title, String siteName) {
+    return '$title at $siteName was submitted. A moderator will approve or decline it before it appears publicly. You can open it from your events anytime.';
+  }
 
   @override
   String get eventsTimePickerSelectTime => 'Select time';
@@ -4830,4 +5126,139 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chatSharedLocation => 'Shared location';
+
+  @override
+  String get organizerToolkitTitle => 'Become an organizer';
+
+  @override
+  String get organizerToolkitPage1Title => 'Plan ahead';
+
+  @override
+  String get organizerToolkitPage1Body =>
+      'Assess the site for hazards, prepare safety gear, and brief your team before volunteers arrive.';
+
+  @override
+  String get organizerToolkitPage2Title => 'Moderation keeps trust';
+
+  @override
+  String get organizerToolkitPage2Body =>
+      'After you create an event, moderators review it. Once approved, volunteers can see and join.';
+
+  @override
+  String get organizerToolkitPage3Title => 'Verify attendance';
+
+  @override
+  String get organizerToolkitPage3Body =>
+      'Use the in-app QR check-in so every volunteer gets credit for showing up.';
+
+  @override
+  String get organizerToolkitPage4Title => 'Weather and safety';
+
+  @override
+  String get organizerToolkitPage4Body =>
+      'If conditions turn unsafe, pause or postpone. Tell joined volunteers promptly in the app so nobody travels for a cancelled start.';
+
+  @override
+  String get organizerToolkitPage5Title => 'Waste and disposal';
+
+  @override
+  String get organizerToolkitPage5Body =>
+      'Sort recyclables when you can, bag sharp objects safely, and take waste to authorized disposal points. Leave the site cleaner than you found it.';
+
+  @override
+  String get organizerToolkitPage6Title => 'Include everyone';
+
+  @override
+  String get organizerToolkitPage6Body =>
+      'Offer clear roles, steady pacing, and patience. A welcoming briefing helps first-time volunteers feel confident and stay safe.';
+
+  @override
+  String get organizerToolkitPage7Title => 'Privacy in chat';
+
+  @override
+  String get organizerToolkitPage7Body =>
+      'Keep personal phone numbers and addresses out of public event chat. Use in-app messaging so the whole team stays informed without oversharing.';
+
+  @override
+  String get organizerToolkitPage8Title => 'Evidence and honest impact';
+
+  @override
+  String get organizerToolkitPage8Body =>
+      'After photos and bag counts should reflect what really happened. Accurate reporting builds trust with volunteers, moderators, and the wider community.';
+
+  @override
+  String get organizerToolkitContinue => 'Continue';
+
+  @override
+  String get organizerToolkitStartQuiz => 'Take the quiz';
+
+  @override
+  String get organizerQuizTitle => 'Quick knowledge check';
+
+  @override
+  String get organizerQuizLoadFailed =>
+      'Could not load the quiz. Please try again.';
+
+  @override
+  String get organizerQuizLoadInvalidResponse =>
+      'The quiz data from the server was incomplete. Please try again.';
+
+  @override
+  String get organizerQuizRetryLoad => 'Try again';
+
+  @override
+  String get organizerQuizSubmitFailed =>
+      'Could not submit answers. Try again.';
+
+  @override
+  String organizerQuizOptionSemantic(int index, int total, String optionText) {
+    return 'Question $index of $total: $optionText';
+  }
+
+  @override
+  String get organizerQuizSubmit => 'Submit answers';
+
+  @override
+  String get organizerQuizPassedTitle => 'You\'re certified!';
+
+  @override
+  String get organizerQuizPassedBody =>
+      'You can now create cleanup events. Volunteers are waiting.';
+
+  @override
+  String get organizerQuizFailedTitle => 'Not quite';
+
+  @override
+  String organizerQuizFailedBody(int correct, int total) {
+    return 'Review the tutorial and try again. You got $correct out of $total.';
+  }
+
+  @override
+  String get organizerQuizRetry => 'Try again';
+
+  @override
+  String get organizerQuizCreateEvent => 'Create your first event';
+
+  @override
+  String get organizerCertifiedBadge => 'Certified organizer';
+
+  @override
+  String get errorOrganizerQuizSessionExpired =>
+      'That quiz session expired. Load a new quiz and try again.';
+
+  @override
+  String get errorOrganizerQuizSessionInvalid =>
+      'This quiz session is not valid. Load the quiz again.';
+
+  @override
+  String get errorOrganizerQuizAnswersMismatch =>
+      'Answers do not match the quiz you started. Load the quiz again.';
+
+  @override
+  String get errorOrganizerQuizInvalid =>
+      'One or more answers are not valid for this quiz. Load the quiz again.';
+
+  @override
+  String get errorOrganizerCertificationAlreadyDone =>
+      'You are already a certified organizer. No need to take the quiz again.';
 }

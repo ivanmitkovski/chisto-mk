@@ -34,6 +34,14 @@ export class PatchCleanupEventDto {
   @IsDateString()
   scheduledAt?: string;
 
+  @ApiPropertyOptional({
+    description: 'Empty string clears endAt (legacy rows only).',
+  })
+  @IsOptional()
+  @ValidateIf((_: unknown, o: PatchCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
+  @IsDateString()
+  endAt?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsDateString()

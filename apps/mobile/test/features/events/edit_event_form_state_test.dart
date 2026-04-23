@@ -45,6 +45,7 @@ void main() {
           descriptionTrimmed: 'D',
           maxParticipants: 10,
           dateOnly: DateUtils.dateOnly(DateTime.utc(2026, 6, 15)),
+          endDateOnly: DateUtils.dateOnly(DateTime.utc(2026, 6, 15)),
           startTime: const EventTime(hour: 10, minute: 0),
           endTime: const EventTime(hour: 12, minute: 0),
           category: EcoEventCategory.generalCleanup,

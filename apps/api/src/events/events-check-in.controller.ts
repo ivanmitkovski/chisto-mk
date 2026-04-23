@@ -149,7 +149,11 @@ export class EventsCheckInController {
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RedeemEventCheckInDto,
   ) {
-    return this.checkIn.redeem(eventId, user, dto.qrPayload);
+    const geo =
+      dto.redeemLatitude != null && dto.redeemLongitude != null
+        ? { lat: dto.redeemLatitude, lng: dto.redeemLongitude }
+        : undefined;
+    return this.checkIn.redeem(eventId, user, dto.qrPayload, geo);
   }
 
   @Post('pending/:pendingId/resolve')

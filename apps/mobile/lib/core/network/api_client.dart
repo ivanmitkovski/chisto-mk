@@ -424,17 +424,25 @@ class ApiClient {
     }
   }
 
+  static Map<String, dynamic>? _decodeJsonObject(String bodyStr) {
+    try {
+      final Object? decoded = jsonDecode(bodyStr);
+      if (decoded is Map<String, dynamic>) {
+        return decoded;
+      }
+      if (decoded is Map) {
+        return Map<String, dynamic>.from(decoded);
+      }
+    } catch (_) {
+      // Not JSON
+    }
+    return null;
+  }
+
   ApiResponse _handleResponse(http.Response response) {
     final String? bodyStr = response.body.isNotEmpty ? response.body : null;
-    Map<String, dynamic>? json;
-    if (bodyStr != null) {
-      try {
-        final Object? decoded = jsonDecode(bodyStr);
-        if (decoded is Map<String, dynamic>) json = decoded;
-      } catch (_) {
-        // Not JSON
-      }
-    }
+    final Map<String, dynamic>? json =
+        bodyStr != null ? _decodeJsonObject(bodyStr) : null;
 
     if (response.statusCode >= 200 && response.statusCode < 300) {
       return ApiResponse(

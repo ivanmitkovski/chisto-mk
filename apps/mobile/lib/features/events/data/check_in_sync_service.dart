@@ -6,12 +6,11 @@ import 'package:chisto_mobile/features/events/data/check_in_sync_queue.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
 
-/// Singleton that drains the [CheckInSyncQueue] whenever connectivity is restored.
+/// Singleton that drains the [CheckInSyncQueue] when the app-level offline-work
+/// coordinator schedules work (connectivity restored, app resume, or manual sync).
 ///
 /// Start once in ServiceLocator via [CheckInSyncService.start].
-/// The service listens for connectivity changes and retries queued check-ins.
 /// Entries that return [CheckInSubmissionStatus.replayDetected] or
 /// [CheckInSubmissionStatus.alreadyCheckedIn] are treated as already synced
 /// and silently removed.
@@ -30,7 +29,6 @@ class CheckInSyncService {
   final EventsRepository _eventsRepository;
   final CheckInRepository _checkInRepository;
 
-  StreamSubscription<List<ConnectivityResult>>? _connectivitySub;
   bool _draining = false;
 
   /// Initialises and starts the service. Idempotent — safe to call more than once.
@@ -49,19 +47,17 @@ class CheckInSyncService {
   }
 
   Future<void> _init() async {
-    // Drain immediately in case we're already online.
+    // One immediate attempt; ongoing drains are owned by [EventOfflineWorkCoordinator].
     unawaited(_drainIfOnline());
+  }
 
-    _connectivitySub = Connectivity().onConnectivityChanged.listen((
-      List<ConnectivityResult> results,
-    ) async {
-      final bool online = results.any(
-        (ConnectivityResult r) => r != ConnectivityResult.none,
-      );
-      if (online) {
-        await _drainIfOnline();
-      }
-    });
+  /// Drains the offline redeem queue once (serialized with the coordinator).
+  static Future<void> drainPendingQueue() async {
+    final CheckInSyncService? svc = _instance;
+    if (svc == null) {
+      return;
+    }
+    await svc._drainIfOnline();
   }
 
   Future<void> _drainIfOnline() async {
@@ -104,8 +100,5 @@ class CheckInSyncService {
     _instance = null;
   }
 
-  void _tearDown() {
-    _connectivitySub?.cancel();
-    _connectivitySub = null;
-  }
+  void _tearDown() {}
 }

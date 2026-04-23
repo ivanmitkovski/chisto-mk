@@ -2,10 +2,11 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button, Card, Icon, Pagination } from '@/components/ui';
 import type { CleanupEventRow, EventsStats } from '@/features/events/data/events-adapter';
+import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import styles from './events-workspace.module.css';
 
 const STATUS_OPTIONS = [
@@ -55,6 +56,11 @@ export function EventsWorkspace({
   const [data, setData] = useState(initialData);
   const [meta, setMeta] = useState(initialMeta);
   const [stats, setStats] = useState(initialStats);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [bulkBusy, setBulkBusy] = useState(false);
+
+  const status = searchParams.get('status') ?? '';
+  const moderationStatus = searchParams.get('moderationStatus') ?? '';
 
   useEffect(() => {
     setData(initialData);
@@ -62,11 +68,12 @@ export function EventsWorkspace({
   }, [initialData, initialMeta]);
 
   useEffect(() => {
+    setSelectedIds(new Set());
+  }, [initialData, moderationStatus]);
+
+  useEffect(() => {
     setStats(initialStats);
   }, [initialStats]);
-
-  const status = searchParams.get('status') ?? '';
-  const moderationStatus = searchParams.get('moderationStatus') ?? '';
 
   const buildUrl = (updates: { status?: string; moderationStatus?: string; page?: number }) => {
     const sp = new URLSearchParams(searchParams.toString());
@@ -97,6 +104,81 @@ export function EventsWorkspace({
   const refresh = () => router.refresh();
 
   const totalParticipants = data.reduce((sum, e) => sum + e.participantCount, 0);
+
+  const toggleRowSelected = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const selectAllOnPage = useCallback(() => {
+    setSelectedIds(new Set(data.map((e) => e.id)));
+  }, [data]);
+
+  const clearSelection = useCallback(() => {
+    setSelectedIds(new Set());
+  }, []);
+
+  const bulkApprove = useCallback(async () => {
+    if (!canWriteCleanupEvents || selectedIds.size === 0) {
+      return;
+    }
+    setBulkBusy(true);
+    try {
+      const clientJobId = crypto.randomUUID();
+      await adminBrowserFetch<{ processed: number; failed: unknown[] }>('/admin/cleanup-events/bulk-moderate', {
+        method: 'POST',
+        body: {
+          eventIds: [...selectedIds],
+          action: 'APPROVED',
+          clientJobId,
+        },
+      });
+      setSelectedIds(new Set());
+      refresh();
+    } catch {
+      window.alert('Bulk approve failed. Try again or approve events individually.');
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [canWriteCleanupEvents, refresh, selectedIds]);
+
+  const bulkDecline = useCallback(async () => {
+    if (!canWriteCleanupEvents || selectedIds.size === 0) {
+      return;
+    }
+    const reason = window.prompt('Decline reason (applies to all selected events):');
+    if (reason == null || reason.trim().length < 3) {
+      return;
+    }
+    setBulkBusy(true);
+    try {
+      const clientJobId = crypto.randomUUID();
+      await adminBrowserFetch<{ processed: number; failed: unknown[] }>('/admin/cleanup-events/bulk-moderate', {
+        method: 'POST',
+        body: {
+          eventIds: [...selectedIds],
+          action: 'DECLINED',
+          declineReason: reason.trim(),
+          clientJobId,
+        },
+      });
+      setSelectedIds(new Set());
+      refresh();
+    } catch {
+      window.alert('Bulk decline failed. Try again or decline events individually.');
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [canWriteCleanupEvents, refresh, selectedIds]);
+
+  const showModerationBulk = moderationStatus === 'PENDING' && canWriteCleanupEvents;
 
   return (
     <div className={styles.layout}>
@@ -136,6 +218,11 @@ export function EventsWorkspace({
           </span>
           <span className={styles.statValue}>{stats.pending}</span>
           <span className={styles.statLabel}>Pending</span>
+          {stats.pending > 0 ? (
+            <Link className={styles.queueLink} href={buildUrl({ moderationStatus: 'PENDING', page: 1 })}>
+              Open moderation queue
+            </Link>
+          ) : null}
         </motion.div>
         <motion.div
           className={styles.statCard}
@@ -167,9 +254,17 @@ export function EventsWorkspace({
         <div className={styles.toolbar}>
           <div className={styles.filters}>
             <div className={styles.createHintBlock}>
-              <Link href="/dashboard/sites" className={styles.createHint}>
-                Create event from site
-              </Link>
+              <div className={styles.createHintRow}>
+                <Link href="/dashboard/sites" className={styles.createHint}>
+                  Create event from site
+                </Link>
+                <span className={styles.hintDivider} aria-hidden>
+                  ·
+                </span>
+                <Link href="/dashboard/events/risk-signals" className={styles.createHint}>
+                  Check-in risk signals
+                </Link>
+              </div>
               {!canWriteCleanupEvents ? (
                 <p className={styles.readOnlyHint} role="note">
                   Your role can view events; only admins can create or edit cleanup events.
@@ -206,6 +301,28 @@ export function EventsWorkspace({
           </Button>
         </div>
 
+        {showModerationBulk ? (
+          <div className={styles.moderationBulkBar}>
+            <span className={styles.moderationBulkMeta}>
+              {selectedIds.size} selected · SSE refreshes this list automatically
+            </span>
+            <div className={styles.moderationBulkActions}>
+              <Button variant="outline" size="sm" type="button" onClick={selectAllOnPage} disabled={bulkBusy}>
+                Select page
+              </Button>
+              <Button variant="outline" size="sm" type="button" onClick={clearSelection} disabled={bulkBusy}>
+                Clear
+              </Button>
+              <Button variant="solid" size="sm" type="button" onClick={bulkApprove} disabled={bulkBusy || selectedIds.size === 0}>
+                Approve selected
+              </Button>
+              <Button variant="outline" size="sm" type="button" onClick={bulkDecline} disabled={bulkBusy || selectedIds.size === 0}>
+                Decline selected
+              </Button>
+            </div>
+          </div>
+        ) : null}
+
         <div className={styles.tableWrap}>
           {data.length === 0 ? (
             <div className={styles.empty}>No events match your filters.</div>
@@ -213,6 +330,11 @@ export function EventsWorkspace({
             <table className={styles.table}>
               <thead>
                 <tr>
+                  {showModerationBulk ? (
+                    <th className={styles.thCheckbox} scope="col">
+                      <span className={styles.srOnly}>Select</span>
+                    </th>
+                  ) : null}
                   <th>Scheduled</th>
                   <th>Site</th>
                   <th>Participants</th>
@@ -225,9 +347,19 @@ export function EventsWorkspace({
                 {data.map((e) => {
                   const { gm, am } = mapLinks(e.site.latitude, e.site.longitude);
                   const isCompleted = !!e.completedAt;
-                  const modStatus = (e as { status?: string }).status ?? 'APPROVED';
+                  const modStatus = e.status ?? 'APPROVED';
                   return (
                     <tr key={e.id}>
+                      {showModerationBulk ? (
+                        <td className={styles.tdCheckbox}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(e.id)}
+                            onChange={() => toggleRowSelected(e.id)}
+                            aria-label={`Select ${e.title}`}
+                          />
+                        </td>
+                      ) : null}
                       <td className={styles.cellDateTime}>
                         {formatDateTime(e.scheduledAt)}
                       </td>

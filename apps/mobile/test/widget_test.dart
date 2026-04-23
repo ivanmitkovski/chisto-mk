@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/sign_in_screen.dart';
 import 'package:chisto_mobile/features/auth/presentation/screens/splash_screen.dart';
-import 'package:chisto_mobile/shared/testing/widget_test_bootstrap.dart';
+import 'shared/widget_test_bootstrap.dart';
 
 import 'package:chisto_mobile/main.dart';
 

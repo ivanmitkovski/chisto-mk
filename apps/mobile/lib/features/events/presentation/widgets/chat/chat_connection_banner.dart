@@ -12,12 +12,15 @@ class ChatConnectionBanner extends StatelessWidget {
     required this.reconnecting,
     this.disconnected = false,
     this.showConnectedFlash = false,
+    this.networkOffline = false,
     this.reduceMotion = false,
     this.liveRegion = true,
   });
 
   final bool reconnecting;
   final bool disconnected;
+  /// Device has no usable data connection (connectivity gate); shown even if WS is idle.
+  final bool networkOffline;
   final bool showConnectedFlash;
   /// When true (e.g. system Reduce Motion), skip slide/fade durations.
   final bool reduceMotion;
@@ -26,7 +29,8 @@ class ChatConnectionBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool visible = reconnecting || disconnected || showConnectedFlash;
+    final bool visible =
+        reconnecting || disconnected || showConnectedFlash || networkOffline;
     final Duration animDuration = reduceMotion ? Duration.zero : AppMotion.medium;
     return AnimatedSlide(
       offset: visible ? Offset.zero : const Offset(0, -1),
@@ -52,7 +56,7 @@ class ChatConnectionBanner extends StatelessWidget {
     final IconData icon;
     final String text;
 
-    if (disconnected) {
+    if (networkOffline || disconnected) {
       bg = AppColors.accentDanger.withValues(alpha: 0.10);
       icon = Icons.cloud_off_outlined;
       text = context.l10n.errorUserNetwork;

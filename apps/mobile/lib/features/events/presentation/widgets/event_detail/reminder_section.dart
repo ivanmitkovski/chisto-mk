@@ -30,7 +30,7 @@ class ReminderSection extends StatelessWidget {
         : context.l10n.eventsReminderSectionDisabled;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: EventDetailSurfaceDecoration.elevatedCard(),
+      decoration: EventDetailSurfaceDecoration.detailModule(),
       child: Row(
         children: <Widget>[
           Container(

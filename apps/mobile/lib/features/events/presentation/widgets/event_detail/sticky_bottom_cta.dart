@@ -47,8 +47,11 @@ class StickyBottomCTA extends StatelessWidget {
         color: AppColors.panelBackground.withValues(
           alpha: reduceMotion ? 1.0 : kEventDetailStickyCtaPanelAlpha,
         ),
-        border: const Border(
-          top: BorderSide(color: AppColors.divider, width: 0.5),
+        border: Border(
+          top: BorderSide(
+            color: AppColors.divider.withValues(alpha: 0.45),
+            width: 0.5,
+          ),
         ),
         boxShadow: reduceMotion
             ? null

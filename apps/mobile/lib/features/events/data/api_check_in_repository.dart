@@ -9,6 +9,7 @@ import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dar
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter/foundation.dart';
 
 /// Parses `checkedInAt` from POST `/events/:id/check-in/redeem` success JSON (root or `data`).
@@ -129,9 +130,21 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
       );
     }
     try {
+      final Map<String, dynamic> body = <String, dynamic>{
+        'qrPayload': rawPayload.trim(),
+      };
+      try {
+        final Position? last = await Geolocator.getLastKnownPosition();
+        if (last != null) {
+          body['redeemLatitude'] = last.latitude;
+          body['redeemLongitude'] = last.longitude;
+        }
+      } on Object {
+        // Optional geo for risk scoring — ignore all failures.
+      }
       final ApiResponse response = await _client.post(
         '/events/$expectedEventId/check-in/redeem',
-        body: <String, dynamic>{'qrPayload': rawPayload.trim()},
+        body: body,
       );
       final Map<String, dynamic>? json = response.json;
 

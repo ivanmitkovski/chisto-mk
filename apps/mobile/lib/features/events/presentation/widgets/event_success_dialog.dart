@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/events/presentation/events_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class EventSuccessDialog extends StatefulWidget {
@@ -13,10 +17,15 @@ class EventSuccessDialog extends StatefulWidget {
     super.key,
     required this.title,
     required this.siteName,
+    this.requiresModeration = false,
   });
 
   final String title;
   final String siteName;
+
+  /// When true (event not yet approved by moderators), copy and visuals reflect
+  /// a submission state instead of a public listing.
+  final bool requiresModeration;
 
   @override
   State<EventSuccessDialog> createState() => _EventSuccessDialogState();
@@ -56,16 +65,33 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      if (MediaQuery.disableAnimationsOf(context)) {
-        _containerController.value = 1.0;
-        _checkController.value = 1.0;
-        AppHaptics.success(context);
+      if (!mounted) {
+        return;
+      }
+      final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
+      if (widget.requiresModeration) {
+        if (reduceMotion) {
+          _containerController.value = 1.0;
+        } else {
+          unawaited(_containerController.forward());
+        }
+        AppHaptics.light(context);
       } else {
-        _containerController.forward().then((_) {
-          _checkController.forward();
+        if (reduceMotion) {
+          _containerController.value = 1.0;
+          _checkController.value = 1.0;
           AppHaptics.success(context);
-        });
+        } else {
+          unawaited(
+            _containerController.forward().then((_) {
+              if (!mounted) {
+                return;
+              }
+              unawaited(_checkController.forward());
+              AppHaptics.success(context);
+            }),
+          );
+        }
       }
     });
   }
@@ -79,6 +105,7 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
 
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
     return Center(
       child: ScaleTransition(
         scale: _scaleAnimation,
@@ -87,7 +114,10 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
           child: Container(
             margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.xl, AppSpacing.lg, AppSpacing.lg,
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.lg,
             ),
             decoration: BoxDecoration(
               color: AppColors.panelBackground,
@@ -103,57 +133,31 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: <Widget>[
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: <Color>[
-                              AppColors.primary,
-                              AppColors.primaryDark,
-                            ],
-                          ),
-                        ),
-                      ),
-                      AnimatedBuilder(
-                        animation: _checkAnimation,
-                        builder: (BuildContext context, Widget? child) {
-                          return CustomPaint(
-                            size: const Size(36, 36),
-                            painter: _CheckPainter(
-                              progress: _checkAnimation.value,
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                if (widget.requiresModeration)
+                  _buildPendingIconHeader()
+                else
+                  _buildApprovedIconHeader(),
                 const SizedBox(height: AppSpacing.lg),
                 Text(
-                  context.l10n.eventsSuccessDialogTitle,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                  widget.requiresModeration
+                      ? context.l10n.eventsSuccessDialogPendingTitle
+                      : context.l10n.eventsSuccessDialogTitle,
+                  style: AppTypography.eventsSheetTitle(textTheme),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  context.l10n.eventsSuccessDialogBody(widget.title, widget.siteName),
+                  widget.requiresModeration
+                      ? context.l10n.eventsSuccessDialogPendingBody(
+                          widget.title,
+                          widget.siteName,
+                        )
+                      : context.l10n.eventsSuccessDialogBody(
+                          widget.title,
+                          widget.siteName,
+                        ),
                   textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                        height: 1.5,
-                      ),
+                  style: AppTypography.eventsBodyMuted(textTheme).copyWith(height: 1.5),
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 SizedBox(
@@ -173,10 +177,8 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
                       ),
                     ),
                     child: Text(
-                      context.l10n.eventsSuccessDialogOpenEvent,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
+                      context.l10n.eventsSuccessDialogViewEvent,
+                      style: AppTypography.eventsPrimaryButtonLabel(textTheme),
                     ),
                   ),
                 ),
@@ -184,6 +186,63 @@ class _EventSuccessDialogState extends State<EventSuccessDialog>
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPendingIconHeader() {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: AppColors.inputFill,
+          border: Border.all(color: AppColors.divider.withValues(alpha: 0.9)),
+        ),
+        child: const Icon(
+          CupertinoIcons.doc_text,
+          size: 36,
+          color: AppColors.textSecondary,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildApprovedIconHeader() {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: Stack(
+        alignment: Alignment.center,
+        children: <Widget>[
+          Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: <Color>[
+                  AppColors.primary,
+                  AppColors.primaryDark,
+                ],
+              ),
+            ),
+          ),
+          AnimatedBuilder(
+            animation: _checkAnimation,
+            builder: (BuildContext context, Widget? child) {
+              return CustomPaint(
+                size: const Size(36, 36),
+                painter: _CheckPainter(
+                  progress: _checkAnimation.value,
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -196,7 +255,9 @@ class _CheckPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (progress <= 0) return;
+    if (progress <= 0) {
+      return;
+    }
 
     final Paint paint = Paint()
       ..color = AppColors.white

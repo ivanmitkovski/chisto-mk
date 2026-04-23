@@ -1,23 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { CleanupEventStatus } from '../prisma-client';
-import { PrismaService } from '../prisma/prisma.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import {
+  EventMobileEvidenceStripItemDto,
+  EventMobileResponseDto,
+  EventMobileRouteSegmentDto,
+} from './dto/event-mobile-response.dto';
 import {
   categoryToMobile,
   difficultyToMobile,
   lifecycleToMobile,
+  moderationStatusToMobile,
   scaleToMobile,
 } from './events-mobile.mapper';
 import type { LoadedEvent } from './events-query.include';
+import { EventsRepository } from './events.repository';
+
+export type MobileEventMappingOptions = {
+  /** Distance from viewer to event site (km); 0 when viewer coordinates are absent. */
+  siteDistanceKm?: number;
+};
 
 @Injectable()
 export class EventsMobileMapperService {
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly eventsRepository: EventsRepository,
     private readonly uploads: ReportsUploadService,
   ) {}
 
-  async toMobileEvent(row: LoadedEvent): Promise<Record<string, unknown>> {
+  async toMobileEvent(
+    row: LoadedEvent,
+    options?: MobileEventMappingOptions,
+  ): Promise<EventMobileResponseDto> {
     const participant = row.participants[0];
     const viewerCheckIn = row.checkIns[0];
     const isJoined = participant != null;
@@ -43,13 +57,7 @@ export class EventsMobileMapperService {
 
     if (row.recurrenceRule != null || row.parentEventId != null) {
       const rootId = row.parentEventId ?? row.id;
-      const series = await this.prisma.cleanupEvent.findMany({
-        where: {
-          OR: [{ id: rootId }, { parentEventId: rootId }],
-        },
-        select: { id: true, scheduledAt: true },
-        orderBy: [{ scheduledAt: 'asc' }, { id: 'asc' }],
-      });
+      const series = await this.eventsRepository.listRecurrenceSeriesEvents(rootId);
       const total = series.length;
       const idx = series.findIndex((s) => s.id === row.id);
       recurrenceSeriesTotal = total;
@@ -64,16 +72,49 @@ export class EventsMobileMapperService {
       }
     }
 
-    return {
+    const evidenceSigned = await this.uploads.signUrls(
+      this.uploads.getPublicUrlsForKeys(row.evidencePhotos.map((p) => p.objectKey)),
+    );
+    const routeSegments: EventMobileRouteSegmentDto[] = row.routeSegments.map((s) => {
+      const seg = new EventMobileRouteSegmentDto();
+      seg.id = s.id;
+      seg.sortOrder = s.sortOrder;
+      seg.label = s.label;
+      seg.latitude = s.latitude;
+      seg.longitude = s.longitude;
+      seg.status = s.status.toLowerCase();
+      seg.claimedByUserId = s.claimedByUserId;
+      seg.claimedAt = s.claimedAt?.toISOString() ?? null;
+      seg.completedAt = s.completedAt?.toISOString() ?? null;
+      return seg;
+    });
+
+    const evidenceStrip: EventMobileEvidenceStripItemDto[] = row.evidencePhotos.map((p, i) => {
+      const item = new EventMobileEvidenceStripItemDto();
+      item.id = p.id;
+      item.kind = p.kind.toLowerCase();
+      item.imageUrl = evidenceSigned[i] ?? '';
+      item.caption = p.caption;
+      item.createdAt = p.createdAt.toISOString();
+      return item;
+    });
+
+    const gearStrings = Array.isArray(row.gear)
+      ? (row.gear as unknown[]).filter((g): g is string => typeof g === 'string')
+      : [];
+
+    const out = new EventMobileResponseDto();
+    Object.assign(out, {
       id: row.id,
       title: row.title,
       description: row.description,
       category: categoryToMobile(row.category),
       moderationApproved: row.status === CleanupEventStatus.APPROVED,
+      moderationStatus: moderationStatusToMobile(row.status),
       siteId: row.siteId,
       siteName: this.siteDisplayName(row.site),
       siteImageUrl: await this.resolveSiteCoverImageUrl(row.site),
-      siteDistanceKm: 0,
+      siteDistanceKm: options?.siteDistanceKm ?? 0,
       siteLat: row.site?.latitude ?? null,
       siteLng: row.site?.longitude ?? null,
       organizerId: row.organizerId ?? '',
@@ -85,7 +126,7 @@ export class EventsMobileMapperService {
       participantCount: row.participantCount,
       maxParticipants: row.maxParticipants,
       isJoined,
-      gear: row.gear,
+      gear: gearStrings,
       scale: scaleToMobile(row.scale),
       difficulty: difficultyToMobile(row.difficulty),
       reminderEnabled,
@@ -105,7 +146,12 @@ export class EventsMobileMapperService {
       recurrenceSeriesPosition,
       recurrencePrevEventId,
       recurrenceNextEventId,
-    };
+      liveReportedBagsCollected: row.liveMetric?.reportedBagsCollected ?? 0,
+      liveMetricUpdatedAt: row.liveMetric?.updatedAt.toISOString() ?? null,
+      routeSegments,
+      evidenceStrip,
+    });
+    return out;
   }
 
   private siteDisplayName(site: LoadedEvent['site']): string {

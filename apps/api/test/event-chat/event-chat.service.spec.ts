@@ -189,6 +189,9 @@ describe('EventChatService', () => {
       expect.objectContaining({
         type: NotificationType.EVENT_CHAT,
         threadKey: `event-chat:${eventId}`,
+        data: expect.objectContaining({
+          threadTitle: 'River',
+        }),
       }),
     );
   });

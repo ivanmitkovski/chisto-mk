@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 
-import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/organizer_end_soon_local_controller.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/extend_event_end_sheet.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/core/network/api_client.dart';
+import 'package:chisto_mobile/features/events/data/field_mode_queue.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
@@ -22,8 +22,8 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event_join_toggl
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_export.dart';
-import 'package:chisto_mobile/features/events/presentation/utils/event_share_payload.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_scroll_interaction.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/after_photos_gallery.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/detail_content.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/feedback_sheet.dart';
@@ -39,10 +39,8 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_detail_
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/widgets/animated_phase_switcher.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
-import 'package:share_plus/share_plus.dart';
 
 class EventDetailScreen extends StatefulWidget {
   const EventDetailScreen({
@@ -81,6 +79,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
     return _detailResumeRefreshTtlDefault;
   }
+
   EventFeedbackSnapshot? _feedbackSnapshot;
   bool _detailPrefetchDone = false;
   bool _detailMissing = false;
@@ -91,13 +90,31 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   final OrganizerEndSoonLocalController _organizerEndSoonLocal =
       OrganizerEndSoonLocalController();
   Timer? _joinWindowTicker;
-  final GlobalKey _shareActionKey = GlobalKey();
+  final ScrollController _detailScrollController = ScrollController();
+
+  /// True once scroll offset passes the fully-collapsed hero height (body
+  /// scrolling under the pinned toolbar). Feeds [HeroImageBar.innerBoxIsScrolled].
+  bool _heroCollapsedEnoughForBodyScroll = false;
 
   /// True when a forced refresh failed while we still show a cached [EcoEvent].
   bool _localDetailRefreshFailed = false;
 
   bool get _showStaleDetailBanner =>
       _eventsStore.isShowingStaleCachedEvents || _localDetailRefreshFailed;
+
+  static const double _heroFullyCollapsedScrollOffset =
+      kEventDetailHeroExpandedHeight - kToolbarHeight;
+
+  void _onDetailScroll() {
+    if (!mounted || !_detailScrollController.hasClients) {
+      return;
+    }
+    final bool next =
+        _detailScrollController.offset > _heroFullyCollapsedScrollOffset;
+    if (next != _heroCollapsedEnoughForBodyScroll) {
+      setState(() => _heroCollapsedEnoughForBodyScroll = next);
+    }
+  }
 
   bool _canOpenEventChat(EcoEvent e) =>
       (e.isJoined || e.isOrganizer) && e.status != EcoEventStatus.cancelled;
@@ -204,11 +221,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       return;
     }
     final EcoEvent? e = _eventsStore.findById(widget.eventId);
-    final bool needTicker = e != null &&
-        !e.isOrganizer &&
-        e.isJoinable &&
-        !e.isJoined &&
-        e.isBeforeScheduledStart;
+    final bool needTicker = e != null && e.shouldTickVolunteerJoinNearDeadline;
     if (!needTicker) {
       _joinWindowTicker?.cancel();
       _joinWindowTicker = null;
@@ -222,11 +235,8 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         return;
       }
       final EcoEvent? cur = _eventsStore.findById(widget.eventId);
-      final bool stillNeed = cur != null &&
-          !cur.isOrganizer &&
-          cur.isJoinable &&
-          !cur.isJoined &&
-          cur.isBeforeScheduledStart;
+      final bool stillNeed =
+          cur != null && cur.shouldTickVolunteerJoinNearDeadline;
       if (!stillNeed) {
         _joinWindowTicker?.cancel();
         _joinWindowTicker = null;
@@ -237,6 +247,25 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   @override
+  void didUpdateWidget(EventDetailScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.eventId != widget.eventId) {
+      if (_detailScrollController.hasClients) {
+        _detailScrollController.jumpTo(0);
+      } else {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && _detailScrollController.hasClients) {
+            _detailScrollController.jumpTo(0);
+          }
+        });
+      }
+      if (_heroCollapsedEnoughForBodyScroll) {
+        setState(() => _heroCollapsedEnoughForBodyScroll = false);
+      }
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
@@ -244,15 +273,19 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     _eventsStore.addListener(_onStoreChanged);
     _loadFeedback();
     unawaited(_prefetchDetailDeduped());
+    _detailScrollController.addListener(_onDetailScroll);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         _ensureJoinWindowTicker();
+        _onDetailScroll();
       }
     });
   }
 
   @override
   void dispose() {
+    _detailScrollController.removeListener(_onDetailScroll);
+    _detailScrollController.dispose();
     WidgetsBinding.instance.removeObserver(this);
     _eventsStore.removeListener(_onStoreChanged);
     if (ServiceLocator.instance.isInitialized) {
@@ -368,6 +401,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
   }
 
   Future<void> _handlePullToRefresh() async {
+    eventsPullRefreshHaptic(context);
     try {
       final bool fetched = await _eventsStore.prefetchEvent(
         widget.eventId,
@@ -422,7 +456,8 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
     final DateTime? lastRefresh = _lastDetailRefreshAt;
     if (lastRefresh != null &&
-        DateTime.now().difference(lastRefresh) < _detailResumeRefreshTtl(event)) {
+        DateTime.now().difference(lastRefresh) <
+            _detailResumeRefreshTtl(event)) {
       return;
     }
     try {
@@ -493,6 +528,29 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       message: context.l10n.eventsCompletedBagsSaved,
       type: AppSnackType.success,
     );
+    unawaited(_pushLiveImpactBags(event.id, clamped));
+  }
+
+  Future<void> _pushLiveImpactBags(String eventId, int bags) async {
+    try {
+      final ApiResponse res = await ServiceLocator.instance.apiClient.patch(
+        '/events/$eventId/live-impact',
+        body: <String, dynamic>{'reportedBagsCollected': bags},
+      );
+      if (res.statusCode < 200 || res.statusCode >= 300) {
+        await FieldModeQueue.instance.enqueueLiveImpactBags(
+          eventId: eventId,
+          reportedBagsCollected: bags,
+        );
+        return;
+      }
+      await EventsRepositoryRegistry.instance.prefetchEvent(eventId, force: true);
+    } on Object {
+      await FieldModeQueue.instance.enqueueLiveImpactBags(
+        eventId: eventId,
+        reportedBagsCollected: bags,
+      );
+    }
   }
 
   Future<EventFeedbackSnapshot?> _showFeedbackSheet(
@@ -515,69 +573,6 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         );
       },
     );
-  }
-
-  Rect _shareSheetOrigin(BuildContext context) {
-    final BuildContext? keyContext = _shareActionKey.currentContext;
-    if (keyContext != null) {
-      final RenderObject? ro = keyContext.findRenderObject();
-      if (ro is RenderBox && ro.hasSize && ro.attached) {
-        final Offset topLeft = ro.localToGlobal(Offset.zero);
-        return topLeft & ro.size;
-      }
-    }
-    return sharePopoverOrigin(context);
-  }
-
-  Future<void> _handleShare(EcoEvent event) async {
-    AppHaptics.tap();
-    if (!mounted) {
-      return;
-    }
-    final String baseUrl = AppConfig.shareBaseUrlFromEnvironment;
-    final Rect origin = _shareSheetOrigin(context);
-    try {
-      final Uri? uri = eventShareHttpsUri(baseUrl, event.id);
-      final ShareResult result;
-      if (uri != null) {
-        result = await Share.shareUri(uri, sharePositionOrigin: origin);
-      } else {
-        final String text = buildEventSharePlainText(context, event, baseUrl);
-        result = await Share.share(
-          text,
-          subject: event.title,
-          sharePositionOrigin: origin,
-        );
-      }
-      if (!mounted) {
-        return;
-      }
-      if (result.status == ShareResultStatus.success) {
-        AppSnack.show(
-          context,
-          message: context.l10n.eventsDetailShareSuccess,
-          type: AppSnackType.success,
-        );
-      }
-    } on PlatformException catch (_) {
-      logEventsDiagnostic('events_detail_share_failed');
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: context.l10n.eventsDetailShareFailed,
-          type: AppSnackType.warning,
-        );
-      }
-    } on Object catch (_) {
-      logEventsDiagnostic('events_detail_share_failed');
-      if (mounted) {
-        AppSnack.show(
-          context,
-          message: context.l10n.eventsDetailShareFailed,
-          type: AppSnackType.warning,
-        );
-      }
-    }
   }
 
   Future<void> _handleStartEvent(EcoEvent event) async {
@@ -657,7 +652,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       AppHaptics.warning();
       AppSnack.show(
         context,
-        message: context.l10n.eventsJoinNotYetOpen,
+        message: context.l10n.eventsJoinWindowClosed,
         type: AppSnackType.warning,
       );
       return;
@@ -824,8 +819,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     if (!event.isOrganizer || event.status != EcoEventStatus.inProgress) {
       return false;
     }
-    final DateTime threshold =
-        event.endDateTime.subtract(const Duration(minutes: 10));
+    final DateTime threshold = event.endDateTime.subtract(
+      const Duration(minutes: 10),
+    );
     return !DateTime.now().isBefore(threshold);
   }
 
@@ -911,7 +907,7 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         appBar: AppBar(
           backgroundColor: AppColors.appBackground,
           leading: const AppBackButton(),
-          title: Text(context.l10n.eventsEventNotFoundTitle),
+          title: Text(context.l10n.authLoading),
         ),
         body: AnimatedPhaseSwitcher(
           phaseKey: 'skeleton',
@@ -951,38 +947,45 @@ class _EventDetailScreenState extends State<EventDetailScreen>
         child: Stack(
           children: <Widget>[
             RefreshIndicator(
+              color: AppColors.primary,
+              displacement: 48,
+              strokeWidth: 2.2,
               onRefresh: _handlePullToRefresh,
               child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(
-                  parent: BouncingScrollPhysics(),
-                ),
+                controller: _detailScrollController,
+                physics: eventDetailScrollPhysics(context),
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
                 slivers: <Widget>[
                   HeroImageBar(
-                    event: event,
-                    enableThumbnailHero: widget.enableThumbnailHero,
-                    shareButtonKey: _shareActionKey,
-                    onShare: () => _handleShare(event),
-                    onEdit:
-                        event.isOrganizer &&
-                            (event.status == EcoEventStatus.upcoming ||
-                                event.status == EcoEventStatus.inProgress)
-                        ? () {
-                            AppHaptics.tap();
-                            _openEditEvent(event);
-                          }
-                        : null,
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        kEventDetailBodyHorizontalGutter,
-                        kEventDetailBodyHorizontalGutter,
-                        kEventDetailBodyHorizontalGutter,
-                        scrollBottomInset,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: <Widget>[
+                      event: event,
+                      innerBoxIsScrolled: _heroCollapsedEnoughForBodyScroll,
+                      enableThumbnailHero: widget.enableThumbnailHero,
+                      onEdit:
+                          event.isOrganizer &&
+                              (event.status == EcoEventStatus.upcoming ||
+                                  event.status == EcoEventStatus.inProgress)
+                          ? () {
+                              AppHaptics.tap();
+                              _openEditEvent(event);
+                            }
+                          : null,
+                      onOpenEventChat: _canOpenEventChat(event)
+                          ? () => _openEventChat(event)
+                          : null,
+                      eventChatUnreadCount: _chatUnreadCount,
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(
+                          kEventDetailBodyHorizontalGutter,
+                          kEventDetailBodyHorizontalGutter,
+                          kEventDetailBodyHorizontalGutter,
+                          scrollBottomInset,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
                           if (_showStaleDetailBanner) ...<Widget>[
                             Semantics(
                               container: true,
@@ -1014,7 +1017,16 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                             ),
                             const SizedBox(height: AppSpacing.md),
                           ],
-                          if (!event.moderationApproved &&
+                          if (event.isDeclined &&
+                              event.isOrganizer) ...<Widget>[
+                            ReportInfoBanner(
+                              title: context.l10n.eventsDeclinedBannerTitle,
+                              message: context.l10n.eventsDeclinedBannerBody,
+                              icon: CupertinoIcons.xmark_circle_fill,
+                              tone: ReportSurfaceTone.danger,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ] else if (!event.moderationApproved &&
                               event.isOrganizer) ...<Widget>[
                             ReportInfoBanner(
                               title: context.l10n.eventsModerationBannerTitle,
@@ -1024,7 +1036,23 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                             ),
                             const SizedBox(height: AppSpacing.lg),
                           ],
-                          if (_shouldShowOrganizerEndSoonBanner(event)) ...<Widget>[
+                          if (!event.moderationApproved &&
+                              !event.isOrganizer) ...<Widget>[
+                            ReportInfoBanner(
+                              title: context
+                                  .l10n
+                                  .eventsAttendeeModerationBannerTitle,
+                              message: context
+                                  .l10n
+                                  .eventsAttendeeModerationBannerBody,
+                              icon: CupertinoIcons.hourglass,
+                              tone: ReportSurfaceTone.accent,
+                            ),
+                            const SizedBox(height: AppSpacing.lg),
+                          ],
+                          if (_shouldShowOrganizerEndSoonBanner(
+                            event,
+                          )) ...<Widget>[
                             ReportInfoBanner(
                               title: context.l10n.eventsEndSoonBannerTitle,
                               message: context.l10n.eventsEndSoonBannerBody,
@@ -1035,7 +1063,9 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                               alignment: AlignmentDirectional.centerEnd,
                               child: TextButton(
                                 onPressed: () => _openExtendCleanupEnd(event),
-                                child: Text(context.l10n.eventsEndSoonBannerExtend),
+                                child: Text(
+                                  context.l10n.eventsEndSoonBannerExtend,
+                                ),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.md),
@@ -1058,14 +1088,17 @@ class _EventDetailScreenState extends State<EventDetailScreen>
                                 eventId: id,
                               );
                             },
-                            onOpenEventChat: _canOpenEventChat(event)
-                                ? () => _openEventChat(event)
-                                : null,
-                            eventChatUnreadCount: _chatUnreadCount,
                             onSaveBagsCollected:
                                 event.isOrganizer &&
                                     event.status == EcoEventStatus.completed
                                 ? (int bags) => _saveBagsCollected(event, bags)
+                                : null,
+                            onOpenImpactReceipt: event.status == EcoEventStatus.inProgress ||
+                                    event.status == EcoEventStatus.completed
+                                ? () => EventsNavigation.openImpactReceipt(
+                                      context,
+                                      eventId: event.id,
+                                    )
                                 : null,
                           ),
                         ],

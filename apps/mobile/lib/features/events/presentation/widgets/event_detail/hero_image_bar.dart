@@ -1,3 +1,7 @@
+import 'dart:math' as math;
+
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +13,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
+import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 
 /// Key for tests and accessibility drivers targeting the organizer edit control.
@@ -16,28 +21,67 @@ const ValueKey<String> kEventDetailHeroEditKey = ValueKey<String>(
   'event_detail_hero_edit',
 );
 
-/// Pinned, stretchable hero sliver for the event detail screen.
+/// Key for tests targeting the hero toolbar chat action.
+const ValueKey<String> kEventDetailHeroChatKey = ValueKey<String>(
+  'event_detail_hero_chat',
+);
+
+/// Radius of trailing toolbar action chips; keep in sync with
+/// [_heroToolbarTrailingReservePx].
+const double _kHeroToolbarActionChipRadius = 22;
+
+/// Opacity of the solid fill over [BackdropFilter] for the collapsed toolbar
+/// (higher when list scrolls underneath so body text does not read through).
+const double _kHeroToolbarScrimFillAlphaCollapsed = 0.94;
+const double _kHeroToolbarScrimFillAlphaScrolledUnder = 0.98;
+
+/// Start inset for the collapsed toolbar title: [AppBackButton] + leading padding.
+double _heroToolbarLeadingReservePx() =>
+    AppSpacing.sm + AppSpacing.iconMd * 2;
+
+/// End inset for the collapsed title: trailing `_ActionChip` circles + paddings.
+double _heroToolbarTrailingReservePx({
+  required bool hasEdit,
+  required bool hasChat,
+}) {
+  final int actionChips = (hasEdit ? 1 : 0) + (hasChat ? 1 : 0);
+  if (actionChips == 0) {
+    return AppSpacing.sm;
+  }
+  final double chipDiameter = _kHeroToolbarActionChipRadius * 2;
+  return AppSpacing.sm +
+      actionChips * chipDiameter +
+      (actionChips - 1) * AppSpacing.xs;
+}
+
+/// Pinned large top app bar for the event detail screen.
 ///
 /// The expanded state shows the cover image with a cinematic 3-stop gradient
 /// overlay. The collapsed state fades in a centred one-line title. The status
 /// pill and optional countdown badge are placed at the bottom of the hero and
 /// fade away as the bar collapses — this removes the awkward body-top pill jump
 /// present when the pill lived in TitleSection.
+///
+/// [SliverAppBar.pinned] keeps the toolbar visible once the hero has collapsed,
+/// matching Material large / medium top app bar behavior. Pass
+/// [innerBoxIsScrolled] from the screen scroll position so the frosted toolbar
+/// reads as opaque when list content scrolls underneath (Material
+/// “scrolled under” affordance without applying theme tint over custom chrome).
+///
+/// [SliverAppBar.stretch] stays off: stretch plus overscroll can desync the hero layout.
+/// Overscroll uses the platform bounce from [eventDetailScrollPhysics].
 class HeroImageBar extends StatelessWidget {
   const HeroImageBar({
     super.key,
     required this.event,
-    required this.onShare,
     this.onEdit,
     this.enableThumbnailHero = false,
-    this.shareButtonKey,
+    this.onOpenEventChat,
+    this.eventChatUnreadCount = 0,
+    this.innerBoxIsScrolled = false,
   });
 
   final EcoEvent event;
-  final VoidCallback onShare;
-
-  /// When set, pinned to the share action for [Share.shareUri] popover anchoring.
-  final GlobalKey? shareButtonKey;
 
   /// When false, skips [Hero] so route replacements between different event ids do not
   /// trip `_HeroFlight.divert` (see [EventDetailScreen.enableThumbnailHero]).
@@ -46,7 +90,17 @@ class HeroImageBar extends StatelessWidget {
   /// Organizer edit entry (upcoming/approved events only).
   final VoidCallback? onEdit;
 
-  static const double _actionAvatarRadius = 22;
+  /// Opens event group chat when the attendee/organizer may access it.
+  final VoidCallback? onOpenEventChat;
+
+  /// Unread count for [onOpenEventChat]; ignored when [onOpenEventChat] is null.
+  final int eventChatUnreadCount;
+
+  /// When true, the collapsed toolbar frosted strip stays at full opacity (body
+  /// content scrolling under the pinned toolbar).
+  final bool innerBoxIsScrolled;
+
+  static const double _actionAvatarRadius = _kHeroToolbarActionChipRadius;
   static const double _actionIconSize = 18;
 
   @override
@@ -54,10 +108,13 @@ class HeroImageBar extends StatelessWidget {
     return SliverAppBar(
       expandedHeight: kEventDetailHeroExpandedHeight,
       pinned: true,
-      stretch: true,
-      backgroundColor: AppColors.panelBackground,
+      stretch: false,
+      automaticallyImplyLeading: false,
+      backgroundColor: AppColors.transparent,
+      surfaceTintColor: AppColors.transparent,
       elevation: 0,
       scrolledUnderElevation: 0,
+      shadowColor: AppColors.transparent,
       leading: const Padding(
         padding: EdgeInsets.only(left: AppSpacing.sm),
         child: Center(child: AppBackButton()),
@@ -65,7 +122,9 @@ class HeroImageBar extends StatelessWidget {
       actions: <Widget>[
         if (onEdit != null)
           Padding(
-            padding: const EdgeInsets.only(right: AppSpacing.xs),
+            padding: EdgeInsets.only(
+              right: onOpenEventChat != null ? AppSpacing.xs : AppSpacing.sm,
+            ),
             child: _ActionChip(
               key: kEventDetailHeroEditKey,
               icon: CupertinoIcons.pencil,
@@ -73,15 +132,23 @@ class HeroImageBar extends StatelessWidget {
               onTap: onEdit!,
             ),
           ),
-        Padding(
-          padding: const EdgeInsets.only(right: AppSpacing.sm),
-          child: _ActionChip(
-            key: shareButtonKey,
-            icon: CupertinoIcons.share,
-            tooltip: context.l10n.eventsShareEventTooltip,
-            onTap: onShare,
+        if (onOpenEventChat != null)
+          Padding(
+            padding: const EdgeInsets.only(right: AppSpacing.sm),
+            child: _ActionChip(
+              key: kEventDetailHeroChatKey,
+              icon: CupertinoIcons.chat_bubble_2,
+              tooltip: context.l10n.eventChatRowTitle,
+              semanticsLabel: context.l10n.eventsHeroChatSemantic(
+                eventChatUnreadCount,
+              ),
+              badgeCount: eventChatUnreadCount,
+              onTap: () {
+                AppHaptics.softTransition();
+                onOpenEventChat!();
+              },
+            ),
           ),
-        ),
       ],
       // Keep the [Hero] subtree geometry stable (no per-frame [Transform.scale]).
       // Animated layout inside a Hero + [SliverAppBar] is a common source of
@@ -92,6 +159,22 @@ class HeroImageBar extends StatelessWidget {
               ((constraints.maxHeight - kToolbarHeight) /
                       (kEventDetailHeroExpandedHeight - kToolbarHeight))
                   .clamp(0.0, 1.0);
+          // Fade in a frosted strip as the hero collapses; [innerBoxIsScrolled]
+          // keeps it solid while body content scrolls under the pinned toolbar.
+          final double linearScrim = (1.0 - expandRatio).clamp(0.0, 1.0);
+          // Once the hero is past ~full expansion, keep the toolbar strip opaque
+          // enough that list rows never read through (linear alone stays too low
+          // in the middle of the collapse range).
+          final double scrimOpacity = innerBoxIsScrolled
+              ? 1.0
+              : (expandRatio < 0.98
+                  ? math.max(linearScrim, 0.92)
+                  : linearScrim);
+          final double scrimFillAlpha = innerBoxIsScrolled
+              ? _kHeroToolbarScrimFillAlphaScrolledUnder
+              : _kHeroToolbarScrimFillAlphaCollapsed;
+          final double topInset = MediaQuery.paddingOf(context).top;
+          final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
           return Stack(
             fit: StackFit.expand,
@@ -144,6 +227,44 @@ class HeroImageBar extends StatelessWidget {
                   ],
                 ),
               ),
+              if (scrimOpacity > 0.01)
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: IgnorePointer(
+                    child: Opacity(
+                      opacity: scrimOpacity,
+                      child: ClipRect(
+                        child: reduceMotion
+                            ? ColoredBox(
+                                color: AppColors.appBackground,
+                                child: SizedBox(
+                                  height: topInset + kToolbarHeight,
+                                  width: double.infinity,
+                                ),
+                              )
+                            : BackdropFilter(
+                                filter: ImageFilter.blur(
+                                  sigmaX: 18,
+                                  sigmaY: 18,
+                                ),
+                                child: DecoratedBox(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.appBackground.withValues(
+                                      alpha: scrimFillAlpha,
+                                    ),
+                                  ),
+                                  child: SizedBox(
+                                    height: topInset + kToolbarHeight,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                              ),
+                      ),
+                    ),
+                  ),
+                ),
               // ── Collapsed title ──────────────────────────────────────────
               SafeArea(
                 bottom: false,
@@ -155,8 +276,14 @@ class HeroImageBar extends StatelessWidget {
                       child: Opacity(
                         opacity: (1.0 - expandRatio * 1.5).clamp(0.0, 1.0),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: kHeroToolbarTitleInset,
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            _heroToolbarLeadingReservePx(),
+                            0,
+                            _heroToolbarTrailingReservePx(
+                              hasEdit: onEdit != null,
+                              hasChat: onOpenEventChat != null,
+                            ),
+                            0,
                           ),
                           child: Center(
                             child: _CollapsedToolbarTitle(title: event.title),
@@ -244,32 +371,73 @@ class _ActionChip extends StatelessWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.semanticsLabel,
+    this.badgeCount = 0,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
 
+  /// When set, used as the [Semantics] label instead of [tooltip] (e.g. unread).
+  final String? semanticsLabel;
+
+  /// When &gt; 0, shows a small unread badge on the chip.
+  final int badgeCount;
+
   @override
   Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    final Widget iconButton = IconButton(
+      iconSize: HeroImageBar._actionIconSize,
+      tooltip: tooltip,
+      onPressed: onTap,
+      padding: EdgeInsets.zero,
+      icon: Icon(
+        icon,
+        size: HeroImageBar._actionIconSize,
+        color: AppColors.textPrimary,
+      ),
+    );
+
+    final Widget avatar = CircleAvatar(
+      radius: HeroImageBar._actionAvatarRadius,
+      backgroundColor: AppColors.appBackground.withValues(alpha: 0.85),
+      child: iconButton,
+    );
+
     return Semantics(
       button: true,
-      label: tooltip,
-      child: CircleAvatar(
-        radius: HeroImageBar._actionAvatarRadius,
-        backgroundColor: AppColors.appBackground.withValues(alpha: 0.85),
-        child: IconButton(
-          iconSize: HeroImageBar._actionIconSize,
-          tooltip: tooltip,
-          onPressed: onTap,
-          padding: EdgeInsets.zero,
-          icon: Icon(
-            icon,
-            size: HeroImageBar._actionIconSize,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ),
+      label: semanticsLabel ?? tooltip,
+      child: badgeCount > 0
+          ? Stack(
+              clipBehavior: Clip.none,
+              alignment: Alignment.center,
+              children: <Widget>[
+                avatar,
+                Positioned(
+                  right: 2,
+                  top: 2,
+                  child: IgnorePointer(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text(
+                        badgeCount > 99 ? '99+' : '$badgeCount',
+                        style: AppTypography.eventsUnreadCountBadge(textTheme),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : avatar,
     );
   }
 }

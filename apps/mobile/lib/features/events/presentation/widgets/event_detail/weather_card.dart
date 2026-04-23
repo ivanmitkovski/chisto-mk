@@ -70,9 +70,8 @@ class _WeatherCardState extends State<WeatherCard> {
       children: <Widget>[
         DetailSectionHeader(context.l10n.eventsWeatherForecast),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: EventDetailSurfaceDecoration.elevatedCard(),
+          decoration: EventDetailSurfaceDecoration.detailModule(),
           child: _loading
               ? _buildSkeleton(context)
               : _failed

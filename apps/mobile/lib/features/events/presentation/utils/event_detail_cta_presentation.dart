@@ -29,6 +29,13 @@ EventDetailCtaPresentation resolveEventDetailCtaPresentation({
   required AppLocalizations l10n,
 }) {
   if (event.isOrganizer) {
+    if (event.isDeclined) {
+      return EventDetailCtaPresentation(
+        primaryLabel: l10n.eventsDeclinedResubmitCta,
+        primaryEnabled: true,
+        showsSecondaryRow: false,
+      );
+    }
     return switch (event.status) {
       EcoEventStatus.upcoming when !event.moderationApproved => EventDetailCtaPresentation(
           primaryLabel: l10n.eventsAwaitingModerationCta,

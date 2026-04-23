@@ -19,6 +19,7 @@ import 'package:chisto_mobile/features/events/presentation/widgets/cleanup_evide
 import 'package:chisto_mobile/features/reports/data/report_photo_upload_prep.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_cover_image.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_evidence_strip_section.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -553,6 +554,19 @@ class _EventCleanupEvidenceScreenState
               ],
             ),
           ),
+          if (event.evidenceStrip.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.sm,
+              ),
+              child: EventEvidenceStripSection(
+                items: event.evidenceStrip,
+                compactSubtitle: true,
+              ),
+            ),
           Expanded(
             child: ValueListenableBuilder<String>(
               valueListenable: _tab,

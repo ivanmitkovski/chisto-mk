@@ -862,10 +862,20 @@
   "eventsUnableToStartEventGeneric": "Could not start the event. Check your connection and try again.",
   "eventsStartEventTooEarly": "You can start this eco action once the scheduled start time arrives.",
   "eventsJoinNotYetOpen": "Joining opens when the scheduled start time arrives.",
+  "eventsJoinWindowClosed": "You can no longer join this action. Joining stayed open until 15 minutes after the scheduled start.",
   "errorEventEndAtTooFar": "The planned end cannot be that far after the start. Try a shorter extension.",
+  "errorEventsEndDifferentSkopjeCalendarDay": "The end time must be on the same calendar day as the start (Europe/Skopje).",
+  "errorEventsEndAfterSkopjeLocalDay": "The event must end by 23:59 on the start day.",
   "eventsAwaitingModerationCta": "Awaiting approval",
   "eventsModerationBannerTitle": "Awaiting approval",
   "eventsModerationBannerBody": "This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.",
+  "eventsAttendeeModerationBannerTitle": "Awaiting approval",
+  "eventsAttendeeModerationBannerBody": "Moderators are reviewing this action. You can open it, but joining opens only after approval.",
+  "eventsDeclinedBannerTitle": "Not approved",
+  "eventsDeclinedBannerBody": "This event did not meet the criteria. Edit and resubmit to try again.",
+  "eventsDeclinedResubmitCta": "Edit & resubmit",
+  "eventsDeclinedDashboardPill": "Declined",
+  "eventsPendingDashboardPill": "Under review",
   "eventsEventPendingPublicCta": "Not open for joining yet",
   "eventsFeedOfflineStaleBanner": "Showing saved events — couldn’t refresh. Pull down to retry.",
   "eventsFeedInitialLoadFailed": "We couldn’t load events. Check your connection and try again.",
@@ -1048,6 +1058,55 @@
   "eventsOrganizerCompletionStepImpactBody": "Record bags collected, time volunteered, and estimates from the event page.",
   "eventsOrganizerCompletionStepVisibilityTitle": "Build trust",
   "eventsOrganizerCompletionStepVisibilityBody": "Photos help moderators verify the cleanup and inspire future actions in your community.",
+  "eventsOrganizerCompletionViewReceipt": "View impact receipt",
+  "eventsImpactReceiptScreenTitle": "Impact receipt",
+  "eventsImpactReceiptHeroSemantic": "Impact receipt for {title}",
+  "@eventsImpactReceiptHeroSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptMetricCheckIns": "Check-ins",
+  "eventsImpactReceiptMetricParticipants": "Joined",
+  "eventsImpactReceiptMetricBags": "Bags (reported)",
+  "eventsImpactReceiptProofHeading": "Proof",
+  "eventsImpactReceiptNoMediaHint": "Add after photos or structured evidence from the event page when you can.",
+  "eventsImpactReceiptAsOf": "Updated {timestamp}",
+  "@eventsImpactReceiptAsOf": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptCompletenessInProgress": "In progress",
+  "eventsImpactReceiptCompletenessFull": "Complete record",
+  "eventsImpactReceiptCompletenessPartialAfter": "After photos pending",
+  "eventsImpactReceiptCompletenessPartialEvidence": "Structured evidence pending",
+  "eventsImpactReceiptCompletenessPartialBoth": "After photos and evidence pending",
+  "eventsImpactReceiptShare": "Share",
+  "eventsImpactReceiptCopyLink": "Copy link",
+  "eventsImpactReceiptLinkCopied": "Link copied",
+  "eventsImpactReceiptViewCta": "Impact receipt",
+  "eventsImpactReceiptRetry": "Try again",
+  "eventsImpactReceiptLoadFailed": "Could not load receipt.",
+  "eventsImpactReceiptShareSummary": "{checkIns} check-ins · {bags} bags · {joined} joined",
+  "@eventsImpactReceiptShareSummary": {
+    "placeholders": {
+      "checkIns": {
+        "type": "int"
+      },
+      "bags": {
+        "type": "int"
+      },
+      "joined": {
+        "type": "int"
+      }
+    }
+  },
+  "errorEventsImpactReceiptNotAvailable": "Impact receipt is not available for this event yet.",
   "eventsOrganizerDetailPendingAfterPhotosTitle": "After photos",
   "eventsOrganizerDetailPendingAfterPhotosMessage": "Upload photos after cleanup so volunteers and moderators can see your results. Use the button below when you are ready.",
   "eventsAttendeeCompletedTitle": "Thank you",
@@ -1209,6 +1268,8 @@
       }
     }
   },
+  "createEventScheduleDateLabel": "Event date",
+  "createEventScheduleEndAfterDayError": "The event must end by 23:59 on the same day.",
   "createEventFieldType": "Event type",
   "createEventPlaceholderType": "Select event type",
   "createEventFieldTeamSize": "Team size",
@@ -1222,7 +1283,8 @@
   "createEventHelpBulletModeration": "Events are reviewed so the community sees accurate, safe cleanups.",
   "createEventHelpBulletVolunteers": "Volunteers see your title, schedule, site, gear list, and description once the event is live.",
   "createEventHelpBulletSite": "Pick a pollution site on the list or map so everyone knows where to meet.",
-  "createEventHelpBulletSchedule": "Set the date and time span so calendars and reminders stay clear.",
+  "createEventHelpBulletSchedule": "Pick the event date, then start and end times on that same day.",
+  "createEventHelpBulletSameDay": "The event must finish on the same calendar day and by 23:59 at the latest.",
   "createEventHelpBulletSubmit": "When everything required is filled in, use Create eco action to publish.",
   "createEventFieldVolunteerCap": "Volunteer cap",
   "createEventVolunteerCapPlaceholderNoLimit": "No limit",
@@ -1444,6 +1506,15 @@
     }
   },
   "eventsDetailGroupedPanelSemantic": "Location, schedule, and details",
+  "eventsHeroChatSemantic": "{count, plural, =0{Group chat} one{Group chat, 1 unread} other{Group chat, {count} unread}}",
+  "@eventsHeroChatSemantic": {
+    "description": "Accessibility label for the hero toolbar chat action, including unread count when applicable.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "eventsDetailParticipationSemantic": "Your participation",
   "eventsAnalyticsLoadFailed": "Could not load analytics.",
   "eventsAnalyticsRetry": "Retry",
@@ -1582,6 +1653,8 @@
       }
     }
   },
+  "eventsDiscoveryThisWeekRetryHint": "We couldn’t load this week’s picks.",
+  "eventsDiscoveryThisWeekRetry": "Retry",
   "eventsDetailSemanticsLabel": "Event detail: {title}",
   "@eventsDetailSemanticsLabel": {
     "placeholders": {
@@ -1948,10 +2021,131 @@
   "eventsImpactSummaryTitle": "Impact summary",
   "eventsImpactSummaryAdd": "Add",
   "eventsImpactSummaryEdit": "Edit",
-  "eventsImpactSummaryEmptyHint": "Capture cleanup outcomes, effort, and lessons learned.",
+  "eventsImpactSummaryEmptyHint": "Note results and lessons from this cleanup.",
+  "eventsLivePulseTitle": "Live impact",
+  "eventsLivePulseVolunteers": "{count} joined",
+  "@eventsLivePulseVolunteers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsLivePulseCheckIns": "{count} checked in",
+  "@eventsLivePulseCheckIns": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsLivePulseBags": "{count} bags · est. {kg} kg",
+  "@eventsLivePulseBags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsEvidenceStripTitle": "Field proof",
+  "eventsEvidenceStripSubtitle": "Photos from the cleanup evidence feed.",
+  "eventsEvidenceStripSemantic": "Before, after, and field photos from the evidence feed",
+  "eventsEvidenceKindBefore": "Before",
+  "eventsEvidenceKindAfter": "After",
+  "eventsEvidenceKindField": "Field",
+  "eventsEvidenceStripTileSemantic": "Photo {index} of {total}, {kind}",
+  "@eventsEvidenceStripTileSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsRouteProgressTitle": "Route",
+  "eventsFieldModeRowServerError": "Server: {code}",
+  "@eventsFieldModeRowServerError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsFieldModeTitle": "Field mode",
+  "eventsFieldModeSync": "Sync now",
+  "eventsFieldModeEmpty": "Nothing queued offline.",
+  "eventsFieldModeSynced": "Queue synced.",
+  "eventsFieldModeSyncFailed": "Could not sync. Try again when online.",
+  "eventsFieldModeSyncPartial": "Synced {synced} update(s). {failed} still in the offline queue.",
+  "@eventsFieldModeSyncPartial": {
+    "placeholders": {
+      "synced": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowLiveImpactBags": "Live impact · {count} bags",
+  "@eventsFieldModeRowLiveImpactBags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowUnknown": "Offline change",
+  "eventsFieldModeRowStatusPending": "Pending",
+  "eventsFieldModeRowStatusSyncing": "Syncing",
+  "eventsOfflineWorkHubTitle": "Offline work",
+  "eventsOfflineWorkHubSemanticSheet": "Offline work summary and sync actions",
+  "eventsOfflineWorkSubtitle": "Queued changes across check-ins, field updates, and chat.",
+  "eventsOfflineWorkSectionCheckIns": "Check-ins",
+  "eventsOfflineWorkSectionField": "Field updates",
+  "eventsOfflineWorkSectionChat": "Chat",
+  "eventsOfflineWorkCountPending": "{count} pending",
+  "@eventsOfflineWorkCountPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkCountFailed": "{count} need attention",
+  "@eventsOfflineWorkCountFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkSyncNow": "Sync now",
+  "eventsOfflineWorkOpenFieldQueue": "Open field queue",
+  "eventsOfflineWorkOpenChat": "Open event chat",
+  "eventsOfflineWorkRetryFailedChat": "Retry failed chat sends",
+  "eventsOfflineWorkResolveInChat": "Open the chat and fix or delete the message that could not be sent.",
+  "eventsOfflineWorkSyncDone": "Sync finished",
+  "eventsOfflineWorkSyncing": "Syncing…",
+  "eventsOfflineWorkDrainFailed": "Could not finish syncing. Try again when you are online.",
+  "eventsChatOutboxFull": "Too many messages are waiting to send offline (limit {max}). Go online to send pending messages, then try again.",
+  "@eventsChatOutboxFull": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "eventsCompletedBagsSectionTitle": "Trash bags collected",
-  "eventsCompletedBagsSectionSubtitle": "How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.",
-  "eventsCompletedBagsSave": "Save bag count",
+  "eventsCompletedBagsSave": "Save",
   "eventsCompletedBagsSaved": "Bag count saved.",
   "eventsImpactBadgeRating": "{rating}★ rating",
   "@eventsImpactBadgeRating": {
@@ -2059,6 +2253,19 @@
     }
   },
   "eventsSuccessDialogOpenEvent": "Open event",
+  "eventsSuccessDialogViewEvent": "View event",
+  "eventsSuccessDialogPendingTitle": "Submitted for review",
+  "eventsSuccessDialogPendingBody": "{title} at {siteName} was submitted. A moderator will approve or decline it before it appears publicly. You can open it from your events anytime.",
+  "@eventsSuccessDialogPendingBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "siteName": {
+        "type": "String"
+      }
+    }
+  },
   "eventsTimePickerSelectTime": "Select time",
   "eventsTimePickerConfirm": "Confirm",
   "eventsTimePickerFrom": "From",
@@ -2718,5 +2925,57 @@
     }
   },
   "chatShareLocation": "Share Location",
-  "chatSharedLocation": "Shared location"
+  "chatSharedLocation": "Shared location",
+
+  "organizerToolkitTitle": "Become an organizer",
+  "organizerToolkitPage1Title": "Plan ahead",
+  "organizerToolkitPage1Body": "Assess the site for hazards, prepare safety gear, and brief your team before volunteers arrive.",
+  "organizerToolkitPage2Title": "Moderation keeps trust",
+  "organizerToolkitPage2Body": "After you create an event, moderators review it. Once approved, volunteers can see and join.",
+  "organizerToolkitPage3Title": "Verify attendance",
+  "organizerToolkitPage3Body": "Use the in-app QR check-in so every volunteer gets credit for showing up.",
+  "organizerToolkitPage4Title": "Weather and safety",
+  "organizerToolkitPage4Body": "If conditions turn unsafe, pause or postpone. Tell joined volunteers promptly in the app so nobody travels for a cancelled start.",
+  "organizerToolkitPage5Title": "Waste and disposal",
+  "organizerToolkitPage5Body": "Sort recyclables when you can, bag sharp objects safely, and take waste to authorized disposal points. Leave the site cleaner than you found it.",
+  "organizerToolkitPage6Title": "Include everyone",
+  "organizerToolkitPage6Body": "Offer clear roles, steady pacing, and patience. A welcoming briefing helps first-time volunteers feel confident and stay safe.",
+  "organizerToolkitPage7Title": "Privacy in chat",
+  "organizerToolkitPage7Body": "Keep personal phone numbers and addresses out of public event chat. Use in-app messaging so the whole team stays informed without oversharing.",
+  "organizerToolkitPage8Title": "Evidence and honest impact",
+  "organizerToolkitPage8Body": "After photos and bag counts should reflect what really happened. Accurate reporting builds trust with volunteers, moderators, and the wider community.",
+  "organizerToolkitContinue": "Continue",
+  "organizerToolkitStartQuiz": "Take the quiz",
+  "organizerQuizTitle": "Quick knowledge check",
+  "organizerQuizLoadFailed": "Could not load the quiz. Please try again.",
+  "organizerQuizLoadInvalidResponse": "The quiz data from the server was incomplete. Please try again.",
+  "organizerQuizRetryLoad": "Try again",
+  "organizerQuizSubmitFailed": "Could not submit answers. Try again.",
+  "organizerQuizOptionSemantic": "Question {index} of {total}: {optionText}",
+  "@organizerQuizOptionSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" },
+      "optionText": { "type": "String" }
+    }
+  },
+  "organizerQuizSubmit": "Submit answers",
+  "organizerQuizPassedTitle": "You're certified!",
+  "organizerQuizPassedBody": "You can now create cleanup events. Volunteers are waiting.",
+  "organizerQuizFailedTitle": "Not quite",
+  "organizerQuizFailedBody": "Review the tutorial and try again. You got {correct} out of {total}.",
+  "@organizerQuizFailedBody": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "organizerQuizRetry": "Try again",
+  "organizerQuizCreateEvent": "Create your first event",
+  "organizerCertifiedBadge": "Certified organizer",
+  "errorOrganizerQuizSessionExpired": "That quiz session expired. Load a new quiz and try again.",
+  "errorOrganizerQuizSessionInvalid": "This quiz session is not valid. Load the quiz again.",
+  "errorOrganizerQuizAnswersMismatch": "Answers do not match the quiz you started. Load the quiz again.",
+  "errorOrganizerQuizInvalid": "One or more answers are not valid for this quiz. Load the quiz again.",
+  "errorOrganizerCertificationAlreadyDone": "You are already a certified organizer. No need to take the quiz again."
 }

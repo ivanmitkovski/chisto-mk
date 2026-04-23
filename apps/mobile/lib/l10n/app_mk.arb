@@ -862,10 +862,20 @@
   "eventsUnableToStartEventGeneric": "Не можевме да го започнеме настанот. Проверете ја врската и обидете се повторно.",
   "eventsStartEventTooEarly": "Можете да го започнете ова еко дејство откако ќе настапи закажаното време на почеток.",
   "eventsJoinNotYetOpen": "Приклучувањето се отвора кога ќе настапи закажаното време на почеток.",
+  "eventsJoinWindowClosed": "Не можете повеќе да се придружите. Приклучувањето беше отворено до 15 минути по закажаниот почеток.",
   "errorEventEndAtTooFar": "Планираниот крај не може да биде толку далеку од почетокот. Обидете се со пократко продолжување.",
+  "errorEventsEndDifferentSkopjeCalendarDay": "Крајот мора да биде истиот календарски ден како почетокот (Европа/Скопје).",
+  "errorEventsEndAfterSkopjeLocalDay": "Настанот мора да заврши до 23:59 на денот на почетокот.",
   "eventsAwaitingModerationCta": "Чека одобрување",
   "eventsModerationBannerTitle": "Чека одобрување",
   "eventsModerationBannerBody": "Оваа акција е видлива за вас како организатор. Волонтерите ќе можат да се придружат откако модераторите ќе ја одобрат.",
+  "eventsAttendeeModerationBannerTitle": "Чека одобрување",
+  "eventsAttendeeModerationBannerBody": "Модераторите ја разгледуваат акцијата. Можете да ја отворите, но придружувањето се отвора откако ќе биде одобрена.",
+  "eventsDeclinedBannerTitle": "Не е одобрен",
+  "eventsDeclinedBannerBody": "Настанот не ги исполни критериумите. Уредете и поднесете повторно.",
+  "eventsDeclinedResubmitCta": "Уреди и поднеси",
+  "eventsDeclinedDashboardPill": "Одбиен",
+  "eventsPendingDashboardPill": "На преглед",
   "eventsEventPendingPublicCta": "Сè уште не е отворено за придружување",
   "eventsFeedOfflineStaleBanner": "Прикажани се зачувани настани — освежувањето не успеа. Повлечете надолу за повторен обид.",
   "eventsFeedInitialLoadFailed": "Не можевме да ги вчитаме настаните. Проверете ја врската и обидете се повторно.",
@@ -1048,6 +1058,55 @@
   "eventsOrganizerCompletionStepImpactBody": "Забележете торби, волонтерски часови и проценки од страницата на настанот.",
   "eventsOrganizerCompletionStepVisibilityTitle": "Изградете доверба",
   "eventsOrganizerCompletionStepVisibilityBody": "Фотографиите им помагаат на модераторите и инспирираат идни акции.",
+  "eventsOrganizerCompletionViewReceipt": "Погледни потврда за влијание",
+  "eventsImpactReceiptScreenTitle": "Потврда за влијание",
+  "eventsImpactReceiptHeroSemantic": "Потврда за влијание за {title}",
+  "@eventsImpactReceiptHeroSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptMetricCheckIns": "Пријави присуство",
+  "eventsImpactReceiptMetricParticipants": "Пријавени",
+  "eventsImpactReceiptMetricBags": "Торби (пријавено)",
+  "eventsImpactReceiptProofHeading": "Доказ",
+  "eventsImpactReceiptNoMediaHint": "Додајте фотографии „потоа“ или структурирани докази од страницата на настанот.",
+  "eventsImpactReceiptAsOf": "Ажурирано {timestamp}",
+  "@eventsImpactReceiptAsOf": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptCompletenessInProgress": "Во тек",
+  "eventsImpactReceiptCompletenessFull": "Целосен запис",
+  "eventsImpactReceiptCompletenessPartialAfter": "Недостасуваат фотографии „потоа“",
+  "eventsImpactReceiptCompletenessPartialEvidence": "Недостасува структуриран доказ",
+  "eventsImpactReceiptCompletenessPartialBoth": "Недостасуваат фотографии и доказ",
+  "eventsImpactReceiptShare": "Сподели",
+  "eventsImpactReceiptCopyLink": "Копирај врска",
+  "eventsImpactReceiptLinkCopied": "Врската е копирана",
+  "eventsImpactReceiptViewCta": "Потврда за влијание",
+  "eventsImpactReceiptRetry": "Обиди се повторно",
+  "eventsImpactReceiptLoadFailed": "Не може да се вчита потврдата.",
+  "eventsImpactReceiptShareSummary": "{checkIns} пријави · {bags} торби · {joined} пријавени",
+  "@eventsImpactReceiptShareSummary": {
+    "placeholders": {
+      "checkIns": {
+        "type": "int"
+      },
+      "bags": {
+        "type": "int"
+      },
+      "joined": {
+        "type": "int"
+      }
+    }
+  },
+  "errorEventsImpactReceiptNotAvailable": "Потврдата за влијание сè уште не е достапна за овој настан.",
   "eventsOrganizerDetailPendingAfterPhotosTitle": "Фотографии „потоа“",
   "eventsOrganizerDetailPendingAfterPhotosMessage": "Поставете фотографии по чистењето за да ги видат доброволците и модераторите. Користете го копчето подолу.",
   "eventsAttendeeCompletedTitle": "Ви благодариме",
@@ -1202,6 +1261,8 @@
       }
     }
   },
+  "createEventScheduleDateLabel": "Датум на настанот",
+  "createEventScheduleEndAfterDayError": "Настанот мора да заврши до 23:59 истиот ден.",
   "createEventFieldType": "Тип на настан",
   "createEventPlaceholderType": "Изберете тип",
   "createEventFieldTeamSize": "Големина на тим",
@@ -1215,7 +1276,8 @@
   "createEventHelpBulletModeration": "Настаните се проверуваат за точни и безбедни акции за заедницата.",
   "createEventHelpBulletVolunteers": "Доброволците гледаат наслов, распоред, локација, опрема и опис кога настанот е објавен.",
   "createEventHelpBulletSite": "Изберете локација од листата или мапата за да знаат сите каде да се сретнат.",
-  "createEventHelpBulletSchedule": "Поставете датум и време за јасни календари и потсетници.",
+  "createEventHelpBulletSchedule": "Изберете датум на настанот, па почетно и крајно време истиот ден.",
+  "createEventHelpBulletSameDay": "Настанот мора да заврши истиот календарски ден, најдоцна до 23:59.",
   "createEventHelpBulletSubmit": "Кога се пополнети задолжителните полиња, користете „Креирај еко-акција“ за објавување.",
   "createEventFieldVolunteerCap": "Лимит на доброволци",
   "createEventVolunteerCapPlaceholderNoLimit": "Без лимит",
@@ -1437,6 +1499,15 @@
     }
   },
   "eventsDetailGroupedPanelSemantic": "Локација, распоред и детали",
+  "eventsHeroChatSemantic": "{count, plural, =0{Групен разговор} one{Групен разговор, 1 непрочитана} other{Групен разговор, {count} непрочитани}}",
+  "@eventsHeroChatSemantic": {
+    "description": "Пристапна ознака за копчето за групен разговор во херој-лентата, со број непрочитани пораки.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "eventsDetailParticipationSemantic": "Ваше учество",
   "eventsAnalyticsLoadFailed": "Не можеше да се вчитаат аналитиките.",
   "eventsAnalyticsRetry": "Обиди се повторно",
@@ -1549,6 +1620,8 @@
   "eventsCardParticipantsMore": "+{count} повеќе",
   "eventsCardParticipantsCountMax": "{count} / {max}",
   "eventsCardParticipantsJoined": "{count} пријавени",
+  "eventsDiscoveryThisWeekRetryHint": "Не можевме да го вчитаме изборот за оваа недела.",
+  "eventsDiscoveryThisWeekRetry": "Обиди повторно",
   "eventsDetailSemanticsLabel": "Детали за настан: {title}",
   "eventsCountdownBadgeSemantic": "Време до почеток на настанот: {label}",
   "eventsEvidenceThumbnailMenuTitle": "Фотографија",
@@ -1901,10 +1974,107 @@
   "eventsImpactSummaryTitle": "Преглед на ефект",
   "eventsImpactSummaryAdd": "Додај",
   "eventsImpactSummaryEdit": "Уреди",
-  "eventsImpactSummaryEmptyHint": "Забележете ги резултатите, напорот и поуките од чистењето.",
+  "eventsImpactSummaryEmptyHint": "Забележете резултати и поуки од чистењето.",
+  "eventsLivePulseTitle": "Влијание во живо",
+  "eventsLivePulseVolunteers": "{count} пријавени",
+  "eventsLivePulseCheckIns": "{count} check-in",
+  "eventsLivePulseBags": "{count} ќесиња · прибл. {kg} kg",
+  "eventsEvidenceStripTitle": "Доказ од терен",
+  "eventsEvidenceStripSubtitle": "Фотографии од евиденцијата за чистење.",
+  "eventsEvidenceStripSemantic": "Фотографии пред, потоа и од терен од евиденцијата",
+  "eventsEvidenceKindBefore": "Пред",
+  "eventsEvidenceKindAfter": "Потоа",
+  "eventsEvidenceKindField": "Терен",
+  "eventsEvidenceStripTileSemantic": "Фотографија {index} од {total}, {kind}",
+  "@eventsEvidenceStripTileSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsRouteProgressTitle": "Рута",
+  "eventsFieldModeRowServerError": "Сервер: {code}",
+  "@eventsFieldModeRowServerError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsFieldModeTitle": "Теренски режим",
+  "eventsFieldModeSync": "Синхронизирај",
+  "eventsFieldModeEmpty": "Нема редица офлајн.",
+  "eventsFieldModeSynced": "Редицата е синхронизирана.",
+  "eventsFieldModeSyncFailed": "Не успеа синхронизација. Обидете се повторно.",
+  "eventsFieldModeSyncPartial": "Синхронизирани се {synced} промени. {failed} сè уште се во офлајн редицата.",
+  "@eventsFieldModeSyncPartial": {
+    "placeholders": {
+      "synced": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowLiveImpactBags": "Влијание во живо · {count} ќесии",
+  "@eventsFieldModeRowLiveImpactBags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowUnknown": "Офлајн промена",
+  "eventsFieldModeRowStatusPending": "Чека",
+  "eventsFieldModeRowStatusSyncing": "Се синхронизира",
+  "eventsOfflineWorkHubTitle": "Офлајн работа",
+  "eventsOfflineWorkHubSemanticSheet": "Преглед на офлајн работа и синхронизација",
+  "eventsOfflineWorkSubtitle": "Редици за проверки на локација, теренски промени и разговор.",
+  "eventsOfflineWorkSectionCheckIns": "Проверки на локација",
+  "eventsOfflineWorkSectionField": "Теренски промени",
+  "eventsOfflineWorkSectionChat": "Разговор",
+  "eventsOfflineWorkCountPending": "{count} на чекање",
+  "@eventsOfflineWorkCountPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkCountFailed": "{count} бараат внимание",
+  "@eventsOfflineWorkCountFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkSyncNow": "Синхронизирај сега",
+  "eventsOfflineWorkOpenFieldQueue": "Отвори ја теренската редица",
+  "eventsOfflineWorkOpenChat": "Отвори разговор на настанот",
+  "eventsOfflineWorkRetryFailedChat": "Обиди се повторно со неиспратени пораки",
+  "eventsOfflineWorkResolveInChat": "Отворете го разговорот и поправете или избришете ја пораката што не можеше да се испрати.",
+  "eventsOfflineWorkSyncDone": "Синхронизацијата заврши",
+  "eventsOfflineWorkSyncing": "Се синхронизира…",
+  "eventsOfflineWorkDrainFailed": "Не можевме да ја завршиме синхронизацијата. Обидете се повторно кога сте онлајн.",
+  "eventsChatOutboxFull": "Премногу пораки чекаат офлајн (лимит {max}). Поврзете се за да ги испратите, па обидете се повторно.",
+  "@eventsChatOutboxFull": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "eventsCompletedBagsSectionTitle": "Собрани ќесии со отпад",
-  "eventsCompletedBagsSectionSubtitle": "Колку ќесии со отпад собраа волонтерите на ова чистење. Можете да го менувате кога сакате; се вклучува во прегледот на ефект подолу.",
-  "eventsCompletedBagsSave": "Зачувај број",
+  "eventsCompletedBagsSave": "Зачувај",
   "eventsCompletedBagsSaved": "Бројот на ќесии е зачуван.",
   "eventsImpactBadgeRating": "{rating}★ оценка",
   "eventsImpactBadgeBags": "{count} ќесии",
@@ -1933,6 +2103,9 @@
   "eventsSuccessDialogTitle": "Настанот е создаден",
   "eventsSuccessDialogBody": "„{title}“ на {siteName} е подготвен. Споделете со заедницата за да се приклучат волонтери.",
   "eventsSuccessDialogOpenEvent": "Отвори настан",
+  "eventsSuccessDialogViewEvent": "Погледни настан",
+  "eventsSuccessDialogPendingTitle": "Испратено за проверка",
+  "eventsSuccessDialogPendingBody": "„{title}“ на {siteName} е испратен. Модератор ќе го одобри или одбие пред да се појави јавно. Можеш да го отвориш од твоите настани во секое време.",
   "eventsTimePickerSelectTime": "Изберете време",
   "eventsTimePickerConfirm": "Потврди",
   "eventsTimePickerFrom": "Од",
@@ -2563,5 +2736,57 @@
     }
   },
   "chatShareLocation": "Сподели локација",
-  "chatSharedLocation": "Споделена локација"
+  "chatSharedLocation": "Споделена локација",
+
+  "organizerToolkitTitle": "Стани организатор",
+  "organizerToolkitPage1Title": "Планирај однапред",
+  "organizerToolkitPage1Body": "Проценете ја локацијата за опасности, подгответе безбедносна опрема и брифирајте го тимот пред доаѓањето на доброволците.",
+  "organizerToolkitPage2Title": "Модерацијата гради доверба",
+  "organizerToolkitPage2Body": "Откако ќе креирате настан, модераторите го прегледуваат. По одобрувањето, доброволците можат да го видат и да се приклучат.",
+  "organizerToolkitPage3Title": "Потврдете присуство",
+  "organizerToolkitPage3Body": "Користете го QR чекирањето во апликацијата за секој доброволец да добие заслужени поени.",
+  "organizerToolkitPage4Title": "Време и безбедност",
+  "organizerToolkitPage4Body": "Ако условите станат небезбедни, паузирајте или одложете. Веднаш известете ги регистрираните доброволци во апликацијата за никој да не патува за откажан почеток.",
+  "organizerToolkitPage5Title": "Отпад и одлагање",
+  "organizerToolkitPage5Body": "Сортирајте рециклажа кога е можно, безбедно пакувајте остри предмети и однесете го отпадот на овластени места. Оставете ја локацијата почиста отколку што ја затекнавте.",
+  "organizerToolkitPage6Title": "Вклучете ги сите",
+  "organizerToolkitPage6Body": "Понудете јасни улоги, постојан темпо и трпеливост. Добредојде брифинг им помага на новите доброволци да се чувствуваат сигурно и безбедно.",
+  "organizerToolkitPage7Title": "Приватност во чат",
+  "organizerToolkitPage7Body": "Држете ги личните телефони и адреси надвор од јавниот чат на настанот. Користете пораки во апликацијата за целиот тим да биде известен без преголемо споделување.",
+  "organizerToolkitPage8Title": "Докази и чесен ефект",
+  "organizerToolkitPage8Body": "Фотографиите потоа и бројот на ќесии треба да ја одразуваат вистината. Точно известување гради доверба кај доброволците, модераторите и пошироката заедница.",
+  "organizerToolkitContinue": "Продолжи",
+  "organizerToolkitStartQuiz": "Реши го квизот",
+  "organizerQuizTitle": "Брза проверка на знаење",
+  "organizerQuizLoadFailed": "Не можеше да се вчита квизот. Обидете се повторно.",
+  "organizerQuizLoadInvalidResponse": "Податоците за квизот од серверот се нецелосни. Обидете се повторно.",
+  "organizerQuizRetryLoad": "Обиди се повторно",
+  "organizerQuizSubmitFailed": "Не можеше да се поднесат одговорите. Обидете се повторно.",
+  "organizerQuizOptionSemantic": "Прашање {index} од {total}: {optionText}",
+  "@organizerQuizOptionSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" },
+      "optionText": { "type": "String" }
+    }
+  },
+  "organizerQuizSubmit": "Поднеси одговори",
+  "organizerQuizPassedTitle": "Сертифициран сте!",
+  "organizerQuizPassedBody": "Сега можете да креирате настани за чистење. Доброволците чекаат.",
+  "organizerQuizFailedTitle": "Не сосема",
+  "organizerQuizFailedBody": "Прегледајте го туториалот и обидете се повторно. Точни {correct} од {total}.",
+  "@organizerQuizFailedBody": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "organizerQuizRetry": "Обидете се повторно",
+  "organizerQuizCreateEvent": "Креирај го првиот настан",
+  "organizerCertifiedBadge": "Сертифициран организатор",
+  "errorOrganizerQuizSessionExpired": "Сесијата за квиз истече. Вчитајте нов квиз и обидете се повторно.",
+  "errorOrganizerQuizSessionInvalid": "Оваа сесија за квиз не е валидна. Вчитајте го квизот повторно.",
+  "errorOrganizerQuizAnswersMismatch": "Одговорите не се совпаѓаат со квизот што го започнавте. Вчитајте го квизот повторно.",
+  "errorOrganizerQuizInvalid": "Некои одговори не се валидни за овој квиз. Вчитајте го квизот повторно.",
+  "errorOrganizerCertificationAlreadyDone": "Веќе сте сертифициран организатор. Не треба повторно да полагате квиз."
 }

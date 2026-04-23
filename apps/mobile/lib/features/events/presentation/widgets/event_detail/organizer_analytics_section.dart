@@ -126,7 +126,7 @@ class _OrganizerAnalyticsSectionState extends State<OrganizerAnalyticsSection> {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: EventDetailSurfaceDecoration.elevatedCard(),
+      decoration: EventDetailSurfaceDecoration.detailModule(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[

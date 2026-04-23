@@ -3,10 +3,14 @@ import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/edit_event_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/hero_image_bar.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/hero_image_bar.dart'
+    show kEventDetailHeroChatKey, kEventDetailHeroEditKey;
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail_skeleton.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/date_time_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/title_section.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,8 +105,33 @@ void main() {
 
       expect(find.text('Set reminder'), findsOneWidget);
       expect(find.text('Leave event'), findsOneWidget);
+      expect(find.byKey(kEventDetailHeroChatKey), findsOneWidget);
     },
   );
+
+  testWidgets('guest not joined does not see hero group chat action', (
+    WidgetTester tester,
+  ) async {
+    final EcoEvent event = buildEvent(
+      id: 'evt-detail-guest',
+      status: EcoEventStatus.upcoming,
+      isJoined: false,
+      organizerId: 'someone_else',
+    );
+    await store.create(event);
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(kEventDetailHeroChatKey), findsNothing);
+  });
 
   testWidgets('in-progress attendee sees scan to check in action', (
     WidgetTester tester,
@@ -204,33 +233,45 @@ void main() {
     expect(find.text('Every week'), findsOneWidget);
   });
 
-  testWidgets('location row exposes Open in Maps when coordinates set', (
-    WidgetTester tester,
-  ) async {
-    final EcoEvent event = buildEvent(
-      id: 'evt-maps',
-      status: EcoEventStatus.upcoming,
-      isJoined: false,
-      organizerId: 'someone_else',
-      siteLat: 41.9965,
-      siteLng: 21.4314,
-    );
-    await store.create(event);
+  testWidgets(
+    'location long-press sheet offers Open in Maps when coordinates set',
+    (WidgetTester tester) async {
+      await tester.binding.setSurfaceSize(const Size(480, 1600));
+      addTearDown(() async {
+        await tester.binding.setSurfaceSize(null);
+      });
 
-    await tester.pumpWidget(
-      MaterialApp(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        home: EventDetailScreen(eventsRepository: store, eventId: event.id),
-      ),
-    );
-    await tester.pumpAndSettle();
+      final EcoEvent event = buildEvent(
+        id: 'evt-maps',
+        status: EcoEventStatus.upcoming,
+        isJoined: false,
+        organizerId: 'someone_else',
+        siteLat: 41.9965,
+        siteLng: 21.4314,
+      );
+      await store.create(event);
 
-    expect(find.byTooltip('Open in Maps'), findsOneWidget);
-  });
+      await tester.pumpWidget(
+        MaterialApp(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          home: EventDetailScreen(eventsRepository: store, eventId: event.id),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-  testWidgets('title section shows localized date and time range subtitle', (
+      // Facts card exposes maps as a direct action when coordinates exist.
+      expect(find.byTooltip('Open in Maps'), findsOneWidget);
+
+      await tester.longPress(find.text('Illegal landfill near the river'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Open in Maps'), findsAtLeastNWidgets(1));
+    },
+  );
+
+  testWidgets('date and time range appear only on when card not under title', (
     WidgetTester tester,
   ) async {
     final EcoEvent event = buildEvent(
@@ -255,6 +296,13 @@ void main() {
     expect(
       find.descendant(
         of: find.byType(TitleSection),
+        matching: find.textContaining('10:00'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DateTimeSection),
         matching: find.textContaining('10:00 - 12:00'),
       ),
       findsOneWidget,
@@ -367,6 +415,8 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.byKey(kEventDetailHeroChatKey), findsOneWidget);
+
     await tester.tap(find.byKey(kEventDetailHeroEditKey));
     await tester.pump();
     await tester.pumpAndSettle();
@@ -399,7 +449,15 @@ void main() {
     expect(find.text('Retry'), findsOneWidget);
 
     store.simulateDetailPrefetchFailureOnForce = false;
-    await tester.drag(find.byType(CustomScrollView), const Offset(0, 320));
+    await tester.drag(
+      find
+          .descendant(
+            of: find.byType(CustomScrollView),
+            matching: find.byType(Scrollable),
+          )
+          .first,
+      const Offset(0, 320),
+    );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
@@ -484,7 +542,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Trash bags collected'), findsOneWidget);
-      expect(find.text('Save bag count'), findsOneWidget);
+      expect(find.text('Save'), findsOneWidget);
     },
   );
 
@@ -544,6 +602,13 @@ void main() {
     expect(
       find.descendant(
         of: find.byType(TitleSection),
+        matching: find.textContaining('10:00'),
+      ),
+      findsNothing,
+    );
+    expect(
+      find.descendant(
+        of: find.byType(DateTimeSection),
         matching: find.textContaining('10:00 - 12:00'),
       ),
       findsOneWidget,

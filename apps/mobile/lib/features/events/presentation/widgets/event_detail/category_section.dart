@@ -4,10 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/events/presentation/events_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -23,7 +24,8 @@ class CategorySection extends StatelessWidget {
   /// When true, uses inset row styling and a trailing chevron (use inside [EventDetailGroupedPanel]).
   final bool embeddedInGroupedPanel;
 
-  void _showCategoryInfo(BuildContext context) {
+  /// Same sheet as tapping the category row on the event detail screen.
+  static void showCategoryInfoSheet(BuildContext context, EcoEvent event) {
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
@@ -55,8 +57,7 @@ class CategorySection extends StatelessWidget {
                 maxLines: 4,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,
-                style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
+                style: AppTypography.eventsBodyMuted(Theme.of(ctx).textTheme).copyWith(
                   height: 1.5,
                 ),
               ),
@@ -66,6 +67,9 @@ class CategorySection extends StatelessWidget {
       },
     );
   }
+
+  void _showCategoryInfo(BuildContext context) =>
+      showCategoryInfoSheet(context, event);
 
   @override
   Widget build(BuildContext context) {
@@ -82,30 +86,18 @@ class CategorySection extends StatelessWidget {
             embeddedInGroupedPanel ? AppSpacing.radiusLg : AppSpacing.radius10,
           ),
           child: embeddedInGroupedPanel
-              ? ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 52),
-                  child: Row(
-                    children: <Widget>[
-                      Icon(
-                        event.category.icon,
-                        size: AppSpacing.iconMd,
-                        color: AppColors.textSecondary,
+              ? EventDetailGroupedMetadataRow(
+                  leading: EventDetailGroupedMetadataRowLeading(
+                    icon: event.category.icon,
+                  ),
+                  center: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      event.category.localizedLabel(context.l10n),
+                      style: AppTypography.eventsGroupedRowPrimary(
+                        Theme.of(context).textTheme,
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Text(
-                          event.category.localizedLabel(context.l10n),
-                          style: AppTypography.eventsGroupedRowPrimary(
-                            Theme.of(context).textTheme,
-                          ),
-                        ),
-                      ),
-                      const Icon(
-                        CupertinoIcons.chevron_right,
-                        size: 14,
-                        color: AppColors.textMuted,
-                      ),
-                    ],
+                    ),
                   ),
                 )
               : Padding(

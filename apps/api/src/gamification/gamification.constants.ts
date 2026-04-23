@@ -33,3 +33,9 @@ export const REASON_EVENT_CHECK_IN = 'EVENT_CHECK_IN' as const;
 
 /** `PointTransaction.reasonCode` — completion bonus for checked-in participants. */
 export const REASON_EVENT_COMPLETED = 'EVENT_COMPLETED' as const;
+
+/** Organizer receives this once after passing the organizer toolkit quiz. */
+export const POINTS_ORGANIZER_CERTIFIED = 15;
+
+/** `PointTransaction.reasonCode` — organizer completed the toolkit certification quiz. */
+export const REASON_ORGANIZER_CERTIFIED = 'ORGANIZER_CERTIFIED' as const;

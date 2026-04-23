@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -21,6 +22,7 @@ import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_the
 import 'package:chisto_mobile/features/events/data/chat/chat_client_message_id.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_diagnostics.dart';
 import 'package:chisto_mobile/features/events/data/chat/chat_upload_limits.dart';
+import 'package:chisto_mobile/features/events/data/chat/chat_outbox_sync.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_connection_status.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_fetch_result.dart';
@@ -43,7 +45,6 @@ import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_mes
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_message_skeleton.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_location_picker_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_pinned_bar.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_search_result_tile.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_participants_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_pinned_messages_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_swipe_reply_wrapper.dart';
@@ -54,6 +55,7 @@ import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
 import 'event_chat_screen_widgets.dart';
+import 'event_chat_search_panel.dart';
 
 class _GroupingInfo {
   const _GroupingInfo({
@@ -199,23 +201,23 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       });
     });
     unawaited(
-      Connectivity().checkConnectivity().then((List<ConnectivityResult> r) {
+      ConnectivityGate.check().then((List<ConnectivityResult> r) {
         if (!mounted) {
           return;
         }
         setState(() {
-          _networkOnline = r.any((ConnectivityResult e) => e != ConnectivityResult.none);
+          _networkOnline = ConnectivityGate.isOnline(r);
         });
       }),
     );
-    _netSub = Connectivity().onConnectivityChanged.listen((List<ConnectivityResult> r) {
+    _netSub = ConnectivityGate.watch().listen((List<ConnectivityResult> r) {
       if (!mounted) {
         return;
       }
       setState(() {
-        _networkOnline = r.any((ConnectivityResult e) => e != ConnectivityResult.none);
+        _networkOnline = ConnectivityGate.isOnline(r);
       });
-      if (r.any((ConnectivityResult e) => e != ConnectivityResult.none)) {
+      if (ConnectivityGate.isOnline(r)) {
         unawaited(_flushOfflineQueue());
       }
     });
@@ -1078,22 +1080,22 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Future<void> _flushOfflineQueue() async {
-    while (mounted) {
+    const int maxIterationsPerRun = 50;
+    for (int n = 0; n < maxIterationsPerRun && mounted; n++) {
       final ChatOutboxEntry? q = await ChatOutboxStore.shared.peekNext(widget.eventId);
       if (q == null) {
         break;
       }
-      try {
-        final EventChatMessage saved = await _repo.sendMessage(
-          widget.eventId,
-          q.body,
-          replyToId: q.replyToId,
-          clientMessageId: q.clientMessageId,
-        );
-        await ChatOutboxStore.shared.remove(widget.eventId, q.clientMessageId);
-        if (!mounted) {
-          return;
-        }
+      final ChatOutboxFlushResult res = await ChatOutboxSync.flushOne(
+        repo: _repo,
+        store: ChatOutboxStore.shared,
+        entry: q,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (res.kind == ChatOutboxFlushKind.sent) {
+        final EventChatMessage saved = res.savedMessage!;
         setState(() {
           final int i = _messages.indexWhere((EventChatMessage m) => m.id == q.tempId);
           if (i >= 0) {
@@ -1102,9 +1104,20 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           _dedupMessages();
         });
         unawaited(_markReadBestEffort());
-      } on Object catch (_) {
-        break;
+        continue;
       }
+      if (res.kind == ChatOutboxFlushKind.terminalFailed) {
+        setState(() {
+          final int i = _messages.indexWhere((EventChatMessage m) => m.id == q.tempId);
+          if (i >= 0) {
+            _messages[i] = _messages[i].copyWith(pending: false, failed: true);
+          }
+        });
+        continue;
+      }
+      await Future<void>.delayed(
+        ChatOutboxSync.retryDelayAfterAttempt(q.attemptCount + 1),
+      );
     }
   }
 
@@ -1124,7 +1137,8 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   /// Restores pending bubbles from SQLite after process death; flushes when online.
   Future<void> _reconcileChatOutboxAfterInitialLoad() async {
     await _pruneOutboxAgainstCommittedMessages();
-    final List<ChatOutboxEntry> rows = await ChatOutboxStore.shared.listPending(widget.eventId);
+    final List<ChatOutboxEntry> rows =
+        await ChatOutboxStore.shared.listPendingAndFailed(widget.eventId);
     if (rows.isEmpty || !mounted) {
       unawaited(_flushOfflineQueue());
       return;
@@ -1148,7 +1162,8 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         isOwnMessage: true,
         replyToId: row.replyToId,
         replyToSnippet: null,
-        pending: true,
+        pending: row.isPending,
+        failed: row.isFailed,
         messageType: EventChatMessageType.text,
         clientMessageId: row.clientMessageId,
       );
@@ -1171,6 +1186,13 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Future<void> _sendVoiceMessage(XFile file, Duration recordedLength) async {
+    if (!_networkOnline) {
+      if (!mounted) {
+        return;
+      }
+      AppSnack.show(context, message: context.l10n.eventChatAttachmentsNeedNetwork);
+      return;
+    }
     final String clientMessageId = newChatClientMessageId();
     final String tempId = 'pending_${DateTime.now().microsecondsSinceEpoch}';
     final int durSec = _voiceDurationSeconds(recordedLength);
@@ -1349,6 +1371,13 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Future<void> _sendAttachments(List<dynamic> files) async {
+    if (!_networkOnline) {
+      if (!mounted) {
+        return;
+      }
+      AppSnack.show(context, message: context.l10n.eventChatAttachmentsNeedNetwork);
+      return;
+    }
     if (files.isEmpty) {
       return;
     }
@@ -1674,6 +1703,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         return;
       }
       final String errMsg = e.message;
+      String snackMsg = errMsg;
       if (_shouldQueueOffline(e)) {
         final bool queued = await ChatOutboxStore.shared.enqueueText(
           eventId: widget.eventId,
@@ -1688,6 +1718,13 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         if (queued) {
           return;
         }
+        final bool full = await ChatOutboxStore.shared.isOutboxFullForEvent(widget.eventId);
+        if (!mounted) {
+          return;
+        }
+        if (full) {
+          snackMsg = context.l10n.eventsChatOutboxFull(ChatOutboxStore.maxPendingTextRowsPerEvent);
+        }
       }
       if (!mounted) {
         return;
@@ -1698,7 +1735,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           _messages[i] = _messages[i].copyWith(pending: false, failed: true);
         }
       });
-      AppSnack.show(context, message: errMsg);
+      AppSnack.show(context, message: snackMsg);
     } on Object catch (_) {
       if (!mounted) {
         return;
@@ -1716,12 +1753,22 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
       if (queued) {
         return;
       }
+      final bool full = await ChatOutboxStore.shared.isOutboxFullForEvent(widget.eventId);
+      if (!mounted) {
+        return;
+      }
       setState(() {
         final int i = _messages.indexWhere((EventChatMessage m) => m.id == tempId);
         if (i >= 0) {
           _messages[i] = _messages[i].copyWith(pending: false, failed: true);
         }
       });
+      if (full) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsChatOutboxFull(ChatOutboxStore.maxPendingTextRowsPerEvent),
+        );
+      }
     }
   }
 
@@ -2047,7 +2094,6 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   }
 
   Widget _buildSearchPanel(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
     final List<EventChatMessage> merged = _mergedSearchHits();
     final bool showLocalBanner = !_searchLoading &&
         _lastSearchQuery.length >= 2 &&
@@ -2055,135 +2101,26 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
           serverHits: _searchServerHits,
           merged: merged,
         );
-
-    if (_searchLoading && merged.isEmpty && !_searchError) {
-      return const Center(
-        child: SizedBox(
-          width: 36,
-          height: 36,
-          child: CircularProgressIndicator(strokeWidth: 3),
-        ),
-      );
-    }
-
-    if (_searchError && merged.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                context.l10n.eventChatSearchFailed,
-                textAlign: TextAlign.center,
-                style: AppTypography.eventsBodyMediumSecondary(textTheme),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              FilledButton(
-                onPressed: _lastSearchQuery.length >= 2
-                    ? () => unawaited(_runSearch(_lastSearchQuery))
-                    : null,
-                child: Text(context.l10n.eventsDetailRetryRefresh),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    if (_lastSearchQuery.length < 2) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            context.l10n.eventChatSearchMinChars,
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsBodyMuted(textTheme),
-          ),
-        ),
-      );
-    }
-
-    if (!_searchLoading && merged.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Text(
-            context.l10n.eventChatSearchNoResults,
-            textAlign: TextAlign.center,
-            style: AppTypography.eventsBodyMuted(textTheme),
-          ),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-      itemCount:
-          merged.length + (_searchHasMore ? 1 : 0) + (showLocalBanner ? 1 : 0),
-      itemBuilder: (BuildContext context, int i) {
-        if (showLocalBanner && i == 0) {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.md,
-              0,
-              AppSpacing.md,
-              AppSpacing.sm,
-            ),
-            child: Material(
-              color: AppColors.inputFill,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                child: Text(
-                  context.l10n.eventChatSearchIncludingLocalMatches,
-                  style: AppTypography.eventsCaptionStrong(
-                    textTheme,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
-        final int offset = showLocalBanner ? 1 : 0;
-        final int j = i - offset;
-        if (j == merged.length) {
-          return Center(
-            child: TextButton(
-              onPressed: _searchLoading
-                  ? null
-                  : () => unawaited(_runSearch(_lastSearchQuery, loadMore: true)),
-              child: _searchLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : Text(context.l10n.eventChatSearchLoadMore),
-            ),
-          );
-        }
-        final EventChatMessage m = merged[j];
-        return ChatSearchResultTile(
-          message: m,
-          query: _lastSearchQuery,
-          onTap: () {
-            _searchSerial++;
-            setState(() {
-              _searchOpen = false;
-              _searchServerHits = <EventChatMessage>[];
-              _searchController.clear();
-              _searchDebounce?.cancel();
-              _lastSearchQuery = '';
-              _searchError = false;
-            });
-            WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToMessageId(m.id));
-          },
-        );
+    return EventChatSearchPanel(
+      searchLoading: _searchLoading,
+      searchError: _searchError,
+      lastSearchQuery: _lastSearchQuery,
+      searchHasMore: _searchHasMore,
+      merged: merged,
+      showLocalBanner: showLocalBanner,
+      onRetrySearch: () => _runSearch(_lastSearchQuery),
+      onLoadMoreSearch: () => _runSearch(_lastSearchQuery, loadMore: true),
+      onSelectHit: (EventChatMessage m) {
+        _searchSerial++;
+        setState(() {
+          _searchOpen = false;
+          _searchServerHits = <EventChatMessage>[];
+          _searchController.clear();
+          _searchDebounce?.cancel();
+          _lastSearchQuery = '';
+          _searchError = false;
+        });
+        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToMessageId(m.id));
       },
     );
   }
@@ -2434,8 +2371,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
   @override
   Widget build(BuildContext context) {
     _rebuildGrouping();
-    final bool reconnecting = _bannerVisible && _conn == EventChatConnectionStatus.reconnecting;
-    final bool disconnected = _bannerVisible && _conn == EventChatConnectionStatus.disconnected;
+    final bool reconnecting =
+        _networkOnline && _bannerVisible && _conn == EventChatConnectionStatus.reconnecting;
+    final bool disconnected =
+        _networkOnline && _bannerVisible && _conn == EventChatConnectionStatus.disconnected;
     final bool reduceMotion = MediaQuery.of(context).disableAnimations;
 
     return Scaffold(
@@ -2449,6 +2388,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
         child: Column(
         children: <Widget>[
           ChatConnectionBanner(
+            networkOffline: !_networkOnline,
             reconnecting: reconnecting,
             disconnected: disconnected,
             showConnectedFlash: _showConnectedFlash,
@@ -2537,7 +2477,7 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                           controller: _scroll,
                           reverse: true,
                           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                          cacheExtent: 800,
+                          cacheExtent: 1400,
                           addAutomaticKeepAlives: false,
                           padding: const EdgeInsets.symmetric(
                             horizontal: AppSpacing.md,

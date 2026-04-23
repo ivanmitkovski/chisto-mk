@@ -1205,6 +1205,7 @@ export class EventChatService {
             messageId: created.id,
             senderName,
             messagePreview: preview.slice(0, 100),
+            threadTitle: event.title,
           },
         })
         .catch((err: unknown) => {

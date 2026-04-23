@@ -287,6 +287,23 @@ export class NotificationsService {
   }): Promise<string> {
     if (!(await this.isInboxEnabled())) return '';
     if (await this.isTypeMuted(input.userId, input.type)) return '';
+    /** Absorb duplicate staff/push emissions (retries, double handlers) for the same logical thread. */
+    const NOTIFICATION_THREAD_DEDUPE_MS = 120_000;
+    if (input.threadKey != null && input.threadKey.trim().length > 0) {
+      const since = new Date(Date.now() - NOTIFICATION_THREAD_DEDUPE_MS);
+      const duplicate = await this.prisma.userNotification.findFirst({
+        where: {
+          userId: input.userId,
+          type: input.type,
+          threadKey: input.threadKey,
+          createdAt: { gte: since },
+        },
+        select: { id: true },
+      });
+      if (duplicate != null) {
+        return '';
+      }
+    }
     const notification = await this.prisma.userNotification.create({
       data: {
         userId: input.userId,

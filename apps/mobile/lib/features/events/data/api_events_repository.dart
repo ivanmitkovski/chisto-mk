@@ -163,6 +163,15 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     return path.toString();
   }
 
+  List<EcoEvent> _eventsFromListResponse(ApiResponse response) {
+    final Map<String, dynamic>? json = response.json;
+    if (json == null) {
+      throw AppError.unknown();
+    }
+    final List<dynamic> raw = json['data'] as List<dynamic>? ?? <dynamic>[];
+    return ecoEventListFromJson(raw);
+  }
+
   Future<void> _fetchPage({
     required bool replace,
     String? cursor,
@@ -171,13 +180,8 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     final ApiResponse response = await _client.get(
       _globalListPath(cursor: cursor, params: params),
     );
-    final Map<String, dynamic>? json = response.json;
-    if (json == null) {
-      throw AppError.unknown();
-    }
-
-    final List<dynamic> raw = json['data'] as List<dynamic>? ?? <dynamic>[];
-    final List<EcoEvent> page = ecoEventListFromJson(raw);
+    final List<EcoEvent> page = _eventsFromListResponse(response);
+    final Map<String, dynamic> json = response.json!;
     final Object? metaRaw = json['meta'];
     final Map<String, dynamic> meta = metaRaw is Map<String, dynamic>
         ? metaRaw
@@ -203,6 +207,14 @@ class ApiEventsRepository extends ChangeNotifier implements EventsRepository {
     _hasMore = hasMore;
     _lastSuccessfulListRefreshAt = DateTime.now();
     notifyListeners();
+  }
+
+  @override
+  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) async {
+    final ApiResponse response = await _client.get(
+      _globalListPath(cursor: null, params: params),
+    );
+    return _eventsFromListResponse(response);
   }
 
   @override

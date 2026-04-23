@@ -165,6 +165,10 @@ class _DelayedParticipantsRepo implements EventsRepository {
   Future<void> loadMore() => _inner.loadMore();
 
   @override
+  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) =>
+      _inner.fetchEventsSnapshot(params);
+
+  @override
   Future<EventParticipantsPage> fetchParticipants(
     String eventId, {
     String? cursor,

@@ -2,25 +2,24 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 
 /// Single card grouping for list-like metadata rows (location, schedule, category, details).
 ///
 /// Uses iOS-style **inset dividers**: each separator is offset from the leading
-/// edge by [_kDividerInset] so it aligns just after the row's leading icon,
-/// matching Apple's UITableView grouped style exactly.
+/// edge so it aligns with the primary text column of [EventDetailGroupedMetadataRow].
 class EventDetailGroupedPanel extends StatelessWidget {
   const EventDetailGroupedPanel({super.key, required this.children});
 
   final List<Widget> children;
 
-  // icon_md (20) + panel horizontal padding (md = 16) + gap (sm = 12) = 48
-  static const double _kDividerInset =
-      AppSpacing.md + AppSpacing.iconMd + AppSpacing.sm;
+  static double get _kDividerInset =>
+      EventDetailGroupedMetadataRowLayout.dividerInsetFromCardEdge;
 
   /// Inset for dividers **inside** a padded row group (aligns with primary text).
-  static const double innerDividerLeadingPadding =
-      AppSpacing.iconMd + AppSpacing.sm;
+  static double get innerDividerLeadingPadding =>
+      EventDetailGroupedMetadataRowLayout.innerDividerLeadingPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +34,7 @@ class EventDetailGroupedPanel extends StatelessWidget {
       if (i < children.length - 1) {
         items.add(
           Padding(
-            padding: const EdgeInsets.only(left: _kDividerInset),
+            padding: EdgeInsets.only(left: _kDividerInset),
             child: Divider(
               height: 1,
               thickness: 0.5,
@@ -47,7 +46,7 @@ class EventDetailGroupedPanel extends StatelessWidget {
     }
 
     return DecoratedBox(
-      decoration: EventDetailSurfaceDecoration.elevatedCard(),
+      decoration: EventDetailSurfaceDecoration.groupedListShell(),
       child: ClipRRect(
         borderRadius: EventDetailSurfaceDecoration.cardBorderRadius,
         child: Column(

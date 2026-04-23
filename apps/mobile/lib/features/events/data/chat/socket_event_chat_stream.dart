@@ -160,11 +160,16 @@ class SocketEventChatStream {
       })
       ..on('message:created', (dynamic data) {
         final dynamic raw = _unwrapSocketArgs(data);
+        if (!_payloadRoomMatches(raw)) {
+          return;
+        }
         final EventChatMessage? m = _parseMessage(raw);
         if (m != null) {
-          _addEvent(EventChatStreamMessageCreated(
-            m.withViewer(_authState.userId),
-          ));
+          if (_messageRoomMatches(m)) {
+            _addEvent(EventChatStreamMessageCreated(
+              m.withViewer(_authState.userId),
+            ));
+          }
         } else if (kDebugMode) {
           debugPrint(
             '[chat:ws] message:created parse failed event=$eventId keys=${_debugPayloadKeys(raw)}',
@@ -172,28 +177,44 @@ class SocketEventChatStream {
         }
       })
       ..on('message:deleted', (dynamic data) {
-        final String? mid = _str(_unwrapSocketArgs(data), 'messageId');
+        final dynamic raw = _unwrapSocketArgs(data);
+        if (!_payloadRoomMatches(raw)) {
+          return;
+        }
+        final String? mid = _str(raw, 'messageId');
         if (mid != null) _addEvent(EventChatStreamMessageDeleted(mid));
       })
       ..on('message:edited', (dynamic data) {
-        final EventChatMessage? m = _parseMessage(_unwrapSocketArgs(data));
-        if (m != null) {
+        final dynamic raw = _unwrapSocketArgs(data);
+        if (!_payloadRoomMatches(raw)) {
+          return;
+        }
+        final EventChatMessage? m = _parseMessage(raw);
+        if (m != null && _messageRoomMatches(m)) {
           _addEvent(EventChatStreamMessageEdited(
             m.withViewer(_authState.userId),
           ));
         }
       })
       ..on('message:pinned', (dynamic data) {
-        final EventChatMessage? m = _parseMessage(_unwrapSocketArgs(data));
-        if (m != null) {
+        final dynamic raw = _unwrapSocketArgs(data);
+        if (!_payloadRoomMatches(raw)) {
+          return;
+        }
+        final EventChatMessage? m = _parseMessage(raw);
+        if (m != null && _messageRoomMatches(m)) {
           _addEvent(EventChatStreamMessagePinned(
             m.withViewer(_authState.userId),
           ));
         }
       })
       ..on('message:unpinned', (dynamic data) {
-        final EventChatMessage? m = _parseMessage(_unwrapSocketArgs(data));
-        if (m != null) {
+        final dynamic raw = _unwrapSocketArgs(data);
+        if (!_payloadRoomMatches(raw)) {
+          return;
+        }
+        final EventChatMessage? m = _parseMessage(raw);
+        if (m != null && _messageRoomMatches(m)) {
           _addEvent(EventChatStreamMessageUnpinned(
             m.withViewer(_authState.userId),
           ));
@@ -202,6 +223,15 @@ class SocketEventChatStream {
       ..on('typing:update', (dynamic data) {
         final Map<String, dynamic>? map = _asStringKeyedMap(_unwrapSocketArgs(data));
         if (map == null) return;
+        final Object? pe = map['eventId'];
+        if (pe is String &&
+            pe.isNotEmpty &&
+            (_currentEventId == null || pe != _currentEventId)) {
+          if (kDebugMode) {
+            debugPrint('[chat:ws] drop typing eventId mismatch');
+          }
+          return;
+        }
         final String? uid = map['userId'] as String?;
         final String? dn = map['displayName'] as String?;
         final bool? ty = map['typing'] as bool?;
@@ -218,6 +248,15 @@ class SocketEventChatStream {
       ..on('read_cursor:updated', (dynamic data) {
         final Map<String, dynamic>? map = _asStringKeyedMap(_unwrapSocketArgs(data));
         if (map == null) return;
+        final Object? pe = map['eventId'];
+        if (pe is String &&
+            pe.isNotEmpty &&
+            (_currentEventId == null || pe != _currentEventId)) {
+          if (kDebugMode) {
+            debugPrint('[chat:ws] drop read_cursor eventId mismatch');
+          }
+          return;
+        }
         final String? uid = map['userId'] as String?;
         final String? dn = map['displayName'] as String?;
         if (uid != null && dn != null) {
@@ -380,5 +419,43 @@ class SocketEventChatStream {
 
   void _addEvent(EventChatStreamEvent event) {
     if (!_controller.isClosed) _controller.add(event);
+  }
+
+  /// Drops misrouted payloads when the server includes an [eventId] that does
+  /// not match the room we joined ([_currentEventId]).
+  bool _payloadRoomMatches(dynamic raw) {
+    final Map<String, dynamic>? map = _asStringKeyedMap(raw);
+    if (map == null) {
+      return true;
+    }
+    final Object? eid = map['eventId'];
+    if (eid is! String || eid.isEmpty) {
+      return true;
+    }
+    final String? cur = _currentEventId;
+    if (cur == null || cur.isEmpty) {
+      return false;
+    }
+    if (eid != cur) {
+      if (kDebugMode) {
+        debugPrint('[chat:ws] drop payload eventId mismatch room=$cur');
+      }
+      return false;
+    }
+    return true;
+  }
+
+  bool _messageRoomMatches(EventChatMessage m) {
+    final String? cur = _currentEventId;
+    if (cur == null || cur.isEmpty) {
+      return false;
+    }
+    if (m.eventId != cur) {
+      if (kDebugMode) {
+        debugPrint('[chat:ws] drop message eventId mismatch room=$cur');
+      }
+      return false;
+    }
+    return true;
   }
 }

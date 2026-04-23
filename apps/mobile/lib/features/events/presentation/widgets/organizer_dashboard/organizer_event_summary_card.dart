@@ -45,21 +45,29 @@ class OrganizerEventSummaryCard extends StatelessWidget {
             max.toString(),
           )
         : context.l10n.eventsOrganizerDashboardParticipantsUnlimited(current);
+    final bool isActiveLifecycle = event.status == EcoEventStatus.upcoming ||
+        event.status == EcoEventStatus.inProgress;
+
     final StringBuffer sem = StringBuffer()
       ..write(event.title)
       ..write('. ')
       ..write(formatEventCalendarDate(context, event.date))
       ..write('. ')
       ..write(participantsLine);
-    if (event.status == EcoEventStatus.upcoming ||
-        event.status == EcoEventStatus.inProgress) {
-      sem
-        ..write('. ')
-        ..write(context.l10n.eventsCheckInTitle);
-      if (event.status == EcoEventStatus.inProgress) {
+    if (isActiveLifecycle) {
+      if (!event.moderationApproved) {
         sem
           ..write('. ')
-          ..write(context.l10n.eventsOrganizerDashboardEvidenceAction);
+          ..write(context.l10n.eventsAwaitingModerationCta);
+      } else {
+        sem
+          ..write('. ')
+          ..write(context.l10n.eventsCheckInTitle);
+        if (event.status == EcoEventStatus.inProgress) {
+          sem
+            ..write('. ')
+            ..write(context.l10n.eventsOrganizerDashboardEvidenceAction);
+        }
       }
     }
     final String semanticsLabel = sem.toString();
@@ -86,7 +94,6 @@ class OrganizerEventSummaryCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              // Title + status pill row
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -101,7 +108,18 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  _StatusPill(status: event.status, color: statusColor),
+                  if (event.isDeclined)
+                    _ModerationPill(
+                      label: context.l10n.eventsDeclinedDashboardPill,
+                      color: AppColors.accentDanger,
+                    )
+                  else if (!event.moderationApproved)
+                    _ModerationPill(
+                      label: context.l10n.eventsPendingDashboardPill,
+                      color: const Color(0xFFF5A623),
+                    )
+                  else
+                    _StatusPill(status: event.status, color: statusColor),
                 ],
               ),
 
@@ -184,28 +202,62 @@ class OrganizerEventSummaryCard extends StatelessWidget {
                 ),
               ],
 
-              // Quick-action buttons (only for active events)
-              if (event.status == EcoEventStatus.upcoming ||
-                  event.status == EcoEventStatus.inProgress) ...<Widget>[
+              if (isActiveLifecycle) ...<Widget>[
                 const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: <Widget>[
-                    _QuickActionButton(
-                      icon: CupertinoIcons.qrcode_viewfinder,
-                      label: context.l10n.eventsCheckInTitle,
-                      onTap: onCheckIn,
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    if (event.status == EcoEventStatus.inProgress ||
-                        event.status == EcoEventStatus.completed)
-                      _QuickActionButton(
-                        icon: CupertinoIcons.camera,
-                        label:
-                            context.l10n.eventsOrganizerDashboardEvidenceAction,
-                        onTap: onEvidence,
+                if (event.isDeclined)
+                  Row(
+                    children: <Widget>[
+                      const Icon(
+                        CupertinoIcons.xmark_circle,
+                        size: 14,
+                        color: AppColors.accentDanger,
                       ),
-                  ],
-                ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      Expanded(
+                        child: Text(
+                          context.l10n.eventsDeclinedResubmitCta,
+                          style: AppTypography.eventsListCardMeta(textTheme).copyWith(
+                            color: AppColors.accentDanger,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else if (!event.moderationApproved)
+                  Row(
+                    children: <Widget>[
+                      const Icon(
+                        CupertinoIcons.hourglass,
+                        size: 14,
+                        color: AppColors.textMuted,
+                      ),
+                      const SizedBox(width: AppSpacing.xxs),
+                      Expanded(
+                        child: Text(
+                          context.l10n.eventsAwaitingModerationCta,
+                          style: AppTypography.eventsListCardMeta(textTheme),
+                        ),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: <Widget>[
+                      _QuickActionButton(
+                        icon: CupertinoIcons.qrcode_viewfinder,
+                        label: context.l10n.eventsCheckInTitle,
+                        onTap: onCheckIn,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      if (event.status == EcoEventStatus.inProgress)
+                        _QuickActionButton(
+                          icon: CupertinoIcons.camera,
+                          label: context
+                              .l10n.eventsOrganizerDashboardEvidenceAction,
+                          onTap: onEvidence,
+                        ),
+                    ],
+                  ),
               ],
             ],
           ),
@@ -232,6 +284,32 @@ class _StatusPill extends StatelessWidget {
       ),
       child: Text(
         status.localizedLabel(context.l10n),
+        style: AppTypography.eventsCaptionStrong(
+          textTheme,
+          color: color,
+        ).copyWith(fontSize: 11),
+      ),
+    );
+  }
+}
+
+class _ModerationPill extends StatelessWidget {
+  const _ModerationPill({required this.label, required this.color});
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    final TextTheme textTheme = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        label,
         style: AppTypography.eventsCaptionStrong(
           textTheme,
           color: color,

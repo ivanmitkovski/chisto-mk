@@ -8,6 +8,12 @@ export function cleanupEventMutationMessage(error: unknown, fallback: string): s
   if (error instanceof ApiError && error.status === 422) {
     return 'Validation failed. Adjust the fields and try again.';
   }
+  if (error instanceof ApiError && error.code === 'EVENTS_END_DIFFERENT_SKOPJE_CALENDAR_DAY') {
+    return error.message || 'Event end must be on the same calendar day as the start.';
+  }
+  if (error instanceof ApiError && error.code === 'EVENTS_END_AFTER_SKOPJE_LOCAL_DAY') {
+    return error.message || 'Event end must not be after 23:59 on the start day.';
+  }
   if (error instanceof ApiError) {
     return error.message || fallback;
   }

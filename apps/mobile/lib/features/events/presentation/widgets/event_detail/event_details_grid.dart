@@ -9,6 +9,7 @@ import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/event_ui_mappers.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_panel.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -24,6 +25,38 @@ class EventDetailsGrid extends StatelessWidget {
 
   /// When true, adds vertical inset for use inside [EventDetailGroupedPanel].
   final bool embeddedInGroupedPanel;
+
+  /// Opens the same scale explainer as the grouped-panel row / chip.
+  static void openScaleInfoSheet(BuildContext context, EcoEvent event) {
+    final CleanupScale? scale = event.scale;
+    if (scale == null) {
+      return;
+    }
+    final AppLocalizations l10n = context.l10n;
+    _showInfoSheet(
+      context,
+      icon: Icons.groups_rounded,
+      title: scale.localizedLabel(l10n),
+      description: scale.localizedDescription(l10n),
+      color: AppColors.primaryDark,
+    );
+  }
+
+  /// Opens the same difficulty explainer as the grouped-panel row / chip.
+  static void openDifficultyInfoSheet(BuildContext context, EcoEvent event) {
+    final EventDifficulty? d = event.difficulty;
+    if (d == null) {
+      return;
+    }
+    final AppLocalizations l10n = context.l10n;
+    _showInfoSheet(
+      context,
+      icon: CupertinoIcons.shield_fill,
+      title: d.localizedLabel(l10n),
+      description: d.localizedDescription(l10n),
+      color: d.color,
+    );
+  }
 
   static void _showInfoSheet(BuildContext context, {
     required IconData icon,
@@ -84,13 +117,7 @@ class EventDetailsGrid extends StatelessWidget {
               icon: Icons.groups_rounded,
               label: event.scale!.localizedLabel(l10n),
               color: AppColors.primaryDark,
-              onTap: () => _showInfoSheet(
-                context,
-                icon: Icons.groups_rounded,
-                title: event.scale!.localizedLabel(l10n),
-                description: event.scale!.localizedDescription(l10n),
-                color: AppColors.primaryDark,
-              ),
+              onTap: () => openScaleInfoSheet(context, event),
             ),
           ),
         if (hasScale && hasDifficulty)
@@ -101,13 +128,7 @@ class EventDetailsGrid extends StatelessWidget {
               icon: CupertinoIcons.shield_fill,
               label: event.difficulty!.localizedLabel(l10n),
               color: event.difficulty!.color,
-              onTap: () => _showInfoSheet(
-                context,
-                icon: CupertinoIcons.shield_fill,
-                title: event.difficulty!.localizedLabel(l10n),
-                description: event.difficulty!.localizedDescription(l10n),
-                color: event.difficulty!.color,
-              ),
+              onTap: () => openDifficultyInfoSheet(context, event),
             ),
           ),
       ],
@@ -121,20 +142,14 @@ class EventDetailsGrid extends StatelessWidget {
         children: <Widget>[
           if (hasScale)
             _GroupedPanelDetailsRow(
-              icon: Icons.groups_outlined,
+              icon: CupertinoIcons.person_3,
               label: event.scale!.localizedLabel(l10n),
               textTheme: textTheme,
-              onTap: () => _showInfoSheet(
-                context,
-                icon: Icons.groups_rounded,
-                title: event.scale!.localizedLabel(l10n),
-                description: event.scale!.localizedDescription(l10n),
-                color: AppColors.primaryDark,
-              ),
+              onTap: () => openScaleInfoSheet(context, event),
             ),
           if (hasScale && hasDifficulty)
             Padding(
-              padding: const EdgeInsets.only(
+              padding: EdgeInsets.only(
                 left: EventDetailGroupedPanel.innerDividerLeadingPadding,
               ),
               child: Divider(
@@ -145,16 +160,10 @@ class EventDetailsGrid extends StatelessWidget {
             ),
           if (hasDifficulty)
             _GroupedPanelDetailsRow(
-              icon: Icons.shield_outlined,
+              icon: CupertinoIcons.shield,
               label: event.difficulty!.localizedLabel(l10n),
               textTheme: textTheme,
-              onTap: () => _showInfoSheet(
-                context,
-                icon: CupertinoIcons.shield_fill,
-                title: event.difficulty!.localizedLabel(l10n),
-                description: event.difficulty!.localizedDescription(l10n),
-                color: event.difficulty!.color,
-              ),
+              onTap: () => openDifficultyInfoSheet(context, event),
             ),
         ],
       );
@@ -186,36 +195,21 @@ class _GroupedPanelDetailsRow extends StatelessWidget {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(minHeight: 52),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  icon,
-                  size: AppSpacing.iconMd,
-                  color: AppColors.textSecondary,
+          child: EventDetailGroupedMetadataRow(
+            leading: EventDetailGroupedMetadataRowLeading(icon: icon),
+            center: Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                textHeightBehavior: const TextHeightBehavior(
+                  applyHeightToFirstAscent: true,
+                  applyHeightToLastDescent: true,
+                  leadingDistribution: TextLeadingDistribution.even,
                 ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Text(
-                    label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    textHeightBehavior: const TextHeightBehavior(
-                      applyHeightToFirstAscent: true,
-                      applyHeightToLastDescent: true,
-                      leadingDistribution: TextLeadingDistribution.even,
-                    ),
-                    style: AppTypography.eventsGroupedRowPrimary(textTheme),
-                  ),
-                ),
-                const Icon(
-                  CupertinoIcons.chevron_right,
-                  size: 14,
-                  color: AppColors.textMuted,
-                ),
-              ],
+                style: AppTypography.eventsGroupedRowPrimary(textTheme),
+              ),
             ),
           ),
         ),

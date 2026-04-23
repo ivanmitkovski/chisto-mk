@@ -69,6 +69,7 @@ void main() {
         participantCount: 5,
         status: status,
         createdAt: DateTime(2025, 6, 10),
+        moderationApproved: true,
       );
     }
 
@@ -110,6 +111,26 @@ void main() {
       expect(approved.isJoinable, isTrue);
     });
 
+    test('canOpenAttendeeCheckIn requires moderation approval', () {
+      final EcoEvent openButPending = buildEvent(
+        organizerId: 'other',
+      ).copyWith(
+        moderationApproved: false,
+        isJoined: true,
+        status: EcoEventStatus.inProgress,
+        isCheckInOpen: true,
+      );
+      expect(openButPending.canOpenAttendeeCheckIn, isFalse);
+
+      final EcoEvent openApproved = buildEvent(organizerId: 'other').copyWith(
+        moderationApproved: true,
+        isJoined: true,
+        status: EcoEventStatus.inProgress,
+        isCheckInOpen: true,
+      );
+      expect(openApproved.canOpenAttendeeCheckIn, isTrue);
+    });
+
     test('organizer is never joinable via isJoinable', () {
       final EcoEvent orgEvent = buildEvent(
         organizerId: CurrentUser.id,
@@ -129,19 +150,20 @@ void main() {
       expect(pastUtc.isBeforeScheduledStart, isFalse);
     });
 
-    test('canVolunteerJoinNow is false before scheduledAtUtc when otherwise joinable', () {
+    test('canVolunteerJoinNow is true before scheduledAtUtc when otherwise joinable', () {
       final EcoEvent e = buildEvent().copyWith(
         scheduledAtUtc: DateTime.utc(2035, 1, 1, 12),
       );
       expect(e.isJoinable, isTrue);
-      expect(e.canVolunteerJoinNow, isFalse);
+      expect(e.canVolunteerJoinNow, isTrue);
     });
 
-    test('canVolunteerJoinNow is true when joinable and start has passed', () {
+    test('canVolunteerJoinNow is false when joinable but join grace after start has ended', () {
       final EcoEvent e = buildEvent().copyWith(
-        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12),
+        scheduledAtUtc: DateTime.utc(2020, 1, 1, 12, 0, 0),
       );
-      expect(e.canVolunteerJoinNow, isTrue);
+      expect(e.isJoinable, isTrue);
+      expect(e.canVolunteerJoinNow, isFalse);
     });
 
     test('isValidRange validates time ranges', () {
@@ -202,6 +224,7 @@ void main() {
       expect(decoded.recurrencePrevEventId, 'evt-prev');
       expect(decoded.recurrenceNextEventId, 'evt-next');
       expect(decoded.organizerAvatarUrl, 'https://signed.example/o.webp');
+      expect(decoded.moderationApproved, original.moderationApproved);
     });
 
     test('ecoEventFromJson sets scheduledAtUtc from scheduledAt', () {
@@ -227,6 +250,7 @@ void main() {
         e.scheduledAtUtc!.toUtc().toIso8601String(),
         '2025-06-15T10:00:00.000Z',
       );
+      expect(e.moderationApproved, isFalse);
     });
 
     test('formattedTimeRange', () {
@@ -303,6 +327,7 @@ void main() {
       expect(event.gear.length, 2);
       expect(event.gear, contains(EventGear.gloves));
       expect(event.gear, contains(EventGear.rakes));
+      expect(event.moderationApproved, isFalse);
     });
 
     test('fromJson falls back gracefully for unknown enum values', () {
@@ -330,6 +355,7 @@ void main() {
       expect(event.difficulty, EventDifficulty.easy);
       expect(event.scale, CleanupScale.small);
       expect(event.gear, contains(EventGear.trashBags));
+      expect(event.moderationApproved, isFalse);
     });
 
     test('fromJson converts UTC attendeeCheckedInAt to local time', () {

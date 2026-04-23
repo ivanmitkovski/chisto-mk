@@ -5,6 +5,7 @@ import { NotificationType, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from './notifications.service';
 import { FcmPushService } from './fcm-push.service';
+import { buildFcmDataPayload } from './notification-push-data';
 
 export type NotificationEvent = {
   recipientUserIds: string[];
@@ -58,15 +59,7 @@ export class NotificationDispatcherService {
     const tokens = await this.notificationsService.getActiveTokensForUser(userId);
     if (tokens.length === 0) return;
 
-    const pushData: Record<string, string> = {
-      notificationId,
-      type: event.type,
-      ...(event.data
-        ? Object.fromEntries(
-            Object.entries(event.data).map(([k, v]) => [k, String(v)]),
-          )
-        : {}),
-    };
+    const pushData = buildFcmDataPayload(notificationId, event.type, event.data);
 
     const outboxEntries = tokens.map((t) => ({
       userNotificationId: notificationId,

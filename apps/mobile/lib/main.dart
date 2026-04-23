@@ -56,13 +56,24 @@ class _ChistoAppState extends State<ChistoApp> {
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<RemoteMessage>? _tapSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
+  RemoteMessage? _pendingPushOpen;
+  int _pendingPushOpenAttempts = 0;
+  static const int _maxPendingPushOpenAttempts = 120;
+  String? _lastConsumedPushMessageId;
+  DateTime? _lastConsumedPushAt;
 
   @override
   void initState() {
     super.initState();
-    _tapSubscription = ServiceLocator.instance.pushNotificationService
-        .notificationTaps
-        .listen(_onNotificationTap);
+    final push = ServiceLocator.instance.pushNotificationService;
+    unawaited(push.initialize());
+    push.foregroundMessages.listen((RemoteMessage message) {
+      final Map<String, dynamic> data = message.data;
+      if (data['type'] == 'CLEANUP_EVENT' && data['kind'] == 'published') {
+        ServiceLocator.instance.eventsFeedRemoteRefreshTick.value++;
+      }
+    });
+    _tapSubscription = push.notificationTaps.listen(_onNotificationTap);
     // iOS (FlutterImplicitEngineDelegate): native plugins register in
     // `didInitializeImplicitFlutterEngine`, which can run after the first
     // frame. Subscribing to `app_links` in initState races and causes
@@ -117,9 +128,48 @@ class _ChistoAppState extends State<ChistoApp> {
   }
 
   void _onNotificationTap(RemoteMessage message) {
+    final String? id = message.messageId;
+    if (id != null &&
+        id.isNotEmpty &&
+        id == _lastConsumedPushMessageId &&
+        _lastConsumedPushAt != null &&
+        DateTime.now().difference(_lastConsumedPushAt!) < const Duration(seconds: 3)) {
+      return;
+    }
+    _pendingPushOpen = message;
+    _pendingPushOpenAttempts = 0;
+    _tryConsumePendingPushOpen();
+  }
+
+  void _tryConsumePendingPushOpen() {
+    final RemoteMessage? message = _pendingPushOpen;
+    if (message == null) {
+      return;
+    }
     final BuildContext? ctx = _navigatorKey.currentContext;
-    if (ctx == null) return;
+    if (ctx == null) {
+      if (_pendingPushOpenAttempts >= _maxPendingPushOpenAttempts) {
+        debugPrint('[Push] Open dropped: navigator context not ready');
+        _pendingPushOpen = null;
+        _pendingPushOpenAttempts = 0;
+        return;
+      }
+      _pendingPushOpenAttempts += 1;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _tryConsumePendingPushOpen();
+        }
+      });
+      return;
+    }
+    _pendingPushOpen = null;
+    _pendingPushOpenAttempts = 0;
     NotificationOpenRouter.handleOpen(ctx, message);
+    final String? mid = message.messageId;
+    if (mid != null && mid.isNotEmpty) {
+      _lastConsumedPushMessageId = mid;
+      _lastConsumedPushAt = DateTime.now();
+    }
   }
 
   @override

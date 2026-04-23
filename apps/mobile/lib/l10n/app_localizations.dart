@@ -2992,11 +2992,29 @@ abstract class AppLocalizations {
   /// **'Joining opens when the scheduled start time arrives.'**
   String get eventsJoinNotYetOpen;
 
+  /// No description provided for @eventsJoinWindowClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'You can no longer join this action. Joining stayed open until 15 minutes after the scheduled start.'**
+  String get eventsJoinWindowClosed;
+
   /// No description provided for @errorEventEndAtTooFar.
   ///
   /// In en, this message translates to:
   /// **'The planned end cannot be that far after the start. Try a shorter extension.'**
   String get errorEventEndAtTooFar;
+
+  /// No description provided for @errorEventsEndDifferentSkopjeCalendarDay.
+  ///
+  /// In en, this message translates to:
+  /// **'The end time must be on the same calendar day as the start (Europe/Skopje).'**
+  String get errorEventsEndDifferentSkopjeCalendarDay;
+
+  /// No description provided for @errorEventsEndAfterSkopjeLocalDay.
+  ///
+  /// In en, this message translates to:
+  /// **'The event must end by 23:59 on the start day.'**
+  String get errorEventsEndAfterSkopjeLocalDay;
 
   /// No description provided for @eventsAwaitingModerationCta.
   ///
@@ -3015,6 +3033,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This action is visible to you as the organizer. Volunteers will be able to join after moderators approve it.'**
   String get eventsModerationBannerBody;
+
+  /// No description provided for @eventsAttendeeModerationBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting approval'**
+  String get eventsAttendeeModerationBannerTitle;
+
+  /// No description provided for @eventsAttendeeModerationBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderators are reviewing this action. You can open it, but joining opens only after approval.'**
+  String get eventsAttendeeModerationBannerBody;
+
+  /// No description provided for @eventsDeclinedBannerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not approved'**
+  String get eventsDeclinedBannerTitle;
+
+  /// No description provided for @eventsDeclinedBannerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This event did not meet the criteria. Edit and resubmit to try again.'**
+  String get eventsDeclinedBannerBody;
+
+  /// No description provided for @eventsDeclinedResubmitCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit & resubmit'**
+  String get eventsDeclinedResubmitCta;
+
+  /// No description provided for @eventsDeclinedDashboardPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get eventsDeclinedDashboardPill;
+
+  /// No description provided for @eventsPendingDashboardPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Under review'**
+  String get eventsPendingDashboardPill;
 
   /// No description provided for @eventsEventPendingPublicCta.
   ///
@@ -3429,6 +3489,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photos help moderators verify the cleanup and inspire future actions in your community.'**
   String get eventsOrganizerCompletionStepVisibilityBody;
+
+  /// No description provided for @eventsOrganizerCompletionViewReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'View impact receipt'**
+  String get eventsOrganizerCompletionViewReceipt;
+
+  /// No description provided for @eventsImpactReceiptScreenTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact receipt'**
+  String get eventsImpactReceiptScreenTitle;
+
+  /// No description provided for @eventsImpactReceiptHeroSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact receipt for {title}'**
+  String eventsImpactReceiptHeroSemantic(String title);
+
+  /// No description provided for @eventsImpactReceiptMetricCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins'**
+  String get eventsImpactReceiptMetricCheckIns;
+
+  /// No description provided for @eventsImpactReceiptMetricParticipants.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined'**
+  String get eventsImpactReceiptMetricParticipants;
+
+  /// No description provided for @eventsImpactReceiptMetricBags.
+  ///
+  /// In en, this message translates to:
+  /// **'Bags (reported)'**
+  String get eventsImpactReceiptMetricBags;
+
+  /// No description provided for @eventsImpactReceiptProofHeading.
+  ///
+  /// In en, this message translates to:
+  /// **'Proof'**
+  String get eventsImpactReceiptProofHeading;
+
+  /// No description provided for @eventsImpactReceiptNoMediaHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Add after photos or structured evidence from the event page when you can.'**
+  String get eventsImpactReceiptNoMediaHint;
+
+  /// No description provided for @eventsImpactReceiptAsOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated {timestamp}'**
+  String eventsImpactReceiptAsOf(String timestamp);
+
+  /// No description provided for @eventsImpactReceiptCompletenessInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get eventsImpactReceiptCompletenessInProgress;
+
+  /// No description provided for @eventsImpactReceiptCompletenessFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete record'**
+  String get eventsImpactReceiptCompletenessFull;
+
+  /// No description provided for @eventsImpactReceiptCompletenessPartialAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos pending'**
+  String get eventsImpactReceiptCompletenessPartialAfter;
+
+  /// No description provided for @eventsImpactReceiptCompletenessPartialEvidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Structured evidence pending'**
+  String get eventsImpactReceiptCompletenessPartialEvidence;
+
+  /// No description provided for @eventsImpactReceiptCompletenessPartialBoth.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos and evidence pending'**
+  String get eventsImpactReceiptCompletenessPartialBoth;
+
+  /// No description provided for @eventsImpactReceiptShare.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get eventsImpactReceiptShare;
+
+  /// No description provided for @eventsImpactReceiptCopyLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get eventsImpactReceiptCopyLink;
+
+  /// No description provided for @eventsImpactReceiptLinkCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Link copied'**
+  String get eventsImpactReceiptLinkCopied;
+
+  /// No description provided for @eventsImpactReceiptViewCta.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact receipt'**
+  String get eventsImpactReceiptViewCta;
+
+  /// No description provided for @eventsImpactReceiptRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get eventsImpactReceiptRetry;
+
+  /// No description provided for @eventsImpactReceiptLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load receipt.'**
+  String get eventsImpactReceiptLoadFailed;
+
+  /// No description provided for @eventsImpactReceiptShareSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{checkIns} check-ins · {bags} bags · {joined} joined'**
+  String eventsImpactReceiptShareSummary(int checkIns, int bags, int joined);
+
+  /// No description provided for @errorEventsImpactReceiptNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Impact receipt is not available for this event yet.'**
+  String get errorEventsImpactReceiptNotAvailable;
 
   /// No description provided for @eventsOrganizerDetailPendingAfterPhotosTitle.
   ///
@@ -3958,6 +4150,18 @@ abstract class AppLocalizations {
   /// **'Choose an end time at least {minutes} minutes from now.'**
   String createEventScheduleEndInPast(int minutes);
 
+  /// No description provided for @createEventScheduleDateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Event date'**
+  String get createEventScheduleDateLabel;
+
+  /// No description provided for @createEventScheduleEndAfterDayError.
+  ///
+  /// In en, this message translates to:
+  /// **'The event must end by 23:59 on the same day.'**
+  String get createEventScheduleEndAfterDayError;
+
   /// No description provided for @createEventFieldType.
   ///
   /// In en, this message translates to:
@@ -4039,8 +4243,14 @@ abstract class AppLocalizations {
   /// No description provided for @createEventHelpBulletSchedule.
   ///
   /// In en, this message translates to:
-  /// **'Set the date and time span so calendars and reminders stay clear.'**
+  /// **'Pick the event date, then start and end times on that same day.'**
   String get createEventHelpBulletSchedule;
+
+  /// No description provided for @createEventHelpBulletSameDay.
+  ///
+  /// In en, this message translates to:
+  /// **'The event must finish on the same calendar day and by 23:59 at the latest.'**
+  String get createEventHelpBulletSameDay;
 
   /// No description provided for @createEventHelpBulletSubmit.
   ///
@@ -4834,6 +5044,12 @@ abstract class AppLocalizations {
   /// **'Location, schedule, and details'**
   String get eventsDetailGroupedPanelSemantic;
 
+  /// Accessibility label for the hero toolbar chat action, including unread count when applicable.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{Group chat} one{Group chat, 1 unread} other{Group chat, {count} unread}}'**
+  String eventsHeroChatSemantic(int count);
+
   /// No description provided for @eventsDetailParticipationSemantic.
   ///
   /// In en, this message translates to:
@@ -5145,6 +5361,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} joined'**
   String eventsCardParticipantsJoined(int count);
+
+  /// No description provided for @eventsDiscoveryThisWeekRetryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn’t load this week’s picks.'**
+  String get eventsDiscoveryThisWeekRetryHint;
+
+  /// No description provided for @eventsDiscoveryThisWeekRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get eventsDiscoveryThisWeekRetry;
 
   /// No description provided for @eventsDetailSemanticsLabel.
   ///
@@ -6251,8 +6479,248 @@ abstract class AppLocalizations {
   /// No description provided for @eventsImpactSummaryEmptyHint.
   ///
   /// In en, this message translates to:
-  /// **'Capture cleanup outcomes, effort, and lessons learned.'**
+  /// **'Note results and lessons from this cleanup.'**
   String get eventsImpactSummaryEmptyHint;
+
+  /// No description provided for @eventsLivePulseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Live impact'**
+  String get eventsLivePulseTitle;
+
+  /// No description provided for @eventsLivePulseVolunteers.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} joined'**
+  String eventsLivePulseVolunteers(int count);
+
+  /// No description provided for @eventsLivePulseCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} checked in'**
+  String eventsLivePulseCheckIns(int count);
+
+  /// No description provided for @eventsLivePulseBags.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} bags · est. {kg} kg'**
+  String eventsLivePulseBags(int count, String kg);
+
+  /// No description provided for @eventsEvidenceStripTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Field proof'**
+  String get eventsEvidenceStripTitle;
+
+  /// No description provided for @eventsEvidenceStripSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos from the cleanup evidence feed.'**
+  String get eventsEvidenceStripSubtitle;
+
+  /// No description provided for @eventsEvidenceStripSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Before, after, and field photos from the evidence feed'**
+  String get eventsEvidenceStripSemantic;
+
+  /// No description provided for @eventsEvidenceKindBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Before'**
+  String get eventsEvidenceKindBefore;
+
+  /// No description provided for @eventsEvidenceKindAfter.
+  ///
+  /// In en, this message translates to:
+  /// **'After'**
+  String get eventsEvidenceKindAfter;
+
+  /// No description provided for @eventsEvidenceKindField.
+  ///
+  /// In en, this message translates to:
+  /// **'Field'**
+  String get eventsEvidenceKindField;
+
+  /// No description provided for @eventsEvidenceStripTileSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index} of {total}, {kind}'**
+  String eventsEvidenceStripTileSemantic(int index, int total, String kind);
+
+  /// No description provided for @eventsRouteProgressTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get eventsRouteProgressTitle;
+
+  /// No description provided for @eventsFieldModeRowServerError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server: {code}'**
+  String eventsFieldModeRowServerError(String code);
+
+  /// No description provided for @eventsFieldModeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Field mode'**
+  String get eventsFieldModeTitle;
+
+  /// No description provided for @eventsFieldModeSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get eventsFieldModeSync;
+
+  /// No description provided for @eventsFieldModeEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing queued offline.'**
+  String get eventsFieldModeEmpty;
+
+  /// No description provided for @eventsFieldModeSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue synced.'**
+  String get eventsFieldModeSynced;
+
+  /// No description provided for @eventsFieldModeSyncFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not sync. Try again when online.'**
+  String get eventsFieldModeSyncFailed;
+
+  /// No description provided for @eventsFieldModeSyncPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced {synced} update(s). {failed} still in the offline queue.'**
+  String eventsFieldModeSyncPartial(int synced, int failed);
+
+  /// No description provided for @eventsFieldModeRowLiveImpactBags.
+  ///
+  /// In en, this message translates to:
+  /// **'Live impact · {count} bags'**
+  String eventsFieldModeRowLiveImpactBags(int count);
+
+  /// No description provided for @eventsFieldModeRowUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline change'**
+  String get eventsFieldModeRowUnknown;
+
+  /// No description provided for @eventsFieldModeRowStatusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get eventsFieldModeRowStatusPending;
+
+  /// No description provided for @eventsFieldModeRowStatusSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing'**
+  String get eventsFieldModeRowStatusSyncing;
+
+  /// No description provided for @eventsOfflineWorkHubTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline work'**
+  String get eventsOfflineWorkHubTitle;
+
+  /// No description provided for @eventsOfflineWorkHubSemanticSheet.
+  ///
+  /// In en, this message translates to:
+  /// **'Offline work summary and sync actions'**
+  String get eventsOfflineWorkHubSemanticSheet;
+
+  /// No description provided for @eventsOfflineWorkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Queued changes across check-ins, field updates, and chat.'**
+  String get eventsOfflineWorkSubtitle;
+
+  /// No description provided for @eventsOfflineWorkSectionCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-ins'**
+  String get eventsOfflineWorkSectionCheckIns;
+
+  /// No description provided for @eventsOfflineWorkSectionField.
+  ///
+  /// In en, this message translates to:
+  /// **'Field updates'**
+  String get eventsOfflineWorkSectionField;
+
+  /// No description provided for @eventsOfflineWorkSectionChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat'**
+  String get eventsOfflineWorkSectionChat;
+
+  /// No description provided for @eventsOfflineWorkCountPending.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} pending'**
+  String eventsOfflineWorkCountPending(int count);
+
+  /// No description provided for @eventsOfflineWorkCountFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} need attention'**
+  String eventsOfflineWorkCountFailed(int count);
+
+  /// No description provided for @eventsOfflineWorkSyncNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get eventsOfflineWorkSyncNow;
+
+  /// No description provided for @eventsOfflineWorkOpenFieldQueue.
+  ///
+  /// In en, this message translates to:
+  /// **'Open field queue'**
+  String get eventsOfflineWorkOpenFieldQueue;
+
+  /// No description provided for @eventsOfflineWorkOpenChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Open event chat'**
+  String get eventsOfflineWorkOpenChat;
+
+  /// No description provided for @eventsOfflineWorkRetryFailedChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry failed chat sends'**
+  String get eventsOfflineWorkRetryFailedChat;
+
+  /// No description provided for @eventsOfflineWorkResolveInChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the chat and fix or delete the message that could not be sent.'**
+  String get eventsOfflineWorkResolveInChat;
+
+  /// No description provided for @eventsOfflineWorkSyncDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync finished'**
+  String get eventsOfflineWorkSyncDone;
+
+  /// No description provided for @eventsOfflineWorkSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing…'**
+  String get eventsOfflineWorkSyncing;
+
+  /// No description provided for @eventsOfflineWorkDrainFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not finish syncing. Try again when you are online.'**
+  String get eventsOfflineWorkDrainFailed;
+
+  /// No description provided for @eventsChatOutboxFull.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many messages are waiting to send offline (limit {max}). Go online to send pending messages, then try again.'**
+  String eventsChatOutboxFull(int max);
 
   /// No description provided for @eventsCompletedBagsSectionTitle.
   ///
@@ -6260,16 +6728,10 @@ abstract class AppLocalizations {
   /// **'Trash bags collected'**
   String get eventsCompletedBagsSectionTitle;
 
-  /// No description provided for @eventsCompletedBagsSectionSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'How many bags of trash volunteers collected during this cleanup. You can update this anytime; it is included in the impact summary below.'**
-  String get eventsCompletedBagsSectionSubtitle;
-
   /// No description provided for @eventsCompletedBagsSave.
   ///
   /// In en, this message translates to:
-  /// **'Save bag count'**
+  /// **'Save'**
   String get eventsCompletedBagsSave;
 
   /// No description provided for @eventsCompletedBagsSaved.
@@ -6439,6 +6901,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Open event'**
   String get eventsSuccessDialogOpenEvent;
+
+  /// No description provided for @eventsSuccessDialogViewEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'View event'**
+  String get eventsSuccessDialogViewEvent;
+
+  /// No description provided for @eventsSuccessDialogPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted for review'**
+  String get eventsSuccessDialogPendingTitle;
+
+  /// No description provided for @eventsSuccessDialogPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} at {siteName} was submitted. A moderator will approve or decline it before it appears publicly. You can open it from your events anytime.'**
+  String eventsSuccessDialogPendingBody(String title, String siteName);
 
   /// No description provided for @eventsTimePickerSelectTime.
   ///
@@ -8165,6 +8645,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Shared location'**
   String get chatSharedLocation;
+
+  /// No description provided for @organizerToolkitTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Become an organizer'**
+  String get organizerToolkitTitle;
+
+  /// No description provided for @organizerToolkitPage1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan ahead'**
+  String get organizerToolkitPage1Title;
+
+  /// No description provided for @organizerToolkitPage1Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Assess the site for hazards, prepare safety gear, and brief your team before volunteers arrive.'**
+  String get organizerToolkitPage1Body;
+
+  /// No description provided for @organizerToolkitPage2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Moderation keeps trust'**
+  String get organizerToolkitPage2Title;
+
+  /// No description provided for @organizerToolkitPage2Body.
+  ///
+  /// In en, this message translates to:
+  /// **'After you create an event, moderators review it. Once approved, volunteers can see and join.'**
+  String get organizerToolkitPage2Body;
+
+  /// No description provided for @organizerToolkitPage3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify attendance'**
+  String get organizerToolkitPage3Title;
+
+  /// No description provided for @organizerToolkitPage3Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the in-app QR check-in so every volunteer gets credit for showing up.'**
+  String get organizerToolkitPage3Body;
+
+  /// No description provided for @organizerToolkitPage4Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather and safety'**
+  String get organizerToolkitPage4Title;
+
+  /// No description provided for @organizerToolkitPage4Body.
+  ///
+  /// In en, this message translates to:
+  /// **'If conditions turn unsafe, pause or postpone. Tell joined volunteers promptly in the app so nobody travels for a cancelled start.'**
+  String get organizerToolkitPage4Body;
+
+  /// No description provided for @organizerToolkitPage5Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Waste and disposal'**
+  String get organizerToolkitPage5Title;
+
+  /// No description provided for @organizerToolkitPage5Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort recyclables when you can, bag sharp objects safely, and take waste to authorized disposal points. Leave the site cleaner than you found it.'**
+  String get organizerToolkitPage5Body;
+
+  /// No description provided for @organizerToolkitPage6Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Include everyone'**
+  String get organizerToolkitPage6Title;
+
+  /// No description provided for @organizerToolkitPage6Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Offer clear roles, steady pacing, and patience. A welcoming briefing helps first-time volunteers feel confident and stay safe.'**
+  String get organizerToolkitPage6Body;
+
+  /// No description provided for @organizerToolkitPage7Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy in chat'**
+  String get organizerToolkitPage7Title;
+
+  /// No description provided for @organizerToolkitPage7Body.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep personal phone numbers and addresses out of public event chat. Use in-app messaging so the whole team stays informed without oversharing.'**
+  String get organizerToolkitPage7Body;
+
+  /// No description provided for @organizerToolkitPage8Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence and honest impact'**
+  String get organizerToolkitPage8Title;
+
+  /// No description provided for @organizerToolkitPage8Body.
+  ///
+  /// In en, this message translates to:
+  /// **'After photos and bag counts should reflect what really happened. Accurate reporting builds trust with volunteers, moderators, and the wider community.'**
+  String get organizerToolkitPage8Body;
+
+  /// No description provided for @organizerToolkitContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get organizerToolkitContinue;
+
+  /// No description provided for @organizerToolkitStartQuiz.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the quiz'**
+  String get organizerToolkitStartQuiz;
+
+  /// No description provided for @organizerQuizTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick knowledge check'**
+  String get organizerQuizTitle;
+
+  /// No description provided for @organizerQuizLoadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the quiz. Please try again.'**
+  String get organizerQuizLoadFailed;
+
+  /// No description provided for @organizerQuizLoadInvalidResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'The quiz data from the server was incomplete. Please try again.'**
+  String get organizerQuizLoadInvalidResponse;
+
+  /// No description provided for @organizerQuizRetryLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get organizerQuizRetryLoad;
+
+  /// No description provided for @organizerQuizSubmitFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not submit answers. Try again.'**
+  String get organizerQuizSubmitFailed;
+
+  /// No description provided for @organizerQuizOptionSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Question {index} of {total}: {optionText}'**
+  String organizerQuizOptionSemantic(int index, int total, String optionText);
+
+  /// No description provided for @organizerQuizSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit answers'**
+  String get organizerQuizSubmit;
+
+  /// No description provided for @organizerQuizPassedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re certified!'**
+  String get organizerQuizPassedTitle;
+
+  /// No description provided for @organizerQuizPassedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You can now create cleanup events. Volunteers are waiting.'**
+  String get organizerQuizPassedBody;
+
+  /// No description provided for @organizerQuizFailedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not quite'**
+  String get organizerQuizFailedTitle;
+
+  /// No description provided for @organizerQuizFailedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Review the tutorial and try again. You got {correct} out of {total}.'**
+  String organizerQuizFailedBody(int correct, int total);
+
+  /// No description provided for @organizerQuizRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get organizerQuizRetry;
+
+  /// No description provided for @organizerQuizCreateEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first event'**
+  String get organizerQuizCreateEvent;
+
+  /// No description provided for @organizerCertifiedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Certified organizer'**
+  String get organizerCertifiedBadge;
+
+  /// No description provided for @errorOrganizerQuizSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'That quiz session expired. Load a new quiz and try again.'**
+  String get errorOrganizerQuizSessionExpired;
+
+  /// No description provided for @errorOrganizerQuizSessionInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This quiz session is not valid. Load the quiz again.'**
+  String get errorOrganizerQuizSessionInvalid;
+
+  /// No description provided for @errorOrganizerQuizAnswersMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Answers do not match the quiz you started. Load the quiz again.'**
+  String get errorOrganizerQuizAnswersMismatch;
+
+  /// No description provided for @errorOrganizerQuizInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'One or more answers are not valid for this quiz. Load the quiz again.'**
+  String get errorOrganizerQuizInvalid;
+
+  /// No description provided for @errorOrganizerCertificationAlreadyDone.
+  ///
+  /// In en, this message translates to:
+  /// **'You are already a certified organizer. No need to take the quiz again.'**
+  String get errorOrganizerCertificationAlreadyDone;
 }
 
 class _AppLocalizationsDelegate

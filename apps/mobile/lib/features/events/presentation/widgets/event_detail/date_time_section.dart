@@ -7,6 +7,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_calendar_date_format.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -105,53 +107,52 @@ class DateTimeSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
+    final String dateLabel = formatEventCalendarDate(context, event.date);
+    final String timeRangeLabel = event.formattedTimeRange;
+    final String kmSuffix = context.l10n.eventsLocationDotKm(
+      event.siteDistanceKm.toStringAsFixed(1),
+    );
+
     return Semantics(
       button: true,
-      label: context.l10n.eventsDateInfoSemantic(
-        formatEventCalendarDate(context, event.date),
-        event.formattedTimeRange,
-      ),
+      label: embeddedInGroupedPanel
+          ? '${context.l10n.eventsDateInfoSemantic(dateLabel, timeRangeLabel)} $kmSuffix'
+          : context.l10n.eventsDateInfoSemantic(dateLabel, timeRangeLabel),
       child: Material(
         color: AppColors.transparent,
         child: InkWell(
           onTap: () => _showDateInfo(context),
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           child: embeddedInGroupedPanel
-              // ── Embedded: simple icon row, no card chrome ─────────────────
-              ? ConstrainedBox(
-                  constraints: const BoxConstraints(minHeight: 52),
-                  child: Row(
+              // ── Embedded: grouped metadata row, no card chrome ────────────
+              ? EventDetailGroupedMetadataRow(
+                  leading: const EventDetailGroupedMetadataRowLeading(
+                    icon: CupertinoIcons.calendar,
+                  ),
+                  center: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      Icon(
-                        CupertinoIcons.calendar,
-                        size: AppSpacing.iconMd,
-                        color: AppColors.textSecondary,
+                      Text(
+                        dateLabel,
+                        style: AppTypography.eventsGroupedRowPrimary(textTheme),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              formatEventCalendarDate(context, event.date),
-                              style: AppTypography.eventsGroupedRowPrimary(textTheme),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              event.formattedTimeRange,
-                              style: AppTypography.eventsListCardMeta(textTheme),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
+                      Text.rich(
+                        TextSpan(
+                          style: AppTypography.eventsListCardMeta(textTheme),
+                          children: <InlineSpan>[
+                            TextSpan(text: timeRangeLabel),
+                            TextSpan(
+                              text: ' $kmSuffix',
+                              style: AppTypography.eventsListCardMeta(textTheme)
+                                  .copyWith(color: AppColors.textMuted),
                             ),
                           ],
                         ),
-                      ),
-                      const Icon(
-                        CupertinoIcons.chevron_right,
-                        size: 14,
-                        color: AppColors.textMuted,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ),
@@ -159,17 +160,7 @@ class DateTimeSection extends StatelessWidget {
               // ── Standalone: prominent card with large icon ─────────────────
               : Container(
                   padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: AppColors.panelBackground,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    boxShadow: <BoxShadow>[
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                  decoration: EventDetailSurfaceDecoration.detailModule(),
                   child: Row(
                     children: <Widget>[
                       Container(
@@ -193,14 +184,14 @@ class DateTimeSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              formatEventCalendarDate(context, event.date),
+                              dateLabel,
                               style: AppTypography.eventsGroupedRowPrimary(textTheme),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                             const SizedBox(height: AppSpacing.xxs / 2),
                             Text(
-                              event.formattedTimeRange,
+                              timeRangeLabel,
                               style: AppTypography.eventsListCardMeta(textTheme),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

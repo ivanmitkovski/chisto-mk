@@ -1,7 +1,9 @@
 /// <reference types="jest" />
 
+import { NotFoundException } from '@nestjs/common';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
+import { FindEventQueryDto } from '../../src/events/dto/find-event-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { EventsCheckInController } from '../../src/events/events-check-in.controller';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
@@ -21,27 +23,42 @@ describe('EventsController', () => {
   let controller: EventsController;
   const list = jest.fn();
   const findOne = jest.fn();
+  const findPublicShareCard = jest.fn();
   const create = jest.fn();
   const join = jest.fn();
 
   beforeEach(() => {
     list.mockReset();
     findOne.mockReset();
+    findPublicShareCard.mockReset();
     create.mockReset();
     join.mockReset();
 
-    controller = new EventsController({
-      list,
-      findOne,
-      create,
-      patchEvent: jest.fn(),
-      join,
-      leave: jest.fn(),
-      patchLifecycle: jest.fn(),
-      patchReminder: jest.fn(),
-      appendAfterImages: jest.fn(),
-      listParticipants: jest.fn(),
-    } as unknown as EventsService);
+    controller = new EventsController(
+      {
+        list,
+        findOne,
+        findPublicShareCard,
+        create,
+        patchEvent: jest.fn(),
+        join,
+        leave: jest.fn(),
+        patchLifecycle: jest.fn(),
+        patchReminder: jest.fn(),
+        appendAfterImages: jest.fn(),
+        listParticipants: jest.fn(),
+      } as unknown as EventsService,
+      { getSnapshot: jest.fn(), watchLiveImpactSse: jest.fn(), patch: jest.fn() } as never,
+      { listForEvent: jest.fn(), addPhoto: jest.fn(), deletePhoto: jest.fn() } as never,
+      {
+        listForEvent: jest.fn(),
+        replaceWaypoints: jest.fn(),
+        claimSegment: jest.fn(),
+        completeSegment: jest.fn(),
+      } as never,
+      { applyBatch: jest.fn() } as never,
+      { buildForViewer: jest.fn() } as never,
+    );
   });
 
   it('list forwards user and query to EventsService', async () => {
@@ -56,15 +73,72 @@ describe('EventsController', () => {
     expect(result).toBe(payload);
   });
 
-  it('findOne forwards id and user', async () => {
+  it('findOne forwards id, user, and optional geo query', async () => {
     const u = user('u1');
     const event = { id: 'evt-1', title: 'River' };
     findOne.mockResolvedValue(event);
+    const geo = new FindEventQueryDto();
 
-    const result = await controller.findOne(u, 'evt-1');
+    const result = await controller.findOne(u, 'evt-1', geo);
 
-    expect(findOne).toHaveBeenCalledWith('evt-1', u);
+    expect(findOne).toHaveBeenCalledWith('evt-1', u, geo);
     expect(result).toBe(event);
+  });
+
+  it('getPublicShareCard rejects non-uuid ids', async () => {
+    try {
+      await controller.getPublicShareCard('not-a-uuid');
+      expect(true).toBe(false);
+    } catch (e: unknown) {
+      expect(e).toBeInstanceOf(NotFoundException);
+    }
+  });
+
+  it('getPublicShareCard forwards trimmed uuid to EventsService', async () => {
+    const id = '550e8400-e29b-41d4-a716-446655440000';
+    const card = { id, title: 'River', siteLabel: 'Skopje', scheduledAt: '2026-06-01T08:00:00.000Z', endAt: null, lifecycleStatus: 'UPCOMING' };
+    findPublicShareCard.mockResolvedValue(card);
+
+    const result = await controller.getPublicShareCard(`  ${id}  `);
+
+    expect(findPublicShareCard).toHaveBeenCalledWith(id);
+    expect(result).toBe(card);
+  });
+
+  it('getImpactReceipt forwards id and user to EventImpactReceiptService', async () => {
+    const u = user('u1');
+    const receipt = { eventId: 'evt-1', title: 'River' };
+    const buildForViewer = jest.fn().mockResolvedValue(receipt);
+    const ctrl = new EventsController(
+      {
+        list,
+        findOne,
+        findPublicShareCard: jest.fn(),
+        create: jest.fn(),
+        patchEvent: jest.fn(),
+        join: jest.fn(),
+        leave: jest.fn(),
+        patchLifecycle: jest.fn(),
+        patchReminder: jest.fn(),
+        appendAfterImages: jest.fn(),
+        listParticipants: jest.fn(),
+      } as unknown as EventsService,
+      { getSnapshot: jest.fn(), watchLiveImpactSse: jest.fn(), patch: jest.fn() } as never,
+      { listForEvent: jest.fn(), addPhoto: jest.fn(), deletePhoto: jest.fn() } as never,
+      {
+        listForEvent: jest.fn(),
+        replaceWaypoints: jest.fn(),
+        claimSegment: jest.fn(),
+        completeSegment: jest.fn(),
+      } as never,
+      { applyBatch: jest.fn() } as never,
+      { buildForViewer } as never,
+    );
+
+    const result = await ctrl.getImpactReceipt(u, 'evt-1');
+
+    expect(buildForViewer).toHaveBeenCalledWith('evt-1', u);
+    expect(result).toBe(receipt);
   });
 
   it('create forwards dto and user', async () => {

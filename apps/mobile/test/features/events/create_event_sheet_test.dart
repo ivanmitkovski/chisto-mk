@@ -6,11 +6,13 @@
 // open via named route (CupertinoPageRoute) and confirm iOS edge swipe-back matches discard rules;
 // brief bootstrap skeleton then form fade-in; reduced motion skips section stagger.
 
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/data/in_memory_events_store.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/create_event_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/organizer_toolkit/organizer_toolkit_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/create_event/create_event_sticky_footer.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
@@ -20,6 +22,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+/// Fixed wall time so schedule validation and step progress are CI-stable.
+DateTime createEventSheetTestClock() => DateTime(2026, 6, 15, 10, 0);
 
 Future<void> settlePastCreateEventBootstrap(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 420));
@@ -42,6 +47,36 @@ void main() {
 
   tearDown(() {
     EventsRepositoryRegistry.setTestOverride(null);
+    ServiceLocator.instance.reset();
+  });
+
+  testWidgets('uncertified user is redirected from CreateEventSheet to toolkit', (
+    WidgetTester tester,
+  ) async {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    await ServiceLocator.instance.initialize();
+    ServiceLocator.instance.authState.setAuthenticated(
+      userId: 'u1',
+      displayName: 'Tester',
+      organizerCertifiedAt: null,
+      syncOrganizerCertifiedAt: true,
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: const Locale('en'),
+        home: const Scaffold(
+          body: CreateEventSheet(clock: createEventSheetTestClock),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    expect(find.byType(OrganizerToolkitScreen), findsOneWidget);
   });
 
   testWidgets('requires site selection before creating an event', (
@@ -52,7 +87,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(body: CreateEventSheet()),
+        home: Scaffold(
+          body: CreateEventSheet(clock: createEventSheetTestClock),
+        ),
       ),
     );
 
@@ -86,7 +123,8 @@ void main() {
                   onPressed: () async {
                     createdEvent = await Navigator.of(context).push<EcoEvent>(
                       MaterialPageRoute<EcoEvent>(
-                        builder: (_) => const CreateEventSheet(
+                        builder: (_) => CreateEventSheet(
+                          clock: createEventSheetTestClock,
                           preselectedSiteId: '1',
                           preselectedSiteName: 'Illegal landfill near the river',
                           preselectedSiteImageUrl:
@@ -126,9 +164,9 @@ void main() {
     await tester.tap(find.text('Create eco action'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Event created'), findsOneWidget);
+    expect(find.text('Submitted for review'), findsOneWidget);
 
-    await tester.tap(find.text('Open event'));
+    await tester.tap(find.text('View event'));
     await tester.pumpAndSettle();
 
     expect(createdEvent, isNotNull);
@@ -144,8 +182,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(
+        home: Scaffold(
           body: CreateEventSheet(
+            clock: createEventSheetTestClock,
             preselectedSiteId: '1',
             preselectedSiteName: 'Illegal landfill near the river',
             preselectedSiteImageUrl:
@@ -177,8 +216,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(
+        home: Scaffold(
           body: CreateEventSheet(
+            clock: createEventSheetTestClock,
             preselectedSiteId: '1',
             preselectedSiteName: 'Illegal landfill near the river',
             preselectedSiteImageUrl:
@@ -218,8 +258,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(
+        home: Scaffold(
           body: CreateEventSheet(
+            clock: createEventSheetTestClock,
             preselectedSiteId: '1',
             preselectedSiteName: 'Illegal landfill near the river',
             preselectedSiteImageUrl:
@@ -232,12 +273,13 @@ void main() {
     await tester.pumpAndSettle();
     await settlePastCreateEventBootstrap(tester);
 
-    final BuildContext calContext = tester.element(find.byType(EventCalendar));
+    final BuildContext calContext =
+        tester.element(find.byType(EventCalendar).first);
     final MaterialLocalizations loc = MaterialLocalizations.of(calContext);
-    final DateTime now = DateTime.now();
+    final DateTime anchor = createEventSheetTestClock();
     final String monthLabel =
-        loc.formatMonthYear(DateTime(now.year, now.month));
-    expect(find.text(monthLabel), findsOneWidget);
+        loc.formatMonthYear(DateTime(anchor.year, anchor.month));
+    expect(find.text(monthLabel), findsWidgets);
   });
 
   testWidgets('primary CTA lives in sticky footer without scrolling the form', (
@@ -253,8 +295,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('en'),
-        home: const Scaffold(
+        home: Scaffold(
           body: CreateEventSheet(
+            clock: createEventSheetTestClock,
             preselectedSiteId: '1',
             preselectedSiteName: 'Illegal landfill near the river',
             preselectedSiteImageUrl:
@@ -283,17 +326,18 @@ void main() {
     });
 
     await tester.pumpWidget(
-      const MediaQuery(
-        data: MediaQueryData(
+      MediaQuery(
+        data: const MediaQueryData(
           viewInsets: EdgeInsets.only(bottom: 280),
         ),
         child: MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
-          locale: Locale('en'),
+          locale: const Locale('en'),
           home: Scaffold(
             resizeToAvoidBottomInset: false,
             body: CreateEventSheet(
+              clock: createEventSheetTestClock,
               preselectedSiteId: '1',
               preselectedSiteName: 'Illegal landfill near the river',
               preselectedSiteImageUrl:
@@ -345,7 +389,8 @@ void main() {
                   onPressed: () async {
                     createdEvent = await Navigator.of(context).push<EcoEvent>(
                       MaterialPageRoute<EcoEvent>(
-                        builder: (_) => const CreateEventSheet(
+                        builder: (_) => CreateEventSheet(
+                          clock: createEventSheetTestClock,
                           preselectedSiteId: '1',
                           preselectedSiteName: 'Illegal landfill near the river',
                           preselectedSiteImageUrl:
@@ -377,7 +422,7 @@ void main() {
     await tester.tap(find.byKey(const ValueKey<String>('create_event_volunteer_cap')));
     await tester.pumpAndSettle();
     final Finder preset15 = find.byWidgetPredicate(
-      (Widget w) => w is ReportActionTile && (w as ReportActionTile).title == '15',
+      (Widget w) => w is ReportActionTile && w.title == '15',
     );
     await tester.ensureVisible(preset15);
     await tester.pumpAndSettle();
@@ -399,7 +444,7 @@ void main() {
     await tester.tap(find.text('Create eco action'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Open event'));
+    await tester.tap(find.text('View event'));
     await tester.pumpAndSettle();
 
     expect(createdEvent, isNotNull);
@@ -422,8 +467,9 @@ void main() {
             child: child!,
           );
         },
-        home: const Scaffold(
+        home: Scaffold(
           body: CreateEventSheet(
+            clock: createEventSheetTestClock,
             preselectedSiteId: '1',
             preselectedSiteName: 'Illegal landfill near the river',
             preselectedSiteImageUrl:

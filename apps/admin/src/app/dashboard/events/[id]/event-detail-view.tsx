@@ -40,6 +40,14 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
   const [description, setDescription] = useState(event.description);
   const [recurrenceRule, setRecurrenceRule] = useState(event.recurrenceRule ?? '');
   const [scheduledAt, setScheduledAt] = useState(event.scheduledAt);
+  const [endAt, setEndAt] = useState(() => {
+    if (event.endAt) {
+      return new Date(event.endAt).toISOString();
+    }
+    const next = new Date(event.scheduledAt);
+    next.setDate(next.getDate() + 1);
+    return next.toISOString();
+  });
   const [completedAt, setCompletedAt] = useState(event.completedAt ?? '');
   const [participantCount, setParticipantCount] = useState(event.participantCount);
   const [saving, setSaving] = useState(false);
@@ -66,9 +74,18 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
     return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
   }, [scheduledAt]);
 
+  const endAtIso = useMemo(() => {
+    if (!endAt.trim()) {
+      return null;
+    }
+    const parsed = new Date(endAt);
+    return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+  }, [endAt]);
+
   const { hint: scheduleConflictHint, checking: scheduleConflictChecking } = useScheduleConflictPreview({
     siteId: site.id,
     scheduledAtIso,
+    endAtIso,
     excludeEventId: event.id,
   });
 
@@ -138,10 +155,10 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
       description,
       recurrenceRule,
       scheduledAtValue: scheduledAt,
-      participantCount,
       ...(isCompleted
         ? { completedAtLocal: completedAt.trim() ? toDatetimeLocal(completedAt) : '' }
-        : {}),
+        : { endAtValue: endAt }),
+      participantCount,
     });
     setFieldErrors(errors);
     if (Object.keys(errors).length > 0) {
@@ -155,6 +172,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
       description: string;
       recurrenceRule: string;
       scheduledAt: string;
+      endAt?: string;
       participantCount: number;
       completedAt?: string | null;
     } = {
@@ -164,6 +182,9 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
       scheduledAt: new Date(scheduledAt).toISOString(),
       participantCount,
     };
+    if (!isCompleted) {
+      body.endAt = new Date(endAt).toISOString();
+    }
     if (event.completedAt) {
       body.completedAt = completedAt ? new Date(completedAt).toISOString() : null;
     }
@@ -450,7 +471,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
             ) : null}
           </label>
           <label className={styles.field} htmlFor="detail-event-scheduled">
-            <span className={styles.fieldLabel}>Scheduled date & time</span>
+            <span className={styles.fieldLabel}>Start date & time</span>
             <input
               id="detail-event-scheduled"
               type="datetime-local"
@@ -470,6 +491,30 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               </span>
             ) : null}
           </label>
+          {!isCompleted ? (
+            <label className={styles.field} htmlFor="detail-event-end">
+              <span className={styles.fieldLabel}>End date & time</span>
+              <span className={styles.fieldHint}>Must be on the same calendar day as the start, by 23:59 at the latest.</span>
+              <input
+                id="detail-event-end"
+                type="datetime-local"
+                value={toDatetimeLocal(endAt)}
+                disabled={readOnly}
+                onChange={(e) => {
+                  setEndAt(new Date(e.target.value).toISOString());
+                  clearFieldError('endAt');
+                }}
+                className={styles.input}
+                aria-invalid={fieldErrors.endAt ? true : undefined}
+                aria-describedby={fieldErrors.endAt ? 'detail-event-end-err' : undefined}
+              />
+              {fieldErrors.endAt ? (
+                <span id="detail-event-end-err" className={styles.fieldError} role="alert">
+                  {fieldErrors.endAt}
+                </span>
+              ) : null}
+            </label>
+          ) : null}
           {scheduleConflictHint ? (
             <div className={styles.conflictBanner} role="status">
               {scheduleConflictChecking ? (
