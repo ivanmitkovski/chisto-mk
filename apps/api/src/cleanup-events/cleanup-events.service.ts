@@ -408,10 +408,14 @@ export class CleanupEventsService {
     }
 
     /** Approve/decline-only: do not re-validate stored span (legacy rows may predate stricter rules). */
+    const endAtPatchHasValue =
+      dto.endAt !== undefined &&
+      dto.endAt != null &&
+      String(dto.endAt).trim() !== '';
     const isModerationStatusOnly =
       (dto.status === CleanupEventStatus.APPROVED || dto.status === CleanupEventStatus.DECLINED) &&
       dto.scheduledAt == null &&
-      dto.endAt === undefined;
+      !endAtPatchHasValue;
 
     const nextStart =
       dto.scheduledAt != null ? new Date(dto.scheduledAt) : existing.scheduledAt;

@@ -8,6 +8,7 @@ import {
   Role,
 } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
+import type { PatchCleanupEventDto } from '../../src/cleanup-events/dto/patch-cleanup-event.dto';
 import { CleanupEventsService } from '../../src/cleanup-events/cleanup-events.service';
 
 function actor(id: string): AuthenticatedUser {
@@ -326,6 +327,80 @@ describe('CleanupEventsService duplicate schedule', () => {
     prisma.cleanupEvent.update.mockResolvedValue({});
 
     await service.patch(pendingId, { status: CleanupEventStatus.APPROVED }, actor('admin-1'));
+
+    expect(prisma.$transaction).toHaveBeenCalled();
+  });
+
+  it('patch approve with explicit null endAt skips calendar validation (moderation-only)', async () => {
+    const pendingId = 'pending-null-end';
+    prisma.cleanupEvent.findUnique
+      .mockResolvedValueOnce({
+        id: pendingId,
+        createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        title: 'River cleanup',
+        description: '',
+        siteId: 'site-1',
+        scheduledAt: new Date('2025-06-01T10:00:00.000Z'),
+        endAt: new Date('2025-06-03T18:00:00.000Z'),
+        completedAt: null,
+        organizerId: 'org-1',
+        participantCount: 0,
+        status: CleanupEventStatus.PENDING,
+        lifecycleStatus: EcoEventLifecycleStatus.UPCOMING,
+        recurrenceRule: null,
+        recurrenceIndex: null,
+        parentEventId: null,
+        category: 'GENERAL_CLEANUP',
+        scale: null,
+        difficulty: null,
+        gear: [],
+        maxParticipants: null,
+        checkInOpen: false,
+        checkedInCount: 0,
+        afterImageKeys: [],
+      })
+      .mockResolvedValueOnce({
+        id: pendingId,
+        createdAt: new Date('2025-01-01T00:00:00.000Z'),
+        title: 'River cleanup',
+        description: '',
+        siteId: 'site-1',
+        scheduledAt: new Date('2025-06-01T10:00:00.000Z'),
+        endAt: new Date('2025-06-03T18:00:00.000Z'),
+        completedAt: null,
+        organizerId: 'org-1',
+        participantCount: 0,
+        status: CleanupEventStatus.APPROVED,
+        lifecycleStatus: EcoEventLifecycleStatus.UPCOMING,
+        recurrenceRule: null,
+        recurrenceIndex: null,
+        parentEventId: null,
+        category: 'GENERAL_CLEANUP',
+        scale: null,
+        difficulty: null,
+        gear: [],
+        maxParticipants: null,
+        checkInOpen: false,
+        checkedInCount: 0,
+        afterImageKeys: [],
+        site: {
+          id: 'site-1',
+          latitude: 0,
+          longitude: 0,
+          description: null,
+          status: 'ACTIVE',
+        },
+        organizer: { id: 'org-1', firstName: 'A', lastName: 'B', email: 'a@x.mk' },
+        _count: { seriesChildren: 0 },
+      });
+    prisma.cleanupEvent.update.mockResolvedValue({});
+
+    await service.patch(
+      pendingId,
+      // Some clients send JSON null for omitted optional fields.
+      { status: CleanupEventStatus.APPROVED, endAt: null } as unknown as PatchCleanupEventDto,
+      actor('admin-1'),
+    );
 
     expect(prisma.$transaction).toHaveBeenCalled();
   });
