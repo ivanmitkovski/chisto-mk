@@ -53,6 +53,8 @@ class _PrimaryButtonState extends State<PrimaryButton> {
             style: ElevatedButton.styleFrom(
               elevation: 0,
               alignment: Alignment.center,
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               backgroundColor: busy
                   ? AppColors.primary
                   : (inactive ? AppColors.inputFill : AppColors.primary),
@@ -67,19 +69,30 @@ class _PrimaryButtonState extends State<PrimaryButton> {
               ),
             ),
             child: busy
-                ? SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: AppColors.textPrimary,
+                ? Center(
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.5,
+                        color: AppColors.textPrimary,
+                      ),
                     ),
                   )
-                : Text(
-                    widget.label,
-                    textAlign: TextAlign.center,
-                    style: AppTypography.buttonLabel.copyWith(
-                      color: inactive ? AppColors.textSecondary : AppColors.textPrimary,
+                : Center(
+                    child: Text(
+                      widget.label,
+                      textAlign: TextAlign.center,
+                      textHeightBehavior: const TextHeightBehavior(
+                        applyHeightToFirstAscent: false,
+                        applyHeightToLastDescent: false,
+                      ),
+                      style: AppTypography.buttonLabel.copyWith(
+                        color: inactive
+                            ? AppColors.textSecondary
+                            : AppColors.textPrimary,
+                        height: 1.0,
+                      ),
                     ),
                   ),
           ),

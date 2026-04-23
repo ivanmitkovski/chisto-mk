@@ -230,6 +230,8 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
       final String message = switch (issue) {
         ScheduleValidationIssue.endNotAfterStart =>
           context.l10n.eventsExtendEndInvalidRange,
+        ScheduleValidationIssue.endAfterLocalDayEnd =>
+          context.l10n.eventsExtendEndInvalidRange,
         ScheduleValidationIssue.startTooSoon =>
           context.l10n.eventsExtendEndInvalidRange,
         ScheduleValidationIssue.endTooSoon => context.l10n.eventsExtendEndTooSoon,
@@ -247,10 +249,7 @@ class _ExtendEventEndSheetState extends State<ExtendEventEndSheet> {
     if (!mounted) {
       return;
     }
-    final bool online = connectivity.isEmpty ||
-        connectivity.any(
-          (ConnectivityResult e) => e != ConnectivityResult.none,
-        );
+    final bool online = ConnectivityGate.isOnline(connectivity);
     if (!online) {
       AppSnack.show(
         context,

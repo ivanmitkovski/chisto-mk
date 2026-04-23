@@ -86,6 +86,49 @@ class InMemoryEventsStore extends ChangeNotifier implements EventsRepository {
   Future<void> loadMore() async {}
 
   @override
+  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) async {
+    Iterable<EcoEvent> out = _events;
+    if (params.statuses.isNotEmpty) {
+      out = out.where((EcoEvent e) => params.statuses.contains(e.status));
+    }
+    if (params.dateFrom != null && params.dateTo != null) {
+      final DateTime f = DateTime(
+        params.dateFrom!.year,
+        params.dateFrom!.month,
+        params.dateFrom!.day,
+      );
+      final DateTime t = DateTime(
+        params.dateTo!.year,
+        params.dateTo!.month,
+        params.dateTo!.day,
+      );
+      out = out.where((EcoEvent e) {
+        final DateTime d = DateTime(e.date.year, e.date.month, e.date.day);
+        return !d.isBefore(f) && !d.isAfter(t);
+      });
+    }
+    if (params.categories.isNotEmpty) {
+      out = out.where((EcoEvent e) => params.categories.contains(e.category));
+    }
+    if (params.query != null && params.query!.trim().isNotEmpty) {
+      final String q = params.query!.trim().toLowerCase();
+      out = out.where(
+        (EcoEvent e) =>
+            e.title.toLowerCase().contains(q) || e.siteName.toLowerCase().contains(q),
+      );
+    }
+    final List<EcoEvent> list = out.toList()
+      ..sort((EcoEvent a, EcoEvent b) {
+        final int dist = a.siteDistanceKm.compareTo(b.siteDistanceKm);
+        if (dist != 0) {
+          return dist;
+        }
+        return a.startDateTime.compareTo(b.startDateTime);
+      });
+    return list;
+  }
+
+  @override
   EcoEvent? findById(String id) {
     for (final EcoEvent event in _events) {
       if (event.id == id) {

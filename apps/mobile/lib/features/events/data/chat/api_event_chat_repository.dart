@@ -397,7 +397,7 @@ class ApiEventChatRepository implements EventChatRepository {
       payload['location'] = <String, dynamic>{
         'lat': locationLat,
         'lng': locationLng,
-        'label': ?locationLabel,
+        if (locationLabel != null && locationLabel.isNotEmpty) 'label': locationLabel,
       };
     }
     final ApiResponse res = await _client.post('/events/$eventId/chat', body: payload);

@@ -12,6 +12,7 @@ import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import type { EventChatMessageResponseDto } from './dto/event-chat-message-response.dto';
 
+/** MIME/size caps mirror mobile `ChatUploadLimits` (apps/mobile/.../chat_upload_limits.dart). */
 const IMAGE_MIMES = new Set([
   'image/jpeg',
   'image/jpg',

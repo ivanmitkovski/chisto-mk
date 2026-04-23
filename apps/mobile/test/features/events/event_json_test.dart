@@ -81,6 +81,48 @@ void main() {
       expect(event.gear, contains(EventGear.trashBags));
       expect(event.scale, CleanupScale.medium);
       expect(event.difficulty, EventDifficulty.easy);
+      expect(event.moderationApproved, isFalse);
+    });
+
+    test('treats missing moderationApproved as not approved', () {
+      final EcoEvent? event = ecoEventFromJson(<String, dynamic>{
+        'id': 'evt-no-mod',
+        'title': 'T',
+        'description': 'D',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Park',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'scheduledAt': '2026-08-15T09:30:00.000Z',
+        'status': 'upcoming',
+        'participantCount': 0,
+        'createdAt': '2026-01-01T00:00:00.000Z',
+      });
+      expect(event, isNotNull);
+      expect(event!.moderationApproved, isFalse);
+    });
+
+    test('parses moderationApproved true when server sends true', () {
+      final EcoEvent? event = ecoEventFromJson(<String, dynamic>{
+        'id': 'evt-mod-ok',
+        'title': 'T',
+        'description': 'D',
+        'category': 'generalCleanup',
+        'siteId': 's1',
+        'siteName': 'Park',
+        'siteImageUrl': '',
+        'organizerId': 'o1',
+        'organizerName': 'Org',
+        'scheduledAt': '2026-08-15T09:30:00.000Z',
+        'status': 'upcoming',
+        'participantCount': 0,
+        'createdAt': '2026-01-01T00:00:00.000Z',
+        'moderationApproved': true,
+      });
+      expect(event, isNotNull);
+      expect(event!.moderationApproved, isTrue);
     });
 
     test('ecoEventListFromJson skips entries with unparseable dates', () {

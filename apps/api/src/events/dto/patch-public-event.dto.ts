@@ -12,8 +12,10 @@ import {
   MaxLength,
   Min,
   MinLength,
+  ValidateNested,
 } from 'class-validator';
 import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
+import { EventRouteWaypointDto } from './event-route-waypoint.dto';
 
 export class PatchPublicEventDto {
   @ApiPropertyOptional({ minLength: 3, maxLength: 200 })
@@ -76,4 +78,15 @@ export class PatchPublicEventDto {
   @IsString()
   @IsIn(['easy', 'moderate', 'hard'])
   difficulty?: string;
+
+  @ApiPropertyOptional({
+    type: [EventRouteWaypointDto],
+    description: 'When set, replaces the entire route for this event (may be empty to clear)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(24)
+  @ValidateNested({ each: true })
+  @Type(() => EventRouteWaypointDto)
+  routeWaypoints?: EventRouteWaypointDto[];
 }

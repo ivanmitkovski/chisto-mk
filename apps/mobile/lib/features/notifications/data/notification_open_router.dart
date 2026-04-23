@@ -1,7 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
+import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_diagnostics.dart';
+import 'package:chisto_mobile/features/notifications/data/notification_open_payload.dart';
 
 class NotificationOpenRouter {
   const NotificationOpenRouter._();
@@ -32,7 +34,9 @@ class NotificationOpenRouter {
         return;
       case 'CLEANUP_EVENT':
         final String? eventId = data['eventId'] as String?;
-        if (eventId != null && eventId.isNotEmpty) {
+        if (eventId != null &&
+            eventId.isNotEmpty &&
+            notificationOpenPayloadLooksLikeUuid(eventId)) {
           Navigator.of(context).pushNamed(
             AppRoutes.eventsDetail,
             arguments: EventRouteArguments(eventId: eventId),
@@ -45,12 +49,20 @@ class NotificationOpenRouter {
         return;
       case 'EVENT_CHAT':
         final String? chatEventId = data['eventId'] as String?;
-        if (chatEventId != null && chatEventId.isNotEmpty) {
+        if (chatEventId != null &&
+            chatEventId.isNotEmpty &&
+            notificationOpenPayloadLooksLikeUuid(chatEventId)) {
+          final String eventTitle = notificationOpenResolveChatBarTitle(
+            data: data,
+            notificationTitle: message.notification?.title,
+            cachedEventTitle:
+                EventsRepositoryRegistry.instance.findById(chatEventId)?.title,
+          );
           Navigator.of(context).pushNamed(
             AppRoutes.eventChat,
             arguments: EventChatRouteArguments(
               eventId: chatEventId,
-              eventTitle: '',
+              eventTitle: eventTitle,
               isOrganizer: false,
             ),
           );
@@ -68,8 +80,9 @@ class NotificationOpenRouter {
 
   static void handleOpenFromData(
     BuildContext context,
-    Map<String, dynamic> data,
-  ) {
+    Map<String, dynamic> data, {
+    String? notificationTitle,
+  }) {
     NotificationOpenDiagnostics.recordOpenAttempt('push_data');
     final String? type = data['type'] as String?;
     final String? siteId = data['siteId'] as String?;
@@ -86,7 +99,9 @@ class NotificationOpenRouter {
     switch (type) {
       case 'CLEANUP_EVENT':
         final String? eventId = data['eventId'] as String?;
-        if (eventId != null && eventId.isNotEmpty) {
+        if (eventId != null &&
+            eventId.isNotEmpty &&
+            notificationOpenPayloadLooksLikeUuid(eventId)) {
           Navigator.of(context).pushNamed(
             AppRoutes.eventsDetail,
             arguments: EventRouteArguments(eventId: eventId),
@@ -99,12 +114,20 @@ class NotificationOpenRouter {
         return;
       case 'EVENT_CHAT':
         final String? chatEventId = data['eventId'] as String?;
-        if (chatEventId != null && chatEventId.isNotEmpty) {
+        if (chatEventId != null &&
+            chatEventId.isNotEmpty &&
+            notificationOpenPayloadLooksLikeUuid(chatEventId)) {
+          final String eventTitle = notificationOpenResolveChatBarTitle(
+            data: data,
+            notificationTitle: notificationTitle,
+            cachedEventTitle:
+                EventsRepositoryRegistry.instance.findById(chatEventId)?.title,
+          );
           Navigator.of(context).pushNamed(
             AppRoutes.eventChat,
             arguments: EventChatRouteArguments(
               eventId: chatEventId,
-              eventTitle: '',
+              eventTitle: eventTitle,
               isOrganizer: false,
             ),
           );

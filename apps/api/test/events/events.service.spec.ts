@@ -19,8 +19,13 @@ import { CheckEventConflictQueryDto } from '../../src/events/dto/check-event-con
 import { ListEventParticipantsQueryDto } from '../../src/events/dto/list-event-participants-query.dto';
 import { ListEventsQueryDto } from '../../src/events/dto/list-events-query.dto';
 import { PatchEventReminderDto } from '../../src/events/dto/patch-event-reminder.dto';
+import { EventsCreationService } from '../../src/events/events-creation.service';
+import { EventsLifecycleParticipationService } from '../../src/events/events-lifecycle-participation.service';
 import { EventsMobileMapperService } from '../../src/events/events-mobile-mapper.service';
+import { EventsQueryService } from '../../src/events/events-query.service';
+import { EventsRepository } from '../../src/events/events.repository';
 import { EventsService } from '../../src/events/events.service';
+import { EventsUpdateService } from '../../src/events/events-update.service';
 
 function user(id: string, role: Role = Role.USER): AuthenticatedUser {
   return {
@@ -79,6 +84,9 @@ function baseEvent(overrides: Partial<Record<string, unknown>> = {}) {
     },
     participants: [] as { id: string; reminderEnabled: boolean; reminderAt: Date | null }[],
     checkIns: [] as { checkedInAt: Date }[],
+    liveMetric: null as { reportedBagsCollected: number; updatedAt: Date } | null,
+    routeSegments: [] as unknown[],
+    evidencePhotos: [] as unknown[],
     checkInSessionId: null,
     checkInOpen: false,
     checkedInCount: 0,
@@ -115,6 +123,11 @@ describe('EventsService', () => {
   let uploads: ReturnType<typeof makeUploads>;
   let ecoEventPoints: { creditIfNew: jest.Mock; debitOnceIfNew: jest.Mock };
   let notificationDispatcher: { dispatchToUser: jest.Mock };
+  let cleanupEventNotifications: {
+    notifyStaffPendingReview: jest.Mock;
+    notifyAudienceEventPublished: jest.Mock;
+    notifyOrganizerReturnedToPending: jest.Mock;
+  };
   let eventChat: { createSystemMessage: jest.Mock };
   let cleanupEventsSse: {
     emitCleanupEventPending: jest.Mock;
@@ -122,6 +135,8 @@ describe('EventsService', () => {
     emitCleanupEventUpdated: jest.Mock;
   };
   let scheduleConflict: { findConflictingEvent: jest.Mock };
+  let routeSegments: { replaceWaypoints: jest.Mock };
+  let liveImpact: { notifyListeners: jest.Mock };
   let service: EventsService;
 
   beforeEach(() => {
@@ -131,6 +146,11 @@ describe('EventsService', () => {
       debitOnceIfNew: jest.fn().mockResolvedValue(0),
     };
     notificationDispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
+    cleanupEventNotifications = {
+      notifyStaffPendingReview: jest.fn().mockResolvedValue(undefined),
+      notifyAudienceEventPublished: jest.fn().mockResolvedValue(undefined),
+      notifyOrganizerReturnedToPending: jest.fn().mockResolvedValue(undefined),
+    };
     eventChat = { createSystemMessage: jest.fn().mockResolvedValue(undefined) };
     cleanupEventsSse = {
       emitCleanupEventPending: jest.fn(),
@@ -140,10 +160,14 @@ describe('EventsService', () => {
     scheduleConflict = {
       findConflictingEvent: jest.fn().mockResolvedValue(null),
     };
+    routeSegments = { replaceWaypoints: jest.fn().mockResolvedValue([]) };
+    liveImpact = { notifyListeners: jest.fn() };
     const eventsTelemetry = { emitSpan: jest.fn() };
     prisma = {
       site: { findUnique: jest.fn() },
-      user: { findUnique: jest.fn() },
+      user: {
+        findUnique: jest.fn().mockResolvedValue({ organizerCertifiedAt: new Date('2026-01-01') }),
+      },
       cleanupEvent: {
         findMany: jest.fn(),
         findFirst: jest.fn(),
@@ -170,17 +194,42 @@ describe('EventsService', () => {
         }
       }),
     };
-    service = new EventsService(
-      prisma as never,
+    const eventsRepository = new EventsRepository(prisma as never);
+    const mobileMapper = new EventsMobileMapperService(eventsRepository, uploads as never);
+    const query = new EventsQueryService(
+      eventsRepository,
       uploads as never,
-      ecoEventPoints as never,
-      notificationDispatcher as never,
-      eventChat as never,
-      new EventsMobileMapperService(prisma as never, uploads as never),
-      cleanupEventsSse as never,
+      mobileMapper,
       scheduleConflict as never,
       eventsTelemetry as never,
     );
+    const creation = new EventsCreationService(
+      eventsRepository,
+      mobileMapper,
+      cleanupEventsSse as never,
+      cleanupEventNotifications as never,
+      scheduleConflict as never,
+      routeSegments as never,
+    );
+    const update = new EventsUpdateService(
+      eventsRepository,
+      mobileMapper,
+      scheduleConflict as never,
+      cleanupEventsSse as never,
+      cleanupEventNotifications as never,
+      eventChat as never,
+      routeSegments as never,
+    );
+    const lifecycle = new EventsLifecycleParticipationService(
+      eventsRepository,
+      uploads as never,
+      mobileMapper,
+      ecoEventPoints as never,
+      notificationDispatcher as never,
+      eventChat as never,
+      liveImpact as never,
+    );
+    service = new EventsService(query, creation, update, lifecycle);
   });
 
   describe('create', () => {
@@ -322,6 +371,51 @@ describe('EventsService', () => {
       ).rejects.toBeInstanceOf(ConflictException);
       expect(prisma.$transaction).not.toHaveBeenCalled();
     });
+
+    it('accepts when endAt is on the same Skopje calendar day as scheduledAt', async () => {
+      prisma.site.findUnique.mockResolvedValue({ id: 'site-1' });
+      prisma.cleanupEvent.create.mockResolvedValue({ id: 'new-evt' });
+      prisma.cleanupEvent.findFirstOrThrow.mockResolvedValue(baseEvent({ id: 'new-evt' }));
+      scheduleConflict.findConflictingEvent.mockResolvedValue(null);
+
+      await service.create(
+        {
+          siteId: 'site-1',
+          title: 'Same day end',
+          description: 'Hello world cleanup',
+          category: 'generalCleanup',
+          scheduledAt: '2025-07-01T08:00:00.000Z',
+          endAt: '2025-07-01T20:00:00.000Z',
+        },
+        user('u1', Role.USER),
+      );
+
+      expect(prisma.cleanupEvent.create).toHaveBeenCalled();
+    });
+
+    it('rejects when endAt falls on the next Skopje calendar day', async () => {
+      prisma.site.findUnique.mockResolvedValue({ id: 'site-1' });
+      let thrown: unknown;
+      try {
+        await service.create(
+          {
+            siteId: 'site-1',
+            title: 'Cross midnight Skopje',
+            description: 'Hello world cleanup',
+            category: 'generalCleanup',
+            scheduledAt: '2025-07-01T20:00:00.000Z',
+            endAt: '2025-07-01T22:30:00.000Z',
+          },
+          user('u1', Role.USER),
+        );
+      } catch (e) {
+        thrown = e;
+      }
+      expect(thrown).toBeInstanceOf(BadRequestException);
+      expect((thrown as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'EVENTS_END_DIFFERENT_SKOPJE_CALENDAR_DAY' }),
+      );
+    });
   });
 
   describe('checkScheduleConflictPreview', () => {
@@ -348,6 +442,34 @@ describe('EventsService', () => {
       const out = await service.checkScheduleConflictPreview(q);
       expect(out.hasConflict).toBe(true);
       expect(out.conflictingEvent?.id).toBe('e1');
+    });
+
+    it('accepts preview when endAt is same Skopje calendar day as scheduledAt', async () => {
+      const q = Object.assign(new CheckEventConflictQueryDto(), {
+        siteId: 'site-1',
+        scheduledAt: '2025-07-01T08:00:00.000Z',
+        endAt: '2025-07-01T20:00:00.000Z',
+      });
+      const out = await service.checkScheduleConflictPreview(q);
+      expect(out.hasConflict).toBe(false);
+    });
+
+    it('rejects preview when endAt is on a different Skopje calendar day', async () => {
+      const q = Object.assign(new CheckEventConflictQueryDto(), {
+        siteId: 'site-1',
+        scheduledAt: '2025-07-01T20:00:00.000Z',
+        endAt: '2025-07-01T22:30:00.000Z',
+      });
+      let thrown: unknown;
+      try {
+        await service.checkScheduleConflictPreview(q);
+      } catch (e) {
+        thrown = e;
+      }
+      expect(thrown).toBeInstanceOf(BadRequestException);
+      expect((thrown as BadRequestException).getResponse()).toEqual(
+        expect.objectContaining({ code: 'EVENTS_END_DIFFERENT_SKOPJE_CALENDAR_DAY' }),
+      );
     });
   });
 
@@ -479,19 +601,22 @@ describe('EventsService', () => {
     });
 
     it('rejects when event is full', async () => {
+      const future = new Date();
+      future.setFullYear(future.getFullYear() + 1);
       prisma.cleanupEvent.findFirst.mockResolvedValue(
         baseEvent({
           organizerId: 'org-1',
           participantCount: 10,
           maxParticipants: 10,
           participants: [],
+          scheduledAt: future,
         }),
       );
 
       await expect(service.join('evt-1', user('u2'))).rejects.toBeInstanceOf(ConflictException);
     });
 
-    it('rejects join before scheduledAt', async () => {
+    it('allows join before scheduledAt', async () => {
       const future = new Date();
       future.setFullYear(future.getFullYear() + 1);
       prisma.cleanupEvent.findFirst.mockResolvedValue(
@@ -499,6 +624,30 @@ describe('EventsService', () => {
           organizerId: 'org-1',
           participants: [],
           scheduledAt: future,
+        }),
+      );
+      prisma.eventParticipant.create.mockResolvedValue({ id: 'part-new' });
+      ecoEventPoints.creditIfNew.mockResolvedValue(5);
+      prisma.cleanupEvent.findFirstOrThrow.mockResolvedValue(
+        baseEvent({
+          organizerId: 'org-1',
+          participants: [{ id: 'part-new', reminderEnabled: false, reminderAt: null }],
+          scheduledAt: future,
+        }),
+      );
+      prisma.user.findUnique.mockResolvedValue({ firstName: 'Jane', lastName: 'Volunteer' });
+
+      const out = await service.join('evt-1', user('u2'));
+
+      expect((out as { pointsAwarded: number }).pointsAwarded).toBe(5);
+    });
+
+    it('rejects join after scheduledAt plus grace window', async () => {
+      prisma.cleanupEvent.findFirst.mockResolvedValue(
+        baseEvent({
+          organizerId: 'org-1',
+          participants: [],
+          scheduledAt: new Date('2020-01-01T12:00:00.000Z'),
         }),
       );
 
@@ -510,22 +659,28 @@ describe('EventsService', () => {
       }
       expect(thrown).toBeInstanceOf(BadRequestException);
       expect((thrown as BadRequestException).getResponse()).toEqual(
-        expect.objectContaining({ code: 'EVENT_JOIN_NOT_YET_OPEN' }),
+        expect.objectContaining({ code: 'EVENT_JOIN_WINDOW_CLOSED' }),
       );
     });
 
     it('returns pointsAwarded when join succeeds', async () => {
+      const future = new Date();
+      future.setFullYear(future.getFullYear() + 1);
       prisma.cleanupEvent.findFirst.mockResolvedValue(
         baseEvent({
           organizerId: 'org-1',
           participants: [],
-          scheduledAt: new Date('2020-01-01T09:00:00Z'),
+          scheduledAt: future,
         }),
       );
       prisma.eventParticipant.create.mockResolvedValue({ id: 'part-new' });
       ecoEventPoints.creditIfNew.mockResolvedValue(5);
       prisma.cleanupEvent.findFirstOrThrow.mockResolvedValue(
-        baseEvent({ organizerId: 'org-1', participants: [{ id: 'part-new', reminderEnabled: false, reminderAt: null }] }),
+        baseEvent({
+          organizerId: 'org-1',
+          participants: [{ id: 'part-new', reminderEnabled: false, reminderAt: null }],
+          scheduledAt: future,
+        }),
       );
       prisma.user.findUnique.mockResolvedValue({ firstName: 'Jane', lastName: 'Volunteer' });
 
@@ -945,6 +1100,28 @@ describe('EventsService', () => {
         expect.objectContaining({ code: 'EVENT_NOT_EDITABLE' }),
       );
       expect(prisma.cleanupEvent.update).not.toHaveBeenCalled();
+    });
+
+    it('returns an approved event to PENDING when organizer changes title', async () => {
+      prisma.cleanupEvent.findUnique.mockResolvedValue(
+        baseEvent({ organizerId: 'org-1', status: CleanupEventStatus.APPROVED }),
+      );
+      prisma.cleanupEvent.update.mockResolvedValue(
+        baseEvent({
+          organizerId: 'org-1',
+          status: CleanupEventStatus.PENDING,
+          title: 'New title',
+        }),
+      );
+      scheduleConflict.findConflictingEvent.mockResolvedValue(null);
+      await service.patchEvent('evt-1', { title: 'New title' }, user('org-1'));
+      expect(prisma.cleanupEvent.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({ status: CleanupEventStatus.PENDING }),
+        }),
+      );
+      expect(cleanupEventsSse.emitCleanupEventPending).toHaveBeenCalledWith('evt-1');
+      expect(cleanupEventNotifications.notifyStaffPendingReview).toHaveBeenCalled();
     });
   });
 

@@ -30,6 +30,26 @@ export class ObservabilityStore {
   private static mapSseReconnectHints = 0;
   private static mapSseEventsEmitted = 0;
   private static mapSseReplayEvents = 0;
+  private static cleanupEventStaffPendingSignals = 0;
+  private static cleanupEventPublishedAudienceNotified = 0;
+  private static cleanupEventModerationApproved = 0;
+  private static impactReceiptFetchTotal = 0;
+
+  static recordCleanupEventStaffPendingSignals(count: number): void {
+    this.cleanupEventStaffPendingSignals += Math.max(0, count);
+  }
+
+  static recordCleanupEventPublishedAudienceBatch(count: number): void {
+    this.cleanupEventPublishedAudienceNotified += Math.max(0, count);
+  }
+
+  static recordCleanupEventModerationApproved(): void {
+    this.cleanupEventModerationApproved += 1;
+  }
+
+  static recordImpactReceiptFetch(): void {
+    this.impactReceiptFetchTotal += 1;
+  }
 
   static recordRequest(durationMs: number, statusCode: number): void {
     this.requestsTotal += 1;
@@ -243,6 +263,10 @@ export class ObservabilityStore {
       mapSseReconnectHints: this.mapSseReconnectHints,
       mapSseEventsEmitted: this.mapSseEventsEmitted,
       mapSseReplayEvents: this.mapSseReplayEvents,
+      cleanupEventStaffPendingSignals: this.cleanupEventStaffPendingSignals,
+      cleanupEventPublishedAudienceNotified: this.cleanupEventPublishedAudienceNotified,
+      cleanupEventModerationApproved: this.cleanupEventModerationApproved,
+      impactReceiptFetchTotal: this.impactReceiptFetchTotal,
     };
   }
 }

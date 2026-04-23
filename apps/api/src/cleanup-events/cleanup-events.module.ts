@@ -3,6 +3,7 @@ import { AdminEventsModule } from '../admin-events/admin-events.module';
 import { AuditModule } from '../audit/audit.module';
 import { EventScheduleConflictModule } from '../event-schedule-conflict/event-schedule-conflict.module';
 import { GamificationModule } from '../gamification/gamification.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { CleanupEventsController } from './cleanup-events.controller';
 import { CleanupEventsService } from './cleanup-events.service';
@@ -13,6 +14,7 @@ import { CleanupEventsService } from './cleanup-events.service';
     AuditModule,
     EventScheduleConflictModule,
     GamificationModule,
+    NotificationsModule,
     ReportsUploadModule,
   ],
   controllers: [CleanupEventsController],

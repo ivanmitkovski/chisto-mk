@@ -1734,8 +1734,20 @@ class AppLocalizationsSq extends AppLocalizations {
       'Bashkimi hapet kur arrin koha e planifikuar e fillimit.';
 
   @override
+  String get eventsJoinWindowClosed =>
+      'Nuk mund të bashkoheni më. Bashkimi mbeti i hapur deri në 15 minuta pas fillimit të planifikuar.';
+
+  @override
   String get errorEventEndAtTooFar =>
       'Fundi i planifikuar nuk mund të jetë kaq larg nga fillimi. Provoni një zgjatje më të shkurtër.';
+
+  @override
+  String get errorEventsEndDifferentSkopjeCalendarDay =>
+      'Fundi duhet të jetë i njëjtës ditë kalendarike si fillimi (Evropë/Shkup).';
+
+  @override
+  String get errorEventsEndAfterSkopjeLocalDay =>
+      'Ngjarja duhet të përfundojë deri në 23:59 të ditës së fillimit.';
 
   @override
   String get eventsAwaitingModerationCta => 'Në pritje të aprovimit';
@@ -1746,6 +1758,29 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventsModerationBannerBody =>
       'Ky veprim është i dukshëm për ju si organizator. Vullnetarët mund të bashkohen pasi moderatorët ta aprovojnë.';
+
+  @override
+  String get eventsAttendeeModerationBannerTitle => 'Në pritje të aprovimit';
+
+  @override
+  String get eventsAttendeeModerationBannerBody =>
+      'Moderatorët po e shqyrtojnë veprimin. Mund ta hapni, por bashkimi hapet vetëm pas aprovimit.';
+
+  @override
+  String get eventsDeclinedBannerTitle => 'Nuk u aprovua';
+
+  @override
+  String get eventsDeclinedBannerBody =>
+      'Kjo ngjarje nuk i plotësoi kriteret. Ndryshoni dhe ridërgoni.';
+
+  @override
+  String get eventsDeclinedResubmitCta => 'Ndrysho dhe ridërgo';
+
+  @override
+  String get eventsDeclinedDashboardPill => 'Refuzuar';
+
+  @override
+  String get eventsPendingDashboardPill => 'Nën shqyrtim';
 
   @override
   String get eventsEventPendingPublicCta =>
@@ -2009,6 +2044,84 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get eventsOrganizerCompletionStepVisibilityBody =>
       'Fotot ndihmojnë moderatorët të verifikojnë pastrimin dhe frymëzojnë veprime të ardhshme.';
+
+  @override
+  String get eventsOrganizerCompletionViewReceipt =>
+      'Shiko fletëpagesën e ndikimit';
+
+  @override
+  String get eventsImpactReceiptScreenTitle => 'Fletëpagesa e ndikimit';
+
+  @override
+  String eventsImpactReceiptHeroSemantic(String title) {
+    return 'Fletëpagesë ndikimi për $title';
+  }
+
+  @override
+  String get eventsImpactReceiptMetricCheckIns => 'Regjistrime';
+
+  @override
+  String get eventsImpactReceiptMetricParticipants => 'Të regjistruar';
+
+  @override
+  String get eventsImpactReceiptMetricBags => 'Çanta (të raportuara)';
+
+  @override
+  String get eventsImpactReceiptProofHeading => 'Dëshmi';
+
+  @override
+  String get eventsImpactReceiptNoMediaHint =>
+      'Shto foto \"pas\" ose dëshmi të strukturuar nga faqja e ngjarjes.';
+
+  @override
+  String eventsImpactReceiptAsOf(String timestamp) {
+    return 'Përditësuar $timestamp';
+  }
+
+  @override
+  String get eventsImpactReceiptCompletenessInProgress => 'Në progres';
+
+  @override
+  String get eventsImpactReceiptCompletenessFull => 'Regjistrim i plotë';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialAfter =>
+      'Mungojnë fotot \"pas\"';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialEvidence =>
+      'Mungojnë dëshmitë e strukturuara';
+
+  @override
+  String get eventsImpactReceiptCompletenessPartialBoth =>
+      'Mungojnë fotot dhe dëshmitë';
+
+  @override
+  String get eventsImpactReceiptShare => 'Ndaj';
+
+  @override
+  String get eventsImpactReceiptCopyLink => 'Kopjo lidhjen';
+
+  @override
+  String get eventsImpactReceiptLinkCopied => 'Lidhja u kopjua';
+
+  @override
+  String get eventsImpactReceiptViewCta => 'Fletëpagesa e ndikimit';
+
+  @override
+  String get eventsImpactReceiptRetry => 'Provo përsëri';
+
+  @override
+  String get eventsImpactReceiptLoadFailed => 'Nuk u ngarkua fletëpagesa.';
+
+  @override
+  String eventsImpactReceiptShareSummary(int checkIns, int bags, int joined) {
+    return '$checkIns regjistrime · $bags çanta · $joined të regjistruar';
+  }
+
+  @override
+  String get errorEventsImpactReceiptNotAvailable =>
+      'Fletëpagesa e ndikimit ende nuk është e disponueshme për këtë ngjarje.';
 
   @override
   String get eventsOrganizerDetailPendingAfterPhotosTitle => 'Foto \"pas\"';
@@ -2334,6 +2447,13 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
+  String get createEventScheduleDateLabel => 'Data e ngjarjes';
+
+  @override
+  String get createEventScheduleEndAfterDayError =>
+      'Ngjarja duhet të përfundojë deri në 23:59 të së njëjtës dite.';
+
+  @override
   String get createEventFieldType => 'Lloji i ngjarjes';
 
   @override
@@ -2378,7 +2498,11 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get createEventHelpBulletSchedule =>
-      'Cakto datën dhe intervalin kohor që kalendarët dhe kujtuesit të jenë të qartë.';
+      'Zgjidh datën e ngjarjes, pastaj orët e fillimit dhe mbarimit të asaj dite.';
+
+  @override
+  String get createEventHelpBulletSameDay =>
+      'Ngjarja duhet të përfundojë të njëjtën ditë kalendarike, së voni deri në 23:59.';
 
   @override
   String get createEventHelpBulletSubmit =>
@@ -2833,6 +2957,18 @@ class AppLocalizationsSq extends AppLocalizations {
       'Vendndodhja, orari dhe detajet';
 
   @override
+  String eventsHeroChatSemantic(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Bisedë në grup, $count të palexuara',
+      one: 'Bisedë në grup, 1 e palexuar',
+      zero: 'Bisedë në grup',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get eventsDetailParticipationSemantic => 'Pjesëmarrja juaj';
 
   @override
@@ -3020,6 +3156,13 @@ class AppLocalizationsSq extends AppLocalizations {
   String eventsCardParticipantsJoined(int count) {
     return '$count të bashkuar';
   }
+
+  @override
+  String get eventsDiscoveryThisWeekRetryHint =>
+      'Nuk mund të ngarkojmë zgjedhjet e kësaj jave.';
+
+  @override
+  String get eventsDiscoveryThisWeekRetry => 'Riprovo';
 
   @override
   String eventsDetailSemanticsLabel(String title) {
@@ -3725,18 +3868,162 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsImpactSummaryEmptyHint =>
-      'Regjistroni rezultatet, përpjekjen dhe mësimet nga pastrimi.';
+      'Shënoni rezultatet dhe mësimet nga pastrimi.';
+
+  @override
+  String get eventsLivePulseTitle => 'Ndikimi në kohë reale';
+
+  @override
+  String eventsLivePulseVolunteers(int count) {
+    return '$count të regjistruar';
+  }
+
+  @override
+  String eventsLivePulseCheckIns(int count) {
+    return '$count check-in';
+  }
+
+  @override
+  String eventsLivePulseBags(int count, String kg) {
+    return '$count thesa · rreth $kg kg';
+  }
+
+  @override
+  String get eventsEvidenceStripTitle => 'Dëshmi nga fusha';
+
+  @override
+  String get eventsEvidenceStripSubtitle =>
+      'Foto nga rrjedha e dëshmive të pastrimit.';
+
+  @override
+  String get eventsEvidenceStripSemantic =>
+      'Foto para, pas dhe nga fusha nga rrjedha e dëshmive';
+
+  @override
+  String get eventsEvidenceKindBefore => 'Para';
+
+  @override
+  String get eventsEvidenceKindAfter => 'Pas';
+
+  @override
+  String get eventsEvidenceKindField => 'Fushë';
+
+  @override
+  String eventsEvidenceStripTileSemantic(int index, int total, String kind) {
+    return 'Foto $index nga $total, $kind';
+  }
+
+  @override
+  String get eventsRouteProgressTitle => 'Rruga';
+
+  @override
+  String eventsFieldModeRowServerError(String code) {
+    return 'Serveri: $code';
+  }
+
+  @override
+  String get eventsFieldModeTitle => 'Modaliteti fushë';
+
+  @override
+  String get eventsFieldModeSync => 'Sinkronizo tani';
+
+  @override
+  String get eventsFieldModeEmpty => 'Asgjë në radhë jashtë linje.';
+
+  @override
+  String get eventsFieldModeSynced => 'Radha u sinkronizua.';
+
+  @override
+  String get eventsFieldModeSyncFailed =>
+      'Sinkronizimi dështoi. Provoni përsëri.';
+
+  @override
+  String eventsFieldModeSyncPartial(int synced, int failed) {
+    return 'U sinkronizuan $synced përditësime. $failed ende janë në radhë jashtë linje.';
+  }
+
+  @override
+  String eventsFieldModeRowLiveImpactBags(int count) {
+    return 'Ndikim në kohë reale · $count thesa';
+  }
+
+  @override
+  String get eventsFieldModeRowUnknown => 'Ndryshim jashtë linje';
+
+  @override
+  String get eventsFieldModeRowStatusPending => 'Në pritje';
+
+  @override
+  String get eventsFieldModeRowStatusSyncing => 'Duke u sinkronizuar';
+
+  @override
+  String get eventsOfflineWorkHubTitle => 'Punë jashtë linje';
+
+  @override
+  String get eventsOfflineWorkHubSemanticSheet =>
+      'Përmbledhje e punës jashtë linje dhe veprime sinkronizimi';
+
+  @override
+  String get eventsOfflineWorkSubtitle =>
+      'Ndryshime në radhë për check-in, përditësime në terren dhe bisedë.';
+
+  @override
+  String get eventsOfflineWorkSectionCheckIns => 'Check-in';
+
+  @override
+  String get eventsOfflineWorkSectionField => 'Përditësime në terren';
+
+  @override
+  String get eventsOfflineWorkSectionChat => 'Bisedë';
+
+  @override
+  String eventsOfflineWorkCountPending(int count) {
+    return '$count në pritje';
+  }
+
+  @override
+  String eventsOfflineWorkCountFailed(int count) {
+    return '$count kërkojnë vëmendje';
+  }
+
+  @override
+  String get eventsOfflineWorkSyncNow => 'Sinkronizo tani';
+
+  @override
+  String get eventsOfflineWorkOpenFieldQueue => 'Hap radhën e terrenit';
+
+  @override
+  String get eventsOfflineWorkOpenChat => 'Hap bisedën e ngjarjes';
+
+  @override
+  String get eventsOfflineWorkRetryFailedChat =>
+      'Riprovo dërgimin e mesazheve të dështuara';
+
+  @override
+  String get eventsOfflineWorkResolveInChat =>
+      'Hap bisedën dhe korrigjo ose fshi mesazhin që nuk u dërgua dot.';
+
+  @override
+  String get eventsOfflineWorkSyncDone => 'Sinkronizimi përfundoi';
+
+  @override
+  String get eventsOfflineWorkSyncing => 'Duke u sinkronizuar…';
+
+  @override
+  String get eventsOfflineWorkDrainFailed =>
+      'Nuk e përfunduam dot sinkronizimin. Provo përsëri kur të jesh në linjë.';
+
+  @override
+  String eventsChatOutboxFull(int max) {
+    return 'Shumë mesazhe presin dërgim jashtë linje (limiti $max). Lidhu për t’i dërguar mesazhet në pritje, pastaj provo përsëri.';
+  }
 
   @override
   String get eventsCompletedBagsSectionTitle =>
       'Thesa me mbeturina të mbledhura';
 
   @override
-  String get eventsCompletedBagsSectionSubtitle =>
-      'Sa thesa me mbeturina u mblodhën nga vullnetarët gjatë këtij pastrimi. Mund ta përditësoni kur të doni; përfshihet në përmbledhjen e ndikimit më poshtë.';
-
-  @override
-  String get eventsCompletedBagsSave => 'Ruaj numrin';
+  String get eventsCompletedBagsSave => 'Ruaj';
 
   @override
   String get eventsCompletedBagsSaved => 'Numri i thesave u ruajt.';
@@ -3850,6 +4137,17 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get eventsSuccessDialogOpenEvent => 'Hap ngjarjen';
+
+  @override
+  String get eventsSuccessDialogViewEvent => 'Shiko ngjarjen';
+
+  @override
+  String get eventsSuccessDialogPendingTitle => 'Dërguar për shqyrtim';
+
+  @override
+  String eventsSuccessDialogPendingBody(String title, String siteName) {
+    return '$title në $siteName u dërgua. Një moderator do ta miratojë ose refuzojë para se të shfaqet publikisht. Mund ta hapësh nga ngjarjet e tua në çdo kohë.';
+  }
 
   @override
   String get eventsTimePickerSelectTime => 'Zgjidh orën';
@@ -4875,4 +5173,138 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get chatSharedLocation => 'Vendndodhje e ndarë';
+
+  @override
+  String get organizerToolkitTitle => 'Bëhu organizator';
+
+  @override
+  String get organizerToolkitPage1Title => 'Planifiko përpara';
+
+  @override
+  String get organizerToolkitPage1Body =>
+      'Vlerësoni vendin për rreziqe, përgatitni pajisjet e sigurisë dhe informoni ekipin para se të vijnë vullnetarët.';
+
+  @override
+  String get organizerToolkitPage2Title => 'Moderimi ndërton besim';
+
+  @override
+  String get organizerToolkitPage2Body =>
+      'Pasi të krijoni një ngjarje, moderatorët e shqyrtojnë. Pas aprovimit, vullnetarët mund ta shohin dhe të bashkohen.';
+
+  @override
+  String get organizerToolkitPage3Title => 'Verifikoni pjesëmarrjen';
+
+  @override
+  String get organizerToolkitPage3Body =>
+      'Përdorni check-in me QR në aplikacion që çdo vullnetar të marrë pikët e merituara.';
+
+  @override
+  String get organizerToolkitPage4Title => 'Moti dhe siguria';
+
+  @override
+  String get organizerToolkitPage4Body =>
+      'Nëse kushtet bëhen të pasigurta, ndaloni ose shtyni. Njoftoni menjëherë vullnetarët e regjistruar në aplikacion që askush të mos udhëtojë për një fillim të anuluar.';
+
+  @override
+  String get organizerToolkitPage5Title => 'Mbeturinat dhe hedhja';
+
+  @override
+  String get organizerToolkitPage5Body =>
+      'Ndani riciklimin kur është e mundur, paketoni me siguri sende të mprehta dhe çojini mbeturinat në pika të autorizuara. Lëreni vendin më pastër se sa e gjetët.';
+
+  @override
+  String get organizerToolkitPage6Title => 'Përfshini të gjithë';
+
+  @override
+  String get organizerToolkitPage6Body =>
+      'Ofroni role të qarta, ritëm të qëndrueshëm dhe durim. Një briefing mirëpritës i ndihmon vullnetarët e rinj të ndihen të sigurt.';
+
+  @override
+  String get organizerToolkitPage7Title => 'Privatësia në chat';
+
+  @override
+  String get organizerToolkitPage7Body =>
+      'Mbajini numrat e telefonit dhe adresat jashtë bisedës publike të ngjarjes. Përdorni mesazhet në aplikacion që ekipi të mbetet i informuar pa ndarë tepër.';
+
+  @override
+  String get organizerToolkitPage8Title => 'Dëshmi dhe ndikim i ndershëm';
+
+  @override
+  String get organizerToolkitPage8Body =>
+      'Fotot pas dhe numri i qeseve duhet të pasqyrojnë atë që ndodhi vërtet. Raportimi i saktë ndërton besim te vullnetarët, moderatorët dhe komuniteti.';
+
+  @override
+  String get organizerToolkitContinue => 'Vazhdo';
+
+  @override
+  String get organizerToolkitStartQuiz => 'Zgjidh kuizin';
+
+  @override
+  String get organizerQuizTitle => 'Kontroll i shpejtë i njohurive';
+
+  @override
+  String get organizerQuizLoadFailed => 'Nuk u ngarkua kuizi. Provo përsëri.';
+
+  @override
+  String get organizerQuizLoadInvalidResponse =>
+      'Të dhënat e kuizit nga serveri ishin të paplota. Provo përsëri.';
+
+  @override
+  String get organizerQuizRetryLoad => 'Provo përsëri';
+
+  @override
+  String get organizerQuizSubmitFailed =>
+      'Nuk u dorëzuan përgjigjet. Provo përsëri.';
+
+  @override
+  String organizerQuizOptionSemantic(int index, int total, String optionText) {
+    return 'Pyetja $index nga $total: $optionText';
+  }
+
+  @override
+  String get organizerQuizSubmit => 'Dorëzo përgjigjet';
+
+  @override
+  String get organizerQuizPassedTitle => 'Jeni certifikuar!';
+
+  @override
+  String get organizerQuizPassedBody =>
+      'Tani mund të krijoni ngjarje pastrimi. Vullnetarët po presin.';
+
+  @override
+  String get organizerQuizFailedTitle => 'Jo plotësisht';
+
+  @override
+  String organizerQuizFailedBody(int correct, int total) {
+    return 'Rishikoni tutorialin dhe provoni përsëri. Keni $correct nga $total të sakta.';
+  }
+
+  @override
+  String get organizerQuizRetry => 'Provo përsëri';
+
+  @override
+  String get organizerQuizCreateEvent => 'Krijo ngjarjen e parë';
+
+  @override
+  String get organizerCertifiedBadge => 'Organizator i certifikuar';
+
+  @override
+  String get errorOrganizerQuizSessionExpired =>
+      'Sesioni i kuizit skadoi. Ngarkoni një kuiz të ri dhe provoni përsëri.';
+
+  @override
+  String get errorOrganizerQuizSessionInvalid =>
+      'Ky sesion kuizi nuk është i vlefshëm. Ngarkoni kuizin përsëri.';
+
+  @override
+  String get errorOrganizerQuizAnswersMismatch =>
+      'Përgjigjet nuk përputhen me kuizin që filluat. Ngarkoni kuizin përsëri.';
+
+  @override
+  String get errorOrganizerQuizInvalid =>
+      'Disa përgjigje nuk janë të vlefshme për këtë kuiz. Ngarkoni kuizin përsëri.';
+
+  @override
+  String get errorOrganizerCertificationAlreadyDone =>
+      'Jeni tashmë organizator i certifikuar. Nuk duhet të rifilloni kuizin.';
 }

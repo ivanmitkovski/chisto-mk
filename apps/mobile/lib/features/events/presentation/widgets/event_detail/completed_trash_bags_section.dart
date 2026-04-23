@@ -69,7 +69,7 @@ class _CompletedTrashBagsSectionState extends State<CompletedTrashBagsSection> {
       container: true,
       label: context.l10n.eventsCompletedBagsSectionTitle,
       child: DecoratedBox(
-        decoration: EventDetailSurfaceDecoration.elevatedCard(),
+        decoration: EventDetailSurfaceDecoration.detailModule(),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
@@ -79,12 +79,7 @@ class _CompletedTrashBagsSectionState extends State<CompletedTrashBagsSection> {
                 context.l10n.eventsCompletedBagsSectionTitle,
                 style: AppTypography.eventsPanelTitle(textTheme),
               ),
-              const SizedBox(height: AppSpacing.xs),
-              Text(
-                context.l10n.eventsCompletedBagsSectionSubtitle,
-                style: AppTypography.eventsSupportingCaption(textTheme),
-              ),
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.sm),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[

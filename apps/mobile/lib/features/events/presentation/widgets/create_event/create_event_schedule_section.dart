@@ -50,6 +50,13 @@ class CreateEventScheduleSection extends StatelessWidget {
       key: sectionKey,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
+        Text(
+          context.l10n.createEventScheduleDateLabel,
+          style: AppTypography.eventsSheetSectionLabel(
+            Theme.of(context).textTheme,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.sm),
         EventCalendar(
           selectedDate: selectedDate,
           onDateSelected: onDateSelected,
@@ -80,6 +87,18 @@ class CreateEventScheduleSection extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             context.l10n.createEventEndTimeError,
+            style: AppTypography.eventsCaptionStrong(
+              Theme.of(context).textTheme,
+              color: AppColors.accentDanger,
+            ).copyWith(fontWeight: FontWeight.w500),
+          ),
+        ],
+        if (showValidationErrors &&
+            isTimeRangeValid &&
+            scheduleIssue == ScheduleValidationIssue.endAfterLocalDayEnd) ...<Widget>[
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            context.l10n.createEventScheduleEndAfterDayError,
             style: AppTypography.eventsCaptionStrong(
               Theme.of(context).textTheme,
               color: AppColors.accentDanger,

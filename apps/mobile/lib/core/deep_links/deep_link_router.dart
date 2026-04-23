@@ -32,6 +32,24 @@ final RegExp _uuidPattern = RegExp(
   caseSensitive: false,
 );
 
+/// Hosts allowed for `https://…/events/<uuid>` share links (avoid open redirects).
+bool deepLinkTrustedShareHost(String? host) {
+  final String h = (host ?? '').toLowerCase();
+  if (h.isEmpty) {
+    return true;
+  }
+  if (h == 'chisto.mk' || h == 'www.chisto.mk') {
+    return true;
+  }
+  if (h == 'localhost' || h == '127.0.0.1') {
+    return true;
+  }
+  if (h.endsWith('.chisto.mk')) {
+    return true;
+  }
+  return false;
+}
+
 /// Maps `https://chisto.mk/app/...`, `chisto://app/...`, and path-only variants to [AppRoutes].
 class DeepLinkRouter {
   DeepLinkRouter._();
@@ -39,6 +57,17 @@ class DeepLinkRouter {
   /// Returns a route plan when the URI is recognized; otherwise `null`.
   static DeepLinkRoute? parse(Uri uri) {
     final List<String> raw = uri.pathSegments.where((String s) => s.isNotEmpty).toList();
+
+    // Public share URL: `/events/<uuid>` on the marketing host (see `event_share_payload.dart`).
+    if (raw.length == 2 && raw[0] == 'events') {
+      final String id = raw[1].trim();
+      if (id.isNotEmpty &&
+          _uuidPattern.hasMatch(id) &&
+          deepLinkTrustedShareHost(uri.host)) {
+        return DeepLinkEventDetail(id);
+      }
+    }
+
     final List<String> seg = raw.isNotEmpty && raw.first == 'app' ? raw.sublist(1) : raw;
 
     if (seg.length >= 3 && seg[0] == 'events' && seg[1] == 'detail') {

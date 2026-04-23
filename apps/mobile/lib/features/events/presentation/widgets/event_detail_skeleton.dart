@@ -4,11 +4,12 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 
 /// Placeholder while a single event is fetched from the API.
 ///
-/// Mirrors the real layout depth: hero → status pill → title → grouped panel
-/// card (3 rows) → gear chips → description lines (×5) → participants row
+/// Mirrors the real layout depth: hero → status pill → title → facts cards
+/// (schedule + location + meta strip) → gear chips → description lines (×5) → participants row
 /// — roughly 10 distinct skeleton items.
 ///
 /// When `MediaQuery.disableAnimationsOf` is true the pulse is skipped and a
@@ -85,8 +86,8 @@ class _EventDetailSkeletonState extends State<EventDetailSkeleton>
               _Bar(band: band, height: 28, widthFactor: 0.48),
               const SizedBox(height: AppSpacing.lg),
 
-              // ── Grouped panel card (3 rows) ──────────────────────────────
-              _GroupedPanelSkeleton(band: band),
+              // ── Facts: schedule + location + meta chips ───────────────────
+              _FactsSectionSkeleton(band: band),
               const SizedBox(height: AppSpacing.lg),
 
               // ── Gear header + chips ──────────────────────────────────────
@@ -163,69 +164,92 @@ class _Bar extends StatelessWidget {
   }
 }
 
-/// Card outline + 3 placeholder rows mirroring [EventDetailGroupedPanel].
-class _GroupedPanelSkeleton extends StatelessWidget {
-  const _GroupedPanelSkeleton({required this.band});
+/// Placeholder blocks mirroring [EventDetailFactsSection] (soft cards + chip strip).
+class _FactsSectionSkeleton extends StatelessWidget {
+  const _FactsSectionSkeleton({required this.band});
 
   final Color band;
 
   @override
   Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: band.withValues(alpha: band.a * 0.5),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: band),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            _PanelRow(band: band),
-            Divider(height: 1, thickness: 0.5, color: band),
-            _PanelRow(band: band),
-            Divider(height: 1, thickness: 0.5, color: band),
-            _PanelRow(band: band),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: <Widget>[
+        _DetailModuleSkeleton(
+          band: band,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              _Bar(band: band, height: 18, widthFactor: 0.45),
+              const SizedBox(height: AppSpacing.sm),
+              _Bar(band: band, height: 14, widthFactor: 0.62),
+            ],
+          ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.md),
+        _DetailModuleSkeleton(
+          band: band,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: band,
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    _Bar(band: band, height: 11, width: 72),
+                    const SizedBox(height: AppSpacing.xs),
+                    _Bar(band: band, height: 14, widthFactor: 0.92),
+                    const SizedBox(height: 4),
+                    _Bar(band: band, height: 14, widthFactor: 0.78),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        _DetailModuleSkeleton(
+          band: band,
+          child: Wrap(
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: <Widget>[
+              _Bar(band: band, height: 32, width: 96, radius: AppSpacing.radiusMd),
+              _Bar(band: band, height: 32, width: 120, radius: AppSpacing.radiusMd),
+              _Bar(band: band, height: 32, width: 88, radius: AppSpacing.radiusMd),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
 
-class _PanelRow extends StatelessWidget {
-  const _PanelRow({required this.band});
+class _DetailModuleSkeleton extends StatelessWidget {
+  const _DetailModuleSkeleton({
+    required this.band,
+    required this.child,
+  });
 
   final Color band;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 52,
-      child: Row(
-        children: <Widget>[
-          Container(
-            width: AppSpacing.iconMd,
-            height: AppSpacing.iconMd,
-            decoration: BoxDecoration(
-              color: band,
-              borderRadius: BorderRadius.circular(4),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _Bar(band: band, height: 13, widthFactor: 0.55),
-                const SizedBox(height: 4),
-                _Bar(band: band, height: 11, widthFactor: 0.38),
-              ],
-            ),
-          ),
-        ],
+    return DecoratedBox(
+      decoration: EventDetailSurfaceDecoration.detailModule(),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: child,
       ),
     );
   }
@@ -240,11 +264,7 @@ class _ParticipantsSkeleton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: band.withValues(alpha: band.a * 0.5),
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-        border: Border.all(color: band),
-      ),
+      decoration: EventDetailSurfaceDecoration.detailModule(),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
@@ -260,7 +280,7 @@ class _ParticipantsSkeleton extends StatelessWidget {
                     color: band,
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: AppColors.panelBackground,
+                      color: AppColors.detailSurfaceModule,
                       width: 2,
                     ),
                   ),

@@ -10,6 +10,7 @@ import {
   Min,
   MinLength,
   Matches,
+  ValidateIf,
 } from 'class-validator';
 import { CleanupEventStatus } from '../../prisma-client';
 
@@ -25,6 +26,15 @@ export class CreateCleanupEventDto {
   @ApiProperty()
   @IsDateString()
   scheduledAt!: string;
+
+  @ApiPropertyOptional({
+    description:
+      'When omitted, end is set to the same local wall time on the next calendar day (Europe/Skopje).',
+  })
+  @IsOptional()
+  @ValidateIf((_: unknown, o: CreateCleanupEventDto) => o.endAt != null && String(o.endAt).trim() !== '')
+  @IsDateString()
+  endAt?: string;
 
   @ApiPropertyOptional()
   @IsOptional()

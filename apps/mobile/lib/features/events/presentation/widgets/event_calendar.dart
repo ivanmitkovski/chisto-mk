@@ -13,10 +13,13 @@ class EventCalendar extends StatefulWidget {
     super.key,
     required this.selectedDate,
     required this.onDateSelected,
+    /// First calendar day that may be selected (inclusive). Earlier days are disabled.
+    this.minimumSelectableDate,
   });
 
   final DateTime? selectedDate;
   final ValueChanged<DateTime> onDateSelected;
+  final DateTime? minimumSelectableDate;
 
   @override
   State<EventCalendar> createState() => _EventCalendarState();
@@ -220,14 +223,17 @@ class _EventCalendarState extends State<EventCalendar> {
           final bool isSelected =
               widget.selectedDate != null && _isSameDay(date, widget.selectedDate!);
           final bool isPast = date.isBefore(_today);
+          final DateTime? minSel = widget.minimumSelectableDate;
+          final bool beforeMin = minSel != null &&
+              DateUtils.dateOnly(date).isBefore(DateUtils.dateOnly(minSel));
 
           return Expanded(
             child: Semantics(
-              button: !(isPast && !isToday),
+              button: !((isPast && !isToday) || beforeMin),
               selected: isSelected,
               label: context.l10n.eventsCalendarDaySemantic(date.day),
               child: InkWell(
-                onTap: (isPast && !isToday)
+                onTap: ((isPast && !isToday) || beforeMin)
                     ? null
                     : () {
                         AppHaptics.tap();
@@ -259,7 +265,7 @@ class _EventCalendarState extends State<EventCalendar> {
                         inMonth: inMonth,
                         isSelected: isSelected,
                         isToday: isToday,
-                        isPast: isPast,
+                        isPast: isPast || beforeMin,
                       ),
                     ),
                   ),

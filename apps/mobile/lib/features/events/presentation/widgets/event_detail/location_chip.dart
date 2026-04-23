@@ -10,9 +10,11 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_site_resolver.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/ellipsize_words_to_max_width.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_location_detail_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_site_maps.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_metadata_row.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
@@ -28,7 +30,8 @@ class LocationChip extends StatelessWidget {
   /// When true, renders as an inset row without an outer card (use inside [EventDetailGroupedPanel]).
   final bool embeddedInGroupedPanel;
 
-  void _openSite(BuildContext context) {
+  /// Opens the pollution site detail for [event] (same as tapping the location row).
+  static void openSiteDetail(BuildContext context, EcoEvent event) {
     AppHaptics.softTransition();
     final PollutionSite site = EventSiteResolver.resolveSiteForEvent(
       event,
@@ -42,7 +45,8 @@ class LocationChip extends StatelessWidget {
     );
   }
 
-  Future<void> _openMaps(BuildContext context) async {
+  /// Opens maps when [event] has coordinates.
+  static Future<void> openMapsSheet(BuildContext context, EcoEvent event) async {
     final double? lat = event.siteLat;
     final double? lng = event.siteLng;
     if (lat == null || lng == null) {
@@ -52,6 +56,9 @@ class LocationChip extends StatelessWidget {
     await showEventSiteMapsSheet(context, lat: lat, lng: lng);
   }
 
+  Future<void> _openMaps(BuildContext context) async =>
+      openMapsSheet(context, event);
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -60,92 +67,53 @@ class LocationChip extends StatelessWidget {
     return Material(
       color: AppColors.transparent,
       child: embeddedInGroupedPanel
-          ? ConstrainedBox(
-              constraints: const BoxConstraints(minHeight: 52),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Expanded(
-                    child: Semantics(
-                      button: true,
-                      label:
-                          '${event.siteName}, ${context.l10n.eventsLocationDotKm(event.siteDistanceKm.toStringAsFixed(1))}',
-                      hint: context.l10n.eventsDetailLocationLongPressHint,
-                      child: InkWell(
-                        onTap: () => _openSite(context),
-                        onLongPress: () {
-                          AppHaptics.light();
-                          unawaited(
-                            showEventLocationDetailSheet(context, event: event),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(
-                          AppSpacing.radiusLg,
-                        ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: <Widget>[
-                            Icon(
-                              CupertinoIcons.location,
-                              size: AppSpacing.iconMd,
-                              color: AppColors.textSecondary,
-                            ),
-                            const SizedBox(width: AppSpacing.sm),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    event.siteName,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTypography.eventsGroupedRowPrimary(
-                                      textTheme,
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xxs),
-                                  Text(
-                                    context.l10n.eventsLocationDotKm(
-                                      event.siteDistanceKm.toStringAsFixed(1),
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: AppTypography.eventsListCardMeta(textTheme),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: AppSpacing.xs),
-                            const Icon(
-                              CupertinoIcons.chevron_right,
-                              size: 14,
-                              color: AppColors.textMuted,
-                            ),
-                          ],
-                        ),
-                      ),
+          ? EventDetailGroupedMetadataRow(
+              leading: const EventDetailGroupedMetadataRowLeading(
+                icon: CupertinoIcons.location,
+              ),
+              center: Semantics(
+                button: true,
+                label: event.siteName,
+                hint: context.l10n.eventsDetailLocationLongPressHint,
+                child: InkWell(
+                  onTap: () => openSiteDetail(context, event),
+                  onLongPress: () {
+                    AppHaptics.light();
+                    unawaited(
+                      showEventLocationDetailSheet(context, event: event),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                  child: Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: LayoutBuilder(
+                      builder:
+                          (BuildContext context, BoxConstraints constraints) {
+                        final TextDirection direction =
+                            Directionality.maybeOf(context) ??
+                                TextDirection.ltr;
+                        final TextScaler textScaler =
+                            MediaQuery.textScalerOf(context);
+                        final TextStyle primaryStyle =
+                            AppTypography.eventsGroupedRowPrimary(textTheme);
+                        final String addressShown = ellipsizeWordsToMaxWidth(
+                          event.siteName,
+                          primaryStyle,
+                          constraints.maxWidth,
+                          direction,
+                          textScaler,
+                        );
+
+                        return Text(
+                          addressShown,
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          style: primaryStyle,
+                        );
+                      },
                     ),
                   ),
-                  if (hasCoords)
-                    Semantics(
-                      button: true,
-                      label: context.l10n.eventsDetailOpenInMaps,
-                      child: IconButton(
-                        tooltip: context.l10n.eventsDetailOpenInMaps,
-                        constraints: const BoxConstraints(
-                          minWidth: AppSpacing.avatarMd,
-                          minHeight: AppSpacing.avatarMd,
-                        ),
-                        onPressed: () => _openMaps(context),
-                        icon: const Icon(
-                          CupertinoIcons.map,
-                          size: AppSpacing.iconMd,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                ],
+                ),
               ),
             )
           : Row(
@@ -160,7 +128,7 @@ class LocationChip extends StatelessWidget {
                     child: Material(
                       color: AppColors.transparent,
                       child: InkWell(
-                        onTap: () => _openSite(context),
+                        onTap: () => openSiteDetail(context, event),
                         borderRadius: BorderRadius.circular(
                           AppSpacing.radiusMd,
                         ),
@@ -187,13 +155,33 @@ class LocationChip extends StatelessWidget {
                               ),
                               const SizedBox(width: AppSpacing.sm),
                               Expanded(
-                                child: Text(
-                                  event.siteName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: AppTypography.eventsGroupedRowPrimary(
-                                    textTheme,
-                                  ).copyWith(color: AppColors.primaryDark),
+                                child: LayoutBuilder(
+                                  builder:
+                                      (BuildContext context, BoxConstraints constraints) {
+                                    final TextDirection direction =
+                                        Directionality.maybeOf(context) ??
+                                            TextDirection.ltr;
+                                    final TextScaler textScaler =
+                                        MediaQuery.textScalerOf(context);
+                                    final TextStyle addressStyle =
+                                        AppTypography.eventsGroupedRowPrimary(
+                                      textTheme,
+                                    ).copyWith(color: AppColors.primaryDark);
+                                    final String addressShown =
+                                        ellipsizeWordsToMaxWidth(
+                                      event.siteName,
+                                      addressStyle,
+                                      constraints.maxWidth,
+                                      direction,
+                                      textScaler,
+                                    );
+                                    return Text(
+                                      addressShown,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.clip,
+                                      style: addressStyle,
+                                    );
+                                  },
                                 ),
                               ),
                               const SizedBox(width: AppSpacing.xs),

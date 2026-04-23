@@ -84,7 +84,7 @@ void main() {
       ),
     );
 
-    client.postHandler = (_, __) async {
+    client.postHandler = (_, _) async {
       throw const AppError(code: 'CHECK_IN_REPLAY', message: 'used');
     };
 
@@ -112,7 +112,7 @@ void main() {
       ),
     );
 
-    client.postHandler = (_, __) async {
+    client.postHandler = (_, _) async {
       throw AppError.network();
     };
 

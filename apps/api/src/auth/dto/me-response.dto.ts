@@ -79,4 +79,7 @@ export class MeResponseDto {
 
   @ApiProperty({ description: 'Current week end (Sunday Skopje), ISO-8601' })
   weekEndsAt!: string;
+
+  @ApiProperty({ nullable: true, description: 'Set when user passed the organizer toolkit quiz' })
+  organizerCertifiedAt!: string | null;
 }

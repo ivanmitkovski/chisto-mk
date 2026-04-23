@@ -11,6 +11,12 @@ class AppColors {
   /// Base tone behind Carto dark tiles while pixels load.
   static const Color mapDarkPaper = Color(0xFF1A1A1A);
   static const Color panelBackground = Color(0xFFFFFFFF);
+
+  /// Slightly lifted surface for iOS-style grouped lists on [appBackground] (event detail).
+  static const Color detailSurfaceGrouped = Color(0xFFE8EAEF);
+
+  /// Raised module on detail canvas (weather, participants, etc.); keep readable with body text.
+  static const Color detailSurfaceModule = inputFill;
   static const Color textPrimary = Color(0xFF121212);
   static const Color textSecondary = Color(0xFF4C4C4C);
   static const Color textMuted = Color(0xFF7A7A7A);

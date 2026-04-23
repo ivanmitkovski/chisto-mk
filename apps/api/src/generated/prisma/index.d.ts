@@ -134,6 +134,26 @@ export type EventCheckIn = $Result.DefaultSelection<Prisma.$EventCheckInPayload>
  */
 export type EventCheckInRedemption = $Result.DefaultSelection<Prisma.$EventCheckInRedemptionPayload>
 /**
+ * Model EventLiveMetric
+ * Denormalized organizer-reported live counters (pulse); aggregates also read from [CleanupEvent].
+ */
+export type EventLiveMetric = $Result.DefaultSelection<Prisma.$EventLiveMetricPayload>
+/**
+ * Model EventEvidencePhoto
+ * 
+ */
+export type EventEvidencePhoto = $Result.DefaultSelection<Prisma.$EventEvidencePhotoPayload>
+/**
+ * Model EventRouteSegment
+ * 
+ */
+export type EventRouteSegment = $Result.DefaultSelection<Prisma.$EventRouteSegmentPayload>
+/**
+ * Model CheckInRiskSignal
+ * 
+ */
+export type CheckInRiskSignal = $Result.DefaultSelection<Prisma.$CheckInRiskSignalPayload>
+/**
  * Model SiteVote
  * 
  */
@@ -178,6 +198,11 @@ export type UserNotificationPreference = $Result.DefaultSelection<Prisma.$UserNo
  * 
  */
 export type NotificationOutbox = $Result.DefaultSelection<Prisma.$NotificationOutboxPayload>
+/**
+ * Model AdminMutationIdempotency
+ * Records client-supplied job ids for idempotent admin bulk mutations (e.g. bulk approve/decline).
+ */
+export type AdminMutationIdempotency = $Result.DefaultSelection<Prisma.$AdminMutationIdempotencyPayload>
 
 /**
  * Enums
@@ -318,6 +343,31 @@ export const EventChatMessageType: {
 export type EventChatMessageType = (typeof EventChatMessageType)[keyof typeof EventChatMessageType]
 
 
+export const EventEvidenceKind: {
+  BEFORE: 'BEFORE',
+  AFTER: 'AFTER',
+  FIELD: 'FIELD'
+};
+
+export type EventEvidenceKind = (typeof EventEvidenceKind)[keyof typeof EventEvidenceKind]
+
+
+export const RouteSegmentStatus: {
+  OPEN: 'OPEN',
+  CLAIMED: 'CLAIMED',
+  COMPLETED: 'COMPLETED'
+};
+
+export type RouteSegmentStatus = (typeof RouteSegmentStatus)[keyof typeof RouteSegmentStatus]
+
+
+export const CheckInRiskSignalType: {
+  FAR_FROM_SITE: 'FAR_FROM_SITE'
+};
+
+export type CheckInRiskSignalType = (typeof CheckInRiskSignalType)[keyof typeof CheckInRiskSignalType]
+
+
 export const SiteShareChannel: {
   native: 'native',
   link: 'link',
@@ -404,6 +454,18 @@ export const EcoEventDifficulty: typeof $Enums.EcoEventDifficulty
 export type EventChatMessageType = $Enums.EventChatMessageType
 
 export const EventChatMessageType: typeof $Enums.EventChatMessageType
+
+export type EventEvidenceKind = $Enums.EventEvidenceKind
+
+export const EventEvidenceKind: typeof $Enums.EventEvidenceKind
+
+export type RouteSegmentStatus = $Enums.RouteSegmentStatus
+
+export const RouteSegmentStatus: typeof $Enums.RouteSegmentStatus
+
+export type CheckInRiskSignalType = $Enums.CheckInRiskSignalType
+
+export const CheckInRiskSignalType: typeof $Enums.CheckInRiskSignalType
 
 export type SiteShareChannel = $Enums.SiteShareChannel
 
@@ -779,6 +841,46 @@ export class PrismaClient<
   get eventCheckInRedemption(): Prisma.EventCheckInRedemptionDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.eventLiveMetric`: Exposes CRUD operations for the **EventLiveMetric** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventLiveMetrics
+    * const eventLiveMetrics = await prisma.eventLiveMetric.findMany()
+    * ```
+    */
+  get eventLiveMetric(): Prisma.EventLiveMetricDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventEvidencePhoto`: Exposes CRUD operations for the **EventEvidencePhoto** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventEvidencePhotos
+    * const eventEvidencePhotos = await prisma.eventEvidencePhoto.findMany()
+    * ```
+    */
+  get eventEvidencePhoto(): Prisma.EventEvidencePhotoDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.eventRouteSegment`: Exposes CRUD operations for the **EventRouteSegment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more EventRouteSegments
+    * const eventRouteSegments = await prisma.eventRouteSegment.findMany()
+    * ```
+    */
+  get eventRouteSegment(): Prisma.EventRouteSegmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.checkInRiskSignal`: Exposes CRUD operations for the **CheckInRiskSignal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CheckInRiskSignals
+    * const checkInRiskSignals = await prisma.checkInRiskSignal.findMany()
+    * ```
+    */
+  get checkInRiskSignal(): Prisma.CheckInRiskSignalDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.siteVote`: Exposes CRUD operations for the **SiteVote** model.
     * Example usage:
     * ```ts
@@ -867,6 +969,16 @@ export class PrismaClient<
     * ```
     */
   get notificationOutbox(): Prisma.NotificationOutboxDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.adminMutationIdempotency`: Exposes CRUD operations for the **AdminMutationIdempotency** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminMutationIdempotencies
+    * const adminMutationIdempotencies = await prisma.adminMutationIdempotency.findMany()
+    * ```
+    */
+  get adminMutationIdempotency(): Prisma.AdminMutationIdempotencyDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1325,6 +1437,10 @@ export namespace Prisma {
     EventChatReadCursor: 'EventChatReadCursor',
     EventCheckIn: 'EventCheckIn',
     EventCheckInRedemption: 'EventCheckInRedemption',
+    EventLiveMetric: 'EventLiveMetric',
+    EventEvidencePhoto: 'EventEvidencePhoto',
+    EventRouteSegment: 'EventRouteSegment',
+    CheckInRiskSignal: 'CheckInRiskSignal',
     SiteVote: 'SiteVote',
     SiteSave: 'SiteSave',
     SiteComment: 'SiteComment',
@@ -1333,7 +1449,8 @@ export namespace Prisma {
     UserDeviceToken: 'UserDeviceToken',
     UserNotification: 'UserNotification',
     UserNotificationPreference: 'UserNotificationPreference',
-    NotificationOutbox: 'NotificationOutbox'
+    NotificationOutbox: 'NotificationOutbox',
+    AdminMutationIdempotency: 'AdminMutationIdempotency'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1349,7 +1466,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3129,6 +3246,302 @@ export namespace Prisma {
           }
         }
       }
+      EventLiveMetric: {
+        payload: Prisma.$EventLiveMetricPayload<ExtArgs>
+        fields: Prisma.EventLiveMetricFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventLiveMetricFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventLiveMetricFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          findFirst: {
+            args: Prisma.EventLiveMetricFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventLiveMetricFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          findMany: {
+            args: Prisma.EventLiveMetricFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>[]
+          }
+          create: {
+            args: Prisma.EventLiveMetricCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          createMany: {
+            args: Prisma.EventLiveMetricCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventLiveMetricCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>[]
+          }
+          delete: {
+            args: Prisma.EventLiveMetricDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          update: {
+            args: Prisma.EventLiveMetricUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventLiveMetricDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventLiveMetricUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventLiveMetricUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventLiveMetricUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventLiveMetricPayload>
+          }
+          aggregate: {
+            args: Prisma.EventLiveMetricAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventLiveMetric>
+          }
+          groupBy: {
+            args: Prisma.EventLiveMetricGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventLiveMetricGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventLiveMetricCountArgs<ExtArgs>
+            result: $Utils.Optional<EventLiveMetricCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventEvidencePhoto: {
+        payload: Prisma.$EventEvidencePhotoPayload<ExtArgs>
+        fields: Prisma.EventEvidencePhotoFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventEvidencePhotoFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventEvidencePhotoFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          findFirst: {
+            args: Prisma.EventEvidencePhotoFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventEvidencePhotoFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          findMany: {
+            args: Prisma.EventEvidencePhotoFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>[]
+          }
+          create: {
+            args: Prisma.EventEvidencePhotoCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          createMany: {
+            args: Prisma.EventEvidencePhotoCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventEvidencePhotoCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>[]
+          }
+          delete: {
+            args: Prisma.EventEvidencePhotoDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          update: {
+            args: Prisma.EventEvidencePhotoUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventEvidencePhotoDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventEvidencePhotoUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventEvidencePhotoUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventEvidencePhotoUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventEvidencePhotoPayload>
+          }
+          aggregate: {
+            args: Prisma.EventEvidencePhotoAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventEvidencePhoto>
+          }
+          groupBy: {
+            args: Prisma.EventEvidencePhotoGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventEvidencePhotoGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventEvidencePhotoCountArgs<ExtArgs>
+            result: $Utils.Optional<EventEvidencePhotoCountAggregateOutputType> | number
+          }
+        }
+      }
+      EventRouteSegment: {
+        payload: Prisma.$EventRouteSegmentPayload<ExtArgs>
+        fields: Prisma.EventRouteSegmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.EventRouteSegmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.EventRouteSegmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          findFirst: {
+            args: Prisma.EventRouteSegmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.EventRouteSegmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          findMany: {
+            args: Prisma.EventRouteSegmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>[]
+          }
+          create: {
+            args: Prisma.EventRouteSegmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          createMany: {
+            args: Prisma.EventRouteSegmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.EventRouteSegmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>[]
+          }
+          delete: {
+            args: Prisma.EventRouteSegmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          update: {
+            args: Prisma.EventRouteSegmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.EventRouteSegmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.EventRouteSegmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.EventRouteSegmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.EventRouteSegmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$EventRouteSegmentPayload>
+          }
+          aggregate: {
+            args: Prisma.EventRouteSegmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateEventRouteSegment>
+          }
+          groupBy: {
+            args: Prisma.EventRouteSegmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<EventRouteSegmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.EventRouteSegmentCountArgs<ExtArgs>
+            result: $Utils.Optional<EventRouteSegmentCountAggregateOutputType> | number
+          }
+        }
+      }
+      CheckInRiskSignal: {
+        payload: Prisma.$CheckInRiskSignalPayload<ExtArgs>
+        fields: Prisma.CheckInRiskSignalFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.CheckInRiskSignalFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CheckInRiskSignalFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          findFirst: {
+            args: Prisma.CheckInRiskSignalFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CheckInRiskSignalFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          findMany: {
+            args: Prisma.CheckInRiskSignalFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>[]
+          }
+          create: {
+            args: Prisma.CheckInRiskSignalCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          createMany: {
+            args: Prisma.CheckInRiskSignalCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.CheckInRiskSignalCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>[]
+          }
+          delete: {
+            args: Prisma.CheckInRiskSignalDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          update: {
+            args: Prisma.CheckInRiskSignalUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          deleteMany: {
+            args: Prisma.CheckInRiskSignalDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CheckInRiskSignalUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.CheckInRiskSignalUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>[]
+          }
+          upsert: {
+            args: Prisma.CheckInRiskSignalUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$CheckInRiskSignalPayload>
+          }
+          aggregate: {
+            args: Prisma.CheckInRiskSignalAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateCheckInRiskSignal>
+          }
+          groupBy: {
+            args: Prisma.CheckInRiskSignalGroupByArgs<ExtArgs>
+            result: $Utils.Optional<CheckInRiskSignalGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CheckInRiskSignalCountArgs<ExtArgs>
+            result: $Utils.Optional<CheckInRiskSignalCountAggregateOutputType> | number
+          }
+        }
+      }
       SiteVote: {
         payload: Prisma.$SiteVotePayload<ExtArgs>
         fields: Prisma.SiteVoteFieldRefs
@@ -3795,6 +4208,80 @@ export namespace Prisma {
           }
         }
       }
+      AdminMutationIdempotency: {
+        payload: Prisma.$AdminMutationIdempotencyPayload<ExtArgs>
+        fields: Prisma.AdminMutationIdempotencyFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminMutationIdempotencyFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminMutationIdempotencyFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          findFirst: {
+            args: Prisma.AdminMutationIdempotencyFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminMutationIdempotencyFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          findMany: {
+            args: Prisma.AdminMutationIdempotencyFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>[]
+          }
+          create: {
+            args: Prisma.AdminMutationIdempotencyCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          createMany: {
+            args: Prisma.AdminMutationIdempotencyCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminMutationIdempotencyCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>[]
+          }
+          delete: {
+            args: Prisma.AdminMutationIdempotencyDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          update: {
+            args: Prisma.AdminMutationIdempotencyUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminMutationIdempotencyDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminMutationIdempotencyUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminMutationIdempotencyUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminMutationIdempotencyUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminMutationIdempotencyPayload>
+          }
+          aggregate: {
+            args: Prisma.AdminMutationIdempotencyAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminMutationIdempotency>
+          }
+          groupBy: {
+            args: Prisma.AdminMutationIdempotencyGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminMutationIdempotencyGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminMutationIdempotencyCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminMutationIdempotencyCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -3927,6 +4414,10 @@ export namespace Prisma {
     eventChatReadCursor?: EventChatReadCursorOmit
     eventCheckIn?: EventCheckInOmit
     eventCheckInRedemption?: EventCheckInRedemptionOmit
+    eventLiveMetric?: EventLiveMetricOmit
+    eventEvidencePhoto?: EventEvidencePhotoOmit
+    eventRouteSegment?: EventRouteSegmentOmit
+    checkInRiskSignal?: CheckInRiskSignalOmit
     siteVote?: SiteVoteOmit
     siteSave?: SiteSaveOmit
     siteComment?: SiteCommentOmit
@@ -3936,6 +4427,7 @@ export namespace Prisma {
     userNotification?: UserNotificationOmit
     userNotificationPreference?: UserNotificationPreferenceOmit
     notificationOutbox?: NotificationOutboxOmit
+    adminMutationIdempotency?: AdminMutationIdempotencyOmit
   }
 
   /* Types for Logging */
@@ -4040,6 +4532,9 @@ export namespace Prisma {
     eventChatPinnedMessages: number
     eventChatMutes: number
     reportSubmitIdempotencyKeys: number
+    eventEvidencePhotosUploaded: number
+    routeSegmentsClaimed: number
+    checkInRiskSignals: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4067,6 +4562,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: boolean | UserCountOutputTypeCountEventChatPinnedMessagesArgs
     eventChatMutes?: boolean | UserCountOutputTypeCountEventChatMutesArgs
     reportSubmitIdempotencyKeys?: boolean | UserCountOutputTypeCountReportSubmitIdempotencyKeysArgs
+    eventEvidencePhotosUploaded?: boolean | UserCountOutputTypeCountEventEvidencePhotosUploadedArgs
+    routeSegmentsClaimed?: boolean | UserCountOutputTypeCountRouteSegmentsClaimedArgs
+    checkInRiskSignals?: boolean | UserCountOutputTypeCountCheckInRiskSignalsArgs
   }
 
   // Custom InputTypes
@@ -4248,6 +4746,27 @@ export namespace Prisma {
     where?: ReportSubmitIdempotencyWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountEventEvidencePhotosUploadedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventEvidencePhotoWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountRouteSegmentsClaimedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventRouteSegmentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCheckInRiskSignalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CheckInRiskSignalWhereInput
+  }
+
 
   /**
    * Count Type SiteCountOutputType
@@ -4385,6 +4904,9 @@ export namespace Prisma {
     chatMessages: number
     chatReadCursors: number
     chatMutes: number
+    evidencePhotos: number
+    routeSegments: number
+    checkInRiskSignals: number
     seriesChildren: number
   }
 
@@ -4395,6 +4917,9 @@ export namespace Prisma {
     chatMessages?: boolean | CleanupEventCountOutputTypeCountChatMessagesArgs
     chatReadCursors?: boolean | CleanupEventCountOutputTypeCountChatReadCursorsArgs
     chatMutes?: boolean | CleanupEventCountOutputTypeCountChatMutesArgs
+    evidencePhotos?: boolean | CleanupEventCountOutputTypeCountEvidencePhotosArgs
+    routeSegments?: boolean | CleanupEventCountOutputTypeCountRouteSegmentsArgs
+    checkInRiskSignals?: boolean | CleanupEventCountOutputTypeCountCheckInRiskSignalsArgs
     seriesChildren?: boolean | CleanupEventCountOutputTypeCountSeriesChildrenArgs
   }
 
@@ -4449,6 +4974,27 @@ export namespace Prisma {
    */
   export type CleanupEventCountOutputTypeCountChatMutesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventChatMuteWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountEvidencePhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventEvidencePhotoWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountRouteSegmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventRouteSegmentWhereInput
+  }
+
+  /**
+   * CleanupEventCountOutputType without action
+   */
+  export type CleanupEventCountOutputTypeCountCheckInRiskSignalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CheckInRiskSignalWhereInput
   }
 
   /**
@@ -4596,6 +5142,7 @@ export namespace Prisma {
     avatarObjectKey: string | null
     avatarUpdatedAt: Date | null
     totpSecret: string | null
+    organizerCertifiedAt: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -4621,6 +5168,7 @@ export namespace Prisma {
     avatarObjectKey: string | null
     avatarUpdatedAt: Date | null
     totpSecret: string | null
+    organizerCertifiedAt: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -4647,6 +5195,7 @@ export namespace Prisma {
     avatarUpdatedAt: number
     totpSecret: number
     mfaBackupCodes: number
+    organizerCertifiedAt: number
     _all: number
   }
 
@@ -4692,6 +5241,7 @@ export namespace Prisma {
     avatarObjectKey?: true
     avatarUpdatedAt?: true
     totpSecret?: true
+    organizerCertifiedAt?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -4717,6 +5267,7 @@ export namespace Prisma {
     avatarObjectKey?: true
     avatarUpdatedAt?: true
     totpSecret?: true
+    organizerCertifiedAt?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -4743,6 +5294,7 @@ export namespace Prisma {
     avatarUpdatedAt?: true
     totpSecret?: true
     mfaBackupCodes?: true
+    organizerCertifiedAt?: true
     _all?: true
   }
 
@@ -4856,6 +5408,7 @@ export namespace Prisma {
     avatarUpdatedAt: Date | null
     totpSecret: string | null
     mfaBackupCodes: string[]
+    organizerCertifiedAt: Date | null
     _count: UserCountAggregateOutputType | null
     _avg: UserAvgAggregateOutputType | null
     _sum: UserSumAggregateOutputType | null
@@ -4901,6 +5454,7 @@ export namespace Prisma {
     avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
+    organizerCertifiedAt?: boolean
     reports?: boolean | User$reportsArgs<ExtArgs>
     moderatedReports?: boolean | User$moderatedReportsArgs<ExtArgs>
     adminNotifications?: boolean | User$adminNotificationsArgs<ExtArgs>
@@ -4926,6 +5480,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
     eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
     reportSubmitIdempotencyKeys?: boolean | User$reportSubmitIdempotencyKeysArgs<ExtArgs>
+    eventEvidencePhotosUploaded?: boolean | User$eventEvidencePhotosUploadedArgs<ExtArgs>
+    routeSegmentsClaimed?: boolean | User$routeSegmentsClaimedArgs<ExtArgs>
+    checkInRiskSignals?: boolean | User$checkInRiskSignalsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4953,6 +5510,7 @@ export namespace Prisma {
     avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
+    organizerCertifiedAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4979,6 +5537,7 @@ export namespace Prisma {
     avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
+    organizerCertifiedAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -5005,9 +5564,10 @@ export namespace Prisma {
     avatarUpdatedAt?: boolean
     totpSecret?: boolean
     mfaBackupCodes?: boolean
+    organizerCertifiedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "reportCreditsAvailable" | "reportCreditsSpentTotal" | "reportEmergencyWindowDays" | "reportEmergencyUsedAt" | "lastActiveAt" | "avatarObjectKey" | "avatarUpdatedAt" | "totpSecret" | "mfaBackupCodes", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "firstName" | "lastName" | "email" | "phoneNumber" | "passwordHash" | "role" | "status" | "isPhoneVerified" | "pointsBalance" | "totalPointsEarned" | "totalPointsSpent" | "reportCreditsAvailable" | "reportCreditsSpentTotal" | "reportEmergencyWindowDays" | "reportEmergencyUsedAt" | "lastActiveAt" | "avatarObjectKey" | "avatarUpdatedAt" | "totpSecret" | "mfaBackupCodes" | "organizerCertifiedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     reports?: boolean | User$reportsArgs<ExtArgs>
     moderatedReports?: boolean | User$moderatedReportsArgs<ExtArgs>
@@ -5034,6 +5594,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: boolean | User$eventChatPinnedMessagesArgs<ExtArgs>
     eventChatMutes?: boolean | User$eventChatMutesArgs<ExtArgs>
     reportSubmitIdempotencyKeys?: boolean | User$reportSubmitIdempotencyKeysArgs<ExtArgs>
+    eventEvidencePhotosUploaded?: boolean | User$eventEvidencePhotosUploadedArgs<ExtArgs>
+    routeSegmentsClaimed?: boolean | User$routeSegmentsClaimedArgs<ExtArgs>
+    checkInRiskSignals?: boolean | User$checkInRiskSignalsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5067,6 +5630,9 @@ export namespace Prisma {
       eventChatPinnedMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
       eventChatMutes: Prisma.$EventChatMutePayload<ExtArgs>[]
       reportSubmitIdempotencyKeys: Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>[]
+      eventEvidencePhotosUploaded: Prisma.$EventEvidencePhotoPayload<ExtArgs>[]
+      routeSegmentsClaimed: Prisma.$EventRouteSegmentPayload<ExtArgs>[]
+      checkInRiskSignals: Prisma.$CheckInRiskSignalPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5092,6 +5658,7 @@ export namespace Prisma {
       avatarUpdatedAt: Date | null
       totpSecret: string | null
       mfaBackupCodes: string[]
+      organizerCertifiedAt: Date | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -5511,6 +6078,9 @@ export namespace Prisma {
     eventChatPinnedMessages<T extends User$eventChatPinnedMessagesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatPinnedMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     eventChatMutes<T extends User$eventChatMutesArgs<ExtArgs> = {}>(args?: Subset<T, User$eventChatMutesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     reportSubmitIdempotencyKeys<T extends User$reportSubmitIdempotencyKeysArgs<ExtArgs> = {}>(args?: Subset<T, User$reportSubmitIdempotencyKeysArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSubmitIdempotencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    eventEvidencePhotosUploaded<T extends User$eventEvidencePhotosUploadedArgs<ExtArgs> = {}>(args?: Subset<T, User$eventEvidencePhotosUploadedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    routeSegmentsClaimed<T extends User$routeSegmentsClaimedArgs<ExtArgs> = {}>(args?: Subset<T, User$routeSegmentsClaimedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkInRiskSignals<T extends User$checkInRiskSignalsArgs<ExtArgs> = {}>(args?: Subset<T, User$checkInRiskSignalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5563,6 +6133,7 @@ export namespace Prisma {
     readonly avatarUpdatedAt: FieldRef<"User", 'DateTime'>
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly mfaBackupCodes: FieldRef<"User", 'String[]'>
+    readonly organizerCertifiedAt: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -6548,6 +7119,78 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ReportSubmitIdempotencyScalarFieldEnum | ReportSubmitIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * User.eventEvidencePhotosUploaded
+   */
+  export type User$eventEvidencePhotosUploadedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    where?: EventEvidencePhotoWhereInput
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventEvidencePhotoScalarFieldEnum | EventEvidencePhotoScalarFieldEnum[]
+  }
+
+  /**
+   * User.routeSegmentsClaimed
+   */
+  export type User$routeSegmentsClaimedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    where?: EventRouteSegmentWhereInput
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    cursor?: EventRouteSegmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventRouteSegmentScalarFieldEnum | EventRouteSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * User.checkInRiskSignals
+   */
+  export type User$checkInRiskSignalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    where?: CheckInRiskSignalWhereInput
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
   }
 
   /**
@@ -23684,6 +24327,10 @@ export namespace Prisma {
     chatMessages?: boolean | CleanupEvent$chatMessagesArgs<ExtArgs>
     chatReadCursors?: boolean | CleanupEvent$chatReadCursorsArgs<ExtArgs>
     chatMutes?: boolean | CleanupEvent$chatMutesArgs<ExtArgs>
+    liveMetric?: boolean | CleanupEvent$liveMetricArgs<ExtArgs>
+    evidencePhotos?: boolean | CleanupEvent$evidencePhotosArgs<ExtArgs>
+    routeSegments?: boolean | CleanupEvent$routeSegmentsArgs<ExtArgs>
+    checkInRiskSignals?: boolean | CleanupEvent$checkInRiskSignalsArgs<ExtArgs>
     parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
     seriesChildren?: boolean | CleanupEvent$seriesChildrenArgs<ExtArgs>
     _count?: boolean | CleanupEventCountOutputTypeDefaultArgs<ExtArgs>
@@ -23792,6 +24439,10 @@ export namespace Prisma {
     chatMessages?: boolean | CleanupEvent$chatMessagesArgs<ExtArgs>
     chatReadCursors?: boolean | CleanupEvent$chatReadCursorsArgs<ExtArgs>
     chatMutes?: boolean | CleanupEvent$chatMutesArgs<ExtArgs>
+    liveMetric?: boolean | CleanupEvent$liveMetricArgs<ExtArgs>
+    evidencePhotos?: boolean | CleanupEvent$evidencePhotosArgs<ExtArgs>
+    routeSegments?: boolean | CleanupEvent$routeSegmentsArgs<ExtArgs>
+    checkInRiskSignals?: boolean | CleanupEvent$checkInRiskSignalsArgs<ExtArgs>
     parentEvent?: boolean | CleanupEvent$parentEventArgs<ExtArgs>
     seriesChildren?: boolean | CleanupEvent$seriesChildrenArgs<ExtArgs>
     _count?: boolean | CleanupEventCountOutputTypeDefaultArgs<ExtArgs>
@@ -23818,6 +24469,10 @@ export namespace Prisma {
       chatMessages: Prisma.$EventChatMessagePayload<ExtArgs>[]
       chatReadCursors: Prisma.$EventChatReadCursorPayload<ExtArgs>[]
       chatMutes: Prisma.$EventChatMutePayload<ExtArgs>[]
+      liveMetric: Prisma.$EventLiveMetricPayload<ExtArgs> | null
+      evidencePhotos: Prisma.$EventEvidencePhotoPayload<ExtArgs>[]
+      routeSegments: Prisma.$EventRouteSegmentPayload<ExtArgs>[]
+      checkInRiskSignals: Prisma.$CheckInRiskSignalPayload<ExtArgs>[]
       parentEvent: Prisma.$CleanupEventPayload<ExtArgs> | null
       seriesChildren: Prisma.$CleanupEventPayload<ExtArgs>[]
     }
@@ -24275,6 +24930,10 @@ export namespace Prisma {
     chatMessages<T extends CleanupEvent$chatMessagesArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatMessagesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     chatReadCursors<T extends CleanupEvent$chatReadCursorsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatReadCursorsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     chatMutes<T extends CleanupEvent$chatMutesArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$chatMutesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMutePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    liveMetric<T extends CleanupEvent$liveMetricArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$liveMetricArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    evidencePhotos<T extends CleanupEvent$evidencePhotosArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$evidencePhotosArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    routeSegments<T extends CleanupEvent$routeSegmentsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$routeSegmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    checkInRiskSignals<T extends CleanupEvent$checkInRiskSignalsArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$checkInRiskSignalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     parentEvent<T extends CleanupEvent$parentEventArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$parentEventArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     seriesChildren<T extends CleanupEvent$seriesChildrenArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEvent$seriesChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -24893,6 +25552,97 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: EventChatMuteScalarFieldEnum | EventChatMuteScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.liveMetric
+   */
+  export type CleanupEvent$liveMetricArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    where?: EventLiveMetricWhereInput
+  }
+
+  /**
+   * CleanupEvent.evidencePhotos
+   */
+  export type CleanupEvent$evidencePhotosArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    where?: EventEvidencePhotoWhereInput
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventEvidencePhotoScalarFieldEnum | EventEvidencePhotoScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.routeSegments
+   */
+  export type CleanupEvent$routeSegmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    where?: EventRouteSegmentWhereInput
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    cursor?: EventRouteSegmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventRouteSegmentScalarFieldEnum | EventRouteSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * CleanupEvent.checkInRiskSignals
+   */
+  export type CleanupEvent$checkInRiskSignalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    where?: CheckInRiskSignalWhereInput
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
   }
 
   /**
@@ -32925,6 +33675,4529 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: EventCheckInRedemptionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventLiveMetric
+   */
+
+  export type AggregateEventLiveMetric = {
+    _count: EventLiveMetricCountAggregateOutputType | null
+    _avg: EventLiveMetricAvgAggregateOutputType | null
+    _sum: EventLiveMetricSumAggregateOutputType | null
+    _min: EventLiveMetricMinAggregateOutputType | null
+    _max: EventLiveMetricMaxAggregateOutputType | null
+  }
+
+  export type EventLiveMetricAvgAggregateOutputType = {
+    reportedBagsCollected: number | null
+  }
+
+  export type EventLiveMetricSumAggregateOutputType = {
+    reportedBagsCollected: number | null
+  }
+
+  export type EventLiveMetricMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    reportedBagsCollected: number | null
+  }
+
+  export type EventLiveMetricMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    reportedBagsCollected: number | null
+  }
+
+  export type EventLiveMetricCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    eventId: number
+    reportedBagsCollected: number
+    _all: number
+  }
+
+
+  export type EventLiveMetricAvgAggregateInputType = {
+    reportedBagsCollected?: true
+  }
+
+  export type EventLiveMetricSumAggregateInputType = {
+    reportedBagsCollected?: true
+  }
+
+  export type EventLiveMetricMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    reportedBagsCollected?: true
+  }
+
+  export type EventLiveMetricMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    reportedBagsCollected?: true
+  }
+
+  export type EventLiveMetricCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    reportedBagsCollected?: true
+    _all?: true
+  }
+
+  export type EventLiveMetricAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventLiveMetric to aggregate.
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventLiveMetrics to fetch.
+     */
+    orderBy?: EventLiveMetricOrderByWithRelationInput | EventLiveMetricOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventLiveMetricWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventLiveMetrics from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventLiveMetrics.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventLiveMetrics
+    **/
+    _count?: true | EventLiveMetricCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EventLiveMetricAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EventLiveMetricSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventLiveMetricMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventLiveMetricMaxAggregateInputType
+  }
+
+  export type GetEventLiveMetricAggregateType<T extends EventLiveMetricAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventLiveMetric]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventLiveMetric[P]>
+      : GetScalarType<T[P], AggregateEventLiveMetric[P]>
+  }
+
+
+
+
+  export type EventLiveMetricGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventLiveMetricWhereInput
+    orderBy?: EventLiveMetricOrderByWithAggregationInput | EventLiveMetricOrderByWithAggregationInput[]
+    by: EventLiveMetricScalarFieldEnum[] | EventLiveMetricScalarFieldEnum
+    having?: EventLiveMetricScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventLiveMetricCountAggregateInputType | true
+    _avg?: EventLiveMetricAvgAggregateInputType
+    _sum?: EventLiveMetricSumAggregateInputType
+    _min?: EventLiveMetricMinAggregateInputType
+    _max?: EventLiveMetricMaxAggregateInputType
+  }
+
+  export type EventLiveMetricGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    eventId: string
+    reportedBagsCollected: number
+    _count: EventLiveMetricCountAggregateOutputType | null
+    _avg: EventLiveMetricAvgAggregateOutputType | null
+    _sum: EventLiveMetricSumAggregateOutputType | null
+    _min: EventLiveMetricMinAggregateOutputType | null
+    _max: EventLiveMetricMaxAggregateOutputType | null
+  }
+
+  type GetEventLiveMetricGroupByPayload<T extends EventLiveMetricGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventLiveMetricGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventLiveMetricGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventLiveMetricGroupByOutputType[P]>
+            : GetScalarType<T[P], EventLiveMetricGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventLiveMetricSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    reportedBagsCollected?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventLiveMetric"]>
+
+  export type EventLiveMetricSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    reportedBagsCollected?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventLiveMetric"]>
+
+  export type EventLiveMetricSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    reportedBagsCollected?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventLiveMetric"]>
+
+  export type EventLiveMetricSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    reportedBagsCollected?: boolean
+  }
+
+  export type EventLiveMetricOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "eventId" | "reportedBagsCollected", ExtArgs["result"]["eventLiveMetric"]>
+  export type EventLiveMetricInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+  export type EventLiveMetricIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+  export type EventLiveMetricIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+  }
+
+  export type $EventLiveMetricPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventLiveMetric"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      eventId: string
+      reportedBagsCollected: number
+    }, ExtArgs["result"]["eventLiveMetric"]>
+    composites: {}
+  }
+
+  type EventLiveMetricGetPayload<S extends boolean | null | undefined | EventLiveMetricDefaultArgs> = $Result.GetResult<Prisma.$EventLiveMetricPayload, S>
+
+  type EventLiveMetricCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventLiveMetricFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventLiveMetricCountAggregateInputType | true
+    }
+
+  export interface EventLiveMetricDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventLiveMetric'], meta: { name: 'EventLiveMetric' } }
+    /**
+     * Find zero or one EventLiveMetric that matches the filter.
+     * @param {EventLiveMetricFindUniqueArgs} args - Arguments to find a EventLiveMetric
+     * @example
+     * // Get one EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventLiveMetricFindUniqueArgs>(args: SelectSubset<T, EventLiveMetricFindUniqueArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventLiveMetric that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventLiveMetricFindUniqueOrThrowArgs} args - Arguments to find a EventLiveMetric
+     * @example
+     * // Get one EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventLiveMetricFindUniqueOrThrowArgs>(args: SelectSubset<T, EventLiveMetricFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventLiveMetric that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricFindFirstArgs} args - Arguments to find a EventLiveMetric
+     * @example
+     * // Get one EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventLiveMetricFindFirstArgs>(args?: SelectSubset<T, EventLiveMetricFindFirstArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventLiveMetric that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricFindFirstOrThrowArgs} args - Arguments to find a EventLiveMetric
+     * @example
+     * // Get one EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventLiveMetricFindFirstOrThrowArgs>(args?: SelectSubset<T, EventLiveMetricFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventLiveMetrics that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventLiveMetrics
+     * const eventLiveMetrics = await prisma.eventLiveMetric.findMany()
+     * 
+     * // Get first 10 EventLiveMetrics
+     * const eventLiveMetrics = await prisma.eventLiveMetric.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventLiveMetricWithIdOnly = await prisma.eventLiveMetric.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventLiveMetricFindManyArgs>(args?: SelectSubset<T, EventLiveMetricFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventLiveMetric.
+     * @param {EventLiveMetricCreateArgs} args - Arguments to create a EventLiveMetric.
+     * @example
+     * // Create one EventLiveMetric
+     * const EventLiveMetric = await prisma.eventLiveMetric.create({
+     *   data: {
+     *     // ... data to create a EventLiveMetric
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventLiveMetricCreateArgs>(args: SelectSubset<T, EventLiveMetricCreateArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventLiveMetrics.
+     * @param {EventLiveMetricCreateManyArgs} args - Arguments to create many EventLiveMetrics.
+     * @example
+     * // Create many EventLiveMetrics
+     * const eventLiveMetric = await prisma.eventLiveMetric.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventLiveMetricCreateManyArgs>(args?: SelectSubset<T, EventLiveMetricCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventLiveMetrics and returns the data saved in the database.
+     * @param {EventLiveMetricCreateManyAndReturnArgs} args - Arguments to create many EventLiveMetrics.
+     * @example
+     * // Create many EventLiveMetrics
+     * const eventLiveMetric = await prisma.eventLiveMetric.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventLiveMetrics and only return the `id`
+     * const eventLiveMetricWithIdOnly = await prisma.eventLiveMetric.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventLiveMetricCreateManyAndReturnArgs>(args?: SelectSubset<T, EventLiveMetricCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventLiveMetric.
+     * @param {EventLiveMetricDeleteArgs} args - Arguments to delete one EventLiveMetric.
+     * @example
+     * // Delete one EventLiveMetric
+     * const EventLiveMetric = await prisma.eventLiveMetric.delete({
+     *   where: {
+     *     // ... filter to delete one EventLiveMetric
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventLiveMetricDeleteArgs>(args: SelectSubset<T, EventLiveMetricDeleteArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventLiveMetric.
+     * @param {EventLiveMetricUpdateArgs} args - Arguments to update one EventLiveMetric.
+     * @example
+     * // Update one EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventLiveMetricUpdateArgs>(args: SelectSubset<T, EventLiveMetricUpdateArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventLiveMetrics.
+     * @param {EventLiveMetricDeleteManyArgs} args - Arguments to filter EventLiveMetrics to delete.
+     * @example
+     * // Delete a few EventLiveMetrics
+     * const { count } = await prisma.eventLiveMetric.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventLiveMetricDeleteManyArgs>(args?: SelectSubset<T, EventLiveMetricDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventLiveMetrics.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventLiveMetrics
+     * const eventLiveMetric = await prisma.eventLiveMetric.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventLiveMetricUpdateManyArgs>(args: SelectSubset<T, EventLiveMetricUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventLiveMetrics and returns the data updated in the database.
+     * @param {EventLiveMetricUpdateManyAndReturnArgs} args - Arguments to update many EventLiveMetrics.
+     * @example
+     * // Update many EventLiveMetrics
+     * const eventLiveMetric = await prisma.eventLiveMetric.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventLiveMetrics and only return the `id`
+     * const eventLiveMetricWithIdOnly = await prisma.eventLiveMetric.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventLiveMetricUpdateManyAndReturnArgs>(args: SelectSubset<T, EventLiveMetricUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventLiveMetric.
+     * @param {EventLiveMetricUpsertArgs} args - Arguments to update or create a EventLiveMetric.
+     * @example
+     * // Update or create a EventLiveMetric
+     * const eventLiveMetric = await prisma.eventLiveMetric.upsert({
+     *   create: {
+     *     // ... data to create a EventLiveMetric
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventLiveMetric we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventLiveMetricUpsertArgs>(args: SelectSubset<T, EventLiveMetricUpsertArgs<ExtArgs>>): Prisma__EventLiveMetricClient<$Result.GetResult<Prisma.$EventLiveMetricPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventLiveMetrics.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricCountArgs} args - Arguments to filter EventLiveMetrics to count.
+     * @example
+     * // Count the number of EventLiveMetrics
+     * const count = await prisma.eventLiveMetric.count({
+     *   where: {
+     *     // ... the filter for the EventLiveMetrics we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventLiveMetricCountArgs>(
+      args?: Subset<T, EventLiveMetricCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventLiveMetricCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventLiveMetric.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventLiveMetricAggregateArgs>(args: Subset<T, EventLiveMetricAggregateArgs>): Prisma.PrismaPromise<GetEventLiveMetricAggregateType<T>>
+
+    /**
+     * Group by EventLiveMetric.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventLiveMetricGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventLiveMetricGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventLiveMetricGroupByArgs['orderBy'] }
+        : { orderBy?: EventLiveMetricGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventLiveMetricGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventLiveMetricGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventLiveMetric model
+   */
+  readonly fields: EventLiveMetricFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventLiveMetric.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventLiveMetricClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventLiveMetric model
+   */
+  interface EventLiveMetricFieldRefs {
+    readonly id: FieldRef<"EventLiveMetric", 'String'>
+    readonly createdAt: FieldRef<"EventLiveMetric", 'DateTime'>
+    readonly updatedAt: FieldRef<"EventLiveMetric", 'DateTime'>
+    readonly eventId: FieldRef<"EventLiveMetric", 'String'>
+    readonly reportedBagsCollected: FieldRef<"EventLiveMetric", 'Int'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventLiveMetric findUnique
+   */
+  export type EventLiveMetricFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter, which EventLiveMetric to fetch.
+     */
+    where: EventLiveMetricWhereUniqueInput
+  }
+
+  /**
+   * EventLiveMetric findUniqueOrThrow
+   */
+  export type EventLiveMetricFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter, which EventLiveMetric to fetch.
+     */
+    where: EventLiveMetricWhereUniqueInput
+  }
+
+  /**
+   * EventLiveMetric findFirst
+   */
+  export type EventLiveMetricFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter, which EventLiveMetric to fetch.
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventLiveMetrics to fetch.
+     */
+    orderBy?: EventLiveMetricOrderByWithRelationInput | EventLiveMetricOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventLiveMetrics.
+     */
+    cursor?: EventLiveMetricWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventLiveMetrics from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventLiveMetrics.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventLiveMetrics.
+     */
+    distinct?: EventLiveMetricScalarFieldEnum | EventLiveMetricScalarFieldEnum[]
+  }
+
+  /**
+   * EventLiveMetric findFirstOrThrow
+   */
+  export type EventLiveMetricFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter, which EventLiveMetric to fetch.
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventLiveMetrics to fetch.
+     */
+    orderBy?: EventLiveMetricOrderByWithRelationInput | EventLiveMetricOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventLiveMetrics.
+     */
+    cursor?: EventLiveMetricWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventLiveMetrics from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventLiveMetrics.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventLiveMetrics.
+     */
+    distinct?: EventLiveMetricScalarFieldEnum | EventLiveMetricScalarFieldEnum[]
+  }
+
+  /**
+   * EventLiveMetric findMany
+   */
+  export type EventLiveMetricFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter, which EventLiveMetrics to fetch.
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventLiveMetrics to fetch.
+     */
+    orderBy?: EventLiveMetricOrderByWithRelationInput | EventLiveMetricOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventLiveMetrics.
+     */
+    cursor?: EventLiveMetricWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventLiveMetrics from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventLiveMetrics.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventLiveMetrics.
+     */
+    distinct?: EventLiveMetricScalarFieldEnum | EventLiveMetricScalarFieldEnum[]
+  }
+
+  /**
+   * EventLiveMetric create
+   */
+  export type EventLiveMetricCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventLiveMetric.
+     */
+    data: XOR<EventLiveMetricCreateInput, EventLiveMetricUncheckedCreateInput>
+  }
+
+  /**
+   * EventLiveMetric createMany
+   */
+  export type EventLiveMetricCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventLiveMetrics.
+     */
+    data: EventLiveMetricCreateManyInput | EventLiveMetricCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventLiveMetric createManyAndReturn
+   */
+  export type EventLiveMetricCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventLiveMetrics.
+     */
+    data: EventLiveMetricCreateManyInput | EventLiveMetricCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventLiveMetric update
+   */
+  export type EventLiveMetricUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventLiveMetric.
+     */
+    data: XOR<EventLiveMetricUpdateInput, EventLiveMetricUncheckedUpdateInput>
+    /**
+     * Choose, which EventLiveMetric to update.
+     */
+    where: EventLiveMetricWhereUniqueInput
+  }
+
+  /**
+   * EventLiveMetric updateMany
+   */
+  export type EventLiveMetricUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventLiveMetrics.
+     */
+    data: XOR<EventLiveMetricUpdateManyMutationInput, EventLiveMetricUncheckedUpdateManyInput>
+    /**
+     * Filter which EventLiveMetrics to update
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * Limit how many EventLiveMetrics to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventLiveMetric updateManyAndReturn
+   */
+  export type EventLiveMetricUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * The data used to update EventLiveMetrics.
+     */
+    data: XOR<EventLiveMetricUpdateManyMutationInput, EventLiveMetricUncheckedUpdateManyInput>
+    /**
+     * Filter which EventLiveMetrics to update
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * Limit how many EventLiveMetrics to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventLiveMetric upsert
+   */
+  export type EventLiveMetricUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventLiveMetric to update in case it exists.
+     */
+    where: EventLiveMetricWhereUniqueInput
+    /**
+     * In case the EventLiveMetric found by the `where` argument doesn't exist, create a new EventLiveMetric with this data.
+     */
+    create: XOR<EventLiveMetricCreateInput, EventLiveMetricUncheckedCreateInput>
+    /**
+     * In case the EventLiveMetric was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventLiveMetricUpdateInput, EventLiveMetricUncheckedUpdateInput>
+  }
+
+  /**
+   * EventLiveMetric delete
+   */
+  export type EventLiveMetricDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+    /**
+     * Filter which EventLiveMetric to delete.
+     */
+    where: EventLiveMetricWhereUniqueInput
+  }
+
+  /**
+   * EventLiveMetric deleteMany
+   */
+  export type EventLiveMetricDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventLiveMetrics to delete
+     */
+    where?: EventLiveMetricWhereInput
+    /**
+     * Limit how many EventLiveMetrics to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventLiveMetric without action
+   */
+  export type EventLiveMetricDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventLiveMetric
+     */
+    select?: EventLiveMetricSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventLiveMetric
+     */
+    omit?: EventLiveMetricOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventLiveMetricInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventEvidencePhoto
+   */
+
+  export type AggregateEventEvidencePhoto = {
+    _count: EventEvidencePhotoCountAggregateOutputType | null
+    _min: EventEvidencePhotoMinAggregateOutputType | null
+    _max: EventEvidencePhotoMaxAggregateOutputType | null
+  }
+
+  export type EventEvidencePhotoMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    kind: $Enums.EventEvidenceKind | null
+    objectKey: string | null
+    caption: string | null
+    uploadedById: string | null
+  }
+
+  export type EventEvidencePhotoMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    kind: $Enums.EventEvidenceKind | null
+    objectKey: string | null
+    caption: string | null
+    uploadedById: string | null
+  }
+
+  export type EventEvidencePhotoCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    eventId: number
+    kind: number
+    objectKey: number
+    caption: number
+    uploadedById: number
+    _all: number
+  }
+
+
+  export type EventEvidencePhotoMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    kind?: true
+    objectKey?: true
+    caption?: true
+    uploadedById?: true
+  }
+
+  export type EventEvidencePhotoMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    kind?: true
+    objectKey?: true
+    caption?: true
+    uploadedById?: true
+  }
+
+  export type EventEvidencePhotoCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    kind?: true
+    objectKey?: true
+    caption?: true
+    uploadedById?: true
+    _all?: true
+  }
+
+  export type EventEvidencePhotoAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventEvidencePhoto to aggregate.
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventEvidencePhotos to fetch.
+     */
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventEvidencePhotos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventEvidencePhotos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventEvidencePhotos
+    **/
+    _count?: true | EventEvidencePhotoCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventEvidencePhotoMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventEvidencePhotoMaxAggregateInputType
+  }
+
+  export type GetEventEvidencePhotoAggregateType<T extends EventEvidencePhotoAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventEvidencePhoto]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventEvidencePhoto[P]>
+      : GetScalarType<T[P], AggregateEventEvidencePhoto[P]>
+  }
+
+
+
+
+  export type EventEvidencePhotoGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventEvidencePhotoWhereInput
+    orderBy?: EventEvidencePhotoOrderByWithAggregationInput | EventEvidencePhotoOrderByWithAggregationInput[]
+    by: EventEvidencePhotoScalarFieldEnum[] | EventEvidencePhotoScalarFieldEnum
+    having?: EventEvidencePhotoScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventEvidencePhotoCountAggregateInputType | true
+    _min?: EventEvidencePhotoMinAggregateInputType
+    _max?: EventEvidencePhotoMaxAggregateInputType
+  }
+
+  export type EventEvidencePhotoGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    eventId: string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption: string | null
+    uploadedById: string
+    _count: EventEvidencePhotoCountAggregateOutputType | null
+    _min: EventEvidencePhotoMinAggregateOutputType | null
+    _max: EventEvidencePhotoMaxAggregateOutputType | null
+  }
+
+  type GetEventEvidencePhotoGroupByPayload<T extends EventEvidencePhotoGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventEvidencePhotoGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventEvidencePhotoGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventEvidencePhotoGroupByOutputType[P]>
+            : GetScalarType<T[P], EventEvidencePhotoGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventEvidencePhotoSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    kind?: boolean
+    objectKey?: boolean
+    caption?: boolean
+    uploadedById?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventEvidencePhoto"]>
+
+  export type EventEvidencePhotoSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    kind?: boolean
+    objectKey?: boolean
+    caption?: boolean
+    uploadedById?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventEvidencePhoto"]>
+
+  export type EventEvidencePhotoSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    kind?: boolean
+    objectKey?: boolean
+    caption?: boolean
+    uploadedById?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["eventEvidencePhoto"]>
+
+  export type EventEvidencePhotoSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    kind?: boolean
+    objectKey?: boolean
+    caption?: boolean
+    uploadedById?: boolean
+  }
+
+  export type EventEvidencePhotoOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "eventId" | "kind" | "objectKey" | "caption" | "uploadedById", ExtArgs["result"]["eventEvidencePhoto"]>
+  export type EventEvidencePhotoInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventEvidencePhotoIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type EventEvidencePhotoIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    uploadedBy?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $EventEvidencePhotoPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventEvidencePhoto"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      uploadedBy: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      eventId: string
+      kind: $Enums.EventEvidenceKind
+      objectKey: string
+      caption: string | null
+      uploadedById: string
+    }, ExtArgs["result"]["eventEvidencePhoto"]>
+    composites: {}
+  }
+
+  type EventEvidencePhotoGetPayload<S extends boolean | null | undefined | EventEvidencePhotoDefaultArgs> = $Result.GetResult<Prisma.$EventEvidencePhotoPayload, S>
+
+  type EventEvidencePhotoCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventEvidencePhotoFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventEvidencePhotoCountAggregateInputType | true
+    }
+
+  export interface EventEvidencePhotoDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventEvidencePhoto'], meta: { name: 'EventEvidencePhoto' } }
+    /**
+     * Find zero or one EventEvidencePhoto that matches the filter.
+     * @param {EventEvidencePhotoFindUniqueArgs} args - Arguments to find a EventEvidencePhoto
+     * @example
+     * // Get one EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventEvidencePhotoFindUniqueArgs>(args: SelectSubset<T, EventEvidencePhotoFindUniqueArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventEvidencePhoto that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventEvidencePhotoFindUniqueOrThrowArgs} args - Arguments to find a EventEvidencePhoto
+     * @example
+     * // Get one EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventEvidencePhotoFindUniqueOrThrowArgs>(args: SelectSubset<T, EventEvidencePhotoFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventEvidencePhoto that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoFindFirstArgs} args - Arguments to find a EventEvidencePhoto
+     * @example
+     * // Get one EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventEvidencePhotoFindFirstArgs>(args?: SelectSubset<T, EventEvidencePhotoFindFirstArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventEvidencePhoto that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoFindFirstOrThrowArgs} args - Arguments to find a EventEvidencePhoto
+     * @example
+     * // Get one EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventEvidencePhotoFindFirstOrThrowArgs>(args?: SelectSubset<T, EventEvidencePhotoFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventEvidencePhotos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventEvidencePhotos
+     * const eventEvidencePhotos = await prisma.eventEvidencePhoto.findMany()
+     * 
+     * // Get first 10 EventEvidencePhotos
+     * const eventEvidencePhotos = await prisma.eventEvidencePhoto.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventEvidencePhotoWithIdOnly = await prisma.eventEvidencePhoto.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventEvidencePhotoFindManyArgs>(args?: SelectSubset<T, EventEvidencePhotoFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventEvidencePhoto.
+     * @param {EventEvidencePhotoCreateArgs} args - Arguments to create a EventEvidencePhoto.
+     * @example
+     * // Create one EventEvidencePhoto
+     * const EventEvidencePhoto = await prisma.eventEvidencePhoto.create({
+     *   data: {
+     *     // ... data to create a EventEvidencePhoto
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventEvidencePhotoCreateArgs>(args: SelectSubset<T, EventEvidencePhotoCreateArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventEvidencePhotos.
+     * @param {EventEvidencePhotoCreateManyArgs} args - Arguments to create many EventEvidencePhotos.
+     * @example
+     * // Create many EventEvidencePhotos
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventEvidencePhotoCreateManyArgs>(args?: SelectSubset<T, EventEvidencePhotoCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventEvidencePhotos and returns the data saved in the database.
+     * @param {EventEvidencePhotoCreateManyAndReturnArgs} args - Arguments to create many EventEvidencePhotos.
+     * @example
+     * // Create many EventEvidencePhotos
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventEvidencePhotos and only return the `id`
+     * const eventEvidencePhotoWithIdOnly = await prisma.eventEvidencePhoto.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventEvidencePhotoCreateManyAndReturnArgs>(args?: SelectSubset<T, EventEvidencePhotoCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventEvidencePhoto.
+     * @param {EventEvidencePhotoDeleteArgs} args - Arguments to delete one EventEvidencePhoto.
+     * @example
+     * // Delete one EventEvidencePhoto
+     * const EventEvidencePhoto = await prisma.eventEvidencePhoto.delete({
+     *   where: {
+     *     // ... filter to delete one EventEvidencePhoto
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventEvidencePhotoDeleteArgs>(args: SelectSubset<T, EventEvidencePhotoDeleteArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventEvidencePhoto.
+     * @param {EventEvidencePhotoUpdateArgs} args - Arguments to update one EventEvidencePhoto.
+     * @example
+     * // Update one EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventEvidencePhotoUpdateArgs>(args: SelectSubset<T, EventEvidencePhotoUpdateArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventEvidencePhotos.
+     * @param {EventEvidencePhotoDeleteManyArgs} args - Arguments to filter EventEvidencePhotos to delete.
+     * @example
+     * // Delete a few EventEvidencePhotos
+     * const { count } = await prisma.eventEvidencePhoto.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventEvidencePhotoDeleteManyArgs>(args?: SelectSubset<T, EventEvidencePhotoDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventEvidencePhotos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventEvidencePhotos
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventEvidencePhotoUpdateManyArgs>(args: SelectSubset<T, EventEvidencePhotoUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventEvidencePhotos and returns the data updated in the database.
+     * @param {EventEvidencePhotoUpdateManyAndReturnArgs} args - Arguments to update many EventEvidencePhotos.
+     * @example
+     * // Update many EventEvidencePhotos
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventEvidencePhotos and only return the `id`
+     * const eventEvidencePhotoWithIdOnly = await prisma.eventEvidencePhoto.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventEvidencePhotoUpdateManyAndReturnArgs>(args: SelectSubset<T, EventEvidencePhotoUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventEvidencePhoto.
+     * @param {EventEvidencePhotoUpsertArgs} args - Arguments to update or create a EventEvidencePhoto.
+     * @example
+     * // Update or create a EventEvidencePhoto
+     * const eventEvidencePhoto = await prisma.eventEvidencePhoto.upsert({
+     *   create: {
+     *     // ... data to create a EventEvidencePhoto
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventEvidencePhoto we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventEvidencePhotoUpsertArgs>(args: SelectSubset<T, EventEvidencePhotoUpsertArgs<ExtArgs>>): Prisma__EventEvidencePhotoClient<$Result.GetResult<Prisma.$EventEvidencePhotoPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventEvidencePhotos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoCountArgs} args - Arguments to filter EventEvidencePhotos to count.
+     * @example
+     * // Count the number of EventEvidencePhotos
+     * const count = await prisma.eventEvidencePhoto.count({
+     *   where: {
+     *     // ... the filter for the EventEvidencePhotos we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventEvidencePhotoCountArgs>(
+      args?: Subset<T, EventEvidencePhotoCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventEvidencePhotoCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventEvidencePhoto.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventEvidencePhotoAggregateArgs>(args: Subset<T, EventEvidencePhotoAggregateArgs>): Prisma.PrismaPromise<GetEventEvidencePhotoAggregateType<T>>
+
+    /**
+     * Group by EventEvidencePhoto.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventEvidencePhotoGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventEvidencePhotoGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventEvidencePhotoGroupByArgs['orderBy'] }
+        : { orderBy?: EventEvidencePhotoGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventEvidencePhotoGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventEvidencePhotoGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventEvidencePhoto model
+   */
+  readonly fields: EventEvidencePhotoFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventEvidencePhoto.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventEvidencePhotoClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    uploadedBy<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventEvidencePhoto model
+   */
+  interface EventEvidencePhotoFieldRefs {
+    readonly id: FieldRef<"EventEvidencePhoto", 'String'>
+    readonly createdAt: FieldRef<"EventEvidencePhoto", 'DateTime'>
+    readonly updatedAt: FieldRef<"EventEvidencePhoto", 'DateTime'>
+    readonly eventId: FieldRef<"EventEvidencePhoto", 'String'>
+    readonly kind: FieldRef<"EventEvidencePhoto", 'EventEvidenceKind'>
+    readonly objectKey: FieldRef<"EventEvidencePhoto", 'String'>
+    readonly caption: FieldRef<"EventEvidencePhoto", 'String'>
+    readonly uploadedById: FieldRef<"EventEvidencePhoto", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventEvidencePhoto findUnique
+   */
+  export type EventEvidencePhotoFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventEvidencePhoto to fetch.
+     */
+    where: EventEvidencePhotoWhereUniqueInput
+  }
+
+  /**
+   * EventEvidencePhoto findUniqueOrThrow
+   */
+  export type EventEvidencePhotoFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventEvidencePhoto to fetch.
+     */
+    where: EventEvidencePhotoWhereUniqueInput
+  }
+
+  /**
+   * EventEvidencePhoto findFirst
+   */
+  export type EventEvidencePhotoFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventEvidencePhoto to fetch.
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventEvidencePhotos to fetch.
+     */
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventEvidencePhotos.
+     */
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventEvidencePhotos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventEvidencePhotos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventEvidencePhotos.
+     */
+    distinct?: EventEvidencePhotoScalarFieldEnum | EventEvidencePhotoScalarFieldEnum[]
+  }
+
+  /**
+   * EventEvidencePhoto findFirstOrThrow
+   */
+  export type EventEvidencePhotoFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventEvidencePhoto to fetch.
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventEvidencePhotos to fetch.
+     */
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventEvidencePhotos.
+     */
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventEvidencePhotos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventEvidencePhotos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventEvidencePhotos.
+     */
+    distinct?: EventEvidencePhotoScalarFieldEnum | EventEvidencePhotoScalarFieldEnum[]
+  }
+
+  /**
+   * EventEvidencePhoto findMany
+   */
+  export type EventEvidencePhotoFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter, which EventEvidencePhotos to fetch.
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventEvidencePhotos to fetch.
+     */
+    orderBy?: EventEvidencePhotoOrderByWithRelationInput | EventEvidencePhotoOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventEvidencePhotos.
+     */
+    cursor?: EventEvidencePhotoWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventEvidencePhotos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventEvidencePhotos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventEvidencePhotos.
+     */
+    distinct?: EventEvidencePhotoScalarFieldEnum | EventEvidencePhotoScalarFieldEnum[]
+  }
+
+  /**
+   * EventEvidencePhoto create
+   */
+  export type EventEvidencePhotoCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventEvidencePhoto.
+     */
+    data: XOR<EventEvidencePhotoCreateInput, EventEvidencePhotoUncheckedCreateInput>
+  }
+
+  /**
+   * EventEvidencePhoto createMany
+   */
+  export type EventEvidencePhotoCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventEvidencePhotos.
+     */
+    data: EventEvidencePhotoCreateManyInput | EventEvidencePhotoCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventEvidencePhoto createManyAndReturn
+   */
+  export type EventEvidencePhotoCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventEvidencePhotos.
+     */
+    data: EventEvidencePhotoCreateManyInput | EventEvidencePhotoCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventEvidencePhoto update
+   */
+  export type EventEvidencePhotoUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventEvidencePhoto.
+     */
+    data: XOR<EventEvidencePhotoUpdateInput, EventEvidencePhotoUncheckedUpdateInput>
+    /**
+     * Choose, which EventEvidencePhoto to update.
+     */
+    where: EventEvidencePhotoWhereUniqueInput
+  }
+
+  /**
+   * EventEvidencePhoto updateMany
+   */
+  export type EventEvidencePhotoUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventEvidencePhotos.
+     */
+    data: XOR<EventEvidencePhotoUpdateManyMutationInput, EventEvidencePhotoUncheckedUpdateManyInput>
+    /**
+     * Filter which EventEvidencePhotos to update
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * Limit how many EventEvidencePhotos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventEvidencePhoto updateManyAndReturn
+   */
+  export type EventEvidencePhotoUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * The data used to update EventEvidencePhotos.
+     */
+    data: XOR<EventEvidencePhotoUpdateManyMutationInput, EventEvidencePhotoUncheckedUpdateManyInput>
+    /**
+     * Filter which EventEvidencePhotos to update
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * Limit how many EventEvidencePhotos to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventEvidencePhoto upsert
+   */
+  export type EventEvidencePhotoUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventEvidencePhoto to update in case it exists.
+     */
+    where: EventEvidencePhotoWhereUniqueInput
+    /**
+     * In case the EventEvidencePhoto found by the `where` argument doesn't exist, create a new EventEvidencePhoto with this data.
+     */
+    create: XOR<EventEvidencePhotoCreateInput, EventEvidencePhotoUncheckedCreateInput>
+    /**
+     * In case the EventEvidencePhoto was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventEvidencePhotoUpdateInput, EventEvidencePhotoUncheckedUpdateInput>
+  }
+
+  /**
+   * EventEvidencePhoto delete
+   */
+  export type EventEvidencePhotoDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+    /**
+     * Filter which EventEvidencePhoto to delete.
+     */
+    where: EventEvidencePhotoWhereUniqueInput
+  }
+
+  /**
+   * EventEvidencePhoto deleteMany
+   */
+  export type EventEvidencePhotoDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventEvidencePhotos to delete
+     */
+    where?: EventEvidencePhotoWhereInput
+    /**
+     * Limit how many EventEvidencePhotos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventEvidencePhoto without action
+   */
+  export type EventEvidencePhotoDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventEvidencePhoto
+     */
+    select?: EventEvidencePhotoSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventEvidencePhoto
+     */
+    omit?: EventEvidencePhotoOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventEvidencePhotoInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model EventRouteSegment
+   */
+
+  export type AggregateEventRouteSegment = {
+    _count: EventRouteSegmentCountAggregateOutputType | null
+    _avg: EventRouteSegmentAvgAggregateOutputType | null
+    _sum: EventRouteSegmentSumAggregateOutputType | null
+    _min: EventRouteSegmentMinAggregateOutputType | null
+    _max: EventRouteSegmentMaxAggregateOutputType | null
+  }
+
+  export type EventRouteSegmentAvgAggregateOutputType = {
+    sortOrder: number | null
+    latitude: number | null
+    longitude: number | null
+  }
+
+  export type EventRouteSegmentSumAggregateOutputType = {
+    sortOrder: number | null
+    latitude: number | null
+    longitude: number | null
+  }
+
+  export type EventRouteSegmentMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    sortOrder: number | null
+    label: string | null
+    latitude: number | null
+    longitude: number | null
+    status: $Enums.RouteSegmentStatus | null
+    claimedByUserId: string | null
+    claimedAt: Date | null
+    completedAt: Date | null
+  }
+
+  export type EventRouteSegmentMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    eventId: string | null
+    sortOrder: number | null
+    label: string | null
+    latitude: number | null
+    longitude: number | null
+    status: $Enums.RouteSegmentStatus | null
+    claimedByUserId: string | null
+    claimedAt: Date | null
+    completedAt: Date | null
+  }
+
+  export type EventRouteSegmentCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    eventId: number
+    sortOrder: number
+    label: number
+    latitude: number
+    longitude: number
+    status: number
+    claimedByUserId: number
+    claimedAt: number
+    completedAt: number
+    _all: number
+  }
+
+
+  export type EventRouteSegmentAvgAggregateInputType = {
+    sortOrder?: true
+    latitude?: true
+    longitude?: true
+  }
+
+  export type EventRouteSegmentSumAggregateInputType = {
+    sortOrder?: true
+    latitude?: true
+    longitude?: true
+  }
+
+  export type EventRouteSegmentMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    sortOrder?: true
+    label?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    claimedByUserId?: true
+    claimedAt?: true
+    completedAt?: true
+  }
+
+  export type EventRouteSegmentMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    sortOrder?: true
+    label?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    claimedByUserId?: true
+    claimedAt?: true
+    completedAt?: true
+  }
+
+  export type EventRouteSegmentCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    eventId?: true
+    sortOrder?: true
+    label?: true
+    latitude?: true
+    longitude?: true
+    status?: true
+    claimedByUserId?: true
+    claimedAt?: true
+    completedAt?: true
+    _all?: true
+  }
+
+  export type EventRouteSegmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventRouteSegment to aggregate.
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventRouteSegments to fetch.
+     */
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: EventRouteSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventRouteSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventRouteSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned EventRouteSegments
+    **/
+    _count?: true | EventRouteSegmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: EventRouteSegmentAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: EventRouteSegmentSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: EventRouteSegmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: EventRouteSegmentMaxAggregateInputType
+  }
+
+  export type GetEventRouteSegmentAggregateType<T extends EventRouteSegmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateEventRouteSegment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateEventRouteSegment[P]>
+      : GetScalarType<T[P], AggregateEventRouteSegment[P]>
+  }
+
+
+
+
+  export type EventRouteSegmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventRouteSegmentWhereInput
+    orderBy?: EventRouteSegmentOrderByWithAggregationInput | EventRouteSegmentOrderByWithAggregationInput[]
+    by: EventRouteSegmentScalarFieldEnum[] | EventRouteSegmentScalarFieldEnum
+    having?: EventRouteSegmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: EventRouteSegmentCountAggregateInputType | true
+    _avg?: EventRouteSegmentAvgAggregateInputType
+    _sum?: EventRouteSegmentSumAggregateInputType
+    _min?: EventRouteSegmentMinAggregateInputType
+    _max?: EventRouteSegmentMaxAggregateInputType
+  }
+
+  export type EventRouteSegmentGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    eventId: string
+    sortOrder: number
+    label: string | null
+    latitude: number
+    longitude: number
+    status: $Enums.RouteSegmentStatus
+    claimedByUserId: string | null
+    claimedAt: Date | null
+    completedAt: Date | null
+    _count: EventRouteSegmentCountAggregateOutputType | null
+    _avg: EventRouteSegmentAvgAggregateOutputType | null
+    _sum: EventRouteSegmentSumAggregateOutputType | null
+    _min: EventRouteSegmentMinAggregateOutputType | null
+    _max: EventRouteSegmentMaxAggregateOutputType | null
+  }
+
+  type GetEventRouteSegmentGroupByPayload<T extends EventRouteSegmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<EventRouteSegmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof EventRouteSegmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], EventRouteSegmentGroupByOutputType[P]>
+            : GetScalarType<T[P], EventRouteSegmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type EventRouteSegmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    sortOrder?: boolean
+    label?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    claimedByUserId?: boolean
+    claimedAt?: boolean
+    completedAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }, ExtArgs["result"]["eventRouteSegment"]>
+
+  export type EventRouteSegmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    sortOrder?: boolean
+    label?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    claimedByUserId?: boolean
+    claimedAt?: boolean
+    completedAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }, ExtArgs["result"]["eventRouteSegment"]>
+
+  export type EventRouteSegmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    sortOrder?: boolean
+    label?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    claimedByUserId?: boolean
+    claimedAt?: boolean
+    completedAt?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }, ExtArgs["result"]["eventRouteSegment"]>
+
+  export type EventRouteSegmentSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    eventId?: boolean
+    sortOrder?: boolean
+    label?: boolean
+    latitude?: boolean
+    longitude?: boolean
+    status?: boolean
+    claimedByUserId?: boolean
+    claimedAt?: boolean
+    completedAt?: boolean
+  }
+
+  export type EventRouteSegmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "eventId" | "sortOrder" | "label" | "latitude" | "longitude" | "status" | "claimedByUserId" | "claimedAt" | "completedAt", ExtArgs["result"]["eventRouteSegment"]>
+  export type EventRouteSegmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }
+  export type EventRouteSegmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }
+  export type EventRouteSegmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    claimedBy?: boolean | EventRouteSegment$claimedByArgs<ExtArgs>
+  }
+
+  export type $EventRouteSegmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "EventRouteSegment"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      claimedBy: Prisma.$UserPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      eventId: string
+      sortOrder: number
+      label: string | null
+      latitude: number
+      longitude: number
+      status: $Enums.RouteSegmentStatus
+      claimedByUserId: string | null
+      claimedAt: Date | null
+      completedAt: Date | null
+    }, ExtArgs["result"]["eventRouteSegment"]>
+    composites: {}
+  }
+
+  type EventRouteSegmentGetPayload<S extends boolean | null | undefined | EventRouteSegmentDefaultArgs> = $Result.GetResult<Prisma.$EventRouteSegmentPayload, S>
+
+  type EventRouteSegmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<EventRouteSegmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: EventRouteSegmentCountAggregateInputType | true
+    }
+
+  export interface EventRouteSegmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['EventRouteSegment'], meta: { name: 'EventRouteSegment' } }
+    /**
+     * Find zero or one EventRouteSegment that matches the filter.
+     * @param {EventRouteSegmentFindUniqueArgs} args - Arguments to find a EventRouteSegment
+     * @example
+     * // Get one EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends EventRouteSegmentFindUniqueArgs>(args: SelectSubset<T, EventRouteSegmentFindUniqueArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one EventRouteSegment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {EventRouteSegmentFindUniqueOrThrowArgs} args - Arguments to find a EventRouteSegment
+     * @example
+     * // Get one EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends EventRouteSegmentFindUniqueOrThrowArgs>(args: SelectSubset<T, EventRouteSegmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventRouteSegment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentFindFirstArgs} args - Arguments to find a EventRouteSegment
+     * @example
+     * // Get one EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends EventRouteSegmentFindFirstArgs>(args?: SelectSubset<T, EventRouteSegmentFindFirstArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first EventRouteSegment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentFindFirstOrThrowArgs} args - Arguments to find a EventRouteSegment
+     * @example
+     * // Get one EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends EventRouteSegmentFindFirstOrThrowArgs>(args?: SelectSubset<T, EventRouteSegmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more EventRouteSegments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all EventRouteSegments
+     * const eventRouteSegments = await prisma.eventRouteSegment.findMany()
+     * 
+     * // Get first 10 EventRouteSegments
+     * const eventRouteSegments = await prisma.eventRouteSegment.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const eventRouteSegmentWithIdOnly = await prisma.eventRouteSegment.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends EventRouteSegmentFindManyArgs>(args?: SelectSubset<T, EventRouteSegmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a EventRouteSegment.
+     * @param {EventRouteSegmentCreateArgs} args - Arguments to create a EventRouteSegment.
+     * @example
+     * // Create one EventRouteSegment
+     * const EventRouteSegment = await prisma.eventRouteSegment.create({
+     *   data: {
+     *     // ... data to create a EventRouteSegment
+     *   }
+     * })
+     * 
+     */
+    create<T extends EventRouteSegmentCreateArgs>(args: SelectSubset<T, EventRouteSegmentCreateArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many EventRouteSegments.
+     * @param {EventRouteSegmentCreateManyArgs} args - Arguments to create many EventRouteSegments.
+     * @example
+     * // Create many EventRouteSegments
+     * const eventRouteSegment = await prisma.eventRouteSegment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends EventRouteSegmentCreateManyArgs>(args?: SelectSubset<T, EventRouteSegmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many EventRouteSegments and returns the data saved in the database.
+     * @param {EventRouteSegmentCreateManyAndReturnArgs} args - Arguments to create many EventRouteSegments.
+     * @example
+     * // Create many EventRouteSegments
+     * const eventRouteSegment = await prisma.eventRouteSegment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many EventRouteSegments and only return the `id`
+     * const eventRouteSegmentWithIdOnly = await prisma.eventRouteSegment.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends EventRouteSegmentCreateManyAndReturnArgs>(args?: SelectSubset<T, EventRouteSegmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a EventRouteSegment.
+     * @param {EventRouteSegmentDeleteArgs} args - Arguments to delete one EventRouteSegment.
+     * @example
+     * // Delete one EventRouteSegment
+     * const EventRouteSegment = await prisma.eventRouteSegment.delete({
+     *   where: {
+     *     // ... filter to delete one EventRouteSegment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends EventRouteSegmentDeleteArgs>(args: SelectSubset<T, EventRouteSegmentDeleteArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one EventRouteSegment.
+     * @param {EventRouteSegmentUpdateArgs} args - Arguments to update one EventRouteSegment.
+     * @example
+     * // Update one EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends EventRouteSegmentUpdateArgs>(args: SelectSubset<T, EventRouteSegmentUpdateArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more EventRouteSegments.
+     * @param {EventRouteSegmentDeleteManyArgs} args - Arguments to filter EventRouteSegments to delete.
+     * @example
+     * // Delete a few EventRouteSegments
+     * const { count } = await prisma.eventRouteSegment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends EventRouteSegmentDeleteManyArgs>(args?: SelectSubset<T, EventRouteSegmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventRouteSegments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many EventRouteSegments
+     * const eventRouteSegment = await prisma.eventRouteSegment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends EventRouteSegmentUpdateManyArgs>(args: SelectSubset<T, EventRouteSegmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more EventRouteSegments and returns the data updated in the database.
+     * @param {EventRouteSegmentUpdateManyAndReturnArgs} args - Arguments to update many EventRouteSegments.
+     * @example
+     * // Update many EventRouteSegments
+     * const eventRouteSegment = await prisma.eventRouteSegment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more EventRouteSegments and only return the `id`
+     * const eventRouteSegmentWithIdOnly = await prisma.eventRouteSegment.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends EventRouteSegmentUpdateManyAndReturnArgs>(args: SelectSubset<T, EventRouteSegmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one EventRouteSegment.
+     * @param {EventRouteSegmentUpsertArgs} args - Arguments to update or create a EventRouteSegment.
+     * @example
+     * // Update or create a EventRouteSegment
+     * const eventRouteSegment = await prisma.eventRouteSegment.upsert({
+     *   create: {
+     *     // ... data to create a EventRouteSegment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the EventRouteSegment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends EventRouteSegmentUpsertArgs>(args: SelectSubset<T, EventRouteSegmentUpsertArgs<ExtArgs>>): Prisma__EventRouteSegmentClient<$Result.GetResult<Prisma.$EventRouteSegmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of EventRouteSegments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentCountArgs} args - Arguments to filter EventRouteSegments to count.
+     * @example
+     * // Count the number of EventRouteSegments
+     * const count = await prisma.eventRouteSegment.count({
+     *   where: {
+     *     // ... the filter for the EventRouteSegments we want to count
+     *   }
+     * })
+    **/
+    count<T extends EventRouteSegmentCountArgs>(
+      args?: Subset<T, EventRouteSegmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], EventRouteSegmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a EventRouteSegment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends EventRouteSegmentAggregateArgs>(args: Subset<T, EventRouteSegmentAggregateArgs>): Prisma.PrismaPromise<GetEventRouteSegmentAggregateType<T>>
+
+    /**
+     * Group by EventRouteSegment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {EventRouteSegmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends EventRouteSegmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: EventRouteSegmentGroupByArgs['orderBy'] }
+        : { orderBy?: EventRouteSegmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, EventRouteSegmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetEventRouteSegmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the EventRouteSegment model
+   */
+  readonly fields: EventRouteSegmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for EventRouteSegment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__EventRouteSegmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    claimedBy<T extends EventRouteSegment$claimedByArgs<ExtArgs> = {}>(args?: Subset<T, EventRouteSegment$claimedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the EventRouteSegment model
+   */
+  interface EventRouteSegmentFieldRefs {
+    readonly id: FieldRef<"EventRouteSegment", 'String'>
+    readonly createdAt: FieldRef<"EventRouteSegment", 'DateTime'>
+    readonly updatedAt: FieldRef<"EventRouteSegment", 'DateTime'>
+    readonly eventId: FieldRef<"EventRouteSegment", 'String'>
+    readonly sortOrder: FieldRef<"EventRouteSegment", 'Int'>
+    readonly label: FieldRef<"EventRouteSegment", 'String'>
+    readonly latitude: FieldRef<"EventRouteSegment", 'Float'>
+    readonly longitude: FieldRef<"EventRouteSegment", 'Float'>
+    readonly status: FieldRef<"EventRouteSegment", 'RouteSegmentStatus'>
+    readonly claimedByUserId: FieldRef<"EventRouteSegment", 'String'>
+    readonly claimedAt: FieldRef<"EventRouteSegment", 'DateTime'>
+    readonly completedAt: FieldRef<"EventRouteSegment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * EventRouteSegment findUnique
+   */
+  export type EventRouteSegmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventRouteSegment to fetch.
+     */
+    where: EventRouteSegmentWhereUniqueInput
+  }
+
+  /**
+   * EventRouteSegment findUniqueOrThrow
+   */
+  export type EventRouteSegmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventRouteSegment to fetch.
+     */
+    where: EventRouteSegmentWhereUniqueInput
+  }
+
+  /**
+   * EventRouteSegment findFirst
+   */
+  export type EventRouteSegmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventRouteSegment to fetch.
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventRouteSegments to fetch.
+     */
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventRouteSegments.
+     */
+    cursor?: EventRouteSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventRouteSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventRouteSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventRouteSegments.
+     */
+    distinct?: EventRouteSegmentScalarFieldEnum | EventRouteSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventRouteSegment findFirstOrThrow
+   */
+  export type EventRouteSegmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventRouteSegment to fetch.
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventRouteSegments to fetch.
+     */
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for EventRouteSegments.
+     */
+    cursor?: EventRouteSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventRouteSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventRouteSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventRouteSegments.
+     */
+    distinct?: EventRouteSegmentScalarFieldEnum | EventRouteSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventRouteSegment findMany
+   */
+  export type EventRouteSegmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter, which EventRouteSegments to fetch.
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of EventRouteSegments to fetch.
+     */
+    orderBy?: EventRouteSegmentOrderByWithRelationInput | EventRouteSegmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing EventRouteSegments.
+     */
+    cursor?: EventRouteSegmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` EventRouteSegments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` EventRouteSegments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of EventRouteSegments.
+     */
+    distinct?: EventRouteSegmentScalarFieldEnum | EventRouteSegmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventRouteSegment create
+   */
+  export type EventRouteSegmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a EventRouteSegment.
+     */
+    data: XOR<EventRouteSegmentCreateInput, EventRouteSegmentUncheckedCreateInput>
+  }
+
+  /**
+   * EventRouteSegment createMany
+   */
+  export type EventRouteSegmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many EventRouteSegments.
+     */
+    data: EventRouteSegmentCreateManyInput | EventRouteSegmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * EventRouteSegment createManyAndReturn
+   */
+  export type EventRouteSegmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many EventRouteSegments.
+     */
+    data: EventRouteSegmentCreateManyInput | EventRouteSegmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventRouteSegment update
+   */
+  export type EventRouteSegmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a EventRouteSegment.
+     */
+    data: XOR<EventRouteSegmentUpdateInput, EventRouteSegmentUncheckedUpdateInput>
+    /**
+     * Choose, which EventRouteSegment to update.
+     */
+    where: EventRouteSegmentWhereUniqueInput
+  }
+
+  /**
+   * EventRouteSegment updateMany
+   */
+  export type EventRouteSegmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update EventRouteSegments.
+     */
+    data: XOR<EventRouteSegmentUpdateManyMutationInput, EventRouteSegmentUncheckedUpdateManyInput>
+    /**
+     * Filter which EventRouteSegments to update
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * Limit how many EventRouteSegments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventRouteSegment updateManyAndReturn
+   */
+  export type EventRouteSegmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * The data used to update EventRouteSegments.
+     */
+    data: XOR<EventRouteSegmentUpdateManyMutationInput, EventRouteSegmentUncheckedUpdateManyInput>
+    /**
+     * Filter which EventRouteSegments to update
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * Limit how many EventRouteSegments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * EventRouteSegment upsert
+   */
+  export type EventRouteSegmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the EventRouteSegment to update in case it exists.
+     */
+    where: EventRouteSegmentWhereUniqueInput
+    /**
+     * In case the EventRouteSegment found by the `where` argument doesn't exist, create a new EventRouteSegment with this data.
+     */
+    create: XOR<EventRouteSegmentCreateInput, EventRouteSegmentUncheckedCreateInput>
+    /**
+     * In case the EventRouteSegment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<EventRouteSegmentUpdateInput, EventRouteSegmentUncheckedUpdateInput>
+  }
+
+  /**
+   * EventRouteSegment delete
+   */
+  export type EventRouteSegmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+    /**
+     * Filter which EventRouteSegment to delete.
+     */
+    where: EventRouteSegmentWhereUniqueInput
+  }
+
+  /**
+   * EventRouteSegment deleteMany
+   */
+  export type EventRouteSegmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which EventRouteSegments to delete
+     */
+    where?: EventRouteSegmentWhereInput
+    /**
+     * Limit how many EventRouteSegments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * EventRouteSegment.claimedBy
+   */
+  export type EventRouteSegment$claimedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * EventRouteSegment without action
+   */
+  export type EventRouteSegmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventRouteSegment
+     */
+    select?: EventRouteSegmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventRouteSegment
+     */
+    omit?: EventRouteSegmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventRouteSegmentInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model CheckInRiskSignal
+   */
+
+  export type AggregateCheckInRiskSignal = {
+    _count: CheckInRiskSignalCountAggregateOutputType | null
+    _min: CheckInRiskSignalMinAggregateOutputType | null
+    _max: CheckInRiskSignalMaxAggregateOutputType | null
+  }
+
+  export type CheckInRiskSignalMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    expiresAt: Date | null
+    eventId: string | null
+    userId: string | null
+    signalType: $Enums.CheckInRiskSignalType | null
+  }
+
+  export type CheckInRiskSignalMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    expiresAt: Date | null
+    eventId: string | null
+    userId: string | null
+    signalType: $Enums.CheckInRiskSignalType | null
+  }
+
+  export type CheckInRiskSignalCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    expiresAt: number
+    eventId: number
+    userId: number
+    signalType: number
+    metadata: number
+    _all: number
+  }
+
+
+  export type CheckInRiskSignalMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    expiresAt?: true
+    eventId?: true
+    userId?: true
+    signalType?: true
+  }
+
+  export type CheckInRiskSignalMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    expiresAt?: true
+    eventId?: true
+    userId?: true
+    signalType?: true
+  }
+
+  export type CheckInRiskSignalCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    expiresAt?: true
+    eventId?: true
+    userId?: true
+    signalType?: true
+    metadata?: true
+    _all?: true
+  }
+
+  export type CheckInRiskSignalAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CheckInRiskSignal to aggregate.
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CheckInRiskSignals to fetch.
+     */
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CheckInRiskSignals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CheckInRiskSignals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CheckInRiskSignals
+    **/
+    _count?: true | CheckInRiskSignalCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CheckInRiskSignalMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CheckInRiskSignalMaxAggregateInputType
+  }
+
+  export type GetCheckInRiskSignalAggregateType<T extends CheckInRiskSignalAggregateArgs> = {
+        [P in keyof T & keyof AggregateCheckInRiskSignal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCheckInRiskSignal[P]>
+      : GetScalarType<T[P], AggregateCheckInRiskSignal[P]>
+  }
+
+
+
+
+  export type CheckInRiskSignalGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: CheckInRiskSignalWhereInput
+    orderBy?: CheckInRiskSignalOrderByWithAggregationInput | CheckInRiskSignalOrderByWithAggregationInput[]
+    by: CheckInRiskSignalScalarFieldEnum[] | CheckInRiskSignalScalarFieldEnum
+    having?: CheckInRiskSignalScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CheckInRiskSignalCountAggregateInputType | true
+    _min?: CheckInRiskSignalMinAggregateInputType
+    _max?: CheckInRiskSignalMaxAggregateInputType
+  }
+
+  export type CheckInRiskSignalGroupByOutputType = {
+    id: string
+    createdAt: Date
+    expiresAt: Date
+    eventId: string
+    userId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata: JsonValue | null
+    _count: CheckInRiskSignalCountAggregateOutputType | null
+    _min: CheckInRiskSignalMinAggregateOutputType | null
+    _max: CheckInRiskSignalMaxAggregateOutputType | null
+  }
+
+  type GetCheckInRiskSignalGroupByPayload<T extends CheckInRiskSignalGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<CheckInRiskSignalGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CheckInRiskSignalGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CheckInRiskSignalGroupByOutputType[P]>
+            : GetScalarType<T[P], CheckInRiskSignalGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CheckInRiskSignalSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    signalType?: boolean
+    metadata?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["checkInRiskSignal"]>
+
+  export type CheckInRiskSignalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    signalType?: boolean
+    metadata?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["checkInRiskSignal"]>
+
+  export type CheckInRiskSignalSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    signalType?: boolean
+    metadata?: boolean
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["checkInRiskSignal"]>
+
+  export type CheckInRiskSignalSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    expiresAt?: boolean
+    eventId?: boolean
+    userId?: boolean
+    signalType?: boolean
+    metadata?: boolean
+  }
+
+  export type CheckInRiskSignalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "expiresAt" | "eventId" | "userId" | "signalType" | "metadata", ExtArgs["result"]["checkInRiskSignal"]>
+  export type CheckInRiskSignalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type CheckInRiskSignalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type CheckInRiskSignalIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    event?: boolean | CleanupEventDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $CheckInRiskSignalPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "CheckInRiskSignal"
+    objects: {
+      event: Prisma.$CleanupEventPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      expiresAt: Date
+      eventId: string
+      userId: string
+      signalType: $Enums.CheckInRiskSignalType
+      metadata: Prisma.JsonValue | null
+    }, ExtArgs["result"]["checkInRiskSignal"]>
+    composites: {}
+  }
+
+  type CheckInRiskSignalGetPayload<S extends boolean | null | undefined | CheckInRiskSignalDefaultArgs> = $Result.GetResult<Prisma.$CheckInRiskSignalPayload, S>
+
+  type CheckInRiskSignalCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<CheckInRiskSignalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: CheckInRiskSignalCountAggregateInputType | true
+    }
+
+  export interface CheckInRiskSignalDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CheckInRiskSignal'], meta: { name: 'CheckInRiskSignal' } }
+    /**
+     * Find zero or one CheckInRiskSignal that matches the filter.
+     * @param {CheckInRiskSignalFindUniqueArgs} args - Arguments to find a CheckInRiskSignal
+     * @example
+     * // Get one CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends CheckInRiskSignalFindUniqueArgs>(args: SelectSubset<T, CheckInRiskSignalFindUniqueArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one CheckInRiskSignal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {CheckInRiskSignalFindUniqueOrThrowArgs} args - Arguments to find a CheckInRiskSignal
+     * @example
+     * // Get one CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends CheckInRiskSignalFindUniqueOrThrowArgs>(args: SelectSubset<T, CheckInRiskSignalFindUniqueOrThrowArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CheckInRiskSignal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalFindFirstArgs} args - Arguments to find a CheckInRiskSignal
+     * @example
+     * // Get one CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends CheckInRiskSignalFindFirstArgs>(args?: SelectSubset<T, CheckInRiskSignalFindFirstArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first CheckInRiskSignal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalFindFirstOrThrowArgs} args - Arguments to find a CheckInRiskSignal
+     * @example
+     * // Get one CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends CheckInRiskSignalFindFirstOrThrowArgs>(args?: SelectSubset<T, CheckInRiskSignalFindFirstOrThrowArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more CheckInRiskSignals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CheckInRiskSignals
+     * const checkInRiskSignals = await prisma.checkInRiskSignal.findMany()
+     * 
+     * // Get first 10 CheckInRiskSignals
+     * const checkInRiskSignals = await prisma.checkInRiskSignal.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const checkInRiskSignalWithIdOnly = await prisma.checkInRiskSignal.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends CheckInRiskSignalFindManyArgs>(args?: SelectSubset<T, CheckInRiskSignalFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a CheckInRiskSignal.
+     * @param {CheckInRiskSignalCreateArgs} args - Arguments to create a CheckInRiskSignal.
+     * @example
+     * // Create one CheckInRiskSignal
+     * const CheckInRiskSignal = await prisma.checkInRiskSignal.create({
+     *   data: {
+     *     // ... data to create a CheckInRiskSignal
+     *   }
+     * })
+     * 
+     */
+    create<T extends CheckInRiskSignalCreateArgs>(args: SelectSubset<T, CheckInRiskSignalCreateArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many CheckInRiskSignals.
+     * @param {CheckInRiskSignalCreateManyArgs} args - Arguments to create many CheckInRiskSignals.
+     * @example
+     * // Create many CheckInRiskSignals
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends CheckInRiskSignalCreateManyArgs>(args?: SelectSubset<T, CheckInRiskSignalCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many CheckInRiskSignals and returns the data saved in the database.
+     * @param {CheckInRiskSignalCreateManyAndReturnArgs} args - Arguments to create many CheckInRiskSignals.
+     * @example
+     * // Create many CheckInRiskSignals
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many CheckInRiskSignals and only return the `id`
+     * const checkInRiskSignalWithIdOnly = await prisma.checkInRiskSignal.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends CheckInRiskSignalCreateManyAndReturnArgs>(args?: SelectSubset<T, CheckInRiskSignalCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a CheckInRiskSignal.
+     * @param {CheckInRiskSignalDeleteArgs} args - Arguments to delete one CheckInRiskSignal.
+     * @example
+     * // Delete one CheckInRiskSignal
+     * const CheckInRiskSignal = await prisma.checkInRiskSignal.delete({
+     *   where: {
+     *     // ... filter to delete one CheckInRiskSignal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends CheckInRiskSignalDeleteArgs>(args: SelectSubset<T, CheckInRiskSignalDeleteArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one CheckInRiskSignal.
+     * @param {CheckInRiskSignalUpdateArgs} args - Arguments to update one CheckInRiskSignal.
+     * @example
+     * // Update one CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends CheckInRiskSignalUpdateArgs>(args: SelectSubset<T, CheckInRiskSignalUpdateArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more CheckInRiskSignals.
+     * @param {CheckInRiskSignalDeleteManyArgs} args - Arguments to filter CheckInRiskSignals to delete.
+     * @example
+     * // Delete a few CheckInRiskSignals
+     * const { count } = await prisma.checkInRiskSignal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends CheckInRiskSignalDeleteManyArgs>(args?: SelectSubset<T, CheckInRiskSignalDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CheckInRiskSignals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CheckInRiskSignals
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends CheckInRiskSignalUpdateManyArgs>(args: SelectSubset<T, CheckInRiskSignalUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CheckInRiskSignals and returns the data updated in the database.
+     * @param {CheckInRiskSignalUpdateManyAndReturnArgs} args - Arguments to update many CheckInRiskSignals.
+     * @example
+     * // Update many CheckInRiskSignals
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more CheckInRiskSignals and only return the `id`
+     * const checkInRiskSignalWithIdOnly = await prisma.checkInRiskSignal.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends CheckInRiskSignalUpdateManyAndReturnArgs>(args: SelectSubset<T, CheckInRiskSignalUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one CheckInRiskSignal.
+     * @param {CheckInRiskSignalUpsertArgs} args - Arguments to update or create a CheckInRiskSignal.
+     * @example
+     * // Update or create a CheckInRiskSignal
+     * const checkInRiskSignal = await prisma.checkInRiskSignal.upsert({
+     *   create: {
+     *     // ... data to create a CheckInRiskSignal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CheckInRiskSignal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends CheckInRiskSignalUpsertArgs>(args: SelectSubset<T, CheckInRiskSignalUpsertArgs<ExtArgs>>): Prisma__CheckInRiskSignalClient<$Result.GetResult<Prisma.$CheckInRiskSignalPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of CheckInRiskSignals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalCountArgs} args - Arguments to filter CheckInRiskSignals to count.
+     * @example
+     * // Count the number of CheckInRiskSignals
+     * const count = await prisma.checkInRiskSignal.count({
+     *   where: {
+     *     // ... the filter for the CheckInRiskSignals we want to count
+     *   }
+     * })
+    **/
+    count<T extends CheckInRiskSignalCountArgs>(
+      args?: Subset<T, CheckInRiskSignalCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CheckInRiskSignalCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CheckInRiskSignal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CheckInRiskSignalAggregateArgs>(args: Subset<T, CheckInRiskSignalAggregateArgs>): Prisma.PrismaPromise<GetCheckInRiskSignalAggregateType<T>>
+
+    /**
+     * Group by CheckInRiskSignal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CheckInRiskSignalGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CheckInRiskSignalGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CheckInRiskSignalGroupByArgs['orderBy'] }
+        : { orderBy?: CheckInRiskSignalGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CheckInRiskSignalGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCheckInRiskSignalGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the CheckInRiskSignal model
+   */
+  readonly fields: CheckInRiskSignalFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CheckInRiskSignal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__CheckInRiskSignalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the CheckInRiskSignal model
+   */
+  interface CheckInRiskSignalFieldRefs {
+    readonly id: FieldRef<"CheckInRiskSignal", 'String'>
+    readonly createdAt: FieldRef<"CheckInRiskSignal", 'DateTime'>
+    readonly expiresAt: FieldRef<"CheckInRiskSignal", 'DateTime'>
+    readonly eventId: FieldRef<"CheckInRiskSignal", 'String'>
+    readonly userId: FieldRef<"CheckInRiskSignal", 'String'>
+    readonly signalType: FieldRef<"CheckInRiskSignal", 'CheckInRiskSignalType'>
+    readonly metadata: FieldRef<"CheckInRiskSignal", 'Json'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * CheckInRiskSignal findUnique
+   */
+  export type CheckInRiskSignalFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter, which CheckInRiskSignal to fetch.
+     */
+    where: CheckInRiskSignalWhereUniqueInput
+  }
+
+  /**
+   * CheckInRiskSignal findUniqueOrThrow
+   */
+  export type CheckInRiskSignalFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter, which CheckInRiskSignal to fetch.
+     */
+    where: CheckInRiskSignalWhereUniqueInput
+  }
+
+  /**
+   * CheckInRiskSignal findFirst
+   */
+  export type CheckInRiskSignalFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter, which CheckInRiskSignal to fetch.
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CheckInRiskSignals to fetch.
+     */
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CheckInRiskSignals.
+     */
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CheckInRiskSignals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CheckInRiskSignals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CheckInRiskSignals.
+     */
+    distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
+  }
+
+  /**
+   * CheckInRiskSignal findFirstOrThrow
+   */
+  export type CheckInRiskSignalFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter, which CheckInRiskSignal to fetch.
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CheckInRiskSignals to fetch.
+     */
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CheckInRiskSignals.
+     */
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CheckInRiskSignals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CheckInRiskSignals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CheckInRiskSignals.
+     */
+    distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
+  }
+
+  /**
+   * CheckInRiskSignal findMany
+   */
+  export type CheckInRiskSignalFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter, which CheckInRiskSignals to fetch.
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CheckInRiskSignals to fetch.
+     */
+    orderBy?: CheckInRiskSignalOrderByWithRelationInput | CheckInRiskSignalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CheckInRiskSignals.
+     */
+    cursor?: CheckInRiskSignalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CheckInRiskSignals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CheckInRiskSignals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CheckInRiskSignals.
+     */
+    distinct?: CheckInRiskSignalScalarFieldEnum | CheckInRiskSignalScalarFieldEnum[]
+  }
+
+  /**
+   * CheckInRiskSignal create
+   */
+  export type CheckInRiskSignalCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * The data needed to create a CheckInRiskSignal.
+     */
+    data: XOR<CheckInRiskSignalCreateInput, CheckInRiskSignalUncheckedCreateInput>
+  }
+
+  /**
+   * CheckInRiskSignal createMany
+   */
+  export type CheckInRiskSignalCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CheckInRiskSignals.
+     */
+    data: CheckInRiskSignalCreateManyInput | CheckInRiskSignalCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * CheckInRiskSignal createManyAndReturn
+   */
+  export type CheckInRiskSignalCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * The data used to create many CheckInRiskSignals.
+     */
+    data: CheckInRiskSignalCreateManyInput | CheckInRiskSignalCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CheckInRiskSignal update
+   */
+  export type CheckInRiskSignalUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * The data needed to update a CheckInRiskSignal.
+     */
+    data: XOR<CheckInRiskSignalUpdateInput, CheckInRiskSignalUncheckedUpdateInput>
+    /**
+     * Choose, which CheckInRiskSignal to update.
+     */
+    where: CheckInRiskSignalWhereUniqueInput
+  }
+
+  /**
+   * CheckInRiskSignal updateMany
+   */
+  export type CheckInRiskSignalUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CheckInRiskSignals.
+     */
+    data: XOR<CheckInRiskSignalUpdateManyMutationInput, CheckInRiskSignalUncheckedUpdateManyInput>
+    /**
+     * Filter which CheckInRiskSignals to update
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * Limit how many CheckInRiskSignals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * CheckInRiskSignal updateManyAndReturn
+   */
+  export type CheckInRiskSignalUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * The data used to update CheckInRiskSignals.
+     */
+    data: XOR<CheckInRiskSignalUpdateManyMutationInput, CheckInRiskSignalUncheckedUpdateManyInput>
+    /**
+     * Filter which CheckInRiskSignals to update
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * Limit how many CheckInRiskSignals to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * CheckInRiskSignal upsert
+   */
+  export type CheckInRiskSignalUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * The filter to search for the CheckInRiskSignal to update in case it exists.
+     */
+    where: CheckInRiskSignalWhereUniqueInput
+    /**
+     * In case the CheckInRiskSignal found by the `where` argument doesn't exist, create a new CheckInRiskSignal with this data.
+     */
+    create: XOR<CheckInRiskSignalCreateInput, CheckInRiskSignalUncheckedCreateInput>
+    /**
+     * In case the CheckInRiskSignal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CheckInRiskSignalUpdateInput, CheckInRiskSignalUncheckedUpdateInput>
+  }
+
+  /**
+   * CheckInRiskSignal delete
+   */
+  export type CheckInRiskSignalDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
+    /**
+     * Filter which CheckInRiskSignal to delete.
+     */
+    where: CheckInRiskSignalWhereUniqueInput
+  }
+
+  /**
+   * CheckInRiskSignal deleteMany
+   */
+  export type CheckInRiskSignalDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CheckInRiskSignals to delete
+     */
+    where?: CheckInRiskSignalWhereInput
+    /**
+     * Limit how many CheckInRiskSignals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * CheckInRiskSignal without action
+   */
+  export type CheckInRiskSignalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CheckInRiskSignal
+     */
+    select?: CheckInRiskSignalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the CheckInRiskSignal
+     */
+    omit?: CheckInRiskSignalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: CheckInRiskSignalInclude<ExtArgs> | null
   }
 
 
@@ -43029,6 +48302,1006 @@ export namespace Prisma {
 
 
   /**
+   * Model AdminMutationIdempotency
+   */
+
+  export type AggregateAdminMutationIdempotency = {
+    _count: AdminMutationIdempotencyCountAggregateOutputType | null
+    _min: AdminMutationIdempotencyMinAggregateOutputType | null
+    _max: AdminMutationIdempotencyMaxAggregateOutputType | null
+  }
+
+  export type AdminMutationIdempotencyMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    actorUserId: string | null
+    purpose: string | null
+    clientJobId: string | null
+  }
+
+  export type AdminMutationIdempotencyMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    actorUserId: string | null
+    purpose: string | null
+    clientJobId: string | null
+  }
+
+  export type AdminMutationIdempotencyCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    actorUserId: number
+    purpose: number
+    clientJobId: number
+    _all: number
+  }
+
+
+  export type AdminMutationIdempotencyMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    actorUserId?: true
+    purpose?: true
+    clientJobId?: true
+  }
+
+  export type AdminMutationIdempotencyMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    actorUserId?: true
+    purpose?: true
+    clientJobId?: true
+  }
+
+  export type AdminMutationIdempotencyCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    actorUserId?: true
+    purpose?: true
+    clientJobId?: true
+    _all?: true
+  }
+
+  export type AdminMutationIdempotencyAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminMutationIdempotency to aggregate.
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminMutationIdempotencies to fetch.
+     */
+    orderBy?: AdminMutationIdempotencyOrderByWithRelationInput | AdminMutationIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminMutationIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminMutationIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminMutationIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminMutationIdempotencies
+    **/
+    _count?: true | AdminMutationIdempotencyCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminMutationIdempotencyMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminMutationIdempotencyMaxAggregateInputType
+  }
+
+  export type GetAdminMutationIdempotencyAggregateType<T extends AdminMutationIdempotencyAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminMutationIdempotency]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminMutationIdempotency[P]>
+      : GetScalarType<T[P], AggregateAdminMutationIdempotency[P]>
+  }
+
+
+
+
+  export type AdminMutationIdempotencyGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminMutationIdempotencyWhereInput
+    orderBy?: AdminMutationIdempotencyOrderByWithAggregationInput | AdminMutationIdempotencyOrderByWithAggregationInput[]
+    by: AdminMutationIdempotencyScalarFieldEnum[] | AdminMutationIdempotencyScalarFieldEnum
+    having?: AdminMutationIdempotencyScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminMutationIdempotencyCountAggregateInputType | true
+    _min?: AdminMutationIdempotencyMinAggregateInputType
+    _max?: AdminMutationIdempotencyMaxAggregateInputType
+  }
+
+  export type AdminMutationIdempotencyGroupByOutputType = {
+    id: string
+    createdAt: Date
+    actorUserId: string
+    purpose: string
+    clientJobId: string
+    _count: AdminMutationIdempotencyCountAggregateOutputType | null
+    _min: AdminMutationIdempotencyMinAggregateOutputType | null
+    _max: AdminMutationIdempotencyMaxAggregateOutputType | null
+  }
+
+  type GetAdminMutationIdempotencyGroupByPayload<T extends AdminMutationIdempotencyGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminMutationIdempotencyGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminMutationIdempotencyGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminMutationIdempotencyGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminMutationIdempotencyGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminMutationIdempotencySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    actorUserId?: boolean
+    purpose?: boolean
+    clientJobId?: boolean
+  }, ExtArgs["result"]["adminMutationIdempotency"]>
+
+  export type AdminMutationIdempotencySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    actorUserId?: boolean
+    purpose?: boolean
+    clientJobId?: boolean
+  }, ExtArgs["result"]["adminMutationIdempotency"]>
+
+  export type AdminMutationIdempotencySelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    actorUserId?: boolean
+    purpose?: boolean
+    clientJobId?: boolean
+  }, ExtArgs["result"]["adminMutationIdempotency"]>
+
+  export type AdminMutationIdempotencySelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    actorUserId?: boolean
+    purpose?: boolean
+    clientJobId?: boolean
+  }
+
+  export type AdminMutationIdempotencyOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "actorUserId" | "purpose" | "clientJobId", ExtArgs["result"]["adminMutationIdempotency"]>
+
+  export type $AdminMutationIdempotencyPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminMutationIdempotency"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      actorUserId: string
+      purpose: string
+      clientJobId: string
+    }, ExtArgs["result"]["adminMutationIdempotency"]>
+    composites: {}
+  }
+
+  type AdminMutationIdempotencyGetPayload<S extends boolean | null | undefined | AdminMutationIdempotencyDefaultArgs> = $Result.GetResult<Prisma.$AdminMutationIdempotencyPayload, S>
+
+  type AdminMutationIdempotencyCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminMutationIdempotencyFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminMutationIdempotencyCountAggregateInputType | true
+    }
+
+  export interface AdminMutationIdempotencyDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminMutationIdempotency'], meta: { name: 'AdminMutationIdempotency' } }
+    /**
+     * Find zero or one AdminMutationIdempotency that matches the filter.
+     * @param {AdminMutationIdempotencyFindUniqueArgs} args - Arguments to find a AdminMutationIdempotency
+     * @example
+     * // Get one AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminMutationIdempotencyFindUniqueArgs>(args: SelectSubset<T, AdminMutationIdempotencyFindUniqueArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminMutationIdempotency that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminMutationIdempotencyFindUniqueOrThrowArgs} args - Arguments to find a AdminMutationIdempotency
+     * @example
+     * // Get one AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminMutationIdempotencyFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminMutationIdempotencyFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminMutationIdempotency that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyFindFirstArgs} args - Arguments to find a AdminMutationIdempotency
+     * @example
+     * // Get one AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminMutationIdempotencyFindFirstArgs>(args?: SelectSubset<T, AdminMutationIdempotencyFindFirstArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminMutationIdempotency that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyFindFirstOrThrowArgs} args - Arguments to find a AdminMutationIdempotency
+     * @example
+     * // Get one AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminMutationIdempotencyFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminMutationIdempotencyFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminMutationIdempotencies that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminMutationIdempotencies
+     * const adminMutationIdempotencies = await prisma.adminMutationIdempotency.findMany()
+     * 
+     * // Get first 10 AdminMutationIdempotencies
+     * const adminMutationIdempotencies = await prisma.adminMutationIdempotency.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const adminMutationIdempotencyWithIdOnly = await prisma.adminMutationIdempotency.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AdminMutationIdempotencyFindManyArgs>(args?: SelectSubset<T, AdminMutationIdempotencyFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminMutationIdempotency.
+     * @param {AdminMutationIdempotencyCreateArgs} args - Arguments to create a AdminMutationIdempotency.
+     * @example
+     * // Create one AdminMutationIdempotency
+     * const AdminMutationIdempotency = await prisma.adminMutationIdempotency.create({
+     *   data: {
+     *     // ... data to create a AdminMutationIdempotency
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminMutationIdempotencyCreateArgs>(args: SelectSubset<T, AdminMutationIdempotencyCreateArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminMutationIdempotencies.
+     * @param {AdminMutationIdempotencyCreateManyArgs} args - Arguments to create many AdminMutationIdempotencies.
+     * @example
+     * // Create many AdminMutationIdempotencies
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminMutationIdempotencyCreateManyArgs>(args?: SelectSubset<T, AdminMutationIdempotencyCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminMutationIdempotencies and returns the data saved in the database.
+     * @param {AdminMutationIdempotencyCreateManyAndReturnArgs} args - Arguments to create many AdminMutationIdempotencies.
+     * @example
+     * // Create many AdminMutationIdempotencies
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminMutationIdempotencies and only return the `id`
+     * const adminMutationIdempotencyWithIdOnly = await prisma.adminMutationIdempotency.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminMutationIdempotencyCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminMutationIdempotencyCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminMutationIdempotency.
+     * @param {AdminMutationIdempotencyDeleteArgs} args - Arguments to delete one AdminMutationIdempotency.
+     * @example
+     * // Delete one AdminMutationIdempotency
+     * const AdminMutationIdempotency = await prisma.adminMutationIdempotency.delete({
+     *   where: {
+     *     // ... filter to delete one AdminMutationIdempotency
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminMutationIdempotencyDeleteArgs>(args: SelectSubset<T, AdminMutationIdempotencyDeleteArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminMutationIdempotency.
+     * @param {AdminMutationIdempotencyUpdateArgs} args - Arguments to update one AdminMutationIdempotency.
+     * @example
+     * // Update one AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminMutationIdempotencyUpdateArgs>(args: SelectSubset<T, AdminMutationIdempotencyUpdateArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminMutationIdempotencies.
+     * @param {AdminMutationIdempotencyDeleteManyArgs} args - Arguments to filter AdminMutationIdempotencies to delete.
+     * @example
+     * // Delete a few AdminMutationIdempotencies
+     * const { count } = await prisma.adminMutationIdempotency.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminMutationIdempotencyDeleteManyArgs>(args?: SelectSubset<T, AdminMutationIdempotencyDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminMutationIdempotencies.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminMutationIdempotencies
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminMutationIdempotencyUpdateManyArgs>(args: SelectSubset<T, AdminMutationIdempotencyUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminMutationIdempotencies and returns the data updated in the database.
+     * @param {AdminMutationIdempotencyUpdateManyAndReturnArgs} args - Arguments to update many AdminMutationIdempotencies.
+     * @example
+     * // Update many AdminMutationIdempotencies
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminMutationIdempotencies and only return the `id`
+     * const adminMutationIdempotencyWithIdOnly = await prisma.adminMutationIdempotency.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminMutationIdempotencyUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminMutationIdempotencyUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminMutationIdempotency.
+     * @param {AdminMutationIdempotencyUpsertArgs} args - Arguments to update or create a AdminMutationIdempotency.
+     * @example
+     * // Update or create a AdminMutationIdempotency
+     * const adminMutationIdempotency = await prisma.adminMutationIdempotency.upsert({
+     *   create: {
+     *     // ... data to create a AdminMutationIdempotency
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminMutationIdempotency we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminMutationIdempotencyUpsertArgs>(args: SelectSubset<T, AdminMutationIdempotencyUpsertArgs<ExtArgs>>): Prisma__AdminMutationIdempotencyClient<$Result.GetResult<Prisma.$AdminMutationIdempotencyPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminMutationIdempotencies.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyCountArgs} args - Arguments to filter AdminMutationIdempotencies to count.
+     * @example
+     * // Count the number of AdminMutationIdempotencies
+     * const count = await prisma.adminMutationIdempotency.count({
+     *   where: {
+     *     // ... the filter for the AdminMutationIdempotencies we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminMutationIdempotencyCountArgs>(
+      args?: Subset<T, AdminMutationIdempotencyCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminMutationIdempotencyCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminMutationIdempotency.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminMutationIdempotencyAggregateArgs>(args: Subset<T, AdminMutationIdempotencyAggregateArgs>): Prisma.PrismaPromise<GetAdminMutationIdempotencyAggregateType<T>>
+
+    /**
+     * Group by AdminMutationIdempotency.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminMutationIdempotencyGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminMutationIdempotencyGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminMutationIdempotencyGroupByArgs['orderBy'] }
+        : { orderBy?: AdminMutationIdempotencyGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminMutationIdempotencyGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminMutationIdempotencyGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminMutationIdempotency model
+   */
+  readonly fields: AdminMutationIdempotencyFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminMutationIdempotency.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminMutationIdempotencyClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminMutationIdempotency model
+   */
+  interface AdminMutationIdempotencyFieldRefs {
+    readonly id: FieldRef<"AdminMutationIdempotency", 'String'>
+    readonly createdAt: FieldRef<"AdminMutationIdempotency", 'DateTime'>
+    readonly actorUserId: FieldRef<"AdminMutationIdempotency", 'String'>
+    readonly purpose: FieldRef<"AdminMutationIdempotency", 'String'>
+    readonly clientJobId: FieldRef<"AdminMutationIdempotency", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminMutationIdempotency findUnique
+   */
+  export type AdminMutationIdempotencyFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminMutationIdempotency to fetch.
+     */
+    where: AdminMutationIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * AdminMutationIdempotency findUniqueOrThrow
+   */
+  export type AdminMutationIdempotencyFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminMutationIdempotency to fetch.
+     */
+    where: AdminMutationIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * AdminMutationIdempotency findFirst
+   */
+  export type AdminMutationIdempotencyFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminMutationIdempotency to fetch.
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminMutationIdempotencies to fetch.
+     */
+    orderBy?: AdminMutationIdempotencyOrderByWithRelationInput | AdminMutationIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminMutationIdempotencies.
+     */
+    cursor?: AdminMutationIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminMutationIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminMutationIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminMutationIdempotencies.
+     */
+    distinct?: AdminMutationIdempotencyScalarFieldEnum | AdminMutationIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminMutationIdempotency findFirstOrThrow
+   */
+  export type AdminMutationIdempotencyFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminMutationIdempotency to fetch.
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminMutationIdempotencies to fetch.
+     */
+    orderBy?: AdminMutationIdempotencyOrderByWithRelationInput | AdminMutationIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminMutationIdempotencies.
+     */
+    cursor?: AdminMutationIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminMutationIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminMutationIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminMutationIdempotencies.
+     */
+    distinct?: AdminMutationIdempotencyScalarFieldEnum | AdminMutationIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminMutationIdempotency findMany
+   */
+  export type AdminMutationIdempotencyFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter, which AdminMutationIdempotencies to fetch.
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminMutationIdempotencies to fetch.
+     */
+    orderBy?: AdminMutationIdempotencyOrderByWithRelationInput | AdminMutationIdempotencyOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminMutationIdempotencies.
+     */
+    cursor?: AdminMutationIdempotencyWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminMutationIdempotencies from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminMutationIdempotencies.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminMutationIdempotencies.
+     */
+    distinct?: AdminMutationIdempotencyScalarFieldEnum | AdminMutationIdempotencyScalarFieldEnum[]
+  }
+
+  /**
+   * AdminMutationIdempotency create
+   */
+  export type AdminMutationIdempotencyCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data needed to create a AdminMutationIdempotency.
+     */
+    data: XOR<AdminMutationIdempotencyCreateInput, AdminMutationIdempotencyUncheckedCreateInput>
+  }
+
+  /**
+   * AdminMutationIdempotency createMany
+   */
+  export type AdminMutationIdempotencyCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminMutationIdempotencies.
+     */
+    data: AdminMutationIdempotencyCreateManyInput | AdminMutationIdempotencyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminMutationIdempotency createManyAndReturn
+   */
+  export type AdminMutationIdempotencyCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminMutationIdempotencies.
+     */
+    data: AdminMutationIdempotencyCreateManyInput | AdminMutationIdempotencyCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminMutationIdempotency update
+   */
+  export type AdminMutationIdempotencyUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data needed to update a AdminMutationIdempotency.
+     */
+    data: XOR<AdminMutationIdempotencyUpdateInput, AdminMutationIdempotencyUncheckedUpdateInput>
+    /**
+     * Choose, which AdminMutationIdempotency to update.
+     */
+    where: AdminMutationIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * AdminMutationIdempotency updateMany
+   */
+  export type AdminMutationIdempotencyUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminMutationIdempotencies.
+     */
+    data: XOR<AdminMutationIdempotencyUpdateManyMutationInput, AdminMutationIdempotencyUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminMutationIdempotencies to update
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * Limit how many AdminMutationIdempotencies to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminMutationIdempotency updateManyAndReturn
+   */
+  export type AdminMutationIdempotencyUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminMutationIdempotencies.
+     */
+    data: XOR<AdminMutationIdempotencyUpdateManyMutationInput, AdminMutationIdempotencyUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminMutationIdempotencies to update
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * Limit how many AdminMutationIdempotencies to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminMutationIdempotency upsert
+   */
+  export type AdminMutationIdempotencyUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * The filter to search for the AdminMutationIdempotency to update in case it exists.
+     */
+    where: AdminMutationIdempotencyWhereUniqueInput
+    /**
+     * In case the AdminMutationIdempotency found by the `where` argument doesn't exist, create a new AdminMutationIdempotency with this data.
+     */
+    create: XOR<AdminMutationIdempotencyCreateInput, AdminMutationIdempotencyUncheckedCreateInput>
+    /**
+     * In case the AdminMutationIdempotency was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminMutationIdempotencyUpdateInput, AdminMutationIdempotencyUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminMutationIdempotency delete
+   */
+  export type AdminMutationIdempotencyDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+    /**
+     * Filter which AdminMutationIdempotency to delete.
+     */
+    where: AdminMutationIdempotencyWhereUniqueInput
+  }
+
+  /**
+   * AdminMutationIdempotency deleteMany
+   */
+  export type AdminMutationIdempotencyDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminMutationIdempotencies to delete
+     */
+    where?: AdminMutationIdempotencyWhereInput
+    /**
+     * Limit how many AdminMutationIdempotencies to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminMutationIdempotency without action
+   */
+  export type AdminMutationIdempotencyDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminMutationIdempotency
+     */
+    select?: AdminMutationIdempotencySelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminMutationIdempotency
+     */
+    omit?: AdminMutationIdempotencyOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -43065,7 +49338,8 @@ export namespace Prisma {
     avatarObjectKey: 'avatarObjectKey',
     avatarUpdatedAt: 'avatarUpdatedAt',
     totpSecret: 'totpSecret',
-    mfaBackupCodes: 'mfaBackupCodes'
+    mfaBackupCodes: 'mfaBackupCodes',
+    organizerCertifiedAt: 'organizerCertifiedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -43405,6 +49679,62 @@ export namespace Prisma {
   export type EventCheckInRedemptionScalarFieldEnum = (typeof EventCheckInRedemptionScalarFieldEnum)[keyof typeof EventCheckInRedemptionScalarFieldEnum]
 
 
+  export const EventLiveMetricScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    eventId: 'eventId',
+    reportedBagsCollected: 'reportedBagsCollected'
+  };
+
+  export type EventLiveMetricScalarFieldEnum = (typeof EventLiveMetricScalarFieldEnum)[keyof typeof EventLiveMetricScalarFieldEnum]
+
+
+  export const EventEvidencePhotoScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    eventId: 'eventId',
+    kind: 'kind',
+    objectKey: 'objectKey',
+    caption: 'caption',
+    uploadedById: 'uploadedById'
+  };
+
+  export type EventEvidencePhotoScalarFieldEnum = (typeof EventEvidencePhotoScalarFieldEnum)[keyof typeof EventEvidencePhotoScalarFieldEnum]
+
+
+  export const EventRouteSegmentScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    eventId: 'eventId',
+    sortOrder: 'sortOrder',
+    label: 'label',
+    latitude: 'latitude',
+    longitude: 'longitude',
+    status: 'status',
+    claimedByUserId: 'claimedByUserId',
+    claimedAt: 'claimedAt',
+    completedAt: 'completedAt'
+  };
+
+  export type EventRouteSegmentScalarFieldEnum = (typeof EventRouteSegmentScalarFieldEnum)[keyof typeof EventRouteSegmentScalarFieldEnum]
+
+
+  export const CheckInRiskSignalScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    expiresAt: 'expiresAt',
+    eventId: 'eventId',
+    userId: 'userId',
+    signalType: 'signalType',
+    metadata: 'metadata'
+  };
+
+  export type CheckInRiskSignalScalarFieldEnum = (typeof CheckInRiskSignalScalarFieldEnum)[keyof typeof CheckInRiskSignalScalarFieldEnum]
+
+
   export const SiteVoteScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -43531,6 +49861,17 @@ export namespace Prisma {
   };
 
   export type NotificationOutboxScalarFieldEnum = (typeof NotificationOutboxScalarFieldEnum)[keyof typeof NotificationOutboxScalarFieldEnum]
+
+
+  export const AdminMutationIdempotencyScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    actorUserId: 'actorUserId',
+    purpose: 'purpose',
+    clientJobId: 'clientJobId'
+  };
+
+  export type AdminMutationIdempotencyScalarFieldEnum = (typeof AdminMutationIdempotencyScalarFieldEnum)[keyof typeof AdminMutationIdempotencyScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -43846,6 +50187,48 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'EventEvidenceKind'
+   */
+  export type EnumEventEvidenceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventEvidenceKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'EventEvidenceKind[]'
+   */
+  export type ListEnumEventEvidenceKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventEvidenceKind[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'RouteSegmentStatus'
+   */
+  export type EnumRouteSegmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RouteSegmentStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'RouteSegmentStatus[]'
+   */
+  export type ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'RouteSegmentStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'CheckInRiskSignalType'
+   */
+  export type EnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CheckInRiskSignalType'>
+    
+
+
+  /**
+   * Reference to a field of type 'CheckInRiskSignalType[]'
+   */
+  export type ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'CheckInRiskSignalType[]'>
+    
+
+
+  /**
    * Reference to a field of type 'SiteShareChannel'
    */
   export type EnumSiteShareChannelFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareChannel'>
@@ -43917,6 +50300,7 @@ export namespace Prisma {
     avatarUpdatedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
+    organizerCertifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     reports?: ReportListRelationFilter
     moderatedReports?: ReportListRelationFilter
     adminNotifications?: AdminNotificationListRelationFilter
@@ -43942,6 +50326,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageListRelationFilter
     eventChatMutes?: EventChatMuteListRelationFilter
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
+    eventEvidencePhotosUploaded?: EventEvidencePhotoListRelationFilter
+    routeSegmentsClaimed?: EventRouteSegmentListRelationFilter
+    checkInRiskSignals?: CheckInRiskSignalListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -43968,6 +50355,7 @@ export namespace Prisma {
     avatarUpdatedAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
+    organizerCertifiedAt?: SortOrderInput | SortOrder
     reports?: ReportOrderByRelationAggregateInput
     moderatedReports?: ReportOrderByRelationAggregateInput
     adminNotifications?: AdminNotificationOrderByRelationAggregateInput
@@ -43993,6 +50381,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageOrderByRelationAggregateInput
     eventChatMutes?: EventChatMuteOrderByRelationAggregateInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyOrderByRelationAggregateInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoOrderByRelationAggregateInput
+    routeSegmentsClaimed?: EventRouteSegmentOrderByRelationAggregateInput
+    checkInRiskSignals?: CheckInRiskSignalOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -44022,6 +50413,7 @@ export namespace Prisma {
     avatarUpdatedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     totpSecret?: StringNullableFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
+    organizerCertifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     reports?: ReportListRelationFilter
     moderatedReports?: ReportListRelationFilter
     adminNotifications?: AdminNotificationListRelationFilter
@@ -44047,6 +50439,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageListRelationFilter
     eventChatMutes?: EventChatMuteListRelationFilter
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyListRelationFilter
+    eventEvidencePhotosUploaded?: EventEvidencePhotoListRelationFilter
+    routeSegmentsClaimed?: EventRouteSegmentListRelationFilter
+    checkInRiskSignals?: CheckInRiskSignalListRelationFilter
   }, "id" | "email" | "phoneNumber">
 
   export type UserOrderByWithAggregationInput = {
@@ -44073,6 +50468,7 @@ export namespace Prisma {
     avatarUpdatedAt?: SortOrderInput | SortOrder
     totpSecret?: SortOrderInput | SortOrder
     mfaBackupCodes?: SortOrder
+    organizerCertifiedAt?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _avg?: UserAvgOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
@@ -44107,6 +50503,7 @@ export namespace Prisma {
     avatarUpdatedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     mfaBackupCodes?: StringNullableListFilter<"User">
+    organizerCertifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
   export type UserSessionWhereInput = {
@@ -45205,6 +51602,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageListRelationFilter
     chatReadCursors?: EventChatReadCursorListRelationFilter
     chatMutes?: EventChatMuteListRelationFilter
+    liveMetric?: XOR<EventLiveMetricNullableScalarRelationFilter, EventLiveMetricWhereInput> | null
+    evidencePhotos?: EventEvidencePhotoListRelationFilter
+    routeSegments?: EventRouteSegmentListRelationFilter
+    checkInRiskSignals?: CheckInRiskSignalListRelationFilter
     parentEvent?: XOR<CleanupEventNullableScalarRelationFilter, CleanupEventWhereInput> | null
     seriesChildren?: CleanupEventListRelationFilter
   }
@@ -45244,6 +51645,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageOrderByRelationAggregateInput
     chatReadCursors?: EventChatReadCursorOrderByRelationAggregateInput
     chatMutes?: EventChatMuteOrderByRelationAggregateInput
+    liveMetric?: EventLiveMetricOrderByWithRelationInput
+    evidencePhotos?: EventEvidencePhotoOrderByRelationAggregateInput
+    routeSegments?: EventRouteSegmentOrderByRelationAggregateInput
+    checkInRiskSignals?: CheckInRiskSignalOrderByRelationAggregateInput
     parentEvent?: CleanupEventOrderByWithRelationInput
     seriesChildren?: CleanupEventOrderByRelationAggregateInput
   }
@@ -45286,6 +51691,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageListRelationFilter
     chatReadCursors?: EventChatReadCursorListRelationFilter
     chatMutes?: EventChatMuteListRelationFilter
+    liveMetric?: XOR<EventLiveMetricNullableScalarRelationFilter, EventLiveMetricWhereInput> | null
+    evidencePhotos?: EventEvidencePhotoListRelationFilter
+    routeSegments?: EventRouteSegmentListRelationFilter
+    checkInRiskSignals?: CheckInRiskSignalListRelationFilter
     parentEvent?: XOR<CleanupEventNullableScalarRelationFilter, CleanupEventWhereInput> | null
     seriesChildren?: CleanupEventListRelationFilter
   }, "id">
@@ -45880,6 +52289,299 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"EventCheckInRedemption"> | Date | string
     eventId?: StringWithAggregatesFilter<"EventCheckInRedemption"> | string
     jti?: StringWithAggregatesFilter<"EventCheckInRedemption"> | string
+  }
+
+  export type EventLiveMetricWhereInput = {
+    AND?: EventLiveMetricWhereInput | EventLiveMetricWhereInput[]
+    OR?: EventLiveMetricWhereInput[]
+    NOT?: EventLiveMetricWhereInput | EventLiveMetricWhereInput[]
+    id?: StringFilter<"EventLiveMetric"> | string
+    createdAt?: DateTimeFilter<"EventLiveMetric"> | Date | string
+    updatedAt?: DateTimeFilter<"EventLiveMetric"> | Date | string
+    eventId?: StringFilter<"EventLiveMetric"> | string
+    reportedBagsCollected?: IntFilter<"EventLiveMetric"> | number
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+  }
+
+  export type EventLiveMetricOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    reportedBagsCollected?: SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+  }
+
+  export type EventLiveMetricWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    eventId?: string
+    AND?: EventLiveMetricWhereInput | EventLiveMetricWhereInput[]
+    OR?: EventLiveMetricWhereInput[]
+    NOT?: EventLiveMetricWhereInput | EventLiveMetricWhereInput[]
+    createdAt?: DateTimeFilter<"EventLiveMetric"> | Date | string
+    updatedAt?: DateTimeFilter<"EventLiveMetric"> | Date | string
+    reportedBagsCollected?: IntFilter<"EventLiveMetric"> | number
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+  }, "id" | "eventId">
+
+  export type EventLiveMetricOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    reportedBagsCollected?: SortOrder
+    _count?: EventLiveMetricCountOrderByAggregateInput
+    _avg?: EventLiveMetricAvgOrderByAggregateInput
+    _max?: EventLiveMetricMaxOrderByAggregateInput
+    _min?: EventLiveMetricMinOrderByAggregateInput
+    _sum?: EventLiveMetricSumOrderByAggregateInput
+  }
+
+  export type EventLiveMetricScalarWhereWithAggregatesInput = {
+    AND?: EventLiveMetricScalarWhereWithAggregatesInput | EventLiveMetricScalarWhereWithAggregatesInput[]
+    OR?: EventLiveMetricScalarWhereWithAggregatesInput[]
+    NOT?: EventLiveMetricScalarWhereWithAggregatesInput | EventLiveMetricScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventLiveMetric"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventLiveMetric"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EventLiveMetric"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventLiveMetric"> | string
+    reportedBagsCollected?: IntWithAggregatesFilter<"EventLiveMetric"> | number
+  }
+
+  export type EventEvidencePhotoWhereInput = {
+    AND?: EventEvidencePhotoWhereInput | EventEvidencePhotoWhereInput[]
+    OR?: EventEvidencePhotoWhereInput[]
+    NOT?: EventEvidencePhotoWhereInput | EventEvidencePhotoWhereInput[]
+    id?: StringFilter<"EventEvidencePhoto"> | string
+    createdAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    updatedAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    eventId?: StringFilter<"EventEvidencePhoto"> | string
+    kind?: EnumEventEvidenceKindFilter<"EventEvidencePhoto"> | $Enums.EventEvidenceKind
+    objectKey?: StringFilter<"EventEvidencePhoto"> | string
+    caption?: StringNullableFilter<"EventEvidencePhoto"> | string | null
+    uploadedById?: StringFilter<"EventEvidencePhoto"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    uploadedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type EventEvidencePhotoOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    kind?: SortOrder
+    objectKey?: SortOrder
+    caption?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    uploadedBy?: UserOrderByWithRelationInput
+  }
+
+  export type EventEvidencePhotoWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EventEvidencePhotoWhereInput | EventEvidencePhotoWhereInput[]
+    OR?: EventEvidencePhotoWhereInput[]
+    NOT?: EventEvidencePhotoWhereInput | EventEvidencePhotoWhereInput[]
+    createdAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    updatedAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    eventId?: StringFilter<"EventEvidencePhoto"> | string
+    kind?: EnumEventEvidenceKindFilter<"EventEvidencePhoto"> | $Enums.EventEvidenceKind
+    objectKey?: StringFilter<"EventEvidencePhoto"> | string
+    caption?: StringNullableFilter<"EventEvidencePhoto"> | string | null
+    uploadedById?: StringFilter<"EventEvidencePhoto"> | string
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    uploadedBy?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type EventEvidencePhotoOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    kind?: SortOrder
+    objectKey?: SortOrder
+    caption?: SortOrderInput | SortOrder
+    uploadedById?: SortOrder
+    _count?: EventEvidencePhotoCountOrderByAggregateInput
+    _max?: EventEvidencePhotoMaxOrderByAggregateInput
+    _min?: EventEvidencePhotoMinOrderByAggregateInput
+  }
+
+  export type EventEvidencePhotoScalarWhereWithAggregatesInput = {
+    AND?: EventEvidencePhotoScalarWhereWithAggregatesInput | EventEvidencePhotoScalarWhereWithAggregatesInput[]
+    OR?: EventEvidencePhotoScalarWhereWithAggregatesInput[]
+    NOT?: EventEvidencePhotoScalarWhereWithAggregatesInput | EventEvidencePhotoScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventEvidencePhoto"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventEvidencePhoto"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EventEvidencePhoto"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventEvidencePhoto"> | string
+    kind?: EnumEventEvidenceKindWithAggregatesFilter<"EventEvidencePhoto"> | $Enums.EventEvidenceKind
+    objectKey?: StringWithAggregatesFilter<"EventEvidencePhoto"> | string
+    caption?: StringNullableWithAggregatesFilter<"EventEvidencePhoto"> | string | null
+    uploadedById?: StringWithAggregatesFilter<"EventEvidencePhoto"> | string
+  }
+
+  export type EventRouteSegmentWhereInput = {
+    AND?: EventRouteSegmentWhereInput | EventRouteSegmentWhereInput[]
+    OR?: EventRouteSegmentWhereInput[]
+    NOT?: EventRouteSegmentWhereInput | EventRouteSegmentWhereInput[]
+    id?: StringFilter<"EventRouteSegment"> | string
+    createdAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    updatedAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    eventId?: StringFilter<"EventRouteSegment"> | string
+    sortOrder?: IntFilter<"EventRouteSegment"> | number
+    label?: StringNullableFilter<"EventRouteSegment"> | string | null
+    latitude?: FloatFilter<"EventRouteSegment"> | number
+    longitude?: FloatFilter<"EventRouteSegment"> | number
+    status?: EnumRouteSegmentStatusFilter<"EventRouteSegment"> | $Enums.RouteSegmentStatus
+    claimedByUserId?: StringNullableFilter<"EventRouteSegment"> | string | null
+    claimedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    claimedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }
+
+  export type EventRouteSegmentOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    sortOrder?: SortOrder
+    label?: SortOrderInput | SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    claimedByUserId?: SortOrderInput | SortOrder
+    claimedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    claimedBy?: UserOrderByWithRelationInput
+  }
+
+  export type EventRouteSegmentWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: EventRouteSegmentWhereInput | EventRouteSegmentWhereInput[]
+    OR?: EventRouteSegmentWhereInput[]
+    NOT?: EventRouteSegmentWhereInput | EventRouteSegmentWhereInput[]
+    createdAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    updatedAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    eventId?: StringFilter<"EventRouteSegment"> | string
+    sortOrder?: IntFilter<"EventRouteSegment"> | number
+    label?: StringNullableFilter<"EventRouteSegment"> | string | null
+    latitude?: FloatFilter<"EventRouteSegment"> | number
+    longitude?: FloatFilter<"EventRouteSegment"> | number
+    status?: EnumRouteSegmentStatusFilter<"EventRouteSegment"> | $Enums.RouteSegmentStatus
+    claimedByUserId?: StringNullableFilter<"EventRouteSegment"> | string | null
+    claimedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    claimedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id">
+
+  export type EventRouteSegmentOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    sortOrder?: SortOrder
+    label?: SortOrderInput | SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    claimedByUserId?: SortOrderInput | SortOrder
+    claimedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    _count?: EventRouteSegmentCountOrderByAggregateInput
+    _avg?: EventRouteSegmentAvgOrderByAggregateInput
+    _max?: EventRouteSegmentMaxOrderByAggregateInput
+    _min?: EventRouteSegmentMinOrderByAggregateInput
+    _sum?: EventRouteSegmentSumOrderByAggregateInput
+  }
+
+  export type EventRouteSegmentScalarWhereWithAggregatesInput = {
+    AND?: EventRouteSegmentScalarWhereWithAggregatesInput | EventRouteSegmentScalarWhereWithAggregatesInput[]
+    OR?: EventRouteSegmentScalarWhereWithAggregatesInput[]
+    NOT?: EventRouteSegmentScalarWhereWithAggregatesInput | EventRouteSegmentScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"EventRouteSegment"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"EventRouteSegment"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"EventRouteSegment"> | Date | string
+    eventId?: StringWithAggregatesFilter<"EventRouteSegment"> | string
+    sortOrder?: IntWithAggregatesFilter<"EventRouteSegment"> | number
+    label?: StringNullableWithAggregatesFilter<"EventRouteSegment"> | string | null
+    latitude?: FloatWithAggregatesFilter<"EventRouteSegment"> | number
+    longitude?: FloatWithAggregatesFilter<"EventRouteSegment"> | number
+    status?: EnumRouteSegmentStatusWithAggregatesFilter<"EventRouteSegment"> | $Enums.RouteSegmentStatus
+    claimedByUserId?: StringNullableWithAggregatesFilter<"EventRouteSegment"> | string | null
+    claimedAt?: DateTimeNullableWithAggregatesFilter<"EventRouteSegment"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"EventRouteSegment"> | Date | string | null
+  }
+
+  export type CheckInRiskSignalWhereInput = {
+    AND?: CheckInRiskSignalWhereInput | CheckInRiskSignalWhereInput[]
+    OR?: CheckInRiskSignalWhereInput[]
+    NOT?: CheckInRiskSignalWhereInput | CheckInRiskSignalWhereInput[]
+    id?: StringFilter<"CheckInRiskSignal"> | string
+    createdAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    expiresAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    eventId?: StringFilter<"CheckInRiskSignal"> | string
+    userId?: StringFilter<"CheckInRiskSignal"> | string
+    signalType?: EnumCheckInRiskSignalTypeFilter<"CheckInRiskSignal"> | $Enums.CheckInRiskSignalType
+    metadata?: JsonNullableFilter<"CheckInRiskSignal">
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type CheckInRiskSignalOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    signalType?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    event?: CleanupEventOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type CheckInRiskSignalWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: CheckInRiskSignalWhereInput | CheckInRiskSignalWhereInput[]
+    OR?: CheckInRiskSignalWhereInput[]
+    NOT?: CheckInRiskSignalWhereInput | CheckInRiskSignalWhereInput[]
+    createdAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    expiresAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    eventId?: StringFilter<"CheckInRiskSignal"> | string
+    userId?: StringFilter<"CheckInRiskSignal"> | string
+    signalType?: EnumCheckInRiskSignalTypeFilter<"CheckInRiskSignal"> | $Enums.CheckInRiskSignalType
+    metadata?: JsonNullableFilter<"CheckInRiskSignal">
+    event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type CheckInRiskSignalOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    signalType?: SortOrder
+    metadata?: SortOrderInput | SortOrder
+    _count?: CheckInRiskSignalCountOrderByAggregateInput
+    _max?: CheckInRiskSignalMaxOrderByAggregateInput
+    _min?: CheckInRiskSignalMinOrderByAggregateInput
+  }
+
+  export type CheckInRiskSignalScalarWhereWithAggregatesInput = {
+    AND?: CheckInRiskSignalScalarWhereWithAggregatesInput | CheckInRiskSignalScalarWhereWithAggregatesInput[]
+    OR?: CheckInRiskSignalScalarWhereWithAggregatesInput[]
+    NOT?: CheckInRiskSignalScalarWhereWithAggregatesInput | CheckInRiskSignalScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"CheckInRiskSignal"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"CheckInRiskSignal"> | Date | string
+    expiresAt?: DateTimeWithAggregatesFilter<"CheckInRiskSignal"> | Date | string
+    eventId?: StringWithAggregatesFilter<"CheckInRiskSignal"> | string
+    userId?: StringWithAggregatesFilter<"CheckInRiskSignal"> | string
+    signalType?: EnumCheckInRiskSignalTypeWithAggregatesFilter<"CheckInRiskSignal"> | $Enums.CheckInRiskSignalType
+    metadata?: JsonNullableWithAggregatesFilter<"CheckInRiskSignal">
   }
 
   export type SiteVoteWhereInput = {
@@ -46553,6 +53255,59 @@ export namespace Prisma {
     idempotencyKey?: StringWithAggregatesFilter<"NotificationOutbox"> | string
   }
 
+  export type AdminMutationIdempotencyWhereInput = {
+    AND?: AdminMutationIdempotencyWhereInput | AdminMutationIdempotencyWhereInput[]
+    OR?: AdminMutationIdempotencyWhereInput[]
+    NOT?: AdminMutationIdempotencyWhereInput | AdminMutationIdempotencyWhereInput[]
+    id?: StringFilter<"AdminMutationIdempotency"> | string
+    createdAt?: DateTimeFilter<"AdminMutationIdempotency"> | Date | string
+    actorUserId?: StringFilter<"AdminMutationIdempotency"> | string
+    purpose?: StringFilter<"AdminMutationIdempotency"> | string
+    clientJobId?: StringFilter<"AdminMutationIdempotency"> | string
+  }
+
+  export type AdminMutationIdempotencyOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    actorUserId?: SortOrder
+    purpose?: SortOrder
+    clientJobId?: SortOrder
+  }
+
+  export type AdminMutationIdempotencyWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    actorUserId_purpose_clientJobId?: AdminMutationIdempotencyActorUserIdPurposeClientJobIdCompoundUniqueInput
+    AND?: AdminMutationIdempotencyWhereInput | AdminMutationIdempotencyWhereInput[]
+    OR?: AdminMutationIdempotencyWhereInput[]
+    NOT?: AdminMutationIdempotencyWhereInput | AdminMutationIdempotencyWhereInput[]
+    createdAt?: DateTimeFilter<"AdminMutationIdempotency"> | Date | string
+    actorUserId?: StringFilter<"AdminMutationIdempotency"> | string
+    purpose?: StringFilter<"AdminMutationIdempotency"> | string
+    clientJobId?: StringFilter<"AdminMutationIdempotency"> | string
+  }, "id" | "actorUserId_purpose_clientJobId">
+
+  export type AdminMutationIdempotencyOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    actorUserId?: SortOrder
+    purpose?: SortOrder
+    clientJobId?: SortOrder
+    _count?: AdminMutationIdempotencyCountOrderByAggregateInput
+    _max?: AdminMutationIdempotencyMaxOrderByAggregateInput
+    _min?: AdminMutationIdempotencyMinOrderByAggregateInput
+  }
+
+  export type AdminMutationIdempotencyScalarWhereWithAggregatesInput = {
+    AND?: AdminMutationIdempotencyScalarWhereWithAggregatesInput | AdminMutationIdempotencyScalarWhereWithAggregatesInput[]
+    OR?: AdminMutationIdempotencyScalarWhereWithAggregatesInput[]
+    NOT?: AdminMutationIdempotencyScalarWhereWithAggregatesInput | AdminMutationIdempotencyScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AdminMutationIdempotency"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"AdminMutationIdempotency"> | Date | string
+    actorUserId?: StringWithAggregatesFilter<"AdminMutationIdempotency"> | string
+    purpose?: StringWithAggregatesFilter<"AdminMutationIdempotency"> | string
+    clientJobId?: StringWithAggregatesFilter<"AdminMutationIdempotency"> | string
+  }
+
   export type UserCreateInput = {
     id?: string
     createdAt?: Date | string
@@ -46577,6 +53332,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -46602,6 +53358,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -46628,6 +53387,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -46653,6 +53413,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -46679,6 +53442,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -46704,6 +53468,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -46730,6 +53497,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -46755,6 +53523,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -46781,6 +53552,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -46807,6 +53579,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -46833,6 +53606,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserSessionCreateInput = {
@@ -48002,6 +54776,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -48039,6 +54817,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -48074,6 +54856,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -48111,6 +54897,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -48729,6 +55519,307 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     eventId?: StringFieldUpdateOperationsInput | string
     jti?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventLiveMetricCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reportedBagsCollected?: number
+    event: CleanupEventCreateNestedOneWithoutLiveMetricInput
+  }
+
+  export type EventLiveMetricUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    reportedBagsCollected?: number
+  }
+
+  export type EventLiveMetricUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+    event?: CleanupEventUpdateOneRequiredWithoutLiveMetricNestedInput
+  }
+
+  export type EventLiveMetricUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EventLiveMetricCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    reportedBagsCollected?: number
+  }
+
+  export type EventLiveMetricUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EventLiveMetricUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EventEvidencePhotoCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    event: CleanupEventCreateNestedOneWithoutEvidencePhotosInput
+    uploadedBy: UserCreateNestedOneWithoutEventEvidencePhotosUploadedInput
+  }
+
+  export type EventEvidencePhotoUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    uploadedById: string
+  }
+
+  export type EventEvidencePhotoUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutEvidencePhotosNestedInput
+    uploadedBy?: UserUpdateOneRequiredWithoutEventEvidencePhotosUploadedNestedInput
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventEvidencePhotoCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    uploadedById: string
+  }
+
+  export type EventEvidencePhotoUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventRouteSegmentCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+    event: CleanupEventCreateNestedOneWithoutRouteSegmentsInput
+    claimedBy?: UserCreateNestedOneWithoutRouteSegmentsClaimedInput
+  }
+
+  export type EventRouteSegmentUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedByUserId?: string | null
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type EventRouteSegmentUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutRouteSegmentsNestedInput
+    claimedBy?: UserUpdateOneWithoutRouteSegmentsClaimedNestedInput
+  }
+
+  export type EventRouteSegmentUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventRouteSegmentCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedByUserId?: string | null
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type EventRouteSegmentUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventRouteSegmentUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type CheckInRiskSignalCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    event: CleanupEventCreateNestedOneWithoutCheckInRiskSignalsInput
+    user: UserCreateNestedOneWithoutCheckInRiskSignalsInput
+  }
+
+  export type CheckInRiskSignalUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    eventId: string
+    userId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    event?: CleanupEventUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput
+    user?: UserUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    eventId: string
+    userId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type SiteVoteCreateInput = {
@@ -49432,6 +56523,62 @@ export namespace Prisma {
     idempotencyKey?: StringFieldUpdateOperationsInput | string
   }
 
+  export type AdminMutationIdempotencyCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    actorUserId: string
+    purpose: string
+    clientJobId: string
+  }
+
+  export type AdminMutationIdempotencyUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    actorUserId: string
+    purpose: string
+    clientJobId: string
+  }
+
+  export type AdminMutationIdempotencyUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    clientJobId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminMutationIdempotencyUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    clientJobId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminMutationIdempotencyCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    actorUserId: string
+    purpose: string
+    clientJobId: string
+  }
+
+  export type AdminMutationIdempotencyUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    clientJobId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type AdminMutationIdempotencyUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    actorUserId?: StringFieldUpdateOperationsInput | string
+    purpose?: StringFieldUpdateOperationsInput | string
+    clientJobId?: StringFieldUpdateOperationsInput | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -49659,6 +56806,24 @@ export namespace Prisma {
     none?: ReportSubmitIdempotencyWhereInput
   }
 
+  export type EventEvidencePhotoListRelationFilter = {
+    every?: EventEvidencePhotoWhereInput
+    some?: EventEvidencePhotoWhereInput
+    none?: EventEvidencePhotoWhereInput
+  }
+
+  export type EventRouteSegmentListRelationFilter = {
+    every?: EventRouteSegmentWhereInput
+    some?: EventRouteSegmentWhereInput
+    none?: EventRouteSegmentWhereInput
+  }
+
+  export type CheckInRiskSignalListRelationFilter = {
+    every?: CheckInRiskSignalWhereInput
+    some?: CheckInRiskSignalWhereInput
+    none?: CheckInRiskSignalWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -49752,6 +56917,18 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type EventEvidencePhotoOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type EventRouteSegmentOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type CheckInRiskSignalOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
@@ -49776,6 +56953,7 @@ export namespace Prisma {
     avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
     mfaBackupCodes?: SortOrder
+    organizerCertifiedAt?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
@@ -49810,6 +56988,7 @@ export namespace Prisma {
     avatarObjectKey?: SortOrder
     avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
+    organizerCertifiedAt?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -49835,6 +57014,7 @@ export namespace Prisma {
     avatarObjectKey?: SortOrder
     avatarUpdatedAt?: SortOrder
     totpSecret?: SortOrder
+    organizerCertifiedAt?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
@@ -50747,6 +57927,11 @@ export namespace Prisma {
     none?: EventCheckInRedemptionWhereInput
   }
 
+  export type EventLiveMetricNullableScalarRelationFilter = {
+    is?: EventLiveMetricWhereInput | null
+    isNot?: EventLiveMetricWhereInput | null
+  }
+
   export type CleanupEventNullableScalarRelationFilter = {
     is?: CleanupEventWhereInput | null
     isNot?: CleanupEventWhereInput | null
@@ -51250,6 +58435,207 @@ export namespace Prisma {
     jti?: SortOrder
   }
 
+  export type EventLiveMetricCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    reportedBagsCollected?: SortOrder
+  }
+
+  export type EventLiveMetricAvgOrderByAggregateInput = {
+    reportedBagsCollected?: SortOrder
+  }
+
+  export type EventLiveMetricMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    reportedBagsCollected?: SortOrder
+  }
+
+  export type EventLiveMetricMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    reportedBagsCollected?: SortOrder
+  }
+
+  export type EventLiveMetricSumOrderByAggregateInput = {
+    reportedBagsCollected?: SortOrder
+  }
+
+  export type EnumEventEvidenceKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventEvidenceKind | EnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventEvidenceKindFilter<$PrismaModel> | $Enums.EventEvidenceKind
+  }
+
+  export type EventEvidencePhotoCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    kind?: SortOrder
+    objectKey?: SortOrder
+    caption?: SortOrder
+    uploadedById?: SortOrder
+  }
+
+  export type EventEvidencePhotoMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    kind?: SortOrder
+    objectKey?: SortOrder
+    caption?: SortOrder
+    uploadedById?: SortOrder
+  }
+
+  export type EventEvidencePhotoMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    kind?: SortOrder
+    objectKey?: SortOrder
+    caption?: SortOrder
+    uploadedById?: SortOrder
+  }
+
+  export type EnumEventEvidenceKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventEvidenceKind | EnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventEvidenceKindWithAggregatesFilter<$PrismaModel> | $Enums.EventEvidenceKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventEvidenceKindFilter<$PrismaModel>
+    _max?: NestedEnumEventEvidenceKindFilter<$PrismaModel>
+  }
+
+  export type EnumRouteSegmentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RouteSegmentStatus | EnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRouteSegmentStatusFilter<$PrismaModel> | $Enums.RouteSegmentStatus
+  }
+
+  export type EventRouteSegmentCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    sortOrder?: SortOrder
+    label?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    claimedByUserId?: SortOrder
+    claimedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type EventRouteSegmentAvgOrderByAggregateInput = {
+    sortOrder?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+  }
+
+  export type EventRouteSegmentMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    sortOrder?: SortOrder
+    label?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    claimedByUserId?: SortOrder
+    claimedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type EventRouteSegmentMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    eventId?: SortOrder
+    sortOrder?: SortOrder
+    label?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+    status?: SortOrder
+    claimedByUserId?: SortOrder
+    claimedAt?: SortOrder
+    completedAt?: SortOrder
+  }
+
+  export type EventRouteSegmentSumOrderByAggregateInput = {
+    sortOrder?: SortOrder
+    latitude?: SortOrder
+    longitude?: SortOrder
+  }
+
+  export type EnumRouteSegmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RouteSegmentStatus | EnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRouteSegmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.RouteSegmentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRouteSegmentStatusFilter<$PrismaModel>
+    _max?: NestedEnumRouteSegmentStatusFilter<$PrismaModel>
+  }
+
+  export type EnumCheckInRiskSignalTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CheckInRiskSignalType | EnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel> | $Enums.CheckInRiskSignalType
+  }
+
+  export type CheckInRiskSignalCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    signalType?: SortOrder
+    metadata?: SortOrder
+  }
+
+  export type CheckInRiskSignalMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    signalType?: SortOrder
+  }
+
+  export type CheckInRiskSignalMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    expiresAt?: SortOrder
+    eventId?: SortOrder
+    userId?: SortOrder
+    signalType?: SortOrder
+  }
+
+  export type EnumCheckInRiskSignalTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CheckInRiskSignalType | EnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCheckInRiskSignalTypeWithAggregatesFilter<$PrismaModel> | $Enums.CheckInRiskSignalType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel>
+    _max?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel>
+  }
+
   export type SiteVoteSiteIdUserIdCompoundUniqueInput = {
     siteId: string
     userId: string
@@ -51703,6 +59089,36 @@ export namespace Prisma {
     _max?: NestedJsonFilter<$PrismaModel>
   }
 
+  export type AdminMutationIdempotencyActorUserIdPurposeClientJobIdCompoundUniqueInput = {
+    actorUserId: string
+    purpose: string
+    clientJobId: string
+  }
+
+  export type AdminMutationIdempotencyCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    actorUserId?: SortOrder
+    purpose?: SortOrder
+    clientJobId?: SortOrder
+  }
+
+  export type AdminMutationIdempotencyMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    actorUserId?: SortOrder
+    purpose?: SortOrder
+    clientJobId?: SortOrder
+  }
+
+  export type AdminMutationIdempotencyMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    actorUserId?: SortOrder
+    purpose?: SortOrder
+    clientJobId?: SortOrder
+  }
+
   export type UserCreatemfaBackupCodesInput = {
     set: string[]
   }
@@ -51881,6 +59297,27 @@ export namespace Prisma {
     connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
   }
 
+  export type EventEvidencePhotoCreateNestedManyWithoutUploadedByInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput> | EventEvidencePhotoCreateWithoutUploadedByInput[] | EventEvidencePhotoUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutUploadedByInput | EventEvidencePhotoCreateOrConnectWithoutUploadedByInput[]
+    createMany?: EventEvidencePhotoCreateManyUploadedByInputEnvelope
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+  }
+
+  export type EventRouteSegmentCreateNestedManyWithoutClaimedByInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput> | EventRouteSegmentCreateWithoutClaimedByInput[] | EventRouteSegmentUncheckedCreateWithoutClaimedByInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutClaimedByInput | EventRouteSegmentCreateOrConnectWithoutClaimedByInput[]
+    createMany?: EventRouteSegmentCreateManyClaimedByInputEnvelope
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+  }
+
+  export type CheckInRiskSignalCreateNestedManyWithoutUserInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput> | CheckInRiskSignalCreateWithoutUserInput[] | CheckInRiskSignalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutUserInput | CheckInRiskSignalCreateOrConnectWithoutUserInput[]
+    createMany?: CheckInRiskSignalCreateManyUserInputEnvelope
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutReporterInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -52053,6 +59490,27 @@ export namespace Prisma {
     connectOrCreate?: ReportSubmitIdempotencyCreateOrConnectWithoutUserInput | ReportSubmitIdempotencyCreateOrConnectWithoutUserInput[]
     createMany?: ReportSubmitIdempotencyCreateManyUserInputEnvelope
     connect?: ReportSubmitIdempotencyWhereUniqueInput | ReportSubmitIdempotencyWhereUniqueInput[]
+  }
+
+  export type EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput> | EventEvidencePhotoCreateWithoutUploadedByInput[] | EventEvidencePhotoUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutUploadedByInput | EventEvidencePhotoCreateOrConnectWithoutUploadedByInput[]
+    createMany?: EventEvidencePhotoCreateManyUploadedByInputEnvelope
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+  }
+
+  export type EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput> | EventRouteSegmentCreateWithoutClaimedByInput[] | EventRouteSegmentUncheckedCreateWithoutClaimedByInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutClaimedByInput | EventRouteSegmentCreateOrConnectWithoutClaimedByInput[]
+    createMany?: EventRouteSegmentCreateManyClaimedByInputEnvelope
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+  }
+
+  export type CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput> | CheckInRiskSignalCreateWithoutUserInput[] | CheckInRiskSignalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutUserInput | CheckInRiskSignalCreateOrConnectWithoutUserInput[]
+    createMany?: CheckInRiskSignalCreateManyUserInputEnvelope
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -52442,6 +59900,48 @@ export namespace Prisma {
     deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
   }
 
+  export type EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput> | EventEvidencePhotoCreateWithoutUploadedByInput[] | EventEvidencePhotoUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutUploadedByInput | EventEvidencePhotoCreateOrConnectWithoutUploadedByInput[]
+    upsert?: EventEvidencePhotoUpsertWithWhereUniqueWithoutUploadedByInput | EventEvidencePhotoUpsertWithWhereUniqueWithoutUploadedByInput[]
+    createMany?: EventEvidencePhotoCreateManyUploadedByInputEnvelope
+    set?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    disconnect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    delete?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    update?: EventEvidencePhotoUpdateWithWhereUniqueWithoutUploadedByInput | EventEvidencePhotoUpdateWithWhereUniqueWithoutUploadedByInput[]
+    updateMany?: EventEvidencePhotoUpdateManyWithWhereWithoutUploadedByInput | EventEvidencePhotoUpdateManyWithWhereWithoutUploadedByInput[]
+    deleteMany?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+  }
+
+  export type EventRouteSegmentUpdateManyWithoutClaimedByNestedInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput> | EventRouteSegmentCreateWithoutClaimedByInput[] | EventRouteSegmentUncheckedCreateWithoutClaimedByInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutClaimedByInput | EventRouteSegmentCreateOrConnectWithoutClaimedByInput[]
+    upsert?: EventRouteSegmentUpsertWithWhereUniqueWithoutClaimedByInput | EventRouteSegmentUpsertWithWhereUniqueWithoutClaimedByInput[]
+    createMany?: EventRouteSegmentCreateManyClaimedByInputEnvelope
+    set?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    disconnect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    delete?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    update?: EventRouteSegmentUpdateWithWhereUniqueWithoutClaimedByInput | EventRouteSegmentUpdateWithWhereUniqueWithoutClaimedByInput[]
+    updateMany?: EventRouteSegmentUpdateManyWithWhereWithoutClaimedByInput | EventRouteSegmentUpdateManyWithWhereWithoutClaimedByInput[]
+    deleteMany?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+  }
+
+  export type CheckInRiskSignalUpdateManyWithoutUserNestedInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput> | CheckInRiskSignalCreateWithoutUserInput[] | CheckInRiskSignalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutUserInput | CheckInRiskSignalCreateOrConnectWithoutUserInput[]
+    upsert?: CheckInRiskSignalUpsertWithWhereUniqueWithoutUserInput | CheckInRiskSignalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: CheckInRiskSignalCreateManyUserInputEnvelope
+    set?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    disconnect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    delete?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    update?: CheckInRiskSignalUpdateWithWhereUniqueWithoutUserInput | CheckInRiskSignalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: CheckInRiskSignalUpdateManyWithWhereWithoutUserInput | CheckInRiskSignalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutReporterNestedInput = {
     create?: XOR<ReportCreateWithoutReporterInput, ReportUncheckedCreateWithoutReporterInput> | ReportCreateWithoutReporterInput[] | ReportUncheckedCreateWithoutReporterInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutReporterInput | ReportCreateOrConnectWithoutReporterInput[]
@@ -52786,6 +60286,48 @@ export namespace Prisma {
     update?: ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput | ReportSubmitIdempotencyUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput | ReportSubmitIdempotencyUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ReportSubmitIdempotencyScalarWhereInput | ReportSubmitIdempotencyScalarWhereInput[]
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput> | EventEvidencePhotoCreateWithoutUploadedByInput[] | EventEvidencePhotoUncheckedCreateWithoutUploadedByInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutUploadedByInput | EventEvidencePhotoCreateOrConnectWithoutUploadedByInput[]
+    upsert?: EventEvidencePhotoUpsertWithWhereUniqueWithoutUploadedByInput | EventEvidencePhotoUpsertWithWhereUniqueWithoutUploadedByInput[]
+    createMany?: EventEvidencePhotoCreateManyUploadedByInputEnvelope
+    set?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    disconnect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    delete?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    update?: EventEvidencePhotoUpdateWithWhereUniqueWithoutUploadedByInput | EventEvidencePhotoUpdateWithWhereUniqueWithoutUploadedByInput[]
+    updateMany?: EventEvidencePhotoUpdateManyWithWhereWithoutUploadedByInput | EventEvidencePhotoUpdateManyWithWhereWithoutUploadedByInput[]
+    deleteMany?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+  }
+
+  export type EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput> | EventRouteSegmentCreateWithoutClaimedByInput[] | EventRouteSegmentUncheckedCreateWithoutClaimedByInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutClaimedByInput | EventRouteSegmentCreateOrConnectWithoutClaimedByInput[]
+    upsert?: EventRouteSegmentUpsertWithWhereUniqueWithoutClaimedByInput | EventRouteSegmentUpsertWithWhereUniqueWithoutClaimedByInput[]
+    createMany?: EventRouteSegmentCreateManyClaimedByInputEnvelope
+    set?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    disconnect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    delete?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    update?: EventRouteSegmentUpdateWithWhereUniqueWithoutClaimedByInput | EventRouteSegmentUpdateWithWhereUniqueWithoutClaimedByInput[]
+    updateMany?: EventRouteSegmentUpdateManyWithWhereWithoutClaimedByInput | EventRouteSegmentUpdateManyWithWhereWithoutClaimedByInput[]
+    deleteMany?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput> | CheckInRiskSignalCreateWithoutUserInput[] | CheckInRiskSignalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutUserInput | CheckInRiskSignalCreateOrConnectWithoutUserInput[]
+    upsert?: CheckInRiskSignalUpsertWithWhereUniqueWithoutUserInput | CheckInRiskSignalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: CheckInRiskSignalCreateManyUserInputEnvelope
+    set?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    disconnect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    delete?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    update?: CheckInRiskSignalUpdateWithWhereUniqueWithoutUserInput | CheckInRiskSignalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: CheckInRiskSignalUpdateManyWithWhereWithoutUserInput | CheckInRiskSignalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSessionsInput = {
@@ -53479,6 +61021,33 @@ export namespace Prisma {
     connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
   }
 
+  export type EventLiveMetricCreateNestedOneWithoutEventInput = {
+    create?: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+    connectOrCreate?: EventLiveMetricCreateOrConnectWithoutEventInput
+    connect?: EventLiveMetricWhereUniqueInput
+  }
+
+  export type EventEvidencePhotoCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput> | EventEvidencePhotoCreateWithoutEventInput[] | EventEvidencePhotoUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutEventInput | EventEvidencePhotoCreateOrConnectWithoutEventInput[]
+    createMany?: EventEvidencePhotoCreateManyEventInputEnvelope
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+  }
+
+  export type EventRouteSegmentCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput> | EventRouteSegmentCreateWithoutEventInput[] | EventRouteSegmentUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutEventInput | EventRouteSegmentCreateOrConnectWithoutEventInput[]
+    createMany?: EventRouteSegmentCreateManyEventInputEnvelope
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+  }
+
+  export type CheckInRiskSignalCreateNestedManyWithoutEventInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput> | CheckInRiskSignalCreateWithoutEventInput[] | CheckInRiskSignalUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutEventInput | CheckInRiskSignalCreateOrConnectWithoutEventInput[]
+    createMany?: CheckInRiskSignalCreateManyEventInputEnvelope
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+  }
+
   export type CleanupEventCreateNestedOneWithoutSeriesChildrenInput = {
     create?: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
     connectOrCreate?: CleanupEventCreateOrConnectWithoutSeriesChildrenInput
@@ -53532,6 +61101,33 @@ export namespace Prisma {
     connectOrCreate?: EventChatMuteCreateOrConnectWithoutEventInput | EventChatMuteCreateOrConnectWithoutEventInput[]
     createMany?: EventChatMuteCreateManyEventInputEnvelope
     connect?: EventChatMuteWhereUniqueInput | EventChatMuteWhereUniqueInput[]
+  }
+
+  export type EventLiveMetricUncheckedCreateNestedOneWithoutEventInput = {
+    create?: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+    connectOrCreate?: EventLiveMetricCreateOrConnectWithoutEventInput
+    connect?: EventLiveMetricWhereUniqueInput
+  }
+
+  export type EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput> | EventEvidencePhotoCreateWithoutEventInput[] | EventEvidencePhotoUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutEventInput | EventEvidencePhotoCreateOrConnectWithoutEventInput[]
+    createMany?: EventEvidencePhotoCreateManyEventInputEnvelope
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+  }
+
+  export type EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput> | EventRouteSegmentCreateWithoutEventInput[] | EventRouteSegmentUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutEventInput | EventRouteSegmentCreateOrConnectWithoutEventInput[]
+    createMany?: EventRouteSegmentCreateManyEventInputEnvelope
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+  }
+
+  export type CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput> | CheckInRiskSignalCreateWithoutEventInput[] | CheckInRiskSignalUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutEventInput | CheckInRiskSignalCreateOrConnectWithoutEventInput[]
+    createMany?: CheckInRiskSignalCreateManyEventInputEnvelope
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
   }
 
   export type CleanupEventUncheckedCreateNestedManyWithoutParentEventInput = {
@@ -53673,6 +61269,58 @@ export namespace Prisma {
     deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
   }
 
+  export type EventLiveMetricUpdateOneWithoutEventNestedInput = {
+    create?: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+    connectOrCreate?: EventLiveMetricCreateOrConnectWithoutEventInput
+    upsert?: EventLiveMetricUpsertWithoutEventInput
+    disconnect?: EventLiveMetricWhereInput | boolean
+    delete?: EventLiveMetricWhereInput | boolean
+    connect?: EventLiveMetricWhereUniqueInput
+    update?: XOR<XOR<EventLiveMetricUpdateToOneWithWhereWithoutEventInput, EventLiveMetricUpdateWithoutEventInput>, EventLiveMetricUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput> | EventEvidencePhotoCreateWithoutEventInput[] | EventEvidencePhotoUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutEventInput | EventEvidencePhotoCreateOrConnectWithoutEventInput[]
+    upsert?: EventEvidencePhotoUpsertWithWhereUniqueWithoutEventInput | EventEvidencePhotoUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventEvidencePhotoCreateManyEventInputEnvelope
+    set?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    disconnect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    delete?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    update?: EventEvidencePhotoUpdateWithWhereUniqueWithoutEventInput | EventEvidencePhotoUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventEvidencePhotoUpdateManyWithWhereWithoutEventInput | EventEvidencePhotoUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+  }
+
+  export type EventRouteSegmentUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput> | EventRouteSegmentCreateWithoutEventInput[] | EventRouteSegmentUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutEventInput | EventRouteSegmentCreateOrConnectWithoutEventInput[]
+    upsert?: EventRouteSegmentUpsertWithWhereUniqueWithoutEventInput | EventRouteSegmentUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventRouteSegmentCreateManyEventInputEnvelope
+    set?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    disconnect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    delete?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    update?: EventRouteSegmentUpdateWithWhereUniqueWithoutEventInput | EventRouteSegmentUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventRouteSegmentUpdateManyWithWhereWithoutEventInput | EventRouteSegmentUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+  }
+
+  export type CheckInRiskSignalUpdateManyWithoutEventNestedInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput> | CheckInRiskSignalCreateWithoutEventInput[] | CheckInRiskSignalUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutEventInput | CheckInRiskSignalCreateOrConnectWithoutEventInput[]
+    upsert?: CheckInRiskSignalUpsertWithWhereUniqueWithoutEventInput | CheckInRiskSignalUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: CheckInRiskSignalCreateManyEventInputEnvelope
+    set?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    disconnect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    delete?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    update?: CheckInRiskSignalUpdateWithWhereUniqueWithoutEventInput | CheckInRiskSignalUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: CheckInRiskSignalUpdateManyWithWhereWithoutEventInput | CheckInRiskSignalUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
+  }
+
   export type CleanupEventUpdateOneWithoutSeriesChildrenNestedInput = {
     create?: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
     connectOrCreate?: CleanupEventCreateOrConnectWithoutSeriesChildrenInput
@@ -53779,6 +61427,58 @@ export namespace Prisma {
     update?: EventChatMuteUpdateWithWhereUniqueWithoutEventInput | EventChatMuteUpdateWithWhereUniqueWithoutEventInput[]
     updateMany?: EventChatMuteUpdateManyWithWhereWithoutEventInput | EventChatMuteUpdateManyWithWhereWithoutEventInput[]
     deleteMany?: EventChatMuteScalarWhereInput | EventChatMuteScalarWhereInput[]
+  }
+
+  export type EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput = {
+    create?: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+    connectOrCreate?: EventLiveMetricCreateOrConnectWithoutEventInput
+    upsert?: EventLiveMetricUpsertWithoutEventInput
+    disconnect?: EventLiveMetricWhereInput | boolean
+    delete?: EventLiveMetricWhereInput | boolean
+    connect?: EventLiveMetricWhereUniqueInput
+    update?: XOR<XOR<EventLiveMetricUpdateToOneWithWhereWithoutEventInput, EventLiveMetricUpdateWithoutEventInput>, EventLiveMetricUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput> | EventEvidencePhotoCreateWithoutEventInput[] | EventEvidencePhotoUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventEvidencePhotoCreateOrConnectWithoutEventInput | EventEvidencePhotoCreateOrConnectWithoutEventInput[]
+    upsert?: EventEvidencePhotoUpsertWithWhereUniqueWithoutEventInput | EventEvidencePhotoUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventEvidencePhotoCreateManyEventInputEnvelope
+    set?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    disconnect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    delete?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    connect?: EventEvidencePhotoWhereUniqueInput | EventEvidencePhotoWhereUniqueInput[]
+    update?: EventEvidencePhotoUpdateWithWhereUniqueWithoutEventInput | EventEvidencePhotoUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventEvidencePhotoUpdateManyWithWhereWithoutEventInput | EventEvidencePhotoUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+  }
+
+  export type EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput> | EventRouteSegmentCreateWithoutEventInput[] | EventRouteSegmentUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: EventRouteSegmentCreateOrConnectWithoutEventInput | EventRouteSegmentCreateOrConnectWithoutEventInput[]
+    upsert?: EventRouteSegmentUpsertWithWhereUniqueWithoutEventInput | EventRouteSegmentUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: EventRouteSegmentCreateManyEventInputEnvelope
+    set?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    disconnect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    delete?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    connect?: EventRouteSegmentWhereUniqueInput | EventRouteSegmentWhereUniqueInput[]
+    update?: EventRouteSegmentUpdateWithWhereUniqueWithoutEventInput | EventRouteSegmentUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: EventRouteSegmentUpdateManyWithWhereWithoutEventInput | EventRouteSegmentUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput = {
+    create?: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput> | CheckInRiskSignalCreateWithoutEventInput[] | CheckInRiskSignalUncheckedCreateWithoutEventInput[]
+    connectOrCreate?: CheckInRiskSignalCreateOrConnectWithoutEventInput | CheckInRiskSignalCreateOrConnectWithoutEventInput[]
+    upsert?: CheckInRiskSignalUpsertWithWhereUniqueWithoutEventInput | CheckInRiskSignalUpsertWithWhereUniqueWithoutEventInput[]
+    createMany?: CheckInRiskSignalCreateManyEventInputEnvelope
+    set?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    disconnect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    delete?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    connect?: CheckInRiskSignalWhereUniqueInput | CheckInRiskSignalWhereUniqueInput[]
+    update?: CheckInRiskSignalUpdateWithWhereUniqueWithoutEventInput | CheckInRiskSignalUpdateWithWhereUniqueWithoutEventInput[]
+    updateMany?: CheckInRiskSignalUpdateManyWithWhereWithoutEventInput | CheckInRiskSignalUpdateManyWithWhereWithoutEventInput[]
+    deleteMany?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
   }
 
   export type CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput = {
@@ -54091,6 +61791,118 @@ export namespace Prisma {
     upsert?: CleanupEventUpsertWithoutCheckInRedemptionsInput
     connect?: CleanupEventWhereUniqueInput
     update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutCheckInRedemptionsInput, CleanupEventUpdateWithoutCheckInRedemptionsInput>, CleanupEventUncheckedUpdateWithoutCheckInRedemptionsInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutLiveMetricInput = {
+    create?: XOR<CleanupEventCreateWithoutLiveMetricInput, CleanupEventUncheckedCreateWithoutLiveMetricInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutLiveMetricInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutLiveMetricNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutLiveMetricInput, CleanupEventUncheckedCreateWithoutLiveMetricInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutLiveMetricInput
+    upsert?: CleanupEventUpsertWithoutLiveMetricInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutLiveMetricInput, CleanupEventUpdateWithoutLiveMetricInput>, CleanupEventUncheckedUpdateWithoutLiveMetricInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutEvidencePhotosInput = {
+    create?: XOR<CleanupEventCreateWithoutEvidencePhotosInput, CleanupEventUncheckedCreateWithoutEvidencePhotosInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutEvidencePhotosInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutEventEvidencePhotosUploadedInput = {
+    create?: XOR<UserCreateWithoutEventEvidencePhotosUploadedInput, UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventEvidencePhotosUploadedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumEventEvidenceKindFieldUpdateOperationsInput = {
+    set?: $Enums.EventEvidenceKind
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutEvidencePhotosNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutEvidencePhotosInput, CleanupEventUncheckedCreateWithoutEvidencePhotosInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutEvidencePhotosInput
+    upsert?: CleanupEventUpsertWithoutEvidencePhotosInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutEvidencePhotosInput, CleanupEventUpdateWithoutEvidencePhotosInput>, CleanupEventUncheckedUpdateWithoutEvidencePhotosInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutEventEvidencePhotosUploadedNestedInput = {
+    create?: XOR<UserCreateWithoutEventEvidencePhotosUploadedInput, UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutEventEvidencePhotosUploadedInput
+    upsert?: UserUpsertWithoutEventEvidencePhotosUploadedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventEvidencePhotosUploadedInput, UserUpdateWithoutEventEvidencePhotosUploadedInput>, UserUncheckedUpdateWithoutEventEvidencePhotosUploadedInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutRouteSegmentsInput = {
+    create?: XOR<CleanupEventCreateWithoutRouteSegmentsInput, CleanupEventUncheckedCreateWithoutRouteSegmentsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutRouteSegmentsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutRouteSegmentsClaimedInput = {
+    create?: XOR<UserCreateWithoutRouteSegmentsClaimedInput, UserUncheckedCreateWithoutRouteSegmentsClaimedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRouteSegmentsClaimedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumRouteSegmentStatusFieldUpdateOperationsInput = {
+    set?: $Enums.RouteSegmentStatus
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutRouteSegmentsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutRouteSegmentsInput, CleanupEventUncheckedCreateWithoutRouteSegmentsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutRouteSegmentsInput
+    upsert?: CleanupEventUpsertWithoutRouteSegmentsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutRouteSegmentsInput, CleanupEventUpdateWithoutRouteSegmentsInput>, CleanupEventUncheckedUpdateWithoutRouteSegmentsInput>
+  }
+
+  export type UserUpdateOneWithoutRouteSegmentsClaimedNestedInput = {
+    create?: XOR<UserCreateWithoutRouteSegmentsClaimedInput, UserUncheckedCreateWithoutRouteSegmentsClaimedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutRouteSegmentsClaimedInput
+    upsert?: UserUpsertWithoutRouteSegmentsClaimedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutRouteSegmentsClaimedInput, UserUpdateWithoutRouteSegmentsClaimedInput>, UserUncheckedUpdateWithoutRouteSegmentsClaimedInput>
+  }
+
+  export type CleanupEventCreateNestedOneWithoutCheckInRiskSignalsInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedCreateWithoutCheckInRiskSignalsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInRiskSignalsInput
+    connect?: CleanupEventWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutCheckInRiskSignalsInput = {
+    create?: XOR<UserCreateWithoutCheckInRiskSignalsInput, UserUncheckedCreateWithoutCheckInRiskSignalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCheckInRiskSignalsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumCheckInRiskSignalTypeFieldUpdateOperationsInput = {
+    set?: $Enums.CheckInRiskSignalType
+  }
+
+  export type CleanupEventUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput = {
+    create?: XOR<CleanupEventCreateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedCreateWithoutCheckInRiskSignalsInput>
+    connectOrCreate?: CleanupEventCreateOrConnectWithoutCheckInRiskSignalsInput
+    upsert?: CleanupEventUpsertWithoutCheckInRiskSignalsInput
+    connect?: CleanupEventWhereUniqueInput
+    update?: XOR<XOR<CleanupEventUpdateToOneWithWhereWithoutCheckInRiskSignalsInput, CleanupEventUpdateWithoutCheckInRiskSignalsInput>, CleanupEventUncheckedUpdateWithoutCheckInRiskSignalsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput = {
+    create?: XOR<UserCreateWithoutCheckInRiskSignalsInput, UserUncheckedCreateWithoutCheckInRiskSignalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCheckInRiskSignalsInput
+    upsert?: UserUpsertWithoutCheckInRiskSignalsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCheckInRiskSignalsInput, UserUpdateWithoutCheckInRiskSignalsInput>, UserUncheckedUpdateWithoutCheckInRiskSignalsInput>
   }
 
   export type SiteCreateNestedOneWithoutVotesInput = {
@@ -54864,6 +62676,57 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumEventEvidenceKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventEvidenceKind | EnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventEvidenceKindFilter<$PrismaModel> | $Enums.EventEvidenceKind
+  }
+
+  export type NestedEnumEventEvidenceKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventEvidenceKind | EnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    in?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventEvidenceKind[] | ListEnumEventEvidenceKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventEvidenceKindWithAggregatesFilter<$PrismaModel> | $Enums.EventEvidenceKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventEvidenceKindFilter<$PrismaModel>
+    _max?: NestedEnumEventEvidenceKindFilter<$PrismaModel>
+  }
+
+  export type NestedEnumRouteSegmentStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.RouteSegmentStatus | EnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRouteSegmentStatusFilter<$PrismaModel> | $Enums.RouteSegmentStatus
+  }
+
+  export type NestedEnumRouteSegmentStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.RouteSegmentStatus | EnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.RouteSegmentStatus[] | ListEnumRouteSegmentStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumRouteSegmentStatusWithAggregatesFilter<$PrismaModel> | $Enums.RouteSegmentStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumRouteSegmentStatusFilter<$PrismaModel>
+    _max?: NestedEnumRouteSegmentStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.CheckInRiskSignalType | EnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel> | $Enums.CheckInRiskSignalType
+  }
+
+  export type NestedEnumCheckInRiskSignalTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.CheckInRiskSignalType | EnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.CheckInRiskSignalType[] | ListEnumCheckInRiskSignalTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumCheckInRiskSignalTypeWithAggregatesFilter<$PrismaModel> | $Enums.CheckInRiskSignalType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel>
+    _max?: NestedEnumCheckInRiskSignalTypeFilter<$PrismaModel>
+  }
+
   export type NestedEnumSiteShareChannelFilter<$PrismaModel = never> = {
     equals?: $Enums.SiteShareChannel | EnumSiteShareChannelFieldRefInput<$PrismaModel>
     in?: $Enums.SiteShareChannel[] | ListEnumSiteShareChannelFieldRefInput<$PrismaModel>
@@ -55512,6 +63375,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -55548,6 +63415,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -55792,6 +63663,102 @@ export namespace Prisma {
 
   export type ReportSubmitIdempotencyCreateManyUserInputEnvelope = {
     data: ReportSubmitIdempotencyCreateManyUserInput | ReportSubmitIdempotencyCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventEvidencePhotoCreateWithoutUploadedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    event: CleanupEventCreateNestedOneWithoutEvidencePhotosInput
+  }
+
+  export type EventEvidencePhotoUncheckedCreateWithoutUploadedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+  }
+
+  export type EventEvidencePhotoCreateOrConnectWithoutUploadedByInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    create: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput>
+  }
+
+  export type EventEvidencePhotoCreateManyUploadedByInputEnvelope = {
+    data: EventEvidencePhotoCreateManyUploadedByInput | EventEvidencePhotoCreateManyUploadedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventRouteSegmentCreateWithoutClaimedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+    event: CleanupEventCreateNestedOneWithoutRouteSegmentsInput
+  }
+
+  export type EventRouteSegmentUncheckedCreateWithoutClaimedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type EventRouteSegmentCreateOrConnectWithoutClaimedByInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    create: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput>
+  }
+
+  export type EventRouteSegmentCreateManyClaimedByInputEnvelope = {
+    data: EventRouteSegmentCreateManyClaimedByInput | EventRouteSegmentCreateManyClaimedByInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CheckInRiskSignalCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    event: CleanupEventCreateNestedOneWithoutCheckInRiskSignalsInput
+  }
+
+  export type CheckInRiskSignalUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    eventId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalCreateOrConnectWithoutUserInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    create: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput>
+  }
+
+  export type CheckInRiskSignalCreateManyUserInputEnvelope = {
+    data: CheckInRiskSignalCreateManyUserInput | CheckInRiskSignalCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -56533,6 +64500,99 @@ export namespace Prisma {
     reportId?: StringFilter<"ReportSubmitIdempotency"> | string
   }
 
+  export type EventEvidencePhotoUpsertWithWhereUniqueWithoutUploadedByInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    update: XOR<EventEvidencePhotoUpdateWithoutUploadedByInput, EventEvidencePhotoUncheckedUpdateWithoutUploadedByInput>
+    create: XOR<EventEvidencePhotoCreateWithoutUploadedByInput, EventEvidencePhotoUncheckedCreateWithoutUploadedByInput>
+  }
+
+  export type EventEvidencePhotoUpdateWithWhereUniqueWithoutUploadedByInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    data: XOR<EventEvidencePhotoUpdateWithoutUploadedByInput, EventEvidencePhotoUncheckedUpdateWithoutUploadedByInput>
+  }
+
+  export type EventEvidencePhotoUpdateManyWithWhereWithoutUploadedByInput = {
+    where: EventEvidencePhotoScalarWhereInput
+    data: XOR<EventEvidencePhotoUpdateManyMutationInput, EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByInput>
+  }
+
+  export type EventEvidencePhotoScalarWhereInput = {
+    AND?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+    OR?: EventEvidencePhotoScalarWhereInput[]
+    NOT?: EventEvidencePhotoScalarWhereInput | EventEvidencePhotoScalarWhereInput[]
+    id?: StringFilter<"EventEvidencePhoto"> | string
+    createdAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    updatedAt?: DateTimeFilter<"EventEvidencePhoto"> | Date | string
+    eventId?: StringFilter<"EventEvidencePhoto"> | string
+    kind?: EnumEventEvidenceKindFilter<"EventEvidencePhoto"> | $Enums.EventEvidenceKind
+    objectKey?: StringFilter<"EventEvidencePhoto"> | string
+    caption?: StringNullableFilter<"EventEvidencePhoto"> | string | null
+    uploadedById?: StringFilter<"EventEvidencePhoto"> | string
+  }
+
+  export type EventRouteSegmentUpsertWithWhereUniqueWithoutClaimedByInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    update: XOR<EventRouteSegmentUpdateWithoutClaimedByInput, EventRouteSegmentUncheckedUpdateWithoutClaimedByInput>
+    create: XOR<EventRouteSegmentCreateWithoutClaimedByInput, EventRouteSegmentUncheckedCreateWithoutClaimedByInput>
+  }
+
+  export type EventRouteSegmentUpdateWithWhereUniqueWithoutClaimedByInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    data: XOR<EventRouteSegmentUpdateWithoutClaimedByInput, EventRouteSegmentUncheckedUpdateWithoutClaimedByInput>
+  }
+
+  export type EventRouteSegmentUpdateManyWithWhereWithoutClaimedByInput = {
+    where: EventRouteSegmentScalarWhereInput
+    data: XOR<EventRouteSegmentUpdateManyMutationInput, EventRouteSegmentUncheckedUpdateManyWithoutClaimedByInput>
+  }
+
+  export type EventRouteSegmentScalarWhereInput = {
+    AND?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+    OR?: EventRouteSegmentScalarWhereInput[]
+    NOT?: EventRouteSegmentScalarWhereInput | EventRouteSegmentScalarWhereInput[]
+    id?: StringFilter<"EventRouteSegment"> | string
+    createdAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    updatedAt?: DateTimeFilter<"EventRouteSegment"> | Date | string
+    eventId?: StringFilter<"EventRouteSegment"> | string
+    sortOrder?: IntFilter<"EventRouteSegment"> | number
+    label?: StringNullableFilter<"EventRouteSegment"> | string | null
+    latitude?: FloatFilter<"EventRouteSegment"> | number
+    longitude?: FloatFilter<"EventRouteSegment"> | number
+    status?: EnumRouteSegmentStatusFilter<"EventRouteSegment"> | $Enums.RouteSegmentStatus
+    claimedByUserId?: StringNullableFilter<"EventRouteSegment"> | string | null
+    claimedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"EventRouteSegment"> | Date | string | null
+  }
+
+  export type CheckInRiskSignalUpsertWithWhereUniqueWithoutUserInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    update: XOR<CheckInRiskSignalUpdateWithoutUserInput, CheckInRiskSignalUncheckedUpdateWithoutUserInput>
+    create: XOR<CheckInRiskSignalCreateWithoutUserInput, CheckInRiskSignalUncheckedCreateWithoutUserInput>
+  }
+
+  export type CheckInRiskSignalUpdateWithWhereUniqueWithoutUserInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    data: XOR<CheckInRiskSignalUpdateWithoutUserInput, CheckInRiskSignalUncheckedUpdateWithoutUserInput>
+  }
+
+  export type CheckInRiskSignalUpdateManyWithWhereWithoutUserInput = {
+    where: CheckInRiskSignalScalarWhereInput
+    data: XOR<CheckInRiskSignalUpdateManyMutationInput, CheckInRiskSignalUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type CheckInRiskSignalScalarWhereInput = {
+    AND?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
+    OR?: CheckInRiskSignalScalarWhereInput[]
+    NOT?: CheckInRiskSignalScalarWhereInput | CheckInRiskSignalScalarWhereInput[]
+    id?: StringFilter<"CheckInRiskSignal"> | string
+    createdAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    expiresAt?: DateTimeFilter<"CheckInRiskSignal"> | Date | string
+    eventId?: StringFilter<"CheckInRiskSignal"> | string
+    userId?: StringFilter<"CheckInRiskSignal"> | string
+    signalType?: EnumCheckInRiskSignalTypeFilter<"CheckInRiskSignal"> | $Enums.CheckInRiskSignalType
+    metadata?: JsonNullableFilter<"CheckInRiskSignal">
+  }
+
   export type UserCreateWithoutSessionsInput = {
     id?: string
     createdAt?: Date | string
@@ -56557,6 +64617,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -56581,6 +64642,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -56607,6 +64671,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -56631,6 +64696,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -56673,6 +64741,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -56697,6 +64766,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -56723,6 +64795,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -56747,6 +64820,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminTempTokensInput = {
@@ -56773,6 +64849,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -56797,6 +64874,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminTempTokensInput = {
@@ -56823,6 +64903,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -56847,6 +64928,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminTempTokensInput = {
@@ -56889,6 +64973,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -56913,6 +64998,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminTempTokensInput = {
@@ -56939,6 +65027,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -56963,6 +65052,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminPendingMfaInput = {
@@ -56989,6 +65081,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -57013,6 +65106,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminPendingMfaInput = {
@@ -57039,6 +65135,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -57063,6 +65160,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminPendingMfaInput = {
@@ -57105,6 +65205,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -57129,6 +65230,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminPendingMfaInput = {
@@ -57155,6 +65259,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -57179,6 +65284,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAdminNotificationsInput = {
@@ -57205,6 +65313,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
@@ -57229,6 +65338,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminNotificationsInput = {
@@ -57255,6 +65367,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
@@ -57279,6 +65392,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminNotificationsInput = {
@@ -57321,6 +65437,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
@@ -57345,6 +65462,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
@@ -57371,6 +65491,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
@@ -57395,6 +65516,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPointTransactionsInput = {
@@ -57421,6 +65545,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -57445,6 +65570,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPointTransactionsInput = {
@@ -57471,6 +65599,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -57495,6 +65624,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPointTransactionsInput = {
@@ -57537,6 +65669,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -57561,6 +65694,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPointTransactionsInput = {
@@ -57587,6 +65723,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -57611,6 +65748,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateWithoutSiteInput = {
@@ -57698,6 +65838,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -57734,6 +65878,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -58020,6 +66168,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
     pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
@@ -58044,6 +66193,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportsInput = {
@@ -58070,6 +66222,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
     pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
@@ -58094,6 +66247,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportsInput = {
@@ -58125,6 +66281,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
     pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
@@ -58149,6 +66306,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutModeratedReportsInput = {
@@ -58175,6 +66335,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
     pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
@@ -58199,6 +66360,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutModeratedReportsInput = {
@@ -58443,6 +66607,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
     pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
@@ -58467,6 +66632,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportsInput = {
@@ -58493,6 +66661,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
     pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
@@ -58517,6 +66686,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserUpsertWithoutModeratedReportsInput = {
@@ -58554,6 +66726,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
     pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
@@ -58578,6 +66751,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutModeratedReportsInput = {
@@ -58604,6 +66780,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
     pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
@@ -58628,6 +66805,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithoutPotentialDuplicatesInput = {
@@ -58806,6 +66986,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -58830,6 +67011,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutCoReportedReportsInput = {
@@ -58856,6 +67040,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -58880,6 +67065,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutCoReportedReportsInput = {
@@ -58977,6 +67165,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -59001,6 +67190,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutCoReportedReportsInput = {
@@ -59027,6 +67219,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -59051,6 +67244,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutReportSubmitIdempotencyKeysInput = {
@@ -59077,6 +67273,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -59101,6 +67298,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutReportSubmitIdempotencyKeysInput = {
@@ -59127,6 +67327,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -59151,6 +67352,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutReportSubmitIdempotencyKeysInput = {
@@ -59242,6 +67446,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -59266,6 +67471,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutReportSubmitIdempotencyKeysInput = {
@@ -59292,6 +67500,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -59316,6 +67525,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportUpsertWithoutSubmitIdempotencyKeysInput = {
@@ -59397,6 +67609,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -59421,6 +67634,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAuditLogsInput = {
@@ -59447,6 +67663,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -59471,6 +67688,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAuditLogsInput = {
@@ -59513,6 +67733,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -59537,6 +67758,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAuditLogsInput = {
@@ -59563,6 +67787,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -59587,6 +67812,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutEventsInput = {
@@ -59658,6 +67886,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -59682,6 +67911,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOrganizedCleanupEventsInput = {
@@ -59708,6 +67940,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -59732,6 +67965,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrganizedCleanupEventsInput = {
@@ -59917,6 +68153,121 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type EventLiveMetricCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reportedBagsCollected?: number
+  }
+
+  export type EventLiveMetricUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    reportedBagsCollected?: number
+  }
+
+  export type EventLiveMetricCreateOrConnectWithoutEventInput = {
+    where: EventLiveMetricWhereUniqueInput
+    create: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    uploadedBy: UserCreateNestedOneWithoutEventEvidencePhotosUploadedInput
+  }
+
+  export type EventEvidencePhotoUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    uploadedById: string
+  }
+
+  export type EventEvidencePhotoCreateOrConnectWithoutEventInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    create: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoCreateManyEventInputEnvelope = {
+    data: EventEvidencePhotoCreateManyEventInput | EventEvidencePhotoCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventRouteSegmentCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+    claimedBy?: UserCreateNestedOneWithoutRouteSegmentsClaimedInput
+  }
+
+  export type EventRouteSegmentUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedByUserId?: string | null
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type EventRouteSegmentCreateOrConnectWithoutEventInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    create: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventRouteSegmentCreateManyEventInputEnvelope = {
+    data: EventRouteSegmentCreateManyEventInput | EventRouteSegmentCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type CheckInRiskSignalCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    user: UserCreateNestedOneWithoutCheckInRiskSignalsInput
+  }
+
+  export type CheckInRiskSignalUncheckedCreateWithoutEventInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    userId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalCreateOrConnectWithoutEventInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    create: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput>
+  }
+
+  export type CheckInRiskSignalCreateManyEventInputEnvelope = {
+    data: CheckInRiskSignalCreateManyEventInput | CheckInRiskSignalCreateManyEventInput[]
+    skipDuplicates?: boolean
+  }
+
   export type CleanupEventCreateWithoutSeriesChildrenInput = {
     id?: string
     createdAt?: Date | string
@@ -59949,6 +68300,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
   }
 
@@ -59985,6 +68340,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
   }
 
   export type CleanupEventCreateOrConnectWithoutSeriesChildrenInput = {
@@ -60024,6 +68383,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
 
@@ -60059,6 +68422,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -60158,6 +68525,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -60182,6 +68550,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOrganizedCleanupEventsInput = {
@@ -60208,6 +68579,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -60232,6 +68604,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventParticipantUpsertWithWhereUniqueWithoutEventInput = {
@@ -60340,6 +68715,79 @@ export namespace Prisma {
     data: XOR<EventChatMuteUpdateManyMutationInput, EventChatMuteUncheckedUpdateManyWithoutEventInput>
   }
 
+  export type EventLiveMetricUpsertWithoutEventInput = {
+    update: XOR<EventLiveMetricUpdateWithoutEventInput, EventLiveMetricUncheckedUpdateWithoutEventInput>
+    create: XOR<EventLiveMetricCreateWithoutEventInput, EventLiveMetricUncheckedCreateWithoutEventInput>
+    where?: EventLiveMetricWhereInput
+  }
+
+  export type EventLiveMetricUpdateToOneWithWhereWithoutEventInput = {
+    where?: EventLiveMetricWhereInput
+    data: XOR<EventLiveMetricUpdateWithoutEventInput, EventLiveMetricUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventLiveMetricUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EventLiveMetricUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reportedBagsCollected?: IntFieldUpdateOperationsInput | number
+  }
+
+  export type EventEvidencePhotoUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    update: XOR<EventEvidencePhotoUpdateWithoutEventInput, EventEvidencePhotoUncheckedUpdateWithoutEventInput>
+    create: XOR<EventEvidencePhotoCreateWithoutEventInput, EventEvidencePhotoUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventEvidencePhotoWhereUniqueInput
+    data: XOR<EventEvidencePhotoUpdateWithoutEventInput, EventEvidencePhotoUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventEvidencePhotoUpdateManyWithWhereWithoutEventInput = {
+    where: EventEvidencePhotoScalarWhereInput
+    data: XOR<EventEvidencePhotoUpdateManyMutationInput, EventEvidencePhotoUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type EventRouteSegmentUpsertWithWhereUniqueWithoutEventInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    update: XOR<EventRouteSegmentUpdateWithoutEventInput, EventRouteSegmentUncheckedUpdateWithoutEventInput>
+    create: XOR<EventRouteSegmentCreateWithoutEventInput, EventRouteSegmentUncheckedCreateWithoutEventInput>
+  }
+
+  export type EventRouteSegmentUpdateWithWhereUniqueWithoutEventInput = {
+    where: EventRouteSegmentWhereUniqueInput
+    data: XOR<EventRouteSegmentUpdateWithoutEventInput, EventRouteSegmentUncheckedUpdateWithoutEventInput>
+  }
+
+  export type EventRouteSegmentUpdateManyWithWhereWithoutEventInput = {
+    where: EventRouteSegmentScalarWhereInput
+    data: XOR<EventRouteSegmentUpdateManyMutationInput, EventRouteSegmentUncheckedUpdateManyWithoutEventInput>
+  }
+
+  export type CheckInRiskSignalUpsertWithWhereUniqueWithoutEventInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    update: XOR<CheckInRiskSignalUpdateWithoutEventInput, CheckInRiskSignalUncheckedUpdateWithoutEventInput>
+    create: XOR<CheckInRiskSignalCreateWithoutEventInput, CheckInRiskSignalUncheckedCreateWithoutEventInput>
+  }
+
+  export type CheckInRiskSignalUpdateWithWhereUniqueWithoutEventInput = {
+    where: CheckInRiskSignalWhereUniqueInput
+    data: XOR<CheckInRiskSignalUpdateWithoutEventInput, CheckInRiskSignalUncheckedUpdateWithoutEventInput>
+  }
+
+  export type CheckInRiskSignalUpdateManyWithWhereWithoutEventInput = {
+    where: CheckInRiskSignalScalarWhereInput
+    data: XOR<CheckInRiskSignalUpdateManyMutationInput, CheckInRiskSignalUncheckedUpdateManyWithoutEventInput>
+  }
+
   export type CleanupEventUpsertWithoutSeriesChildrenInput = {
     update: XOR<CleanupEventUpdateWithoutSeriesChildrenInput, CleanupEventUncheckedUpdateWithoutSeriesChildrenInput>
     create: XOR<CleanupEventCreateWithoutSeriesChildrenInput, CleanupEventUncheckedCreateWithoutSeriesChildrenInput>
@@ -60383,6 +68831,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
   }
 
@@ -60419,6 +68871,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
   }
 
   export type CleanupEventUpsertWithWhereUniqueWithoutParentEventInput = {
@@ -60468,6 +68924,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -60504,6 +68964,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -60536,6 +69000,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -60560,6 +69025,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventParticipationsInput = {
@@ -60586,6 +69054,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -60610,6 +69079,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventParticipationsInput = {
@@ -60659,6 +69131,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -60695,6 +69171,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -60733,6 +69213,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -60757,6 +69238,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventParticipationsInput = {
@@ -60783,6 +69267,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -60807,6 +69292,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutChatMessagesInput = {
@@ -60840,6 +69328,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -60876,6 +69368,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -60908,6 +69404,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -60932,6 +69429,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMessagesInput = {
@@ -60958,6 +69458,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -60982,6 +69483,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMessagesInput = {
@@ -61116,6 +69620,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -61140,6 +69645,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatPinnedMessagesInput = {
@@ -61166,6 +69674,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -61190,6 +69699,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatPinnedMessagesInput = {
@@ -61275,6 +69787,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -61311,6 +69827,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -61349,6 +69869,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -61373,6 +69894,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMessagesInput = {
@@ -61399,6 +69923,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -61423,6 +69948,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventChatMessageUpsertWithoutRepliesInput = {
@@ -61531,6 +70059,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -61555,6 +70084,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatPinnedMessagesInput = {
@@ -61581,6 +70113,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -61605,6 +70138,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type EventChatAttachmentUpsertWithWhereUniqueWithoutMessageInput = {
@@ -61775,6 +70311,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -61811,6 +70351,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -61843,6 +70387,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -61867,6 +70412,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatMutesInput = {
@@ -61893,6 +70441,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -61917,6 +70466,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatMutesInput = {
@@ -61966,6 +70518,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -62002,6 +70558,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -62040,6 +70600,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -62064,6 +70625,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatMutesInput = {
@@ -62090,6 +70654,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -62114,6 +70679,9 @@ export namespace Prisma {
     eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutChatReadCursorsInput = {
@@ -62147,6 +70715,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -62183,6 +70755,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -62215,6 +70791,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -62239,6 +70816,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventChatReadCursorsInput = {
@@ -62265,6 +70845,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -62289,6 +70870,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventChatReadCursorsInput = {
@@ -62338,6 +70922,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -62374,6 +70962,10 @@ export namespace Prisma {
     checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -62412,6 +71004,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -62436,6 +71029,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventChatReadCursorsInput = {
@@ -62462,6 +71058,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -62486,6 +71083,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInsInput = {
@@ -62519,6 +71119,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -62555,6 +71159,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -62587,6 +71195,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -62611,6 +71220,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEventCheckInsInput = {
@@ -62637,6 +71249,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -62661,6 +71274,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEventCheckInsInput = {
@@ -62710,6 +71326,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -62746,6 +71366,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -62784,6 +71408,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -62808,6 +71433,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEventCheckInsInput = {
@@ -62834,6 +71462,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -62858,6 +71487,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInRedemptionsInput = {
@@ -62891,6 +71523,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
     parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
     seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
   }
@@ -62927,6 +71563,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
     chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
     chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
     seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
   }
 
@@ -62977,6 +71617,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -63013,7 +71657,1395 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventCreateWithoutLiveMetricInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutLiveMetricInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutLiveMetricInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutLiveMetricInput, CleanupEventUncheckedCreateWithoutLiveMetricInput>
+  }
+
+  export type CleanupEventUpsertWithoutLiveMetricInput = {
+    update: XOR<CleanupEventUpdateWithoutLiveMetricInput, CleanupEventUncheckedUpdateWithoutLiveMetricInput>
+    create: XOR<CleanupEventCreateWithoutLiveMetricInput, CleanupEventUncheckedCreateWithoutLiveMetricInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutLiveMetricInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutLiveMetricInput, CleanupEventUncheckedUpdateWithoutLiveMetricInput>
+  }
+
+  export type CleanupEventUpdateWithoutLiveMetricInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutLiveMetricInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventCreateWithoutEvidencePhotosInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutEvidencePhotosInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutEvidencePhotosInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutEvidencePhotosInput, CleanupEventUncheckedCreateWithoutEvidencePhotosInput>
+  }
+
+  export type UserCreateWithoutEventEvidencePhotosUploadedInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutEventEvidencePhotosUploadedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutEventEvidencePhotosUploadedInput, UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput>
+  }
+
+  export type CleanupEventUpsertWithoutEvidencePhotosInput = {
+    update: XOR<CleanupEventUpdateWithoutEvidencePhotosInput, CleanupEventUncheckedUpdateWithoutEvidencePhotosInput>
+    create: XOR<CleanupEventCreateWithoutEvidencePhotosInput, CleanupEventUncheckedCreateWithoutEvidencePhotosInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutEvidencePhotosInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutEvidencePhotosInput, CleanupEventUncheckedUpdateWithoutEvidencePhotosInput>
+  }
+
+  export type CleanupEventUpdateWithoutEvidencePhotosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutEvidencePhotosInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutEventEvidencePhotosUploadedInput = {
+    update: XOR<UserUpdateWithoutEventEvidencePhotosUploadedInput, UserUncheckedUpdateWithoutEventEvidencePhotosUploadedInput>
+    create: XOR<UserCreateWithoutEventEvidencePhotosUploadedInput, UserUncheckedCreateWithoutEventEvidencePhotosUploadedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutEventEvidencePhotosUploadedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutEventEvidencePhotosUploadedInput, UserUncheckedUpdateWithoutEventEvidencePhotosUploadedInput>
+  }
+
+  export type UserUpdateWithoutEventEvidencePhotosUploadedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutEventEvidencePhotosUploadedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CleanupEventCreateWithoutRouteSegmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutRouteSegmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutRouteSegmentsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutRouteSegmentsInput, CleanupEventUncheckedCreateWithoutRouteSegmentsInput>
+  }
+
+  export type UserCreateWithoutRouteSegmentsClaimedInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutRouteSegmentsClaimedInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutRouteSegmentsClaimedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutRouteSegmentsClaimedInput, UserUncheckedCreateWithoutRouteSegmentsClaimedInput>
+  }
+
+  export type CleanupEventUpsertWithoutRouteSegmentsInput = {
+    update: XOR<CleanupEventUpdateWithoutRouteSegmentsInput, CleanupEventUncheckedUpdateWithoutRouteSegmentsInput>
+    create: XOR<CleanupEventCreateWithoutRouteSegmentsInput, CleanupEventUncheckedCreateWithoutRouteSegmentsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutRouteSegmentsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutRouteSegmentsInput, CleanupEventUncheckedUpdateWithoutRouteSegmentsInput>
+  }
+
+  export type CleanupEventUpdateWithoutRouteSegmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutRouteSegmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutRouteSegmentsClaimedInput = {
+    update: XOR<UserUpdateWithoutRouteSegmentsClaimedInput, UserUncheckedUpdateWithoutRouteSegmentsClaimedInput>
+    create: XOR<UserCreateWithoutRouteSegmentsClaimedInput, UserUncheckedCreateWithoutRouteSegmentsClaimedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutRouteSegmentsClaimedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutRouteSegmentsClaimedInput, UserUncheckedUpdateWithoutRouteSegmentsClaimedInput>
+  }
+
+  export type UserUpdateWithoutRouteSegmentsClaimedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutRouteSegmentsClaimedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type CleanupEventCreateWithoutCheckInRiskSignalsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    recurrenceIndex?: number | null
+    site: SiteCreateNestedOneWithoutEventsInput
+    organizer?: UserCreateNestedOneWithoutOrganizedCleanupEventsInput
+    participants?: EventParticipantCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentCreateNestedManyWithoutEventInput
+    parentEvent?: CleanupEventCreateNestedOneWithoutSeriesChildrenInput
+    seriesChildren?: CleanupEventCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventUncheckedCreateWithoutCheckInRiskSignalsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    siteId: string
+    title: string
+    description: string
+    category?: $Enums.EcoEventCategory
+    scheduledAt: Date | string
+    endAt?: Date | string | null
+    endSoonNotifiedForEndAt?: Date | string | null
+    completedAt?: Date | string | null
+    status?: $Enums.CleanupEventStatus
+    lifecycleStatus?: $Enums.EcoEventLifecycleStatus
+    organizerId?: string | null
+    participantCount?: number
+    gear?: CleanupEventCreategearInput | string[]
+    scale?: $Enums.EcoCleanupScale | null
+    difficulty?: $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventCreateafterImageKeysInput | string[]
+    maxParticipants?: number | null
+    checkInSessionId?: string | null
+    checkInOpen?: boolean
+    checkedInCount?: number
+    recurrenceRule?: string | null
+    parentEventId?: string | null
+    recurrenceIndex?: number | null
+    participants?: EventParticipantUncheckedCreateNestedManyWithoutEventInput
+    checkIns?: EventCheckInUncheckedCreateNestedManyWithoutEventInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedCreateNestedManyWithoutEventInput
+    chatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutEventInput
+    chatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutEventInput
+    chatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutEventInput
+    liveMetric?: EventLiveMetricUncheckedCreateNestedOneWithoutEventInput
+    evidencePhotos?: EventEvidencePhotoUncheckedCreateNestedManyWithoutEventInput
+    routeSegments?: EventRouteSegmentUncheckedCreateNestedManyWithoutEventInput
+    seriesChildren?: CleanupEventUncheckedCreateNestedManyWithoutParentEventInput
+  }
+
+  export type CleanupEventCreateOrConnectWithoutCheckInRiskSignalsInput = {
+    where: CleanupEventWhereUniqueInput
+    create: XOR<CleanupEventCreateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedCreateWithoutCheckInRiskSignalsInput>
+  }
+
+  export type UserCreateWithoutCheckInRiskSignalsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+  }
+
+  export type UserUncheckedCreateWithoutCheckInRiskSignalsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+  }
+
+  export type UserCreateOrConnectWithoutCheckInRiskSignalsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCheckInRiskSignalsInput, UserUncheckedCreateWithoutCheckInRiskSignalsInput>
+  }
+
+  export type CleanupEventUpsertWithoutCheckInRiskSignalsInput = {
+    update: XOR<CleanupEventUpdateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedUpdateWithoutCheckInRiskSignalsInput>
+    create: XOR<CleanupEventCreateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedCreateWithoutCheckInRiskSignalsInput>
+    where?: CleanupEventWhereInput
+  }
+
+  export type CleanupEventUpdateToOneWithWhereWithoutCheckInRiskSignalsInput = {
+    where?: CleanupEventWhereInput
+    data: XOR<CleanupEventUpdateWithoutCheckInRiskSignalsInput, CleanupEventUncheckedUpdateWithoutCheckInRiskSignalsInput>
+  }
+
+  export type CleanupEventUpdateWithoutCheckInRiskSignalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    site?: SiteUpdateOneRequiredWithoutEventsNestedInput
+    organizer?: UserUpdateOneWithoutOrganizedCleanupEventsNestedInput
+    participants?: EventParticipantUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
+    seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type CleanupEventUncheckedUpdateWithoutCheckInRiskSignalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    title?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    category?: EnumEcoEventCategoryFieldUpdateOperationsInput | $Enums.EcoEventCategory
+    scheduledAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endSoonNotifiedForEndAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    status?: EnumCleanupEventStatusFieldUpdateOperationsInput | $Enums.CleanupEventStatus
+    lifecycleStatus?: EnumEcoEventLifecycleStatusFieldUpdateOperationsInput | $Enums.EcoEventLifecycleStatus
+    organizerId?: NullableStringFieldUpdateOperationsInput | string | null
+    participantCount?: IntFieldUpdateOperationsInput | number
+    gear?: CleanupEventUpdategearInput | string[]
+    scale?: NullableEnumEcoCleanupScaleFieldUpdateOperationsInput | $Enums.EcoCleanupScale | null
+    difficulty?: NullableEnumEcoEventDifficultyFieldUpdateOperationsInput | $Enums.EcoEventDifficulty | null
+    afterImageKeys?: CleanupEventUpdateafterImageKeysInput | string[]
+    maxParticipants?: NullableIntFieldUpdateOperationsInput | number | null
+    checkInSessionId?: NullableStringFieldUpdateOperationsInput | string | null
+    checkInOpen?: BoolFieldUpdateOperationsInput | boolean
+    checkedInCount?: IntFieldUpdateOperationsInput | number
+    recurrenceRule?: NullableStringFieldUpdateOperationsInput | string | null
+    parentEventId?: NullableStringFieldUpdateOperationsInput | string | null
+    recurrenceIndex?: NullableIntFieldUpdateOperationsInput | number | null
+    participants?: EventParticipantUncheckedUpdateManyWithoutEventNestedInput
+    checkIns?: EventCheckInUncheckedUpdateManyWithoutEventNestedInput
+    checkInRedemptions?: EventCheckInRedemptionUncheckedUpdateManyWithoutEventNestedInput
+    chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
+    chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
+    chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
+  }
+
+  export type UserUpsertWithoutCheckInRiskSignalsInput = {
+    update: XOR<UserUpdateWithoutCheckInRiskSignalsInput, UserUncheckedUpdateWithoutCheckInRiskSignalsInput>
+    create: XOR<UserCreateWithoutCheckInRiskSignalsInput, UserUncheckedCreateWithoutCheckInRiskSignalsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCheckInRiskSignalsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCheckInRiskSignalsInput, UserUncheckedUpdateWithoutCheckInRiskSignalsInput>
+  }
+
+  export type UserUpdateWithoutCheckInRiskSignalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCheckInRiskSignalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
   }
 
   export type SiteCreateWithoutVotesInput = {
@@ -63085,6 +73117,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -63109,6 +73142,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteVotesInput = {
@@ -63135,6 +73171,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -63159,6 +73196,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteVotesInput = {
@@ -63252,6 +73292,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -63276,6 +73317,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteVotesInput = {
@@ -63302,6 +73346,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -63326,6 +73371,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutSavesInput = {
@@ -63397,6 +73445,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -63421,6 +73470,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteSavesInput = {
@@ -63447,6 +73499,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -63471,6 +73524,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteSavesInput = {
@@ -63564,6 +73620,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -63588,6 +73645,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteSavesInput = {
@@ -63614,6 +73674,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -63638,6 +73699,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutCommentsInput = {
@@ -63709,6 +73773,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -63733,6 +73798,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentsInput = {
@@ -63759,6 +73827,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -63783,6 +73852,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentsInput = {
@@ -63965,6 +74037,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -63989,6 +74062,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentsInput = {
@@ -64015,6 +74091,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -64039,6 +74116,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCommentUpsertWithoutRepliesInput = {
@@ -64165,6 +74245,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -64189,6 +74270,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteCommentLikesInput = {
@@ -64215,6 +74299,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -64239,6 +74324,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteCommentLikesInput = {
@@ -64318,6 +74406,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -64342,6 +74431,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteCommentLikesInput = {
@@ -64368,6 +74460,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -64392,6 +74485,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SiteCreateWithoutShareEventsInput = {
@@ -64463,6 +74559,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -64487,6 +74584,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSiteShareEventsInput = {
@@ -64513,6 +74613,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -64537,6 +74638,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSiteShareEventsInput = {
@@ -64630,6 +74734,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -64654,6 +74759,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSiteShareEventsInput = {
@@ -64680,6 +74788,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -64704,6 +74813,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutDeviceTokensInput = {
@@ -64730,6 +74842,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -64754,6 +74867,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDeviceTokensInput = {
@@ -64780,6 +74896,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -64804,6 +74921,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDeviceTokensInput = {
@@ -64846,6 +74966,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -64870,6 +74991,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDeviceTokensInput = {
@@ -64896,6 +75020,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -64920,6 +75045,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutUserNotificationsInput = {
@@ -64946,6 +75074,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -64970,6 +75099,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutUserNotificationsInput = {
@@ -64996,6 +75128,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65020,6 +75153,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutUserNotificationsInput = {
@@ -65062,6 +75198,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -65086,6 +75223,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutUserNotificationsInput = {
@@ -65112,6 +75252,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65136,6 +75277,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutNotificationPreferencesInput = {
@@ -65162,6 +75306,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
@@ -65186,6 +75331,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationPreferencesInput = {
@@ -65212,6 +75360,7 @@ export namespace Prisma {
     avatarUpdatedAt?: Date | string | null
     totpSecret?: string | null
     mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
     reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
     moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
     adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65236,6 +75385,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
     eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationPreferencesInput = {
@@ -65278,6 +75430,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
@@ -65302,6 +75455,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationPreferencesInput = {
@@ -65328,6 +75484,7 @@ export namespace Prisma {
     avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
     moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
     adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65352,6 +75509,9 @@ export namespace Prisma {
     eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
     eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
     reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ReportCreateManyReporterInput = {
@@ -65632,6 +75792,39 @@ export namespace Prisma {
     createdAt?: Date | string
     key: string
     reportId: string
+  }
+
+  export type EventEvidencePhotoCreateManyUploadedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+  }
+
+  export type EventRouteSegmentCreateManyClaimedByInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type CheckInRiskSignalCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    eventId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
   export type ReportUpdateWithoutReporterInput = {
@@ -66203,6 +76396,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -66239,6 +76436,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -66512,6 +76713,105 @@ export namespace Prisma {
     reportId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type EventEvidencePhotoUpdateWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutEvidencePhotosNestedInput
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventRouteSegmentUpdateWithoutClaimedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutRouteSegmentsNestedInput
+  }
+
+  export type EventRouteSegmentUncheckedUpdateWithoutClaimedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventRouteSegmentUncheckedUpdateManyWithoutClaimedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type CheckInRiskSignalUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    event?: CleanupEventUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
   export type ReportCreateManySiteInput = {
     id?: string
     createdAt?: Date | string
@@ -66685,6 +76985,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     parentEvent?: CleanupEventUpdateOneWithoutSeriesChildrenNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
@@ -66721,6 +77025,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 
@@ -67047,6 +77355,39 @@ export namespace Prisma {
     userId: string
   }
 
+  export type EventEvidencePhotoCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.EventEvidenceKind
+    objectKey: string
+    caption?: string | null
+    uploadedById: string
+  }
+
+  export type EventRouteSegmentCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    sortOrder: number
+    label?: string | null
+    latitude: number
+    longitude: number
+    status?: $Enums.RouteSegmentStatus
+    claimedByUserId?: string | null
+    claimedAt?: Date | string | null
+    completedAt?: Date | string | null
+  }
+
+  export type CheckInRiskSignalCreateManyEventInput = {
+    id?: string
+    createdAt?: Date | string
+    expiresAt: Date | string
+    userId: string
+    signalType: $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
   export type CleanupEventCreateManyParentEventInput = {
     id?: string
     createdAt?: Date | string
@@ -67250,6 +77591,105 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type EventEvidencePhotoUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedBy?: UserUpdateOneRequiredWithoutEventEvidencePhotosUploadedNestedInput
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventEvidencePhotoUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumEventEvidenceKindFieldUpdateOperationsInput | $Enums.EventEvidenceKind
+    objectKey?: StringFieldUpdateOperationsInput | string
+    caption?: NullableStringFieldUpdateOperationsInput | string | null
+    uploadedById?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventRouteSegmentUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    claimedBy?: UserUpdateOneWithoutRouteSegmentsClaimedNestedInput
+  }
+
+  export type EventRouteSegmentUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type EventRouteSegmentUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    label?: NullableStringFieldUpdateOperationsInput | string | null
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    status?: EnumRouteSegmentStatusFieldUpdateOperationsInput | $Enums.RouteSegmentStatus
+    claimedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    claimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type CheckInRiskSignalUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+    user?: UserUpdateOneRequiredWithoutCheckInRiskSignalsNestedInput
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
+  export type CheckInRiskSignalUncheckedUpdateManyWithoutEventInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    signalType?: EnumCheckInRiskSignalTypeFieldUpdateOperationsInput | $Enums.CheckInRiskSignalType
+    metadata?: NullableJsonNullValueInput | InputJsonValue
+  }
+
   export type CleanupEventUpdateWithoutParentEventInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -67282,6 +77722,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUpdateManyWithoutParentEventNestedInput
   }
 
@@ -67317,6 +77761,10 @@ export namespace Prisma {
     chatMessages?: EventChatMessageUncheckedUpdateManyWithoutEventNestedInput
     chatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutEventNestedInput
     chatMutes?: EventChatMuteUncheckedUpdateManyWithoutEventNestedInput
+    liveMetric?: EventLiveMetricUncheckedUpdateOneWithoutEventNestedInput
+    evidencePhotos?: EventEvidencePhotoUncheckedUpdateManyWithoutEventNestedInput
+    routeSegments?: EventRouteSegmentUncheckedUpdateManyWithoutEventNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutEventNestedInput
     seriesChildren?: CleanupEventUncheckedUpdateManyWithoutParentEventNestedInput
   }
 

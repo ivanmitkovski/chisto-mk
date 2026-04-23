@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/features/events/domain/models/event_pulse_route_evidence.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:flutter/foundation.dart';
 
@@ -98,8 +99,16 @@ enum CleanupScale {
 
 enum EventDifficulty {
   easy('Easy', 'Flat terrain, light waste, family-friendly.', 0xFF2FD788),
-  moderate('Moderate', 'Mixed terrain or bulky items, some effort.', 0xFFF5A623),
-  hard('Hard', 'Steep slopes, heavy debris, or hazardous materials.', 0xFFE6513D);
+  moderate(
+    'Moderate',
+    'Mixed terrain or bulky items, some effort.',
+    0xFFF5A623,
+  ),
+  hard(
+    'Hard',
+    'Steep slopes, heavy debris, or hazardous materials.',
+    0xFFE6513D,
+  );
 
   const EventDifficulty(this.label, this.description, this.colorValue);
   final String label;
@@ -121,10 +130,27 @@ enum EcoEventStatus {
   String get apiKey => name;
 }
 
-enum AttendeeCheckInStatus {
-  notCheckedIn,
-  checkedIn,
+/// Server moderation lifecycle: pending → approved or declined.
+/// Declined events can be edited and resubmitted by the organizer.
+enum ModerationStatus {
+  pending,
+  approved,
+  declined;
+
+  static ModerationStatus fromBoolAndString({
+    required bool moderationApproved,
+    String? moderationStatusRaw,
+  }) {
+    if (moderationStatusRaw != null) {
+      for (final ModerationStatus v in ModerationStatus.values) {
+        if (v.name == moderationStatusRaw) return v;
+      }
+    }
+    return moderationApproved ? ModerationStatus.approved : ModerationStatus.pending;
+  }
 }
+
+enum AttendeeCheckInStatus { notCheckedIn, checkedIn }
 
 class EcoEvent {
   const EcoEvent({
@@ -140,6 +166,8 @@ class EcoEvent {
     required this.organizerName,
     this.organizerAvatarUrl,
     required this.date,
+    /// Local calendar date of [endTime]. When null, end is on [date] (legacy same-day).
+    this.endDate,
     required this.startTime,
     required this.endTime,
     required this.participantCount,
@@ -158,7 +186,10 @@ class EcoEvent {
     this.gear = const <EventGear>[],
     this.scale,
     this.difficulty,
-    this.moderationApproved = true,
+
+    /// Default false: only explicit server `moderationApproved: true` means published.
+    this.moderationApproved = false,
+    this.moderationStatus = ModerationStatus.pending,
     this.siteLat,
     this.siteLng,
     this.recurrenceRule,
@@ -169,6 +200,10 @@ class EcoEvent {
     this.recurrenceSeriesPosition,
     this.recurrencePrevEventId,
     this.recurrenceNextEventId,
+    this.routeSegments = const <EventRouteSegmentModel>[],
+    this.evidenceStrip = const <EventEvidenceStripItem>[],
+    this.liveReportedBagsCollected = 0,
+    this.liveMetricUpdatedAt,
   });
 
   final String id;
@@ -179,8 +214,10 @@ class EcoEvent {
   final String siteName;
   final String siteImageUrl;
   final double siteDistanceKm;
+
   /// Geographic latitude of the cleanup site (from API). Null when not exposed.
   final double? siteLat;
+
   /// Geographic longitude of the cleanup site (from API). Null when not exposed.
   final double? siteLng;
 
@@ -213,6 +250,7 @@ class EcoEvent {
   final String organizerName;
   final String? organizerAvatarUrl;
   final DateTime date;
+  final DateTime? endDate;
   final EventTime startTime;
   final EventTime endTime;
   final int participantCount;
@@ -232,8 +270,23 @@ class EcoEvent {
   final CleanupScale? scale;
   final EventDifficulty? difficulty;
 
-  /// Server moderation: citizen-created events are false until [CleanupEvent] is APPROVED.
+  /// Server moderation: true only when [CleanupEvent] is APPROVED. Constructor defaults to false;
+  /// [EcoEvent.fromJson] sets true only when JSON contains `moderationApproved: true`.
   final bool moderationApproved;
+
+  /// Rich 3-state moderation lifecycle from API `moderationStatus` field.
+  /// Falls back to [moderationApproved] boolean when the API field is absent.
+  final ModerationStatus moderationStatus;
+
+  bool get isDeclined => moderationStatus == ModerationStatus.declined;
+
+  final List<EventRouteSegmentModel> routeSegments;
+  final List<EventEvidenceStripItem> evidenceStrip;
+  final int liveReportedBagsCollected;
+  final DateTime? liveMetricUpdatedAt;
+
+  /// After the scheduled start instant, volunteers may still join for this duration.
+  static const Duration volunteerJoinGraceAfterStart = Duration(minutes: 15);
 
   bool get isOrganizer => organizerId == CurrentUser.id;
   bool get isJoinable =>
@@ -242,15 +295,62 @@ class EcoEvent {
       status != EcoEventStatus.completed &&
       status != EcoEventStatus.cancelled;
 
-  /// New joins allowed (server: not before [scheduledAtUtc] / [startDateTime]).
-  bool get canVolunteerJoinNow => isJoinable && !isBeforeScheduledStart;
+  bool get _isBeforeVolunteerJoinDeadline {
+    final DateTime? utc = scheduledAtUtc;
+    if (utc != null) {
+      return DateTime.now().toUtc().isBefore(
+        utc.add(volunteerJoinGraceAfterStart),
+      );
+    }
+    return DateTime.now().isBefore(
+      startDateTime.add(volunteerJoinGraceAfterStart),
+    );
+  }
+
+  /// New joins allowed until scheduled start + [volunteerJoinGraceAfterStart].
+  bool get canVolunteerJoinNow => isJoinable && _isBeforeVolunteerJoinDeadline;
+
+  /// Rebuild join CTA periodically near the join cutoff or when the start is soon.
+  bool get shouldTickVolunteerJoinNearDeadline {
+    if (!isJoinable || isJoined || isOrganizer) {
+      return false;
+    }
+    if (!_isBeforeVolunteerJoinDeadline) {
+      return false;
+    }
+    const Duration horizon = Duration(hours: 3);
+    final DateTime? utc = scheduledAtUtc;
+    if (utc != null) {
+      final DateTime now = DateTime.now().toUtc();
+      final DateTime deadline = utc.add(volunteerJoinGraceAfterStart);
+      final Duration untilClose = deadline.difference(now);
+      if (untilClose <= horizon) {
+        return true;
+      }
+      final Duration untilStart = utc.difference(now);
+      return !untilStart.isNegative && untilStart <= horizon;
+    }
+    final DateTime now = DateTime.now();
+    final DateTime deadline = startDateTime.add(volunteerJoinGraceAfterStart);
+    final Duration untilClose = deadline.difference(now);
+    if (untilClose <= horizon) {
+      return true;
+    }
+    final Duration untilStart = startDateTime.difference(now);
+    return !untilStart.isNegative && untilStart <= horizon;
+  }
 
   bool get isLifecycleClosed =>
       status == EcoEventStatus.completed || status == EcoEventStatus.cancelled;
-  bool get isCheckedIn => attendeeCheckInStatus == AttendeeCheckInStatus.checkedIn;
+  bool get isCheckedIn =>
+      attendeeCheckInStatus == AttendeeCheckInStatus.checkedIn;
   bool get hasAfterImages => afterImagePaths.isNotEmpty;
   bool get canOpenAttendeeCheckIn =>
-      isJoined && !isOrganizer && status == EcoEventStatus.inProgress && isCheckInOpen;
+      moderationApproved &&
+      isJoined &&
+      !isOrganizer &&
+      status == EcoEventStatus.inProgress &&
+      isCheckInOpen;
 
   /// True while the scheduled start instant is still in the future (organizer must wait).
   bool get isBeforeScheduledStart {
@@ -267,9 +367,11 @@ class EcoEvent {
     }
     switch (status) {
       case EcoEventStatus.upcoming:
-        return next == EcoEventStatus.inProgress || next == EcoEventStatus.cancelled;
+        return next == EcoEventStatus.inProgress ||
+            next == EcoEventStatus.cancelled;
       case EcoEventStatus.inProgress:
-        return next == EcoEventStatus.completed || next == EcoEventStatus.cancelled;
+        return next == EcoEventStatus.completed ||
+            next == EcoEventStatus.cancelled;
       case EcoEventStatus.completed:
       case EcoEventStatus.cancelled:
         return false;
@@ -279,17 +381,43 @@ class EcoEvent {
   static bool isValidRange(EventTime start, EventTime end) =>
       end.totalMinutes > start.totalMinutes;
 
-  String get formattedTimeRange => '${startTime.formatted} - ${endTime.formatted}';
+  DateTime get _endCalendarDay =>
+      endDate ?? DateTime(date.year, date.month, date.day);
+
+  bool get spansMultipleCalendarDays {
+    final DateTime startDay = DateTime(date.year, date.month, date.day);
+    final DateTime endDay = DateTime(
+      _endCalendarDay.year,
+      _endCalendarDay.month,
+      _endCalendarDay.day,
+    );
+    return endDay.isAfter(startDay);
+  }
+
+  String get formattedTimeRange {
+    if (spansMultipleCalendarDays) {
+      final DateTime ed = _endCalendarDay;
+      return '${startTime.formatted} – ${endTime.formatted} '
+          '(${ed.day.toString().padLeft(2, '0')}.${ed.month.toString().padLeft(2, '0')})';
+    }
+    return '${startTime.formatted} - ${endTime.formatted}';
+  }
 
   DateTime get startDateTime => DateTime(
-        date.year, date.month, date.day,
-        startTime.hour, startTime.minute,
-      );
+    date.year,
+    date.month,
+    date.day,
+    startTime.hour,
+    startTime.minute,
+  );
 
   DateTime get endDateTime => DateTime(
-        date.year, date.month, date.day,
-        endTime.hour, endTime.minute,
-      );
+    _endCalendarDay.year,
+    _endCalendarDay.month,
+    _endCalendarDay.day,
+    endTime.hour,
+    endTime.minute,
+  );
 
   EcoEvent copyWith({
     String? title,
@@ -302,6 +430,8 @@ class EcoEvent {
     String? organizerAvatarUrl,
     bool clearOrganizerAvatarUrl = false,
     DateTime? date,
+    DateTime? endDate,
+    bool clearEndDate = false,
     EventTime? startTime,
     EventTime? endTime,
     int? participantCount,
@@ -326,6 +456,7 @@ class EcoEvent {
     EventDifficulty? difficulty,
     bool clearDifficulty = false,
     bool? moderationApproved,
+    ModerationStatus? moderationStatus,
     DateTime? scheduledAtUtc,
     int? recurrenceSeriesTotal,
     int? recurrenceSeriesPosition,
@@ -348,6 +479,7 @@ class EcoEvent {
           ? null
           : organizerAvatarUrl ?? this.organizerAvatarUrl,
       date: date ?? this.date,
+      endDate: clearEndDate ? null : endDate ?? this.endDate,
       startTime: startTime ?? this.startTime,
       endTime: endTime ?? this.endTime,
       participantCount: participantCount ?? this.participantCount,
@@ -374,13 +506,15 @@ class EcoEvent {
       scale: clearScale ? null : scale ?? this.scale,
       difficulty: clearDifficulty ? null : difficulty ?? this.difficulty,
       moderationApproved: moderationApproved ?? this.moderationApproved,
+      moderationStatus: moderationStatus ?? this.moderationStatus,
       siteLat: siteLat,
       siteLng: siteLng,
       recurrenceRule: recurrenceRule,
       parentEventId: parentEventId,
       recurrenceIndex: recurrenceIndex,
       scheduledAtUtc: scheduledAtUtc ?? this.scheduledAtUtc,
-      recurrenceSeriesTotal: recurrenceSeriesTotal ?? this.recurrenceSeriesTotal,
+      recurrenceSeriesTotal:
+          recurrenceSeriesTotal ?? this.recurrenceSeriesTotal,
       recurrenceSeriesPosition:
           recurrenceSeriesPosition ?? this.recurrenceSeriesPosition,
       recurrencePrevEventId: clearRecurrenceNav
@@ -389,6 +523,10 @@ class EcoEvent {
       recurrenceNextEventId: clearRecurrenceNav
           ? null
           : recurrenceNextEventId ?? this.recurrenceNextEventId,
+      routeSegments: routeSegments,
+      evidenceStrip: evidenceStrip,
+      liveReportedBagsCollected: liveReportedBagsCollected,
+      liveMetricUpdatedAt: liveMetricUpdatedAt,
     );
   }
 
@@ -409,35 +547,49 @@ class EcoEvent {
           attendeeCheckInStatus == other.attendeeCheckInStatus &&
           reminderEnabled == other.reminderEnabled &&
           date == other.date &&
+          endDate == other.endDate &&
           startTime == other.startTime &&
           endTime == other.endTime &&
           scheduledAtUtc == other.scheduledAtUtc &&
           listEquals(afterImagePaths, other.afterImagePaths) &&
           listEquals(gear, other.gear) &&
-          moderationApproved == other.moderationApproved;
+          moderationApproved == other.moderationApproved &&
+          moderationStatus == other.moderationStatus &&
+          liveReportedBagsCollected == other.liveReportedBagsCollected &&
+          liveMetricUpdatedAt == other.liveMetricUpdatedAt &&
+          listEquals(routeSegments, other.routeSegments) &&
+          listEquals(evidenceStrip, other.evidenceStrip);
 
   @override
   int get hashCode => Object.hash(
-        id,
-        title,
-        description,
-        category,
-        siteId,
-        status,
-        isJoined,
-        participantCount,
-        checkedInCount,
-        isCheckInOpen,
-        attendeeCheckInStatus,
-        reminderEnabled,
-        date,
-        startTime,
-        endTime,
-        scheduledAtUtc,
-        Object.hashAll(afterImagePaths),
-        Object.hashAll(gear),
-        moderationApproved,
-      );
+    id,
+    title,
+    description,
+    category,
+    siteId,
+    status,
+    isJoined,
+    participantCount,
+    checkedInCount,
+    isCheckInOpen,
+    attendeeCheckInStatus,
+    reminderEnabled,
+    date,
+    endDate,
+    startTime,
+    endTime,
+    scheduledAtUtc,
+    Object.hash(
+      Object.hashAll(afterImagePaths),
+      Object.hashAll(gear),
+      moderationApproved,
+      moderationStatus,
+      liveReportedBagsCollected,
+      liveMetricUpdatedAt,
+      Object.hashAll(routeSegments),
+      Object.hashAll(evidenceStrip),
+    ),
+  );
 
   factory EcoEvent.fromJson(Map<String, dynamic> json) {
     T enumByNameOr<T extends Enum>(List<T> values, String? name, T fallback) {
@@ -446,8 +598,10 @@ class EcoEvent {
         if (value.name == name) return value;
       }
       assert(() {
-        debugPrint('[EcoEvent] Unknown enum value "$name" for '
-            '${fallback.runtimeType}, falling back to ${fallback.name}');
+        debugPrint(
+          '[EcoEvent] Unknown enum value "$name" for '
+          '${fallback.runtimeType}, falling back to ${fallback.name}',
+        );
         return true;
       }());
       return fallback;
@@ -473,6 +627,28 @@ class EcoEvent {
     }
 
     final DateTime now = DateTime.now();
+    final DateTime eventDate = parseDate(json['date'], now);
+    DateTime dayOnlyD(DateTime d) => DateTime(d.year, d.month, d.day);
+    final DateTime startDay = dayOnlyD(eventDate);
+    DateTime? computedEndDate;
+    if (json['endDate'] is String) {
+      final DateTime parsed = parseDate(json['endDate'], now);
+      final DateTime ed = dayOnlyD(parsed);
+      if (ed.isAfter(startDay)) {
+        computedEndDate = ed;
+      }
+    } else {
+      final String? endAtStr = json['endAt'] as String?;
+      if (endAtStr != null) {
+        final DateTime? endAtLocal = DateTime.tryParse(endAtStr)?.toLocal();
+        if (endAtLocal != null) {
+          final DateTime endDay = dayOnlyD(endAtLocal);
+          if (endDay.isAfter(startDay)) {
+            computedEndDate = endDay;
+          }
+        }
+      }
+    }
     return EcoEvent(
       id: (json['id'] as String?) ?? 'evt-${now.millisecondsSinceEpoch}',
       title: (json['title'] as String?) ?? 'Untitled event',
@@ -489,9 +665,16 @@ class EcoEvent {
       organizerId: (json['organizerId'] as String?) ?? '',
       organizerName: (json['organizerName'] as String?) ?? '',
       organizerAvatarUrl: json['organizerAvatarUrl'] as String?,
-      date: parseDate(json['date'], now),
-      startTime: decodeTime(json['startTime'], const EventTime(hour: 10, minute: 0)),
-      endTime: decodeTime(json['endTime'], const EventTime(hour: 12, minute: 0)),
+      date: eventDate,
+      endDate: computedEndDate,
+      startTime: decodeTime(
+        json['startTime'],
+        const EventTime(hour: 10, minute: 0),
+      ),
+      endTime: decodeTime(
+        json['endTime'],
+        const EventTime(hour: 12, minute: 0),
+      ),
       participantCount: (json['participantCount'] as num?)?.toInt() ?? 0,
       maxParticipants: (json['maxParticipants'] as num?)?.toInt(),
       status: enumByNameOr<EcoEventStatus>(
@@ -516,16 +699,19 @@ class EcoEvent {
       reminderAt: json['reminderAt'] == null
           ? null
           : parseDate(json['reminderAt'], now).toLocal(),
-      afterImagePaths: (json['afterImagePaths'] as List<dynamic>? ?? const <dynamic>[])
-          .whereType<String>()
-          .toList(growable: false),
+      afterImagePaths:
+          (json['afterImagePaths'] as List<dynamic>? ?? const <dynamic>[])
+              .whereType<String>()
+              .toList(growable: false),
       gear: (json['gear'] as List<dynamic>? ?? const <dynamic>[])
           .whereType<String>()
-          .map((String raw) => enumByNameOr<EventGear>(
-                EventGear.values,
-                raw,
-                EventGear.trashBags,
-              ))
+          .map(
+            (String raw) => enumByNameOr<EventGear>(
+              EventGear.values,
+              raw,
+              EventGear.trashBags,
+            ),
+          )
           .toSet()
           .toList(growable: false),
       scale: json['scale'] == null
@@ -542,24 +728,42 @@ class EcoEvent {
               json['difficulty'] as String?,
               EventDifficulty.easy,
             ),
-      moderationApproved: (json['moderationApproved'] as bool?) ?? true,
+      // Fail closed: absent or non-bool must not be treated as approved (stale cache / older payloads).
+      moderationApproved: json['moderationApproved'] == true,
+      moderationStatus: ModerationStatus.fromBoolAndString(
+        moderationApproved: json['moderationApproved'] == true,
+        moderationStatusRaw: json['moderationStatus'] as String?,
+      ),
       siteLat: (json['siteLat'] as num?)?.toDouble(),
       siteLng: (json['siteLng'] as num?)?.toDouble(),
       recurrenceRule: json['recurrenceRule'] as String?,
       parentEventId: json['parentEventId'] as String?,
       recurrenceIndex: (json['recurrenceIndex'] as num?)?.toInt(),
       recurrenceSeriesTotal: (json['recurrenceSeriesTotal'] as num?)?.toInt(),
-      recurrenceSeriesPosition:
-          (json['recurrenceSeriesPosition'] as num?)?.toInt(),
+      recurrenceSeriesPosition: (json['recurrenceSeriesPosition'] as num?)
+          ?.toInt(),
       recurrencePrevEventId: json['recurrencePrevEventId'] as String?,
       recurrenceNextEventId: json['recurrenceNextEventId'] as String?,
       scheduledAtUtc: () {
-        final String? iso = json['scheduledAtUtc'] as String? ??
-            json['scheduledAt'] as String?;
+        final String? iso =
+            json['scheduledAtUtc'] as String? ?? json['scheduledAt'] as String?;
         if (iso == null) return null;
         final DateTime? parsed = DateTime.tryParse(iso);
         return parsed?.toUtc();
       }(),
+      routeSegments: (json['routeSegments'] as List<dynamic>? ?? const <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map(EventRouteSegmentModel.fromJson)
+          .toList(growable: false),
+      evidenceStrip: (json['evidenceStrip'] as List<dynamic>? ?? const <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .map(EventEvidenceStripItem.fromJson)
+          .toList(growable: false),
+      liveReportedBagsCollected:
+          (json['liveReportedBagsCollected'] as num?)?.toInt() ?? 0,
+      liveMetricUpdatedAt: json['liveMetricUpdatedAt'] == null
+          ? null
+          : DateTime.tryParse(json['liveMetricUpdatedAt'] as String),
     );
   }
 
@@ -592,14 +796,12 @@ class EcoEvent {
       'organizerName': organizerName,
       if (organizerAvatarUrl != null) 'organizerAvatarUrl': organizerAvatarUrl,
       'date': date.toIso8601String(),
+      if (endDate != null) 'endDate': endDate!.toIso8601String(),
       'startTime': <String, int>{
         'hour': startTime.hour,
         'minute': startTime.minute,
       },
-      'endTime': <String, int>{
-        'hour': endTime.hour,
-        'minute': endTime.minute,
-      },
+      'endTime': <String, int>{'hour': endTime.hour, 'minute': endTime.minute},
       'participantCount': participantCount,
       'maxParticipants': maxParticipants,
       'status': status.name,
@@ -617,6 +819,36 @@ class EcoEvent {
       'scale': scale?.name,
       'difficulty': difficulty?.name,
       'moderationApproved': moderationApproved,
+      'moderationStatus': moderationStatus.name,
+      'routeSegments': routeSegments
+          .map(
+            (EventRouteSegmentModel s) => <String, dynamic>{
+              'id': s.id,
+              'sortOrder': s.sortOrder,
+              'label': s.label,
+              'latitude': s.latitude,
+              'longitude': s.longitude,
+              'status': s.status,
+              'claimedByUserId': s.claimedByUserId,
+              'claimedAt': s.claimedAt?.toIso8601String(),
+              'completedAt': s.completedAt?.toIso8601String(),
+            },
+          )
+          .toList(growable: false),
+      'evidenceStrip': evidenceStrip
+          .map(
+            (EventEvidenceStripItem e) => <String, dynamic>{
+              'id': e.id,
+              'kind': e.kind,
+              'imageUrl': e.imageUrl,
+              'caption': e.caption,
+              'createdAt': e.createdAt.toIso8601String(),
+            },
+          )
+          .toList(growable: false),
+      'liveReportedBagsCollected': liveReportedBagsCollected,
+      if (liveMetricUpdatedAt != null)
+        'liveMetricUpdatedAt': liveMetricUpdatedAt!.toIso8601String(),
     };
   }
 }

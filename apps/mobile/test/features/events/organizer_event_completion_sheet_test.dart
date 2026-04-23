@@ -43,6 +43,7 @@ void main() {
 
     expect(find.text('Event ended'), findsOneWidget);
     expect(find.text('Back to event'), findsOneWidget);
+    expect(find.text('View impact receipt'), findsOneWidget);
     expect(find.text('Add cleanup photos now'), findsOneWidget);
     expect(find.text('Thanks for organizing!'), findsOneWidget);
 

@@ -3,8 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('EventFeedbackSnapshot', () {
-    final DateTime createdAt = DateTime(2025, 6, 15, 14, 30);
-
     EventFeedbackSnapshot buildSnapshot({
       String eventId = 'evt-1',
       int rating = 5,

@@ -18,6 +18,8 @@ Future<T?> showEventsSurfaceModal<T>({
     barrierColor: AppColors.overlay,
     isDismissible: true,
     enableDrag: true,
+    // [ReportSheetScaffold] already includes a grabber row; enabling the
+    // modal's built-in drag handle duplicates it on iOS/macOS.
     showDragHandle: false,
     builder: builder,
   );

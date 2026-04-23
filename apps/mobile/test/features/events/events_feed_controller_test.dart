@@ -80,6 +80,8 @@ void main() {
 
     expect(ok, isFalse);
     expect(repo.refreshCallCount, 1);
+    expect(c.lastPullRefreshError, isNotNull);
+    expect(c.lastPullRefreshError!.code, 'NETWORK_ERROR');
   });
 
   test('resetAllDiscoveryFilters clears all state and refreshes', () async {

@@ -211,6 +211,14 @@ class SocketCheckInStream {
             fn != null &&
             ln != null &&
             exp != null) {
+          if (_currentEventId != null &&
+              eid.isNotEmpty &&
+              eid != _currentEventId) {
+            if (kDebugMode) {
+              debugPrint('[checkin:ws] drop request wrong eventId');
+            }
+            return;
+          }
           _addEvent(
             CheckInRequestEvent(
               pendingId: pid,
@@ -233,6 +241,14 @@ class SocketCheckInStream {
         final String? cat = map['checkedInAt'] as String?;
         final num? pts = map['pointsAwarded'] as num?;
         if (pid != null && eid != null && uid != null && cat != null) {
+          if (_currentEventId != null &&
+              eid.isNotEmpty &&
+              eid != _currentEventId) {
+            if (kDebugMode) {
+              debugPrint('[checkin:ws] drop confirmed wrong eventId');
+            }
+            return;
+          }
           _addEvent(
             CheckInConfirmedEvent(
               pendingId: pid,
@@ -252,6 +268,14 @@ class SocketCheckInStream {
         final String? eid = map['eventId'] as String?;
         final String? uid = map['userId'] as String?;
         if (pid != null && eid != null && uid != null) {
+          if (_currentEventId != null &&
+              eid.isNotEmpty &&
+              eid != _currentEventId) {
+            if (kDebugMode) {
+              debugPrint('[checkin:ws] drop rejected wrong eventId');
+            }
+            return;
+          }
           _addEvent(
             CheckInRejectedEvent(pendingId: pid, eventId: eid, userId: uid),
           );

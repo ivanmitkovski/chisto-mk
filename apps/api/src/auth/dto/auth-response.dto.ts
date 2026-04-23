@@ -34,6 +34,12 @@ export class AuthUserDto {
     description: 'Signed URL for the profile avatar, if set',
   })
   avatarUrl!: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'ISO-8601 timestamp when the user passed the organizer toolkit quiz',
+  })
+  organizerCertifiedAt!: string | null;
 }
 
 export class AuthResponseDto {

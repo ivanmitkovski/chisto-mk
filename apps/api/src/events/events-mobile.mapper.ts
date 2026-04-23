@@ -1,9 +1,16 @@
 import {
+  CleanupEventStatus,
   EcoCleanupScale,
   EcoEventCategory,
   EcoEventDifficulty,
   EcoEventLifecycleStatus,
 } from '../prisma-client';
+
+const MODERATION_TO_MOBILE: Record<CleanupEventStatus, string> = {
+  [CleanupEventStatus.PENDING]: 'pending',
+  [CleanupEventStatus.APPROVED]: 'approved',
+  [CleanupEventStatus.DECLINED]: 'declined',
+};
 
 const LIFECYCLE_TO_MOBILE: Record<EcoEventLifecycleStatus, string> = {
   [EcoEventLifecycleStatus.UPCOMING]: 'upcoming',
@@ -121,6 +128,10 @@ export function difficultyFromMobile(raw: string | undefined): EcoEventDifficult
     return null;
   }
   return MOBILE_TO_DIFFICULTY[raw] ?? null;
+}
+
+export function moderationStatusToMobile(status: CleanupEventStatus): string {
+  return MODERATION_TO_MOBILE[status];
 }
 
 export function parseLifecycleFilterList(raw: string | undefined): EcoEventLifecycleStatus[] | null {

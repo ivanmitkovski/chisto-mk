@@ -47,6 +47,8 @@ void main() {
       authState.setAuthenticated(
         userId: 'user-123',
         displayName: 'John',
+        organizerCertifiedAt: DateTime.utc(2026, 1, 5),
+        syncOrganizerCertifiedAt: true,
       );
       authState.setUnauthenticated();
 
@@ -54,6 +56,7 @@ void main() {
       expect(authState.userId, isNull);
       expect(authState.displayName, isNull);
       expect(authState.accessToken, isNull);
+      expect(authState.isOrganizerCertified, isFalse);
       expect(authState.isAuthenticated, isFalse);
     });
 
@@ -97,6 +100,24 @@ void main() {
       authState.updateDisplayName('Y');
 
       expect(notified, isTrue);
+    });
+
+    test('syncOrganizerCertifiedAt overwrites organizer certification including null', () {
+      authState.setAuthenticated(
+        userId: 'u',
+        displayName: 'X',
+        organizerCertifiedAt: DateTime.utc(2026, 1, 1),
+        syncOrganizerCertifiedAt: true,
+      );
+      expect(authState.isOrganizerCertified, isTrue);
+
+      authState.setAuthenticated(
+        userId: 'u',
+        displayName: 'X',
+        organizerCertifiedAt: null,
+        syncOrganizerCertifiedAt: true,
+      );
+      expect(authState.isOrganizerCertified, isFalse);
     });
   });
 }

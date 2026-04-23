@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
+  CheckInRiskSignalType,
   CleanupEventStatus,
   EcoEventLifecycleStatus,
   Prisma,
@@ -21,7 +22,7 @@ import {
   REASON_EVENT_CHECK_IN,
 } from '../gamification/gamification.constants';
 import { EcoEventPointsService } from '../gamification/eco-event-points.service';
-import { PrismaService } from '../prisma/prisma.service';
+import { CheckInRepository } from './check-in.repository';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import {
   CHECK_IN_QR_TTL_SEC,
@@ -33,6 +34,7 @@ import { ManualEventCheckInDto } from './dto/manual-event-check-in.dto';
 import { EventCheckInGateway } from './event-check-in.gateway';
 import { PendingCheckInService } from './pending-check-in.service';
 import { CheckInTelemetryService } from './check-in-telemetry.service';
+import { EventLiveImpactService } from './event-live-impact.service';
 import { performance } from 'node:perf_hooks';
 
 export interface RedeemResult {
@@ -61,13 +63,14 @@ export class EventsCheckInService {
   private readonly logger = new Logger(EventsCheckInService.name);
 
   constructor(
-    private readonly prisma: PrismaService,
+    private readonly checkInRepository: CheckInRepository,
     private readonly config: ConfigService,
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly pendingCheckIn: PendingCheckInService,
     private readonly checkInGateway: EventCheckInGateway,
     private readonly reportsUpload: ReportsUploadService,
     private readonly checkInTelemetry: CheckInTelemetryService,
+    private readonly liveImpact: EventLiveImpactService,
   ) {}
 
   private telemetryErrorLabel(err: unknown): string {
@@ -104,7 +107,7 @@ export class EventsCheckInService {
     eventId: string,
     user: AuthenticatedUser,
   ): Promise<{ id: string; organizerId: string | null; lifecycleStatus: EcoEventLifecycleStatus; status: CleanupEventStatus; checkInSessionId: string | null; checkInOpen: boolean }> {
-    const row = await this.prisma.cleanupEvent.findFirst({
+    const row = await this.checkInRepository.prisma.cleanupEvent.findFirst({
       where: { id: eventId, ...visibilityWhere(user.userId) },
       select: {
         id: true,
@@ -154,7 +157,7 @@ export class EventsCheckInService {
       data.checkInSessionId = newCheckInJti();
     }
 
-    await this.prisma.cleanupEvent.update({
+    await this.checkInRepository.prisma.cleanupEvent.update({
       where: { id: eventId },
       data,
     });
@@ -179,7 +182,7 @@ export class EventsCheckInService {
         message: 'Check-in can only run while the event is in progress',
       });
     }
-    await this.prisma.cleanupEvent.update({
+    await this.checkInRepository.prisma.cleanupEvent.update({
       where: { id: eventId },
       data: { checkInSessionId: newCheckInJti() },
     });
@@ -198,6 +201,12 @@ export class EventsCheckInService {
     const t0 = performance.now();
     try {
       const row = await this.loadEventForOrganizer(eventId, user);
+      if (row.status !== CleanupEventStatus.APPROVED) {
+        throw new BadRequestException({
+          code: 'EVENT_NOT_APPROVED',
+          message: 'Check-in is only available for approved events',
+        });
+      }
       if (!row.checkInOpen) {
         throw new BadRequestException({
           code: 'CHECK_IN_SESSION_CLOSED',
@@ -256,7 +265,7 @@ export class EventsCheckInService {
   async listAttendees(eventId: string, user: AuthenticatedUser) {
     const t0 = performance.now();
     await this.loadEventForOrganizer(eventId, user);
-    const rows = await this.prisma.eventCheckIn.findMany({
+    const rows = await this.checkInRepository.prisma.eventCheckIn.findMany({
       where: { eventId },
       orderBy: { checkedInAt: 'desc' },
       select: {
@@ -316,7 +325,7 @@ export class EventsCheckInService {
     const dedupeKey = `u:${targetUserId}`;
 
     try {
-      const created = await this.prisma.$transaction(async (tx) => {
+      const created = await this.checkInRepository.prisma.$transaction(async (tx) => {
         const participant = await tx.eventParticipant.findUnique({
           where: {
             eventId_userId: { eventId, userId: targetUserId },
@@ -374,6 +383,7 @@ export class EventsCheckInService {
         targetUserId,
         pointsAwarded: created.pointsAwarded,
       });
+      this.liveImpact.notifyListeners(eventId);
       return {
         id: created.checkIn.id,
         name: created.displayName,
@@ -406,7 +416,7 @@ export class EventsCheckInService {
     user: AuthenticatedUser,
   ): Promise<void> {
     await this.loadEventForOrganizer(eventId, user);
-    await this.prisma.$transaction(async (tx) => {
+    await this.checkInRepository.prisma.$transaction(async (tx) => {
       const deleted = await tx.eventCheckIn.deleteMany({
         where: { id: checkInId, eventId },
       });
@@ -423,12 +433,12 @@ export class EventsCheckInService {
         },
       });
     });
-    const ev = await this.prisma.cleanupEvent.findUnique({
+    const ev = await this.checkInRepository.prisma.cleanupEvent.findUnique({
       where: { id: eventId },
       select: { checkedInCount: true },
     });
     if (ev != null && ev.checkedInCount < 0) {
-      await this.prisma.cleanupEvent.update({
+      await this.checkInRepository.prisma.cleanupEvent.update({
         where: { id: eventId },
         data: { checkedInCount: 0 },
       });
@@ -438,16 +448,18 @@ export class EventsCheckInService {
       organizerId: user.userId,
       checkInId,
     });
+    this.liveImpact.notifyListeners(eventId);
   }
 
   async redeem(
     eventId: string,
     user: AuthenticatedUser,
     rawPayload: string,
+    clientGeo?: { lat: number; lng: number },
   ): Promise<RedeemResult> {
     const t0 = performance.now();
     try {
-      const result = await this.doRedeem(eventId, user, rawPayload);
+      const result = await this.doRedeem(eventId, user, rawPayload, clientGeo);
       this.checkInTelemetry.emitMetric({
         op: 'check_in.redeem',
         eventId,
@@ -468,12 +480,56 @@ export class EventsCheckInService {
     }
   }
 
+  private async maybeRecordFarFromSiteRisk(
+    eventId: string,
+    userId: string,
+    clientGeo?: { lat: number; lng: number },
+  ): Promise<void> {
+    if (clientGeo == null) {
+      return;
+    }
+    const row = await this.checkInRepository.prisma.cleanupEvent.findUnique({
+      where: { id: eventId },
+      select: {
+        site: { select: { latitude: true, longitude: true } },
+      },
+    });
+    if (row?.site == null) {
+      return;
+    }
+    const meters = await this.checkInRepository.geographyDistanceMeters(
+      clientGeo.lat,
+      clientGeo.lng,
+      row.site.latitude,
+      row.site.longitude,
+    );
+    const thresholdM = 250;
+    if (meters <= thresholdM) {
+      return;
+    }
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 90);
+    await this.checkInRepository.prisma.checkInRiskSignal.create({
+      data: {
+        eventId,
+        userId,
+        signalType: CheckInRiskSignalType.FAR_FROM_SITE,
+        expiresAt,
+        metadata: {
+          distanceMeters: Math.round(meters),
+          thresholdMeters: thresholdM,
+        },
+      },
+    });
+  }
+
   private async doRedeem(
     eventId: string,
     user: AuthenticatedUser,
     rawPayload: string,
+    clientGeo?: { lat: number; lng: number },
   ): Promise<RedeemResult> {
-    const event = await this.prisma.cleanupEvent.findFirst({
+    const event = await this.checkInRepository.prisma.cleanupEvent.findFirst({
       where: { id: eventId, ...visibilityWhere(user.userId) },
       select: {
         id: true,
@@ -497,7 +553,7 @@ export class EventsCheckInService {
       });
     }
 
-    const participant = await this.prisma.eventParticipant.findUnique({
+    const participant = await this.checkInRepository.prisma.eventParticipant.findUnique({
       where: {
         eventId_userId: { eventId, userId: user.userId },
       },
@@ -572,11 +628,13 @@ export class EventsCheckInService {
       });
     }
 
+    await this.maybeRecordFarFromSiteRisk(eventId, user.userId, clientGeo);
+
     const dedupeKey = `u:${user.userId}`;
 
     // Record JTI immediately (replay protection) and check for existing check-in.
     try {
-      await this.prisma.$transaction(async (tx) => {
+      await this.checkInRepository.prisma.$transaction(async (tx) => {
         try {
           await tx.eventCheckInRedemption.create({
             data: { eventId, jti: claims.j },
@@ -605,7 +663,7 @@ export class EventsCheckInService {
     }
 
     // If user is already checked in, return idempotent success.
-    const existing = await this.prisma.eventCheckIn.findUnique({
+    const existing = await this.checkInRepository.prisma.eventCheckIn.findUnique({
       where: { eventId_dedupeKey: { eventId, dedupeKey } },
       select: { checkedInAt: true },
     });
@@ -618,7 +676,7 @@ export class EventsCheckInService {
     }
 
     // Fetch user details for the organizer confirmation modal.
-    const userRow = await this.prisma.user.findUnique({
+    const userRow = await this.checkInRepository.prisma.user.findUnique({
       where: { id: user.userId },
       select: { firstName: true, lastName: true, avatarObjectKey: true },
     });
@@ -712,7 +770,7 @@ export class EventsCheckInService {
     const displayName = `${pending.firstName} ${pending.lastName}`.trim() || 'Volunteer';
 
     try {
-      const { checkedInAt, pointsAwarded } = await this.prisma.$transaction(async (tx) => {
+      const { checkedInAt, pointsAwarded } = await this.checkInRepository.prisma.$transaction(async (tx) => {
         const existing = await tx.eventCheckIn.findUnique({
           where: { eventId_dedupeKey: { eventId, dedupeKey } },
         });
@@ -777,6 +835,7 @@ export class EventsCheckInService {
         durationMs: Math.round(performance.now() - t0),
         outcome: 'approve',
       });
+      this.liveImpact.notifyListeners(eventId);
       return result;
     } catch (err: unknown) {
       if (

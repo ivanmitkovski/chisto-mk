@@ -530,6 +530,7 @@ export class AuthService {
     weeklyRank: number | null;
     weekStartsAt: string;
     weekEndsAt: string;
+    organizerCertifiedAt: string | null;
   }> {
     const user = await this.prisma.user.findUnique({
       where: { id: authenticatedUser.userId },
@@ -547,6 +548,7 @@ export class AuthService {
         totalPointsSpent: true,
         totpSecret: true,
         avatarObjectKey: true,
+        organizerCertifiedAt: true,
       },
     });
 
@@ -558,7 +560,7 @@ export class AuthService {
     }
 
     const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
-    const { totpSecret: _, avatarObjectKey: __, ...rest } = user;
+    const { totpSecret: _, avatarObjectKey: __, organizerCertifiedAt, ...rest } = user;
     const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned);
     const weekly = await this.rankingsService.getUserWeeklySummary(authenticatedUser.userId);
     return {
@@ -575,6 +577,7 @@ export class AuthService {
       weeklyRank: weekly.weeklyRank,
       weekStartsAt: weekly.weekStartsAt,
       weekEndsAt: weekly.weekEndsAt,
+      organizerCertifiedAt: organizerCertifiedAt?.toISOString() ?? null,
     };
   }
 
@@ -1090,6 +1093,7 @@ export class AuthService {
         isPhoneVerified: user.isPhoneVerified,
         pointsBalance: user.pointsBalance,
         avatarUrl,
+        organizerCertifiedAt: user.organizerCertifiedAt?.toISOString() ?? null,
       },
     };
   }

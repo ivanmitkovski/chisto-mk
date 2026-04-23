@@ -8,13 +8,16 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
+import 'package:chisto_mobile/features/events/data/event_offline_work_coordinator.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_scroll_interaction.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/field_mode_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/offline_work_hub_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/organizer_dashboard/organizer_event_summary_card.dart';
-import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
@@ -23,7 +26,8 @@ class OrganizerDashboardScreen extends StatefulWidget {
   const OrganizerDashboardScreen({super.key});
 
   @override
-  State<OrganizerDashboardScreen> createState() => _OrganizerDashboardScreenState();
+  State<OrganizerDashboardScreen> createState() =>
+      _OrganizerDashboardScreenState();
 }
 
 class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
@@ -65,7 +69,9 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
     });
     try {
       await _eventsStore.refreshEvents(
-        params: const EcoEventSearchParams(statuses: <EcoEventStatus>{EcoEventStatus.upcoming}),
+        params: const EcoEventSearchParams(
+          statuses: <EcoEventStatus>{EcoEventStatus.upcoming},
+        ),
       );
       // Also load all statuses for a complete picture.
       await _eventsStore.refreshEvents();
@@ -79,7 +85,7 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
   }
 
   Future<void> _onRefresh() async {
-    AppHaptics.medium();
+    eventsPullRefreshHaptic(context);
     try {
       await _eventsStore.refreshEvents();
       _refreshFromStore();
@@ -100,150 +106,216 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double topPad = MediaQuery.paddingOf(context).top;
-
     return Scaffold(
       backgroundColor: AppColors.appBackground,
-      body: RefreshIndicator(
-        color: AppColors.primary,
-        strokeWidth: 2.2,
-        onRefresh: _onRefresh,
-        child: CustomScrollView(
-          physics: const AlwaysScrollableScrollPhysics(
-            parent: BouncingScrollPhysics(),
-          ),
-          slivers: <Widget>[
-            // ── Header ──
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  topPad + AppSpacing.md,
-                  AppSpacing.lg,
-                  AppSpacing.sm,
-                ),
-                child: Row(
-                  children: <Widget>[
-                    const AppBackButton(),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        context.l10n.eventsOrganizerDashboardTitle,
-                        style: AppTypography.eventsDetailHeadline(
-                          Theme.of(context).textTheme,
-                        ),
-                      ),
+      body: SafeArea(
+        bottom: false,
+        child: Builder(
+          builder: (BuildContext context) {
+            final Widget scrollView = CustomScrollView(
+              physics: eventsListScrollPhysics(context),
+              slivers: <Widget>[
+                if (eventsUseCupertinoSystemEffects(context))
+                  CupertinoSliverRefreshControl(onRefresh: _onRefresh),
+                // ── Header ──
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.lg,
+                      AppSpacing.md,
+                      AppSpacing.lg,
+                      AppSpacing.sm,
                     ),
-                  ],
-                ),
-              ),
-            ),
-
-            if (_isLoading)
-              const SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: CupertinoActivityIndicator(),
-                ),
-              )
-            else if (_loadError != null && _myEvents.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      const Icon(
-                        CupertinoIcons.exclamationmark_circle,
-                        size: 40,
-                        color: AppColors.textMuted,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        context.l10n.eventsFeedInitialLoadFailed,
-                        style: AppTypography.eventsBodyMuted(
-                          Theme.of(context).textTheme,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      TextButton(
-                        onPressed: _loadMyEvents,
-                        child: Text(context.l10n.eventsFeedRefreshFailed),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else if (_myEvents.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      Container(
-                        width: 72,
-                        height: 72,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          CupertinoIcons.calendar_badge_plus,
-                          size: 32,
-                          color: AppColors.primaryDark,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        context.l10n.eventsOrganizerDashboardEmpty,
-                        style: AppTypography.eventsBodyMuted(
-                          Theme.of(context).textTheme,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      FilledButton.icon(
-                        onPressed: () => EventsNavigation.openCreate(context),
-                        icon: const Icon(CupertinoIcons.add, size: 16),
-                        label: Text(context.l10n.eventsOrganizerDashboardEmptyAction),
-                        style: FilledButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
+                    child: Row(
+                      children: <Widget>[
+                        const AppBackButton(),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            context.l10n.eventsOrganizerDashboardTitle,
+                            style: AppTypography.eventsDetailHeadline(
+                              Theme.of(context).textTheme,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        ValueListenableBuilder<EventOfflineWorkSnapshot>(
+                          valueListenable:
+                              EventOfflineWorkCoordinator.instance.snapshot,
+                          builder:
+                              (
+                                BuildContext context,
+                                EventOfflineWorkSnapshot snap,
+                                Widget? _,
+                              ) {
+                                if (snap.totalWorkItems <= 0) {
+                                  return const SizedBox.shrink();
+                                }
+                                final String badge = snap.totalWorkItems > 99
+                                    ? '99+'
+                                    : '${snap.totalWorkItems}';
+                                return IconButton(
+                                  tooltip:
+                                      context.l10n.eventsOfflineWorkHubTitle,
+                                  onPressed: () =>
+                                      showOfflineWorkHubSheet(context),
+                                  icon: Badge(
+                                    label: Text(
+                                      badge,
+                                      style: const TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    child: const Icon(
+                                      Icons.cloud_sync_outlined,
+                                    ),
+                                  ),
+                                );
+                              },
+                        ),
+                        IconButton(
+                          tooltip: context.l10n.eventsFieldModeTitle,
+                          icon: const Icon(CupertinoIcons.arrow_2_circlepath),
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) => const FieldModeScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              )
-            else ...<Widget>[
-              _buildSection(
-                context,
-                label: context.l10n.eventsOrganizerDashboardSectionInProgress,
-                events: _sectionEvents(EcoEventStatus.inProgress),
-              ),
-              _buildSection(
-                context,
-                label: context.l10n.eventsOrganizerDashboardSectionUpcoming,
-                events: _sectionEvents(EcoEventStatus.upcoming),
-              ),
-              _buildSection(
-                context,
-                label: context.l10n.eventsOrganizerDashboardSectionCompleted,
-                events: _sectionEvents(EcoEventStatus.completed),
-              ),
-              _buildSection(
-                context,
-                label: context.l10n.eventsOrganizerDashboardSectionCancelled,
-                events: _sectionEvents(EcoEventStatus.cancelled),
-              ),
-              const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xxl)),
-            ],
-          ],
+
+                if (_isLoading)
+                  const SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: CupertinoActivityIndicator()),
+                  )
+                else if (_loadError != null && _myEvents.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          const Icon(
+                            CupertinoIcons.exclamationmark_circle,
+                            size: 40,
+                            color: AppColors.textMuted,
+                          ),
+                          const SizedBox(height: AppSpacing.sm),
+                          Text(
+                            context.l10n.eventsFeedInitialLoadFailed,
+                            style: AppTypography.eventsBodyMuted(
+                              Theme.of(context).textTheme,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          TextButton(
+                            onPressed: _loadMyEvents,
+                            child: Text(context.l10n.eventsFeedRefreshFailed),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else if (_myEvents.isEmpty)
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            width: 72,
+                            height: 72,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              CupertinoIcons.calendar_badge_plus,
+                              size: 32,
+                              color: AppColors.primaryDark,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            context.l10n.eventsOrganizerDashboardEmpty,
+                            style: AppTypography.eventsBodyMuted(
+                              Theme.of(context).textTheme,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          FilledButton.icon(
+                            onPressed: () =>
+                                EventsNavigation.openCreate(context),
+                            icon: const Icon(CupertinoIcons.add, size: 16),
+                            label: Text(
+                              context.l10n.eventsOrganizerDashboardEmptyAction,
+                            ),
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(
+                                  AppSpacing.radiusPill,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  )
+                else ...<Widget>[
+                  _buildSection(
+                    context,
+                    label:
+                        context.l10n.eventsOrganizerDashboardSectionInProgress,
+                    events: _sectionEvents(EcoEventStatus.inProgress),
+                  ),
+                  _buildSection(
+                    context,
+                    label: context.l10n.eventsOrganizerDashboardSectionUpcoming,
+                    events: _sectionEvents(EcoEventStatus.upcoming),
+                  ),
+                  _buildSection(
+                    context,
+                    label:
+                        context.l10n.eventsOrganizerDashboardSectionCompleted,
+                    events: _sectionEvents(EcoEventStatus.completed),
+                  ),
+                  _buildSection(
+                    context,
+                    label:
+                        context.l10n.eventsOrganizerDashboardSectionCancelled,
+                    events: _sectionEvents(EcoEventStatus.cancelled),
+                  ),
+                  SliverToBoxAdapter(
+                    child: SizedBox(
+                      height:
+                          AppSpacing.xxl + MediaQuery.paddingOf(context).bottom,
+                    ),
+                  ),
+                ],
+              ],
+            );
+            return eventsUseCupertinoSystemEffects(context)
+                ? scrollView
+                : RefreshIndicator(
+                    color: AppColors.primary,
+                    strokeWidth: 2.2,
+                    displacement: 40,
+                    onRefresh: _onRefresh,
+                    child: scrollView,
+                  );
+          },
         ),
       ),
     );
@@ -254,33 +326,42 @@ class _OrganizerDashboardScreenState extends State<OrganizerDashboardScreen> {
     required String label,
     required List<EcoEvent> events,
   }) {
-    if (events.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+    if (events.isEmpty) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
     return SliverList(
-      delegate: SliverChildListDelegate(
-        <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              AppSpacing.lg, AppSpacing.lg, AppSpacing.lg, AppSpacing.xs,
+      delegate: SliverChildListDelegate(<Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.lg,
+            AppSpacing.xs,
+          ),
+          child: Text(
+            label,
+            style: AppTypography.eventsMicroSectionHeading(
+              Theme.of(context).textTheme,
+            ).copyWith(letterSpacing: 0.3, fontWeight: FontWeight.w700),
+          ),
+        ),
+        ...events.map(
+          (EcoEvent event) => OrganizerEventSummaryCard(
+            key: ValueKey<String>(event.id),
+            event: event,
+            onTap: () =>
+                EventsNavigation.openDetail(context, eventId: event.id),
+            onCheckIn: () => EventsNavigation.openOrganizerCheckIn(
+              context,
+              eventId: event.id,
             ),
-            child: Text(
-              label,
-              style: AppTypography.eventsMicroSectionHeading(
-                Theme.of(context).textTheme,
-              ).copyWith(letterSpacing: 0.3, fontWeight: FontWeight.w700),
+            onEvidence: () => EventsNavigation.openCleanupEvidence(
+              context,
+              eventId: event.id,
             ),
           ),
-          ...events.map((EcoEvent event) => OrganizerEventSummaryCard(
-                key: ValueKey<String>(event.id),
-                event: event,
-                onTap: () => EventsNavigation.openDetail(context, eventId: event.id),
-                onCheckIn: () =>
-                    EventsNavigation.openOrganizerCheckIn(context, eventId: event.id),
-                onEvidence: () =>
-                    EventsNavigation.openCleanupEvidence(context, eventId: event.id),
-              )),
-        ],
-        addAutomaticKeepAlives: false,
-      ),
+        ),
+      ], addAutomaticKeepAlives: false),
     );
   }
 }

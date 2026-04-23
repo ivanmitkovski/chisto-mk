@@ -4,7 +4,7 @@
 // 1) Primary user journeys
 // -----------------------------------------------------------------------------
 // - Discovery journey:
-//   EventsFeedScreen -> EventDetailScreen -> join/leave -> reminder -> share.
+//   EventsFeedScreen -> EventDetailScreen -> join/leave -> reminder.
 // - Organizer journey:
 //   EventDetailScreen -> OrganizerCheckInScreen -> open/pause/resume check-in ->
 //   attendee list updates -> end event -> OrganizerEventCompletionSheet (next steps +
@@ -17,6 +17,12 @@
 // Route entry points:
 // - EventsNavigation (feature navigation helpers)
 // - AppRoutes.events* (named routes + Cupertino transitions for check-in)
+// - Create entry: [EventsNavigation.openCreate] and [CreateEventSheet] both gate organizer
+//   certification; [ApiAuthRepository.restoreSession] hydrates `organizerCertifiedAt` from
+//   secure storage before `/auth/me` when the network is temporarily unavailable.
+// - Field mode + offline hub: OrganizerDashboardScreen pushes FieldModeScreen (MaterialPageRoute) for offline
+//   queue review/sync and opens OfflineWorkHubSheet for cross-lane pending work — not registered on AppRoutes;
+//   document in release checklist (docs/events-release-checklist.md).
 //
 // -----------------------------------------------------------------------------
 // 1b) Typography — AppTypography.events* role map
@@ -26,7 +32,7 @@
 //
 // Discovery & cards: eventsListCardTitle, eventsListCardMeta, eventsHeroCardTitle,
 //   eventsHeroCardMeta, eventsCardBadgeAccent, eventsCardBadgeMuted.
-// Detail chrome: eventsDetailHeadline, eventsDetailScheduleLine, eventsSectionTitle,
+// Detail chrome: eventsDetailHeadline, eventsSectionTitle,
 //   eventsBodyProse, eventsBodyMuted, eventsInlineLabel, eventsGridPropertyValue,
 //   eventsCaptionStrong, eventsMetricValue, eventsDisplayStat.
 // Sheets & filters: eventsSheetTitle, eventsSheetTextLink, eventsSheetSectionLabel,
@@ -51,13 +57,60 @@
 //   (category: comma-separated mobile keys; status: comma-separated lifecycle keys)
 // - GET    /events/:id
 // - GET    /events/:id/participants?limit=...&cursor=...  (joiners only; organizer from detail)
-// - POST   /events
+// - POST   /events (same calendar day start/end in Europe/Skopje; end by 23:59 local)
 // - PATCH  /events/:id
 // - PATCH  /events/:id/status
 // - PATCH  /events/:id/reminder
 // - POST   /events/:id/join
 // - DELETE /events/:id/join
 // - POST   /events/:id/after-images
+// - GET    /events/:id/impact-receipt
+//   (aggregate impact read model: counts + signed evidence/after URLs; no roster.
+//   400 EVENTS_IMPACT_RECEIPT_NOT_AVAILABLE for upcoming or cancelled.)
+//
+// -----------------------------------------------------------------------------
+// 2d) Push notification `data` keys (FCM — contract for mobile routing)
+// -----------------------------------------------------------------------------
+// Handled by [NotificationOpenRouter] / [PushNotificationService]. Unknown types
+// should degrade to the events tab; payloads must never crash cold start.
+//
+// - `CLEANUP_EVENT`: required `eventId` (UUID string). Optional `kind` (e.g. `published`)
+//   may bump [eventsFeedRemoteRefreshTick] before navigation (see main.dart).
+// - `EVENT_CHAT`: required `eventId` (UUID string). Optional `threadTitle` (non-PII event
+//   title for app bar); when absent the client hydrates from cache/prefetch where possible.
+//
+// -----------------------------------------------------------------------------
+// 2b) Impact receipt (upgrade #1) — product rules (server is source of truth)
+// -----------------------------------------------------------------------------
+// - Eligibility: same visibility as GET /events/:id (`visibilityWhere`). Receipt
+//   is returned only for lifecycle IN_PROGRESS or COMPLETED. UPCOMING and CANCELLED
+//   return 400 EVENTS_IMPACT_RECEIPT_NOT_AVAILABLE (mobile maps via ARB).
+// - Privacy: counts only (participantCount, checkedInCount, reportedBagsCollected);
+//   no attendee identities. Organizer display name matches event detail exposure.
+// - Bags on the receipt: `liveMetric.reportedBagsCollected` only — not device-local
+//   impact feedback (`EventFeedbackLocalCache`) until that data is persisted on API.
+// - Completeness (completed): `full` when after photos and structured evidence both
+//   exist; partial enums when one or both are missing; `in_progress` while the event
+//   is live.
+// - Share URL: `event_share_payload.dart` (`/events/:id` on share base). Rich link
+//   preview / universal landing page is deferred (see docs/events-release-checklist.md).
+//
+// -----------------------------------------------------------------------------
+// 2c) Offline work coordinator (upgrade #2 — foreground reliability)
+// -----------------------------------------------------------------------------
+// - [EventOfflineWorkCoordinator] is a singleton started from ServiceLocator.initialize and
+//   disposed on ServiceLocator.reset. It owns a debounced (~550ms), serialized drain after
+//   [ConnectivityGate.watch] reports online and on app resume ([WidgetsBindingObserver] bridge).
+// - Drain order (deterministic, single flight): check-in redeem queue → field batch
+//   ([FieldModeSyncService] / POST /events/field-batch) → chat text outbox ([ChatOutboxSync],
+//   bounded 50 sends per drain, exponential backoff on retryable failures).
+// - Gating: drains no-op when [AuthState.isAuthenticated] is false or [ConnectivityGate.isOnline]
+//   is false (empty connectivity list counts as online — same contract as [ConnectivityGate] docs).
+// - Privacy: hub UI shows counts only; [logEventsDiagnostic] emits stable codes only (no bodies,
+//   titles, ids, or queries). Chat outbox still stores message bodies in SQLite — cleared on
+//   logout via [ChatOutboxStore.clearAll] (see auth repository).
+// - OS background workers (WorkManager / BGTaskScheduler) are explicitly out of scope for v1;
+//   see docs/events-release-checklist.md § “Phase 2 — OS background”.
 //
 // Check-in:
 // - PATCH  /events/:id/check-in
@@ -128,11 +181,27 @@
 // - Cursor pagination (loadMore) follows the repository's active merged params.
 //
 // -----------------------------------------------------------------------------
+// 3d) Discovery shelf — "this week" (upgrade #3)
+// -----------------------------------------------------------------------------
+// **Week definition (product)**: the ISO calendar week (Monday–Sunday) in
+// **Europe/Skopje** that contains the reference instant, inclusive of both endpoints as
+// calendar **dates** (`dateFrom` / `dateTo` on GET /events). Implemented by
+// `skopjeCalendarWeekBoundsInclusive` + `EcoEventSearchParams.discoveryThisSkopjeCalendarWeek`.
+// This is a **Skopje wall-calendar** window, not a rolling 7-day interval from "now".
+//
+// **UI**: [EventsThisWeekShelf] on [EventsFeedScreen] (list mode, non-calendar, empty search):
+// horizontal tiles only; collapses to [SizedBox.shrink] while empty or still loading (no second
+// spinner — pull-to-refresh uses [CupertinoSliverRefreshControl] only).
+// Strip loads via [EventsRepository.fetchEventsSnapshot] so the main feed query is unchanged.
+// Client sorts snapshot rows by `siteDistanceKm` then lifecycle rank (see feed controller).
+//
+// -----------------------------------------------------------------------------
 // 3c) Event detail section order (see DetailContent doc comment)
 // -----------------------------------------------------------------------------
-// Title → banners → EventDetailGroupedPanel → weather (if coords) → gear →
+// Title → banners → EventDetailGroupedPanel (facts) → weather (if coords) → gear →
 // description → participation → participants → organizer → analytics → after
-// photos → impact. Stagger delays: event_detail_stagger.dart.
+// photos → impact receipt link (in progress / completed) → impact. Stagger delays:
+// event_detail_stagger.dart.
 //
 // -----------------------------------------------------------------------------
 // 4) Data freshness and cache rules (mobile)
@@ -160,7 +229,7 @@
 // 5b) UX system (typography, touch targets, haptics, loading)
 // -----------------------------------------------------------------------------
 // Typography ladder — use [Theme.of] scaling via [AppTypography] helpers:
-// - eventsDetailHeadline / eventsDetailScheduleLine: [TitleSection]
+// - eventsDetailHeadline: [TitleSection] (schedule line removed — see [DateTimeSection])
 // - eventsSectionTitle: [DetailSectionHeader]
 // - eventsListCardTitle / eventsListCardMeta: [EcoEventCard] rows
 // - eventsHeroCardTitle / eventsHeroCardMeta: [HeroEventCard] on imagery
@@ -201,6 +270,9 @@
 //   PopScope(canPop: !_isDirty) + onPopInvokedWithResult shows discard when needed.
 // - First paint: short bootstrap skeleton (CreateEventScreenSkeleton) then
 //   AnimatedSwitcher to form; section FadeTransitions respect reduce motion.
+// - Schedule: one calendar day plus start/end times; product rule is same local day,
+//   end strictly after start, end by 23:59 (see [event_schedule_constraints.dart];
+//   API `EVENTS_END_DIFFERENT_SKOPJE_CALENDAR_DAY` / `EVENTS_END_AFTER_SKOPJE_LOCAL_DAY`).
 //
 // -----------------------------------------------------------------------------
 // 8) Event detail screen — layout and typography
@@ -211,7 +283,8 @@
 //   grouped metadata panel, gear, description, participants, organizer, galleries,
 //   impact, reminder, and check-in banner.
 // - Grouped metadata: [EventDetailGroupedPanel] wraps location, date/time, category,
-//   and optional scale/difficulty chips; rows use embedded* flags to avoid nested cards.
+//   optional scale/difficulty, recurrence; rows use embedded* flags. Event chat opens
+//   from [HeroImageBar] when the user may access it (not inside the grouped panel).
 // - Title: status capsule uses [AppSpacing.radiusPill] + [AppTypography.pillLabel]-derived
 //   styling; event name uses [AppTypography.eventsDetailHeadline] (theme headlineMedium).
 //
@@ -220,9 +293,17 @@
 // -----------------------------------------------------------------------------
 // - Reduced motion ON: staggered sections / pulse visuals
 // - Large text + narrow width: event detail and organizer check-in overflow checks
+// - Dynamic Type (largest) + narrow device: sticky CTA, chat composer, field mode list,
+//   quiz option rows — no clipping; verify docs/events-release-checklist.md release row.
 // - Airplane mode: feed refresh, detail open, join/reminder/check-in feedback
+// - Offline work hub: organizer dashboard badge when pending work exists; sheet counts for
+//   check-in / field / chat; Sync now completes without PII in diagnostics; terminal chat rows
+//   surface as “needs attention” and open-chat deep link + snack (ARB `eventsOfflineWorkResolveInChat`)
 // - Organizer pause/resume while screen is open: QR availability and banners
 // - Attendee scanner: invalid/expired/wrong-event/rate-limit feedback paths
+// - Impact receipt: entry from completed/in-progress detail + organizer completion sheet;
+//   load OK (full + partial completeness), 400 not-available (upcoming/cancelled deep link),
+//   offline/error retry; share + copy link (iOS popover origin); large text + reduce motion
 // - Participants sheet: loading, error+retry, organizer-only (count 0), multi-page fetch
 // - Slow network: empty states, site picker, participant roster open from detail
 // - Create event: Cupertino swipe-back vs dirty discard dialog; bootstrap skeleton timing
@@ -250,9 +331,32 @@
 //   in progress); very rapid moderator edits may still lag until pull-to-refresh or re-entry.
 // - Check-in: QR session rotation vs offline redeem queue ordering is covered by unit tests,
 //   but extreme clock skew or multi-device races can still produce edge cases.
+// - Chat outbox: at most [ChatOutboxStore.maxPendingTextRowsPerEvent] pending **text** rows
+//   per event; when full, the UI shows eventsChatOutboxFull (connect and flush). SQLite v2 adds
+//   `sync_status` / `attempt_count` / `last_error_code`; non-retryable sends mark `failed` for
+//   hub visibility without opening chat. [EventChatScreen] flushes pending on socket connect;
+//   [EventOfflineWorkCoordinator] also drains globally when online.
+// - Field mode: `POST /events/field-batch` may partially succeed; mobile clears only rows
+//   for applied indices (see field_mode_batch_result.dart). [FieldModeSyncService] shares the
+//   POST + clear path with FieldModeScreen; auto-sync still runs on resume when online from the
+//   screen; the coordinator also retries field batches after reconnect.
 // - Cleanup evidence: large batches and backgrounding mid-upload depend on OS process limits;
 //   back navigation is blocked while saving; a snack explains if the user tries to leave
 //   (eventsEvidenceSaveInProgressHint).
+// - Impact receipt share URL points at `{shareBase}/events/:id`; landing is implemented on
+//   `apps/landing` (`/events/[id]`) with `GET /events/:id/share-card` (public). Rich OG tags remain
+//   optional; see docs/events-release-checklist.md (universal links + AASA/assetlinks).
 //
-// Deferred epics (OS reminders, universal links, funnel analytics, roster privacy):
-// docs/events-deferred-epics.md
+// Discovery funnel analytics (upgrade #3):
+// - Mobile: [DiscoveryAnalytics] posts to `POST /discovery-analytics/events` when
+//   `--dart-define=DISCOVERY_ANALYTICS_ENABLED=true` **and** user consent (`discovery_analytics_consent_v1`
+//   in SharedPreferences via [DiscoveryAnalytics.setUserConsent]). Hook example: [EventsNavigation.openDetail].
+// - API: ingest is a no-op unless env `DISCOVERY_ANALYTICS_ENABLED=true` (legal/ops gate); payload is
+//   DTO-validated (event UUID, step enum, platform, appVersion) — no free-text, no GPS.
+//
+// Deferred epics (OS reminders, roster privacy, full warehouse dashboards):
+// docs/events-deferred-epics.md (sign-off + API versioning expectations).
+//
+// Security / performance checklists:
+// - docs/events-security-checklist.md
+// - docs/events-performance-notes.md

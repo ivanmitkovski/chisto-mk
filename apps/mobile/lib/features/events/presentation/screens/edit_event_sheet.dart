@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
@@ -22,6 +23,7 @@ import 'package:chisto_mobile/features/events/presentation/utils/edit_event_form
 import 'package:chisto_mobile/features/events/presentation/utils/event_schedule_constraints.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_form_primitives.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_help_sheet.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/edit_event/edit_event_schedule_conflict_callout.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_calendar.dart';
@@ -58,6 +60,8 @@ class _EditEventSheetState extends State<EditEventSheet>
   late EventDifficulty _difficulty;
   bool _submitting = false;
   bool _showValidationErrors = false;
+  bool _networkOnline = true;
+  StreamSubscription<List<ConnectivityResult>>? _netSub;
   Timer? _scheduleConflictTimer;
   ConflictingEventInfo? _scheduleConflictHint;
   int _scheduleConflictRequestId = 0;
@@ -72,7 +76,20 @@ class _EditEventSheetState extends State<EditEventSheet>
 
   EcoEvent get _event => widget.event;
 
-  bool get _isTimeValid => EcoEvent.isValidRange(_startTime, _endTime);
+  bool get _isTimeValid {
+    if (_event.status == EcoEventStatus.inProgress) {
+      return EcoEvent.isValidRange(_startTime, _endTime);
+    }
+    final DateTime si = eventScheduleInstantLocal(
+      DateUtils.dateOnly(_selectedDate),
+      _startTime,
+    );
+    final DateTime ei = eventScheduleInstantLocal(
+      DateUtils.dateOnly(_selectedDate),
+      _endTime,
+    );
+    return ei.isAfter(si);
+  }
 
   ScheduleValidationIssue? _editScheduleIssue() {
     return validateEditSchedule(
@@ -96,7 +113,9 @@ class _EditEventSheetState extends State<EditEventSheet>
       dateOnly: dateOnly,
       start: _startTime,
       now: now,
-      editStatus: _event.status,
+      editStatus: _event.status == EcoEventStatus.upcoming
+          ? null
+          : _event.status,
     );
     return (minStart: minStart, minEnd: minEnd);
   }
@@ -110,6 +129,7 @@ class _EditEventSheetState extends State<EditEventSheet>
       descriptionTrimmed: _descriptionController.text.trim(),
       maxParticipants: maxParsed,
       dateOnly: DateUtils.dateOnly(_selectedDate),
+      endDateOnly: DateUtils.dateOnly(_selectedDate),
       startTime: _startTime,
       endTime: _endTime,
       category: _category,
@@ -140,7 +160,9 @@ class _EditEventSheetState extends State<EditEventSheet>
     );
     _selectedDate = _event.date;
     _startTime = _event.startTime;
-    _endTime = _event.endTime;
+    _endTime = _event.spansMultipleCalendarDays
+        ? const EventTime(hour: 23, minute: 59)
+        : _event.endTime;
     _category = _event.category;
     _gear = _event.gear.toSet();
     _scale = _event.scale ?? CleanupScale.small;
@@ -168,10 +190,24 @@ class _EditEventSheetState extends State<EditEventSheet>
       }
       _scheduleConflictPreviewDebounced();
     });
+
+    unawaited(ConnectivityGate.check().then((List<ConnectivityResult> r) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _networkOnline = ConnectivityGate.isOnline(r));
+    }));
+    _netSub = ConnectivityGate.watch().listen((List<ConnectivityResult> r) {
+      if (!mounted) {
+        return;
+      }
+      setState(() => _networkOnline = ConnectivityGate.isOnline(r));
+    });
   }
 
   @override
   void dispose() {
+    _netSub?.cancel();
     _scheduleConflictTimer?.cancel();
     _entranceController.dispose();
     _titleController.dispose();
@@ -206,19 +242,13 @@ class _EditEventSheetState extends State<EditEventSheet>
         return;
       }
       final int token = ++_scheduleConflictRequestId;
-      final DateTime startLocal = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        _startTime.hour,
-        _startTime.minute,
+      final DateTime startLocal = eventScheduleInstantLocal(
+        DateUtils.dateOnly(_selectedDate),
+        _startTime,
       );
-      final DateTime endLocal = DateTime(
-        _selectedDate.year,
-        _selectedDate.month,
-        _selectedDate.day,
-        _endTime.hour,
-        _endTime.minute,
+      final DateTime endLocal = eventScheduleInstantLocal(
+        DateUtils.dateOnly(_selectedDate),
+        _endTime,
       );
       unawaited(() async {
         try {
@@ -689,17 +719,11 @@ class _EditEventSheetState extends State<EditEventSheet>
       return;
     }
 
-    final List<ConnectivityResult> connectivity = await Connectivity()
-        .checkConnectivity();
+    final List<ConnectivityResult> connectivity = await ConnectivityGate.check();
     if (!mounted) {
       return;
     }
-    // [checkConnectivity] can return an empty list while the platform has not
-    // reported a state yet; treating that as online avoids blocking saves.
-    final bool online = connectivity.isEmpty ||
-        connectivity.any(
-          (ConnectivityResult e) => e != ConnectivityResult.none,
-        );
+    final bool online = ConnectivityGate.isOnline(connectivity);
     if (!online) {
       if (!mounted) {
         return;
@@ -752,10 +776,11 @@ class _EditEventSheetState extends State<EditEventSheet>
       _startTime.hour,
       _startTime.minute,
     );
+    final DateTime endCal = DateUtils.dateOnly(_selectedDate);
     final DateTime endDt = DateTime(
-      _selectedDate.year,
-      _selectedDate.month,
-      _selectedDate.day,
+      endCal.year,
+      endCal.month,
+      endCal.day,
       _endTime.hour,
       _endTime.minute,
     );
@@ -935,9 +960,9 @@ class _EditEventSheetState extends State<EditEventSheet>
           ),
           footer: PrimaryButton(
             label: l10n.eventsEditEventSave,
-            enabled: _isDirty,
+            enabled: _isDirty && _networkOnline,
             isLoading: _submitting,
-            onPressed: _isDirty && !_submitting
+            onPressed: _isDirty && !_submitting && _networkOnline
                 ? () => unawaited(_submit())
                 : null,
           ),
@@ -953,6 +978,42 @@ class _EditEventSheetState extends State<EditEventSheet>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
+                      if (!_networkOnline) ...<Widget>[
+                        Semantics(
+                          container: true,
+                          label: l10n.editEventOfflineSave,
+                          child: Material(
+                            color: AppColors.accentWarning.withValues(
+                              alpha: 0.12,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppSpacing.radiusMd,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Row(
+                                children: <Widget>[
+                                  Icon(
+                                    Icons.cloud_off_outlined,
+                                    size: AppSpacing.iconSm,
+                                    color: AppColors.textSecondary,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Expanded(
+                                    child: Text(
+                                      l10n.editEventOfflineSave,
+                                      style: AppTypography.eventsSupportingCaption(
+                                        textTheme,
+                                      ).copyWith(color: AppColors.textPrimary),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                      ],
                       if (!_event.moderationApproved) ...<Widget>[
                         Semantics(
                           container: true,
@@ -990,13 +1051,13 @@ class _EditEventSheetState extends State<EditEventSheet>
                               required bool isFocused,
                               required int? maxLength,
                             }) {
-                              return _editEventLengthCounter(
+                              return editEventLengthCounter(
                                 textTheme,
                                 currentLength,
                                 maxLength ?? kEditEventTitleMaxLength,
                               );
                             },
-                        decoration: _textFieldDecoration(
+                        decoration: editEventTextFieldDecoration(
                           textTheme,
                           labelText: l10n.createEventTitleLabel,
                           errorText: _titleError(l10n),
@@ -1021,13 +1082,13 @@ class _EditEventSheetState extends State<EditEventSheet>
                               required bool isFocused,
                               required int? maxLength,
                             }) {
-                              return _editEventLengthCounter(
+                              return editEventLengthCounter(
                                 textTheme,
                                 currentLength,
                                 maxLength ?? kEditEventDescriptionMaxLength,
                               );
                             },
-                        decoration: _textFieldDecoration(
+                        decoration: editEventTextFieldDecoration(
                           textTheme,
                           labelText: l10n.createEventDescriptionLabel,
                           errorText: _descriptionError(l10n),
@@ -1043,39 +1104,52 @@ class _EditEventSheetState extends State<EditEventSheet>
                         onTap: _showCategoryPicker,
                       ),
                       const SizedBox(height: AppSpacing.lg),
-                      EventCalendar(
-                        selectedDate: _selectedDate,
-                        onDateSelected: (DateTime d) {
-                          setState(() {
-                            _selectedDate = d;
-                            final DateTime dateOnly = DateUtils.dateOnly(d);
-                            final DateTime now = DateTime.now();
-                            if (_event.status == EcoEventStatus.upcoming) {
+                      if (_event.status == EcoEventStatus.upcoming) ...<Widget>[
+                        Text(
+                          l10n.createEventScheduleDateLabel,
+                          style: AppTypography.eventsSheetSectionLabel(textTheme),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        EventCalendar(
+                          selectedDate: _selectedDate,
+                          onDateSelected: (DateTime d) {
+                            setState(() {
+                              _selectedDate = DateUtils.dateOnly(d);
                               final ({EventTime start, EventTime end}) c =
                                   clampCreateOrUpcomingSchedule(
-                                    dateOnly: dateOnly,
-                                    start: _startTime,
-                                    end: _endTime,
-                                    now: now,
-                                  );
+                                dateOnly: _selectedDate,
+                                start: _startTime,
+                                end: _endTime,
+                                now: DateTime.now(),
+                              );
                               _startTime = c.start;
                               _endTime = c.end;
-                            } else if (_event.status ==
-                                EcoEventStatus.inProgress) {
+                            });
+                            _scheduleConflictPreviewDebounced();
+                          },
+                        ),
+                      ] else ...<Widget>[
+                        EventCalendar(
+                          selectedDate: _selectedDate,
+                          onDateSelected: (DateTime d) {
+                            setState(() {
+                              _selectedDate = d;
+                              final DateTime dateOnly = DateUtils.dateOnly(d);
+                              final DateTime now = DateTime.now();
                               final ({EventTime start, EventTime end}) c =
                                   clampInProgressEditSchedule(
-                                    dateOnly: dateOnly,
-                                    start: _startTime,
-                                    end: _endTime,
-                                    now: now,
-                                  );
+                                dateOnly: dateOnly,
+                                start: _startTime,
+                                end: _endTime,
+                                now: now,
+                              );
                               _startTime = c.start;
                               _endTime = c.end;
-                            }
-                          });
-                          _scheduleConflictPreviewDebounced();
-                        },
-                      ),
+                            });
+                            _scheduleConflictPreviewDebounced();
+                          },
+                        ),
+                      ],
                       const SizedBox(height: AppSpacing.lg),
                       Divider(
                         height: 1,
@@ -1095,29 +1169,58 @@ class _EditEventSheetState extends State<EditEventSheet>
                                 (!_isTimeValid || _editScheduleIssue() != null),
                             minimumStartPickerTime: b.minStart,
                             minimumEndPickerTime: b.minEnd,
+                            maximumEndPickerTime: pickerMaximumForEndSameCalendarDay(),
                             onStartChanged: (TimeOfDay t) {
                               setState(() {
                                 _startTime = EventTimeUI.fromTimeOfDay(t);
-                                if (!EcoEvent.isValidRange(
-                                  _startTime,
-                                  _endTime,
-                                )) {
-                                  final DateTime sdt =
-                                      eventScheduleInstantLocal(
-                                        DateUtils.dateOnly(_selectedDate),
-                                        _startTime,
-                                      );
-                                  _endTime = eventTimeFromDateTime(
-                                    sdt.add(const Duration(hours: 2)),
+                                if (_event.status == EcoEventStatus.inProgress) {
+                                  if (!EcoEvent.isValidRange(_startTime, _endTime)) {
+                                    final DateTime sdt = eventScheduleInstantLocal(
+                                      DateUtils.dateOnly(_selectedDate),
+                                      _startTime,
+                                    );
+                                    _endTime = eventTimeFromDateTime(
+                                      sdt.add(const Duration(hours: 2)),
+                                    );
+                                  }
+                                  _endTime = clampEndTimeToEventDay(
+                                    dateOnly: DateUtils.dateOnly(_selectedDate),
+                                    end: _endTime,
+                                    start: _startTime,
+                                  );
+                                } else {
+                                  final DateTime si = eventScheduleInstantLocal(
+                                    DateUtils.dateOnly(_selectedDate),
+                                    _startTime,
+                                  );
+                                  final DateTime ei = eventScheduleInstantLocal(
+                                    DateUtils.dateOnly(_selectedDate),
+                                    _endTime,
+                                  );
+                                  if (!ei.isAfter(si)) {
+                                    _endTime = eventTimeFromDateTime(
+                                      ceilToMinuteGrid(
+                                        si.add(const Duration(hours: 1)),
+                                      ),
+                                    );
+                                  }
+                                  _endTime = clampEndTimeToEventDay(
+                                    dateOnly: DateUtils.dateOnly(_selectedDate),
+                                    end: _endTime,
+                                    start: _startTime,
                                   );
                                 }
                               });
                               _scheduleConflictPreviewDebounced();
                             },
                             onEndChanged: (TimeOfDay t) {
-                              setState(
-                                () => _endTime = EventTimeUI.fromTimeOfDay(t),
-                              );
+                              setState(() {
+                                _endTime = clampEndTimeToEventDay(
+                                  dateOnly: DateUtils.dateOnly(_selectedDate),
+                                  end: EventTimeUI.fromTimeOfDay(t),
+                                  start: _startTime,
+                                );
+                              });
                               _scheduleConflictPreviewDebounced();
                             },
                           );
@@ -1149,6 +1252,19 @@ class _EditEventSheetState extends State<EditEventSheet>
                         const SizedBox(height: AppSpacing.xs),
                         Text(
                           l10n.createEventEndTimeError,
+                          style: AppTypography.eventsCaptionStrong(
+                            textTheme,
+                            color: AppColors.accentDanger,
+                          ).copyWith(fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                      if (_showValidationErrors &&
+                          _isTimeValid &&
+                          _editScheduleIssue() ==
+                              ScheduleValidationIssue.endAfterLocalDayEnd) ...<Widget>[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          l10n.createEventScheduleEndAfterDayError,
                           style: AppTypography.eventsCaptionStrong(
                             textTheme,
                             color: AppColors.accentDanger,
@@ -1191,7 +1307,7 @@ class _EditEventSheetState extends State<EditEventSheet>
                         controller: _maxParticipantsController,
                         keyboardType: TextInputType.number,
                         style: AppTypography.eventsEditFormFieldPrimary(textTheme),
-                        decoration: _textFieldDecoration(
+                        decoration: editEventTextFieldDecoration(
                           textTheme,
                           labelText: l10n.createEventFieldVolunteerCap,
                           hintText: l10n.createEventVolunteerCapCustomHint,
@@ -1233,44 +1349,4 @@ class _EditEventSheetState extends State<EditEventSheet>
     );
   }
 
-  static Widget _editEventLengthCounter(
-    TextTheme textTheme,
-    int currentLength,
-    int maxLength,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 2),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Text(
-          '$currentLength/$maxLength',
-          style: AppTypography.eventsListCardMeta(textTheme).copyWith(height: 1.0),
-        ),
-      ),
-    );
-  }
-
-  static InputDecoration _textFieldDecoration(
-    TextTheme textTheme, {
-    required String labelText,
-    String? hintText,
-    String? errorText,
-  }) {
-    return InputDecoration(
-      labelText: labelText,
-      hintText: hintText,
-      errorText: errorText,
-      labelStyle: AppTypography.eventsCalendarSectionHeader(textTheme),
-      floatingLabelStyle: AppTypography.eventsListCardMeta(textTheme).copyWith(
-        fontWeight: FontWeight.w600,
-        fontSize: 13,
-        height: 1.15,
-      ),
-      isDense: true,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: 14,
-      ),
-    );
-  }
 }

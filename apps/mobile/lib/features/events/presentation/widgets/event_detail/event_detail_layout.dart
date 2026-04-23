@@ -1,7 +1,7 @@
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
 /// **Event detail layout catalog** (related widgets, not all exported here):
-/// - Hero / toolbar: [HeroImageBar], [kHeroToolbarTitleInset].
+/// - Hero / toolbar: [HeroImageBar].
 /// - Body structure: [DetailContent], [DetailSectionHeader], [EventDetailGroupedPanel],
 ///   [EventDetailSurfaceDecoration].
 /// - Sticky CTA: [StickyBottomCTA], [kEventDetailMinimumCtaReserveHeight].
@@ -15,10 +15,6 @@ const double kEventDetailBodyHorizontalGutter = AppSpacing.lg;
 
 /// Minimum tap row height inside [EventDetailGroupedPanel] list rows.
 const double kEventDetailGroupedRowMinHeight = 52;
-
-/// Horizontal padding reserved by the leading/trailing action buttons in
-/// [HeroImageBar] so the collapsed title never overlaps the action buttons.
-const double kHeroToolbarTitleInset = AppSpacing.xl + AppSpacing.xs;
 
 // ── Sticky bottom CTA (frosted bar) ─────────────────────────────────────────
 

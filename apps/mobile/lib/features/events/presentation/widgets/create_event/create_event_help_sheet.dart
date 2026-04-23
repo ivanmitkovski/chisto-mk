@@ -57,6 +57,11 @@ void showCreateEventHelpSheet(BuildContext context) {
                 textTheme: textTheme,
               ),
               _HelpInfoRow(
+                icon: Icons.date_range_outlined,
+                text: ctx.l10n.createEventHelpBulletSameDay,
+                textTheme: textTheme,
+              ),
+              _HelpInfoRow(
                 icon: Icons.publish_outlined,
                 text: ctx.l10n.createEventHelpBulletSubmit,
                 textTheme: textTheme,

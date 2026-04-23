@@ -1,5 +1,4 @@
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/eco_event_card.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_feed/events_empty_states.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_filter_chips.dart';

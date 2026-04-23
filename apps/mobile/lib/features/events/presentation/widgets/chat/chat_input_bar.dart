@@ -18,6 +18,7 @@ import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_input_bar_attach_option_row.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_theme.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/voice_recording_meter.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -1075,33 +1076,33 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
                   ),
                 ),
               ),
-              _AttachOptionRow(
+              ChatInputBarAttachOptionRow(
                 icon: CupertinoIcons.photo,
                 label: context.l10n.eventChatAttachPhotoLibrary,
                 onTap: () { Navigator.pop(ctx); _pickImages(ImageSource.gallery); },
               ),
-              _AttachOptionRow(
+              ChatInputBarAttachOptionRow(
                 icon: CupertinoIcons.camera,
                 label: context.l10n.eventChatAttachCamera,
                 onTap: () { Navigator.pop(ctx); _pickImages(ImageSource.camera); },
               ),
-              _AttachOptionRow(
+              ChatInputBarAttachOptionRow(
                 icon: CupertinoIcons.videocam,
                 label: context.l10n.eventChatAttachVideo,
                 onTap: () { Navigator.pop(ctx); _pickVideo(); },
               ),
-              _AttachOptionRow(
+              ChatInputBarAttachOptionRow(
                 icon: CupertinoIcons.doc,
                 label: context.l10n.eventChatAttachDocument,
                 onTap: () { Navigator.pop(ctx); _pickDocument(); },
               ),
-              _AttachOptionRow(
+              ChatInputBarAttachOptionRow(
                 icon: CupertinoIcons.music_note,
                 label: context.l10n.eventChatAttachAudio,
                 onTap: () { Navigator.pop(ctx); _pickAudio(); },
               ),
               if (widget.onShareLocation != null)
-                _AttachOptionRow(
+                ChatInputBarAttachOptionRow(
                   icon: CupertinoIcons.location,
                   label: context.l10n.eventChatAttachLocation,
                   onTap: () { Navigator.pop(ctx); widget.onShareLocation!(); },
@@ -1281,36 +1282,5 @@ class _ChatInputBarState extends State<ChatInputBar> with SingleTickerProviderSt
     } finally {
       if (mounted) setState(() => _sending = false);
     }
-  }
-}
-
-class _AttachOptionRow extends StatelessWidget {
-  const _AttachOptionRow({required this.icon, required this.label, required this.onTap});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-        child: Row(
-          children: <Widget>[
-            Icon(icon, size: 22, color: AppColors.primary),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme)
-                    .copyWith(fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

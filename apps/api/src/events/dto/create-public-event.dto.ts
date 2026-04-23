@@ -13,8 +13,10 @@ import {
   Min,
   MinLength,
   Matches,
+  ValidateNested,
 } from 'class-validator';
 import { MOBILE_CATEGORY_KEYS } from '../events-mobile.mapper';
+import { EventRouteWaypointDto } from './event-route-waypoint.dto';
 
 export class CreatePublicEventDto {
   @ApiProperty()
@@ -104,4 +106,15 @@ export class CreatePublicEventDto {
   @Min(2)
   @Max(52)
   recurrenceCount?: number;
+
+  @ApiPropertyOptional({
+    type: [EventRouteWaypointDto],
+    description: 'Optional cleanup route waypoints (max 24)',
+  })
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(24)
+  @ValidateNested({ each: true })
+  @Type(() => EventRouteWaypointDto)
+  routeWaypoints?: EventRouteWaypointDto[];
 }

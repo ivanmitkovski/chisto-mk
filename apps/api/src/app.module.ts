@@ -26,6 +26,7 @@ import { EventsModule } from './events/events.module';
 import { EventChatModule } from './event-chat/event-chat.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
+import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.life
     EventsModule,
     EventChatModule,
     WebhooksModule,
+    DiscoveryAnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisIoAdapterLifecycle],

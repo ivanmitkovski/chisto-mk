@@ -107,11 +107,28 @@ class EcoEventCoverImage extends StatelessWidget {
       return _placeholder();
     }
     if (isNetworkUrl(t)) {
+      final double dpr = MediaQuery.devicePixelRatioOf(context);
+      int? cacheW;
+      int? cacheH;
+      final double? w = width;
+      final double? h = height;
+      // [Image] layout may pass infinity (e.g. full-width hero); never feed that to .round().
+      if (w != null &&
+          h != null &&
+          w.isFinite &&
+          h.isFinite &&
+          w > 0 &&
+          h > 0) {
+        cacheW = (w * dpr).round().clamp(1, 8192);
+        cacheH = (h * dpr).round().clamp(1, 8192);
+      }
       return Image.network(
         t,
         width: width,
         height: height,
         fit: fit,
+        cacheWidth: cacheW,
+        cacheHeight: cacheH,
         errorBuilder:
             (BuildContext context, Object error, StackTrace? stackTrace) {
           return _errorPlaceholder(context);

@@ -40,13 +40,13 @@ void main() {
     );
   }
 
-  test('joinable public guest: primary enabled, no secondary row', () {
+  test('joinable public guest: primary enabled before join deadline, no secondary row', () {
     final EcoEvent event = base(
       id: '1',
       status: EcoEventStatus.upcoming,
       organizerId: 'other',
       isJoined: false,
-    ).copyWith(scheduledAtUtc: DateTime.utc(2020, 6, 1, 8, 0));
+    ).copyWith(scheduledAtUtc: DateTime.utc(2030, 6, 1, 8, 0));
     final EventDetailCtaPresentation p =
         resolveEventDetailCtaPresentation(event: event, l10n: l10n);
     expect(p.primaryEnabled, isTrue);
@@ -54,13 +54,13 @@ void main() {
     expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);
   });
 
-  test('joinable guest before scheduled start: Join disabled', () {
+  test('joinable guest after join window: Join disabled', () {
     final EcoEvent event = base(
-      id: 'join-future',
+      id: 'join-closed',
       status: EcoEventStatus.upcoming,
       organizerId: 'other',
       isJoined: false,
-    ).copyWith(scheduledAtUtc: DateTime.utc(2035, 6, 1, 8, 0));
+    ).copyWith(scheduledAtUtc: DateTime.utc(2020, 6, 1, 8, 0));
     final EventDetailCtaPresentation p =
         resolveEventDetailCtaPresentation(event: event, l10n: l10n);
     expect(p.primaryLabel, l10n.eventsCtaJoinEcoAction);

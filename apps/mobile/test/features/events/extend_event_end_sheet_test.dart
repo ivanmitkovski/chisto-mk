@@ -19,19 +19,12 @@ void main() {
     ConnectivityGate.check = () async => <ConnectivityResult>[
       ConnectivityResult.wifi,
     ];
-    final DateTime d = DateUtils.dateOnly(DateTime.now());
+    // Tomorrow keeps schedule well above `now + minLead` so validation is not clock-sensitive.
     final DateTime now = DateTime.now();
-    DateTime endDt = DateTime(d.year, d.month, d.day, 22, 0);
-    if (!endDt.isAfter(now.add(const Duration(minutes: 10)))) {
-      endDt = now.add(const Duration(hours: 3));
-      endDt = DateTime(d.year, d.month, d.day, endDt.hour, endDt.minute);
-      if (!endDt.isAfter(now.add(const Duration(minutes: 10)))) {
-        endDt = DateTime(d.year, d.month, d.day, 23, 30);
-      }
-    }
-    final DateTime startDt = endDt.subtract(const Duration(hours: 8));
-    final EventTime startT = eventTimeFromDateTime(startDt);
-    final EventTime endT = eventTimeFromDateTime(endDt);
+    final DateTime d =
+        DateUtils.dateOnly(now).add(const Duration(days: 1));
+    const EventTime startT = EventTime(hour: 10, minute: 0);
+    const EventTime endT = EventTime(hour: 18, minute: 0);
     expect(
       validateInProgressEditSchedule(
         dateOnly: d,

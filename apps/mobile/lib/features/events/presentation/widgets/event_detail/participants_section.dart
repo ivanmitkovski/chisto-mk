@@ -11,6 +11,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/events_modal_sheet.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/event_participant_row.dart';
@@ -120,17 +121,7 @@ class _ParticipantsSectionState extends State<ParticipantsSection> {
           borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.03),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
-            ),
+            decoration: EventDetailSurfaceDecoration.detailModule(),
             child: Row(
               children: <Widget>[
                 AvatarStack(
@@ -671,7 +662,7 @@ class AvatarStack extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(color: AppColors.panelBackground, width: _borderW),
+          border: Border.all(color: AppColors.white, width: _borderW),
         ),
         child: child,
       ),

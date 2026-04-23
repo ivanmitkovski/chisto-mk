@@ -143,7 +143,8 @@ exports.Prisma.UserScalarFieldEnum = {
   avatarObjectKey: 'avatarObjectKey',
   avatarUpdatedAt: 'avatarUpdatedAt',
   totpSecret: 'totpSecret',
-  mfaBackupCodes: 'mfaBackupCodes'
+  mfaBackupCodes: 'mfaBackupCodes',
+  organizerCertifiedAt: 'organizerCertifiedAt'
 };
 
 exports.Prisma.UserSessionScalarFieldEnum = {
@@ -411,6 +412,50 @@ exports.Prisma.EventCheckInRedemptionScalarFieldEnum = {
   jti: 'jti'
 };
 
+exports.Prisma.EventLiveMetricScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  reportedBagsCollected: 'reportedBagsCollected'
+};
+
+exports.Prisma.EventEvidencePhotoScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  kind: 'kind',
+  objectKey: 'objectKey',
+  caption: 'caption',
+  uploadedById: 'uploadedById'
+};
+
+exports.Prisma.EventRouteSegmentScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  eventId: 'eventId',
+  sortOrder: 'sortOrder',
+  label: 'label',
+  latitude: 'latitude',
+  longitude: 'longitude',
+  status: 'status',
+  claimedByUserId: 'claimedByUserId',
+  claimedAt: 'claimedAt',
+  completedAt: 'completedAt'
+};
+
+exports.Prisma.CheckInRiskSignalScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  expiresAt: 'expiresAt',
+  eventId: 'eventId',
+  userId: 'userId',
+  signalType: 'signalType',
+  metadata: 'metadata'
+};
+
 exports.Prisma.SiteVoteScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -510,6 +555,14 @@ exports.Prisma.NotificationOutboxScalarFieldEnum = {
   deliveredAt: 'deliveredAt',
   failedPermanently: 'failedPermanently',
   idempotencyKey: 'idempotencyKey'
+};
+
+exports.Prisma.AdminMutationIdempotencyScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  actorUserId: 'actorUserId',
+  purpose: 'purpose',
+  clientJobId: 'clientJobId'
 };
 
 exports.Prisma.SortOrder = {
@@ -637,6 +690,22 @@ exports.EventChatMessageType = exports.$Enums.EventChatMessageType = {
   FILE: 'FILE'
 };
 
+exports.EventEvidenceKind = exports.$Enums.EventEvidenceKind = {
+  BEFORE: 'BEFORE',
+  AFTER: 'AFTER',
+  FIELD: 'FIELD'
+};
+
+exports.RouteSegmentStatus = exports.$Enums.RouteSegmentStatus = {
+  OPEN: 'OPEN',
+  CLAIMED: 'CLAIMED',
+  COMPLETED: 'COMPLETED'
+};
+
+exports.CheckInRiskSignalType = exports.$Enums.CheckInRiskSignalType = {
+  FAR_FROM_SITE: 'FAR_FROM_SITE'
+};
+
 exports.SiteShareChannel = exports.$Enums.SiteShareChannel = {
   native: 'native',
   link: 'link',
@@ -687,6 +756,10 @@ exports.Prisma.ModelName = {
   EventChatReadCursor: 'EventChatReadCursor',
   EventCheckIn: 'EventCheckIn',
   EventCheckInRedemption: 'EventCheckInRedemption',
+  EventLiveMetric: 'EventLiveMetric',
+  EventEvidencePhoto: 'EventEvidencePhoto',
+  EventRouteSegment: 'EventRouteSegment',
+  CheckInRiskSignal: 'CheckInRiskSignal',
   SiteVote: 'SiteVote',
   SiteSave: 'SiteSave',
   SiteComment: 'SiteComment',
@@ -695,7 +768,8 @@ exports.Prisma.ModelName = {
   UserDeviceToken: 'UserDeviceToken',
   UserNotification: 'UserNotification',
   UserNotificationPreference: 'UserNotificationPreference',
-  NotificationOutbox: 'NotificationOutbox'
+  NotificationOutbox: 'NotificationOutbox',
+  AdminMutationIdempotency: 'AdminMutationIdempotency'
 };
 
 /**

@@ -9,15 +9,11 @@ import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.da
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/event_recurrence_rrule_summary.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_layout.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_surface_decoration.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_stagger.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/staggered_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/title_section.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_chat_row.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_grouped_panel.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/location_chip.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/date_time_section.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/category_section.dart';
-import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_details_grid.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_detail_facts_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/gear_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/description_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/participants_section.dart';
@@ -25,6 +21,9 @@ import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/after_photos_gallery.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/completed_trash_bags_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_completed_detail_callouts.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_live_impact_section.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_evidence_strip_section.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/event_route_progress_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/impact_summary_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/reminder_section.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/event_detail/attendee_check_in_banner.dart';
@@ -34,10 +33,12 @@ import 'package:chisto_mobile/features/reports/presentation/widgets/report_surfa
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 /// Vertical section order (product + screen reader narrative):
-/// title → contextual banners → grouped metadata (where / when / category / …) →
-/// weather (when coordinates exist) → gear → description → participation block
+/// title → contextual banners → facts (where / when / category / scale / difficulty) →
+/// facts cards (when / where / meta chips) → weather (when coordinates exist) → gear → description → participation block
 /// (check-in + reminder when joined) → participants → organizer → organizer
-/// analytics (non-upcoming) → after photos → trash bags (organizer, completed) → impact summary (completed).
+/// analytics (non-upcoming) → after photos → impact receipt link (in progress / completed) →
+/// trash bags (organizer, completed) → impact summary (completed).
+/// Event chat opens from the hero toolbar when the user may access it.
 class DetailContent extends StatelessWidget {
   const DetailContent({
     super.key,
@@ -48,9 +49,8 @@ class DetailContent extends StatelessWidget {
     required this.onEditFeedback,
     required this.onImageTap,
     this.onOpenSeriesOccurrence,
-    this.onOpenEventChat,
-    this.eventChatUnreadCount = 0,
     this.onSaveBagsCollected,
+    this.onOpenImpactReceipt,
   });
 
   final EcoEvent event;
@@ -60,11 +60,12 @@ class DetailContent extends StatelessWidget {
   final VoidCallback onEditFeedback;
   final ValueChanged<int> onImageTap;
   final ValueChanged<String>? onOpenSeriesOccurrence;
-  final VoidCallback? onOpenEventChat;
-  final int eventChatUnreadCount;
 
   /// When non-null and the event is completed + organizer, shows inline trash-bag count.
   final Future<void> Function(int bagsCollected)? onSaveBagsCollected;
+
+  /// Opens the impact receipt screen (in progress or completed only).
+  final VoidCallback? onOpenImpactReceipt;
 
   @override
   Widget build(BuildContext context) {
@@ -124,33 +125,100 @@ class DetailContent extends StatelessWidget {
             child: EventCompletedDetailCallouts(event: event),
           ),
         ],
+        if (event.status == EcoEventStatus.inProgress) ...<Widget>[
+          const SizedBox(height: AppSpacing.lg),
+          StaggeredSection(
+            delay: EventDetailStagger.livePulse,
+            child: EventLiveImpactSection(event: event),
+          ),
+        ],
+        if (onOpenImpactReceipt != null &&
+            (event.status == EcoEventStatus.inProgress ||
+                event.status == EcoEventStatus.completed)) ...<Widget>[
+          const SizedBox(height: AppSpacing.md),
+          StaggeredSection(
+            delay: EventDetailStagger.impactReceiptLink,
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(AppSpacing.md),
+                onTap: () {
+                  AppHaptics.tap();
+                  onOpenImpactReceipt!();
+                },
+                child: Ink(
+                  decoration: EventDetailSurfaceDecoration.detailModule(),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.md,
+                    ),
+                    child: Row(
+                      children: <Widget>[
+                        Icon(
+                          CupertinoIcons.doc_text_fill,
+                          color: AppColors.primaryDark,
+                          size: 22,
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            context.l10n.eventsImpactReceiptViewCta,
+                            style: AppTypography.eventsGroupedRowPrimary(
+                              Theme.of(context).textTheme,
+                            ),
+                          ),
+                        ),
+                        Icon(
+                          CupertinoIcons.chevron_forward,
+                          size: 18,
+                          color: AppColors.textMuted,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+        if (event.routeSegments.isNotEmpty) ...<Widget>[
+          const SizedBox(height: AppSpacing.lg),
+          StaggeredSection(
+            delay: EventDetailStagger.routeProgress,
+            child: EventRouteProgressSection(event: event),
+          ),
+        ],
+        if (event.evidenceStrip.isNotEmpty) ...<Widget>[
+          const SizedBox(height: AppSpacing.lg),
+          StaggeredSection(
+            delay: EventDetailStagger.evidenceStrip,
+            child: EventEvidenceStripSection(items: event.evidenceStrip),
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
         Semantics(
           container: true,
           label: context.l10n.eventsDetailGroupedPanelSemantic,
           child: StaggeredSection(
             delay: EventDetailStagger.groupedPanel,
-            child: EventDetailGroupedPanel(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                LocationChip(event: event, embeddedInGroupedPanel: true),
-                DateTimeSection(
+                EventDetailFactsSection(
                   event: event,
                   onExportCalendar: onExportCalendar,
-                  embeddedInGroupedPanel: true,
                 ),
-                CategorySection(event: event, embeddedInGroupedPanel: true),
-                if (event.scale != null || event.difficulty != null)
-                  EventDetailsGrid(event: event, embeddedInGroupedPanel: true),
-                if (event.isRecurring)
-                  _RecurrenceRow(
-                    event: event,
-                    onOpenSeriesOccurrence: onOpenSeriesOccurrence,
+                if (event.isRecurring) ...<Widget>[
+                  const SizedBox(height: AppSpacing.md),
+                  DecoratedBox(
+                    decoration: EventDetailSurfaceDecoration.detailModule(),
+                    child: _RecurrenceRow(
+                      event: event,
+                      onOpenSeriesOccurrence: onOpenSeriesOccurrence,
+                    ),
                   ),
-                if (onOpenEventChat != null)
-                  EventDetailChatRow(
-                    unreadCount: eventChatUnreadCount,
-                    onOpen: onOpenEventChat!,
-                  ),
+                ],
               ],
             ),
           ),
@@ -254,7 +322,7 @@ class DetailContent extends StatelessWidget {
   }
 }
 
-/// Embedded row inside [EventDetailGroupedPanel] for recurring series context.
+/// Recurring series summary and prev/next occurrence controls.
 class _RecurrenceRow extends StatelessWidget {
   const _RecurrenceRow({required this.event, this.onOpenSeriesOccurrence});
 

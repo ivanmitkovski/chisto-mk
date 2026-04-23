@@ -3,6 +3,9 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 
 /// Design-time text styles for Chisto mobile.
 ///
+/// Typeface: [AppTheme] applies **Roboto** on iOS and Android via `google_fonts`
+/// (`GoogleFonts.robotoTextTheme`); this file defines sizes, weights, and colors only.
+///
 /// **Dynamic Type (text scaling)** — Prefer widgets that inherit the ambient
 /// [TextScaler] (default [Text] behavior). When a layout would overflow at large
 /// accessibility sizes, wrap that subtree with

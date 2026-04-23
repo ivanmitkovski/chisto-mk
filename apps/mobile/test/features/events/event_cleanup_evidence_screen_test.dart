@@ -12,7 +12,6 @@ import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'dart:ui' show SemanticsAction;
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> _pumpUi(WidgetTester tester) async {

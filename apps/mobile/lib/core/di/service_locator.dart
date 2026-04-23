@@ -16,6 +16,7 @@ import 'package:chisto_mobile/features/events/data/api_event_analytics_repositor
 import 'package:chisto_mobile/features/events/data/chat/api_event_chat_repository.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_repository.dart';
 import 'package:chisto_mobile/features/events/data/check_in_sync_service.dart';
+import 'package:chisto_mobile/features/events/data/event_offline_work_coordinator.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
@@ -62,6 +63,9 @@ class ServiceLocator {
 
   /// Increment to trigger profile refresh (e.g. after report submit).
   final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
+
+  /// Increment when a server push implies the public events list should refresh (e.g. new published cleanup).
+  final ValueNotifier<int> eventsFeedRemoteRefreshTick = ValueNotifier<int>(0);
 
   AppConfig get config => _config!;
   AuthState? get authStateOrNull => _authState;
@@ -180,6 +184,8 @@ class ServiceLocator {
       ),
     );
 
+    unawaited(EventOfflineWorkCoordinator.instance.start());
+
     _loadStoredAppLocale(prefs);
 
     _initialized = true;
@@ -215,6 +221,7 @@ class ServiceLocator {
   }
 
   void reset() {
+    EventOfflineWorkCoordinator.instance.dispose();
     CheckInSyncService.dispose();
     _reportsRealtimeService?.dispose();
     _mapRealtimeService?.dispose();

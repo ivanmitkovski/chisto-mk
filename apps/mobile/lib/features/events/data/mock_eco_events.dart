@@ -40,6 +40,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.large,
       difficulty: EventDifficulty.moderate,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-2',
@@ -62,6 +63,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       gear: <EventGear>[EventGear.trashBags, EventGear.gloves],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.easy,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-3',
@@ -90,6 +92,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.medium,
       difficulty: EventDifficulty.hard,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-4',
@@ -118,6 +121,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.medium,
       difficulty: EventDifficulty.hard,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-5',
@@ -145,6 +149,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.moderate,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-6',
@@ -167,6 +172,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       gear: <EventGear>[EventGear.trashBags, EventGear.gloves],
       scale: CleanupScale.medium,
       difficulty: EventDifficulty.easy,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-7',
@@ -195,6 +201,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.large,
       difficulty: EventDifficulty.easy,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-8',
@@ -217,6 +224,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       gear: <EventGear>[EventGear.rakes, EventGear.gloves, EventGear.sunscreen],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.easy,
+      moderationApproved: true,
     ),
     EcoEvent(
       id: 'evt-9',
@@ -243,6 +251,7 @@ List<EcoEvent> buildMockEcoEventsSeed() {
       ],
       scale: CleanupScale.small,
       difficulty: EventDifficulty.moderate,
+      moderationApproved: true,
     ),
   ];
 }

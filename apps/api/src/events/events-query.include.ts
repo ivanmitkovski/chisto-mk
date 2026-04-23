@@ -40,6 +40,34 @@ export const eventIncludeForViewer = (viewerId?: string) =>
       take: 1,
       select: { checkedInAt: true },
     },
+    liveMetric: {
+      select: { reportedBagsCollected: true, updatedAt: true },
+    },
+    routeSegments: {
+      orderBy: { sortOrder: 'asc' },
+      select: {
+        id: true,
+        sortOrder: true,
+        label: true,
+        latitude: true,
+        longitude: true,
+        status: true,
+        claimedByUserId: true,
+        claimedAt: true,
+        completedAt: true,
+      },
+    },
+    evidencePhotos: {
+      orderBy: { createdAt: 'asc' },
+      take: 32,
+      select: {
+        id: true,
+        kind: true,
+        objectKey: true,
+        caption: true,
+        createdAt: true,
+      },
+    },
   }) satisfies Prisma.CleanupEventInclude;
 
 export type LoadedEvent = Prisma.CleanupEventGetPayload<{

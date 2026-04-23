@@ -14,6 +14,7 @@ export type AuthResponse = {
     isPhoneVerified: boolean;
     pointsBalance: number;
     avatarUrl: string | null;
+    organizerCertifiedAt: string | null;
   };
 };
 

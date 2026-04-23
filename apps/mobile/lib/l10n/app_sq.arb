@@ -862,10 +862,20 @@
   "eventsUnableToStartEventGeneric": "Nuk mund të nisej ngjarja. Kontrollo lidhjen dhe provo përsëri.",
   "eventsStartEventTooEarly": "Mund ta nisni këtë veprim ekologjik pasi të arrijë koha e planifikuar e fillimit.",
   "eventsJoinNotYetOpen": "Bashkimi hapet kur arrin koha e planifikuar e fillimit.",
+  "eventsJoinWindowClosed": "Nuk mund të bashkoheni më. Bashkimi mbeti i hapur deri në 15 minuta pas fillimit të planifikuar.",
   "errorEventEndAtTooFar": "Fundi i planifikuar nuk mund të jetë kaq larg nga fillimi. Provoni një zgjatje më të shkurtër.",
+  "errorEventsEndDifferentSkopjeCalendarDay": "Fundi duhet të jetë i njëjtës ditë kalendarike si fillimi (Evropë/Shkup).",
+  "errorEventsEndAfterSkopjeLocalDay": "Ngjarja duhet të përfundojë deri në 23:59 të ditës së fillimit.",
   "eventsAwaitingModerationCta": "Në pritje të aprovimit",
   "eventsModerationBannerTitle": "Në pritje të aprovimit",
   "eventsModerationBannerBody": "Ky veprim është i dukshëm për ju si organizator. Vullnetarët mund të bashkohen pasi moderatorët ta aprovojnë.",
+  "eventsAttendeeModerationBannerTitle": "Në pritje të aprovimit",
+  "eventsAttendeeModerationBannerBody": "Moderatorët po e shqyrtojnë veprimin. Mund ta hapni, por bashkimi hapet vetëm pas aprovimit.",
+  "eventsDeclinedBannerTitle": "Nuk u aprovua",
+  "eventsDeclinedBannerBody": "Kjo ngjarje nuk i plotësoi kriteret. Ndryshoni dhe ridërgoni.",
+  "eventsDeclinedResubmitCta": "Ndrysho dhe ridërgo",
+  "eventsDeclinedDashboardPill": "Refuzuar",
+  "eventsPendingDashboardPill": "Nën shqyrtim",
   "eventsEventPendingPublicCta": "Ende nuk është hapur për t'u bashkuar",
   "eventsFeedOfflineStaleBanner": "Po shfaqen ngjarje të ruajtura — rifreskimi dështoi. Tërhiq poshtë për të provuar përsëri.",
   "eventsFeedInitialLoadFailed": "Nuk mundëm të ngarkojmë ngjarjet. Kontrollo lidhjen dhe provo përsëri.",
@@ -1048,6 +1058,55 @@
   "eventsOrganizerCompletionStepImpactBody": "Shëno çanta, orë vullnetare dhe vlerësime nga faqja e ngjarjes.",
   "eventsOrganizerCompletionStepVisibilityTitle": "Ndërto besim",
   "eventsOrganizerCompletionStepVisibilityBody": "Fotot ndihmojnë moderatorët të verifikojnë pastrimin dhe frymëzojnë veprime të ardhshme.",
+  "eventsOrganizerCompletionViewReceipt": "Shiko fletëpagesën e ndikimit",
+  "eventsImpactReceiptScreenTitle": "Fletëpagesa e ndikimit",
+  "eventsImpactReceiptHeroSemantic": "Fletëpagesë ndikimi për {title}",
+  "@eventsImpactReceiptHeroSemantic": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptMetricCheckIns": "Regjistrime",
+  "eventsImpactReceiptMetricParticipants": "Të regjistruar",
+  "eventsImpactReceiptMetricBags": "Çanta (të raportuara)",
+  "eventsImpactReceiptProofHeading": "Dëshmi",
+  "eventsImpactReceiptNoMediaHint": "Shto foto \"pas\" ose dëshmi të strukturuar nga faqja e ngjarjes.",
+  "eventsImpactReceiptAsOf": "Përditësuar {timestamp}",
+  "@eventsImpactReceiptAsOf": {
+    "placeholders": {
+      "timestamp": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsImpactReceiptCompletenessInProgress": "Në progres",
+  "eventsImpactReceiptCompletenessFull": "Regjistrim i plotë",
+  "eventsImpactReceiptCompletenessPartialAfter": "Mungojnë fotot \"pas\"",
+  "eventsImpactReceiptCompletenessPartialEvidence": "Mungojnë dëshmitë e strukturuara",
+  "eventsImpactReceiptCompletenessPartialBoth": "Mungojnë fotot dhe dëshmitë",
+  "eventsImpactReceiptShare": "Ndaj",
+  "eventsImpactReceiptCopyLink": "Kopjo lidhjen",
+  "eventsImpactReceiptLinkCopied": "Lidhja u kopjua",
+  "eventsImpactReceiptViewCta": "Fletëpagesa e ndikimit",
+  "eventsImpactReceiptRetry": "Provo përsëri",
+  "eventsImpactReceiptLoadFailed": "Nuk u ngarkua fletëpagesa.",
+  "eventsImpactReceiptShareSummary": "{checkIns} regjistrime · {bags} çanta · {joined} të regjistruar",
+  "@eventsImpactReceiptShareSummary": {
+    "placeholders": {
+      "checkIns": {
+        "type": "int"
+      },
+      "bags": {
+        "type": "int"
+      },
+      "joined": {
+        "type": "int"
+      }
+    }
+  },
+  "errorEventsImpactReceiptNotAvailable": "Fletëpagesa e ndikimit ende nuk është e disponueshme për këtë ngjarje.",
   "eventsOrganizerDetailPendingAfterPhotosTitle": "Foto \"pas\"",
   "eventsOrganizerDetailPendingAfterPhotosMessage": "Ngarko foto pas pastrimit që vullnetarët dhe moderatorët të shohin rezultatet. Përdor butonin më poshtë.",
   "eventsAttendeeCompletedTitle": "Faleminderit",
@@ -1202,6 +1261,8 @@
       }
     }
   },
+  "createEventScheduleDateLabel": "Data e ngjarjes",
+  "createEventScheduleEndAfterDayError": "Ngjarja duhet të përfundojë deri në 23:59 të së njëjtës dite.",
   "createEventFieldType": "Lloji i ngjarjes",
   "createEventPlaceholderType": "Zgjidh llojin e ngjarjes",
   "createEventFieldTeamSize": "Madhësia e ekipit",
@@ -1215,7 +1276,8 @@
   "createEventHelpBulletModeration": "Ngjarjet shqyrtohen që komuniteti të shohë pastrime të sakta dhe të sigurta.",
   "createEventHelpBulletVolunteers": "Vullnetarët shohin titullin, orarin, vendin, pajisjet dhe përshkrimin kur ngjarja është aktive.",
   "createEventHelpBulletSite": "Zgjidh një vend ndotjeje nga lista ose harta që të dinë të gjithë ku të takohen.",
-  "createEventHelpBulletSchedule": "Cakto datën dhe intervalin kohor që kalendarët dhe kujtuesit të jenë të qartë.",
+  "createEventHelpBulletSchedule": "Zgjidh datën e ngjarjes, pastaj orët e fillimit dhe mbarimit të asaj dite.",
+  "createEventHelpBulletSameDay": "Ngjarja duhet të përfundojë të njëjtën ditë kalendarike, së voni deri në 23:59.",
   "createEventHelpBulletSubmit": "Kur janë plotësuar fushat e detyrueshme, përdor „Krijo aksionin ekologjik“ për publikim.",
   "createEventFieldVolunteerCap": "Kufiri i vullnetarëve",
   "createEventVolunteerCapPlaceholderNoLimit": "Pa kufi",
@@ -1437,6 +1499,15 @@
     }
   },
   "eventsDetailGroupedPanelSemantic": "Vendndodhja, orari dhe detajet",
+  "eventsHeroChatSemantic": "{count, plural, =0{Bisedë në grup} one{Bisedë në grup, 1 e palexuar} other{Bisedë në grup, {count} të palexuara}}",
+  "@eventsHeroChatSemantic": {
+    "description": "Etiketë aksesibiliteti për veprimin e bisedës në grup në shiritin e veglive.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "eventsDetailParticipationSemantic": "Pjesëmarrja juaj",
   "eventsAnalyticsLoadFailed": "Nuk u ngarkuan analitikat.",
   "eventsAnalyticsRetry": "Riprovo",
@@ -1549,6 +1620,8 @@
   "eventsCardParticipantsMore": "+{count} të tjerë",
   "eventsCardParticipantsCountMax": "{count} / {max}",
   "eventsCardParticipantsJoined": "{count} të bashkuar",
+  "eventsDiscoveryThisWeekRetryHint": "Nuk mund të ngarkojmë zgjedhjet e kësaj jave.",
+  "eventsDiscoveryThisWeekRetry": "Riprovo",
   "eventsDetailSemanticsLabel": "Detaje ngjarjeje: {title}",
   "eventsCountdownBadgeSemantic": "Kohë deri në fillim të ngjarjes: {label}",
   "eventsEvidenceThumbnailMenuTitle": "Foto",
@@ -1901,10 +1974,107 @@
   "eventsImpactSummaryTitle": "Përmbledhje e ndikimit",
   "eventsImpactSummaryAdd": "Shto",
   "eventsImpactSummaryEdit": "Ndrysho",
-  "eventsImpactSummaryEmptyHint": "Regjistroni rezultatet, përpjekjen dhe mësimet nga pastrimi.",
+  "eventsImpactSummaryEmptyHint": "Shënoni rezultatet dhe mësimet nga pastrimi.",
+  "eventsLivePulseTitle": "Ndikimi në kohë reale",
+  "eventsLivePulseVolunteers": "{count} të regjistruar",
+  "eventsLivePulseCheckIns": "{count} check-in",
+  "eventsLivePulseBags": "{count} thesa · rreth {kg} kg",
+  "eventsEvidenceStripTitle": "Dëshmi nga fusha",
+  "eventsEvidenceStripSubtitle": "Foto nga rrjedha e dëshmive të pastrimit.",
+  "eventsEvidenceStripSemantic": "Foto para, pas dhe nga fusha nga rrjedha e dëshmive",
+  "eventsEvidenceKindBefore": "Para",
+  "eventsEvidenceKindAfter": "Pas",
+  "eventsEvidenceKindField": "Fushë",
+  "eventsEvidenceStripTileSemantic": "Foto {index} nga {total}, {kind}",
+  "@eventsEvidenceStripTileSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "kind": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsRouteProgressTitle": "Rruga",
+  "eventsFieldModeRowServerError": "Serveri: {code}",
+  "@eventsFieldModeRowServerError": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "eventsFieldModeTitle": "Modaliteti fushë",
+  "eventsFieldModeSync": "Sinkronizo tani",
+  "eventsFieldModeEmpty": "Asgjë në radhë jashtë linje.",
+  "eventsFieldModeSynced": "Radha u sinkronizua.",
+  "eventsFieldModeSyncFailed": "Sinkronizimi dështoi. Provoni përsëri.",
+  "eventsFieldModeSyncPartial": "U sinkronizuan {synced} përditësime. {failed} ende janë në radhë jashtë linje.",
+  "@eventsFieldModeSyncPartial": {
+    "placeholders": {
+      "synced": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowLiveImpactBags": "Ndikim në kohë reale · {count} thesa",
+  "@eventsFieldModeRowLiveImpactBags": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsFieldModeRowUnknown": "Ndryshim jashtë linje",
+  "eventsFieldModeRowStatusPending": "Në pritje",
+  "eventsFieldModeRowStatusSyncing": "Duke u sinkronizuar",
+  "eventsOfflineWorkHubTitle": "Punë jashtë linje",
+  "eventsOfflineWorkHubSemanticSheet": "Përmbledhje e punës jashtë linje dhe veprime sinkronizimi",
+  "eventsOfflineWorkSubtitle": "Ndryshime në radhë për check-in, përditësime në terren dhe bisedë.",
+  "eventsOfflineWorkSectionCheckIns": "Check-in",
+  "eventsOfflineWorkSectionField": "Përditësime në terren",
+  "eventsOfflineWorkSectionChat": "Bisedë",
+  "eventsOfflineWorkCountPending": "{count} në pritje",
+  "@eventsOfflineWorkCountPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkCountFailed": "{count} kërkojnë vëmendje",
+  "@eventsOfflineWorkCountFailed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsOfflineWorkSyncNow": "Sinkronizo tani",
+  "eventsOfflineWorkOpenFieldQueue": "Hap radhën e terrenit",
+  "eventsOfflineWorkOpenChat": "Hap bisedën e ngjarjes",
+  "eventsOfflineWorkRetryFailedChat": "Riprovo dërgimin e mesazheve të dështuara",
+  "eventsOfflineWorkResolveInChat": "Hap bisedën dhe korrigjo ose fshi mesazhin që nuk u dërgua dot.",
+  "eventsOfflineWorkSyncDone": "Sinkronizimi përfundoi",
+  "eventsOfflineWorkSyncing": "Duke u sinkronizuar…",
+  "eventsOfflineWorkDrainFailed": "Nuk e përfunduam dot sinkronizimin. Provo përsëri kur të jesh në linjë.",
+  "eventsChatOutboxFull": "Shumë mesazhe presin dërgim jashtë linje (limiti {max}). Lidhu për t’i dërguar mesazhet në pritje, pastaj provo përsëri.",
+  "@eventsChatOutboxFull": {
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
   "eventsCompletedBagsSectionTitle": "Thesa me mbeturina të mbledhura",
-  "eventsCompletedBagsSectionSubtitle": "Sa thesa me mbeturina u mblodhën nga vullnetarët gjatë këtij pastrimi. Mund ta përditësoni kur të doni; përfshihet në përmbledhjen e ndikimit më poshtë.",
-  "eventsCompletedBagsSave": "Ruaj numrin",
+  "eventsCompletedBagsSave": "Ruaj",
   "eventsCompletedBagsSaved": "Numri i thesave u ruajt.",
   "eventsImpactBadgeRating": "{rating}★ vlerësim",
   "eventsImpactBadgeBags": "{count} thesa",
@@ -1933,6 +2103,9 @@
   "eventsSuccessDialogTitle": "Ngjarja u krijua",
   "eventsSuccessDialogBody": "{title} në {siteName} është gati. Ndaje me komunitetin për të mbledhur vullnetarë.",
   "eventsSuccessDialogOpenEvent": "Hap ngjarjen",
+  "eventsSuccessDialogViewEvent": "Shiko ngjarjen",
+  "eventsSuccessDialogPendingTitle": "Dërguar për shqyrtim",
+  "eventsSuccessDialogPendingBody": "{title} në {siteName} u dërgua. Një moderator do ta miratojë ose refuzojë para se të shfaqet publikisht. Mund ta hapësh nga ngjarjet e tua në çdo kohë.",
   "eventsTimePickerSelectTime": "Zgjidh orën",
   "eventsTimePickerConfirm": "Konfirmo",
   "eventsTimePickerFrom": "Nga",
@@ -2563,5 +2736,57 @@
     }
   },
   "chatShareLocation": "Ndaj vendndodhjen",
-  "chatSharedLocation": "Vendndodhje e ndarë"
+  "chatSharedLocation": "Vendndodhje e ndarë",
+
+  "organizerToolkitTitle": "Bëhu organizator",
+  "organizerToolkitPage1Title": "Planifiko përpara",
+  "organizerToolkitPage1Body": "Vlerësoni vendin për rreziqe, përgatitni pajisjet e sigurisë dhe informoni ekipin para se të vijnë vullnetarët.",
+  "organizerToolkitPage2Title": "Moderimi ndërton besim",
+  "organizerToolkitPage2Body": "Pasi të krijoni një ngjarje, moderatorët e shqyrtojnë. Pas aprovimit, vullnetarët mund ta shohin dhe të bashkohen.",
+  "organizerToolkitPage3Title": "Verifikoni pjesëmarrjen",
+  "organizerToolkitPage3Body": "Përdorni check-in me QR në aplikacion që çdo vullnetar të marrë pikët e merituara.",
+  "organizerToolkitPage4Title": "Moti dhe siguria",
+  "organizerToolkitPage4Body": "Nëse kushtet bëhen të pasigurta, ndaloni ose shtyni. Njoftoni menjëherë vullnetarët e regjistruar në aplikacion që askush të mos udhëtojë për një fillim të anuluar.",
+  "organizerToolkitPage5Title": "Mbeturinat dhe hedhja",
+  "organizerToolkitPage5Body": "Ndani riciklimin kur është e mundur, paketoni me siguri sende të mprehta dhe çojini mbeturinat në pika të autorizuara. Lëreni vendin më pastër se sa e gjetët.",
+  "organizerToolkitPage6Title": "Përfshini të gjithë",
+  "organizerToolkitPage6Body": "Ofroni role të qarta, ritëm të qëndrueshëm dhe durim. Një briefing mirëpritës i ndihmon vullnetarët e rinj të ndihen të sigurt.",
+  "organizerToolkitPage7Title": "Privatësia në chat",
+  "organizerToolkitPage7Body": "Mbajini numrat e telefonit dhe adresat jashtë bisedës publike të ngjarjes. Përdorni mesazhet në aplikacion që ekipi të mbetet i informuar pa ndarë tepër.",
+  "organizerToolkitPage8Title": "Dëshmi dhe ndikim i ndershëm",
+  "organizerToolkitPage8Body": "Fotot pas dhe numri i qeseve duhet të pasqyrojnë atë që ndodhi vërtet. Raportimi i saktë ndërton besim te vullnetarët, moderatorët dhe komuniteti.",
+  "organizerToolkitContinue": "Vazhdo",
+  "organizerToolkitStartQuiz": "Zgjidh kuizin",
+  "organizerQuizTitle": "Kontroll i shpejtë i njohurive",
+  "organizerQuizLoadFailed": "Nuk u ngarkua kuizi. Provo përsëri.",
+  "organizerQuizLoadInvalidResponse": "Të dhënat e kuizit nga serveri ishin të paplota. Provo përsëri.",
+  "organizerQuizRetryLoad": "Provo përsëri",
+  "organizerQuizSubmitFailed": "Nuk u dorëzuan përgjigjet. Provo përsëri.",
+  "organizerQuizOptionSemantic": "Pyetja {index} nga {total}: {optionText}",
+  "@organizerQuizOptionSemantic": {
+    "placeholders": {
+      "index": { "type": "int" },
+      "total": { "type": "int" },
+      "optionText": { "type": "String" }
+    }
+  },
+  "organizerQuizSubmit": "Dorëzo përgjigjet",
+  "organizerQuizPassedTitle": "Jeni certifikuar!",
+  "organizerQuizPassedBody": "Tani mund të krijoni ngjarje pastrimi. Vullnetarët po presin.",
+  "organizerQuizFailedTitle": "Jo plotësisht",
+  "organizerQuizFailedBody": "Rishikoni tutorialin dhe provoni përsëri. Keni {correct} nga {total} të sakta.",
+  "@organizerQuizFailedBody": {
+    "placeholders": {
+      "correct": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "organizerQuizRetry": "Provo përsëri",
+  "organizerQuizCreateEvent": "Krijo ngjarjen e parë",
+  "organizerCertifiedBadge": "Organizator i certifikuar",
+  "errorOrganizerQuizSessionExpired": "Sesioni i kuizit skadoi. Ngarkoni një kuiz të ri dhe provoni përsëri.",
+  "errorOrganizerQuizSessionInvalid": "Ky sesion kuizi nuk është i vlefshëm. Ngarkoni kuizin përsëri.",
+  "errorOrganizerQuizAnswersMismatch": "Përgjigjet nuk përputhen me kuizin që filluat. Ngarkoni kuizin përsëri.",
+  "errorOrganizerQuizInvalid": "Disa përgjigje nuk janë të vlefshme për këtë kuiz. Ngarkoni kuizin përsëri.",
+  "errorOrganizerCertificationAlreadyDone": "Jeni tashmë organizator i certifikuar. Nuk duhet të rifilloni kuizin."
 }

@@ -37,6 +37,11 @@ EcoEvent? ecoEventFromJson(Map<String, dynamic> json) {
       'hour': end.hour,
       'minute': end.minute,
     };
+    final DateTime startDay = DateTime(start.year, start.month, start.day);
+    final DateTime endDay = DateTime(end.year, end.month, end.day);
+    if (endDay.isAfter(startDay)) {
+      merged['endDate'] = endDay.toIso8601String();
+    }
   }
 
   return EcoEvent.fromJson(merged);

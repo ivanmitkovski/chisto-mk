@@ -10,6 +10,7 @@ import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_filter.dart';
 import 'package:chisto_mobile/features/events/domain/models/eco_event_search_params.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/utils/events_diagnostic_log.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_feed_search_merge.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 
@@ -44,7 +45,21 @@ class EventsFeedController extends ChangeNotifier {
   String? _derivedCacheKey;
   List<EcoEvent>? _cachedFiltered;
 
+  List<EcoEvent> _discoveryThisWeekShelf = <EcoEvent>[];
+  bool _discoveryThisWeekShelfLoading = false;
+  bool _discoveryThisWeekShelfFailed = false;
+
+  /// Set when [userPullRefresh] fails so the UI can show a typed message via [localizedAppErrorMessage].
+  AppError? _lastPullRefreshError;
+
   EventsRepository get repository => _repository;
+
+  AppError? get lastPullRefreshError => _lastPullRefreshError;
+
+  List<EcoEvent> get discoveryThisWeekShelf =>
+      List<EcoEvent>.unmodifiable(_discoveryThisWeekShelf);
+
+  bool get discoveryThisWeekShelfFailed => _discoveryThisWeekShelfFailed;
 
   EcoEventFilter get activeFilter => _activeFilter;
   EcoEventSearchParams get activeSearchParams => _activeSearchParams;
@@ -79,6 +94,10 @@ class EventsFeedController extends ChangeNotifier {
     _cachedFiltered = null;
   }
 
+  /// Unapproved events are organizer-only; keeps hero/sections safe if bad data slips in.
+  bool _visibleInPublicDiscovery(EcoEvent e) =>
+      e.moderationApproved || e.isOrganizer;
+
   int _eventsFingerprint(List<EcoEvent> list) {
     int h = list.length;
     for (final EcoEvent e in list) {
@@ -105,11 +124,51 @@ class EventsFeedController extends ChangeNotifier {
   Future<bool> userPullRefresh() async {
     try {
       await refreshMergedList();
+      await loadDiscoveryThisWeekShelf();
       _initialLoadError = null;
+      _lastPullRefreshError = null;
       notifyListeners();
       return true;
-    } on Object catch (_) {
+    } on AppError catch (e) {
+      _lastPullRefreshError = e;
+      notifyListeners();
       return false;
+    } on Object catch (e) {
+      _lastPullRefreshError = AppError.unknown(cause: e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  /// Loads the horizontal "this week (Skopje)" discovery strip without mutating the main feed query.
+  Future<void> loadDiscoveryThisWeekShelf() async {
+    if (_discoveryThisWeekShelfLoading) {
+      return;
+    }
+    _discoveryThisWeekShelfLoading = true;
+    _discoveryThisWeekShelfFailed = false;
+    notifyListeners();
+    try {
+      final EcoEventSearchParams params = EcoEventSearchParams.discoveryThisSkopjeCalendarWeek(
+        DateTime.now().toUtc(),
+      );
+      final List<EcoEvent> rows = await _repository.fetchEventsSnapshot(params);
+      final List<EcoEvent> sorted = List<EcoEvent>.from(rows)
+        ..sort((EcoEvent a, EcoEvent b) {
+          final int dist = a.siteDistanceKm.compareTo(b.siteDistanceKm);
+          if (dist != 0) {
+            return dist;
+          }
+          return _statusRank(a).compareTo(_statusRank(b));
+        });
+      _discoveryThisWeekShelf = sorted;
+    } on Object catch (_) {
+      _discoveryThisWeekShelfFailed = true;
+      _discoveryThisWeekShelf = <EcoEvent>[];
+      logEventsDiagnostic('discovery_week_shelf_fetch_failed');
+    } finally {
+      _discoveryThisWeekShelfLoading = false;
+      notifyListeners();
     }
   }
 
@@ -144,6 +203,7 @@ class EventsFeedController extends ChangeNotifier {
           // Keep bootstrap list; user can pull to refresh.
         }
       }
+      unawaited(loadDiscoveryThisWeekShelf());
     } on Object catch (e) {
       _initialLoadError = AppError.network(cause: e);
       _isInitialLoading = false;
@@ -377,11 +437,15 @@ class EventsFeedController extends ChangeNotifier {
   /// In-progress rows for sectioned feed (from full [events], not client-filtered list).
   List<EcoEvent> get happeningNow => events
       .where((EcoEvent e) => e.status == EcoEventStatus.inProgress)
+      .where(_visibleInPublicDiscovery)
       .toList();
 
   /// Upcoming rows for hero + sections (from full [events]).
   List<EcoEvent> get comingUp => _applyDiscoverySort(
-        events.where((EcoEvent e) => e.status == EcoEventStatus.upcoming).toList(),
+        events
+            .where((EcoEvent e) => e.status == EcoEventStatus.upcoming)
+            .where(_visibleInPublicDiscovery)
+            .toList(),
       );
 
   List<EcoEvent> get recentlyCompleted => events

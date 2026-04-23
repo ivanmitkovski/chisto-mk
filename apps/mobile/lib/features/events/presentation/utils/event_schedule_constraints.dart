@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 
-// Same-calendar-day start/end only; overnight or multi-day spans are out of scope here.
-
 /// Minimum lead time before scheduled start for new events and upcoming edits.
 const Duration kEventScheduleMinLead = Duration(minutes: 5);
 
@@ -21,8 +19,17 @@ DateTime eventScheduleInstantLocal(DateTime dateOnly, EventTime time) {
   );
 }
 
+/// Last selectable minute on [dateOnly] (same calendar day as start).
+DateTime eventScheduleLocalDayEnd(DateTime dateOnly) {
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  return DateTime(d.year, d.month, d.day, 23, 59);
+}
+
 DateTime _pickerShell(int hour, int minute) =>
     DateTime(2000, 1, 1, hour.clamp(0, 23), minute.clamp(0, 59));
+
+/// Upper bound for end time pickers (shell date `2000-01-01`).
+DateTime pickerMaximumForEndSameCalendarDay() => _pickerShell(23, 59);
 
 /// Rounds [dt] up to the next [stepMinutes] boundary (ceiling in local time).
 DateTime ceilToMinuteGrid(DateTime dt, {int stepMinutes = kEventScheduleTimeGridMinutes}) {
@@ -45,8 +52,11 @@ EventTime eventTimeFromDateTime(DateTime dt) {
 
 /// Why schedule validation failed (single primary reason for UX).
 enum ScheduleValidationIssue {
-  /// [EcoEvent.isValidRange] is false.
+  /// [endInstant] is not strictly after [startInstant].
   endNotAfterStart,
+
+  /// End is after 23:59 on the event's calendar day.
+  endAfterLocalDayEnd,
 
   /// Start is before [earliestStartInstant] (e.g. now + lead on create/upcoming edit).
   startTooSoon,
@@ -59,7 +69,7 @@ DateTime _earliestStartInstant(DateTime now, Duration minLead) {
   return ceilToMinuteGrid(now.add(minLead));
 }
 
-/// Validates create flow and edit while event is [EcoEventStatus.upcoming].
+/// Validates create flow and **upcoming** edit: same calendar day, end before next day, start lead time.
 ScheduleValidationIssue? validateCreateOrUpcomingEditSchedule({
   required DateTime dateOnly,
   required EventTime start,
@@ -67,14 +77,20 @@ ScheduleValidationIssue? validateCreateOrUpcomingEditSchedule({
   required DateTime now,
   Duration minLead = kEventScheduleMinLead,
 }) {
-  if (!EcoEvent.isValidRange(start, end)) {
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  final DateTime startInstant = eventScheduleInstantLocal(d, start);
+  final DateTime endInstant = eventScheduleInstantLocal(d, end);
+  final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+  if (!endInstant.isAfter(startInstant)) {
     return ScheduleValidationIssue.endNotAfterStart;
   }
+  if (endInstant.isAfter(dayEnd)) {
+    return ScheduleValidationIssue.endAfterLocalDayEnd;
+  }
   final DateTime today = DateUtils.dateOnly(now);
-  if (dateOnly.isBefore(today)) {
+  if (d.isBefore(today)) {
     return ScheduleValidationIssue.startTooSoon;
   }
-  final DateTime startInstant = eventScheduleInstantLocal(dateOnly, start);
   final DateTime earliest = _earliestStartInstant(now, minLead);
   if (startInstant.isBefore(earliest)) {
     return ScheduleValidationIssue.startTooSoon;
@@ -82,7 +98,8 @@ ScheduleValidationIssue? validateCreateOrUpcomingEditSchedule({
   return null;
 }
 
-/// Validates edit while event is in progress: start may be in the past; end must be after now + lead.
+/// Validates edit while event is in progress: start may be in the past; end must be after now + lead
+/// and not after 23:59 on [dateOnly].
 ScheduleValidationIssue? validateInProgressEditSchedule({
   required DateTime dateOnly,
   required EventTime start,
@@ -93,7 +110,12 @@ ScheduleValidationIssue? validateInProgressEditSchedule({
   if (!EcoEvent.isValidRange(start, end)) {
     return ScheduleValidationIssue.endNotAfterStart;
   }
-  final DateTime endInstant = eventScheduleInstantLocal(dateOnly, end);
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  final DateTime endInstant = eventScheduleInstantLocal(d, end);
+  final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+  if (endInstant.isAfter(dayEnd)) {
+    return ScheduleValidationIssue.endAfterLocalDayEnd;
+  }
   final DateTime earliestEnd = _earliestStartInstant(now, minLead);
   if (endInstant.isBefore(earliestEnd) || endInstant.isAtSameMomentAs(earliestEnd)) {
     return ScheduleValidationIssue.endTooSoon;
@@ -120,7 +142,7 @@ ScheduleValidationIssue? validateEditSchedule({
       );
     case EcoEventStatus.inProgress:
       return validateInProgressEditSchedule(
-        dateOnly: dateOnly,
+        dateOnly: DateUtils.dateOnly(dateOnly),
         start: start,
         end: end,
         now: now,
@@ -132,7 +154,30 @@ ScheduleValidationIssue? validateEditSchedule({
   }
 }
 
-/// Picks default start/end for create when [dateOnly] is today: next grid slot + 2h duration.
+/// Keeps [end] on the same [dateOnly] and not after 23:59, strictly after [start] when possible.
+EventTime clampEndTimeToEventDay({
+  required DateTime dateOnly,
+  required EventTime end,
+  required EventTime start,
+}) {
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+  DateTime endInstant = eventScheduleInstantLocal(d, end);
+  if (endInstant.isAfter(dayEnd)) {
+    endInstant = dayEnd;
+  }
+  final DateTime startInstant = eventScheduleInstantLocal(d, start);
+  if (!endInstant.isAfter(startInstant)) {
+    endInstant = ceilToMinuteGrid(startInstant.add(const Duration(minutes: 1)));
+    if (endInstant.isAfter(dayEnd)) {
+      endInstant = dayEnd;
+    }
+  }
+  return eventTimeFromDateTime(endInstant);
+}
+
+/// Picks default start/end **times** for create when [dateOnly] is chosen: next grid slot + 2h duration,
+/// capped to 23:59 the same calendar day.
 ({EventTime start, EventTime end}) defaultStartEndForDate({
   required DateTime dateOnly,
   required DateTime now,
@@ -140,28 +185,43 @@ ScheduleValidationIssue? validateEditSchedule({
   int defaultDurationHours = 2,
 }) {
   final DateTime today = DateUtils.dateOnly(now);
-  if (dateOnly.isBefore(today)) {
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+  if (d.isBefore(today)) {
     final EventTime s = eventTimeFromDateTime(
       ceilToMinuteGrid(DateTime(today.year, today.month, today.day, 9, 0)),
     );
-    final DateTime endDt = DateTime(today.year, today.month, today.day, s.hour, s.minute)
+    DateTime endDt = DateTime(today.year, today.month, today.day, s.hour, s.minute)
         .add(Duration(hours: defaultDurationHours));
+    if (endDt.isAfter(dayEnd)) {
+      endDt = dayEnd;
+    }
+    final DateTime startInstant = DateTime(today.year, today.month, today.day, s.hour, s.minute);
+    if (!endDt.isAfter(startInstant)) {
+      endDt = dayEnd;
+    }
     return (start: s, end: eventTimeFromDateTime(endDt));
   }
-  if (dateOnly.isAfter(today)) {
+  if (d.isAfter(today)) {
     const EventTime s = EventTime(hour: 10, minute: 0);
     const EventTime e = EventTime(hour: 12, minute: 0);
     return (start: s, end: e);
   }
   final DateTime startDt = ceilToMinuteGrid(now.add(minLead));
-  final DateTime endDt = startDt.add(Duration(hours: defaultDurationHours));
+  DateTime endDt = startDt.add(Duration(hours: defaultDurationHours));
+  if (endDt.isAfter(dayEnd)) {
+    endDt = dayEnd;
+  }
+  if (!endDt.isAfter(startDt)) {
+    endDt = dayEnd;
+  }
   return (
     start: eventTimeFromDateTime(startDt),
     end: eventTimeFromDateTime(endDt),
   );
 }
 
-/// After date change or when current pair is invalid, snap to a valid pair for **create** / upcoming.
+/// After date or time change when current pair is invalid, snap for **create** / upcoming.
 ({EventTime start, EventTime end}) clampCreateOrUpcomingSchedule({
   required DateTime dateOnly,
   required EventTime start,
@@ -170,30 +230,48 @@ ScheduleValidationIssue? validateEditSchedule({
   Duration minLead = kEventScheduleMinLead,
   int defaultDurationHours = 2,
 }) {
-  final issue = validateCreateOrUpcomingEditSchedule(
-    dateOnly: dateOnly,
-    start: start,
-    end: end,
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  EventTime st = start;
+  EventTime en = clampEndTimeToEventDay(dateOnly: d, end: end, start: st);
+  ScheduleValidationIssue? issue = validateCreateOrUpcomingEditSchedule(
+    dateOnly: d,
+    start: st,
+    end: en,
     now: now,
     minLead: minLead,
   );
   if (issue == null) {
-    return (start: start, end: end);
+    return (start: st, end: en);
   }
   final ({EventTime start, EventTime end}) defaults = defaultStartEndForDate(
-    dateOnly: dateOnly,
+    dateOnly: d,
     now: now,
     minLead: minLead,
     defaultDurationHours: defaultDurationHours,
   );
-  EventTime s = defaults.start;
-  EventTime e = defaults.end;
-  // If defaults somehow invalid (should not), widen end.
-  if (!EcoEvent.isValidRange(s, e)) {
-    final DateTime sdt = eventScheduleInstantLocal(dateOnly, s);
-    e = eventTimeFromDateTime(sdt.add(Duration(hours: defaultDurationHours)));
+  st = defaults.start;
+  en = clampEndTimeToEventDay(dateOnly: d, end: defaults.end, start: st);
+  issue = validateCreateOrUpcomingEditSchedule(
+    dateOnly: d,
+    start: st,
+    end: en,
+    now: now,
+    minLead: minLead,
+  );
+  if (issue == ScheduleValidationIssue.endNotAfterStart ||
+      issue == ScheduleValidationIssue.endAfterLocalDayEnd) {
+    final DateTime si = eventScheduleInstantLocal(d, st);
+    final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+    DateTime bumped = ceilToMinuteGrid(si.add(Duration(hours: defaultDurationHours)));
+    if (bumped.isAfter(dayEnd)) {
+      bumped = dayEnd;
+    }
+    if (!bumped.isAfter(si)) {
+      bumped = dayEnd;
+    }
+    en = eventTimeFromDateTime(bumped);
   }
-  return (start: s, end: e);
+  return (start: st, end: en);
 }
 
 /// Clamp for in-progress edit: keep [start] if range invalid or end too soon; bump [end].
@@ -205,41 +283,57 @@ ScheduleValidationIssue? validateEditSchedule({
   Duration minLead = kEventScheduleMinLead,
   int defaultDurationHours = 2,
 }) {
+  final DateTime d = DateUtils.dateOnly(dateOnly);
+  EventTime en = clampEndTimeToEventDay(dateOnly: d, end: end, start: start);
   if (validateInProgressEditSchedule(
-        dateOnly: dateOnly,
+        dateOnly: d,
         start: start,
-        end: end,
+        end: en,
         now: now,
         minLead: minLead,
       ) ==
       null) {
-    return (start: start, end: end);
+    return (start: start, end: en);
   }
   final DateTime earliestEnd = _earliestStartInstant(now, minLead);
-  final DateTime startInstant = eventScheduleInstantLocal(dateOnly, start);
-  DateTime endCandidate = eventScheduleInstantLocal(dateOnly, end);
-  if (!EcoEvent.isValidRange(start, end)) {
+  final DateTime startInstant = eventScheduleInstantLocal(d, start);
+  DateTime endCandidate = eventScheduleInstantLocal(d, en);
+  if (!EcoEvent.isValidRange(start, en)) {
     endCandidate = startInstant.add(Duration(hours: defaultDurationHours));
   }
+  final DateTime dayEnd = eventScheduleLocalDayEnd(d);
+  if (endCandidate.isAfter(dayEnd)) {
+    endCandidate = dayEnd;
+  }
   if (!endCandidate.isAfter(earliestEnd)) {
-    endCandidate = earliestEnd.add(const Duration(minutes: 1));
-    endCandidate = ceilToMinuteGrid(endCandidate);
+    endCandidate = ceilToMinuteGrid(earliestEnd.add(const Duration(minutes: 1)));
     if (!endCandidate.isAfter(startInstant) && !endCandidate.isAfter(earliestEnd)) {
-      endCandidate = earliestEnd.add(const Duration(minutes: kEventScheduleTimeGridMinutes));
-      endCandidate = ceilToMinuteGrid(endCandidate);
+      endCandidate = ceilToMinuteGrid(
+        earliestEnd.add(const Duration(minutes: kEventScheduleTimeGridMinutes)),
+      );
     }
+  }
+  if (endCandidate.isAfter(dayEnd)) {
+    endCandidate = dayEnd;
   }
   EventTime endResult = eventTimeFromDateTime(endCandidate);
   if (!EcoEvent.isValidRange(start, endResult)) {
     endCandidate = ceilToMinuteGrid(
       startInstant.add(Duration(hours: defaultDurationHours)),
     );
+    if (endCandidate.isAfter(dayEnd)) {
+      endCandidate = dayEnd;
+    }
     endResult = eventTimeFromDateTime(endCandidate);
   }
   if (!endCandidate.isAfter(earliestEnd)) {
     endCandidate = ceilToMinuteGrid(earliestEnd.add(const Duration(minutes: 1)));
+    if (endCandidate.isAfter(dayEnd)) {
+      endCandidate = dayEnd;
+    }
     endResult = eventTimeFromDateTime(endCandidate);
   }
+  endResult = clampEndTimeToEventDay(dateOnly: d, end: endResult, start: start);
   return (start: start, end: endResult);
 }
 
@@ -261,7 +355,7 @@ DateTime? pickerMinimumForStart({
 
 DateTime _pickerShellFromInstant(DateTime dt) => _pickerShell(dt.hour, dt.minute);
 
-/// Minimum time for end picker on the event day (shell date 2000-01-01).
+/// Minimum time for end picker on [dateOnly] (same calendar day as start).
 DateTime pickerMinimumForEnd({
   required DateTime dateOnly,
   required EventTime start,
@@ -291,5 +385,10 @@ DateTime pickerMinimumForEnd({
       startInstant.add(const Duration(minutes: kEventScheduleTimeGridMinutes)),
     );
   }
-  return _pickerShellFromInstant(candidate);
+  final DateTime dayEndShell = pickerMaximumForEndSameCalendarDay();
+  final DateTime candidateShell = _pickerShellFromInstant(candidate);
+  if (candidateShell.isAfter(dayEndShell)) {
+    return dayEndShell;
+  }
+  return candidateShell;
 }

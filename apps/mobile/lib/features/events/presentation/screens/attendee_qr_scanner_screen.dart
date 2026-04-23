@@ -1,17 +1,14 @@
 import 'dart:async';
 import 'dart:math' as math;
-import 'dart:ui' as ui;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/check_in_repository_registry.dart';
@@ -21,12 +18,19 @@ import 'package:chisto_mobile/features/events/domain/models/check_in_payload.dar
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_camera_error_layer.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_manual_entry_sheet.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_painters.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_pending_panel.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_scanner_chrome.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/attendee_qr_scanner_success_panel.dart';
 import 'package:chisto_mobile/features/events/presentation/utils/events_localized_strings.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/current_user.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
-import 'package:chisto_mobile/shared/widgets/primary_button.dart';
+
+export 'attendee_qr_scanner_camera_error_layer.dart';
 
 /// When set on [AttendeeQrScannerScreen], replaces [MobileScanner] for widget tests.
 typedef AttendeeQrScannerTestSlotBuilder =
@@ -35,657 +39,6 @@ typedef AttendeeQrScannerTestSlotBuilder =
       void Function(String rawPayload) simulateScan,
     );
 
-String _attendeeQrScannerMobileScannerErrorBody(
-  MobileScannerErrorCode code,
-  AppLocalizations l10n,
-) {
-  switch (code) {
-    case MobileScannerErrorCode.permissionDenied:
-      return l10n.qrScannerHintCameraBlocked;
-    case MobileScannerErrorCode.unsupported:
-      return l10n.qrScannerCameraUnavailableFeedback;
-    default:
-      return l10n.qrScannerCameraUnavailableFeedback;
-  }
-}
-
-/// Permission-denied and other camera errors from [mobile_scanner] — widget-tested in isolation.
-@visibleForTesting
-Widget attendeeQrScannerCameraErrorLayerForTesting(
-  BuildContext context, {
-  required MobileScannerErrorCode errorCode,
-  required VoidCallback onRetryCamera,
-  required VoidCallback onEnterManually,
-}) {
-  final TextTheme textTheme = Theme.of(context).textTheme;
-  final AppLocalizations l10n = context.l10n;
-  final String detail = _attendeeQrScannerMobileScannerErrorBody(
-    errorCode,
-    l10n,
-  );
-  return ColoredBox(
-    color: AppColors.black,
-    child: SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Semantics(
-              container: true,
-              label: '${l10n.qrScannerCameraErrorTitle}. $detail',
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Icon(
-                    CupertinoIcons.exclamationmark_circle_fill,
-                    color: AppColors.accentWarning,
-                    size: 44,
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    l10n.qrScannerCameraErrorTitle,
-                    style: AppTypography.eventsHeroCardTitle(textTheme).copyWith(
-                      color: AppColors.textOnDark,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    detail,
-                    style: AppTypography.eventsHeroCardMeta(textTheme).copyWith(
-                      color: AppColors.textOnDarkMuted,
-                      height: 1.4,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            Wrap(
-              alignment: WrapAlignment.center,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.xs,
-              children: <Widget>[
-                Semantics(
-                  button: true,
-                  label: l10n.qrScannerRetryCamera,
-                  child: CupertinoButton(
-                    onPressed: onRetryCamera,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                    ),
-                    child: Text(
-                      l10n.qrScannerRetryCamera,
-                      style: AppTypography.eventsTextLinkEmphasis(textTheme)
-                          .copyWith(color: AppColors.primary),
-                    ),
-                  ),
-                ),
-                Semantics(
-                  button: true,
-                  label: l10n.qrScannerEnterManually,
-                  child: CupertinoButton(
-                    onPressed: onEnterManually,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                    ),
-                    child: Text(
-                      l10n.qrScannerEnterManually,
-                      style: AppTypography.eventsTextLinkEmphasis(textTheme)
-                          .copyWith(color: AppColors.textOnDark),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-}
-
-/// Darkens the preview outside [scanRect] so the target area reads as one square.
-class _DimOutsideScanPainter extends CustomPainter {
-  _DimOutsideScanPainter({
-    required this.scanRect,
-    required this.overlayColor,
-    this.holeRadius = 16,
-  });
-
-  final Rect scanRect;
-  final Color overlayColor;
-  final double holeRadius;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Path outer = Path()..addRect(Offset.zero & size);
-    final Path hole = Path()
-      ..addRRect(
-        RRect.fromRectAndRadius(scanRect, Radius.circular(holeRadius)),
-      );
-    final Path mask = Path.combine(PathOperation.difference, outer, hole);
-    canvas.drawPath(mask, Paint()..color = overlayColor);
-  }
-
-  @override
-  bool shouldRepaint(covariant _DimOutsideScanPainter oldDelegate) =>
-      scanRect != oldDelegate.scanRect ||
-      overlayColor != oldDelegate.overlayColor ||
-      holeRadius != oldDelegate.holeRadius;
-}
-
-/// Solid rounded-rect outline + decorative QR-like dot field **inside** the square.
-///
-/// Finder patterns and timing strips read clearly; data area uses a light dither.
-/// Inner radial wash + tiered opacity keeps the camera preview readable.
-class _SquareScanFramePainter extends CustomPainter {
-  _SquareScanFramePainter({
-    required this.color,
-    this.strokeWidth = 3,
-    this.cornerRadius = 16,
-  });
-
-  final Color color;
-  final double strokeWidth;
-  final double cornerRadius;
-
-  static const double _innerInset = 15;
-
-  /// Standard QR finder pattern (7×7, `true` = dark module).
-  static const List<List<bool>> _finder7 = <List<bool>>[
-    <bool>[true, true, true, true, true, true, true],
-    <bool>[true, false, false, false, false, false, true],
-    <bool>[true, false, true, true, true, false, true],
-    <bool>[true, false, true, true, true, false, true],
-    <bool>[true, false, true, true, true, false, true],
-    <bool>[true, false, false, false, false, false, true],
-    <bool>[true, true, true, true, true, true, true],
-  ];
-
-  /// Returns whether the cell is “inked” and which visual tier to use.
-  static _QrDotTier? _moduleTier(int row, int col, int rows, int cols) {
-    if (cols >= 7 && rows >= 7) {
-      if (row < 7 && col < 7) {
-        return _finder7[row][col] ? _QrDotTier.finder : null;
-      }
-      if (row < 7 && col >= cols - 7) {
-        return _finder7[row][col - (cols - 7)] ? _QrDotTier.finder : null;
-      }
-      if (row >= rows - 7 && col < 7) {
-        return _finder7[row - (rows - 7)][col] ? _QrDotTier.finder : null;
-      }
-    }
-    if (cols >= 14 && rows >= 14) {
-      if (row == 6 && col >= 7 && col < cols - 7) {
-        return (col - 7).isEven ? _QrDotTier.timing : null;
-      }
-      if (col == 6 && row >= 7 && row < rows - 7) {
-        return (row - 7).isEven ? _QrDotTier.timing : null;
-      }
-    }
-    if (((row * 17 + col * 31) & 7) < 3) {
-      return _QrDotTier.data;
-    }
-    return null;
-  }
-
-  static void _paintInnerCornerAccents(
-    Canvas canvas,
-    RRect inner,
-    Color accent,
-  ) {
-    final double inset = math.max(5, inner.width * 0.04);
-    final double d = 2.2;
-    final Paint p = Paint()
-      ..isAntiAlias = true
-      ..color = accent;
-    void cornerDots(double lx, double ty) {
-      canvas.drawCircle(Offset(lx, ty), d, p);
-      canvas.drawCircle(Offset(lx + 5, ty), d * 0.85, p);
-      canvas.drawCircle(Offset(lx, ty + 5), d * 0.85, p);
-    }
-
-    cornerDots(inner.left + inset, inner.top + inset);
-    cornerDots(inner.right - inset - 5, inner.top + inset);
-    cornerDots(inner.left + inset, inner.bottom - inset - 5);
-    cornerDots(inner.right - inset - 5, inner.bottom - inset - 5);
-  }
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Rect rect = Rect.fromLTWH(
-      strokeWidth / 2,
-      strokeWidth / 2,
-      size.width - strokeWidth,
-      size.height - strokeWidth,
-    );
-    final RRect r = RRect.fromRectAndRadius(
-      rect,
-      Radius.circular(cornerRadius.clamp(0, rect.shortestSide / 2)),
-    );
-
-    final RRect inner = r.deflate(_innerInset);
-    if (inner.width > 32 && inner.height > 32) {
-      final double shortest = math.min(inner.width, inner.height);
-      const int targetModules = 23;
-      final double module = shortest / targetModules;
-      final int cols = math.max(7, (inner.width / module).floor());
-      final int rows = math.max(7, (inner.height / module).floor());
-      final double offsetX = inner.left + (inner.width - cols * module) / 2;
-      final double offsetY = inner.top + (inner.height - rows * module) / 2;
-      final double baseDotR = (module * 0.36).clamp(1.0, 2.35);
-
-      canvas.save();
-      canvas.clipRRect(inner);
-
-      final Paint wash = Paint()
-        ..isAntiAlias = true
-        ..shader = ui.Gradient.radial(
-          inner.center,
-          shortest * 0.62,
-          <Color>[
-            color.withValues(alpha: 0.11),
-            color.withValues(alpha: 0.03),
-            Colors.transparent,
-          ],
-          <double>[0.0, 0.45, 1.0],
-        );
-      canvas.drawRRect(inner, wash);
-
-      for (int row = 0; row < rows; row++) {
-        for (int col = 0; col < cols; col++) {
-          final _QrDotTier? tier = _moduleTier(row, col, rows, cols);
-          if (tier == null) {
-            continue;
-          }
-          final Offset c = Offset(
-            offsetX + (col + 0.5) * module,
-            offsetY + (row + 0.5) * module,
-          );
-          if (!inner.contains(c)) {
-            continue;
-          }
-
-          final double radiusMul;
-          final double alpha;
-          final Color dotColor;
-          switch (tier) {
-            case _QrDotTier.finder:
-              radiusMul = 1.28;
-              alpha = 0.58;
-              dotColor = Color.lerp(color, AppColors.white, 0.42)!;
-            case _QrDotTier.timing:
-              radiusMul = 1.08;
-              alpha = 0.4;
-              dotColor = Color.lerp(color, AppColors.white, 0.22)!;
-            case _QrDotTier.data:
-              radiusMul = 1.0;
-              alpha = 0.26;
-              dotColor = color;
-          }
-
-          final double r = baseDotR * radiusMul;
-          if (tier == _QrDotTier.finder) {
-            canvas.drawCircle(
-              c,
-              r * 1.5,
-              Paint()
-                ..isAntiAlias = true
-                ..color = color.withValues(alpha: 0.09),
-            );
-          }
-          final Paint dotPaint = Paint()
-            ..isAntiAlias = true
-            ..color = dotColor.withValues(alpha: alpha);
-          canvas.drawCircle(c, r, dotPaint);
-        }
-      }
-
-      _paintInnerCornerAccents(
-        canvas,
-        inner,
-        AppColors.white.withValues(alpha: 0.22),
-      );
-      canvas.restore();
-    }
-
-    final Paint strokePaint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = strokeWidth
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round
-      ..isAntiAlias = true;
-    canvas.drawRRect(r, strokePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant _SquareScanFramePainter oldDelegate) =>
-      color != oldDelegate.color ||
-      strokeWidth != oldDelegate.strokeWidth ||
-      cornerRadius != oldDelegate.cornerRadius;
-}
-
-enum _QrDotTier { finder, timing, data }
-
-/// Custom painter that draws a checkmark path progressively (0..1).
-class _CheckmarkPainter extends CustomPainter {
-  _CheckmarkPainter({
-    required this.progress,
-    required this.color,
-    this.strokeWidth = 4,
-  });
-
-  final double progress;
-  final Color color;
-  final double strokeWidth;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (progress <= 0) return;
-
-    final double w = size.width;
-    final double h = size.height;
-    final Path path = Path()
-      ..moveTo(w * 0.2, h * 0.5)
-      ..lineTo(w * 0.42, h * 0.72)
-      ..lineTo(w * 0.82, h * 0.28);
-
-    final List<ui.PathMetric> metrics = path.computeMetrics().toList();
-    if (metrics.isEmpty) return;
-
-    final double totalLength = metrics.fold<double>(
-      0,
-      (double sum, ui.PathMetric m) => sum + m.length,
-    );
-    final double drawLength = totalLength * progress.clamp(0, 1);
-
-    double accumulated = 0;
-    for (final ui.PathMetric metric in metrics) {
-      final double len = metric.length;
-      if (accumulated + len <= drawLength) {
-        canvas.drawPath(metric.extractPath(0, len), _paint);
-        accumulated += len;
-      } else {
-        final double t = (drawLength - accumulated) / len;
-        canvas.drawPath(metric.extractPath(0, len * t), _paint);
-        break;
-      }
-    }
-  }
-
-  Paint get _paint => Paint()
-    ..color = color
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = strokeWidth
-    ..strokeCap = StrokeCap.round
-    ..strokeJoin = StrokeJoin.round;
-
-  @override
-  bool shouldRepaint(covariant _CheckmarkPainter oldDelegate) =>
-      progress != oldDelegate.progress || color != oldDelegate.color;
-}
-
-class _ManualEntrySheetHandle extends StatelessWidget {
-  const _ManualEntrySheetHandle();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: AppSpacing.xs),
-      child: Center(
-        child: Container(
-          width: AppSpacing.sheetHandle,
-          height: AppSpacing.sheetHandleHeight,
-          decoration: BoxDecoration(
-            color: AppColors.divider,
-            borderRadius: BorderRadius.circular(
-              AppSpacing.sheetHandleHeight / 2,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Manual QR code entry sheet for attendees.
-/// The modal host uses [MediaQueryData.fromView] + [SafeArea.minimum] so insets
-/// stay correct when the bottom-sheet route’s inherited [MediaQuery] zeros out
-/// [padding]/[viewPadding] (common with edge-to-edge). Cancel + Submit stay
-/// pinned; the keyboard overlays the sheet (host strips bottom viewInsets).
-class _AttendeeManualCodeEntrySheet extends StatefulWidget {
-  const _AttendeeManualCodeEntrySheet({required this.controller});
-
-  final TextEditingController controller;
-
-  @override
-  State<_AttendeeManualCodeEntrySheet> createState() =>
-      _AttendeeManualCodeEntrySheetState();
-}
-
-class _AttendeeManualCodeEntrySheetState
-    extends State<_AttendeeManualCodeEntrySheet> {
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_onControllerChanged);
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_onControllerChanged);
-    super.dispose();
-  }
-
-  void _onControllerChanged() => setState(() {});
-
-  bool get _canSubmit => widget.controller.text.trim().isNotEmpty;
-
-  Future<void> _pasteFromClipboard() async {
-    final ClipboardData? data = await Clipboard.getData(Clipboard.kTextPlain);
-    if (!mounted || data?.text == null) {
-      return;
-    }
-    AppHaptics.tap();
-    widget.controller.text = data!.text!;
-    widget.controller.selection = TextSelection.collapsed(
-      offset: widget.controller.text.length,
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final double bottomSafe = MediaQuery.paddingOf(context).bottom;
-
-    return GestureDetector(
-      onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
-      behavior: HitTestBehavior.translucent,
-      child: SizedBox.expand(
-        child: Material(
-          color: AppColors.panelBackground,
-          clipBehavior: Clip.antiAlias,
-          borderRadius: const BorderRadius.vertical(
-            top: Radius.circular(AppSpacing.radiusCard),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              // ── scrollable body ──────────────────────────────────────────
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: const EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.sm,
-                    AppSpacing.lg,
-                    AppSpacing.lg,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      const _ManualEntrySheetHandle(),
-                      const SizedBox(height: AppSpacing.sm),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  l10n.qrScannerManualEntryTitle,
-                                  style: AppTypography.eventsScreenTitle(textTheme)
-                                      .copyWith(
-                                    color: AppColors.textPrimary,
-                                    letterSpacing: -0.2,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  l10n.qrScannerManualEntrySubtitle,
-                                  style: AppTypography.eventsBodyMediumSecondary(textTheme)
-                                      .copyWith(height: 1.4),
-                                ),
-                              ],
-                            ),
-                          ),
-                          IconButton(
-                            visualDensity: VisualDensity.compact,
-                            tooltip: l10n.commonClose,
-                            constraints: const BoxConstraints(
-                              minWidth: 44,
-                              minHeight: 44,
-                            ),
-                            onPressed: () => Navigator.of(context).pop(false),
-                            icon: Icon(
-                              Icons.close_rounded,
-                              color: AppColors.textMuted,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                      CupertinoTextField(
-                        controller: widget.controller,
-                        autofocus: true,
-                        minLines: 4,
-                        maxLines: 8,
-                        placeholder: l10n.qrScannerPasteOrganizerQrHint,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: AppSpacing.md,
-                        ),
-                        style: AppTypography.eventsEditFormFieldPrimary(textTheme)
-                            .copyWith(height: 1.35),
-                        placeholderStyle:
-                            AppTypography.eventsSearchFieldPlaceholder(textTheme),
-                        decoration: BoxDecoration(
-                          color: AppColors.inputFill,
-                          borderRadius: BorderRadius.circular(
-                            AppSpacing.radiusMd,
-                          ),
-                          border: Border.all(color: AppColors.inputBorder),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      OutlinedButton.icon(
-                        onPressed: _pasteFromClipboard,
-                        icon: Icon(
-                          CupertinoIcons.doc_on_clipboard,
-                          size: 20,
-                          color: AppColors.primaryDark,
-                        ),
-                        label: Text(
-                          l10n.qrScannerPasteButton,
-                          style: AppTypography.eventsTextLinkEmphasis(textTheme)
-                              .copyWith(color: AppColors.primaryDark),
-                        ),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppColors.primaryDark,
-                          side: const BorderSide(color: AppColors.inputBorder),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: AppSpacing.md,
-                            horizontal: AppSpacing.md,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(
-                              AppSpacing.radiusMd,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // ── pinned footer ─────────────────────────────────────────────
-              DecoratedBox(
-                decoration: const BoxDecoration(
-                  color: AppColors.panelBackground,
-                  border: Border(
-                    top: BorderSide(color: AppColors.divider, width: 0.5),
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    AppSpacing.lg,
-                    AppSpacing.md,
-                    AppSpacing.lg,
-                    AppSpacing.md + bottomSafe,
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: SizedBox(
-                          height: 54,
-                          child: OutlinedButton(
-                            onPressed: () => Navigator.of(context).pop(false),
-                            style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.divider),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                  AppSpacing.radiusPill,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              l10n.commonCancel,
-                              style: AppTypography.eventsSecondaryCtaLabel(textTheme)
-                                  .copyWith(color: AppColors.primaryDark),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.sm),
-                      Expanded(
-                        flex: 2,
-                        child: PrimaryButton(
-                          label: l10n.qrScannerSubmitCode,
-                          enabled: _canSubmit,
-                          onPressed: () => Navigator.of(context).pop(true),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 /// Screen for attendees to scan the organizer's QR code to check in.
 /// Parses payload: chisto:evt:eventId:token
@@ -1174,106 +527,6 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     _pendingId = null;
   }
 
-  Widget _buildPendingConfirmationScreen(
-    BuildContext context,
-    TextTheme textTheme,
-    double bottomSafe,
-  ) {
-    final AppLocalizations l10n = context.l10n;
-    final String eventTitle = _event?.title ?? l10n.qrScannerGenericEventTitle;
-    return Scaffold(
-      backgroundColor: AppColors.appBackground,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-          child: Semantics(
-            label: '${l10n.eventsVolunteerPendingTitle}. ${l10n.eventsVolunteerPendingSubtitle}',
-            liveRegion: true,
-            child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              const Spacer(),
-              TweenAnimationBuilder<double>(
-                tween: Tween<double>(begin: 0, end: 1),
-                duration: AppMotion.standard,
-                builder: (BuildContext ctx, double value, Widget? child) {
-                  return Opacity(
-                    opacity: value,
-                    child: Transform.scale(
-                      scale: 0.8 + 0.2 * value,
-                      child: child,
-                    ),
-                  );
-                },
-                child: Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary.withValues(alpha: 0.12),
-                  ),
-                  child: const Center(
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 3,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppSpacing.xl),
-              Text(
-                l10n.eventsVolunteerPendingTitle,
-                style: AppTypography.eventsScreenTitle(textTheme)
-                    .copyWith(color: AppColors.textPrimary),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                l10n.eventsVolunteerPendingSubtitle,
-                style: AppTypography.eventsBodyMediumSecondary(textTheme).copyWith(
-                  height: 1.4,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                eventTitle,
-                style: AppTypography.eventsListCardMeta(textTheme),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const Spacer(),
-              Padding(
-                padding: EdgeInsets.only(bottom: bottomSafe + AppSpacing.md),
-                child: TextButton(
-                  onPressed: () {
-                    _cleanupPendingState();
-                    setState(() {
-                      _pendingConfirmation = false;
-                      _feedback = null;
-                    });
-                    unawaited(_resumeCameraAfterLifecycle());
-                    _resumeScanLineAnimationIfNeeded();
-                  },
-                  child: Text(
-                    MaterialLocalizations.of(context).cancelButtonLabel,
-                    style: AppTypography.eventsBodyMediumSecondary(textTheme),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Future<void> _restartScanner() async {
     AppHaptics.tap();
     setState(() {
@@ -1344,7 +597,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 left: viewPad.left,
                 right: viewPad.right,
               ),
-              child: _AttendeeManualCodeEntrySheet(
+              child: AttendeeManualCodeEntrySheet(
                 controller: _manualCodeController,
               ),
             ),
@@ -1367,160 +620,15 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     unawaited(_submitRawCode(raw));
   }
 
-  Widget _scannerLoadingLayer(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final AppLocalizations l10n = context.l10n;
-    return ColoredBox(
-      color: AppColors.black,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const CupertinoActivityIndicator(color: AppColors.white),
-            const SizedBox(height: AppSpacing.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
-              child: Text(
-                l10n.qrScannerCameraStarting,
-                style: AppTypography.eventsChatMessageBody(
-                  textTheme,
-                  color: AppColors.textOnDarkMuted,
-                ).copyWith(height: 1.35),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _scannerErrorLayer(
     BuildContext context,
     MobileScannerException error,
   ) {
-    return attendeeQrScannerCameraErrorLayerForTesting(
+    return attendeeQrScannerCameraErrorLayer(
       context,
       errorCode: error.errorCode,
       onRetryCamera: _restartScanner,
       onEnterManually: _openManualEntry,
-    );
-  }
-
-  Widget _glassScannerChip(
-    BuildContext context, {
-    required IconData icon,
-    required String text,
-  }) {
-    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final Widget inner = DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.glassDark,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.12)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Icon(icon, color: AppColors.primary, size: 22),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                text,
-                style: AppTypography.eventsChatMessageBody(
-                  textTheme,
-                  color: AppColors.textOnDark,
-                ).copyWith(height: 1.35, fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (reduceMotion) {
-      return inner;
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(14),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-        child: inner,
-      ),
-    );
-  }
-
-  Widget _glassScannerBottomPanel(
-    BuildContext context, {
-    required Widget child,
-  }) {
-    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
-    final Widget inner = DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.glassDark,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.1)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
-        child: child,
-      ),
-    );
-    if (reduceMotion) {
-      return inner;
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: inner,
-      ),
-    );
-  }
-
-  Widget _processingHud(BuildContext context) {
-    final TextTheme textTheme = Theme.of(context).textTheme;
-    final AppLocalizations l10n = context.l10n;
-    final bool reduceMotion = MediaQuery.of(context).disableAnimations;
-    final Widget card = DecoratedBox(
-      decoration: BoxDecoration(
-        color: AppColors.white.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.white.withValues(alpha: 0.14)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const CupertinoActivityIndicator(
-              color: AppColors.white,
-              radius: 14,
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              l10n.qrScannerCheckingIn,
-              style: AppTypography.eventsChatMessageBody(
-                textTheme,
-                color: AppColors.textOnDark,
-              ).copyWith(fontWeight: FontWeight.w600, height: 1.3),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      ),
-    );
-    if (reduceMotion) {
-      return card;
-    }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-        child: card,
-      ),
     );
   }
 
@@ -1535,7 +643,20 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
     final double bottomSafe = MediaQuery.of(context).padding.bottom;
 
     if (_pendingConfirmation) {
-      return _buildPendingConfirmationScreen(context, textTheme, bottomSafe);
+      final AppLocalizations l10n = context.l10n;
+      return AttendeeQrScannerPendingPanel(
+        eventTitle: _event?.title ?? l10n.qrScannerGenericEventTitle,
+        bottomSafe: bottomSafe,
+        onCancel: () {
+          _cleanupPendingState();
+          setState(() {
+            _pendingConfirmation = false;
+            _feedback = null;
+          });
+          unawaited(_resumeCameraAfterLifecycle());
+          _resumeScanLineAnimationIfNeeded();
+        },
+      );
     }
 
     if (_scanned) {
@@ -1545,147 +666,12 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
       final String? checkedInTime = _checkedInAt == null
           ? null
           : formatCheckInTime(_checkedInAt!);
-      const double successMarkSize = 88;
-      return Scaffold(
-        backgroundColor: AppColors.appBackground,
-        appBar: AppBar(
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          backgroundColor: AppColors.appBackground,
-          leading: const AppBackButton(),
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(
-              AppSpacing.xl,
-              AppSpacing.lg,
-              AppSpacing.xl,
-              AppSpacing.xl + bottomSafe,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Spacer(),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: 1),
-                  duration: AppMotion.standard,
-                  curve: AppMotion.emphasized,
-                  builder: (BuildContext context, double scale, Widget? child) {
-                    return Transform.scale(
-                      scale: 0.92 + 0.08 * scale,
-                      child: Opacity(opacity: scale, child: child),
-                    );
-                  },
-                  child: Container(
-                    width: successMarkSize,
-                    height: successMarkSize,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.14),
-                      shape: BoxShape.circle,
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.22),
-                          blurRadius: 24,
-                          spreadRadius: 0,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: TweenAnimationBuilder<double>(
-                      tween: Tween<double>(begin: 0, end: 1),
-                      duration: AppMotion.emphasizedDuration,
-                      curve: AppMotion.emphasized,
-                      builder:
-                          (
-                            BuildContext context,
-                            double progress,
-                            Widget? child,
-                          ) {
-                            return CustomPaint(
-                              painter: _CheckmarkPainter(
-                                progress: progress,
-                                color: AppColors.primaryDark,
-                                strokeWidth: 4,
-                              ),
-                              size: const Size(
-                                successMarkSize,
-                                successMarkSize,
-                              ),
-                            );
-                          },
-                    ),
-                  ),
-                ),
-                SizedBox(height: AppSpacing.xl + AppSpacing.xs),
-                TweenAnimationBuilder<double>(
-                  tween: Tween<double>(begin: 0, end: 1),
-                  duration: AppMotion.standard,
-                  curve: Interval(0.12, 1, curve: AppMotion.emphasized),
-                  builder: (BuildContext context, double t, Widget? child) {
-                    return Opacity(
-                      opacity: t,
-                      child: Transform.translate(
-                        offset: Offset(0, 8 * (1 - t)),
-                        child: child,
-                      ),
-                    );
-                  },
-                  child: Column(
-                    children: <Widget>[
-                      Text(
-                        l10n.qrScannerCheckedInTitle,
-                        style: AppTypography.eventsDetailHeadline(textTheme).copyWith(
-                          fontSize: textTheme.headlineSmall?.fontSize,
-                          color: AppColors.textPrimary,
-                          letterSpacing: -0.3,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        l10n.qrScannerWelcomeTo(eventTitle),
-                        style: AppTypography.eventsDetailAuxRowTitle(textTheme).copyWith(
-                          color: AppColors.textSecondary,
-                          height: 1.35,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (checkedInTime != null) ...<Widget>[
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          l10n.qrScannerCheckedInAt(checkedInTime),
-                          style: AppTypography.eventsListCardMeta(textTheme).copyWith(height: 1.3),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                      if (_checkInPointsAwarded > 0) ...<Widget>[
-                        const SizedBox(height: AppSpacing.md),
-                        Text(
-                          l10n.eventsCheckInPointsEarned(_checkInPointsAwarded),
-                          style: AppTypography.eventsCalendarMonthTitle(textTheme).copyWith(
-                            color: AppColors.primaryDark,
-                            height: 1.25,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                const Spacer(),
-                Semantics(
-                  button: true,
-                  label: l10n.qrScannerDone,
-                  child: PrimaryButton(
-                    label: l10n.qrScannerDone,
-                    enabled: true,
-                    onPressed: _handleDone,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+      return AttendeeQrScannerSuccessScaffold(
+        eventTitle: eventTitle,
+        checkedInTime: checkedInTime,
+        pointsAwarded: _checkInPointsAwarded,
+        bottomSafe: bottomSafe,
+        onDone: _handleDone,
       );
     }
 
@@ -1742,7 +728,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                     child: MobileScanner(
                       controller: _controller!,
                       onDetect: _handleBarcode,
-                      placeholderBuilder: _scannerLoadingLayer,
+                      placeholderBuilder: attendeeQrScannerLoadingLayer,
                       errorBuilder: _scannerErrorLayer,
                       tapToFocus: false,
                       scanWindow: kIsWeb ? null : scanRect,
@@ -1752,7 +738,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                 Positioned.fill(
                   child: IgnorePointer(
                     child: CustomPaint(
-                      painter: _DimOutsideScanPainter(
+                      painter: AttendeeQrDimOutsideScanPainter(
                         scanRect: scanRect,
                         overlayColor: AppColors.black.withValues(alpha: 0.5),
                         holeRadius: _scanFrameCornerRadius,
@@ -1774,7 +760,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                         children: <Widget>[
                           CustomPaint(
                             size: Size.square(side),
-                            painter: _SquareScanFramePainter(
+                            painter: AttendeeQrSquareScanFramePainter(
                               color: AppColors.primary.withValues(alpha: 0.95),
                               strokeWidth: 3,
                               cornerRadius: _scanFrameCornerRadius,
@@ -1824,7 +810,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                   right: AppSpacing.lg,
                   top: AppSpacing.md,
                   child: IgnorePointer(
-                    child: _glassScannerChip(
+                    child: attendeeQrScannerGlassChip(
                       context,
                       icon: CupertinoIcons.qrcode_viewfinder,
                       text: context.l10n.qrScannerPointCameraHint,
@@ -1837,7 +823,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                   bottom: bottomSafe + AppSpacing.md,
                   child: SafeArea(
                     top: false,
-                    child: _glassScannerBottomPanel(
+                    child: attendeeQrScannerGlassBottomPanel(
                       context,
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
@@ -1927,7 +913,7 @@ class _AttendeeQrScannerScreenState extends State<AttendeeQrScannerScreen>
                     label: context.l10n.qrScannerCheckingIn,
                     child: ColoredBox(
                       color: AppColors.black.withValues(alpha: 0.52),
-                      child: Center(child: _processingHud(context)),
+                      child: Center(child: attendeeQrScannerProcessingHud(context)),
                     ),
                   ),
               ],

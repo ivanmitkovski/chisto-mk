@@ -1,11 +1,12 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsDateString, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import { EventsViewerGeoQueryDto } from './events-viewer-geo-query.dto';
 
 const DEFAULT_LIMIT = 20;
 const MAX_LIMIT = 50;
 
-export class ListEventsQueryDto {
+export class ListEventsQueryDto extends EventsViewerGeoQueryDto {
   @ApiPropertyOptional({
     description: 'Max items (1–50)',
     default: DEFAULT_LIMIT,

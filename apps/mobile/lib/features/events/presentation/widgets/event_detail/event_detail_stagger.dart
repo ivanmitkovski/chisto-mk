@@ -8,6 +8,10 @@ abstract final class EventDetailStagger {
   static const int maxParticipantsBanner = 20;
   static const int eventFullBanner = 25;
   static const int completedCallouts = 30;
+  static const int impactReceiptLink = 42;
+  static const int livePulse = 55;
+  static const int evidenceStrip = 56;
+  static const int routeProgress = 58;
   static const int groupedPanel = 60;
   static const int weather = 90;
   static const int gear = 100;

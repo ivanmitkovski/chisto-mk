@@ -6,6 +6,7 @@ import { NotificationsService } from './notifications.service';
 import { FcmPushService } from './fcm-push.service';
 import { PushDeliveryWorkerService } from './push-delivery-worker.service';
 import { NotificationDispatcherService } from './notification-dispatcher.service';
+import { CleanupEventNotificationsService } from './cleanup-event-notifications.service';
 
 @Module({
   imports: [PrismaModule, ConfigModule],
@@ -15,7 +16,8 @@ import { NotificationDispatcherService } from './notification-dispatcher.service
     FcmPushService,
     PushDeliveryWorkerService,
     NotificationDispatcherService,
+    CleanupEventNotificationsService,
   ],
-  exports: [NotificationsService, NotificationDispatcherService],
+  exports: [NotificationsService, NotificationDispatcherService, CleanupEventNotificationsService],
 })
 export class NotificationsModule {}

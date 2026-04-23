@@ -106,4 +106,7 @@ abstract class EventsRepository implements Listenable {
 
   /// Paginated joiners from `GET /events/:id/participants` (organizer not included).
   Future<EventParticipantsPage> fetchParticipants(String eventId, {String? cursor});
+
+  /// One-shot `GET /events` for [params] without replacing the active feed cache.
+  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params);
 }

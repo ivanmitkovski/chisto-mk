@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +12,8 @@ import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/events/data/chat/event_chat_message.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_attachment_source.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_message_action_row.dart';
+import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_message_bubble_image_tile.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_document_open_flow.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_image_gallery_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/widgets/chat/chat_linkified_text.dart';
@@ -25,34 +26,6 @@ import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/cached_tile_provider.dart';
 import 'package:chisto_mobile/shared/widgets/user_avatar_circle.dart';
 import 'package:intl/intl.dart' hide TextDirection;
-
-Widget _eventChatImageTile(EventChatAttachment a, {required int cacheWidth}) {
-  if (isEventChatRemoteAttachmentUrl(a.url)) {
-    return CachedNetworkImage(
-      imageUrl: a.url,
-      cacheKey: eventChatAttachmentCacheKey(a),
-      fit: BoxFit.cover,
-      memCacheWidth: cacheWidth,
-      errorWidget: (BuildContext context, String url, Object error) => Container(
-        color: AppColors.inputFill,
-        child: const Center(
-          child: Icon(Icons.broken_image_outlined, color: AppColors.textMuted),
-        ),
-      ),
-    );
-  }
-  return Image.file(
-    File(eventChatAttachmentFilePath(a.url)),
-    fit: BoxFit.cover,
-    cacheWidth: cacheWidth,
-    errorBuilder: (BuildContext context, Object error, StackTrace? stackTrace) => Container(
-      color: AppColors.inputFill,
-      child: const Center(
-        child: Icon(Icons.broken_image_outlined, color: AppColors.textMuted),
-      ),
-    ),
-  );
-}
 
 class ChatMessageBubble extends StatefulWidget {
   const ChatMessageBubble({
@@ -683,7 +656,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                 ),
               ),
               if (canCopy)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.doc_on_doc,
                   label: context.l10n.eventChatCopy,
                   onTap: () {
@@ -692,7 +665,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   },
                 ),
               if (widget.onReply != null)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.reply,
                   label: context.l10n.eventChatReply,
                   onTap: () {
@@ -701,7 +674,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   },
                 ),
               if (widget.onEdit != null)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.pencil,
                   label: context.l10n.eventChatEditMessage,
                   onTap: () {
@@ -710,7 +683,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   },
                 ),
               if (widget.onPin != null)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.pin,
                   label: context.l10n.eventChatPinMessage,
                   onTap: () {
@@ -719,7 +692,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   },
                 ),
               if (widget.onUnpin != null)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.pin_slash,
                   label: context.l10n.eventChatUnpinMessage,
                   onTap: () {
@@ -728,7 +701,7 @@ class _ChatMessageBubbleState extends State<ChatMessageBubble>
                   },
                 ),
               if (widget.onDelete != null)
-                _ActionRow(
+                ChatMessageActionRow(
                   icon: CupertinoIcons.trash,
                   label: context.l10n.eventChatDelete,
                   onTap: () {
@@ -790,7 +763,7 @@ class _ImageGrid extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
             child: AspectRatio(
               aspectRatio: aspectRatio.clamp(0.5, 2.0),
-              child: _eventChatImageTile(a, cacheWidth: 600),
+              child: eventChatImageTile(a, cacheWidth: 600),
             ),
           ),
         ),
@@ -827,7 +800,7 @@ class _ImageGrid extends StatelessWidget {
                     child: Stack(
                       fit: StackFit.expand,
                       children: <Widget>[
-                        _eventChatImageTile(attachments[i], cacheWidth: 300),
+                        eventChatImageTile(attachments[i], cacheWidth: 300),
                         if (hasMore && i == count - 1)
                           Container(
                             color: Colors.black45,
@@ -1423,47 +1396,6 @@ class _LocationPreview extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _ActionRow extends StatelessWidget {
-  const _ActionRow({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.destructive = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool destructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color fg = destructive ? AppColors.accentDanger : AppColors.textPrimary;
-    return InkWell(
-      onTap: () {
-        AppHaptics.light();
-        onTap();
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-        child: Row(
-          children: <Widget>[
-            Icon(icon, size: 20, color: fg),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Text(
-                label,
-                style: AppTypography.eventsChatMessageBody(Theme.of(context).textTheme, color: fg)
-                    .copyWith(fontWeight: FontWeight.w500),
-              ),
-            ),
-          ],
         ),
       ),
     );

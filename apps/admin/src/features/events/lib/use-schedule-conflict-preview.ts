@@ -10,10 +10,11 @@ export function useScheduleConflictPreview(options: {
   siteId: string;
   /** ISO string or null to skip fetch */
   scheduledAtIso: string | null;
+  endAtIso?: string | null;
   excludeEventId?: string;
   debounceMs?: number;
 }): { hint: ConflictingEventInfo | null; checking: boolean } {
-  const { siteId, scheduledAtIso, excludeEventId, debounceMs = 480 } = options;
+  const { siteId, scheduledAtIso, endAtIso, excludeEventId, debounceMs = 480 } = options;
   const [hint, setHint] = useState<ConflictingEventInfo | null>(null);
   const [checking, setChecking] = useState(false);
 
@@ -31,6 +32,7 @@ export function useScheduleConflictPreview(options: {
           const res = await fetchEventScheduleConflict({
             siteId,
             scheduledAtIso,
+            ...(endAtIso != null && endAtIso.trim() !== '' ? { endAtIso } : {}),
             ...(excludeEventId != null && excludeEventId !== '' ? { excludeEventId } : {}),
           });
           if (cancelled) {
@@ -57,7 +59,7 @@ export function useScheduleConflictPreview(options: {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [siteId, scheduledAtIso, excludeEventId, debounceMs]);
+  }, [siteId, scheduledAtIso, endAtIso, excludeEventId, debounceMs]);
 
   return { hint, checking };
 }

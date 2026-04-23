@@ -224,6 +224,23 @@ class RecordingEventsRepository extends ChangeNotifier implements EventsReposito
     notifyListeners();
   }
 
+  int fetchEventsSnapshotCallCount = 0;
+  EcoEventSearchParams? lastSnapshotParams;
+
+  @override
+  Future<List<EcoEvent>> fetchEventsSnapshot(EcoEventSearchParams params) async {
+    fetchEventsSnapshotCallCount++;
+    lastSnapshotParams = params;
+    return _events
+        .where((EcoEvent e) {
+          if (params.statuses.isNotEmpty && !params.statuses.contains(e.status)) {
+            return false;
+          }
+          return true;
+        })
+        .toList();
+  }
+
   @override
   Future<EventParticipantsPage> fetchParticipants(
     String eventId, {

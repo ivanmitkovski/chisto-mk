@@ -58,6 +58,13 @@ type UserEventPayload = {
   userId: string;
 };
 
+type CleanupEventSsePayload = {
+  type: 'cleanup_event_created' | 'cleanup_event_updated' | 'cleanup_event_pending';
+  eventId: string;
+  moderationStatus?: string;
+  lifecycleStatus?: string;
+};
+
 function isReportEvent(data: unknown): data is ReportEventPayload {
   const d = data as Partial<ReportEventPayload>;
   return (
@@ -95,6 +102,19 @@ function isUserEvent(data: unknown): data is UserEventPayload {
     data !== null &&
     typeof d.type === 'string' &&
     (d.type === 'user_created' || d.type === 'user_updated')
+  );
+}
+
+function isCleanupEventSse(data: unknown): data is CleanupEventSsePayload {
+  const d = data as Partial<CleanupEventSsePayload>;
+  return (
+    typeof data === 'object' &&
+    data !== null &&
+    typeof d.type === 'string' &&
+    (d.type === 'cleanup_event_created' ||
+      d.type === 'cleanup_event_updated' ||
+      d.type === 'cleanup_event_pending') &&
+    typeof d.eventId === 'string'
   );
 }
 
@@ -199,6 +219,15 @@ export function DashboardSSEClient() {
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.usersAll });
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.usersStats });
                 void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                routerRef.current.refresh();
+              } else if (isCleanupEventSse(data)) {
+                const label =
+                  data.type === 'cleanup_event_pending'
+                    ? 'Cleanup event pending review'
+                    : data.type === 'cleanup_event_created'
+                      ? 'New cleanup event'
+                      : 'Cleanup event updated';
+                sseCtxRef.current?.showRefreshToast(label);
                 routerRef.current.refresh();
               }
             } catch {

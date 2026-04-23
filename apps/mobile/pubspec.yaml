@@ -38,6 +38,7 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  google_fonts: ^6.3.3
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,6 +55,7 @@ dependencies:
   flutter_image_compress: ^2.3.0
   shared_preferences: ^2.3.3
   connectivity_plus: ^6.1.4
+  package_info_plus: ^9.0.1
   flutter_map_animations: ^0.6.0
   flutter_map_heatmap: ^0.0.7
   add_2_calendar: ^3.0.1
@@ -93,6 +95,8 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
+  flutter_local_notifications_platform_interface: ^8.0.0
+  path_provider_platform_interface: ^2.1.2
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -119,6 +123,9 @@ flutter:
     - assets/images/content/
     - assets/images/references/
     - assets/animations/
+    # Bundled Roboto files (google_fonts naming: Roboto-{Regular,Medium,Bold}.ttf) so
+    # tests can set allowRuntimeFetching=false and CI stays offline-friendly.
+    - assets/fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

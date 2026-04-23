@@ -1,4 +1,7 @@
-/// Server caps from [EventChatUploadService] — enforce before upload to fail fast.
+/// Server caps — keep in sync with Nest
+/// `apps/api/src/event-chat/event-chat-upload.service.ts`
+/// (`MAX_*_SIZE`, `MAX_FILES_PER_MESSAGE`, mime sets). Enforced client-side before
+/// upload to fail fast. Cleanup evidence uploads use the reports pipeline, not these caps.
 abstract final class ChatUploadLimits {
   static const int maxFilesPerMessage = 5;
   static const int maxImageBytes = 10 * 1024 * 1024;

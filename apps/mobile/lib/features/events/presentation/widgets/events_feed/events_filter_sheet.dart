@@ -37,6 +37,8 @@ class EventsFilterSheet extends StatefulWidget {
       isScrollControlled: true,
       useSafeArea: false,
       backgroundColor: AppColors.transparent,
+      // This sheet draws its own grabber above the header.
+      showDragHandle: false,
       builder: (_) => Padding(
         padding: EdgeInsets.fromLTRB(
           AppSpacing.sm,

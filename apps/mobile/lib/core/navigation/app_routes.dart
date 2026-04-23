@@ -21,6 +21,7 @@ import 'package:chisto_mobile/features/events/presentation/screens/create_event_
 import 'package:chisto_mobile/features/events/presentation/screens/event_cleanup_evidence_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_chat_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/event_detail_screen.dart';
+import 'package:chisto_mobile/features/events/presentation/screens/event_impact_receipt_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_checkin_screen.dart';
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_dashboard_screen.dart';
 import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
@@ -52,6 +53,7 @@ class AppRoutes {
   static const String eventsAttendeeCheckIn = '/events/attendee-check-in';
   static const String eventsOrganizerCheckIn = '/events/organizer-check-in';
   static const String eventsCleanupEvidence = '/events/cleanup-evidence';
+  static const String eventsImpactReceipt = '/events/impact-receipt';
   static const String eventsOrganizerDashboard = '/events/organizer-dashboard';
   static const String eventChat = '/events/chat';
 }
@@ -315,6 +317,13 @@ class AppRouter {
             settings.arguments as EventRouteArguments;
         return CupertinoPageRoute<void>(
           builder: (_) => EventCleanupEvidenceScreen(eventId: args.eventId),
+          settings: settings,
+        );
+      case AppRoutes.eventsImpactReceipt:
+        final EventRouteArguments args =
+            settings.arguments as EventRouteArguments;
+        return CupertinoPageRoute<void>(
+          builder: (_) => EventImpactReceiptScreen(eventId: args.eventId),
           settings: settings,
         );
       case AppRoutes.eventsOrganizerDashboard:

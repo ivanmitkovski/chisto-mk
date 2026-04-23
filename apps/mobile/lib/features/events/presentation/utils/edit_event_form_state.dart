@@ -18,6 +18,7 @@ class EditEventFormSnapshot {
     required this.description,
     required this.maxParticipants,
     required this.dateOnly,
+    required this.endDateOnly,
     required this.startTime,
     required this.endTime,
     required this.category,
@@ -30,6 +31,7 @@ class EditEventFormSnapshot {
   final String description;
   final int? maxParticipants;
   final DateTime dateOnly;
+  final DateTime endDateOnly;
   final EventTime startTime;
   final EventTime endTime;
   final EcoEventCategory category;
@@ -44,6 +46,7 @@ class EditEventFormSnapshot {
       description: event.description.trim(),
       maxParticipants: event.maxParticipants,
       dateOnly: DateUtils.dateOnly(event.date),
+      endDateOnly: DateUtils.dateOnly(event.endDateTime),
       startTime: event.startTime,
       endTime: event.endTime,
       category: event.category,
@@ -58,6 +61,7 @@ class EditEventFormSnapshot {
     required String descriptionTrimmed,
     required int? maxParticipants,
     required DateTime dateOnly,
+    required DateTime endDateOnly,
     required EventTime startTime,
     required EventTime endTime,
     required EcoEventCategory category,
@@ -70,6 +74,7 @@ class EditEventFormSnapshot {
     if (descriptionTrimmed != description) return false;
     if (maxParticipants != this.maxParticipants) return false;
     if (dateOnly != this.dateOnly) return false;
+    if (endDateOnly != this.endDateOnly) return false;
     if (startTime != this.startTime) return false;
     if (endTime != this.endTime) return false;
     if (category != this.category) return false;
@@ -122,9 +127,9 @@ class EditEventFormSnapshot {
 
   bool _endChanged(DateTime nextUtc) {
     final DateTime prevUtc = DateTime(
-      dateOnly.year,
-      dateOnly.month,
-      dateOnly.day,
+      endDateOnly.year,
+      endDateOnly.month,
+      endDateOnly.day,
       endTime.hour,
       endTime.minute,
     ).toUtc();

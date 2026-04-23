@@ -8,6 +8,7 @@ import 'package:chisto_mobile/features/auth/data/access_token_expiry.dart';
 import 'package:chisto_mobile/features/auth/domain/repositories/auth_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/push_notification_service.dart';
 import 'package:chisto_mobile/features/events/data/chat/outbox/chat_outbox_store.dart';
+import 'package:chisto_mobile/features/events/data/events_local_cache.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -211,6 +212,7 @@ class ApiAuthRepository implements AuthRepository {
     profileAvatarState.clearLocalPath();
     await _tokenStorage.clearTokens();
     await ChatOutboxStore.shared.clearAll();
+    await const EventsLocalCache().clear();
   }
 
   Future<void> _performLocalLogout() async {
@@ -291,11 +293,19 @@ class ApiAuthRepository implements AuthRepository {
       }
     }
 
+    final String? storedCertIso = await _tokenStorage.organizerCertifiedAtIso;
+    final bool hasStoredCertIso =
+        storedCertIso != null && storedCertIso.trim().isNotEmpty;
+    final DateTime? organizerFromStorage =
+        hasStoredCertIso ? DateTime.tryParse(storedCertIso.trim()) : null;
+
     _authState.setAuthenticated(
       userId: storedUserId ?? '',
       displayName: storedDisplayName ?? 'User',
       accessToken: storedAccess,
       phoneNumber: storedPhoneNumber,
+      organizerCertifiedAt: organizerFromStorage,
+      syncOrganizerCertifiedAt: hasStoredCertIso,
     );
 
     try {
@@ -305,7 +315,7 @@ class ApiAuthRepository implements AuthRepository {
         await _clearLocalSession();
         return;
       }
-      _applyUserProfile(json, storedAccess);
+      await _applyUserProfile(json, storedAccess);
       _scheduleProactiveRefresh();
       unawaited(_initPushAfterAuth());
     } on AppError catch (e) {
@@ -341,12 +351,25 @@ class ApiAuthRepository implements AuthRepository {
     final String lastName = user['lastName'] as String? ?? '';
     final String displayName = '$firstName $lastName'.trim();
     final String? phoneNumber = user['phoneNumber'] as String?;
+    final String? priorUserId = _authState.userId;
+    final bool switchedAccount = priorUserId != null &&
+        priorUserId.isNotEmpty &&
+        priorUserId != id;
+    final bool hasOrganizerCertifiedAtKey =
+        user.containsKey('organizerCertifiedAt');
+    final String? certifiedAtRaw = user['organizerCertifiedAt'] as String?;
+    final DateTime? organizerCertifiedAt =
+        certifiedAtRaw != null && certifiedAtRaw.trim().isNotEmpty
+            ? DateTime.tryParse(certifiedAtRaw.trim())
+            : null;
 
     _authState.setAuthenticated(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
       accessToken: newAccessToken,
       phoneNumber: phoneNumber,
+      organizerCertifiedAt: organizerCertifiedAt,
+      syncOrganizerCertifiedAt: hasOrganizerCertifiedAtKey || switchedAccount,
     );
 
     profileAvatarState.setRemoteUrl(_extractAvatarUrl(user));
@@ -356,27 +379,36 @@ class ApiAuthRepository implements AuthRepository {
       displayName: displayName.isEmpty ? id : displayName,
       phoneNumber: phoneNumber,
     );
+    if (hasOrganizerCertifiedAtKey || switchedAccount) {
+      await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAt);
+    }
   }
 
-  void _applyUserProfile(Map<String, dynamic> json, String accessToken) {
+  Future<void> _applyUserProfile(Map<String, dynamic> json, String accessToken) async {
     final String id = json['id'] as String? ?? '';
     final String firstName = json['firstName'] as String? ?? '';
     final String lastName = json['lastName'] as String? ?? '';
     final String displayName = '$firstName $lastName'.trim();
     final String? phoneNumber = json['phoneNumber'] as String?;
+    final String? certifiedAtRaw = json['organizerCertifiedAt'] as String?;
+    final DateTime? organizerCertifiedAt =
+        certifiedAtRaw != null ? DateTime.tryParse(certifiedAtRaw) : null;
 
     _authState.setAuthenticated(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
       accessToken: accessToken,
       phoneNumber: phoneNumber,
+      organizerCertifiedAt: organizerCertifiedAt,
+      syncOrganizerCertifiedAt: true,
     );
     profileAvatarState.setRemoteUrl(_extractAvatarUrl(json));
-    _tokenStorage.saveSessionData(
+    await _tokenStorage.saveSessionData(
       userId: id,
       displayName: displayName.isEmpty ? id : displayName,
       phoneNumber: phoneNumber,
     );
+    await _tokenStorage.writeOrganizerCertifiedAt(organizerCertifiedAt);
     _scheduleProactiveRefresh();
   }
 

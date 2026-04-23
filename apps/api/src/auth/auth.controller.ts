@@ -18,6 +18,7 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -50,6 +51,8 @@ import { PointHistoryQueryDto } from './dto/point-history-query.dto';
 import { PointHistoryResponseDto } from './dto/point-history-response.dto';
 import { PointHistoryService } from '../gamification/point-history.service';
 import { OtpSmsPurpose } from '../otp/otp-sender.interface';
+import { OrganizerCertificationService } from './organizer-certification.service';
+import { SubmitOrganizerCertificationDto } from './dto/submit-organizer-certification.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -58,6 +61,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly pointHistoryService: PointHistoryService,
+    private readonly organizerCertification: OrganizerCertificationService,
   ) {}
 
   @Post('register')
@@ -375,6 +379,40 @@ export class AuthController {
       });
     }
     await this.authService.removeAvatar(user.userId);
+  }
+
+  @Get('me/organizer-certification/quiz')
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @ApiBearerAuth()
+  @Throttle({ default: { ttl: 60_000, limit: 60 } })
+  @ApiOperation({ summary: 'Fetch organizer certification quiz questions' })
+  @ApiOkResponse({ description: 'Quiz questions for the caller locale' })
+  async getOrganizerQuiz(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Headers('accept-language') acceptLanguage?: string,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+    return this.organizerCertification.getQuiz(user.userId, acceptLanguage ?? 'en');
+  }
+
+  @Post('me/organizer-certification')
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Submit organizer certification quiz answers' })
+  @ApiBody({ type: SubmitOrganizerCertificationDto })
+  @ApiOkResponse({ description: 'Certification result' })
+  submitOrganizerCertification(
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Body() body: SubmitOrganizerCertificationDto,
+  ) {
+    if (!user) {
+      throw new UnauthorizedException({ code: 'UNAUTHORIZED', message: 'Authentication required' });
+    }
+    return this.organizerCertification.submit(user.userId, body);
   }
 
   @Get('admin/ping')

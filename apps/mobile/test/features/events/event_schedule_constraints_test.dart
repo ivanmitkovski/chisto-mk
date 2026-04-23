@@ -9,19 +9,31 @@ void main() {
   final DateTime tomorrow = today.add(const Duration(days: 1));
 
   group('validateCreateOrUpcomingEditSchedule', () {
-    test('allows tomorrow with typical range', () {
+    test('allows end later same calendar day within 23:59', () {
       expect(
         validateCreateOrUpcomingEditSchedule(
           dateOnly: tomorrow,
           start: const EventTime(hour: 9, minute: 0),
-          end: const EventTime(hour: 11, minute: 0),
+          end: const EventTime(hour: 18, minute: 0),
           now: now,
         ),
         isNull,
       );
     });
 
-    test('rejects end before or equal to start', () {
+    test('allows end at 23:59 same day', () {
+      expect(
+        validateCreateOrUpcomingEditSchedule(
+          dateOnly: tomorrow,
+          start: const EventTime(hour: 9, minute: 0),
+          end: const EventTime(hour: 23, minute: 59),
+          now: now,
+        ),
+        isNull,
+      );
+    });
+
+    test('rejects end before or equal to start instant', () {
       expect(
         validateCreateOrUpcomingEditSchedule(
           dateOnly: tomorrow,
@@ -30,6 +42,18 @@ void main() {
           now: now,
         ),
         ScheduleValidationIssue.endNotAfterStart,
+      );
+    });
+
+    test('clampEndTimeToEventDay leaves 23:59 end when valid', () {
+      final DateTime d = DateUtils.dateOnly(tomorrow);
+      expect(
+        clampEndTimeToEventDay(
+          dateOnly: d,
+          start: const EventTime(hour: 10, minute: 0),
+          end: const EventTime(hour: 23, minute: 59),
+        ),
+        const EventTime(hour: 23, minute: 59),
       );
     });
 
@@ -45,11 +69,10 @@ void main() {
       );
     });
 
-    test('allows today start at ceil(now + lead) on grid', () {
+    test('allows today start at ceil(now + lead) on grid with end same day', () {
       final DateTime earliest = ceilToMinuteGrid(now.add(kEventScheduleMinLead));
       final EventTime start = EventTime(hour: earliest.hour, minute: earliest.minute);
-      final DateTime endDt = earliest.add(const Duration(hours: 2));
-      final EventTime end = EventTime(hour: endDt.hour, minute: endDt.minute);
+      const EventTime end = EventTime(hour: 18, minute: 0);
       expect(
         validateCreateOrUpcomingEditSchedule(
           dateOnly: today,
@@ -103,29 +126,32 @@ void main() {
   });
 
   group('defaultStartEndForDate', () {
-    test('today uses next grid slot and two hour span', () {
+    test('today uses next grid slot; end same calendar day', () {
       final r = defaultStartEndForDate(dateOnly: today, now: now);
-      expect(validateCreateOrUpcomingEditSchedule(
-        dateOnly: today,
-        start: r.start,
-        end: r.end,
-        now: now,
-      ), isNull);
+      expect(
+        validateCreateOrUpcomingEditSchedule(
+          dateOnly: today,
+          start: r.start,
+          end: r.end,
+          now: now,
+        ),
+        isNull,
+      );
       expect(EcoEvent.isValidRange(r.start, r.end), isTrue);
     });
   });
 
   group('validateEditSchedule', () {
-    test('upcoming matches create rules', () {
+    test('upcoming matches create rules for same-day span', () {
       expect(
         validateEditSchedule(
           status: EcoEventStatus.upcoming,
-          dateOnly: today,
+          dateOnly: tomorrow,
           start: const EventTime(hour: 14, minute: 30),
           end: const EventTime(hour: 16, minute: 0),
           now: now,
         ),
-        ScheduleValidationIssue.startTooSoon,
+        isNull,
       );
     });
 
@@ -136,6 +162,26 @@ void main() {
           dateOnly: today,
           start: const EventTime(hour: 8, minute: 0),
           end: const EventTime(hour: 18, minute: 0),
+          now: now,
+        ),
+        isNull,
+      );
+    });
+  });
+
+  group('clampCreateOrUpcomingSchedule', () {
+    test('returns valid same-day schedule when inputs need clamping', () {
+      final r = clampCreateOrUpcomingSchedule(
+        dateOnly: tomorrow,
+        start: const EventTime(hour: 10, minute: 0),
+        end: const EventTime(hour: 9, minute: 0),
+        now: now,
+      );
+      expect(
+        validateCreateOrUpcomingEditSchedule(
+          dateOnly: tomorrow,
+          start: r.start,
+          end: r.end,
           now: now,
         ),
         isNull,
