@@ -16,17 +16,34 @@ import { parseDuplicateEventConflictFromApiError } from '@/features/events/lib/e
 import { useScheduleConflictPreview } from '@/features/events/lib/use-schedule-conflict-preview';
 import styles from './event-detail.module.css';
 
-function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString(undefined, {
+/** North Macedonia schedule display for admin; fixed TZ avoids SSR/client hydration mismatches. */
+const EVENT_ADMIN_TZ = 'Europe/Skopje';
+
+function formatEventAdminDateTime(iso: string): string {
+  return new Date(iso).toLocaleString('en-GB', {
+    timeZone: EVENT_ADMIN_TZ,
     dateStyle: 'medium',
     timeStyle: 'short',
   });
 }
 
-function toDatetimeLocal(iso: string): string {
+/** `datetime-local` value in [EVENT_ADMIN_TZ] wall time (stable across Node SSR and browsers). */
+function toDatetimeLocalField(iso: string): string {
   const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  if (Number.isNaN(d.getTime())) {
+    return '';
+  }
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: EVENT_ADMIN_TZ,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const v = (t: Intl.DateTimeFormatPartTypes) => parts.find((p) => p.type === t)?.value ?? '00';
+  return `${v('year')}-${v('month')}-${v('day')}T${v('hour')}:${v('minute')}`;
 }
 
 type EventDetailViewProps = {
@@ -156,7 +173,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
       recurrenceRule,
       scheduledAtValue: scheduledAt,
       ...(isCompleted
-        ? { completedAtLocal: completedAt.trim() ? toDatetimeLocal(completedAt) : '' }
+        ? { completedAtLocal: completedAt.trim() ? toDatetimeLocalField(completedAt) : '' }
         : { endAtValue: endAt }),
       participantCount,
     });
@@ -340,12 +357,12 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
         <div className={styles.metaRow}>
           <div className={styles.metaItem}>
             <span className={styles.metaLabel}>Scheduled</span>
-            <span className={styles.metaValue}>{formatDateTime(event.scheduledAt)}</span>
+            <span className={styles.metaValue}>{formatEventAdminDateTime(event.scheduledAt)}</span>
           </div>
           {event.completedAt && (
             <div className={styles.metaItem}>
               <span className={styles.metaLabel}>Completed</span>
-              <span className={styles.metaValue}>{formatDateTime(event.completedAt)}</span>
+              <span className={styles.metaValue}>{formatEventAdminDateTime(event.completedAt)}</span>
             </div>
           )}
           <div className={styles.metaItem}>
@@ -475,7 +492,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
             <input
               id="detail-event-scheduled"
               type="datetime-local"
-              value={toDatetimeLocal(scheduledAt)}
+              value={toDatetimeLocalField(scheduledAt)}
               disabled={readOnly}
               onChange={(e) => {
                 setScheduledAt(new Date(e.target.value).toISOString());
@@ -498,7 +515,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               <input
                 id="detail-event-end"
                 type="datetime-local"
-                value={toDatetimeLocal(endAt)}
+                value={toDatetimeLocalField(endAt)}
                 disabled={readOnly}
                 onChange={(e) => {
                   setEndAt(new Date(e.target.value).toISOString());
@@ -522,7 +539,8 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               ) : (
                 <>
                   Another event may overlap this time at this site:{' '}
-                  <strong>{scheduleConflictHint.title}</strong> ({formatDateTime(scheduleConflictHint.scheduledAt)}).{' '}
+                  <strong>{scheduleConflictHint.title}</strong> (
+                  {formatEventAdminDateTime(scheduleConflictHint.scheduledAt)}).{' '}
                   <Link href={`/dashboard/events/${scheduleConflictHint.id}`}>Open event</Link>.
                 </>
               )}
@@ -570,7 +588,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               <input
                 id="detail-event-completed"
                 type="datetime-local"
-                value={completedAt ? toDatetimeLocal(completedAt) : ''}
+                value={completedAt ? toDatetimeLocalField(completedAt) : ''}
                 disabled={readOnly}
                 onChange={(e) => {
                   setCompletedAt(e.target.value ? new Date(e.target.value).toISOString() : '');
@@ -616,7 +634,8 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               Schedule conflict
             </h2>
             <p id="duplicate-event-modal-desc" className={styles.modalBody}>
-              {duplicateModal.title} is already scheduled for {formatDateTime(duplicateModal.scheduledAt)}. Adjust the
+              {duplicateModal.title} is already scheduled for{' '}
+              {formatEventAdminDateTime(duplicateModal.scheduledAt)}. Adjust the
               time or open the existing event.
             </p>
             <div className={styles.modalActions}>
