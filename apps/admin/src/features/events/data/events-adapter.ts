@@ -79,7 +79,8 @@ export async function getEventsStats(): Promise<EventsStats> {
   const completed = overview.cleanupEvents?.completed ?? 0;
   const pending = overview.cleanupEvents?.pending ?? 0;
   return {
-    total: upcoming + completed,
+    /** Counts every cleanup row represented in the overview buckets (excludes declined-only, etc.). */
+    total: upcoming + completed + pending,
     upcoming,
     completed,
     pending,
@@ -112,6 +113,62 @@ export async function getCleanupEvents(params?: {
 export async function getCleanupEventDetail(id: string): Promise<CleanupEventDetail> {
   const token = await getAdminAuthTokenFromCookies();
   return apiFetch<CleanupEventDetail>(`/admin/cleanup-events/${id}`, {
+    method: 'GET',
+    authToken: token,
+  });
+}
+
+export type EventAnalyticsAdminPayload = {
+  totalJoiners: number;
+  checkedInCount: number;
+  attendanceRate: number;
+  joinersCumulative: Array<{ at: string; cumulativeJoiners: number }>;
+  checkInsByHour: Array<{ hour: number; count: number }>;
+};
+
+export async function getCleanupEventAnalytics(id: string): Promise<EventAnalyticsAdminPayload> {
+  const token = await getAdminAuthTokenFromCookies();
+  return apiFetch<EventAnalyticsAdminPayload>(`/admin/cleanup-events/${id}/analytics`, {
+    method: 'GET',
+    authToken: token,
+  });
+}
+
+export type AuditLogAdminRow = {
+  id: string;
+  createdAt: string;
+  action: string;
+  resourceType: string;
+  resourceId: string | null;
+  actorEmail: string | null;
+  metadata: unknown;
+};
+
+export async function getCleanupEventAudit(
+  id: string,
+  page = 1,
+  limit = 50,
+): Promise<{ data: AuditLogAdminRow[]; meta: { page: number; limit: number; total: number } }> {
+  const token = await getAdminAuthTokenFromCookies();
+  const search = new URLSearchParams({ page: String(page), limit: String(limit) });
+  return apiFetch(`/admin/cleanup-events/${id}/audit?${search.toString()}`, {
+    method: 'GET',
+    authToken: token,
+  });
+}
+
+export type CleanupEventParticipantAdminRow = {
+  userId: string;
+  joinedAt: string;
+  displayName: string;
+  email: string;
+};
+
+export async function getCleanupEventParticipants(
+  id: string,
+): Promise<{ data: CleanupEventParticipantAdminRow[] }> {
+  const token = await getAdminAuthTokenFromCookies();
+  return apiFetch(`/admin/cleanup-events/${id}/participants`, {
     method: 'GET',
     authToken: token,
   });

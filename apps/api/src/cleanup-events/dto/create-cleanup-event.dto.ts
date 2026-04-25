@@ -2,16 +2,16 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsDateString,
-  IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
   MaxLength,
   Min,
-  MinLength,
   Matches,
   ValidateIf,
 } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 import { CleanupEventStatus } from '../../prisma-client';
 
 /** Optional RFC 5545 RRULE line (with or without `RRULE:` prefix). Stored on the event; not expanded server-side for admin creates. */
@@ -20,7 +20,7 @@ const RRULE_MAX = 2048;
 export class CreateCleanupEventDto {
   @ApiProperty()
   @IsString()
-  @MinLength(1)
+  @Matches(PRISMA_CUID_REGEX, { message: 'siteId must be a valid cuid' })
   siteId!: string;
 
   @ApiProperty()
@@ -68,7 +68,9 @@ export class CreateCleanupEventDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  @ValidateIf((o: CreateCleanupEventDto) => o.organizerId != null && String(o.organizerId).trim() !== '')
   @IsString()
+  @Matches(PRISMA_CUID_REGEX, { message: 'organizerId must be a valid cuid' })
   organizerId?: string;
 
   @ApiPropertyOptional({ default: 0 })
@@ -83,6 +85,6 @@ export class CreateCleanupEventDto {
     enum: ['PENDING', 'APPROVED'],
   })
   @IsOptional()
-  @IsEnum(CleanupEventStatus)
+  @IsIn([CleanupEventStatus.PENDING, CleanupEventStatus.APPROVED])
   status?: CleanupEventStatus;
 }

@@ -4,7 +4,6 @@ import {
   Delete,
   Get,
   MessageEvent,
-  NotFoundException,
   Param,
   Patch,
   Post,
@@ -24,12 +23,14 @@ import {
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Observable, interval, merge } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { CheckEventConflictQueryDto } from './dto/check-event-conflict-query.dto';
@@ -53,6 +54,7 @@ import { EventsFieldBatchService } from './events-field-batch.service';
 import { EventRouteWaypointsBodyDto } from './dto/event-route-waypoint.dto';
 import { EventsService } from './events.service';
 import { EventImpactReceiptService } from './event-impact-receipt.service';
+import { ApiEventsJwtStandardErrors } from './events-openapi.decorators';
 
 const LIVE_IMPACT_SSE_HEARTBEAT_MS = 30_000;
 
@@ -77,6 +79,7 @@ export class EventsController {
     summary: 'List cleanup events (approved public events plus caller’s own pending drafts)',
   })
   @ApiOkResponse({ description: 'Paginated events' })
+  @ApiEventsJwtStandardErrors()
   list(@CurrentUser() user: AuthenticatedUser, @Query() query: ListEventsQueryDto) {
     return this.eventsService.list(user, query);
   }
@@ -91,6 +94,7 @@ export class EventsController {
   @ApiOkResponse({
     description: '{ hasConflict, conflictingEvent? }',
   })
+  @ApiEventsJwtStandardErrors()
   checkConflict(
     @CurrentUser() _user: AuthenticatedUser,
     @Query() query: CheckEventConflictQueryDto,
@@ -104,6 +108,7 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Apply queued field-mode operations (offline sync)' })
   @ApiOkResponse({ description: 'Batch outcome' })
+  @ApiEventsJwtStandardErrors()
   applyFieldBatch(@CurrentUser() user: AuthenticatedUser, @Body() dto: FieldBatchDto) {
     return this.fieldBatchService.applyBatch(user, dto);
   }
@@ -114,9 +119,10 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @ApiOperation({ summary: 'List event joiners (paginated); organizer is not included' })
   @ApiOkResponse({ description: 'Participants page', type: ListEventParticipantsResponseDto })
+  @ApiEventsJwtStandardErrors()
   listParticipants(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Query() query: ListEventParticipantsQueryDto,
   ) {
     return this.eventsService.listParticipants(id, user, query);
@@ -128,7 +134,8 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiOperation({ summary: 'Aggregated live impact counters for an event' })
   @ApiOkResponse({ description: 'Live impact snapshot' })
-  getLiveImpact(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  getLiveImpact(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.liveImpact.getSnapshot(id, user);
   }
 
@@ -138,9 +145,10 @@ export class EventsController {
   @ApiBearerAuth()
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'SSE stream for live impact updates on this event' })
+  @ApiEventsJwtStandardErrors()
   streamLiveImpact(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
   ): Observable<MessageEvent> {
     const live$ = this.liveImpact.watchLiveImpactSse(id, user);
     const heartbeat$ = interval(LIVE_IMPACT_SSE_HEARTBEAT_MS).pipe(
@@ -155,9 +163,10 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @ApiOperation({ summary: 'Update organizer-reported live impact (organizer only)' })
   @ApiOkResponse({ description: 'Updated snapshot' })
+  @ApiEventsJwtStandardErrors()
   async patchLiveImpact(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchLiveImpactDto,
   ) {
     await this.liveImpact.patch(id, dto, user);
@@ -170,7 +179,8 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 60 } })
   @ApiOperation({ summary: 'List structured evidence photos for an event' })
   @ApiOkResponse({ description: 'Evidence rows with signed URLs' })
-  listEvidence(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  listEvidence(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.evidence.listForEvent(id, user);
   }
 
@@ -187,9 +197,10 @@ export class EventsController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload one evidence image (organizer only); form field `kind`: BEFORE|AFTER|FIELD' })
   @ApiOkResponse({ description: 'Created evidence row' })
+  @ApiEventsJwtStandardErrors()
   uploadEvidence(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @UploadedFile() file: Express.Multer.File,
     @Body('kind') kind: string,
   ) {
@@ -202,10 +213,11 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Delete an evidence photo (organizer only)' })
   @ApiOkResponse({ description: 'No content semantics — returns { ok: true }' })
+  @ApiEventsJwtStandardErrors()
   async deleteEvidence(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
-    @Param('photoId') photoId: string,
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('photoId', ParseCuidPipe) photoId: string,
   ): Promise<{ ok: true }> {
     await this.evidence.deletePhoto(id, photoId, user);
     return { ok: true };
@@ -217,7 +229,8 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiOperation({ summary: 'List route segments for an event' })
   @ApiOkResponse({ description: 'Route segments' })
-  listRoute(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  listRoute(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.routeSegments.listForEvent(id, user);
   }
 
@@ -227,9 +240,10 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @ApiOperation({ summary: 'Replace route waypoints (organizer only)' })
   @ApiOkResponse({ description: 'Updated segments' })
+  @ApiEventsJwtStandardErrors()
   patchRoute(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() body: EventRouteWaypointsBodyDto,
   ) {
     return this.routeSegments.replaceWaypoints(id, user, body.waypoints);
@@ -241,10 +255,11 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Claim an open route segment (joined volunteer)' })
   @ApiOkResponse({ description: 'Updated segments' })
+  @ApiEventsJwtStandardErrors()
   claimRouteSegment(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') _eventId: string,
-    @Param('segmentId') segmentId: string,
+    @Param('id', ParseCuidPipe) _eventId: string,
+    @Param('segmentId', ParseCuidPipe) segmentId: string,
   ) {
     return this.routeSegments.claimSegment(segmentId, user);
   }
@@ -255,10 +270,11 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Mark a route segment completed (claimer or organizer)' })
   @ApiOkResponse({ description: 'Updated segments' })
+  @ApiEventsJwtStandardErrors()
   completeRouteSegment(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') _eventId: string,
-    @Param('segmentId') segmentId: string,
+    @Param('id', ParseCuidPipe) _eventId: string,
+    @Param('segmentId', ParseCuidPipe) segmentId: string,
   ) {
     return this.routeSegments.completeSegment(segmentId, user);
   }
@@ -271,17 +287,24 @@ export class EventsController {
   })
   @ApiOkResponse({ type: EventPublicShareCardResponseDto })
   @ApiNotFoundResponse({ description: 'Event not found or not publicly visible' })
-  getPublicShareCard(@Param('id') id: string) {
-    const trimmed = id.trim();
-    const uuidLike =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidLike.test(trimmed)) {
-      throw new NotFoundException({
-        code: 'EVENT_NOT_FOUND',
-        message: 'Event not found',
-      });
-    }
-    return this.eventsService.findPublicShareCard(trimmed);
+  @ApiBadRequestResponse({
+    description: 'Malformed event id',
+    schema: { example: { code: 'INVALID_CUID', message: 'Invalid resource id' } },
+  })
+  @ApiResponse({
+    status: 429,
+    description: 'Too many requests (throttled)',
+    schema: {
+      example: {
+        code: 'TOO_MANY_REQUESTS',
+        message: 'Too many requests. Please wait and try again.',
+        timestamp: '2026-04-16T12:00:00.000Z',
+        requestId: '01JF…',
+      },
+    },
+  })
+  getPublicShareCard(@Param('id', ParseCuidPipe) id: string) {
+    return this.eventsService.findPublicShareCard(id);
   }
 
   @Get(':id/impact-receipt')
@@ -302,7 +325,8 @@ export class EventsController {
       },
     },
   })
-  getImpactReceipt(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  getImpactReceipt(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.impactReceipt.buildForViewer(id, user);
   }
 
@@ -314,9 +338,10 @@ export class EventsController {
     summary: 'Get event detail (approved public events plus caller’s own pending drafts)',
   })
   @ApiOkResponse({ description: 'Event payload (mobile-shaped JSON)' })
+  @ApiEventsJwtStandardErrors()
   findOne(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Query() geo: FindEventQueryDto,
   ) {
     return this.eventsService.findOne(id, user, geo);
@@ -328,6 +353,7 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @ApiOperation({ summary: 'Create cleanup event (PENDING for citizens, APPROVED for staff)' })
   @ApiOkResponse({ description: 'Created event' })
+  @ApiEventsJwtStandardErrors({ include409: true })
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreatePublicEventDto) {
     return this.eventsService.create(dto, user);
   }
@@ -338,9 +364,10 @@ export class EventsController {
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Update event (organizer only)' })
   @ApiOkResponse({ description: 'Updated event' })
+  @ApiEventsJwtStandardErrors({ include409: true })
   patch(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchPublicEventDto,
   ) {
     return this.eventsService.patchEvent(id, dto, user);
@@ -364,7 +391,8 @@ export class EventsController {
   @ApiOkResponse({
     description: 'Event payload (same as GET /events/:id) plus pointsAwarded for this join',
   })
-  join(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors({ include409: true })
+  join(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.eventsService.join(id, user);
   }
 
@@ -373,7 +401,8 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Leave event' })
   @ApiOkResponse({ description: 'Event with isJoined false' })
-  leave(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  leave(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.eventsService.leave(id, user);
   }
 
@@ -382,9 +411,10 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Transition lifecycle status (organizer only)' })
   @ApiOkResponse({ description: 'Updated event' })
+  @ApiEventsJwtStandardErrors()
   patchStatus(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchEventLifecycleDto,
   ) {
     return this.eventsService.patchLifecycle(id, dto, user);
@@ -395,9 +425,10 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Set participant reminder' })
   @ApiOkResponse({ description: 'Updated event' })
+  @ApiEventsJwtStandardErrors()
   patchReminder(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchEventReminderDto,
   ) {
     return this.eventsService.patchReminder(id, dto, user);
@@ -408,7 +439,8 @@ export class EventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Attendance analytics for an event (organizer only)' })
   @ApiOkResponse({ description: 'Event analytics data', type: EventAnalyticsResponseDto })
-  getAnalytics(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
+  @ApiEventsJwtStandardErrors()
+  getAnalytics(@CurrentUser() user: AuthenticatedUser, @Param('id', ParseCuidPipe) id: string) {
     return this.eventsService.getAnalytics(id, user);
   }
 
@@ -425,9 +457,10 @@ export class EventsController {
   @ApiConsumes('multipart/form-data')
   @ApiOperation({ summary: 'Upload after-cleanup photos (organizer only)' })
   @ApiOkResponse({ description: 'Updated event with signed image URLs' })
+  @ApiEventsJwtStandardErrors()
   uploadAfterImages(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     return this.eventsService.appendAfterImages(id, files ?? [], user);

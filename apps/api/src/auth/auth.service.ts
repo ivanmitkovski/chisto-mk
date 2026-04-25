@@ -506,7 +506,7 @@ export class AuthService {
     });
   }
 
-  async me(authenticatedUser: AuthenticatedUser): Promise<{
+  async me(authenticatedUser: AuthenticatedUser, locale = 'en'): Promise<{
     id: string;
     firstName: string;
     lastName: string;
@@ -561,7 +561,7 @@ export class AuthService {
 
     const avatarUrl = await this.reportsUploadService.signPrivateObjectKey(user.avatarObjectKey);
     const { totpSecret: _, avatarObjectKey: __, organizerCertifiedAt, ...rest } = user;
-    const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned);
+    const levelState = this.gamificationService.getLevelProgress(user.totalPointsEarned, locale);
     const weekly = await this.rankingsService.getUserWeeklySummary(authenticatedUser.userId);
     return {
       ...rest,

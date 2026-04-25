@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
+
+const double _kChipControlHeight = 48;
+const double _kChipSelectedBorderAlpha = 0.5;
+const double _kChipUnselectedBorderAlpha = 0.8;
 
 class AppPillFilterChips extends StatelessWidget {
   const AppPillFilterChips({
@@ -21,8 +24,9 @@ class AppPillFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return SizedBox(
-      height: 44,
+      height: _kChipControlHeight,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
@@ -37,7 +41,7 @@ class AppPillFilterChips extends StatelessWidget {
             selected: isActive,
             label: '$semanticLabelPrefix $label',
             child: Material(
-              color: AppColors.transparent,
+              color: Colors.transparent,
               child: InkWell(
                 onTap: () {
                   if (index != selectedIndex) {
@@ -56,11 +60,13 @@ class AppPillFilterChips extends StatelessWidget {
                   ),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? AppColors.primary.withValues(alpha: 0.12)
-                        : AppColors.panelBackground,
+                        ? colorScheme.primaryContainer
+                        : colorScheme.surface,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
                     border: Border.all(
-                      color: isActive ? AppColors.primary : AppColors.divider,
+                      color: isActive
+                          ? colorScheme.primary.withValues(alpha: _kChipSelectedBorderAlpha)
+                          : colorScheme.outlineVariant.withValues(alpha: _kChipUnselectedBorderAlpha),
                       width: 1.2,
                     ),
                   ),
@@ -70,8 +76,8 @@ class AppPillFilterChips extends StatelessWidget {
                           fontWeight:
                               isActive ? FontWeight.w600 : FontWeight.w500,
                           color: isActive
-                              ? AppColors.primaryDark
-                              : AppColors.textSecondary,
+                                ? colorScheme.onPrimaryContainer
+                                : colorScheme.onSurfaceVariant,
                           letterSpacing: -0.2,
                         ),
                   ),

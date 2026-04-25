@@ -5012,11 +5012,13 @@ export namespace Prisma {
   export type EventChatMessageCountOutputType = {
     replies: number
     attachments: number
+    readCursorsLastRead: number
   }
 
   export type EventChatMessageCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     replies?: boolean | EventChatMessageCountOutputTypeCountRepliesArgs
     attachments?: boolean | EventChatMessageCountOutputTypeCountAttachmentsArgs
+    readCursorsLastRead?: boolean | EventChatMessageCountOutputTypeCountReadCursorsLastReadArgs
   }
 
   // Custom InputTypes
@@ -5042,6 +5044,13 @@ export namespace Prisma {
    */
   export type EventChatMessageCountOutputTypeCountAttachmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: EventChatAttachmentWhereInput
+  }
+
+  /**
+   * EventChatMessageCountOutputType without action
+   */
+  export type EventChatMessageCountOutputTypeCountReadCursorsLastReadArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: EventChatReadCursorWhereInput
   }
 
 
@@ -14936,8 +14945,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType: string | null
-    referenceId: string | null
+    referenceType: string
+    referenceId: string
     metadata: JsonValue | null
     _count: PointTransactionCountAggregateOutputType | null
     _avg: PointTransactionAvgAggregateOutputType | null
@@ -15034,8 +15043,8 @@ export namespace Prisma {
       delta: number
       balanceAfter: number
       reasonCode: string
-      referenceType: string | null
-      referenceId: string | null
+      referenceType: string
+      referenceId: string
       metadata: Prisma.JsonValue | null
     }, ExtArgs["result"]["pointTransaction"]>
     composites: {}
@@ -27099,6 +27108,7 @@ export namespace Prisma {
     replies?: boolean | EventChatMessage$repliesArgs<ExtArgs>
     pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
     attachments?: boolean | EventChatMessage$attachmentsArgs<ExtArgs>
+    readCursorsLastRead?: boolean | EventChatMessage$readCursorsLastReadArgs<ExtArgs>
     _count?: boolean | EventChatMessageCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["eventChatMessage"]>
 
@@ -27181,6 +27191,7 @@ export namespace Prisma {
     replies?: boolean | EventChatMessage$repliesArgs<ExtArgs>
     pinnedBy?: boolean | EventChatMessage$pinnedByArgs<ExtArgs>
     attachments?: boolean | EventChatMessage$attachmentsArgs<ExtArgs>
+    readCursorsLastRead?: boolean | EventChatMessage$readCursorsLastReadArgs<ExtArgs>
     _count?: boolean | EventChatMessageCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type EventChatMessageIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -27205,6 +27216,7 @@ export namespace Prisma {
       replies: Prisma.$EventChatMessagePayload<ExtArgs>[]
       pinnedBy: Prisma.$UserPayload<ExtArgs> | null
       attachments: Prisma.$EventChatAttachmentPayload<ExtArgs>[]
+      readCursorsLastRead: Prisma.$EventChatReadCursorPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -27628,6 +27640,7 @@ export namespace Prisma {
     replies<T extends EventChatMessage$repliesArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$repliesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     pinnedBy<T extends EventChatMessage$pinnedByArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$pinnedByArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     attachments<T extends EventChatMessage$attachmentsArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$attachmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatAttachmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    readCursorsLastRead<T extends EventChatMessage$readCursorsLastReadArgs<ExtArgs> = {}>(args?: Subset<T, EventChatMessage$readCursorsLastReadArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EventChatReadCursorPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -28159,6 +28172,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: EventChatAttachmentScalarFieldEnum | EventChatAttachmentScalarFieldEnum[]
+  }
+
+  /**
+   * EventChatMessage.readCursorsLastRead
+   */
+  export type EventChatMessage$readCursorsLastReadArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatReadCursor
+     */
+    select?: EventChatReadCursorSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatReadCursor
+     */
+    omit?: EventChatReadCursorOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatReadCursorInclude<ExtArgs> | null
+    where?: EventChatReadCursorWhereInput
+    orderBy?: EventChatReadCursorOrderByWithRelationInput | EventChatReadCursorOrderByWithRelationInput[]
+    cursor?: EventChatReadCursorWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: EventChatReadCursorScalarFieldEnum | EventChatReadCursorScalarFieldEnum[]
   }
 
   /**
@@ -30599,6 +30636,7 @@ export namespace Prisma {
     lastReadMessageId?: boolean
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }, ExtArgs["result"]["eventChatReadCursor"]>
 
   export type EventChatReadCursorSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -30610,6 +30648,7 @@ export namespace Prisma {
     lastReadMessageId?: boolean
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }, ExtArgs["result"]["eventChatReadCursor"]>
 
   export type EventChatReadCursorSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -30621,6 +30660,7 @@ export namespace Prisma {
     lastReadMessageId?: boolean
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }, ExtArgs["result"]["eventChatReadCursor"]>
 
   export type EventChatReadCursorSelectScalar = {
@@ -30636,14 +30676,17 @@ export namespace Prisma {
   export type EventChatReadCursorInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }
   export type EventChatReadCursorIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }
   export type EventChatReadCursorIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     event?: boolean | CleanupEventDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
+    lastReadMessage?: boolean | EventChatReadCursor$lastReadMessageArgs<ExtArgs>
   }
 
   export type $EventChatReadCursorPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -30651,6 +30694,7 @@ export namespace Prisma {
     objects: {
       event: Prisma.$CleanupEventPayload<ExtArgs>
       user: Prisma.$UserPayload<ExtArgs>
+      lastReadMessage: Prisma.$EventChatMessagePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -31055,6 +31099,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     event<T extends CleanupEventDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CleanupEventDefaultArgs<ExtArgs>>): Prisma__CleanupEventClient<$Result.GetResult<Prisma.$CleanupEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    lastReadMessage<T extends EventChatReadCursor$lastReadMessageArgs<ExtArgs> = {}>(args?: Subset<T, EventChatReadCursor$lastReadMessageArgs<ExtArgs>>): Prisma__EventChatMessageClient<$Result.GetResult<Prisma.$EventChatMessagePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -31488,6 +31533,25 @@ export namespace Prisma {
      * Limit how many EventChatReadCursors to delete.
      */
     limit?: number
+  }
+
+  /**
+   * EventChatReadCursor.lastReadMessage
+   */
+  export type EventChatReadCursor$lastReadMessageArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the EventChatMessage
+     */
+    select?: EventChatMessageSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the EventChatMessage
+     */
+    omit?: EventChatMessageOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: EventChatMessageInclude<ExtArgs> | null
+    where?: EventChatMessageWhereInput
   }
 
   /**
@@ -50958,8 +51022,8 @@ export namespace Prisma {
     delta?: IntFilter<"PointTransaction"> | number
     balanceAfter?: IntFilter<"PointTransaction"> | number
     reasonCode?: StringFilter<"PointTransaction"> | string
-    referenceType?: StringNullableFilter<"PointTransaction"> | string | null
-    referenceId?: StringNullableFilter<"PointTransaction"> | string | null
+    referenceType?: StringFilter<"PointTransaction"> | string
+    referenceId?: StringFilter<"PointTransaction"> | string
     metadata?: JsonNullableFilter<"PointTransaction">
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -50971,14 +51035,15 @@ export namespace Prisma {
     delta?: SortOrder
     balanceAfter?: SortOrder
     reasonCode?: SortOrder
-    referenceType?: SortOrderInput | SortOrder
-    referenceId?: SortOrderInput | SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
     metadata?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
   }
 
   export type PointTransactionWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    userId_referenceType_referenceId_reasonCode?: PointTransactionUserIdReferenceTypeReferenceIdReasonCodeCompoundUniqueInput
     AND?: PointTransactionWhereInput | PointTransactionWhereInput[]
     OR?: PointTransactionWhereInput[]
     NOT?: PointTransactionWhereInput | PointTransactionWhereInput[]
@@ -50987,11 +51052,11 @@ export namespace Prisma {
     delta?: IntFilter<"PointTransaction"> | number
     balanceAfter?: IntFilter<"PointTransaction"> | number
     reasonCode?: StringFilter<"PointTransaction"> | string
-    referenceType?: StringNullableFilter<"PointTransaction"> | string | null
-    referenceId?: StringNullableFilter<"PointTransaction"> | string | null
+    referenceType?: StringFilter<"PointTransaction"> | string
+    referenceId?: StringFilter<"PointTransaction"> | string
     metadata?: JsonNullableFilter<"PointTransaction">
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+  }, "id" | "userId_referenceType_referenceId_reasonCode">
 
   export type PointTransactionOrderByWithAggregationInput = {
     id?: SortOrder
@@ -51000,8 +51065,8 @@ export namespace Prisma {
     delta?: SortOrder
     balanceAfter?: SortOrder
     reasonCode?: SortOrder
-    referenceType?: SortOrderInput | SortOrder
-    referenceId?: SortOrderInput | SortOrder
+    referenceType?: SortOrder
+    referenceId?: SortOrder
     metadata?: SortOrderInput | SortOrder
     _count?: PointTransactionCountOrderByAggregateInput
     _avg?: PointTransactionAvgOrderByAggregateInput
@@ -51020,8 +51085,8 @@ export namespace Prisma {
     delta?: IntWithAggregatesFilter<"PointTransaction"> | number
     balanceAfter?: IntWithAggregatesFilter<"PointTransaction"> | number
     reasonCode?: StringWithAggregatesFilter<"PointTransaction"> | string
-    referenceType?: StringNullableWithAggregatesFilter<"PointTransaction"> | string | null
-    referenceId?: StringNullableWithAggregatesFilter<"PointTransaction"> | string | null
+    referenceType?: StringWithAggregatesFilter<"PointTransaction"> | string
+    referenceId?: StringWithAggregatesFilter<"PointTransaction"> | string
     metadata?: JsonNullableWithAggregatesFilter<"PointTransaction">
   }
 
@@ -51857,6 +51922,7 @@ export namespace Prisma {
     replies?: EventChatMessageListRelationFilter
     pinnedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     attachments?: EventChatAttachmentListRelationFilter
+    readCursorsLastRead?: EventChatReadCursorListRelationFilter
   }
 
   export type EventChatMessageOrderByWithRelationInput = {
@@ -51884,6 +51950,7 @@ export namespace Prisma {
     replies?: EventChatMessageOrderByRelationAggregateInput
     pinnedBy?: UserOrderByWithRelationInput
     attachments?: EventChatAttachmentOrderByRelationAggregateInput
+    readCursorsLastRead?: EventChatReadCursorOrderByRelationAggregateInput
   }
 
   export type EventChatMessageWhereUniqueInput = Prisma.AtLeast<{
@@ -51915,6 +51982,7 @@ export namespace Prisma {
     replies?: EventChatMessageListRelationFilter
     pinnedBy?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     attachments?: EventChatAttachmentListRelationFilter
+    readCursorsLastRead?: EventChatReadCursorListRelationFilter
   }, "id" | "eventId_clientMessageId">
 
   export type EventChatMessageOrderByWithAggregationInput = {
@@ -52120,6 +52188,7 @@ export namespace Prisma {
     lastReadMessageId?: StringNullableFilter<"EventChatReadCursor"> | string | null
     event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    lastReadMessage?: XOR<EventChatMessageNullableScalarRelationFilter, EventChatMessageWhereInput> | null
   }
 
   export type EventChatReadCursorOrderByWithRelationInput = {
@@ -52131,6 +52200,7 @@ export namespace Prisma {
     lastReadMessageId?: SortOrderInput | SortOrder
     event?: CleanupEventOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
+    lastReadMessage?: EventChatMessageOrderByWithRelationInput
   }
 
   export type EventChatReadCursorWhereUniqueInput = Prisma.AtLeast<{
@@ -52146,6 +52216,7 @@ export namespace Prisma {
     lastReadMessageId?: StringNullableFilter<"EventChatReadCursor"> | string | null
     event?: XOR<CleanupEventScalarRelationFilter, CleanupEventWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    lastReadMessage?: XOR<EventChatMessageNullableScalarRelationFilter, EventChatMessageWhereInput> | null
   }, "id" | "eventId_userId">
 
   export type EventChatReadCursorOrderByWithAggregationInput = {
@@ -54087,8 +54158,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
     user: UserCreateNestedOneWithoutPointTransactionsInput
   }
@@ -54100,8 +54171,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -54111,8 +54182,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
     user?: UserUpdateOneRequiredWithoutPointTransactionsNestedInput
   }
@@ -54124,8 +54195,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -54136,8 +54207,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -54147,8 +54218,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -54159,8 +54230,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -55070,6 +55141,7 @@ export namespace Prisma {
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateInput = {
@@ -55093,6 +55165,7 @@ export namespace Prisma {
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUpdateInput = {
@@ -55116,6 +55189,7 @@ export namespace Prisma {
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateInput = {
@@ -55139,6 +55213,7 @@ export namespace Prisma {
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageCreateManyInput = {
@@ -55348,9 +55423,9 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    lastReadMessageId?: string | null
     event: CleanupEventCreateNestedOneWithoutChatReadCursorsInput
     user: UserCreateNestedOneWithoutEventChatReadCursorsInput
+    lastReadMessage?: EventChatMessageCreateNestedOneWithoutReadCursorsLastReadInput
   }
 
   export type EventChatReadCursorUncheckedCreateInput = {
@@ -55366,9 +55441,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     event?: CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput
     user?: UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput
+    lastReadMessage?: EventChatMessageUpdateOneWithoutReadCursorsLastReadNestedInput
   }
 
   export type EventChatReadCursorUncheckedUpdateInput = {
@@ -55393,7 +55468,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type EventChatReadCursorUncheckedUpdateManyInput = {
@@ -57451,6 +57525,13 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type PointTransactionUserIdReferenceTypeReferenceIdReasonCodeCompoundUniqueInput = {
+    userId: string
+    referenceType: string
+    referenceId: string
+    reasonCode: string
   }
 
   export type PointTransactionCountOrderByAggregateInput = {
@@ -61561,6 +61642,13 @@ export namespace Prisma {
     connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
   }
 
+  export type EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput> | EventChatReadCursorCreateWithoutLastReadMessageInput[] | EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput | EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput[]
+    createMany?: EventChatReadCursorCreateManyLastReadMessageInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+  }
+
   export type EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput = {
     create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
     connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
@@ -61573,6 +61661,13 @@ export namespace Prisma {
     connectOrCreate?: EventChatAttachmentCreateOrConnectWithoutMessageInput | EventChatAttachmentCreateOrConnectWithoutMessageInput[]
     createMany?: EventChatAttachmentCreateManyMessageInputEnvelope
     connect?: EventChatAttachmentWhereUniqueInput | EventChatAttachmentWhereUniqueInput[]
+  }
+
+  export type EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput> | EventChatReadCursorCreateWithoutLastReadMessageInput[] | EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput | EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput[]
+    createMany?: EventChatReadCursorCreateManyLastReadMessageInputEnvelope
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
   }
 
   export type EnumEventChatMessageTypeFieldUpdateOperationsInput = {
@@ -61651,6 +61746,20 @@ export namespace Prisma {
     deleteMany?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
   }
 
+  export type EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput> | EventChatReadCursorCreateWithoutLastReadMessageInput[] | EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput | EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutLastReadMessageInput | EventChatReadCursorUpsertWithWhereUniqueWithoutLastReadMessageInput[]
+    createMany?: EventChatReadCursorCreateManyLastReadMessageInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutLastReadMessageInput | EventChatReadCursorUpdateWithWhereUniqueWithoutLastReadMessageInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutLastReadMessageInput | EventChatReadCursorUpdateManyWithWhereWithoutLastReadMessageInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
+  }
+
   export type EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput = {
     create?: XOR<EventChatMessageCreateWithoutReplyToInput, EventChatMessageUncheckedCreateWithoutReplyToInput> | EventChatMessageCreateWithoutReplyToInput[] | EventChatMessageUncheckedCreateWithoutReplyToInput[]
     connectOrCreate?: EventChatMessageCreateOrConnectWithoutReplyToInput | EventChatMessageCreateOrConnectWithoutReplyToInput[]
@@ -61677,6 +61786,20 @@ export namespace Prisma {
     update?: EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput | EventChatAttachmentUpdateWithWhereUniqueWithoutMessageInput[]
     updateMany?: EventChatAttachmentUpdateManyWithWhereWithoutMessageInput | EventChatAttachmentUpdateManyWithWhereWithoutMessageInput[]
     deleteMany?: EventChatAttachmentScalarWhereInput | EventChatAttachmentScalarWhereInput[]
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput = {
+    create?: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput> | EventChatReadCursorCreateWithoutLastReadMessageInput[] | EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput[]
+    connectOrCreate?: EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput | EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput[]
+    upsert?: EventChatReadCursorUpsertWithWhereUniqueWithoutLastReadMessageInput | EventChatReadCursorUpsertWithWhereUniqueWithoutLastReadMessageInput[]
+    createMany?: EventChatReadCursorCreateManyLastReadMessageInputEnvelope
+    set?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    disconnect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    delete?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    connect?: EventChatReadCursorWhereUniqueInput | EventChatReadCursorWhereUniqueInput[]
+    update?: EventChatReadCursorUpdateWithWhereUniqueWithoutLastReadMessageInput | EventChatReadCursorUpdateWithWhereUniqueWithoutLastReadMessageInput[]
+    updateMany?: EventChatReadCursorUpdateManyWithWhereWithoutLastReadMessageInput | EventChatReadCursorUpdateManyWithWhereWithoutLastReadMessageInput[]
+    deleteMany?: EventChatReadCursorScalarWhereInput | EventChatReadCursorScalarWhereInput[]
   }
 
   export type EventChatMessageCreateNestedOneWithoutAttachmentsInput = {
@@ -61733,6 +61856,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type EventChatMessageCreateNestedOneWithoutReadCursorsLastReadInput = {
+    create?: XOR<EventChatMessageCreateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedCreateWithoutReadCursorsLastReadInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReadCursorsLastReadInput
+    connect?: EventChatMessageWhereUniqueInput
+  }
+
   export type CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput = {
     create?: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
     connectOrCreate?: CleanupEventCreateOrConnectWithoutChatReadCursorsInput
@@ -61747,6 +61876,16 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutEventChatReadCursorsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutEventChatReadCursorsInput, UserUpdateWithoutEventChatReadCursorsInput>, UserUncheckedUpdateWithoutEventChatReadCursorsInput>
+  }
+
+  export type EventChatMessageUpdateOneWithoutReadCursorsLastReadNestedInput = {
+    create?: XOR<EventChatMessageCreateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedCreateWithoutReadCursorsLastReadInput>
+    connectOrCreate?: EventChatMessageCreateOrConnectWithoutReadCursorsLastReadInput
+    upsert?: EventChatMessageUpsertWithoutReadCursorsLastReadInput
+    disconnect?: EventChatMessageWhereInput | boolean
+    delete?: EventChatMessageWhereInput | boolean
+    connect?: EventChatMessageWhereUniqueInput
+    update?: XOR<XOR<EventChatMessageUpdateToOneWithWhereWithoutReadCursorsLastReadInput, EventChatMessageUpdateWithoutReadCursorsLastReadInput>, EventChatMessageUncheckedUpdateWithoutReadCursorsLastReadInput>
   }
 
   export type CleanupEventCreateNestedOneWithoutCheckInsInput = {
@@ -62955,8 +63094,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -62966,8 +63105,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -63506,6 +63645,7 @@ export namespace Prisma {
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutAuthorInput = {
@@ -63528,6 +63668,7 @@ export namespace Prisma {
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutAuthorInput = {
@@ -63544,8 +63685,8 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    lastReadMessageId?: string | null
     event: CleanupEventCreateNestedOneWithoutChatReadCursorsInput
+    lastReadMessage?: EventChatMessageCreateNestedOneWithoutReadCursorsLastReadInput
   }
 
   export type EventChatReadCursorUncheckedCreateWithoutUserInput = {
@@ -63586,6 +63727,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutPinnedByInput = {
@@ -63608,6 +63750,7 @@ export namespace Prisma {
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutPinnedByInput = {
@@ -63878,8 +64021,8 @@ export namespace Prisma {
     delta?: IntFilter<"PointTransaction"> | number
     balanceAfter?: IntFilter<"PointTransaction"> | number
     reasonCode?: StringFilter<"PointTransaction"> | string
-    referenceType?: StringNullableFilter<"PointTransaction"> | string | null
-    referenceId?: StringNullableFilter<"PointTransaction"> | string | null
+    referenceType?: StringFilter<"PointTransaction"> | string
+    referenceId?: StringFilter<"PointTransaction"> | string
     metadata?: JsonNullableFilter<"PointTransaction">
   }
 
@@ -68071,6 +68214,7 @@ export namespace Prisma {
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutEventInput = {
@@ -68093,6 +68237,7 @@ export namespace Prisma {
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutEventInput = {
@@ -68109,8 +68254,8 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
-    lastReadMessageId?: string | null
     user: UserCreateNestedOneWithoutEventChatReadCursorsInput
+    lastReadMessage?: EventChatMessageCreateNestedOneWithoutReadCursorsLastReadInput
   }
 
   export type EventChatReadCursorUncheckedCreateWithoutEventInput = {
@@ -69513,6 +69658,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutRepliesInput = {
@@ -69535,6 +69681,7 @@ export namespace Prisma {
     bodyEncrypted?: boolean
     clientMessageId?: string | null
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutRepliesInput = {
@@ -69562,6 +69709,7 @@ export namespace Prisma {
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
     attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutReplyToInput = {
@@ -69584,6 +69732,7 @@ export namespace Prisma {
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
     attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutReplyToInput = {
@@ -69742,6 +69891,32 @@ export namespace Prisma {
 
   export type EventChatAttachmentCreateManyMessageInputEnvelope = {
     data: EventChatAttachmentCreateManyMessageInput | EventChatAttachmentCreateManyMessageInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type EventChatReadCursorCreateWithoutLastReadMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    event: CleanupEventCreateNestedOneWithoutChatReadCursorsInput
+    user: UserCreateNestedOneWithoutEventChatReadCursorsInput
+  }
+
+  export type EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    userId: string
+  }
+
+  export type EventChatReadCursorCreateOrConnectWithoutLastReadMessageInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    create: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput>
+  }
+
+  export type EventChatReadCursorCreateManyLastReadMessageInputEnvelope = {
+    data: EventChatReadCursorCreateManyLastReadMessageInput | EventChatReadCursorCreateManyLastReadMessageInput[]
     skipDuplicates?: boolean
   }
 
@@ -69984,6 +70159,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutRepliesInput = {
@@ -70006,6 +70182,7 @@ export namespace Prisma {
     bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUpsertWithWhereUniqueWithoutReplyToInput = {
@@ -70176,6 +70353,22 @@ export namespace Prisma {
     thumbnailUrl?: StringNullableFilter<"EventChatAttachment"> | string | null
   }
 
+  export type EventChatReadCursorUpsertWithWhereUniqueWithoutLastReadMessageInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    update: XOR<EventChatReadCursorUpdateWithoutLastReadMessageInput, EventChatReadCursorUncheckedUpdateWithoutLastReadMessageInput>
+    create: XOR<EventChatReadCursorCreateWithoutLastReadMessageInput, EventChatReadCursorUncheckedCreateWithoutLastReadMessageInput>
+  }
+
+  export type EventChatReadCursorUpdateWithWhereUniqueWithoutLastReadMessageInput = {
+    where: EventChatReadCursorWhereUniqueInput
+    data: XOR<EventChatReadCursorUpdateWithoutLastReadMessageInput, EventChatReadCursorUncheckedUpdateWithoutLastReadMessageInput>
+  }
+
+  export type EventChatReadCursorUpdateManyWithWhereWithoutLastReadMessageInput = {
+    where: EventChatReadCursorScalarWhereInput
+    data: XOR<EventChatReadCursorUpdateManyMutationInput, EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageInput>
+  }
+
   export type EventChatMessageCreateWithoutAttachmentsInput = {
     id?: string
     createdAt?: Date | string
@@ -70196,6 +70389,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
     replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
     pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    readCursorsLastRead?: EventChatReadCursorCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageUncheckedCreateWithoutAttachmentsInput = {
@@ -70218,6 +70412,7 @@ export namespace Prisma {
     bodyEncrypted?: boolean
     clientMessageId?: string | null
     replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedCreateNestedManyWithoutLastReadMessageInput
   }
 
   export type EventChatMessageCreateOrConnectWithoutAttachmentsInput = {
@@ -70256,6 +70451,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutAttachmentsInput = {
@@ -70278,6 +70474,7 @@ export namespace Prisma {
     bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type CleanupEventCreateWithoutChatMutesInput = {
@@ -70880,6 +71077,57 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutEventChatReadCursorsInput, UserUncheckedCreateWithoutEventChatReadCursorsInput>
   }
 
+  export type EventChatMessageCreateWithoutReadCursorsLastReadInput = {
+    id?: string
+    createdAt?: Date | string
+    body: string
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    event: CleanupEventCreateNestedOneWithoutChatMessagesInput
+    author: UserCreateNestedOneWithoutEventChatMessagesInput
+    replyTo?: EventChatMessageCreateNestedOneWithoutRepliesInput
+    replies?: EventChatMessageCreateNestedManyWithoutReplyToInput
+    pinnedBy?: UserCreateNestedOneWithoutEventChatPinnedMessagesInput
+    attachments?: EventChatAttachmentCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageUncheckedCreateWithoutReadCursorsLastReadInput = {
+    id?: string
+    createdAt?: Date | string
+    eventId: string
+    authorId: string
+    body: string
+    replyToId?: string | null
+    deletedAt?: Date | string | null
+    editedAt?: Date | string | null
+    isPinned?: boolean
+    pinnedAt?: Date | string | null
+    pinnedById?: string | null
+    messageType?: $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: number | null
+    locationLng?: number | null
+    locationLabel?: string | null
+    bodyEncrypted?: boolean
+    clientMessageId?: string | null
+    replies?: EventChatMessageUncheckedCreateNestedManyWithoutReplyToInput
+    attachments?: EventChatAttachmentUncheckedCreateNestedManyWithoutMessageInput
+  }
+
+  export type EventChatMessageCreateOrConnectWithoutReadCursorsLastReadInput = {
+    where: EventChatMessageWhereUniqueInput
+    create: XOR<EventChatMessageCreateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedCreateWithoutReadCursorsLastReadInput>
+  }
+
   export type CleanupEventUpsertWithoutChatReadCursorsInput = {
     update: XOR<CleanupEventUpdateWithoutChatReadCursorsInput, CleanupEventUncheckedUpdateWithoutChatReadCursorsInput>
     create: XOR<CleanupEventCreateWithoutChatReadCursorsInput, CleanupEventUncheckedCreateWithoutChatReadCursorsInput>
@@ -71086,6 +71334,63 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type EventChatMessageUpsertWithoutReadCursorsLastReadInput = {
+    update: XOR<EventChatMessageUpdateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedUpdateWithoutReadCursorsLastReadInput>
+    create: XOR<EventChatMessageCreateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedCreateWithoutReadCursorsLastReadInput>
+    where?: EventChatMessageWhereInput
+  }
+
+  export type EventChatMessageUpdateToOneWithWhereWithoutReadCursorsLastReadInput = {
+    where?: EventChatMessageWhereInput
+    data: XOR<EventChatMessageUpdateWithoutReadCursorsLastReadInput, EventChatMessageUncheckedUpdateWithoutReadCursorsLastReadInput>
+  }
+
+  export type EventChatMessageUpdateWithoutReadCursorsLastReadInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    body?: StringFieldUpdateOperationsInput | string
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    event?: CleanupEventUpdateOneRequiredWithoutChatMessagesNestedInput
+    author?: UserUpdateOneRequiredWithoutEventChatMessagesNestedInput
+    replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
+    replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
+    pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
+    attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+  }
+
+  export type EventChatMessageUncheckedUpdateWithoutReadCursorsLastReadInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    authorId?: StringFieldUpdateOperationsInput | string
+    body?: StringFieldUpdateOperationsInput | string
+    replyToId?: NullableStringFieldUpdateOperationsInput | string | null
+    deletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    editedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isPinned?: BoolFieldUpdateOperationsInput | boolean
+    pinnedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    pinnedById?: NullableStringFieldUpdateOperationsInput | string | null
+    messageType?: EnumEventChatMessageTypeFieldUpdateOperationsInput | $Enums.EventChatMessageType
+    systemPayload?: NullableJsonNullValueInput | InputJsonValue
+    locationLat?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLng?: NullableFloatFieldUpdateOperationsInput | number | null
+    locationLabel?: NullableStringFieldUpdateOperationsInput | string | null
+    bodyEncrypted?: BoolFieldUpdateOperationsInput | boolean
+    clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
+    replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
+    attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
   }
 
   export type CleanupEventCreateWithoutCheckInsInput = {
@@ -75573,8 +75878,8 @@ export namespace Prisma {
     delta: number
     balanceAfter: number
     reasonCode: string
-    referenceType?: string | null
-    referenceId?: string | null
+    referenceType?: string
+    referenceId?: string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -76004,8 +76309,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -76015,8 +76320,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -76026,8 +76331,8 @@ export namespace Prisma {
     delta?: IntFieldUpdateOperationsInput | number
     balanceAfter?: IntFieldUpdateOperationsInput | number
     reasonCode?: StringFieldUpdateOperationsInput | string
-    referenceType?: NullableStringFieldUpdateOperationsInput | string | null
-    referenceId?: NullableStringFieldUpdateOperationsInput | string | null
+    referenceType?: StringFieldUpdateOperationsInput | string
+    referenceId?: StringFieldUpdateOperationsInput | string
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
@@ -76542,6 +76847,7 @@ export namespace Prisma {
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutAuthorInput = {
@@ -76564,6 +76870,7 @@ export namespace Prisma {
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateManyWithoutAuthorInput = {
@@ -76590,8 +76897,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     event?: CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput
+    lastReadMessage?: EventChatMessageUpdateOneWithoutReadCursorsLastReadNestedInput
   }
 
   export type EventChatReadCursorUncheckedUpdateWithoutUserInput = {
@@ -76630,6 +76937,7 @@ export namespace Prisma {
     replyTo?: EventChatMessageUpdateOneWithoutRepliesNestedInput
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutPinnedByInput = {
@@ -76652,6 +76960,7 @@ export namespace Prisma {
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateManyWithoutPinnedByInput = {
@@ -77505,6 +77814,7 @@ export namespace Prisma {
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutEventInput = {
@@ -77527,6 +77837,7 @@ export namespace Prisma {
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateManyWithoutEventInput = {
@@ -77553,8 +77864,8 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    lastReadMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     user?: UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput
+    lastReadMessage?: EventChatMessageUpdateOneWithoutReadCursorsLastReadNestedInput
   }
 
   export type EventChatReadCursorUncheckedUpdateWithoutEventInput = {
@@ -77829,6 +78140,14 @@ export namespace Prisma {
     thumbnailUrl?: string | null
   }
 
+  export type EventChatReadCursorCreateManyLastReadMessageInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    eventId: string
+    userId: string
+  }
+
   export type EventChatMessageUpdateWithoutReplyToInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77849,6 +78168,7 @@ export namespace Prisma {
     replies?: EventChatMessageUpdateManyWithoutReplyToNestedInput
     pinnedBy?: UserUpdateOneWithoutEventChatPinnedMessagesNestedInput
     attachments?: EventChatAttachmentUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateWithoutReplyToInput = {
@@ -77871,6 +78191,7 @@ export namespace Prisma {
     clientMessageId?: NullableStringFieldUpdateOperationsInput | string | null
     replies?: EventChatMessageUncheckedUpdateManyWithoutReplyToNestedInput
     attachments?: EventChatAttachmentUncheckedUpdateManyWithoutMessageNestedInput
+    readCursorsLastRead?: EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageNestedInput
   }
 
   export type EventChatMessageUncheckedUpdateManyWithoutReplyToInput = {
@@ -77930,6 +78251,30 @@ export namespace Prisma {
     height?: NullableIntFieldUpdateOperationsInput | number | null
     duration?: NullableIntFieldUpdateOperationsInput | number | null
     thumbnailUrl?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type EventChatReadCursorUpdateWithoutLastReadMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    event?: CleanupEventUpdateOneRequiredWithoutChatReadCursorsNestedInput
+    user?: UserUpdateOneRequiredWithoutEventChatReadCursorsNestedInput
+  }
+
+  export type EventChatReadCursorUncheckedUpdateWithoutLastReadMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type EventChatReadCursorUncheckedUpdateManyWithoutLastReadMessageInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type SiteCommentCreateManyParentInput = {

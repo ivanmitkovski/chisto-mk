@@ -2,15 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 
-/// Semantic colors and geometry for event chat (derived from [AppColors] only).
+/// Semantic colors and geometry for event chat (bubbles use [ColorScheme] where noted).
 ///
 /// Follow-ups that need product + API/schema (not UI-only): message reactions,
 /// richer read receipts, link unfurl previews, voice notes.
 abstract final class ChatTheme {
-  static Color get canvas => AppColors.appBackground;
+  static Color surfaceCanvas(ColorScheme colorScheme) => colorScheme.surface;
 
-  static Color get canvasElevated =>
-      Color.lerp(AppColors.appBackground, AppColors.white, 0.025) ?? AppColors.appBackground;
+  static Color surfaceCanvasElevated(ColorScheme colorScheme) =>
+      Color.lerp(
+        colorScheme.surface,
+        colorScheme.surfaceContainerHighest,
+        0.08,
+      ) ??
+      colorScheme.surface;
 
   static Color get bubbleOwnFill => AppColors.primary.withValues(alpha: 0.14);
 

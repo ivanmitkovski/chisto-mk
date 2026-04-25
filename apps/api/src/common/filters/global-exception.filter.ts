@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
 import { Prisma } from '../../prisma-client';
@@ -19,6 +20,8 @@ type HttpExceptionPayload = {
 
 @Catch()
 export class GlobalExceptionFilter implements ExceptionFilter {
+  private static readonly log = new Logger(GlobalExceptionFilter.name);
+
   private static stamp<T extends object>(body: T): T & { timestamp: string } {
     return { ...body, timestamp: new Date().toISOString() };
   }
@@ -55,17 +58,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return;
     }
 
-    // Structured error logging with request correlation id for production diagnostics.
-    console.error(
+    // Structured JSON log line (Nest Logger); no raw client bodies.
+    const errPayload =
+      exception instanceof Error
+        ? { name: exception.name, message: exception.message }
+        : { message: String(exception) };
+    GlobalExceptionFilter.log.error(
       JSON.stringify({
+        context: 'GlobalExceptionFilter',
         requestId: request?.requestId ?? null,
         method: request?.method ?? null,
         route: request?.url ?? null,
         message: 'Unhandled exception in request pipeline',
-        error:
-          exception instanceof Error
-            ? { name: exception.name, message: exception.message }
-            : String(exception),
+        error: errPayload,
       }),
     );
 

@@ -6,8 +6,10 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
+import { ApiAdminCleanupEventsStandardErrors } from './cleanup-events-openapi.decorators';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -33,6 +35,7 @@ export class CleanupEventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List cleanup events' })
   @ApiOkResponse({ description: 'Cleanup events' })
+  @ApiAdminCleanupEventsStandardErrors()
   list(@Query() query: ListCleanupEventsQueryDto) {
     return this.cleanupEventsService.list(query);
   }
@@ -44,18 +47,33 @@ export class CleanupEventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List active check-in risk signals (non-expired)' })
   @ApiOkResponse({ description: 'Paginated risk signals' })
+  @ApiAdminCleanupEventsStandardErrors()
   listCheckInRiskSignals(@Query() query: ListCheckInRiskSignalsQueryDto) {
     return this.cleanupEventsService.listCheckInRiskSignals(query);
   }
 
-  @Get(':id/audit')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(':id/participants')
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'List participants who joined this cleanup event' })
+  @ApiOkResponse({ description: 'Participant rows' })
+  @ApiAdminCleanupEventsStandardErrors()
+  listParticipants(@Param('id', ParseCuidPipe) id: string) {
+    return this.cleanupEventsService.listParticipants(id);
+  }
+
+  @Get(':id/audit')
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
+  @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Audit trail for a cleanup event' })
   @ApiOkResponse({ description: 'Audit log entries' })
+  @ApiAdminCleanupEventsStandardErrors()
   listAudit(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Query('page') page?: string,
     @Query('limit') limit?: string,
   ) {
@@ -68,22 +86,26 @@ export class CleanupEventsController {
   }
 
   @Get(':id/analytics')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Attendance analytics (admin read-only)' })
   @ApiOkResponse({ description: 'Analytics', type: EventAnalyticsResponseDto })
-  analytics(@Param('id') id: string) {
+  @ApiAdminCleanupEventsStandardErrors()
+  analytics(@Param('id', ParseCuidPipe) id: string) {
     return this.cleanupEventsService.getAnalytics(id);
   }
 
   @Get(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
   @Roles(...ADMIN_PANEL_ROLES)
+  @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get cleanup event' })
   @ApiOkResponse({ description: 'Cleanup event' })
-  findOne(@Param('id') id: string) {
+  @ApiAdminCleanupEventsStandardErrors()
+  findOne(@Param('id', ParseCuidPipe) id: string) {
     return this.cleanupEventsService.findOne(id);
   }
 
@@ -99,6 +121,7 @@ export class CleanupEventsController {
   })
   @ApiConflictResponse({ description: 'Duplicate clientJobId for this actor' })
   @ApiOkResponse({ description: 'Per-event outcome summary' })
+  @ApiAdminCleanupEventsStandardErrors()
   bulkModerate(@Body() dto: BulkModerateCleanupEventsDto, @CurrentUser() actor: AuthenticatedUser) {
     return this.cleanupEventsService.bulkModerate(dto, actor);
   }
@@ -110,6 +133,7 @@ export class CleanupEventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create cleanup event' })
   @ApiOkResponse({ description: 'Created' })
+  @ApiAdminCleanupEventsStandardErrors()
   create(@Body() dto: CreateCleanupEventDto, @CurrentUser() actor: AuthenticatedUser) {
     return this.cleanupEventsService.create(dto, actor);
   }
@@ -121,8 +145,9 @@ export class CleanupEventsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update cleanup event' })
   @ApiOkResponse({ description: 'Updated' })
+  @ApiAdminCleanupEventsStandardErrors()
   patch(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: PatchCleanupEventDto,
     @CurrentUser() actor: AuthenticatedUser,
   ) {

@@ -17,7 +17,7 @@ export class GamificationService {
     return xpStepForLevel(level);
   }
 
-  getLevelProgress(totalPointsEarned: number): {
+  getLevelProgress(totalPointsEarned: number, locale = 'en'): {
     level: number;
     pointsInLevel: number;
     pointsToNextLevel: number;
@@ -41,7 +41,7 @@ export class GamificationService {
           pointsToNextLevel,
           levelProgress: need > 0 ? pointsInLevel / need : 1,
           levelTierKey: levelTierKey(level),
-          levelDisplayName: levelDisplayName(level),
+          levelDisplayName: levelDisplayName(level, locale),
         };
       }
       segmentStart += need;
@@ -54,7 +54,7 @@ export class GamificationService {
       pointsToNextLevel: xpStepForLevel(level),
       levelProgress: 0,
       levelTierKey: levelTierKey(level),
-      levelDisplayName: levelDisplayName(level),
+      levelDisplayName: levelDisplayName(level, locale),
     };
   }
 }

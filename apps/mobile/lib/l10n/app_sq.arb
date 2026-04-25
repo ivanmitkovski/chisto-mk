@@ -2479,6 +2479,25 @@
   "homeSiteCleaningVolunteerHint": "Bashkohuni me veprimin për të ndihmuar në pastrimin e këtij vendi.",
   "homeSiteCleaningJoinAction": "Bashkohu",
   "homeSiteCleaningEventUnavailable": "Detajet e ngjarjes nuk janë të disponueshme për momentin.",
+  "homeSiteCleaningListLoadError": "Nuk u ngarkuan ngjarjet. Kontrollo lidhjen dhe provo përsëri.",
+  "homeSiteCleaningRetry": "Riprovo",
+  "eventsDistanceLessThan100m": "<100 m",
+  "eventsDistanceMeters": "{meters} m",
+  "@eventsDistanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsDistanceKilometers": "{km} km",
+  "@eventsDistanceKilometers": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "errorUserNetwork": "Kontrolloni lidhjen dhe provoni përsëri.",
   "errorUserTimeout": "Zgjati shumë. Provoni përsëri.",
   "errorUserUnauthorized": "Hyni përsëri për të vazhduar.",

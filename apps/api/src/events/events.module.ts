@@ -14,7 +14,11 @@ import { EventLiveImpactService } from './event-live-impact.service';
 import { EventRouteSegmentsService } from './event-route-segments.service';
 import { EventsFieldBatchService } from './events-field-batch.service';
 import { EventsCheckInController } from './events-check-in.controller';
+import { EventsCheckInAttendeesService } from './events-check-in-attendees.service';
+import { EventsCheckInQrService } from './events-check-in-qr.service';
+import { EventsCheckInRedemptionService } from './events-check-in-redemption.service';
 import { EventsCheckInService } from './events-check-in.service';
+import { EventsCheckInSharedService } from './events-check-in-shared.service';
 import { EventsController } from './events.controller';
 import { EventsMobileMapperService } from './events-mobile-mapper.service';
 import { EventsCreationService } from './events-creation.service';
@@ -52,6 +56,10 @@ import { EventImpactReceiptService } from './event-impact-receipt.service';
     EventsService,
     CheckInTelemetryService,
     CheckInRepository,
+    EventsCheckInSharedService,
+    EventsCheckInQrService,
+    EventsCheckInAttendeesService,
+    EventsCheckInRedemptionService,
     EventsCheckInService,
     EventLiveImpactEventsService,
     EventLiveImpactService,

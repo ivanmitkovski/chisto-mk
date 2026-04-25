@@ -267,7 +267,9 @@ export class EventsUpdateService {
           title: updated.title,
         })
         .catch((err: unknown) => {
-          this.logger.warn(`notify staff re-review failed for ${id}`, err);
+          this.logger.warn(
+            `notify staff re-review failed for ${id}: ${err instanceof Error ? err.message : String(err)}`,
+          );
         });
       if (updated.organizerId != null) {
         void this.cleanupEventNotifications
@@ -276,7 +278,9 @@ export class EventsUpdateService {
             eventId: id,
           })
           .catch((err: unknown) => {
-            this.logger.warn(`notify organizer re-review failed for ${id}`, err);
+            this.logger.warn(
+              `notify organizer re-review failed for ${id}: ${err instanceof Error ? err.message : String(err)}`,
+            );
           });
       }
     }

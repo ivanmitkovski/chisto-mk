@@ -27,7 +27,12 @@ function resolveCheckInWsCorsOrigin(): boolean | string | string[] {
     const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
     return list.length ? list : '*';
   }
-  return process.env.NODE_ENV === 'production' ? true : '*';
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error(
+      'CHECKIN_WS_CORS_ORIGINS or CHAT_WS_CORS_ORIGINS must be set in production (comma-separated allowlist)',
+    );
+  }
+  return '*';
 }
 
 /**
@@ -85,7 +90,7 @@ export class EventCheckInGateway
         throw new Error('JWT_SECRET not configured');
       }
 
-      const payload = jwt.verify(token, secret) as {
+      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
         sub: string;
         email: string;
       };

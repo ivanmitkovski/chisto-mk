@@ -1,6 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { ArrayMaxSize, IsArray, IsIn, IsInt, IsString, Max, Min, ValidateNested } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsIn,
+  IsInt,
+  IsString,
+  Matches,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 export class FieldBatchLiveImpactOpDto {
   @ApiProperty({ enum: ['live_impact_bags'] })
@@ -8,8 +19,8 @@ export class FieldBatchLiveImpactOpDto {
   @IsIn(['live_impact_bags'])
   type!: 'live_impact_bags';
 
-  @ApiProperty()
-  @IsString()
+  @ApiProperty({ description: 'CleanupEvent id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'eventId must be a valid cuid' })
   eventId!: string;
 
   @ApiProperty({ minimum: 0, maximum: 9999 })

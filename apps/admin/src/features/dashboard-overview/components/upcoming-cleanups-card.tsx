@@ -49,7 +49,7 @@ export function UpcomingCleanupsCard({ upcoming, completed, upcomingEvents = [] 
           <ul className={styles.eventList}>
             {upcomingEvents.map((e) => (
               <li key={e.id}>
-                <Link href="/dashboard/events" className={styles.eventLink}>
+                <Link href={`/dashboard/events/${e.id}`} className={styles.eventLink}>
                   <span className={styles.eventName}>{e.name}</span>
                   <span className={styles.eventDate}>{formatEventDate(e.date)}</span>
                 </Link>

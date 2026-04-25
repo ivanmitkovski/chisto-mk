@@ -19,6 +19,41 @@ export class EventsRepository {
   }
 
   /**
+   * Batch-load recurrence series for many roots (one query). Keys are canonical series roots.
+   */
+  async listRecurrenceSeriesEventsBatch(
+    rootIds: string[],
+  ): Promise<Map<string, { id: string; scheduledAt: Date }[]>> {
+    const roots = [...new Set(rootIds)].filter((id) => id.length > 0);
+    const byRoot = new Map<string, { id: string; scheduledAt: Date }[]>();
+    for (const id of roots) {
+      byRoot.set(id, []);
+    }
+    if (roots.length === 0) {
+      return byRoot;
+    }
+    const rootSet = new Set(roots);
+    const rows = await this.prisma.cleanupEvent.findMany({
+      where: {
+        OR: [{ id: { in: roots } }, { parentEventId: { in: roots } }],
+      },
+      select: { id: true, scheduledAt: true, parentEventId: true },
+      orderBy: [{ scheduledAt: 'asc' }, { id: 'asc' }],
+    });
+    for (const row of rows) {
+      const seriesRoot =
+        row.parentEventId != null && rootSet.has(row.parentEventId)
+          ? row.parentEventId
+          : row.id;
+      const bucket = byRoot.get(seriesRoot);
+      if (bucket != null) {
+        bucket.push({ id: row.id, scheduledAt: row.scheduledAt });
+      }
+    }
+    return byRoot;
+  }
+
+  /**
    * Great-circle distance from a viewer point to each site (km), via PostGIS geography.
    * Prisma cannot express ST_Distance on cast points; raw SQL is required.
    */

@@ -7,6 +7,18 @@ bool notificationOpenPayloadLooksLikeUuid(String raw) {
   return uuid.hasMatch(t);
 }
 
+/// API cleanup/event ids are Prisma `cuid()` (25 chars) or legacy UUID-shaped strings.
+bool notificationOpenPayloadLooksLikeEventId(String raw) {
+  final String t = raw.trim();
+  if (t.isEmpty || t.length > 80) {
+    return false;
+  }
+  if (notificationOpenPayloadLooksLikeUuid(t)) {
+    return true;
+  }
+  return RegExp(r'^c[a-z0-9]{24}$').hasMatch(t);
+}
+
 /// Chat app bar title: server `threadTitle`, then FCM notification title, then cached list title.
 String notificationOpenResolveChatBarTitle({
   required Map<String, dynamic> data,

@@ -55,6 +55,11 @@
   --color-error: #f14336;
   --color-warning: #f8bb00;
   --color-info: #24acf9;
+  /** Darker foreground on tinted info / warning badges (events admin). */
+  --color-status-info-fg: #155a7a;
+  --color-status-warning-fg: #8b6914;
+  /** Participants stat icon (events workspace). */
+  --color-stat-participants-fg: #5b21b6;
 
   --text-primary: #000000;
   --text-secondary: #4c6361;

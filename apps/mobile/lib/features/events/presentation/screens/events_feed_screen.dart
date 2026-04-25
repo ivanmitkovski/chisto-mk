@@ -8,7 +8,6 @@ import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -358,9 +357,10 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
     final double bottomSafePadding = MediaQuery.paddingOf(context).bottom;
     final bool isOrganizer = _feed.events.any((EcoEvent e) => e.isOrganizer);
     final String phase = _feed.feedPhase();
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
+      backgroundColor: colorScheme.surface,
       // Inset applied by tab [HomeShell] to avoid double layout on iOS.
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -401,7 +401,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                               button: true,
                               label: context.l10n.eventsOrganizerDashboardTitle,
                               child: Material(
-                                color: AppColors.transparent,
+                                color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () =>
                                       EventsNavigation.openOrganizerDashboard(
@@ -409,18 +409,19 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                       ),
                                   customBorder: const CircleBorder(),
                                   child: Container(
-                                    width: 44,
-                                    height: AppSpacing.avatarMd,
+                                    width: 48,
+                                    height: 48,
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(
-                                        alpha: 0.08,
-                                      ),
+                                      color: colorScheme.surface,
                                       shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: colorScheme.outlineVariant.withValues(alpha: 0.7),
+                                      ),
                                     ),
-                                    child: const Icon(
+                                    child: Icon(
                                       CupertinoIcons.chart_bar_alt_fill,
                                       size: 18,
-                                      color: AppColors.primaryDark,
+                                      color: colorScheme.onSurfaceVariant,
                                     ),
                                   ),
                                 ),
@@ -431,23 +432,26 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                             button: true,
                             label: context.l10n.eventsFeedCreateSemantic,
                             child: Material(
-                              color: AppColors.transparent,
+                              color: Colors.transparent,
                               child: InkWell(
                                 onTap: _navigateToCreate,
                                 customBorder: const CircleBorder(),
                                 child: Container(
-                                  width: 44,
-                                  height: AppSpacing.avatarMd,
+                                  width: 48,
+                                  height: 48,
                                   decoration: BoxDecoration(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.12,
+                                    color: colorScheme.primary.withValues(
+                                      alpha: 0.14,
                                     ),
                                     shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: colorScheme.primary.withValues(alpha: 0.45),
+                                    ),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     CupertinoIcons.add,
                                     size: 22,
-                                    color: AppColors.primaryDark,
+                                    color: colorScheme.onPrimaryContainer,
                                   ),
                                 ),
                               ),
@@ -486,9 +490,12 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                 vertical: AppSpacing.radius10,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.panelBackground,
+                                color: colorScheme.surface,
                                 borderRadius: BorderRadius.circular(
                                   AppSpacing.radiusMd,
+                                ),
+                                border: Border.all(
+                                  color: colorScheme.outlineVariant.withValues(alpha: 0.75),
                                 ),
                               ),
                               prefix: Padding(
@@ -498,7 +505,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                 child: Icon(
                                   CupertinoIcons.search,
                                   size: 20,
-                                  color: AppColors.textSecondary,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               prefixMode: OverlayVisibilityMode.always,
@@ -526,7 +533,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                 child: Icon(
                                   CupertinoIcons.xmark_circle_fill,
                                   size: 20,
-                                  color: AppColors.textSecondary,
+                                  color: colorScheme.onSurfaceVariant,
                                 ),
                               ),
                               suffixMode: OverlayVisibilityMode.editing,
@@ -551,7 +558,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                             button: true,
                             label: context.l10n.eventsFilterSheetTitle,
                             child: Material(
-                              color: AppColors.transparent,
+                              color: Colors.transparent,
                               child: InkWell(
                                 onTap: _openFilterSheet,
                                 customBorder: RoundedRectangleBorder(
@@ -560,24 +567,20 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                   ),
                                 ),
                                 child: Container(
-                                  width: 44,
-                                  height: 44,
+                                  width: 48,
+                                  height: 48,
                                   alignment: Alignment.center,
                                   decoration: BoxDecoration(
                                     color: _feed.hasActiveFilters
-                                        ? AppColors.primary.withValues(
-                                            alpha: 0.14,
-                                          )
-                                        : AppColors.panelBackground,
+                                        ? colorScheme.primaryContainer
+                                        : colorScheme.surface,
                                     borderRadius: BorderRadius.circular(
                                       AppSpacing.radiusMd,
                                     ),
                                     border: Border.all(
                                       color: _feed.hasActiveFilters
-                                          ? AppColors.primary.withValues(
-                                              alpha: 0.4,
-                                            )
-                                          : AppColors.divider.withValues(
+                                          ? colorScheme.primary.withValues(alpha: 0.45)
+                                          : colorScheme.outlineVariant.withValues(
                                               alpha: 0.6,
                                             ),
                                     ),
@@ -591,8 +594,8 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                         CupertinoIcons.slider_horizontal_3,
                                         size: 18,
                                         color: _feed.hasActiveFilters
-                                            ? AppColors.primaryDark
-                                            : AppColors.textSecondary,
+                                            ? colorScheme.onPrimaryContainer
+                                            : colorScheme.onSurfaceVariant,
                                       ),
                                       if (_feed.hasActiveFilters)
                                         Positioned(
@@ -601,8 +604,8 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                                           child: Container(
                                             width: 7,
                                             height: 7,
-                                            decoration: const BoxDecoration(
-                                              color: AppColors.primaryDark,
+                                            decoration: BoxDecoration(
+                                              color: colorScheme.primary,
                                               shape: BoxShape.circle,
                                             ),
                                           ),
@@ -687,12 +690,12 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                           container: true,
                           child: DecoratedBox(
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.08),
+                              color: colorScheme.primary.withValues(alpha: 0.08),
                               borderRadius: BorderRadius.circular(
                                 AppSpacing.radiusMd,
                               ),
                               border: Border.all(
-                                color: AppColors.divider.withValues(alpha: 0.6),
+                                color: colorScheme.outlineVariant.withValues(alpha: 0.6),
                               ),
                             ),
                             child: Padding(
@@ -702,10 +705,10 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
                               ),
                               child: Row(
                                 children: <Widget>[
-                                  const Icon(
+                                  Icon(
                                     CupertinoIcons.wifi_slash,
                                     size: 20,
-                                    color: AppColors.primaryDark,
+                                    color: colorScheme.primary,
                                   ),
                                   const SizedBox(width: AppSpacing.sm),
                                   Expanded(
@@ -863,7 +866,7 @@ class EventsFeedScreenState extends State<EventsFeedScreen> {
               return eventsUseCupertinoSystemEffects(context)
                   ? scrollView
                   : RefreshIndicator(
-                      color: AppColors.primary,
+                      color: colorScheme.primary,
                       displacement: 48,
                       strokeWidth: 2.2,
                       onRefresh: _onRefresh,

@@ -106,6 +106,11 @@ export class EventChatUploadService {
     return `https://${this.bucket}.s3.${this.region}.amazonaws.com/`;
   }
 
+  /** True if [url] is a published object URL for this deployment's chat prefix (trusted for persistence). */
+  isTrustedChatPublishedUrl(url: string): boolean {
+    return this.keyFromChatPublishedUrl(url) != null;
+  }
+
   /** Extract S3 object key from a URL produced by [processAndUpload], or null if unknown. */
   keyFromChatPublishedUrl(url: string): string | null {
     const prefix = this.publishedUrlPrefix();

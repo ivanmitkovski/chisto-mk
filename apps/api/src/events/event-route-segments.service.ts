@@ -11,6 +11,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { visibilityWhere } from './events-query.include';
 import type { EventRouteWaypointDto } from './dto/event-route-waypoint.dto';
 
+const ROUTE_SEGMENTS_LIST_CAP = 500;
+
 @Injectable()
 export class EventRouteSegmentsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -29,6 +31,7 @@ export class EventRouteSegmentsService {
     const rows = await this.prisma.eventRouteSegment.findMany({
       where: { eventId },
       orderBy: { sortOrder: 'asc' },
+      take: ROUTE_SEGMENTS_LIST_CAP,
       select: {
         id: true,
         sortOrder: true,
@@ -76,19 +79,21 @@ export class EventRouteSegmentsService {
       });
     }
 
-    await this.prisma.eventRouteSegment.deleteMany({ where: { eventId } });
-    if (waypoints.length > 0) {
-      await this.prisma.eventRouteSegment.createMany({
-        data: waypoints.map((w, i) => ({
-          eventId,
-          sortOrder: i,
-          label: w.label?.trim() || null,
-          latitude: w.latitude,
-          longitude: w.longitude,
-          status: RouteSegmentStatus.OPEN,
-        })),
-      });
-    }
+    await this.prisma.$transaction(async (tx) => {
+      await tx.eventRouteSegment.deleteMany({ where: { eventId } });
+      if (waypoints.length > 0) {
+        await tx.eventRouteSegment.createMany({
+          data: waypoints.map((w, i) => ({
+            eventId,
+            sortOrder: i,
+            label: w.label?.trim() || null,
+            latitude: w.latitude,
+            longitude: w.longitude,
+            status: RouteSegmentStatus.OPEN,
+          })),
+        });
+      }
+    });
 
     return this.listForEvent(eventId, user);
   }
@@ -127,14 +132,28 @@ export class EventRouteSegmentsService {
       return this.listForEvent(seg.eventId, user);
     }
 
-    await this.prisma.eventRouteSegment.update({
-      where: { id: segmentId },
+    const claimedAt = new Date();
+    const claimed = await this.prisma.eventRouteSegment.updateMany({
+      where: { id: segmentId, status: RouteSegmentStatus.OPEN },
       data: {
         status: RouteSegmentStatus.CLAIMED,
         claimedByUserId: user.userId,
-        claimedAt: new Date(),
+        claimedAt,
       },
     });
+    if (claimed.count === 0) {
+      const current = await this.prisma.eventRouteSegment.findUnique({
+        where: { id: segmentId },
+        select: { status: true, claimedByUserId: true },
+      });
+      if (current?.status === RouteSegmentStatus.CLAIMED && current.claimedByUserId === user.userId) {
+        return this.listForEvent(seg.eventId, user);
+      }
+      throw new ConflictException({
+        code: 'ROUTE_SEGMENT_CLAIMED',
+        message: 'Segment is claimed by another volunteer',
+      });
+    }
     return this.listForEvent(seg.eventId, user);
   }
 

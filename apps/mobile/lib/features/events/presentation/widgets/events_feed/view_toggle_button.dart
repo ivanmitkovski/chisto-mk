@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+
+const double _kControlSize = 48;
+const double _kControlIconSize = 20;
+const double _kSelectedBorderAlpha = 0.45;
+const double _kUnselectedBorderAlpha = 0.7;
 
 class ViewToggleButton extends StatelessWidget {
   const ViewToggleButton({
@@ -22,6 +26,7 @@ class ViewToggleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Tooltip(
       message: tooltip,
       child: Semantics(
@@ -29,7 +34,7 @@ class ViewToggleButton extends StatelessWidget {
         selected: selected,
         label: tooltip,
         child: Material(
-          color: AppColors.transparent,
+          color: Colors.transparent,
           child: InkWell(
             onTap: onTap,
             customBorder: RoundedRectangleBorder(
@@ -40,18 +45,25 @@ class ViewToggleButton extends StatelessWidget {
                   ? Duration.zero
                   : AppMotion.fast,
               curve: AppMotion.emphasized,
-              width: 44,
-              height: 44,
+              width: _kControlSize,
+              height: _kControlSize,
               decoration: BoxDecoration(
                 color: selected
-                    ? AppColors.primary.withValues(alpha: 0.12)
-                    : AppColors.panelBackground,
+                    ? colorScheme.primaryContainer
+                    : colorScheme.surface,
                 borderRadius: BorderRadius.circular(AppSpacing.radius10),
+                border: Border.all(
+                  color: selected
+                      ? colorScheme.primary.withValues(alpha: _kSelectedBorderAlpha)
+                      : colorScheme.outlineVariant.withValues(alpha: _kUnselectedBorderAlpha),
+                ),
               ),
               child: Icon(
                 icon,
-                size: 20,
-                color: selected ? AppColors.primaryDark : AppColors.textMuted,
+                size: _kControlIconSize,
+                color: selected
+                    ? colorScheme.onPrimaryContainer
+                    : colorScheme.onSurfaceVariant,
               ),
             ),
           ),

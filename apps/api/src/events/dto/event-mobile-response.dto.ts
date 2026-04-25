@@ -9,11 +9,13 @@ import {
   IsNumber,
   IsOptional,
   IsString,
-  IsUUID,
+  Matches,
   MaxLength,
   Min,
+  ValidateIf,
   ValidateNested,
 } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 const EVIDENCE_KINDS = ['before', 'after', 'field'] as const;
 const ROUTE_SEGMENT_STATUSES = ['open', 'claimed', 'completed'] as const;
@@ -21,8 +23,8 @@ const ATTENDEE_CHECK_IN = ['checkedIn', 'notCheckedIn'] as const;
 
 /** Single evidence thumbnail in mobile event payload. */
 export class EventMobileEvidenceStripItemDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'Evidence row id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'id must be a valid cuid' })
   id!: string;
 
   @ApiProperty({ enum: EVIDENCE_KINDS })
@@ -47,8 +49,8 @@ export class EventMobileEvidenceStripItemDto {
 
 /** Route segment row for field mode / map (mobile contract). */
 export class EventMobileRouteSegmentDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'Route segment id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'id must be a valid cuid' })
   id!: string;
 
   @ApiProperty()
@@ -75,9 +77,10 @@ export class EventMobileRouteSegmentDto {
   @IsIn([...ROUTE_SEGMENT_STATUSES])
   status!: string;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({ nullable: true, description: 'User id when claimed (Prisma cuid)' })
   @IsOptional()
-  @IsUUID()
+  @ValidateIf((_, v: unknown) => v != null)
+  @Matches(PRISMA_CUID_REGEX, { message: 'claimedByUserId must be a valid cuid' })
   claimedByUserId!: string | null;
 
   @ApiPropertyOptional({ type: String, format: 'date-time', nullable: true })
@@ -96,8 +99,8 @@ export class EventMobileRouteSegmentDto {
  * Validated for contract stability; nested lists use DTO classes with class-validator.
  */
 export class EventMobileResponseDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'CleanupEvent id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'id must be a valid cuid' })
   id!: string;
 
   @ApiProperty()
@@ -122,8 +125,8 @@ export class EventMobileResponseDto {
   @IsString()
   moderationStatus!: string;
 
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'Site id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'siteId must be a valid cuid' })
   siteId!: string;
 
   @ApiProperty()
@@ -149,8 +152,8 @@ export class EventMobileResponseDto {
   @IsNumber()
   siteLng!: number | null;
 
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID()
+  @ApiProperty({ description: 'Organizer user id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'organizerId must be a valid cuid' })
   organizerId!: string;
 
   @ApiProperty()
@@ -223,9 +226,10 @@ export class EventMobileResponseDto {
   @IsString()
   createdAt!: string;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({ nullable: true, description: 'Check-in session id when set (Prisma cuid)' })
   @IsOptional()
-  @IsUUID()
+  @ValidateIf((_, v: unknown) => v != null)
+  @Matches(PRISMA_CUID_REGEX, { message: 'activeCheckInSessionId must be a valid cuid' })
   activeCheckInSessionId!: string | null;
 
   @ApiProperty()
@@ -252,9 +256,10 @@ export class EventMobileResponseDto {
   @Allow()
   recurrenceRule!: unknown | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({ nullable: true, description: 'Parent series event id (Prisma cuid)' })
   @IsOptional()
-  @IsUUID()
+  @ValidateIf((_, v: unknown) => v != null)
+  @Matches(PRISMA_CUID_REGEX, { message: 'parentEventId must be a valid cuid' })
   parentEventId!: string | null;
 
   @ApiPropertyOptional({ nullable: true })
@@ -275,14 +280,16 @@ export class EventMobileResponseDto {
   @Min(0)
   recurrenceSeriesPosition!: number | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({ nullable: true, description: 'Previous occurrence id (Prisma cuid)' })
   @IsOptional()
-  @IsUUID()
+  @ValidateIf((_, v: unknown) => v != null)
+  @Matches(PRISMA_CUID_REGEX, { message: 'recurrencePrevEventId must be a valid cuid' })
   recurrencePrevEventId!: string | null;
 
-  @ApiPropertyOptional({ format: 'uuid', nullable: true })
+  @ApiPropertyOptional({ nullable: true, description: 'Next occurrence id (Prisma cuid)' })
   @IsOptional()
-  @IsUUID()
+  @ValidateIf((_, v: unknown) => v != null)
+  @Matches(PRISMA_CUID_REGEX, { message: 'recurrenceNextEventId must be a valid cuid' })
   recurrenceNextEventId!: string | null;
 
   @ApiProperty()

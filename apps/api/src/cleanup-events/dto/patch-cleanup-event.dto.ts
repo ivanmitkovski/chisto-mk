@@ -3,6 +3,7 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
+  IsIn,
   IsInt,
   IsOptional,
   IsString,
@@ -12,7 +13,7 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
-import { CleanupEventStatus } from '../../prisma-client';
+import { CleanupEventStatus, EcoEventLifecycleStatus } from '../../prisma-client';
 
 const RRULE_MAX = 2048;
 
@@ -68,11 +69,19 @@ export class PatchCleanupEventDto {
   recurrenceRule?: string;
 
   @ApiPropertyOptional({
+    description: 'Admin-only lifecycle correction (e.g. cancel a published event)',
+    enum: EcoEventLifecycleStatus,
+  })
+  @IsOptional()
+  @IsEnum(EcoEventLifecycleStatus)
+  lifecycleStatus?: EcoEventLifecycleStatus;
+
+  @ApiPropertyOptional({
     description: 'Moderation status: APPROVED or DECLINED',
     enum: ['APPROVED', 'DECLINED'],
   })
   @IsOptional()
-  @IsEnum(CleanupEventStatus)
+  @IsIn([CleanupEventStatus.APPROVED, CleanupEventStatus.DECLINED])
   status?: CleanupEventStatus;
 
   @ApiPropertyOptional({
@@ -81,7 +90,7 @@ export class PatchCleanupEventDto {
   })
   @ValidateIf((o) => o.status === CleanupEventStatus.DECLINED)
   @IsString()
-  @MinLength(1, { message: 'declineReason is required when declining an event' })
+  @MinLength(3, { message: 'declineReason must be at least 3 characters when declining an event' })
   @MaxLength(2000)
   declineReason?: string;
 }

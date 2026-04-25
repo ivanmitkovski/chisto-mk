@@ -9,7 +9,9 @@ export default async function EventsLoading() {
 
   return (
     <AdminShell title="Cleanup events" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
-      <SkeletonTable rows={8} cols={4} />
+      <div role="status" aria-label="Loading">
+        <SkeletonTable rows={8} cols={4} />
+      </div>
     </AdminShell>
   );
 }

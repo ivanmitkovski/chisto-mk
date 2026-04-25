@@ -156,10 +156,23 @@ export class EventsQueryService {
       );
     }
 
+    const recurrenceRoots = [
+      ...new Set(
+        page
+          .filter((r) => r.recurrenceRule != null || r.parentEventId != null)
+          .map((r) => r.parentEventId ?? r.id),
+      ),
+    ];
+    const recurrenceSeriesByRoot =
+      recurrenceRoots.length > 0
+        ? await this.eventsRepository.listRecurrenceSeriesEventsBatch(recurrenceRoots)
+        : new Map<string, { id: string; scheduledAt: Date }[]>();
+
     const data = await Promise.all(
       page.map((row) =>
         this.mobileMapper.toMobileEvent(row, {
           siteDistanceKm: siteDistanceBySiteId?.get(row.siteId) ?? 0,
+          recurrenceSeriesByRoot,
         }),
       ),
     );
@@ -331,14 +344,26 @@ export class EventsQueryService {
     const nextCursor =
       hasMore && last != null ? encodeParticipantCursor(last.joinedAt, last.id) : null;
 
-    const data = await Promise.all(
-      page.map(async (row) => ({
-        userId: row.userId,
-        displayName: participantDisplayName(row.user),
-        avatarUrl: await this.uploads.signPrivateObjectKey(row.user.avatarObjectKey),
-        joinedAt: row.joinedAt.toISOString(),
-      })),
+    const avatarKeys = new Set<string>();
+    for (const row of page) {
+      if (row.user.avatarObjectKey) {
+        avatarKeys.add(row.user.avatarObjectKey);
+      }
+    }
+    const avatarUrlByKey = new Map<string, string | null>();
+    await Promise.all(
+      [...avatarKeys].map(async (key) => {
+        avatarUrlByKey.set(key, await this.uploads.signPrivateObjectKey(key));
+      }),
     );
+    const data = page.map((row) => ({
+      userId: row.userId,
+      displayName: participantDisplayName(row.user),
+      avatarUrl: row.user.avatarObjectKey
+        ? (avatarUrlByKey.get(row.user.avatarObjectKey) ?? null)
+        : null,
+      joinedAt: row.joinedAt.toISOString(),
+    }));
 
     this.eventsTelemetry.emitSpan('events.list_participants', {
       duration_ms: Date.now() - t0,

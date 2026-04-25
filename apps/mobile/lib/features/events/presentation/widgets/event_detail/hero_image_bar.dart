@@ -28,7 +28,7 @@ const ValueKey<String> kEventDetailHeroChatKey = ValueKey<String>(
 
 /// Radius of trailing toolbar action chips; keep in sync with
 /// [_heroToolbarTrailingReservePx].
-const double _kHeroToolbarActionChipRadius = 22;
+const double _kHeroToolbarActionChipRadius = 24;
 
 /// Opacity of the solid fill over [BackdropFilter] for the collapsed toolbar
 /// (higher when list scrolls underneath so body text does not read through).
@@ -388,6 +388,7 @@ class _ActionChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Widget iconButton = IconButton(
       iconSize: HeroImageBar._actionIconSize,
       tooltip: tooltip,
@@ -396,13 +397,13 @@ class _ActionChip extends StatelessWidget {
       icon: Icon(
         icon,
         size: HeroImageBar._actionIconSize,
-        color: AppColors.textPrimary,
+        color: colorScheme.onSurface,
       ),
     );
 
     final Widget avatar = CircleAvatar(
       radius: HeroImageBar._actionAvatarRadius,
-      backgroundColor: AppColors.appBackground.withValues(alpha: 0.85),
+      backgroundColor: colorScheme.surface.withValues(alpha: 0.92),
       child: iconButton,
     );
 
@@ -425,7 +426,7 @@ class _ActionChip extends StatelessWidget {
                         vertical: 2,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.primary,
+                        color: colorScheme.primary,
                         borderRadius: BorderRadius.circular(999),
                       ),
                       child: Text(

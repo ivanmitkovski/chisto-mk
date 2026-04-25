@@ -3,6 +3,14 @@ import { NotificationType, Role, UserStatus } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ObservabilityStore } from '../observability/observability.store';
 import { NotificationDispatcherService } from './notification-dispatcher.service';
+import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
+import {
+  cleanupAudienceEventPublishedPush,
+  cleanupOrganizerApprovedPush,
+  cleanupOrganizerDeclinedPush,
+  cleanupOrganizerReturnedToPendingPush,
+  cleanupStaffPendingReviewPush,
+} from '../common/i18n/event-user-notification.copy';
 
 const STAFF_ROLES: Role[] = [Role.SUPPORT, Role.ADMIN, Role.SUPER_ADMIN];
 const MAX_PUBLISH_RECIPIENTS = 500;
@@ -16,6 +24,10 @@ export class CleanupEventNotificationsService {
     private readonly dispatcher: NotificationDispatcherService,
   ) {}
 
+  private static formatDispatchErr(err: unknown): string {
+    return err instanceof Error ? err.message : String(err);
+  }
+
   async notifyStaffPendingReview(params: {
     eventId: string;
     siteId: string;
@@ -26,9 +38,13 @@ export class CleanupEventNotificationsService {
       select: { id: true },
       take: 200,
     });
-    const title = 'Нова акција за чистење';
-    const body = `Потребна е модерација: «${this.truncate(params.title, 80)}».`;
+    const localeByUser = await notificationLocalesByUserId(
+      this.prisma,
+      staff.map((s) => s.id),
+    );
     for (const { id } of staff) {
+      const locale = localeByUser.get(id) ?? 'mk';
+      const { title, body } = cleanupStaffPendingReviewPush(locale, params.title);
       void this.dispatcher
         .dispatchToUser(id, {
           title,
@@ -43,7 +59,9 @@ export class CleanupEventNotificationsService {
           groupKey: `cleanup_event:${params.eventId}`,
         })
         .catch((err: unknown) => {
-          this.logger.warn(`Staff pending notification failed for ${id}`, err);
+          this.logger.warn(
+            `Staff pending notification failed for ${id}: ${CleanupEventNotificationsService.formatDispatchErr(err)}`,
+          );
         });
     }
     ObservabilityStore.recordCleanupEventStaffPendingSignals(staff.length);
@@ -53,17 +71,22 @@ export class CleanupEventNotificationsService {
     organizerId: string;
     eventId: string;
   }): Promise<void> {
+    const localeByUser = await notificationLocalesByUserId(this.prisma, [params.organizerId]);
+    const locale = localeByUser.get(params.organizerId) ?? 'mk';
+    const { title, body } = cleanupOrganizerReturnedToPendingPush(locale);
     void this.dispatcher
       .dispatchToUser(params.organizerId, {
-        title: 'Промени на настанот',
-        body: 'Настанот повторно е на модерација додека тимот ги провери измените.',
+        title,
+        body,
         type: NotificationType.CLEANUP_EVENT,
         data: { kind: 'pending_review', eventId: params.eventId },
         threadKey: `organizer_pending_review:${params.eventId}:${Date.now()}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })
       .catch((err: unknown) => {
-        this.logger.warn('Organizer re-review notification failed', err);
+        this.logger.warn(
+          `Organizer re-review notification failed: ${CleanupEventNotificationsService.formatDispatchErr(err)}`,
+        );
       });
   }
 
@@ -75,12 +98,15 @@ export class CleanupEventNotificationsService {
     dedupeKey: string;
   }): Promise<void> {
     const recipientIds = await this.resolveSiteEngagedUserIds(params.siteId, params.organizerId);
+    const localeByUser = await notificationLocalesByUserId(this.prisma, recipientIds);
     let sent = 0;
     for (const userId of recipientIds) {
+      const locale = localeByUser.get(userId) ?? 'mk';
+      const { title, body } = cleanupAudienceEventPublishedPush(locale, params.title);
       void this.dispatcher
         .dispatchToUser(userId, {
-          title: 'Нов настан',
-          body: `${this.truncate(params.title, 100)} — отворен е нов чистење настан кај зачувана локација.`,
+          title,
+          body,
           type: NotificationType.CLEANUP_EVENT,
           data: {
             kind: 'published',
@@ -91,7 +117,9 @@ export class CleanupEventNotificationsService {
           groupKey: `cleanup_event:${params.eventId}`,
         })
         .catch((err: unknown) => {
-          this.logger.warn(`Published event notification failed for ${userId}`, err);
+          this.logger.warn(
+            `Published event notification failed for ${userId}: ${CleanupEventNotificationsService.formatDispatchErr(err)}`,
+          );
         });
       sent += 1;
     }
@@ -103,17 +131,22 @@ export class CleanupEventNotificationsService {
     eventId: string;
     title: string;
   }): Promise<void> {
+    const localeByUser = await notificationLocalesByUserId(this.prisma, [params.organizerId]);
+    const locale = localeByUser.get(params.organizerId) ?? 'mk';
+    const { title, body } = cleanupOrganizerApprovedPush(locale, params.title);
     void this.dispatcher
       .dispatchToUser(params.organizerId, {
-        title: 'Настанот е одобрен',
-        body: `«${this.truncate(params.title, 80)}» е одобрен и видлив за доброволците.`,
+        title,
+        body,
         type: NotificationType.CLEANUP_EVENT,
         data: { kind: 'approved', eventId: params.eventId },
         threadKey: `organizer_approved:${params.eventId}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })
       .catch((err: unknown) => {
-        this.logger.warn('Organizer approval notification failed', err);
+        this.logger.warn(
+          `Organizer approval notification failed: ${CleanupEventNotificationsService.formatDispatchErr(err)}`,
+        );
       });
   }
 
@@ -122,26 +155,23 @@ export class CleanupEventNotificationsService {
     eventId: string;
     title: string;
   }): Promise<void> {
+    const localeByUser = await notificationLocalesByUserId(this.prisma, [params.organizerId]);
+    const locale = localeByUser.get(params.organizerId) ?? 'mk';
+    const { title, body } = cleanupOrganizerDeclinedPush(locale, params.title);
     void this.dispatcher
       .dispatchToUser(params.organizerId, {
-        title: 'Настанот не е одобрен',
-        body: `«${this.truncate(params.title, 80)}» не ги исполни критериумите. Уредете и поднесете повторно.`,
+        title,
+        body,
         type: NotificationType.CLEANUP_EVENT,
         data: { kind: 'declined', eventId: params.eventId },
         threadKey: `organizer_declined:${params.eventId}`,
         groupKey: `cleanup_event:${params.eventId}`,
       })
       .catch((err: unknown) => {
-        this.logger.warn('Organizer decline notification failed', err);
+        this.logger.warn(
+          `Organizer decline notification failed: ${CleanupEventNotificationsService.formatDispatchErr(err)}`,
+        );
       });
-  }
-
-  private truncate(s: string, max: number): string {
-    const t = s.trim();
-    if (t.length <= max) {
-      return t;
-    }
-    return `${t.slice(0, max - 1)}…`;
   }
 
   private async resolveSiteEngagedUserIds(

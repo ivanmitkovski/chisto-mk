@@ -7854,6 +7854,36 @@ abstract class AppLocalizations {
   /// **'Event details are unavailable right now.'**
   String get homeSiteCleaningEventUnavailable;
 
+  /// No description provided for @homeSiteCleaningListLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load events. Check your connection and try again.'**
+  String get homeSiteCleaningListLoadError;
+
+  /// No description provided for @homeSiteCleaningRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get homeSiteCleaningRetry;
+
+  /// No description provided for @eventsDistanceLessThan100m.
+  ///
+  /// In en, this message translates to:
+  /// **'<100 m'**
+  String get eventsDistanceLessThan100m;
+
+  /// No description provided for @eventsDistanceMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m'**
+  String eventsDistanceMeters(int meters);
+
+  /// No description provided for @eventsDistanceKilometers.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String eventsDistanceKilometers(String km);
+
   /// No description provided for @errorUserNetwork.
   ///
   /// In en, this message translates to:

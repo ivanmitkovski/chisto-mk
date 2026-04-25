@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon, Input, Snack, type SnackState } from '@/components/ui';
+import { useFocusTrap } from '@/lib/use-focus-trap';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import { cleanupEventMutationMessage } from '@/features/events/lib/cleanup-events-api-messages';
 import {
@@ -15,6 +16,7 @@ import type { CleanupEventDetail } from '@/features/events/data/events-adapter';
 import { parseDuplicateEventConflictFromApiError } from '@/features/events/lib/event-schedule-conflict-client';
 import { useScheduleConflictPreview } from '@/features/events/lib/use-schedule-conflict-preview';
 import styles from './event-detail.module.css';
+import { EventDetailInsights } from './event-detail-insights';
 
 /** North Macedonia schedule display for admin; fixed TZ avoids SSR/client hydration mismatches. */
 const EVENT_ADMIN_TZ = 'Europe/Skopje';
@@ -62,7 +64,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
       return new Date(event.endAt).toISOString();
     }
     const next = new Date(event.scheduledAt);
-    next.setDate(next.getDate() + 1);
+    next.setTime(next.getTime() + 3 * 60 * 60 * 1000);
     return next.toISOString();
   });
   const [completedAt, setCompletedAt] = useState(event.completedAt ?? '');
@@ -76,12 +78,42 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
     scheduledAt: string;
   } | null>(null);
   const duplicateModalPrimaryRef = useRef<HTMLButtonElement>(null);
+  const duplicateModalCardRef = useRef<HTMLDivElement>(null);
   const [declineModalOpen, setDeclineModalOpen] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
   const [declineReasonError, setDeclineReasonError] = useState<string | null>(null);
   const declineReasonTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const declineModalCardRef = useRef<HTMLDivElement>(null);
 
   const site = event.site;
+
+  useEffect(() => {
+    setTitle(event.title);
+    setDescription(event.description);
+    setRecurrenceRule(event.recurrenceRule ?? '');
+    setScheduledAt(event.scheduledAt);
+    if (event.endAt) {
+      setEndAt(new Date(event.endAt).toISOString());
+    } else {
+      const next = new Date(event.scheduledAt);
+      next.setTime(next.getTime() + 3 * 60 * 60 * 1000);
+      setEndAt(next.toISOString());
+    }
+    setCompletedAt(event.completedAt ?? '');
+    setParticipantCount(event.participantCount);
+  }, [
+    event.id,
+    event.title,
+    event.description,
+    event.recurrenceRule,
+    event.scheduledAt,
+    event.endAt,
+    event.completedAt,
+    event.participantCount,
+  ]);
+
+  useFocusTrap(!!duplicateModal, duplicateModalCardRef);
+  useFocusTrap(declineModalOpen, declineModalCardRef);
 
   const scheduledAtIso = useMemo(() => {
     if (!scheduledAt.trim()) {
@@ -318,6 +350,12 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
         Back to events
       </Link>
 
+      <EventDetailInsights
+        eventId={event.id}
+        lifecycleStatus={event.lifecycleStatus}
+        canWrite={canWriteCleanupEvents}
+      />
+
       {readOnly ? (
         <div className={styles.readOnlyBanner} role="status">
           You are viewing this event with read-only access. Creating or editing cleanup events requires an admin
@@ -400,7 +438,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               decline to reject it.
             </p>
             <div className={styles.approveDeclineActions}>
-              <Button onClick={() => void approve()} disabled={saving}>
+              <Button onClick={() => void approve()} isLoading={saving}>
                 <Icon name="check" size={14} />
                 Approve
               </Button>
@@ -575,7 +613,8 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
                 variant="outline"
                 size="sm"
                 onClick={() => void markComplete()}
-                disabled={saving || readOnly}
+                isLoading={saving}
+                disabled={readOnly}
               >
                 <Icon name="check" size={14} />
                 Mark completed
@@ -607,8 +646,8 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
             </label>
           )}
           <div className={styles.formActions}>
-            <Button onClick={() => void saveUpdates()} disabled={saving || readOnly}>
-              {saving ? 'Saving…' : 'Save changes'}
+            <Button onClick={() => void saveUpdates()} isLoading={saving} disabled={readOnly}>
+              Save changes
             </Button>
           </div>
         </div>
@@ -623,6 +662,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
           onClick={() => setDuplicateModal(null)}
         >
           <div
+            ref={duplicateModalCardRef}
             className={styles.modalCard}
             role="dialog"
             aria-modal="true"
@@ -658,15 +698,17 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
         <div
           className={styles.modalBackdrop}
           role="presentation"
-          onClick={() => {
-            if (!saving) {
-              setDeclineModalOpen(false);
-              setDeclineReason('');
-              setDeclineReasonError(null);
+          onClick={(e) => {
+            if (e.target !== e.currentTarget || saving) {
+              return;
             }
+            setDeclineModalOpen(false);
+            setDeclineReason('');
+            setDeclineReasonError(null);
           }}
         >
           <div
+            ref={declineModalCardRef}
             className={styles.modalCard}
             role="dialog"
             aria-modal="true"
@@ -678,7 +720,7 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               Decline event
             </h2>
             <p id="decline-event-modal-desc" className={styles.modalBody}>
-              Provide a short reason for declining. This is stored for audit purposes (1–2000 characters).
+              Provide a short reason for declining. This is stored for audit purposes (3–2000 characters).
             </p>
             <label className={styles.field} htmlFor="decline-reason-text">
               <span className={styles.fieldLabel}>Reason</span>
@@ -695,7 +737,11 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
                 maxLength={2000}
                 disabled={saving}
                 aria-invalid={declineReasonError ? true : undefined}
-                aria-describedby={declineReasonError ? 'decline-reason-err' : undefined}
+                aria-describedby={
+                  declineReasonError
+                    ? 'decline-event-modal-desc decline-reason-err'
+                    : 'decline-event-modal-desc'
+                }
               />
               {declineReasonError ? (
                 <span id="decline-reason-err" className={styles.fieldError} role="alert">
@@ -716,8 +762,8 @@ export function EventDetailView({ event, canWriteCleanupEvents }: EventDetailVie
               >
                 Cancel
               </Button>
-              <Button type="button" disabled={saving} onClick={() => void submitDecline()}>
-                {saving ? 'Declining…' : 'Decline event'}
+              <Button type="button" isLoading={saving} onClick={() => void submitDecline()}>
+                Decline event
               </Button>
             </div>
           </div>

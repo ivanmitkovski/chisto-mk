@@ -31,6 +31,12 @@ export const REASON_EVENT_JOIN_NO_SHOW = 'EVENT_JOIN_NO_SHOW' as const;
 /** `PointTransaction.reasonCode` — user checked in at an in-progress event. */
 export const REASON_EVENT_CHECK_IN = 'EVENT_CHECK_IN' as const;
 
+/** `PointTransaction.reasonCode` — organizer removed a check-in; reverses {@link REASON_EVENT_CHECK_IN} if present. */
+export const REASON_EVENT_CHECK_IN_REMOVED = 'EVENT_CHECK_IN_REMOVED' as const;
+
+/** `PointTransaction.reasonCode` — user left before the event; reverses {@link REASON_EVENT_JOINED} if present. */
+export const REASON_EVENT_JOIN_LEFT = 'EVENT_JOIN_LEFT' as const;
+
 /** `PointTransaction.reasonCode` — completion bonus for checked-in participants. */
 export const REASON_EVENT_COMPLETED = 'EVENT_COMPLETED' as const;
 

@@ -23,11 +23,17 @@ export type EventAnalyticsPayload = {
   checkInsByHour: CheckInsByHourPoint[];
 };
 
-export function buildEventAnalyticsPayload(input: {
+export type BuildEventAnalyticsInput = {
   participantCount: number;
   participantsJoinedAt: Date[];
   checkInsCheckedAt: Date[];
-}): EventAnalyticsPayload {
+  /** When set, skips scanning [checkInsCheckedAt] for counts/hourly (used for DB-aggregated paths). */
+  checkedInCountOverride?: number;
+  /** When set with [checkedInCountOverride], skips deriving hourly buckets from [checkInsCheckedAt]. */
+  checkInsByHourOverride?: CheckInsByHourPoint[];
+};
+
+export function buildEventAnalyticsPayload(input: BuildEventAnalyticsInput): EventAnalyticsPayload {
   const totalJoiners = input.participantCount;
   const sortedJoins = [...input.participantsJoinedAt].sort((a, b) => a.getTime() - b.getTime());
 
@@ -40,15 +46,20 @@ export function buildEventAnalyticsPayload(input: {
     };
   });
 
-  // UTC bucketing (deterministic across deploy regions). Event-local TZ can map from scheduledAt later.
-  const hourCounts = Array.from({ length: 24 }, () => 0);
-  for (const checkedInAt of input.checkInsCheckedAt) {
-    const hour = checkedInAt.getUTCHours();
-    hourCounts[hour] += 1;
+  let checkInsByHour: CheckInsByHourPoint[];
+  if (input.checkInsByHourOverride != null) {
+    checkInsByHour = input.checkInsByHourOverride;
+  } else {
+    // UTC bucketing (deterministic across deploy regions). Event-local TZ can map from scheduledAt later.
+    const hourCounts = Array.from({ length: 24 }, () => 0);
+    for (const checkedInAt of input.checkInsCheckedAt) {
+      const hour = checkedInAt.getUTCHours();
+      hourCounts[hour] += 1;
+    }
+    checkInsByHour = hourCounts.map((count, hour) => ({ hour, count }));
   }
-  const checkInsByHour: CheckInsByHourPoint[] = hourCounts.map((count, hour) => ({ hour, count }));
 
-  const checkedInCount = input.checkInsCheckedAt.length;
+  const checkedInCount = input.checkedInCountOverride ?? input.checkInsCheckedAt.length;
   const attendanceRate =
     totalJoiners > 0 ? Math.round((checkedInCount / Math.max(totalJoiners, 1)) * 100) : 0;
 

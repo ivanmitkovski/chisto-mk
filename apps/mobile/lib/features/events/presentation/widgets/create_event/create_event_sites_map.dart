@@ -52,6 +52,7 @@ class _CreateEventSitesMapState extends State<CreateEventSitesMap> {
   @override
   void dispose() {
     _fitDebounce?.cancel();
+    _mapController.dispose();
     super.dispose();
   }
 

@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
+
 /// Site cover for [EcoEvent.siteImageUrl]: HTTPS URLs from the API, local
 /// `assets/…` paths, or empty (placeholder).
 class EcoEventCoverImage extends StatelessWidget {
@@ -86,20 +88,6 @@ class EcoEventCoverImage extends StatelessWidget {
     );
   }
 
-  Widget _fadeInFrame(
-    BuildContext context,
-    Widget child,
-    int? frame,
-    bool wasSynchronouslyLoaded,
-  ) {
-    if (wasSynchronouslyLoaded ||
-        frame != null ||
-        MediaQuery.disableAnimationsOf(context)) {
-      return child;
-    }
-    return _loadingPlaceholder();
-  }
-
   @override
   Widget build(BuildContext context) {
     final String t = path.trim();
@@ -108,35 +96,29 @@ class EcoEventCoverImage extends StatelessWidget {
     }
     if (isNetworkUrl(t)) {
       final double dpr = MediaQuery.devicePixelRatioOf(context);
-      int? cacheW;
-      int? cacheH;
+      int? memW;
+      int? memH;
       final double? w = width;
       final double? h = height;
-      // [Image] layout may pass infinity (e.g. full-width hero); never feed that to .round().
       if (w != null &&
           h != null &&
           w.isFinite &&
           h.isFinite &&
           w > 0 &&
           h > 0) {
-        cacheW = (w * dpr).round().clamp(1, 8192);
-        cacheH = (h * dpr).round().clamp(1, 8192);
+        memW = (w * dpr).round().clamp(1, 8192);
+        memH = (h * dpr).round().clamp(1, 8192);
       }
-      return Image.network(
-        t,
+      return CachedNetworkImage(
+        imageUrl: t,
         width: width,
         height: height,
         fit: fit,
-        cacheWidth: cacheW,
-        cacheHeight: cacheH,
-        errorBuilder:
-            (BuildContext context, Object error, StackTrace? stackTrace) {
-          return _errorPlaceholder(context);
-        },
-        frameBuilder:
-            (BuildContext ctx, Widget child, int? frame, bool wasSynchronouslyLoaded) {
-          return _fadeInFrame(ctx, child, frame, wasSynchronouslyLoaded);
-        },
+        memCacheWidth: memW,
+        memCacheHeight: memH,
+        fadeInDuration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : const Duration(milliseconds: 150),
+        placeholder: (BuildContext context, String _) => _loadingPlaceholder(),
+        errorWidget: (BuildContext ctx, String _, Object _) => _errorPlaceholder(ctx),
       );
     }
     return Image.asset(

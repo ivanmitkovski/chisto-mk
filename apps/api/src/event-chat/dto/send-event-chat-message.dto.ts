@@ -7,9 +7,11 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Matches,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 export class ChatLocationDto {
   @ApiProperty({ example: 41.9981 })
@@ -38,9 +40,9 @@ export class SendEventChatMessageDto {
   @MaxLength(2000)
   body!: string;
 
-  @ApiPropertyOptional({ description: 'Parent message id for a reply thread' })
+  @ApiPropertyOptional({ description: 'Parent message id for a reply thread (Prisma cuid)' })
   @IsOptional()
-  @IsString()
+  @Matches(PRISMA_CUID_REGEX, { message: 'replyToId must be a valid cuid' })
   replyToId?: string;
 
   @ApiPropertyOptional({

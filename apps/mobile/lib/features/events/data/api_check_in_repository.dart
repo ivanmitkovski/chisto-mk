@@ -67,18 +67,35 @@ class ApiCheckInRepository extends ChangeNotifier implements CheckInRepository {
       return;
     }
     try {
-      final ApiResponse response = await _client.get('/events/$id/check-in/attendees');
-      final Map<String, dynamic>? json = response.json;
-      final List<dynamic>? raw = json?['data'] as List<dynamic>?;
-      if (raw == null) {
-        return;
+      final List<CheckedInAttendee> merged = <CheckedInAttendee>[];
+      String? cursor;
+      for (;;) {
+        final String q = cursor != null && cursor.isNotEmpty
+            ? '?cursor=${Uri.encodeQueryComponent(cursor)}&limit=50'
+            : '?limit=50';
+        final ApiResponse response =
+            await _client.get('/events/$id/check-in/attendees$q');
+        final Map<String, dynamic>? json = response.json;
+        final List<dynamic>? raw = json?['data'] as List<dynamic>?;
+        if (raw == null) {
+          break;
+        }
+        merged.addAll(
+          raw
+              .whereType<Map<String, dynamic>>()
+              .map(CheckedInAttendee.fromApiJson)
+              .whereType<CheckedInAttendee>(),
+        );
+        final Map<String, dynamic>? meta =
+            json?['meta'] as Map<String, dynamic>?;
+        final bool hasMore = meta?['hasMore'] == true;
+        final String? nextCursor = meta?['nextCursor'] as String?;
+        if (!hasMore || nextCursor == null || nextCursor.isEmpty) {
+          break;
+        }
+        cursor = nextCursor;
       }
-      final List<CheckedInAttendee> next = raw
-          .whereType<Map<String, dynamic>>()
-          .map(CheckedInAttendee.fromApiJson)
-          .whereType<CheckedInAttendee>()
-          .toList(growable: false);
-      _attendeesByEvent[id] = next;
+      _attendeesByEvent[id] = merged;
       notifyListeners();
     } on Object {
       rethrow;

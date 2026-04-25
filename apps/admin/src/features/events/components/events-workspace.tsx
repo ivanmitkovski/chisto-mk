@@ -2,12 +2,21 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Button, Card, Icon, Pagination } from '@/components/ui';
+import dynamic from 'next/dynamic';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Card, Pagination, Snack, type SnackState } from '@/components/ui';
+import { useFocusTrap } from '@/lib/use-focus-trap';
 import type { CleanupEventRow, EventsStats } from '@/features/events/data/events-adapter';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import styles from './events-workspace.module.css';
+
+const EventsWorkspaceStatsMotion = dynamic(
+  () =>
+    import('./events-workspace-stats-motion').then((m) => ({
+      default: m.EventsWorkspaceStatsMotion,
+    })),
+  { ssr: false, loading: () => <div className={styles.statsBar} aria-hidden /> },
+);
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All events' },
@@ -58,6 +67,42 @@ export function EventsWorkspace({
   const [stats, setStats] = useState(initialStats);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [snack, setSnack] = useState<SnackState | null>(null);
+  const [bulkDeclineOpen, setBulkDeclineOpen] = useState(false);
+  const [bulkDeclineReason, setBulkDeclineReason] = useState('');
+  const [bulkDeclineError, setBulkDeclineError] = useState<string | null>(null);
+  const bulkDeclineCardRef = useRef<HTMLDivElement>(null);
+  const bulkDeclineReasonRef = useRef<HTMLTextAreaElement>(null);
+
+  useFocusTrap(bulkDeclineOpen, bulkDeclineCardRef);
+
+  useEffect(() => {
+    if (!bulkDeclineOpen) {
+      return;
+    }
+    const id = requestAnimationFrame(() => {
+      bulkDeclineReasonRef.current?.focus();
+    });
+    return () => cancelAnimationFrame(id);
+  }, [bulkDeclineOpen]);
+
+  useEffect(() => {
+    if (!bulkDeclineOpen) {
+      return;
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        if (!bulkBusy) {
+          setBulkDeclineOpen(false);
+          setBulkDeclineReason('');
+          setBulkDeclineError(null);
+        }
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [bulkDeclineOpen, bulkBusy]);
 
   const status = searchParams.get('status') ?? '';
   const moderationStatus = searchParams.get('moderationStatus') ?? '';
@@ -130,6 +175,7 @@ export function EventsWorkspace({
       return;
     }
     setBulkBusy(true);
+    setSnack(null);
     try {
       const clientJobId = crypto.randomUUID();
       await adminBrowserFetch<{ processed: number; failed: unknown[] }>('/admin/cleanup-events/bulk-moderate', {
@@ -143,21 +189,33 @@ export function EventsWorkspace({
       setSelectedIds(new Set());
       refresh();
     } catch {
-      window.alert('Bulk approve failed. Try again or approve events individually.');
+      setSnack({
+        tone: 'warning',
+        title: 'Bulk approve failed',
+        message: 'Try again or approve events individually.',
+      });
     } finally {
       setBulkBusy(false);
     }
   }, [canWriteCleanupEvents, refresh, selectedIds]);
 
-  const bulkDecline = useCallback(async () => {
+  const openBulkDeclineModal = useCallback(() => {
     if (!canWriteCleanupEvents || selectedIds.size === 0) {
       return;
     }
-    const reason = window.prompt('Decline reason (applies to all selected events):');
-    if (reason == null || reason.trim().length < 3) {
+    setBulkDeclineReason('');
+    setBulkDeclineError(null);
+    setBulkDeclineOpen(true);
+  }, [canWriteCleanupEvents, selectedIds]);
+
+  const submitBulkDecline = useCallback(async () => {
+    const reason = bulkDeclineReason.trim();
+    if (reason.length < 3) {
+      setBulkDeclineError('Use at least 3 characters.');
       return;
     }
     setBulkBusy(true);
+    setSnack(null);
     try {
       const clientJobId = crypto.randomUUID();
       await adminBrowserFetch<{ processed: number; failed: unknown[] }>('/admin/cleanup-events/bulk-moderate', {
@@ -165,90 +223,34 @@ export function EventsWorkspace({
         body: {
           eventIds: [...selectedIds],
           action: 'DECLINED',
-          declineReason: reason.trim(),
+          declineReason: reason,
           clientJobId,
         },
       });
+      setBulkDeclineOpen(false);
+      setBulkDeclineReason('');
       setSelectedIds(new Set());
       refresh();
     } catch {
-      window.alert('Bulk decline failed. Try again or decline events individually.');
+      setSnack({
+        tone: 'warning',
+        title: 'Bulk decline failed',
+        message: 'Try again or decline events individually.',
+      });
     } finally {
       setBulkBusy(false);
     }
-  }, [canWriteCleanupEvents, refresh, selectedIds]);
+  }, [bulkDeclineReason, refresh, selectedIds]);
 
   const showModerationBulk = moderationStatus === 'PENDING' && canWriteCleanupEvents;
 
   return (
     <div className={styles.layout}>
-      <div className={styles.statsBar}>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <span className={styles.statIcon}>
-            <Icon name="calendar" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{stats.total}</span>
-          <span className={styles.statLabel}>Total events</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.05 }}
-        >
-          <span className={styles.statIconUpcoming}>
-            <Icon name="document-forward" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{stats.upcoming}</span>
-          <span className={styles.statLabel}>Upcoming</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.1 }}
-        >
-          <span className={styles.statIconPending}>
-            <Icon name="document-text" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{stats.pending}</span>
-          <span className={styles.statLabel}>Pending</span>
-          {stats.pending > 0 ? (
-            <Link className={styles.queueLink} href={buildUrl({ moderationStatus: 'PENDING', page: 1 })}>
-              Open moderation queue
-            </Link>
-          ) : null}
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.15 }}
-        >
-          <span className={styles.statIconCompleted}>
-            <Icon name="check" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{stats.completed}</span>
-          <span className={styles.statLabel}>Completed</span>
-        </motion.div>
-        <motion.div
-          className={styles.statCard}
-          initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2, delay: 0.2 }}
-        >
-          <span className={styles.statIconParticipants}>
-            <Icon name="users" size={18} aria-hidden />
-          </span>
-          <span className={styles.statValue}>{totalParticipants}</span>
-          <span className={styles.statLabel}>Participants</span>
-        </motion.div>
-      </div>
+      <EventsWorkspaceStatsMotion
+        stats={stats}
+        totalParticipants={totalParticipants}
+        moderationQueueHref={buildUrl({ moderationStatus: 'PENDING', page: 1 })}
+      />
 
       <Card className={styles.tableCard}>
         <div className={styles.toolbar}>
@@ -313,10 +315,23 @@ export function EventsWorkspace({
               <Button variant="outline" size="sm" type="button" onClick={clearSelection} disabled={bulkBusy}>
                 Clear
               </Button>
-              <Button variant="solid" size="sm" type="button" onClick={bulkApprove} disabled={bulkBusy || selectedIds.size === 0}>
+              <Button
+                variant="solid"
+                size="sm"
+                type="button"
+                onClick={() => void bulkApprove()}
+                isLoading={bulkBusy}
+                disabled={selectedIds.size === 0}
+              >
                 Approve selected
               </Button>
-              <Button variant="outline" size="sm" type="button" onClick={bulkDecline} disabled={bulkBusy || selectedIds.size === 0}>
+              <Button
+                variant="outline"
+                size="sm"
+                type="button"
+                onClick={openBulkDeclineModal}
+                disabled={bulkBusy || selectedIds.size === 0}
+              >
                 Decline selected
               </Button>
             </div>
@@ -335,12 +350,14 @@ export function EventsWorkspace({
                       <span className={styles.srOnly}>Select</span>
                     </th>
                   ) : null}
-                  <th>Scheduled</th>
-                  <th>Site</th>
-                  <th>Participants</th>
-                  <th>Status</th>
-                  <th>Completed</th>
-                  <th className={styles.thActions}>Actions</th>
+                  <th scope="col">Scheduled</th>
+                  <th scope="col">Site</th>
+                  <th scope="col">Participants</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Completed</th>
+                  <th className={styles.thActions} scope="col">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -437,6 +454,75 @@ export function EventsWorkspace({
           )}
         </div>
       </Card>
+
+      <Snack snack={snack} onClose={() => setSnack(null)} />
+
+      {bulkDeclineOpen ? (
+        <div
+          className={styles.modalBackdrop}
+          role="presentation"
+          onClick={(e) => {
+            if (e.target !== e.currentTarget || bulkBusy) {
+              return;
+            }
+            setBulkDeclineOpen(false);
+            setBulkDeclineReason('');
+            setBulkDeclineError(null);
+          }}
+        >
+          <div
+            ref={bulkDeclineCardRef}
+            className={styles.modalCard}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="bulk-decline-title"
+            onClick={(ev) => ev.stopPropagation()}
+          >
+            <h2 id="bulk-decline-title" className={styles.modalTitle}>
+              Decline selected events
+            </h2>
+            <p id="bulk-decline-hint" className={styles.modalBody}>
+              This reason applies to all {selectedIds.size} selected event{selectedIds.size !== 1 ? 's' : ''} (minimum
+              3 characters).
+            </p>
+            <textarea
+              ref={bulkDeclineReasonRef}
+              className={styles.declineTextarea}
+              value={bulkDeclineReason}
+              onChange={(e) => {
+                setBulkDeclineReason(e.target.value);
+                setBulkDeclineError(null);
+              }}
+              disabled={bulkBusy}
+              maxLength={2000}
+              aria-invalid={bulkDeclineError ? true : undefined}
+              aria-describedby={`bulk-decline-hint${bulkDeclineError ? ' bulk-decline-err' : ''}`}
+            />
+            {bulkDeclineError ? (
+              <p id="bulk-decline-err" className={styles.fieldError} role="alert">
+                {bulkDeclineError}
+              </p>
+            ) : null}
+            <div className={styles.modalActions}>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={bulkBusy}
+                onClick={() => {
+                  setBulkDeclineOpen(false);
+                  setBulkDeclineReason('');
+                  setBulkDeclineError(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="button" isLoading={bulkBusy} onClick={() => void submitBulkDecline()}>
+                Decline all
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
