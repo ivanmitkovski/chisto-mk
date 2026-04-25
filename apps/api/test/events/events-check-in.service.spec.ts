@@ -21,7 +21,11 @@ import {
   signCheckInQrToken,
 } from '../../src/events/check-in-qr-token';
 import { CheckInRepository } from '../../src/events/check-in.repository';
+import { EventsCheckInAttendeesService } from '../../src/events/events-check-in-attendees.service';
+import { EventsCheckInQrService } from '../../src/events/events-check-in-qr.service';
+import { EventsCheckInRedemptionService } from '../../src/events/events-check-in-redemption.service';
 import { EventsCheckInService } from '../../src/events/events-check-in.service';
+import { EventsCheckInSharedService } from '../../src/events/events-check-in-shared.service';
 import {
   POINTS_EVENT_CHECK_IN,
   REASON_EVENT_CHECK_IN,
@@ -57,7 +61,7 @@ describe('EventsCheckInService', () => {
     $transaction: jest.Mock;
   };
   let config: { get: jest.Mock };
-  let ecoEventPoints: { creditIfNew: jest.Mock };
+  let ecoEventPoints: { creditIfNew: jest.Mock; debitOnceIfNew: jest.Mock };
   let pendingCheckIn: {
     createPending: jest.Mock;
     getPending: jest.Mock;
@@ -91,7 +95,10 @@ describe('EventsCheckInService', () => {
         return undefined;
       }),
     };
-    ecoEventPoints = { creditIfNew: jest.fn().mockResolvedValue(5) };
+    ecoEventPoints = {
+      creditIfNew: jest.fn().mockResolvedValue(5),
+      debitOnceIfNew: jest.fn().mockResolvedValue(0),
+    };
     pendingCheckIn = {
       createPending: jest.fn().mockResolvedValue({
         pendingId: 'pending-1',
@@ -136,9 +143,20 @@ describe('EventsCheckInService', () => {
       $queryRaw: jest.fn().mockResolvedValue([{ d: 50 }]),
       $transaction: jest.fn(),
     };
-    service = new EventsCheckInService(
-      new CheckInRepository(prisma as never),
-      config as unknown as ConfigService,
+    const repo = new CheckInRepository(prisma as never);
+    const shared = new EventsCheckInSharedService(repo, config as unknown as ConfigService);
+    const qr = new EventsCheckInQrService(repo, shared, checkInTelemetry as never);
+    const attendees = new EventsCheckInAttendeesService(
+      repo,
+      shared,
+      ecoEventPoints as never,
+      reportsUpload as never,
+      checkInTelemetry as never,
+      liveImpact as never,
+    );
+    const redemption = new EventsCheckInRedemptionService(
+      repo,
+      shared,
       ecoEventPoints as never,
       pendingCheckIn as never,
       checkInGateway as never,
@@ -146,6 +164,7 @@ describe('EventsCheckInService', () => {
       checkInTelemetry as never,
       liveImpact as never,
     );
+    service = new EventsCheckInService(qr, attendees, redemption);
   });
 
   describe('patchOpen', () => {
@@ -247,6 +266,7 @@ describe('EventsCheckInService', () => {
       expect(out.data[0].checkedInAt).toBe('2026-01-01T12:00:00.000Z');
       expect(out.data[0].avatarUrl).toBe('https://signed.example/a.jpg');
       expect(reportsUpload.signPrivateObjectKey).toHaveBeenCalledWith('avatars/u1.jpg');
+      expect(out.meta).toEqual({ hasMore: false, nextCursor: null });
     });
   });
 
@@ -328,12 +348,12 @@ describe('EventsCheckInService', () => {
   });
 
   describe('removeAttendee', () => {
-    it('throws when no row deleted', async () => {
+    it('throws when check-in row is missing', async () => {
       prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
       prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
         const tx = {
           eventCheckIn: {
-            deleteMany: jest.fn().mockResolvedValue({ count: 0 }),
+            findFirst: jest.fn().mockResolvedValue(null),
           },
           cleanupEvent: { update: jest.fn() },
         };
@@ -344,12 +364,13 @@ describe('EventsCheckInService', () => {
       ).rejects.toBeInstanceOf(NotFoundException);
     });
 
-    it('decrements count when delete succeeds', async () => {
+    it('decrements count and reverses points when delete succeeds', async () => {
       prisma.cleanupEvent.findFirst.mockResolvedValue(approvedInProgressEvent);
       prisma.cleanupEvent.findUnique.mockResolvedValue({ checkedInCount: 3 });
       prisma.$transaction.mockImplementation(async (fn: (tx: never) => Promise<unknown>) => {
         const tx = {
           eventCheckIn: {
+            findFirst: jest.fn().mockResolvedValue({ userId: 'vol-1' }),
             deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
           },
           cleanupEvent: { update: jest.fn().mockResolvedValue({}) },
@@ -358,6 +379,7 @@ describe('EventsCheckInService', () => {
       });
       await service.removeAttendee('evt-1', 'cin-1', user('org-1'));
       expect(prisma.$transaction).toHaveBeenCalled();
+      expect(ecoEventPoints.debitOnceIfNew).toHaveBeenCalled();
     });
   });
 

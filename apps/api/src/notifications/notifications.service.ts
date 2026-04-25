@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NotificationType, Prisma } from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -230,6 +230,12 @@ export class NotificationsService {
     });
 
     if (existing) {
+      if (existing.userId !== user.userId && existing.revokedAt == null) {
+        throw new ForbiddenException({
+          code: 'DEVICE_TOKEN_IN_USE',
+          message: 'This device is already registered to another account',
+        });
+      }
       const updated = await this.prisma.userDeviceToken.update({
         where: { id: existing.id },
         data: {

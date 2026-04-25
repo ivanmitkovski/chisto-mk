@@ -1,13 +1,36 @@
 import {
   ForbiddenException,
   forwardRef,
+  HttpException,
   Inject,
   Injectable,
   MessageEvent,
   NotFoundException,
 } from '@nestjs/common';
-import { Observable, concat, from, EMPTY } from 'rxjs';
+import { Observable, concat, from, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+
+function liveImpactSnapshotErrorMessageEvent(err: unknown): MessageEvent {
+  if (err instanceof HttpException) {
+    const body = err.getResponse();
+    const code =
+      typeof body === 'object' && body !== null && 'code' in body
+        ? String((body as { code?: string }).code ?? 'HTTP_ERROR')
+        : 'HTTP_ERROR';
+    const message =
+      typeof body === 'object' && body !== null && 'message' in body
+        ? String((body as { message?: unknown }).message ?? err.message)
+        : err.message;
+    return { data: { type: 'error', code, message } };
+  }
+  return {
+    data: {
+      type: 'error',
+      code: 'EVENTS_LIVE_IMPACT_SNAPSHOT_FAILED',
+      message: 'Could not load live impact',
+    },
+  };
+}
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { visibilityWhere } from './events-query.include';
@@ -103,13 +126,13 @@ export class EventLiveImpactService {
     });
     const initial = from(this.getSnapshot(eventId, user)).pipe(
       map(toEvent),
-      catchError(() => EMPTY),
+      catchError((err: unknown) => of(liveImpactSnapshotErrorMessageEvent(err))),
     );
     const updates = this.bus.watchEvent(eventId).pipe(
       switchMap(() =>
         from(this.getSnapshot(eventId, user)).pipe(
           map(toEvent),
-          catchError(() => EMPTY),
+          catchError((err: unknown) => of(liveImpactSnapshotErrorMessageEvent(err))),
         ),
       ),
     );

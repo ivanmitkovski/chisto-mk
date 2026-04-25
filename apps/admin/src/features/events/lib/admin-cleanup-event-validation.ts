@@ -145,8 +145,8 @@ export function validateCompletedAtInput(raw: string): string | null {
 
 export function validateDeclineReason(reason: string): string | null {
   const t = reason.trim();
-  if (t.length < 1) {
-    return 'A decline reason is required (1–2000 characters).';
+  if (t.length < 3) {
+    return 'A decline reason is required (3–2000 characters).';
   }
   if (t.length > 2000) {
     return 'Decline reason must be at most 2000 characters.';

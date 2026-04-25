@@ -2376,9 +2376,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
     final bool disconnected =
         _networkOnline && _bannerVisible && _conn == EventChatConnectionStatus.disconnected;
     final bool reduceMotion = MediaQuery.of(context).disableAnimations;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: ChatTheme.canvas,
+      backgroundColor: ChatTheme.surfaceCanvas(colorScheme),
       // Search field lives in the app bar; resizing the body for the keyboard
       // would compress the message list with no focused field in the body.
       resizeToAvoidBottomInset: !_searchOpen,
@@ -2418,7 +2419,10 @@ class _EventChatScreenState extends State<EventChatScreen> with WidgetsBindingOb
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: <Color>[ChatTheme.canvas, ChatTheme.canvasElevated],
+                  colors: <Color>[
+                    ChatTheme.surfaceCanvas(colorScheme),
+                    ChatTheme.surfaceCanvasElevated(colorScheme),
+                  ],
                 ),
               ),
               child: Stack(

@@ -98,6 +98,9 @@ class ApiNotificationsRepository implements NotificationsRepository {
 
   @override
   Future<void> unregisterDeviceToken(String token) async {
-    await _client.delete('/notifications/devices/$token');
+    await _client.post(
+      '/notifications/devices/unregister',
+      body: <String, dynamic>{'token': token},
+    );
   }
 }

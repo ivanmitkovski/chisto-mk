@@ -210,10 +210,11 @@ model PointTransaction {
   delta         Int
   balanceAfter  Int
   reasonCode    String
-  referenceType String?
-  referenceId   String?
+  referenceType String @default("")
+  referenceId   String @default("")
   metadata      Json?
 
+  @@unique([userId, referenceType, referenceId, reasonCode], map: "point_transaction_user_ref_reason_key")
   @@index([userId, createdAt])
   @@index([reasonCode])
 }
@@ -525,6 +526,7 @@ model EventParticipant {
   reminderAt      DateTime?
 
   @@unique([eventId, userId])
+  @@index([eventId, joinedAt])
   @@index([userId])
 }
 
@@ -567,6 +569,8 @@ model EventChatMessage {
   clientMessageId String?
 
   attachments EventChatAttachment[]
+
+  readCursorsLastRead EventChatReadCursor[] @relation("ReadCursorLastMessage")
 
   @@unique([eventId, clientMessageId])
   @@index([eventId, createdAt])
@@ -621,6 +625,7 @@ model EventChatReadCursor {
   user   User   @relation("EventChatReadCursors", fields: [userId], references: [id], onDelete: Cascade)
 
   lastReadMessageId String?
+  lastReadMessage   EventChatMessage? @relation("ReadCursorLastMessage", fields: [lastReadMessageId], references: [id], onDelete: SetNull)
 
   @@unique([eventId, userId])
   @@index([userId])
@@ -646,6 +651,7 @@ model EventCheckIn {
 
   @@unique([eventId, dedupeKey])
   @@index([eventId, checkedInAt])
+  @@index([userId])
 }
 
 /// Single-use QR token ids (jti) — prevents screenshot replay across different users.

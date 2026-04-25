@@ -67,16 +67,23 @@ export class EcoEventPointsService {
     const balanceAfter = user.pointsBalance + delta;
     const totalEarnedAfter = user.totalPointsEarned + delta;
 
-    await tx.pointTransaction.create({
-      data: {
-        userId,
-        delta,
-        balanceAfter,
-        reasonCode,
-        referenceType,
-        referenceId,
-      },
-    });
+    try {
+      await tx.pointTransaction.create({
+        data: {
+          userId,
+          delta,
+          balanceAfter,
+          reasonCode,
+          referenceType,
+          referenceId,
+        },
+      });
+    } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return 0;
+      }
+      throw err;
+    }
 
     await tx.user.update({
       where: { id: userId },
@@ -141,16 +148,23 @@ export class EcoEventPointsService {
     const balanceAfter = user.pointsBalance + delta;
     const totalEarnedAfter = user.totalPointsEarned + delta;
 
-    await tx.pointTransaction.create({
-      data: {
-        userId,
-        delta,
-        balanceAfter,
-        reasonCode,
-        referenceType,
-        referenceId,
-      },
-    });
+    try {
+      await tx.pointTransaction.create({
+        data: {
+          userId,
+          delta,
+          balanceAfter,
+          reasonCode,
+          referenceType,
+          referenceId,
+        },
+      });
+    } catch (err: unknown) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
+        return 0;
+      }
+      throw err;
+    }
 
     await tx.user.update({
       where: { id: userId },

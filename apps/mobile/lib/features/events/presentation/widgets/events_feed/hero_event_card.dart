@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -19,6 +18,7 @@ class HeroEventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final String countdownLabel = eventsCountdownLabel(context.l10n, event.startDateTime);
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
@@ -33,12 +33,12 @@ class HeroEventCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
             boxShadow: <BoxShadow>[
               BoxShadow(
-                color: AppColors.shadowLight,
+                color: colorScheme.shadow.withValues(alpha: 0.06),
                 blurRadius: AppSpacing.md,
                 offset: const Offset(0, 4),
               ),
               BoxShadow(
-                color: AppColors.shadowMedium,
+                color: colorScheme.shadow.withValues(alpha: 0.1),
                 blurRadius: AppSpacing.lg,
                 offset: const Offset(0, 8),
               ),
@@ -72,8 +72,8 @@ class HeroEventCard extends StatelessWidget {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: <Color>[
-                        AppColors.transparent,
-                        AppColors.black.withValues(alpha: 0.7),
+                        Colors.transparent,
+                        colorScheme.scrim.withValues(alpha: 0.72),
                       ],
                       stops: const <double>[0.3, 1.0],
                     ),
@@ -93,14 +93,14 @@ class HeroEventCard extends StatelessWidget {
                         vertical: AppSpacing.xxs,
                       ),
                       decoration: BoxDecoration(
-                        color: AppColors.white.withValues(alpha: 0.2),
+                        color: colorScheme.surface.withValues(alpha: 0.22),
                         borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                       ),
                       child: Text(
                         countdownLabel,
                         style: AppTypography.eventsCaptionStrong(
                           textTheme,
-                          color: AppColors.white,
+                          color: colorScheme.onSurface,
                         ),
                       ),
                     ),
@@ -114,7 +114,11 @@ class HeroEventCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.xxs),
                     Row(
                       children: <Widget>[
-                        const Icon(CupertinoIcons.location_solid, size: 12, color: AppColors.textOnDarkMuted),
+                        Icon(
+                          CupertinoIcons.location_solid,
+                          size: 12,
+                          color: colorScheme.onSurface.withValues(alpha: 0.75),
+                        ),
                         const SizedBox(width: AppSpacing.xxs),
                         Expanded(
                           child: Text(
@@ -143,13 +147,13 @@ class HeroEventCard extends StatelessWidget {
                     vertical: AppSpacing.xxs,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary,
+                    color: colorScheme.primary,
                     borderRadius: BorderRadius.circular(AppSpacing.radius10),
                   ),
                   child: Text(
                     context.l10n.eventsFeedUpNext,
                     style: AppTypography.badgeLabel.copyWith(
-                      color: AppColors.white,
+                      color: colorScheme.onPrimary,
                     ),
                   ),
                 ),

@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -20,11 +21,13 @@ import {
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import {
   CheckInAttendeeRowDto,
   CheckInQrResponseDto,
+  ListCheckInAttendeesMetaDto,
   ListCheckInAttendeesResponseDto,
   ManualCheckInResponseDto,
   PatchCheckInOpenResponseDto,
@@ -39,7 +42,9 @@ import { ManualEventCheckInDto } from './dto/manual-event-check-in.dto';
 import { PatchEventCheckInDto } from './dto/patch-event-check-in.dto';
 import { RedeemEventCheckInDto } from './dto/redeem-event-check-in.dto';
 import { ResolveCheckInDto } from './dto/resolve-check-in.dto';
+import { ListCheckInAttendeesQueryDto } from './dto/list-check-in-attendees-query.dto';
 import { EventsCheckInThrottlerGuard } from './events-check-in-throttler.guard';
+import { ApiEventsCheckInStandardErrors } from './events-check-in-openapi.decorators';
 import { EventsCheckInService } from './events-check-in.service';
 
 @ApiTags('events')
@@ -48,6 +53,7 @@ import { EventsCheckInService } from './events-check-in.service';
   RotateSessionResponseDto,
   CheckInQrResponseDto,
   ListCheckInAttendeesResponseDto,
+  ListCheckInAttendeesMetaDto,
   CheckInAttendeeRowDto,
   ManualCheckInResponseDto,
   RemoveCheckInAttendeeResponseDto,
@@ -66,8 +72,9 @@ export class EventsCheckInController {
   @Throttle({ default: { ttl: 60_000, limit: 40 } })
   @ApiOperation({ summary: 'Open or pause QR check-in (organizer only)' })
   @ApiOkResponse({ type: PatchCheckInOpenResponseDto })
+  @ApiEventsCheckInStandardErrors()
   async patchOpen(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: PatchEventCheckInDto,
   ): Promise<{ ok: true }> {
@@ -79,8 +86,9 @@ export class EventsCheckInController {
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Rotate check-in session (invalidates old QR codes)' })
   @ApiOkResponse({ type: RotateSessionResponseDto })
+  @ApiEventsCheckInStandardErrors()
   async rotateSession(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ ok: true }> {
     await this.checkIn.rotateSession(eventId, user);
@@ -91,8 +99,9 @@ export class EventsCheckInController {
   @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiOperation({ summary: 'Issue a signed QR payload for attendees (organizer only)' })
   @ApiOkResponse({ type: CheckInQrResponseDto })
+  @ApiEventsCheckInStandardErrors()
   getQr(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.checkIn.getQrPayload(eventId, user);
@@ -102,11 +111,13 @@ export class EventsCheckInController {
   @Throttle({ default: { ttl: 60_000, limit: 120 } })
   @ApiOperation({ summary: 'List checked-in attendees (organizer only)' })
   @ApiOkResponse({ type: ListCheckInAttendeesResponseDto })
+  @ApiEventsCheckInStandardErrors()
   listAttendees(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
+    @Query() query: ListCheckInAttendeesQueryDto,
   ) {
-    return this.checkIn.listAttendees(eventId, user);
+    return this.checkIn.listAttendees(eventId, user, query);
   }
 
   @Post('manual')
@@ -116,8 +127,9 @@ export class EventsCheckInController {
       'Manually check in a joined volunteer by user id (organizer only)',
   })
   @ApiOkResponse({ type: ManualCheckInResponseDto })
+  @ApiEventsCheckInStandardErrors()
   manualAdd(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ManualEventCheckInDto,
   ) {
@@ -128,9 +140,10 @@ export class EventsCheckInController {
   @Throttle({ default: { ttl: 60_000, limit: 30 } })
   @ApiOperation({ summary: 'Remove a check-in row (organizer only)' })
   @ApiOkResponse({ type: RemoveCheckInAttendeeResponseDto })
+  @ApiEventsCheckInStandardErrors()
   async removeAttendee(
-    @Param('eventId') eventId: string,
-    @Param('checkInId') checkInId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('checkInId', ParseCuidPipe) checkInId: string,
     @CurrentUser() user: AuthenticatedUser,
   ): Promise<{ ok: true }> {
     await this.checkIn.removeAttendee(eventId, checkInId, user);
@@ -144,8 +157,9 @@ export class EventsCheckInController {
       'Redeem an organizer QR token (participant only). Returns pending_confirmation status awaiting organizer approval.',
   })
   @ApiOkResponse({ type: RedeemCheckInResponseDto })
+  @ApiEventsCheckInStandardErrors()
   redeem(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: RedeemEventCheckInDto,
   ) {
@@ -172,9 +186,10 @@ export class EventsCheckInController {
   })
   @ApiGoneResponse({ description: 'Pending request expired' })
   @ApiNotFoundResponse({ description: 'Pending id does not belong to this event' })
+  @ApiEventsCheckInStandardErrors()
   async resolveCheckIn(
-    @Param('eventId') eventId: string,
-    @Param('pendingId') pendingId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('pendingId', ParseCuidPipe) pendingId: string,
     @CurrentUser() user: AuthenticatedUser,
     @Body() dto: ResolveCheckInDto,
   ) {
@@ -198,9 +213,10 @@ export class EventsCheckInController {
     description:
       'Unknown pending id, wrong event, or pending owned by another user (same shape to avoid cross-user probing)',
   })
+  @ApiEventsCheckInStandardErrors()
   getPendingStatus(
-    @Param('eventId') eventId: string,
-    @Param('pendingId') pendingId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('pendingId', ParseCuidPipe) pendingId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.checkIn.getPendingStatus(eventId, pendingId, user);

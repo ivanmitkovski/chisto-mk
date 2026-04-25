@@ -19,6 +19,11 @@ import { EventsRepository } from './events.repository';
 export type MobileEventMappingOptions = {
   /** Distance from viewer to event site (km); 0 when viewer coordinates are absent. */
   siteDistanceKm?: number;
+  /**
+   * When listing events, pass preloaded series rows keyed by canonical root id (`parentEventId ?? id`)
+   * to avoid one query per recurring row.
+   */
+  recurrenceSeriesByRoot?: Map<string, { id: string; scheduledAt: Date }[]>;
 };
 
 @Injectable()
@@ -57,7 +62,9 @@ export class EventsMobileMapperService {
 
     if (row.recurrenceRule != null || row.parentEventId != null) {
       const rootId = row.parentEventId ?? row.id;
-      const series = await this.eventsRepository.listRecurrenceSeriesEvents(rootId);
+      const series =
+        options?.recurrenceSeriesByRoot?.get(rootId) ??
+        (await this.eventsRepository.listRecurrenceSeriesEvents(rootId));
       const total = series.length;
       const idx = series.findIndex((s) => s.id === row.id);
       recurrenceSeriesTotal = total;

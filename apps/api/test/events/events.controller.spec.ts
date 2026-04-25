@@ -1,6 +1,7 @@
 /// <reference types="jest" />
 
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
+import { ParseCuidPipe } from '../../src/common/pipes/parse-cuid.pipe';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { Role } from '../../src/prisma-client';
 import { FindEventQueryDto } from '../../src/events/dto/find-event-query.dto';
@@ -85,21 +86,44 @@ describe('EventsController', () => {
     expect(result).toBe(event);
   });
 
-  it('getPublicShareCard rejects non-uuid ids', async () => {
-    try {
-      await controller.getPublicShareCard('not-a-uuid');
-      expect(true).toBe(false);
-    } catch (e: unknown) {
-      expect(e).toBeInstanceOf(NotFoundException);
-    }
+  it('getPublicShareCard path validation rejects blank ids (ParseCuidPipe)', () => {
+    const pipe = new ParseCuidPipe();
+    expect(() => pipe.transform('   ')).toThrow(BadRequestException);
   });
 
-  it('getPublicShareCard forwards trimmed uuid to EventsService', async () => {
-    const id = '550e8400-e29b-41d4-a716-446655440000';
+  it('getPublicShareCard forwards cuid-shaped id to EventsService', async () => {
+    const cuid = 'c012345678901234567890123';
+    const card = {
+      id: cuid,
+      title: 'River',
+      siteLabel: 'Skopje',
+      scheduledAt: '2026-06-01T08:00:00.000Z',
+      endAt: null,
+      lifecycleStatus: 'UPCOMING',
+    };
+    findPublicShareCard.mockResolvedValue(card);
+
+    const result = await controller.getPublicShareCard(cuid);
+
+    expect(findPublicShareCard).toHaveBeenCalledWith(cuid);
+    expect(result).toBe(card);
+  });
+
+  it('getPublicShareCard forwards arbitrary id to EventsService (not found from service)', async () => {
+    findPublicShareCard.mockRejectedValue(
+      new NotFoundException({ code: 'EVENT_NOT_FOUND', message: 'Event not found' }),
+    );
+    await expect(controller.getPublicShareCard('not-a-cuid')).rejects.toBeInstanceOf(NotFoundException);
+    expect(findPublicShareCard).toHaveBeenCalledWith('not-a-cuid');
+  });
+
+  it('getPublicShareCard forwards trimmed cuid to EventsService', async () => {
+    const id = 'c012345678901234567890123';
     const card = { id, title: 'River', siteLabel: 'Skopje', scheduledAt: '2026-06-01T08:00:00.000Z', endAt: null, lifecycleStatus: 'UPCOMING' };
     findPublicShareCard.mockResolvedValue(card);
 
-    const result = await controller.getPublicShareCard(`  ${id}  `);
+    const trimmed = new ParseCuidPipe().transform(`  ${id}  `);
+    const result = await controller.getPublicShareCard(trimmed);
 
     expect(findPublicShareCard).toHaveBeenCalledWith(id);
     expect(result).toBe(card);

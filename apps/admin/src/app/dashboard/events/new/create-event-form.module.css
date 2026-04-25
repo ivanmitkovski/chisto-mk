@@ -8,7 +8,7 @@
   gap: var(--space-2);
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(8, 54, 39, 0.7);
+  color: var(--text-secondary);
   text-decoration: none;
   margin-bottom: var(--space-4);
   transition: color var(--motion-duration-fast) var(--motion-ease-out);
@@ -21,9 +21,9 @@
 .sectionCard {
   padding: var(--space-6);
   border-radius: var(--radius-xl);
-  border: 1px solid rgba(8, 54, 39, 0.08);
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 4px 20px rgba(8, 54, 39, 0.06);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
+  box-shadow: var(--shadow-md);
 }
 
 .sectionLabel {
@@ -33,7 +33,7 @@
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgba(8, 54, 39, 0.5);
+  color: var(--color-muted);
 }
 
 .fieldError {
@@ -44,7 +44,7 @@
 
 .hint {
   font-size: 0.9375rem;
-  color: rgba(8, 54, 39, 0.75);
+  color: var(--text-secondary);
   margin: 0 0 var(--space-5);
 }
 
@@ -52,7 +52,7 @@
   font-family: ui-monospace, monospace;
   font-size: 0.8125rem;
   padding: 0 var(--space-1);
-  background: rgba(8, 54, 39, 0.06);
+  background: var(--surface-subtle);
   border-radius: var(--radius-sm);
 }
 
@@ -84,7 +84,7 @@
   align-items: center;
   gap: var(--space-2);
   font-size: 0.875rem;
-  color: rgba(8, 54, 39, 0.8);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
@@ -95,13 +95,13 @@
 .fieldLabel {
   font-size: 0.8125rem;
   font-weight: 600;
-  color: rgba(8, 54, 39, 0.85);
+  color: var(--text-secondary);
 }
 
 .fieldHint {
   font-size: 0.75rem;
   line-height: 1.4;
-  color: rgba(8, 54, 39, 0.55);
+  color: var(--color-muted);
   margin: 0;
 }
 
@@ -109,10 +109,10 @@
   max-width: 16rem;
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  border: 1px solid rgba(8, 54, 39, 0.14);
-  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid var(--border-default);
+  background: var(--bg-surface);
   font-size: 0.9375rem;
-  color: rgba(8, 54, 39, 0.95);
+  color: var(--text-primary);
 }
 
 textarea.input {
@@ -125,7 +125,7 @@ textarea.input {
 
 .input:hover,
 .input:focus {
-  border-color: rgba(37, 219, 134, 0.4);
+  border-color: color-mix(in srgb, var(--color-primary) 40%, transparent);
   outline: none;
 }
 
@@ -139,7 +139,7 @@ textarea.input {
 .cancelLink {
   font-size: 0.875rem;
   font-weight: 500;
-  color: rgba(8, 54, 39, 0.65);
+  color: var(--color-muted);
   text-decoration: none;
 }
 
@@ -150,11 +150,11 @@ textarea.input {
 .conflictBanner {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-md);
-  background: rgba(180, 120, 0, 0.1);
-  border: 1px solid rgba(180, 120, 0, 0.35);
+  background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 35%, transparent);
   font-size: 0.875rem;
   line-height: 1.45;
-  color: rgba(8, 54, 39, 0.92);
+  color: var(--text-primary);
 }
 
 .conflictBanner a {
@@ -165,7 +165,7 @@ textarea.input {
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(8, 54, 39, 0.35);
+  background: color-mix(in srgb, var(--color-green-900) 35%, transparent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -178,21 +178,21 @@ textarea.input {
   width: 100%;
   padding: var(--space-6);
   border-radius: var(--radius-xl);
-  background: #fff;
-  box-shadow: 0 16px 48px rgba(8, 54, 39, 0.18);
+  background: var(--bg-surface);
+  box-shadow: var(--elevation-2);
 }
 
 .modalTitle {
   font-size: 1.0625rem;
   font-weight: 700;
   margin: 0 0 var(--space-3);
-  color: rgba(8, 54, 39, 0.95);
+  color: var(--text-primary);
 }
 
 .modalBody {
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: rgba(8, 54, 39, 0.8);
+  color: var(--text-secondary);
   margin: 0 0 var(--space-5);
 }
 
@@ -200,4 +200,18 @@ textarea.input {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+}
+
+@media (max-width: 48rem) {
+  .sectionCard {
+    padding: var(--space-4);
+  }
+
+  .input {
+    max-width: none;
+  }
+
+  .form {
+    gap: var(--space-4);
+  }
 }

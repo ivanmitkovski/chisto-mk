@@ -13,7 +13,6 @@ import 'package:chisto_mobile/features/events/data/field_mode_queue.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/l10n/app_error_localizations.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/events/data/event_feedback_local_cache.dart';
 import 'package:chisto_mobile/features/events/data/events_repository_registry.dart';
@@ -902,10 +901,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     final EcoEvent? event = _eventsStore.findById(widget.eventId);
 
     if (!_detailPrefetchDone && event == null) {
+      final ColorScheme colorScheme = Theme.of(context).colorScheme;
       return Scaffold(
-        backgroundColor: AppColors.appBackground,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: AppColors.appBackground,
+          backgroundColor: colorScheme.surface,
           leading: const AppBackButton(),
           title: Text(context.l10n.authLoading),
         ),
@@ -917,10 +917,11 @@ class _EventDetailScreenState extends State<EventDetailScreen>
     }
 
     if (event == null || _detailMissing) {
+      final ColorScheme colorScheme = Theme.of(context).colorScheme;
       return Scaffold(
-        backgroundColor: AppColors.appBackground,
+        backgroundColor: colorScheme.surface,
         appBar: AppBar(
-          backgroundColor: AppColors.appBackground,
+          backgroundColor: colorScheme.surface,
           leading: const AppBackButton(),
           title: Text(context.l10n.eventsEventNotFoundTitle),
         ),
@@ -940,14 +941,15 @@ class _EventDetailScreenState extends State<EventDetailScreen>
       );
     }
 
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: AppColors.appBackground,
+      backgroundColor: colorScheme.surface,
       body: Semantics(
         label: context.l10n.eventsDetailSemanticsLabel(event.title),
         child: Stack(
           children: <Widget>[
             RefreshIndicator(
-              color: AppColors.primary,
+              color: colorScheme.primary,
               displacement: 48,
               strokeWidth: 2.2,
               onRefresh: _handlePullToRefresh,

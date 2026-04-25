@@ -2,7 +2,8 @@
  * Stable API error `code` strings for event check-in (HTTP 4xx/5xx bodies) and check-in WebSocket `error` payloads.
  * New endpoints should reuse these; add new codes here when introducing them.
  *
- * **Drift control** — literals `code: '…'` under `src/events` and `src/event-chat` must appear in the merged
+ * **Drift control** — literals `code: '…'` under `src/events`, `src/event-chat`, `src/cleanup-events`, and
+ * `src/gamification` must appear in the merged
  * registry exported from this file; see `test/common/api-error-codes.drift.spec.ts`.
  */
 export const CHECK_IN_ERROR_CODES = [
@@ -51,12 +52,16 @@ export const EVENT_CHAT_ERROR_CODES = [
   'EVENT_CHAT_PIN_LIMIT',
   'EVENT_CHAT_DELETE_FORBIDDEN',
   'EVENT_CHAT_READ_MESSAGE_NOT_FOUND',
+  'EVENT_CHAT_READ_CURSOR_STALE',
   'CHAT_UPLOAD_TOO_MANY',
   'CHAT_UPLOAD_MIME',
   'CHAT_UPLOAD_SIZE',
   'S3_NOT_CONFIGURED',
   'EVENT_NOT_FOUND',
   'AUTH_FAILED',
+  'EVENT_CHAT_ATTACHMENT_URL_INVALID',
+  'EVENT_CHAT_WS_RATE_LIMIT',
+  'EVENT_CHAT_WS_AUTH_PENDING',
 ] as const;
 
 export type EventChatErrorCode = (typeof EVENT_CHAT_ERROR_CODES)[number];
@@ -97,6 +102,8 @@ export const GLOBAL_HTTP_ERROR_CODES = [
   'DATABASE_UNAVAILABLE',
   'DATABASE_DISCONNECTED',
   'VALIDATION_ERROR',
+  /** Path params that must be Prisma `cuid()` ids (25 chars, `c` prefix). */
+  'INVALID_CUID',
 ] as const;
 
 export type GlobalHttpErrorCode = (typeof GLOBAL_HTTP_ERROR_CODES)[number];
@@ -105,6 +112,7 @@ export type GlobalHttpErrorCode = (typeof GLOBAL_HTTP_ERROR_CODES)[number];
  * Stable codes returned from `EventsService` / `events-cursors.util` (public events HTTP) not covered elsewhere.
  */
 export const EVENTS_PUBLIC_API_ERROR_CODES = [
+  'EVENTS_SHARE_CARD_ID_INVALID',
   'INVALID_EVENT_STATUS_FILTER',
   'SITE_NOT_FOUND',
   'INVALID_RECURRENCE_RULE',
@@ -121,6 +129,7 @@ export const EVENTS_PUBLIC_API_ERROR_CODES = [
   'INVALID_EVENTS_CURSOR',
   'EVENTS_VIEWER_GEO_INCOMPLETE',
   'INVALID_PARTICIPANTS_CURSOR',
+  'CHECK_IN_ATTENDEES_CURSOR_INVALID',
   'EVENTS_ORGANIZER_NOT_CERTIFIED',
   'ORGANIZER_QUIZ_FAILED',
   'ORGANIZER_QUIZ_INVALID',
@@ -137,21 +146,36 @@ export const EVENTS_PUBLIC_API_ERROR_CODES = [
   'ROUTE_SEGMENT_NOT_COMPLETABLE',
   'ROUTE_SEGMENT_FORBIDDEN',
   'EVENTS_IMPACT_RECEIPT_NOT_AVAILABLE',
+  'EVENTS_LIVE_IMPACT_SNAPSHOT_FAILED',
 ] as const;
 
 export type EventsPublicApiErrorCode = (typeof EVENTS_PUBLIC_API_ERROR_CODES)[number];
 
 /**
  * Admin cleanup event bulk moderation and related mutations.
+ * Includes `BULK_MODERATION_ITEM_FAILED` as fallback when a per-id bulk failure has no structured `HttpException` body.
  */
 export const ADMIN_CLEANUP_EVENT_ERROR_CODES = [
   'DUPLICATE_BULK_MODERATION_JOB',
   'BULK_MODERATION_EMPTY',
   'BULK_MODERATION_TOO_MANY_IDS',
+  'BULK_MODERATION_ITEM_FAILED',
   'CLEANUP_PATCH_NO_CHANGES',
+  'CLEANUP_EVENT_NOT_FOUND',
+  'DECLINE_REASON_REQUIRED',
+  'EVENT_NOT_PENDING',
 ] as const;
 
 export type AdminCleanupEventErrorCode = (typeof ADMIN_CLEANUP_EVENT_ERROR_CODES)[number];
+
+/** Point history and gamification HTTP error codes. */
+export const GAMIFICATION_API_ERROR_CODES = ['INVALID_POINT_HISTORY_CURSOR'] as const;
+
+export type GamificationApiErrorCode = (typeof GAMIFICATION_API_ERROR_CODES)[number];
+
+export const NOTIFICATION_ERROR_CODES = ['DEVICE_TOKEN_IN_USE'] as const;
+
+export type NotificationErrorCode = (typeof NOTIFICATION_ERROR_CODES)[number];
 
 const MERGED_ERROR_CODE_SET = new Set<string>([
   ...CHECK_IN_ERROR_CODES,
@@ -160,6 +184,8 @@ const MERGED_ERROR_CODE_SET = new Set<string>([
   ...GLOBAL_HTTP_ERROR_CODES,
   ...EVENTS_PUBLIC_API_ERROR_CODES,
   ...ADMIN_CLEANUP_EVENT_ERROR_CODES,
+  ...GAMIFICATION_API_ERROR_CODES,
+  ...NOTIFICATION_ERROR_CODES,
 ]);
 
 /**

@@ -50,6 +50,7 @@ import { MeResponseDto } from './dto/me-response.dto';
 import { PointHistoryQueryDto } from './dto/point-history-query.dto';
 import { PointHistoryResponseDto } from './dto/point-history-response.dto';
 import { PointHistoryService } from '../gamification/point-history.service';
+import { localeFromAcceptLanguage } from '../common/utils/format-relative-time-since';
 import { OtpSmsPurpose } from '../otp/otp-sender.interface';
 import { OrganizerCertificationService } from './organizer-certification.service';
 import { SubmitOrganizerCertificationDto } from './dto/submit-organizer-certification.dto';
@@ -269,6 +270,7 @@ export class AuthController {
   async pointHistory(
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Query() query: PointHistoryQueryDto,
+    @Headers('accept-language') acceptLanguage?: string,
   ): Promise<PointHistoryResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
@@ -276,7 +278,11 @@ export class AuthController {
         message: 'Authentication required',
       });
     }
-    return this.pointHistoryService.listForUser(user.userId, query);
+    return this.pointHistoryService.listForUser(
+      user.userId,
+      query,
+      localeFromAcceptLanguage(acceptLanguage),
+    );
   }
 
   @Get('me')
@@ -284,7 +290,10 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get authenticated user profile' })
   @ApiOkResponse({ description: 'Authenticated user profile', type: MeResponseDto })
-  me(@CurrentUser() user?: AuthenticatedUser): Promise<MeResponseDto> {
+  me(
+    @CurrentUser() user?: AuthenticatedUser,
+    @Headers('accept-language') acceptLanguage?: string,
+  ): Promise<MeResponseDto> {
     if (!user) {
       throw new UnauthorizedException({
         code: 'UNAUTHORIZED',
@@ -292,7 +301,7 @@ export class AuthController {
       });
     }
 
-    return this.authService.me(user);
+    return this.authService.me(user, localeFromAcceptLanguage(acceptLanguage));
   }
 
   @Patch('me')

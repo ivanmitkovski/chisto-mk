@@ -10,7 +10,9 @@ export default async function EventDetailLoading() {
   return (
     <AdminShell title="Cleanup event" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
       <Card padding="md">
-        <SkeletonCard lines={6} />
+        <div role="status" aria-label="Loading">
+          <SkeletonCard lines={6} />
+        </div>
       </Card>
     </AdminShell>
   );

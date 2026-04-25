@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Icon, Snack, type SnackState } from '@/components/ui';
+import { useFocusTrap } from '@/lib/use-focus-trap';
 import { adminBrowserFetch } from '@/lib/admin-browser-api';
 import { cleanupEventMutationMessage } from '@/features/events/lib/cleanup-events-api-messages';
 import {
@@ -29,7 +30,7 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
   defaultDate.setDate(defaultDate.getDate() + 7);
   defaultDate.setHours(10, 0, 0, 0);
   const defaultEndDate = new Date(defaultDate);
-  defaultEndDate.setDate(defaultEndDate.getDate() + 1);
+  defaultEndDate.setTime(defaultEndDate.getTime() + 3 * 60 * 60 * 1000);
 
   const [title, setTitle] = useState('Cleanup event');
   const [description, setDescription] = useState('');
@@ -47,6 +48,9 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
     scheduledAt: string;
   } | null>(null);
   const duplicateModalPrimaryRef = useRef<HTMLButtonElement>(null);
+  const duplicateModalCardRef = useRef<HTMLDivElement>(null);
+
+  useFocusTrap(duplicateModal != null, duplicateModalCardRef);
 
   const scheduledAtIso = useMemo(() => {
     if (!scheduledAt.trim()) {
@@ -296,14 +300,17 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
               )}
             </div>
           ) : null}
-          <label className={styles.fieldCheck}>
+          <div className={styles.fieldCheck}>
             <input
+              id="create-event-pending"
               type="checkbox"
               checked={createAsPending}
               onChange={(e) => setCreateAsPending(e.target.checked)}
             />
-            <span>Create as pending (simulate user submission, requires approval)</span>
-          </label>
+            <label htmlFor="create-event-pending">
+              Create as pending (simulate user submission, requires approval)
+            </label>
+          </div>
           <label className={styles.field} htmlFor="create-event-participants">
             <span className={styles.fieldLabel}>Initial participant count</span>
             <input
@@ -326,8 +333,8 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
             ) : null}
           </label>
           <div className={styles.actions}>
-            <Button onClick={() => void submit()} disabled={saving}>
-              {saving ? 'Creating…' : 'Create event'}
+            <Button onClick={() => void submit()} isLoading={saving}>
+              Create event
             </Button>
             <Link href="/dashboard/events" className={styles.cancelLink}>
               Cancel
@@ -341,6 +348,7 @@ export function CreateEventForm({ siteId }: CreateEventFormProps) {
       {duplicateModal ? (
         <div className={styles.modalBackdrop} role="presentation" onClick={() => setDuplicateModal(null)}>
           <div
+            ref={duplicateModalCardRef}
             className={styles.modalCard}
             role="dialog"
             aria-modal="true"

@@ -1,8 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Matches } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 import { EcoEventLifecycleStatus } from '../../prisma-client';
 
 export class EventPublicShareCardResponseDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({ description: 'CleanupEvent id (Prisma cuid)' })
+  @Matches(PRISMA_CUID_REGEX, { message: 'id must be a valid cuid' })
   id!: string;
 
   @ApiProperty()

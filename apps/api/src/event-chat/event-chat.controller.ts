@@ -27,6 +27,7 @@ import {
 import { SkipThrottle, Throttle } from '@nestjs/throttler';
 import { concat, defer, finalize, from, interval, map, merge } from 'rxjs';
 import { CurrentUser } from '../auth/current-user.decorator';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { EditEventChatMessageDto } from './dto/edit-event-chat-message.dto';
@@ -70,7 +71,7 @@ export class EventChatController {
   })
   unreadCount(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
   ) {
     return this.eventChatService.unreadCount(eventId, user);
   }
@@ -85,7 +86,7 @@ export class EventChatController {
     description: 'Missing or invalid bearer token',
     schema: { example: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
   })
-  getMute(@CurrentUser() user: AuthenticatedUser, @Param('eventId') eventId: string) {
+  getMute(@CurrentUser() user: AuthenticatedUser, @Param('eventId', ParseCuidPipe) eventId: string) {
     return this.eventChatService.getMuteStatus(eventId, user);
   }
 
@@ -101,7 +102,7 @@ export class EventChatController {
   })
   setMute(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Body() dto: MuteChatDto,
   ) {
     return this.eventChatService.setMuteStatus(eventId, user, dto);
@@ -117,7 +118,7 @@ export class EventChatController {
     description: 'Missing or invalid bearer token',
     schema: { example: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
   })
-  listParticipants(@Param('eventId') eventId: string) {
+  listParticipants(@Param('eventId', ParseCuidPipe) eventId: string) {
     return this.eventChatService.listParticipants(eventId);
   }
 
@@ -133,7 +134,7 @@ export class EventChatController {
   })
   listPinned(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
   ) {
     return this.eventChatService.listPinnedMessages(eventId, user);
   }
@@ -150,7 +151,7 @@ export class EventChatController {
   })
   searchMessages(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Query() query: SearchEventChatQueryDto,
   ) {
     return this.eventChatService.searchMessages(eventId, user, query);
@@ -172,7 +173,7 @@ export class EventChatController {
   })
   @ApiResponse({ status: 403, description: 'User may not access this event chat' })
   streamChatEvents(
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Headers('last-event-id') lastEventId?: string,
   ) {
     return defer(() => {
@@ -205,7 +206,7 @@ export class EventChatController {
     description: 'Missing or invalid bearer token',
     schema: { example: { code: 'UNAUTHORIZED', message: 'Unauthorized' } },
   })
-  listReadCursors(@Param('eventId') eventId: string) {
+  listReadCursors(@Param('eventId', ParseCuidPipe) eventId: string) {
     return this.eventChatService.listReadCursors(eventId);
   }
 
@@ -223,7 +224,7 @@ export class EventChatController {
   })
   recordTyping(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Body() dto: EventChatTypingDto,
   ) {
     return this.eventChatService.recordTyping(eventId, user, dto.typing);
@@ -241,7 +242,7 @@ export class EventChatController {
   })
   patchRead(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Body() dto: PatchEventChatReadDto,
   ) {
     return this.eventChatService.patchReadCursor(eventId, user, dto);
@@ -259,7 +260,7 @@ export class EventChatController {
   })
   listMessages(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Query() query: ListEventChatQueryDto,
   ) {
     return this.eventChatService.listMessages(eventId, user, query);
@@ -277,7 +278,7 @@ export class EventChatController {
   })
   sendMessage(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @Body() dto: SendEventChatMessageDto,
   ) {
     return this.eventChatService.sendMessage(eventId, user, dto);
@@ -295,8 +296,8 @@ export class EventChatController {
   })
   editMessage(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
-    @Param('messageId') messageId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('messageId', ParseCuidPipe) messageId: string,
     @Body() dto: EditEventChatMessageDto,
   ) {
     return this.eventChatService.editMessage(eventId, messageId, user, dto);
@@ -314,8 +315,8 @@ export class EventChatController {
   })
   setPin(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
-    @Param('messageId') messageId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('messageId', ParseCuidPipe) messageId: string,
     @Body() dto: PinEventChatMessageDto,
   ) {
     return this.eventChatService.setMessagePin(eventId, messageId, user, dto);
@@ -335,7 +336,7 @@ export class EventChatController {
   @UseInterceptors(FilesInterceptor('files', 5))
   async uploadAttachments(
     @CurrentUser() _user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
     @UploadedFiles() files: Array<Express.Multer.File>,
   ) {
     const processed = await this.uploadService.processAndUpload(
@@ -362,8 +363,8 @@ export class EventChatController {
   })
   deleteMessage(
     @CurrentUser() user: AuthenticatedUser,
-    @Param('eventId') eventId: string,
-    @Param('messageId') messageId: string,
+    @Param('eventId', ParseCuidPipe) eventId: string,
+    @Param('messageId', ParseCuidPipe) messageId: string,
   ) {
     return this.eventChatService.softDeleteMessage(eventId, messageId, user);
   }

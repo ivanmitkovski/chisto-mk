@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { AdminShell } from '@/features/admin-shell';
 import { DESKTOP_SIDEBAR_COOKIE_KEY } from '@/features/admin-shell/constants';
 import { SectionState } from '@/components/ui';
@@ -7,6 +8,7 @@ import { getCleanupEvents, getEventsStats } from '@/features/events/data/events-
 import { EventsWorkspace } from '@/features/events/components/events-workspace';
 import { SectionRefreshButton } from '@/features/events/components/section-refresh-button';
 import { canWriteCleanupEvents } from '@/features/events/lib/cleanup-events-write-access';
+import { ApiError } from '@/lib/api';
 
 type PageProps = {
   searchParams: Promise<{ status?: string; moderationStatus?: string; page?: string }>;
@@ -35,7 +37,10 @@ export default async function EventsPage(props: PageProps) {
     canWriteCleanupEventsFlag = canWriteCleanupEvents(me.role);
     result = listResult;
     stats = statsResult;
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError && (error.status === 401 || error.status === 403)) {
+      redirect('/login');
+    }
     return (
       <AdminShell title="Cleanup events" activeItem="events" initialSidebarCollapsed={initialSidebarCollapsed}>
         <SectionState variant="error" message="Unable to load events. Check your connection or sign in again.">

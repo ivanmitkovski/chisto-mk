@@ -25,6 +25,7 @@ import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { NotificationsService } from './notifications.service';
 import { ListNotificationsQueryDto } from './dto/list-notifications-query.dto';
 import { RegisterDeviceTokenDto } from './dto/register-device-token.dto';
+import { UnregisterDeviceTokenDto } from './dto/unregister-device-token.dto';
 import { ObservabilityStore } from '../observability/observability.store';
 import { UpdateNotificationPreferenceDto } from './dto/update-notification-preference.dto';
 import { NotificationType } from '../prisma-client';
@@ -89,6 +90,19 @@ export class NotificationsController {
     return this.notificationsService.updatePreference(user, type, dto);
   }
 
+  @Post('devices/unregister')
+  @ApiOperation({
+    summary: 'Unregister a device push token (preferred; token in body avoids proxy access logs)',
+  })
+  @ApiOkResponse({ description: 'Device token unregistered' })
+  async unregisterDeviceBody(
+    @CurrentUser() user: AuthenticatedUser,
+    @Body() dto: UnregisterDeviceTokenDto,
+  ) {
+    await this.notificationsService.unregisterDeviceToken(user, dto.token);
+    return { success: true };
+  }
+
   @Post('devices')
   @ApiOperation({ summary: 'Register or update a device push token' })
   @ApiOkResponse({ description: 'Device token registered' })
@@ -100,7 +114,9 @@ export class NotificationsController {
   }
 
   @Delete('devices/:token')
-  @ApiOperation({ summary: 'Unregister a device push token' })
+  @ApiOperation({
+    summary: 'Unregister a device push token (deprecated: use POST /notifications/devices/unregister)',
+  })
   @ApiOkResponse({ description: 'Device token unregistered' })
   async unregisterDevice(
     @CurrentUser() user: AuthenticatedUser,

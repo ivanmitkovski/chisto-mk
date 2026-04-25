@@ -17,8 +17,8 @@ import * as jwt from 'jsonwebtoken';
 import { EventChatAccessService } from './event-chat-access.service';
 
 interface SocketData {
-  userId: string;
-  displayName: string;
+  userId?: string;
+  displayName?: string;
 }
 
 function resolveChatWsCorsOrigin(): boolean | string | string[] {
@@ -27,7 +27,10 @@ function resolveChatWsCorsOrigin(): boolean | string | string[] {
     const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
     return list.length ? list : '*';
   }
-  return process.env.NODE_ENV === 'production' ? true : '*';
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('CHAT_WS_CORS_ORIGINS must be set in production (comma-separated allowlist)');
+  }
+  return '*';
 }
 
 @WebSocketGateway({
@@ -41,12 +44,16 @@ export class EventChatGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private static readonly WS_TYPING_MIN_INTERVAL_MS = 2500;
+  private static readonly WS_JOIN_WINDOW_MS = 10_000;
+  private static readonly WS_JOIN_MAX_PER_WINDOW = 20;
 
   @WebSocketServer()
   server!: Server;
 
   private readonly logger = new Logger(EventChatGateway.name);
   private readonly lastWsTypingEmitAt = new Map<string, number>();
+  /** Per-socket join timestamps (ms) for sliding-window rate limit. */
+  private readonly joinTimestampsBySocketId = new Map<string, number[]>();
 
   constructor(
     private readonly config: ConfigService,
@@ -78,7 +85,7 @@ export class EventChatGateway
         throw new Error('JWT_SECRET not configured');
       }
 
-      const payload = jwt.verify(token, secret) as {
+      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
         sub: string;
         email: string;
       };
@@ -108,6 +115,7 @@ export class EventChatGateway
     if (userId) {
       this.logger.debug(`Client disconnected: ${userId} (${client.id})`);
     }
+    this.joinTimestampsBySocketId.delete(client.id);
   }
 
   /** Normalize client payloads (string JSON, or Socket.IO single-arg array). */
@@ -132,6 +140,19 @@ export class EventChatGateway
     return data;
   }
 
+  private assertJoinRateOk(clientId: string): boolean {
+    const now = Date.now();
+    const windowStart = now - EventChatGateway.WS_JOIN_WINDOW_MS;
+    const prev = this.joinTimestampsBySocketId.get(clientId) ?? [];
+    const kept = prev.filter((t) => t > windowStart);
+    if (kept.length >= EventChatGateway.WS_JOIN_MAX_PER_WINDOW) {
+      return false;
+    }
+    kept.push(now);
+    this.joinTimestampsBySocketId.set(clientId, kept);
+    return true;
+  }
+
   private parseEventId(data: unknown): string | null {
     const coerced = this.coerceMessageBody(data);
     if (coerced === null || typeof coerced !== 'object') {
@@ -152,6 +173,20 @@ export class EventChatGateway
       return;
     }
     const userId = (client.data as SocketData).userId;
+    if (!userId) {
+      client.emit('error', {
+        code: 'EVENT_CHAT_WS_AUTH_PENDING',
+        message: 'Authentication not finished; retry join after connected',
+      });
+      return;
+    }
+    if (!this.assertJoinRateOk(client.id)) {
+      client.emit('error', {
+        code: 'EVENT_CHAT_WS_RATE_LIMIT',
+        message: 'Too many join requests; slow down',
+      });
+      return;
+    }
     try {
       await this.eventChatAccess.assertCanAccessEventChat(userId, eventId);
     } catch {
@@ -194,9 +229,20 @@ export class EventChatGateway
       return;
     }
     const socketData = client.data as SocketData;
+    if (!socketData.userId) {
+      client.emit('error', {
+        code: 'EVENT_CHAT_WS_AUTH_PENDING',
+        message: 'Authentication not finished',
+      });
+      return;
+    }
     try {
       await this.eventChatAccess.assertCanAccessEventChat(socketData.userId, eventId);
     } catch {
+      client.emit('error', {
+        code: 'EVENT_CHAT_FORBIDDEN',
+        message: 'Cannot send typing to this chat room',
+      });
       return;
     }
     const room = `event:${eventId}`;

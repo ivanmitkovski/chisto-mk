@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ArrayMaxSize, IsArray, IsIn, IsString, IsUUID, MaxLength, MinLength, ValidateIf } from 'class-validator';
+import { ArrayMaxSize, IsArray, IsIn, IsString, IsUUID, Matches, MaxLength, MinLength, ValidateIf } from 'class-validator';
+import { PRISMA_CUID_REGEX } from '../../common/validators/is-cuid.validator';
 
 export class BulkModerateCleanupEventsDto {
-  @ApiProperty({ type: [String], maxItems: 50 })
+  @ApiProperty({ type: [String], maxItems: 50, description: 'Cleanup event ids (Prisma cuid)' })
   @IsArray()
   @ArrayMaxSize(50)
-  @IsUUID('4', { each: true })
+  @IsString({ each: true })
+  @Matches(PRISMA_CUID_REGEX, { each: true, message: 'each value in eventIds must be a valid cuid' })
   eventIds!: string[];
 
   @ApiProperty({ enum: ['APPROVED', 'DECLINED'] })

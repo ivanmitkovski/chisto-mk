@@ -58,12 +58,8 @@ export function formatRelativeTimeSince(
   const diffMs = now.getTime() - createdAt.getTime();
   const rtf = createRelativeTimeFormatter(locale);
 
-  if (diffMs < 0) {
-    return 'Just now';
-  }
-
-  if (diffMs < 10 * MS_PER_SECOND) {
-    return 'Just now';
+  if (diffMs < 0 || diffMs < 10 * MS_PER_SECOND) {
+    return rtf.format(0, 'second');
   }
 
   if (diffMs < MS_PER_MINUTE) {

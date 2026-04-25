@@ -27,7 +27,7 @@ import {
   normalizeGearKeys,
   scaleFromMobile,
 } from './events-mobile.mapper';
-import { RRule } from 'rrule';
+import { RRule, RRuleSet, rrulestr } from 'rrule';
 import { EventsMobileMapperService } from './events-mobile-mapper.service';
 import { EventRouteSegmentsService } from './event-route-segments.service';
 import { eventIncludeForViewer } from './events-query.include';
@@ -156,7 +156,9 @@ export class EventsCreationService {
           title: dto.title.trim(),
         })
         .catch((err: unknown) => {
-          this.logger.warn(`notify staff pending failed for ${created.id}`, err);
+          this.logger.warn(
+            `notify staff pending failed for ${created.id}: ${err instanceof Error ? err.message : String(err)}`,
+          );
         });
     } else {
       this.cleanupEventsSse.emitCleanupEventCreated(created.id, {
@@ -172,7 +174,9 @@ export class EventsCreationService {
           dedupeKey: String(Date.now()),
         })
         .catch((err: unknown) => {
-          this.logger.warn(`notify audience published failed for ${created.id}`, err);
+          this.logger.warn(
+            `notify audience published failed for ${created.id}: ${err instanceof Error ? err.message : String(err)}`,
+          );
         });
     }
 
@@ -199,14 +203,24 @@ export class EventsCreationService {
     const count = Math.min(dto.recurrenceCount ?? 4, 52);
     let dates: Date[];
     try {
-      const rule = RRule.fromString(
-        dto.recurrenceRule!.startsWith('RRULE:')
-          ? dto.recurrenceRule!
-          : `RRULE:${dto.recurrenceRule}`,
-      );
-      // Start from the parent scheduled date and compute `count` occurrences.
-      dates = rule.all((_, len) => len < count);
-      // Fallback to parent-only if rrule produces no dates.
+      const rrulePart = dto.recurrenceRule!.startsWith('RRULE:')
+        ? dto.recurrenceRule!
+        : `RRULE:${dto.recurrenceRule}`;
+      const y = parentStart.getUTCFullYear();
+      const mo = String(parentStart.getUTCMonth() + 1).padStart(2, '0');
+      const da = String(parentStart.getUTCDate()).padStart(2, '0');
+      const hh = String(parentStart.getUTCHours()).padStart(2, '0');
+      const mm = String(parentStart.getUTCMinutes()).padStart(2, '0');
+      const ss = String(parentStart.getUTCSeconds()).padStart(2, '0');
+      const dtstart = `${y}${mo}${da}T${hh}${mm}${ss}Z`;
+      const fullIcs = `DTSTART:${dtstart}\n${rrulePart}`;
+      const parsed = rrulestr(fullIcs);
+      const rule = parsed instanceof RRule ? parsed : (parsed as RRuleSet).rrules()[0];
+      if (!rule) {
+        dates = [parentStart];
+      } else {
+        dates = rule.all((_, len) => len < count);
+      }
       if (dates.length === 0) {
         dates = [parentStart];
       }
@@ -287,7 +301,9 @@ export class EventsCreationService {
             title: dto.title.trim(),
           })
           .catch((err: unknown) => {
-            this.logger.warn(`notify staff pending failed for series ${parentId}`, err);
+            this.logger.warn(
+              `notify staff pending failed for series ${parentId}: ${err instanceof Error ? err.message : String(err)}`,
+            );
           });
       } else {
         this.cleanupEventsSse.emitCleanupEventCreated(parentId, {
@@ -303,7 +319,9 @@ export class EventsCreationService {
             dedupeKey: String(Date.now()),
           })
           .catch((err: unknown) => {
-            this.logger.warn(`notify audience published failed for series ${parentId}`, err);
+            this.logger.warn(
+              `notify audience published failed for series ${parentId}: ${err instanceof Error ? err.message : String(err)}`,
+            );
           });
       }
     }

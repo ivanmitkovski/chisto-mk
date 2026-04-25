@@ -1,5 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { NotificationType, Prisma } from '../prisma-client';
+import { cleanupEndingSoonPush } from '../common/i18n/event-user-notification.copy';
+import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
 import { PrismaService } from '../prisma/prisma.service';
 import {
@@ -69,14 +71,18 @@ export class EventEndSoonNotifierService implements OnModuleInit, OnModuleDestro
       RETURNING c.id, c."organizerId", c.title, c."endAt"
     `);
 
+    const organizerIds = claimed
+      .map((r) => r.organizerId?.trim() ?? '')
+      .filter((id) => id.length > 0);
+    const localeByUser = await notificationLocalesByUserId(this.prisma, organizerIds);
+
     for (const row of claimed) {
       const organizerId = row.organizerId?.trim() ?? '';
       if (organizerId.length === 0) {
         continue;
       }
-      const title = 'Наскоро крај на чистењето';
-      const safeTitle = row.title.length > 120 ? `${row.title.slice(0, 117)}…` : row.title;
-      const body = `„${safeTitle}“ завршува за околу 10 минути. Ако ви треба повеќе време, продолжете го крајот во апликацијата.`;
+      const locale = localeByUser.get(organizerId) ?? 'mk';
+      const { title, body } = cleanupEndingSoonPush(locale, row.title);
       try {
         await this.dispatcher.dispatchToUser(organizerId, {
           title,

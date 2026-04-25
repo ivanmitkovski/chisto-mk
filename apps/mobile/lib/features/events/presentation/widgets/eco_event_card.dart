@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -35,14 +34,14 @@ class EcoEventCard extends StatefulWidget {
   State<EcoEventCard> createState() => _EcoEventCardState();
 }
 
-String _ecoEventCardDistanceLabel(double km) {
+String _ecoEventCardDistanceLabel(BuildContext context, double km) {
   if (km < 0.1) {
-    return '<100 m';
+    return context.l10n.eventsDistanceLessThan100m;
   }
   if (km < 1) {
-    return '${(km * 1000).round()} m';
+    return context.l10n.eventsDistanceMeters((km * 1000).round());
   }
-  return '${km.toStringAsFixed(1)} km';
+  return context.l10n.eventsDistanceKilometers(km.toStringAsFixed(1));
 }
 
 class _EcoEventCardState extends State<EcoEventCard> {
@@ -65,11 +64,12 @@ class _EcoEventCardState extends State<EcoEventCard> {
   Widget build(BuildContext context) {
     final EcoEvent event = widget.event;
     final TextTheme textTheme = Theme.of(context).textTheme;
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final bool isCancelled = event.status == EcoEventStatus.cancelled;
 
     final bool reduceMotion = MediaQuery.disableAnimationsOf(context);
 
-    final Color dividerEdge = AppColors.divider.withValues(alpha: 0.75);
+    final Color dividerEdge = colorScheme.outlineVariant.withValues(alpha: 0.75);
     final BorderRadius cardRadius =
         BorderRadius.circular(AppSpacing.radiusCard);
     final bool liveAccent = event.status == EcoEventStatus.inProgress;
@@ -80,18 +80,18 @@ class _EcoEventCardState extends State<EcoEventCard> {
       duration: reduceMotion ? Duration.zero : AppMotion.xFast,
       curve: AppMotion.emphasized,
       decoration: BoxDecoration(
-        color: AppColors.panelBackground,
+        color: colorScheme.surfaceContainerHighest,
         borderRadius: cardRadius,
         border: Border.all(color: dividerEdge),
         boxShadow: <BoxShadow>[
           BoxShadow(
-            color: AppColors.shadowLight,
+            color: colorScheme.shadow.withValues(alpha: 0.06),
             blurRadius: _pressed ? AppSpacing.sm : AppSpacing.md,
             offset: Offset(0, _pressed ? 2 : 4),
           ),
           if (!_pressed)
             BoxShadow(
-              color: AppColors.shadowMedium,
+              color: colorScheme.shadow.withValues(alpha: 0.1),
               blurRadius: AppSpacing.lg,
               offset: const Offset(0, 8),
             ),
@@ -143,7 +143,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                         decoration: isCancelled
                                             ? TextDecoration.lineThrough
                                             : null,
-                                        decorationColor: AppColors.textMuted,
+                                        decorationColor: colorScheme.onSurfaceVariant,
                                       ),
                                 ),
                               ),
@@ -157,7 +157,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                   child: Icon(
                                     CupertinoIcons.repeat,
                                     size: 15,
-                                    color: AppColors.textMuted.withValues(alpha: 0.95),
+                                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.95),
                                   ),
                                 ),
                               ],
@@ -205,7 +205,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                     TextSpan(
                                       text: ' · ${context.l10n.eventsCardSoonLabel}',
                                       style: metaStyle.copyWith(
-                                        color: AppColors.accentWarningDark,
+                                        color: colorScheme.tertiary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                     ),
@@ -214,7 +214,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                       text:
                                           ' · ${context.l10n.eventsCardParticipantsJoined(event.participantCount)}',
                                       style: metaStyle.copyWith(
-                                        color: AppColors.textSecondary,
+                                        color: colorScheme.onSurfaceVariant,
                                       ),
                                     ),
                                 ],
@@ -229,7 +229,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
                               Icon(
                                 CupertinoIcons.location_solid,
                                 size: 14,
-                                color: AppColors.textMuted.withValues(alpha: 0.9),
+                                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.9),
                               ),
                               const SizedBox(width: AppSpacing.xxs),
                               Expanded(
@@ -243,10 +243,10 @@ class _EcoEventCardState extends State<EcoEventCard> {
                                         MediaQuery.textScalerOf(context);
                                     final TextStyle siteStyle = metaStyle;
                                     final TextStyle distStyle = metaStyle.copyWith(
-                                      color: AppColors.textMuted,
+                                      color: colorScheme.onSurfaceVariant,
                                     );
                                     final String suffix =
-                                        ' · ${_ecoEventCardDistanceLabel(event.siteDistanceKm)}';
+                                        ' · ${_ecoEventCardDistanceLabel(context, event.siteDistanceKm)}';
                                     final TextPainter suffixPainter = TextPainter(
                                       text: TextSpan(text: suffix, style: distStyle),
                                       textDirection: direction,
@@ -283,17 +283,17 @@ class _EcoEventCardState extends State<EcoEventCard> {
                             const SizedBox(height: AppSpacing.xs),
                             Row(
                               children: <Widget>[
-                                const Icon(
+                                Icon(
                                   CupertinoIcons.checkmark_circle_fill,
                                   size: 14,
-                                  color: AppColors.primaryDark,
+                                  color: colorScheme.primary,
                                 ),
                                 const SizedBox(width: AppSpacing.xxs),
                                 Text(
                                   context.l10n.eventsCheckedInBadge,
                                   style: AppTypography.eventsCardBadgeAccent(
                                     textTheme,
-                                    color: AppColors.primaryDark,
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               ],
@@ -341,7 +341,7 @@ class _EcoEventCardState extends State<EcoEventCard> {
             duration: AppMotion.xFast,
             curve: AppMotion.emphasized,
             child: Material(
-              color: AppColors.transparent,
+              color: Colors.transparent,
               child: InkWell(
                 onTap: () {
                   AppHaptics.softTransition();
@@ -368,6 +368,7 @@ class _Thumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final Widget image = ClipRRect(
       borderRadius: BorderRadius.circular(AppSpacing.radius14),
       child: Container(
@@ -375,10 +376,10 @@ class _Thumbnail extends StatelessWidget {
         height: 72,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppSpacing.radius14),
-          border: Border.all(color: AppColors.white, width: 2),
+          border: Border.all(color: colorScheme.surface, width: 2),
           boxShadow: <BoxShadow>[
             BoxShadow(
-              color: AppColors.black.withValues(alpha: 0.08),
+              color: colorScheme.shadow.withValues(alpha: 0.08),
               blurRadius: 4,
               offset: const Offset(0, 1),
             ),
@@ -391,9 +392,9 @@ class _Thumbnail extends StatelessWidget {
             width: 72,
             height: 72,
             fit: BoxFit.cover,
-            errorWidget: const Icon(
+            errorWidget: Icon(
               Icons.image_not_supported_outlined,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
               size: 22,
             ),
           ),

@@ -27,6 +27,7 @@ export type PointHistoryItem = {
 export function computeLevelMilestonesFromAscRows(
   rows: ReadonlyArray<{ readonly createdAt: Date; readonly delta: number }>,
   gamification: GamificationService,
+  locale = 'en',
 ): PointHistoryMilestone[] {
   let xp = 0;
   let prevLevel = 1;
@@ -36,7 +37,7 @@ export function computeLevelMilestonesFromAscRows(
       continue;
     }
     xp += row.delta;
-    const prog = gamification.getLevelProgress(xp);
+    const prog = gamification.getLevelProgress(xp, locale);
     if (prog.level > prevLevel) {
       out.push({
         reachedAt: row.createdAt.toISOString(),
@@ -104,6 +105,7 @@ export class PointHistoryService {
   async listForUser(
     userId: string,
     query: { limit?: number; cursor?: string },
+    locale = 'en',
   ): Promise<{
     data: PointHistoryItem[];
     meta: { milestones: PointHistoryMilestone[]; nextCursor: string | null };
@@ -155,7 +157,7 @@ export class PointHistoryService {
         take: MAX_MILESTONE_SCAN,
         select: { createdAt: true, delta: true },
       });
-      milestones = computeLevelMilestonesFromAscRows(ascRows, this.gamification);
+      milestones = computeLevelMilestonesFromAscRows(ascRows, this.gamification, locale);
     }
 
     const data: PointHistoryItem[] = page.map((r) => ({

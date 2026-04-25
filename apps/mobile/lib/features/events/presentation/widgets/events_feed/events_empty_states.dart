@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -25,6 +24,7 @@ class EventsEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final String title;
     final String subtitle;
     final IconData icon;
@@ -60,7 +60,7 @@ class EventsEmptyState extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           reduceMotion
-              ? _iconBubble(icon)
+              ? _iconBubble(context, icon)
               : TweenAnimationBuilder<double>(
                   tween: Tween<double>(begin: 0.8, end: 1.0),
                   duration: AppMotion.slow,
@@ -71,7 +71,7 @@ class EventsEmptyState extends StatelessWidget {
                       child: Transform.scale(scale: value, child: child),
                     );
                   },
-                  child: _iconBubble(icon),
+                  child: _iconBubble(context, icon),
                 ),
           const SizedBox(height: AppSpacing.lg),
           Text(
@@ -101,9 +101,10 @@ class EventsEmptyState extends StatelessWidget {
           ],
           if (onCreateEvent != null) ...<Widget>[
             SizedBox(height: showClearFilters ? AppSpacing.sm : AppSpacing.lg),
-            FilledButton(
-              onPressed: onCreateEvent,
-              child: Text(l10n.eventsEmptyActionCreateEvent),
+            _CreateEventButton(
+              label: l10n.eventsEmptyActionCreateEvent,
+              colorScheme: colorScheme,
+              onPressed: onCreateEvent!,
             ),
           ],
         ],
@@ -111,15 +112,16 @@ class EventsEmptyState extends StatelessWidget {
     );
   }
 
-  Widget _iconBubble(IconData icon) {
+  Widget _iconBubble(BuildContext context, IconData icon) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Container(
       width: 80,
       height: 80,
       decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.08),
+        color: colorScheme.primaryContainer.withValues(alpha: 0.45),
         shape: BoxShape.circle,
       ),
-      child: Icon(icon, size: 36, color: AppColors.primaryDark),
+      child: Icon(icon, size: 36, color: colorScheme.onPrimaryContainer),
     );
   }
 }
@@ -138,6 +140,7 @@ class SearchEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final AppLocalizations l10n = context.l10n;
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xxl * 2),
@@ -148,13 +151,13 @@ class SearchEmptyState extends StatelessWidget {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: AppColors.textMuted.withValues(alpha: 0.08),
+              color: colorScheme.onSurfaceVariant.withValues(alpha: 0.08),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               CupertinoIcons.search,
               size: 36,
-              color: AppColors.textMuted,
+              color: colorScheme.onSurfaceVariant,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -198,13 +201,42 @@ class SearchEmptyState extends StatelessWidget {
           ],
           if (onCreateEvent != null) ...<Widget>[
             const SizedBox(height: AppSpacing.sm),
-            FilledButton(
-              onPressed: onCreateEvent,
-              child: Text(l10n.eventsEmptyActionCreateEvent),
+            _CreateEventButton(
+              label: l10n.eventsEmptyActionCreateEvent,
+              colorScheme: colorScheme,
+              onPressed: onCreateEvent!,
             ),
           ],
         ],
       ),
+    );
+  }
+}
+
+class _CreateEventButton extends StatelessWidget {
+  const _CreateEventButton({
+    required this.label,
+    required this.colorScheme,
+    required this.onPressed,
+  });
+
+  final String label;
+  final ColorScheme colorScheme;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        minimumSize: const Size(170, 48),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
+        ),
+      ),
+      child: Text(label),
     );
   }
 }

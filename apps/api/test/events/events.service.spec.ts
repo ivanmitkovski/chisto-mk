@@ -5,7 +5,6 @@ import {
   ConflictException,
   ForbiddenException,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   CleanupEventStatus,
@@ -118,6 +117,7 @@ describe('EventsService', () => {
     };
     eventCheckIn: { findMany: jest.Mock };
     pointTransaction: { findMany: jest.Mock };
+    userDeviceToken: { findMany: jest.Mock };
     $transaction: jest.Mock;
   };
   let uploads: ReturnType<typeof makeUploads>;
@@ -185,6 +185,7 @@ describe('EventsService', () => {
       },
       eventCheckIn: { findMany: jest.fn().mockResolvedValue([]) },
       pointTransaction: { findMany: jest.fn().mockResolvedValue([]) },
+      userDeviceToken: { findMany: jest.fn().mockResolvedValue([]) },
       $transaction: jest.fn(async (arg: unknown) => {
         if (typeof arg === 'function') {
           return arg(prisma);
@@ -858,7 +859,7 @@ describe('EventsService', () => {
       expect(notificationDispatcher.dispatchToUser).toHaveBeenCalledWith(
         'u3',
         expect.objectContaining({
-          body: expect.stringContaining('join bonus'),
+          body: expect.stringContaining('River cleanup'),
         }),
       );
     });
@@ -910,6 +911,13 @@ describe('EventsService', () => {
         expect.objectContaining({
           where: { id: 'evt-1' },
           data: { participantCount: { decrement: 1 } },
+        }),
+      );
+      expect(ecoEventPoints.debitOnceIfNew).toHaveBeenCalledWith(
+        prisma,
+        expect.objectContaining({
+          userId: 'u1',
+          referenceId: 'leave:evt-1:u1',
         }),
       );
     });
@@ -991,16 +999,14 @@ describe('EventsService', () => {
   });
 
   describe('getAnalytics', () => {
-    it('returns 401-shaped error for non-organizer non-staff', async () => {
+    it('returns 403 for non-organizer non-staff', async () => {
       prisma.cleanupEvent.findUnique.mockResolvedValue({
         organizerId: 'org-1',
         participantCount: 5,
       });
       prisma.eventParticipant.findMany.mockResolvedValue([]);
       prisma.eventCheckIn.findMany.mockResolvedValue([]);
-      await expect(service.getAnalytics('evt-1', user('u2'))).rejects.toBeInstanceOf(
-        UnauthorizedException,
-      );
+      await expect(service.getAnalytics('evt-1', user('u2'))).rejects.toBeInstanceOf(ForbiddenException);
     });
 
     it('returns analytics for organizer', async () => {

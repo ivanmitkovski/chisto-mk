@@ -4726,6 +4726,26 @@ class AppLocalizationsMk extends AppLocalizations {
       'Деталите за настанот моментално не се достапни.';
 
   @override
+  String get homeSiteCleaningListLoadError =>
+      'Не можевме да ги вчитаме настаните. Проверете ја врската и обидете се повторно.';
+
+  @override
+  String get homeSiteCleaningRetry => 'Обиди повторно';
+
+  @override
+  String get eventsDistanceLessThan100m => '<100 м';
+
+  @override
+  String eventsDistanceMeters(int meters) {
+    return '$meters м';
+  }
+
+  @override
+  String eventsDistanceKilometers(String km) {
+    return '$km км';
+  }
+
+  @override
   String get errorUserNetwork => 'Проверете ја врската и обидете се повторно.';
 
   @override

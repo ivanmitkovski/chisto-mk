@@ -47,9 +47,23 @@ export class CheckInAttendeeRowDto {
   avatarUrl!: string | null;
 }
 
+export class ListCheckInAttendeesMetaDto {
+  @ApiProperty({ description: 'Whether more rows exist after this page' })
+  hasMore!: boolean;
+
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'Pass as `cursor` query param on the next request',
+  })
+  nextCursor!: string | null;
+}
+
 export class ListCheckInAttendeesResponseDto {
   @ApiProperty({ type: [CheckInAttendeeRowDto] })
   data!: CheckInAttendeeRowDto[];
+
+  @ApiProperty({ type: ListCheckInAttendeesMetaDto })
+  meta!: ListCheckInAttendeesMetaDto;
 }
 
 export class ManualCheckInResponseDto {

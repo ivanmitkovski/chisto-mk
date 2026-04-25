@@ -2668,6 +2668,25 @@
   "homeSiteCleaningVolunteerHint": "Join the action to help clean this site.",
   "homeSiteCleaningJoinAction": "Join action",
   "homeSiteCleaningEventUnavailable": "Event details are unavailable right now.",
+  "homeSiteCleaningListLoadError": "Could not load events. Check your connection and try again.",
+  "homeSiteCleaningRetry": "Retry",
+  "eventsDistanceLessThan100m": "<100 m",
+  "eventsDistanceMeters": "{meters} m",
+  "@eventsDistanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "eventsDistanceKilometers": "{km} km",
+  "@eventsDistanceKilometers": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
   "errorUserNetwork": "Check your connection and try again.",
   "errorUserTimeout": "That took too long. Please try again.",
   "errorUserUnauthorized": "Please sign in again to continue.",

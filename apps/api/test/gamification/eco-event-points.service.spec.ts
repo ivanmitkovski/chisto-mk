@@ -1,5 +1,6 @@
 /// <reference types="jest" />
 
+import { Prisma } from '../../src/prisma-client';
 import { EcoEventPointsService } from '../../src/gamification/eco-event-points.service';
 
 describe('EcoEventPointsService', () => {
@@ -74,6 +75,26 @@ describe('EcoEventPointsService', () => {
     const second = await service.creditIfNew(tx as never, params);
     expect(second).toBe(0);
     expect(pointTransaction.create).toHaveBeenCalledTimes(1);
+  });
+
+  it('treats P2002 on create as idempotent without updating balances', async () => {
+    const { tx, pointTransaction, user } = makeTx();
+    pointTransaction.findFirst.mockResolvedValue(null);
+    user.findUnique.mockResolvedValue({ pointsBalance: 100, totalPointsEarned: 200 });
+    const dup = new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
+      code: 'P2002',
+      clientVersion: 'test',
+    });
+    pointTransaction.create.mockRejectedValue(dup);
+    const r = await service.creditIfNew(tx as never, {
+      userId: 'u1',
+      delta: 5,
+      reasonCode: 'EVENT_JOINED',
+      referenceType: 'EventParticipant',
+      referenceId: 'p1',
+    });
+    expect(r).toBe(0);
+    expect(user.update).not.toHaveBeenCalled();
   });
 
   describe('debitOnceIfNew', () => {

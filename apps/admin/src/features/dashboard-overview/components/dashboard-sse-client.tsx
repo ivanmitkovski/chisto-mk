@@ -2,7 +2,7 @@
 
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef } from 'react';
 import { adminQueryKeys } from '@/lib/admin-api-client';
 import { getApiBaseUrl } from '@/lib/api-base-url';
@@ -120,6 +120,7 @@ function isCleanupEventSse(data: unknown): data is CleanupEventSsePayload {
 
 export function DashboardSSEClient() {
   const router = useRouter();
+  const pathname = usePathname();
   const queryClient = useQueryClient();
   const sseCtx = useDashboardSSE();
   const routerRef = useRef(router);
@@ -132,6 +133,8 @@ export function DashboardSSEClient() {
 
   const sseCtxRef = useRef(sseCtx);
   sseCtxRef.current = sseCtx;
+  const pathnameRef = useRef(pathname);
+  pathnameRef.current = pathname;
 
   const connect = useCallback(() => {
     void (async () => {
@@ -228,7 +231,10 @@ export function DashboardSSEClient() {
                       ? 'New cleanup event'
                       : 'Cleanup event updated';
                 sseCtxRef.current?.showRefreshToast(label);
-                routerRef.current.refresh();
+                void qc.invalidateQueries({ queryKey: adminQueryKeys.overview });
+                if (pathnameRef.current.startsWith('/dashboard/events')) {
+                  routerRef.current.refresh();
+                }
               }
             } catch {
               // Ignore parse errors (e.g. heartbeat)

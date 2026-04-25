@@ -1,14 +1,12 @@
 /// <reference types="jest" />
 
 import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
-import {
-  CleanupEventStatus,
-  EcoEventLifecycleStatus,
-  Prisma,
-  Role,
-} from '../../src/prisma-client';
+import { CleanupEventStatus, EcoEventLifecycleStatus, Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import type { PatchCleanupEventDto } from '../../src/cleanup-events/dto/patch-cleanup-event.dto';
+import { CleanupEventsAnalyticsService } from '../../src/cleanup-events/cleanup-events-analytics.service';
+import { CleanupEventsListService } from '../../src/cleanup-events/cleanup-events-list.service';
+import { CleanupEventsMutationsService } from '../../src/cleanup-events/cleanup-events-mutations.service';
 import { CleanupEventsService } from '../../src/cleanup-events/cleanup-events.service';
 
 function actor(id: string): AuthenticatedUser {
@@ -28,7 +26,7 @@ describe('CleanupEventsService duplicate schedule', () => {
       create: jest.Mock;
       update: jest.Mock;
     };
-    adminMutationIdempotency: { create: jest.Mock };
+    adminMutationIdempotency: { findUnique: jest.Mock; create: jest.Mock };
     $transaction: jest.Mock;
   };
   let audit: { log: jest.Mock };
@@ -75,6 +73,7 @@ describe('CleanupEventsService duplicate schedule', () => {
         update: jest.fn(),
       },
       adminMutationIdempotency: {
+        findUnique: jest.fn().mockResolvedValue(null),
         create: jest.fn().mockResolvedValue({}),
       },
       $transaction: jest.fn(async (fn: (tx: typeof prisma) => Promise<unknown>) => fn(prisma)),
@@ -113,15 +112,18 @@ describe('CleanupEventsService duplicate schedule', () => {
       organizer: null,
       _count: { seriesChildren: 0 },
     });
-    service = new CleanupEventsService(
+    const list = new CleanupEventsListService(prisma as never, uploads as never);
+    const mutations = new CleanupEventsMutationsService(
       prisma as never,
       audit as never,
       ecoEventPoints as never,
-      uploads as never,
       cleanupEventsSse as never,
       scheduleConflict as never,
       cleanupEventNotifications as never,
+      list,
     );
+    const analytics = new CleanupEventsAnalyticsService(prisma as never, audit as never);
+    service = new CleanupEventsService(list, mutations, analytics);
   });
 
   it('throws ConflictException on create when conflict exists', async () => {
@@ -432,19 +434,14 @@ describe('CleanupEventsService duplicate schedule', () => {
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
-  it('bulkModerate throws ConflictException on duplicate clientJobId', async () => {
-    const dup = new Prisma.PrismaClientKnownRequestError('duplicate', {
-      code: 'P2002',
-      clientVersion: 'test',
-      meta: { target: ['actorUserId', 'purpose', 'clientJobId'] },
-    });
-    prisma.adminMutationIdempotency.create.mockRejectedValueOnce(dup);
+  it('bulkModerate throws ConflictException when clientJobId was already completed', async () => {
+    prisma.adminMutationIdempotency.findUnique.mockResolvedValueOnce({ id: 'idem-1' });
     await expect(
       service.bulkModerate(
         {
-          eventIds: ['a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'],
+          eventIds: ['cbbbbbbbbbbbbbbbbbbbbbbb'],
           action: 'APPROVED',
-          clientJobId: 'b0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11',
+          clientJobId: 'cccccccccccccccccccccccc',
         },
         actor('admin-1'),
       ),

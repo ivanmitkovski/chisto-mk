@@ -4724,6 +4724,26 @@ class AppLocalizationsSq extends AppLocalizations {
       'Detajet e ngjarjes nuk janë të disponueshme për momentin.';
 
   @override
+  String get homeSiteCleaningListLoadError =>
+      'Nuk u ngarkuan ngjarjet. Kontrollo lidhjen dhe provo përsëri.';
+
+  @override
+  String get homeSiteCleaningRetry => 'Riprovo';
+
+  @override
+  String get eventsDistanceLessThan100m => '<100 m';
+
+  @override
+  String eventsDistanceMeters(int meters) {
+    return '$meters m';
+  }
+
+  @override
+  String eventsDistanceKilometers(String km) {
+    return '$km km';
+  }
+
+  @override
   String get errorUserNetwork => 'Kontrolloni lidhjen dhe provoni përsëri.';
 
   @override

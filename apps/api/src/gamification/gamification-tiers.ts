@@ -6,6 +6,11 @@
  * Level 51+: capped title "Chisto Legend" with continued XP scaling (soft cap).
  */
 
+import {
+  PRESTIGE_TIER_NAME_COUNT,
+  resolveLevelDisplayTitle,
+} from '../common/i18n/gamification-tier.copy';
+
 export const NUMERIC_LEVEL_MAX = 10;
 
 /** XP to advance from `level` → `level + 1` (1-based). */
@@ -18,65 +23,16 @@ export function levelTierKey(level: number): string {
   if (level <= 0) return 'numeric_1';
   if (level <= NUMERIC_LEVEL_MAX) return `numeric_${level}`;
   const idx = level - NUMERIC_LEVEL_MAX - 1;
-  if (idx < PRESTIGE_TIER_NAMES.length) {
+  if (idx < PRESTIGE_TIER_NAME_COUNT) {
     return `prestige_${String(idx + 1).padStart(2, '0')}`;
   }
   return 'prestige_cap';
 }
 
-/** English display title (mobile may localize via tierKey). */
-export function levelDisplayName(level: number): string {
-  if (level <= 0) return 'Level 1';
-  if (level <= NUMERIC_LEVEL_MAX) return `Level ${level}`;
-  const idx = level - NUMERIC_LEVEL_MAX - 1;
-  if (idx < PRESTIGE_TIER_NAMES.length) {
-    return PRESTIGE_TIER_NAMES[idx]!;
-  }
-  return 'Chisto Legend';
+/** Display title for API / clients; pass BCP-47 locale (`mk`, `mk-MK`, `en`, …). */
+export function levelDisplayName(level: number, locale = 'en'): string {
+  return resolveLevelDisplayTitle(level, locale);
 }
-
-const PRESTIGE_TIER_NAMES: readonly string[] = [
-  'River Watcher',
-  'Valley Keeper',
-  'Field Guardian',
-  'Grove Sentinel',
-  'Sky Steward',
-  'Trail Blazer',
-  'Spring Voice',
-  'Stone Warden',
-  'Meadow Herald',
-  'Ridge Runner',
-  'Creek Protector',
-  'Hill Watcher',
-  'Canopy Ally',
-  'Soil Advocate',
-  'Wind Listener',
-  'Dawn Patroller',
-  'Dusk Ranger',
-  'Wild Path Guide',
-  'Clear Water Knight',
-  'Green Belt Champion',
-  'Urban Roots Ally',
-  'Park Keeper',
-  'Riverbank Defender',
-  'Summit Scout',
-  'Valley Voice',
-  'Eco Cartographer',
-  'Cleanup Captain',
-  'Circle Steward',
-  'Harbor Helper',
-  'Plains Protector',
-  'Forest Friend',
-  'Lake Lookout',
-  'Mountain Mate',
-  'City Green Lead',
-  'Neighborhood Naturalist',
-  'Citizen Scientist',
-  'Climate Courier',
-  'Zero-Waste Warrior',
-  'Circular Economy Sage',
-  'Planet Partner',
-];
 
 export function xpToAdvanceFromLevel(level: number): number {
   if (level < 1) return NUMERIC_XP_STEPS[0]!;

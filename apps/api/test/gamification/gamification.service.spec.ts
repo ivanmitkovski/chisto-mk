@@ -38,5 +38,15 @@ describe('GamificationService', () => {
       expect(p.levelTierKey).toBe('prestige_01');
       expect(p.levelDisplayName).toBe('River Watcher');
     });
+
+    it('localizes prestige title for Macedonian locale', () => {
+      let total = 0;
+      for (let L = 1; L <= 10; L++) {
+        total += service.xpToAdvanceFromLevel(L);
+      }
+      const p = service.getLevelProgress(total, 'mk-MK');
+      expect(p.level).toBe(11);
+      expect(p.levelDisplayName).toBe('Чувар на реката');
+    });
   });
 });

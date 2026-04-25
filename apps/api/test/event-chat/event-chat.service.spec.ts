@@ -3,6 +3,11 @@ import { EventChatMessageType, NotificationType } from '../../src/prisma-client'
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { NotificationDispatcherService } from '../../src/notifications/notification-dispatcher.service';
 import { ChatEncryptionService } from '../../src/event-chat/chat-encryption.service';
+import { EventChatListService } from '../../src/event-chat/event-chat-list.service';
+import { EventChatMessageDtoService } from '../../src/event-chat/event-chat-message-dto.service';
+import { EventChatMutationsService } from '../../src/event-chat/event-chat-mutations.service';
+import { EventChatNotificationsService } from '../../src/event-chat/event-chat-notifications.service';
+import { EventChatPresenceService } from '../../src/event-chat/event-chat-presence.service';
 import { EventChatService } from '../../src/event-chat/event-chat.service';
 import { EventChatSseService } from '../../src/event-chat/event-chat-sse.service';
 import { EventChatTelemetryService } from '../../src/event-chat/event-chat-telemetry.service';
@@ -37,7 +42,7 @@ describe('EventChatService', () => {
   let prisma: {
     cleanupEvent: { findUnique: jest.Mock; findFirst: jest.Mock };
     user: { findUnique: jest.Mock };
-    eventParticipant: { findMany: jest.Mock; findUnique: jest.Mock };
+    eventParticipant: { findMany: jest.Mock; findUnique: jest.Mock; count: jest.Mock };
     eventChatAttachment: { deleteMany: jest.Mock };
     $transaction: jest.Mock;
     eventChatMessage: {
@@ -57,13 +62,14 @@ describe('EventChatService', () => {
   };
   let sse: { emitEvent: jest.Mock };
   let dispatcher: { dispatchToUser: jest.Mock };
+  let chatNotifications: EventChatNotificationsService;
   let telemetry: { emitMetric: jest.Mock; emitSpan: jest.Mock; emitAudit: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
       cleanupEvent: { findUnique: jest.fn(), findFirst: jest.fn() },
       user: { findUnique: jest.fn() },
-      eventParticipant: { findMany: jest.fn(), findUnique: jest.fn() },
+      eventParticipant: { findMany: jest.fn(), findUnique: jest.fn(), count: jest.fn() },
       eventChatAttachment: { deleteMany: jest.fn().mockResolvedValue({ count: 0 }) },
       $transaction: jest.fn((arg: unknown) => {
         if (Array.isArray(arg)) {
@@ -88,6 +94,10 @@ describe('EventChatService', () => {
     };
     sse = { emitEvent: jest.fn() };
     dispatcher = { dispatchToUser: jest.fn().mockResolvedValue(undefined) };
+    chatNotifications = new EventChatNotificationsService(
+      prisma as unknown as PrismaService,
+      dispatcher as unknown as NotificationDispatcherService,
+    );
     telemetry = {
       emitMetric: jest.fn(),
       emitSpan: jest.fn(),
@@ -98,19 +108,36 @@ describe('EventChatService', () => {
     const chatUpload = {
       deleteUploadedObjectsByUrls: jest.fn().mockResolvedValue(undefined),
       applySignedUrlsToMessageDto: jest.fn(async (d: unknown) => d),
+      isTrustedChatPublishedUrl: jest.fn(() => true),
     };
     const uploads = {
       signPrivateObjectKey: jest.fn().mockResolvedValue(null),
     };
-    service = new EventChatService(
-      prisma as unknown as PrismaService,
-      sse as unknown as EventChatSseService,
-      dispatcher as unknown as NotificationDispatcherService,
+    const dto = new EventChatMessageDtoService(
       encryption as unknown as ChatEncryptionService,
       chatUpload as never,
       uploads as never,
-      telemetry as unknown as EventChatTelemetryService,
     );
+    const list = new EventChatListService(
+      prisma as unknown as PrismaService,
+      telemetry as unknown as EventChatTelemetryService,
+      dto,
+    );
+    const presence = new EventChatPresenceService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      uploads as never,
+    );
+    const mutations = new EventChatMutationsService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      chatNotifications,
+      encryption as unknown as ChatEncryptionService,
+      chatUpload as never,
+      telemetry as unknown as EventChatTelemetryService,
+      dto,
+    );
+    service = new EventChatService(list, presence, mutations);
   });
 
   it('listMessages returns newest-first page', async () => {
@@ -460,6 +487,8 @@ describe('EventChatService', () => {
       lastName: 'G',
       avatarObjectKey: null,
     });
+    prisma.eventParticipant.count.mockResolvedValue(1);
+    prisma.eventParticipant.findUnique.mockResolvedValue(null);
     prisma.eventParticipant.findMany.mockImplementation((args: never) => {
       const a = args as { select?: Record<string, unknown> };
       if (a.select != null && 'userId' in a.select) {
@@ -616,19 +645,40 @@ describe('EventChatService', () => {
     const chatUpload = {
       deleteUploadedObjectsByUrls: jest.fn().mockResolvedValue(undefined),
       applySignedUrlsToMessageDto: jest.fn(async (d: unknown) => d),
+      isTrustedChatPublishedUrl: jest.fn(() => true),
     };
     const uploads = {
       signPrivateObjectKey: jest.fn().mockResolvedValue(null),
     };
-    const svc = new EventChatService(
+    const cn = new EventChatNotificationsService(
       prisma as unknown as PrismaService,
-      sse as unknown as EventChatSseService,
       dispatcher as unknown as NotificationDispatcherService,
+    );
+    const dtoInner = new EventChatMessageDtoService(
       encryption as unknown as ChatEncryptionService,
       chatUpload as never,
       uploads as never,
-      telemetry as unknown as EventChatTelemetryService,
     );
+    const listInner = new EventChatListService(
+      prisma as unknown as PrismaService,
+      telemetry as unknown as EventChatTelemetryService,
+      dtoInner,
+    );
+    const presenceInner = new EventChatPresenceService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      uploads as never,
+    );
+    const mutationsInner = new EventChatMutationsService(
+      prisma as unknown as PrismaService,
+      sse as unknown as EventChatSseService,
+      cn,
+      encryption as unknown as ChatEncryptionService,
+      chatUpload as never,
+      telemetry as unknown as EventChatTelemetryService,
+      dtoInner,
+    );
+    const svc = new EventChatService(listInner, presenceInner, mutationsInner);
 
     prisma.eventChatMessage.findMany.mockResolvedValue([
       {

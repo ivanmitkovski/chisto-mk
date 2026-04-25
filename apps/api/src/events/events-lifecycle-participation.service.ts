@@ -5,7 +5,6 @@ import {
   Injectable,
   Logger,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   CleanupEventStatus,
@@ -18,13 +17,14 @@ import {
   POINTS_EVENT_COMPLETED,
   POINTS_EVENT_JOINED,
   REASON_EVENT_COMPLETED,
+  REASON_EVENT_JOIN_LEFT,
   REASON_EVENT_JOIN_NO_SHOW,
   REASON_EVENT_JOINED,
 } from '../gamification/gamification.constants';
 import { EventChatService } from '../event-chat/event-chat.service';
 import { EcoEventPointsService } from '../gamification/eco-event-points.service';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
-import { buildEventAnalyticsPayload } from './event-analytics.aggregation';
+import { buildEventAnalyticsPayload, type CheckInsByHourPoint } from './event-analytics.aggregation';
 import { ReportsUploadService } from '../reports/reports-upload.service';
 import { PatchEventLifecycleDto } from './dto/patch-event-lifecycle.dto';
 import { PatchEventReminderDto } from './dto/patch-event-reminder.dto';
@@ -38,6 +38,11 @@ import {
 } from './events-query.include';
 import { EventsRepository } from './events.repository';
 import { isEventsStaff } from './events-auth.util';
+import {
+  eventCompletedAwardPush,
+  eventCompletedNoShowPush,
+} from '../common/i18n/event-user-notification.copy';
+import { notificationLocalesByUserId } from '../common/i18n/notification-locale.resolver';
 
 
 @Injectable()
@@ -188,16 +193,29 @@ export class EventsLifecycleParticipationService {
       },
     );
 
+    const noShowRecipients = noShowClawbacks.map((n) => n.userId);
+    const awardRecipients = completionAwards.filter((a) => a.points > 0).map((a) => a.userId);
+    const localeByUser = await notificationLocalesByUserId(this.eventsRepository.prisma, [
+      ...noShowRecipients,
+      ...awardRecipients,
+    ]);
+
     for (const { userId: recipientId, points } of noShowClawbacks) {
+      const locale = localeByUser.get(recipientId) ?? 'mk';
+      const { title, body } = eventCompletedNoShowPush(locale, updated.title);
       void this.notificationDispatcher
         .dispatchToUser(recipientId, {
-          title: 'Event completed',
-          body: `Your join bonus for "${updated.title}" was removed because no check-in was recorded.`,
+          title,
+          body,
           type: NotificationType.CLEANUP_EVENT,
           data: { eventId: id, pointsAdjusted: points },
         })
         .catch((err: unknown) => {
-          this.logger.warn(`No-show clawback notification failed for ${recipientId}`, err);
+          this.logger.warn(
+            `No-show clawback notification failed for ${recipientId}: ${
+              err instanceof Error ? err.message : String(err)
+            }`,
+          );
         });
     }
 
@@ -205,15 +223,21 @@ export class EventsLifecycleParticipationService {
       if (points <= 0) {
         continue;
       }
+      const locale = localeByUser.get(recipientId) ?? 'mk';
+      const { title, body } = eventCompletedAwardPush(locale, updated.title, points);
       void this.notificationDispatcher
         .dispatchToUser(recipientId, {
-          title: 'Event completed',
-          body: `You earned ${points} points for taking part in "${updated.title}".`,
+          title,
+          body,
           type: NotificationType.CLEANUP_EVENT,
           data: { eventId: id, pointsAwarded: points },
         })
         .catch((err: unknown) => {
-          this.logger.warn(`Completion points notification failed for ${recipientId}`, err);
+          this.logger.warn(
+            `Completion points notification failed for ${recipientId}: ${
+              err instanceof Error ? err.message : String(err)
+            }`,
+          );
         });
     }
 
@@ -280,10 +304,30 @@ export class EventsLifecycleParticipationService {
             userId: user.userId,
           },
         });
-        await tx.cleanupEvent.update({
-          where: { id },
-          data: { participantCount: { increment: 1 } },
-        });
+
+        // Prisma cannot express a single atomic UPDATE that increments `participantCount` only when
+        // it stays below `maxParticipants` (nullable cap) while returning affected-row count for
+        // race-safe join handling; interactive transaction + `$executeRaw` is required here.
+        const rowsAffected = await tx.$executeRaw(
+          Prisma.sql`
+            UPDATE "CleanupEvent"
+            SET "participantCount" = "participantCount" + 1
+            WHERE "id" = ${id}
+              AND ("maxParticipants" IS NULL OR "participantCount" < "maxParticipants")
+          `,
+        );
+        const updated =
+          typeof rowsAffected === 'bigint' ? Number(rowsAffected) : Number(rowsAffected);
+        if (updated < 1) {
+          await tx.eventParticipant.delete({
+            where: { eventId_userId: { eventId: id, userId: user.userId } },
+          });
+          throw new ConflictException({
+            code: 'EVENT_FULL',
+            message: 'This event has reached its participant limit',
+          });
+        }
+
         return this.ecoEventPoints.creditIfNew(tx, {
           userId: user.userId,
           delta: POINTS_EVENT_JOINED,
@@ -293,6 +337,9 @@ export class EventsLifecycleParticipationService {
         });
       });
     } catch (err: unknown) {
+      if (err instanceof ConflictException) {
+        throw err;
+      }
       if (
         err instanceof Prisma.PrismaClientKnownRequestError &&
         err.code === 'P2002'
@@ -367,6 +414,18 @@ export class EventsLifecycleParticipationService {
         where: { id },
         data: {
           participantCount: { decrement: 1 },
+        },
+      });
+      await this.ecoEventPoints.debitOnceIfNew(tx, {
+        userId: user.userId,
+        delta: -POINTS_EVENT_JOINED,
+        reasonCode: REASON_EVENT_JOIN_LEFT,
+        referenceType: 'CleanupEvent',
+        referenceId: `leave:${id}:${user.userId}`,
+        onlyIfPositiveGrant: {
+          reasonCode: REASON_EVENT_JOINED,
+          referenceType: 'CleanupEvent',
+          referenceId: id,
         },
       });
     });
@@ -502,28 +561,46 @@ export class EventsLifecycleParticipationService {
       throw new NotFoundException({ code: 'EVENT_NOT_FOUND', message: 'Event not found' });
     }
     if (event.organizerId !== user.userId && !isEventsStaff(user)) {
-      throw new UnauthorizedException({
+      throw new ForbiddenException({
         code: 'NOT_EVENT_ORGANIZER',
         message: 'Only the organizer can view analytics',
       });
     }
 
-    const [participants, checkIns] = await Promise.all([
+    const ANALYTICS_JOINER_SAMPLE_CAP = 5_000;
+    const [participants, checkedInCount, hourRows] = await Promise.all([
       this.eventsRepository.prisma.eventParticipant.findMany({
         where: { eventId: id },
         select: { joinedAt: true },
         orderBy: { joinedAt: 'asc' },
+        take: ANALYTICS_JOINER_SAMPLE_CAP,
       }),
-      this.eventsRepository.prisma.eventCheckIn.findMany({
-        where: { eventId: id },
-        select: { checkedInAt: true },
-      }),
+      this.eventsRepository.prisma.eventCheckIn.count({ where: { eventId: id } }),
+      this.eventsRepository.prisma.$queryRaw<Array<{ hour: number; count: bigint }>>(
+        Prisma.sql`
+          SELECT (EXTRACT(HOUR FROM "checkedInAt" AT TIME ZONE 'UTC'))::int AS hour,
+                 COUNT(*)::bigint AS count
+          FROM "EventCheckIn"
+          WHERE "eventId" = ${id}
+          GROUP BY 1
+        `,
+      ),
     ]);
+
+    const hourCounts = Array.from({ length: 24 }, () => 0);
+    for (const row of hourRows) {
+      if (row.hour >= 0 && row.hour < 24) {
+        hourCounts[row.hour] = Number(row.count);
+      }
+    }
+    const checkInsByHour: CheckInsByHourPoint[] = hourCounts.map((count, hour) => ({ hour, count }));
 
     return buildEventAnalyticsPayload({
       participantCount: event.participantCount,
       participantsJoinedAt: participants.map((p) => p.joinedAt),
-      checkInsCheckedAt: checkIns.map((c) => c.checkedInAt),
+      checkInsCheckedAt: [],
+      checkedInCountOverride: checkedInCount,
+      checkInsByHourOverride: checkInsByHour,
     });
   }
 }

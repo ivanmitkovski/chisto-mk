@@ -4682,6 +4682,26 @@ class AppLocalizationsEn extends AppLocalizations {
       'Event details are unavailable right now.';
 
   @override
+  String get homeSiteCleaningListLoadError =>
+      'Could not load events. Check your connection and try again.';
+
+  @override
+  String get homeSiteCleaningRetry => 'Retry';
+
+  @override
+  String get eventsDistanceLessThan100m => '<100 m';
+
+  @override
+  String eventsDistanceMeters(int meters) {
+    return '$meters m';
+  }
+
+  @override
+  String eventsDistanceKilometers(String km) {
+    return '$km km';
+  }
+
+  @override
   String get errorUserNetwork => 'Check your connection and try again.';
 
   @override
