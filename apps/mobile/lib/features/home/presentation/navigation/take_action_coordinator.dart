@@ -1,53 +1,82 @@
+import 'dart:async';
+
+import 'package:chisto_mobile/core/config/app_config.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
 import 'package:chisto_mobile/features/events/presentation/navigation/events_navigation.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
+import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/navigation/site_share_result.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/share_sheet.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/take_action/donate_sheet.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/utils/share_popover_origin.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 
+SiteShareLinkPayload fallbackShareLinkPayloadForSite(
+  PollutionSite site, {
+  required String channel,
+}) {
+  final String base = AppConfig.shareBaseUrlFromEnvironment;
+  final String url = '$base/sites/${site.id}';
+  return SiteShareLinkPayload(
+    siteId: site.id,
+    cid: '',
+    url: url,
+    token: '',
+    channel: channel,
+    expiresAt: DateTime.now().toUtc().add(const Duration(days: 7)),
+  );
+}
+
 class TakeActionCoordinator {
   const TakeActionCoordinator._();
+  static final Set<String> _inFlightActionKeys = <String>{};
 
-  static Future<bool> execute(
+  static Future<TakeActionCoordinatorOutcome> execute(
     BuildContext context, {
     required TakeActionType action,
     required PollutionSite site,
-    VoidCallback? onShareCountChanged,
     bool isFromSiteDetail = false,
     VoidCallback? onSwitchToCleaningTab,
   }) async {
-    switch (action) {
-      case TakeActionType.createEcoAction:
-        await _handleCreateEcoAction(context, site: site);
-        return false;
-      case TakeActionType.joinAction:
-        await _handleJoinAction(
-          context,
-          site: site,
-          isFromSiteDetail: isFromSiteDetail,
-          onSwitchToCleaningTab: onSwitchToCleaningTab,
-        );
-        return false;
-      case TakeActionType.donateContribute:
-        await _handleDonate(context, site: site);
-        return false;
-      case TakeActionType.shareSite:
-        return _handleShareSite(
-          context,
-          site: site,
-          onShareCountChanged: onShareCountChanged,
-        );
+    final String actionKey = '${site.id}:${action.name}';
+    if (_inFlightActionKeys.contains(actionKey)) {
+      if (action == TakeActionType.shareSite) {
+        return const TakeActionCoordinatorShareOutcome(SiteShareCancelled());
+      }
+      return const TakeActionCoordinatorFinished();
+    }
+    _inFlightActionKeys.add(actionKey);
+    try {
+      switch (action) {
+        case TakeActionType.createEcoAction:
+          await _handleCreateEcoAction(context, site: site);
+          return const TakeActionCoordinatorFinished();
+        case TakeActionType.joinAction:
+          await _handleJoinAction(
+            context,
+            site: site,
+            isFromSiteDetail: isFromSiteDetail,
+            onSwitchToCleaningTab: onSwitchToCleaningTab,
+          );
+          return const TakeActionCoordinatorFinished();
+        case TakeActionType.donateContribute:
+          // Donate is intentionally disabled for this release.
+          return const TakeActionCoordinatorFinished();
+        case TakeActionType.shareSite:
+          final SiteShareResult share = await _handleShareSite(context, site: site);
+          return TakeActionCoordinatorShareOutcome(share);
+      }
+    } finally {
+      _inFlightActionKeys.remove(actionKey);
     }
   }
 
@@ -55,16 +84,29 @@ class TakeActionCoordinator {
     BuildContext context, {
     required PollutionSite site,
   }) async {
-    AppHaptics.softTransition();
-    final EcoEvent? created = await EventsNavigation.openCreate(
-      context,
-      preselectedSiteId: site.id,
-      preselectedSiteName: site.title,
-      preselectedSiteImageUrl: 'assets/images/references/onboarding_reference.png',
-      preselectedSiteDistanceKm: site.distanceKm,
-    );
-    if (created != null && context.mounted) {
-      await EventsNavigation.openDetail(context, eventId: created.id);
+    try {
+      AppHaptics.softTransition();
+      final EcoEvent? created = await EventsNavigation.openCreate(
+        context,
+        preselectedSiteId: site.id,
+        preselectedSiteName: site.title,
+        preselectedSiteImageUrl:
+            site.primaryImageUrl != null && site.primaryImageUrl!.trim().isNotEmpty
+                ? site.primaryImageUrl!.trim()
+                : null,
+        preselectedSiteDistanceKm: site.distanceKm,
+      );
+      if (created != null && context.mounted) {
+        await EventsNavigation.openDetail(context, eventId: created.id);
+      }
+    } catch (_) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsOfflineSyncFailed,
+          type: AppSnackType.warning,
+        );
+      }
     }
   }
 
@@ -74,50 +116,66 @@ class TakeActionCoordinator {
     required bool isFromSiteDetail,
     VoidCallback? onSwitchToCleaningTab,
   }) async {
-    AppHaptics.softTransition();
-    if (isFromSiteDetail && onSwitchToCleaningTab != null) {
-      onSwitchToCleaningTab();
-    } else if (!isFromSiteDetail) {
-      await Navigator.of(context).push<void>(
-        MaterialPageRoute<void>(
-          builder: (_) => PollutionSiteDetailScreen(
-            site: site,
-            initialTabIndex: 1,
+    try {
+      AppHaptics.softTransition();
+      if (isFromSiteDetail) {
+        if (onSwitchToCleaningTab != null) {
+          onSwitchToCleaningTab();
+          return;
+        }
+      }
+      if (!isFromSiteDetail || onSwitchToCleaningTab == null) {
+        await Navigator.of(context).push<void>(
+          MaterialPageRoute<void>(
+            builder: (_) => PollutionSiteDetailScreen(
+              site: site,
+              initialTabIndex: 1,
+            ),
           ),
-        ),
-      );
+        );
+      }
+    } catch (_) {
+      if (context.mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.eventsOfflineSyncFailed,
+          type: AppSnackType.warning,
+        );
+      }
     }
   }
 
-  static Future<void> _handleDonate(
-    BuildContext context, {
-    required PollutionSite site,
+  static Future<SiteShareLinkPayload> _issueSiteShareLink(
+    PollutionSite site, {
+    required String channel,
   }) async {
-    final DonateOption? option = await DonateSheet.show(context, siteTitle: site.title);
-    if (option == null || !context.mounted) return;
-    await _launchDonateUrl(context);
-  }
-
-  static Future<void> _launchDonateUrl(BuildContext context) async {
-    const String url = 'https://chisto.mk/donate';
-    final bool ok = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
-    if (!ok && context.mounted) {
-      AppSnack.show(
-        context,
-        message: context.l10n.takeActionDonationOpenFailed,
-        type: AppSnackType.warning,
-      );
+    try {
+      final SiteShareLinkPayload issued = await ServiceLocator
+          .instance.sitesRepository
+          .issueSiteShareLink(site.id, channel: channel);
+      if (issued.url.trim().isNotEmpty) {
+        return issued;
+      }
+    } catch (_) {
+      // Fall through to deterministic non-signed URL in offline/error states.
     }
+    return fallbackShareLinkPayloadForSite(site, channel: channel);
   }
 
-  static Future<bool> _handleShareSite(
+  static Future<SiteShareResult> _handleShareSite(
     BuildContext context, {
     required PollutionSite site,
-    VoidCallback? onShareCountChanged,
   }) async {
     AppHaptics.tap();
+    final SiteShareLinkPayload previewIssued =
+        await _issueSiteShareLink(site, channel: 'native');
+    if (!context.mounted) {
+      return const SiteShareCancelled();
+    }
+    final String siteUrl = previewIssued.url;
     final ShareAction? action = await showModalBottomSheet<ShareAction>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: false,
       isDismissible: true,
       enableDrag: true,
@@ -127,43 +185,71 @@ class TakeActionCoordinator {
       builder: (BuildContext sheetContext) => ShareSheet(
         title: sheetContext.l10n.takeActionShareSiteTitle,
         subtitle: sheetContext.l10n.takeActionShareSiteSubtitle,
+        siteTitle: site.title,
+        shareUrl: siteUrl,
+        siteImageUrl: site.primaryImageUrl,
       ),
     );
-    if (action == null || !context.mounted) return false;
-    const String baseUrl = 'https://chisto.mk';
-    final String siteUrl = '$baseUrl/sites/${site.id}';
-    final String text = '${site.title}\n${site.description}\n\n$siteUrl';
+    if (action == null || !context.mounted) {
+      return const SiteShareCancelled();
+    }
     switch (action) {
       case ShareAction.copyLink:
-        await Clipboard.setData(ClipboardData(text: siteUrl));
+        final SiteShareLinkPayload issued =
+            await _issueSiteShareLink(site, channel: 'link');
+        await Clipboard.setData(ClipboardData(text: issued.url));
         if (context.mounted) {
           AppSnack.show(
             context,
             message: context.l10n.takeActionLinkCopied,
             type: AppSnackType.success,
           );
+          AppHaptics.success(context);
         }
-        onShareCountChanged?.call();
-        return true;
+        try {
+          final EngagementSnapshot snapshot =
+              await ServiceLocator.instance.sitesRepository.shareSite(site.id, channel: 'link');
+          return SiteShareSuccess(snapshot);
+        } catch (_) {
+          if (context.mounted) {
+            AppSnack.show(
+              context,
+              message: context.l10n.siteCardShareTrackFailedSnack,
+              type: AppSnackType.warning,
+            );
+          }
+          return const SiteShareTrackFailed();
+        }
       case ShareAction.sendMessage:
+        final SiteShareLinkPayload issued =
+            await _issueSiteShareLink(site, channel: 'native');
+        if (!context.mounted) {
+          return const SiteShareCancelled();
+        }
+        final String textWithSignedUrl = '${site.title}\n${site.description}\n\n${issued.url}';
         await Share.share(
-          text,
+          textWithSignedUrl,
           subject: site.title,
           sharePositionOrigin: sharePopoverOrigin(context),
         );
-        // share_plus v10 does not expose a reliable completion status for this path.
-        // To avoid false-positive counters, we do not increment here.
-        return false;
-      case ShareAction.shareProfile:
-        if (context.mounted) {
-          AppSnack.show(
-            context,
-            message: context.l10n.takeActionSharedToProfile,
-            type: AppSnackType.success,
-          );
+        if (!context.mounted) {
+          return const SiteShareCancelled();
         }
-        onShareCountChanged?.call();
-        return true;
+        AppHaptics.success(context);
+        try {
+          final EngagementSnapshot snapshot =
+              await ServiceLocator.instance.sitesRepository.shareSite(site.id, channel: 'native');
+          return SiteShareSuccess(snapshot);
+        } catch (_) {
+          if (context.mounted) {
+            AppSnack.show(
+              context,
+              message: context.l10n.siteCardShareTrackFailedSnack,
+              type: AppSnackType.warning,
+            );
+          }
+          return const SiteShareTrackFailed();
+        }
     }
   }
 }

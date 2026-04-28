@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -41,7 +42,7 @@ class SiteInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
-                  'Community action needed',
+                  context.l10n.siteDetailInfoCardTitle,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppColors.textPrimary,
@@ -50,7 +51,7 @@ class SiteInfoCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
-                  'Join a cleanup, report changes, or help spread the word so we can act faster.',
+                  context.l10n.siteDetailInfoCardBody,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         height: 1.4,
                       ),

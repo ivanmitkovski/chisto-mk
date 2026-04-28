@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
@@ -29,13 +30,19 @@ class FirstReportModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<GalleryImageItem> galleryItems = report.images.asMap().entries.map(
-      (MapEntry<int, ImageProvider> e) => GalleryImageItem(
-        image: e.value,
-        heroTag: 'first-report-${report.id}-${e.key}',
-        semanticLabel: context.l10n.semanticsReportPhotoNumber(e.key + 1),
-      ),
-    ).toList();
+    final List<ImageProvider> galleryProviders =
+        siteReportGalleryImageProviders(report);
+    final List<GalleryImageItem> galleryItems = galleryProviders
+        .asMap()
+        .entries
+        .map(
+          (MapEntry<int, ImageProvider> e) => GalleryImageItem(
+            image: e.value,
+            heroTag: 'first-report-${report.id}-${e.key}',
+            semanticLabel: context.l10n.semanticsReportPhotoNumber(e.key + 1),
+          ),
+        )
+        .toList();
 
     return DraggableScrollableSheet(
       initialChildSize: 0.75,

@@ -768,9 +768,11 @@
     }
   },
   "feedRetryLoadingMore": "Обиди повторно да вчиташ повеќе",
+  "feedLoadingMoreSemantic": "Се вчитуваат повеќе објави во фидот",
   "feedShowAllSites": "Прикажи ги сите локации",
   "feedPullToRefreshSemantic": "Повлечи за освежување",
   "feedLoadMoreFailedSnack": "Не можеше да се вчитаат повеќе објави. Допрете за обид.",
+  "feedRefreshStaleSnack": "Не можеше да се освежи листата. Се прикажува последно вчитаната.",
   "feedScrollToTopSemantic": "Скролувај на врв на фидот",
   "mapResetFiltersSemantic": "Ресетирај филтри",
   "mapOpenMapsFailed": "Не можеше да се отвори Maps",
@@ -1690,7 +1692,29 @@
   "takeActionShareSiteTitle": "Сподели локација",
   "takeActionShareSiteSubtitle": "Помогни други да ја откријат и поддржат",
   "takeActionLinkCopied": "Линкот е копиран",
-  "takeActionSharedToProfile": "Споделено на вашиот профил",
+  "takeActionSheetTitle": "Преземи акција",
+  "takeActionSheetSubtitle": "Избери како сакаш да помогнеш",
+  "takeActionCreateEcoTitle": "Креирај еко акција",
+  "takeActionCreateEcoSubtitle": "Закажи акција за чистење на оваа локација",
+  "takeActionJoinTitle": "Приклучи се",
+  "takeActionJoinSubtitle": "Пронајди и приклучи се на претстојни чистења",
+  "takeActionShareTitle": "Сподели ја локацијата",
+  "takeActionShareSubtitle": "Помогни и други да ја откријат оваа локација",
+  "shareSheetSemanticDragHandle": "Влечи за да го промениш големината или да го затвориш",
+  "shareSheetCopyLinkTitle": "Копирај линк",
+  "shareSheetCopyLinkSubtitle": "Копирај го линкот до локацијата во клипборд",
+  "shareSheetCopyLinkSemantic": "Копирај линк до оваа локација со загадување",
+  "shareSheetSendTitle": "Испрати на луѓе",
+  "shareSheetSendSubtitle": "Сподели во пораки или друга апликација",
+  "shareSheetSendSemantic": "Отвори листа за споделување за да ја испратиш оваа локација",
+  "siteDetailSemanticShareCount": "{count} споделувања на оваа локација",
+  "@siteDetailSemanticShareCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteDetailThankYouReportSnack": "Ви благодариме. Вашата пријава ни помага.",
   "siteDetailUpvoteFailedSnack": "Не можеше да се ажурира поддршката. Обидете се повторно.",
   "siteDetailNoUpvotesSnack": "Сè уште нема поддршка. Бидете први!",
@@ -1747,6 +1771,52 @@
   "siteCardDuplicateTitle": "Дупликат",
   "siteCardMisleadingTitle": "Воведувачки",
   "siteCardHidePostTitle": "Сокриј ја објавата",
+  "feedSiteCommentsAppBarFallback": "Коментари",
+  "feedSiteNotFoundMessage": "Ова место не е пронајдено.",
+  "feedDisplayNameFallback": "Ти",
+  "feedOpenProfileSemantics": "Отвори профил",
+  "feedGreetingPrefix": "Здраво, ",
+  "feedGreetingFallbackName": "таму",
+  "feedHeaderSubtitle": "Истражи локации со загадување во близина",
+  "feedNotificationBellAllReadSemantic": "Известувања, сè е прочитано",
+  "feedNotificationBellUnreadSemantic": "Известувања, {count} непрочитани",
+  "@feedNotificationBellUnreadSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailTabPollutionSite": "Локација со загадување",
+  "siteDetailTabCleaningEvents": "Акции за чистење",
+  "siteDetailInfoCardTitle": "Потребна е акција од заедницата",
+  "siteDetailInfoCardBody": "Приклучи се на чистење, пријави промени или сподели за да реагираме побрзо.",
+  "siteDetailReportedByPrefix": "Пријавено од ",
+  "siteDetailCoReportersTitle": "Ко-пријавувачи",
+  "siteDetailCoReportersSubtitle": "{count, plural, one{Уште 1 лице го пријави ова место} other{Уште {count} лица го пријавија ова место}}",
+  "@siteDetailCoReportersSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailGalleryPhotoSemantic": "Фотографија од локацијата {index}",
+  "@siteDetailGalleryPhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailOpenGalleryLabel": "Отвори галерија за локацијата",
+  "siteDetailGalleryTapToExpand": "Допрете за проширување",
+  "siteDetailGalleryOpenPhoto": "Отвори фотографија",
+  "commonNotAvailable": "—",
+  "commonDistanceMetersUnit": "м",
+  "commonDistanceKilometersUnit": "км",
+  "siteCommentsEmptyBody": "Сè уште нема коментари.\nБиди прв/а што ќе коментира.",
+  "feedCommentsLoadMoreFailedSnack": "Не можеше да се вчитаат повеќе коментари. Обиди се повторно.",
   "commentsSheetTitle": "Акции за коментар",
   "commentsSheetSubtitle": "Управувај со коментарот",
   "commentsEditTitle": "Уреди коментар",
@@ -1755,6 +1825,7 @@
   "commentsDeleteSubtitle": "Отстрани го од нишката",
   "commentsEditFailedSnack": "Не можеше да се уреди коментарот.",
   "commentsReplyFailedSnack": "Не можеше да се испрати одговорот.",
+  "commentsSortFailedSnack": "Не можеше да се смени редоследот на коментарите. Обидете се повторно.",
   "commentsDeletedSnack": "Коментарот е избришан.",
   "commentsDeleteFailedSnack": "Не можеше да се избрише коментарот.",
   "commentsLikeFailedSnack": "Не можеше да се ажурира допаѓањето.",
@@ -1768,6 +1839,199 @@
       }
     }
   },
+  "commentsReplyButton": "Одговори",
+  "commentsViewReplies": "Види одговори",
+  "commentsLoadMoreReplies": "Вчитај уште {count}",
+  "@commentsLoadMoreReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteEngagementQueuedOfflineSnack": "Врската прекина. Ќе пробаме повторно кога повторно ќе бидете онлајн.",
+  "commentsHideReplies": "Сокриј одговори",
+  "commentsStatusDeleting": "Се брише…",
+  "commentsStatusSavingEdits": "Се зачувуваат измените…",
+  "commentsCommentMetaJustNow": "Штотуку",
+  "commentsCommentMetaJustNowWithLikes": "{count, plural, one{Штотуку • 1 допаѓање} other{Штотуку • {count} допаѓања}}",
+  "@commentsCommentMetaJustNowWithLikes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgo": "{minutes, plural, one{пред 1 минута} other{пред {minutes} минути}}",
+  "@commentsCommentMetaMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgoWithLikes": "{minutes, plural, one{пред 1 минута} other{пред {minutes} минути}} • {count, plural, one{1 допаѓање} other{{count} допаѓања}}",
+  "@commentsCommentMetaMinutesAgoWithLikes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgo": "{hours, plural, one{пред 1 час} other{пред {hours} часа}}",
+  "@commentsCommentMetaHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgoWithLikes": "{hours, plural, one{пред 1 час} other{пред {hours} часа}} • {count, plural, one{1 допаѓање} other{{count} допаѓања}}",
+  "@commentsCommentMetaHoursAgoWithLikes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgo": "{days, plural, one{пред 1 ден} other{пред {days} дена}}",
+  "@commentsCommentMetaDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgoWithLikes": "{days, plural, one{пред 1 ден} other{пред {days} дена}} • {count, plural, one{1 допаѓање} other{{count} допаѓања}}",
+  "@commentsCommentMetaDaysAgoWithLikes": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDate": "{date}",
+  "@commentsCommentMetaDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsCommentMetaDateWithLikes": "{date} • {count, plural, one{1 допаѓање} other{{count} допаѓања}}",
+  "@commentsCommentMetaDateWithLikes": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsOptimisticAuthorYou": "Вие",
+  "commentsReplyingToBanner": "Одговарате на {name}",
+  "@commentsReplyingToBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticSheetDragHandle": "Променете ја големината или затворете ги коментарите",
+  "commentsPrefetchCouldNotRefreshSnack": "Не можевме да ги освежиме коментарите. Се прикажува последниот вчитан разговор.",
+  "commentsComposerCharsRemaining": "{remaining, plural, one{останува 1 знак} other{остануваат {remaining} знаци}}",
+  "@commentsComposerCharsRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsSemanticHideReplies": "Сокриј ги одговорите за {name}",
+  "@commentsSemanticHideReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticViewReplies": "Види ги одговорите за {name}",
+  "@commentsSemanticViewReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsInputHintEdit": "Уреди го коментарот…",
+  "commentsInputHintAdd": "Додај коментар…",
+  "commentsInputHintReply": "Напиши одговор…",
+  "commentsLikeTooltip": "Допаѓање на коментар",
+  "commentsUnlikeTooltip": "Отстрани допаѓање",
+  "feedPollutionFeedTitle": "Фид на загадување",
+  "feedOfflineBanner": "Нема интернет. Се прикажува последниот вчитан фид.",
+  "feedCaughtUpTitle": "Сè е видено",
+  "feedCaughtUpSubtitle": "Повлечи за освежување за нови пријави",
+  "feedMoreFiltersTooltip": "Повеќе филтри",
+  "feedFilterSemantic": "Филтер {name}",
+  "@feedFilterSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedEmptyAllTitle": "Сè уште нема локации за загадување",
+  "feedEmptyAllHint": "Повлечи за освежување или провери подоцна",
+  "feedEmptyUrgentTitle": "Моментално нема итни локации",
+  "feedEmptyUrgentHint": "Прикажи ги сите или пробај друг филтер",
+  "feedEmptyNearbyTitleOnline": "Нема локации во близина",
+  "feedEmptyNearbyTitleOffline": "Вклучи локација за локации во близина",
+  "feedEmptyNearbyHintOffline": "Вклучи услуги за локација и дозволи пристап",
+  "feedEmptyNearbyHintOnline": "Прикажи ги сите или пробај друг филтер",
+  "feedEmptyMostVotedTitle": "Сè уште нема гласови за локации",
+  "feedEmptyMostVotedHint": "Прикажи ги сите или пробај друг филтер",
+  "feedEmptyRecentTitle": "Нема неодамнешни пријави",
+  "feedEmptyRecentHint": "Прикажи ги сите или пробај друг филтер",
+  "feedEmptySavedTitle": "Сè уште немаш зачувани локации",
+  "feedEmptySavedHint": "Зачувај локации од менито за да ги најдеш тука",
+  "feedFilterAllName": "Сите",
+  "feedFilterAllDesc": "Избалансиран фид",
+  "feedFilterUrgentName": "Итно",
+  "feedFilterUrgentDesc": "Најважните инциденти први",
+  "feedFilterNearbyName": "Во близина",
+  "feedFilterNearbyDesc": "Најблиски пријави околу тебе",
+  "feedFilterMostVotedName": "Најподдржани",
+  "feedFilterMostVotedDesc": "Најмногу поддршка од заедницата",
+  "feedFilterRecentName": "Неодамнешни",
+  "feedFilterRecentDesc": "Најнови пријави први",
+  "feedFilterSavedName": "Зачувани",
+  "feedFilterSavedDesc": "Локации што си ги зачувал",
+  "feedFiltersSheetTitle": "Филтри на фидот",
+  "feedFiltersSheetSubtitle": "Избери како сакаш да прелистуваш пријави",
+  "commentsFeedHeaderTitle": "Коментари",
+  "commentsSortTop": "Најдобри",
+  "commentsSortNew": "Најнови",
+  "commentsEditingBanner": "Уредување на коментар",
+  "commentsBodyTooLong": "Коментарот е предолг (максимум 2000 знаци).",
+  "commentsReplyTargetFallback": "коментар",
+  "reportIssueSheetTitle": "Пријави проблем",
+  "reportIssueSubmitting": "Се испраќа...",
+  "reportIssueSubmit": "Испрати пријава",
+  "reportIssueFailedSnack": "Не можеше да се испрати пријавата. Обиди се повторно.",
+  "reportIssueSheetSubtitle": "Помогни ни да се подобриме. Зошто ја пријавуваш оваа локација?",
+  "reportIssueDetailsLabel": "Дополнителни детали (незадолжително)",
+  "reportIssueDetailsHint": "Опиши го проблемот…",
   "searchModalCancel": "Откажи",
   "appSmartImageRetry": "Обиди повторно",
   "appSmartImageRetryIn": "Обид повторно за {seconds} с",
@@ -2276,6 +2540,130 @@
   "@siteCardPhotoSemantic": {
     "placeholders": {
       "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardGalleryPhotoSemantic": "Фотографија {number} од {siteTitle}",
+  "@siteCardGalleryPhotoSemantic": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "siteTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticRemoveUpvote": "Отстрани поддршка за {title}",
+  "@siteCardSemanticRemoveUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUpvote": "Поддржи {title}",
+  "@siteCardSemanticUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteUpvoteLongPressOpensSupporters": "Долго притисни за листа на поддржувачи",
+  "siteCardSemanticUpvotesOpenSupporters": "{count} поддршки на {title}. Допри за поддржувачи",
+  "@siteCardSemanticUpvotesOpenSupporters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticCommentsOnSite": "{count} коментари на {title}",
+  "@siteCardSemanticCommentsOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSharesOnSite": "{count} споделувања на {title}",
+  "@siteCardSemanticSharesOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSaveSite": "Зачувај {title} и добивај ажурирања",
+  "@siteCardSemanticSaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUnsaveSite": "Отстрани {title} од зачувани",
+  "@siteCardSemanticUnsaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSaveUpdatesOnSnack": "Ќе добиваш ажурирања за оваа локација",
+  "siteCardSaveRemovedSnack": "Отстрането од зачуваните локации",
+  "siteCardFeedbackPostHiddenSnack": "Објавата е сокриена од твојот фид",
+  "siteCardFeedbackThanksSnack": "Ти благодариме за повратната информација",
+  "siteCardFeedOptionsSheetTitle": "Опции на фидот",
+  "siteCardFeedOptionsSheetSubtitle": "Прилагоди што сакаш да гледаш",
+  "siteCardEngagementSignInRequired": "Најави се за да поддржуваш или зачувуваш локации.",
+  "siteCardEngagementWaitBriefly": "Почекај малку пред повторен обид.",
+  "siteCardRateLimitedSnack": "Премногу акции. Обиди се повторно за {seconds} секунди.",
+  "@siteCardRateLimitedSnack": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailSaveAddedSnack": "Локацијата е зачувана.",
+  "siteDetailSaveRemovedSnack": "Отстранета од зачуваните.",
+  "siteQuickActionSaveSiteLabel": "Зачувај локација",
+  "siteQuickActionSavedLabel": "Зачувано",
+  "siteQuickActionReportIssueLabel": "Пријави проблем",
+  "siteQuickActionReportedLabel": "Пријавено",
+  "siteQuickActionShareLabel": "Сподели",
+  "siteCardDistanceMeters": "{meters} м",
+  "@siteCardDistanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "siteCardDistanceKmShort": "{km} км",
+  "@siteCardDistanceKmShort": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardDistanceKmWhole": "{km} км",
+  "@siteCardDistanceKmWhole": {
+    "placeholders": {
+      "km": {
         "type": "String"
       }
     }

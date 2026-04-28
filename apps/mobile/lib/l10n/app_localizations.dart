@@ -2512,6 +2512,12 @@ abstract class AppLocalizations {
   /// **'Retry loading more'**
   String get feedRetryLoadingMore;
 
+  /// No description provided for @feedLoadingMoreSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading more feed posts'**
+  String get feedLoadingMoreSemantic;
+
   /// No description provided for @feedShowAllSites.
   ///
   /// In en, this message translates to:
@@ -2530,11 +2536,299 @@ abstract class AppLocalizations {
   /// **'Could not load more posts. Tap retry.'**
   String get feedLoadMoreFailedSnack;
 
+  /// No description provided for @feedRefreshStaleSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh. Showing the last loaded feed.'**
+  String get feedRefreshStaleSnack;
+
   /// No description provided for @feedScrollToTopSemantic.
   ///
   /// In en, this message translates to:
   /// **'Scroll feed to top'**
   String get feedScrollToTopSemantic;
+
+  /// No description provided for @feedPollutionFeedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pollution feed'**
+  String get feedPollutionFeedTitle;
+
+  /// No description provided for @feedOfflineBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re offline. Showing the last loaded feed.'**
+  String get feedOfflineBanner;
+
+  /// No description provided for @feedCaughtUpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all caught up'**
+  String get feedCaughtUpTitle;
+
+  /// No description provided for @feedCaughtUpSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull to refresh for new reports'**
+  String get feedCaughtUpSubtitle;
+
+  /// No description provided for @feedMoreFiltersTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'More filters'**
+  String get feedMoreFiltersTooltip;
+
+  /// No description provided for @feedFilterSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} filter'**
+  String feedFilterSemantic(String name);
+
+  /// No description provided for @feedEmptyAllTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No pollution sites yet'**
+  String get feedEmptyAllTitle;
+
+  /// No description provided for @feedEmptyAllHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull to refresh or check back later'**
+  String get feedEmptyAllHint;
+
+  /// No description provided for @feedEmptyUrgentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No urgent sites right now'**
+  String get feedEmptyUrgentTitle;
+
+  /// No description provided for @feedEmptyUrgentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sites or try another filter'**
+  String get feedEmptyUrgentHint;
+
+  /// No description provided for @feedEmptyNearbyTitleOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'No nearby sites found'**
+  String get feedEmptyNearbyTitleOnline;
+
+  /// No description provided for @feedEmptyNearbyTitleOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable location to see nearby sites'**
+  String get feedEmptyNearbyTitleOffline;
+
+  /// No description provided for @feedEmptyNearbyHintOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on location services and allow access'**
+  String get feedEmptyNearbyHintOffline;
+
+  /// No description provided for @feedEmptyNearbyHintOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sites or try another filter'**
+  String get feedEmptyNearbyHintOnline;
+
+  /// No description provided for @feedEmptyMostVotedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No sites have been voted yet'**
+  String get feedEmptyMostVotedTitle;
+
+  /// No description provided for @feedEmptyMostVotedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sites or try another filter'**
+  String get feedEmptyMostVotedHint;
+
+  /// No description provided for @feedEmptyRecentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent reports'**
+  String get feedEmptyRecentTitle;
+
+  /// No description provided for @feedEmptyRecentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all sites or try another filter'**
+  String get feedEmptyRecentHint;
+
+  /// No description provided for @feedEmptySavedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved sites yet'**
+  String get feedEmptySavedTitle;
+
+  /// No description provided for @feedEmptySavedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Save sites from the menu to find them here'**
+  String get feedEmptySavedHint;
+
+  /// No description provided for @feedFilterAllName.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get feedFilterAllName;
+
+  /// No description provided for @feedFilterAllDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced feed ranking'**
+  String get feedFilterAllDesc;
+
+  /// No description provided for @feedFilterUrgentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Urgent'**
+  String get feedFilterUrgentName;
+
+  /// No description provided for @feedFilterUrgentDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'High-priority incidents first'**
+  String get feedFilterUrgentDesc;
+
+  /// No description provided for @feedFilterNearbyName.
+  ///
+  /// In en, this message translates to:
+  /// **'Nearby'**
+  String get feedFilterNearbyName;
+
+  /// No description provided for @feedFilterNearbyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Closest reports around you'**
+  String get feedFilterNearbyDesc;
+
+  /// No description provided for @feedFilterMostVotedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Top support'**
+  String get feedFilterMostVotedName;
+
+  /// No description provided for @feedFilterMostVotedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Most community-backed'**
+  String get feedFilterMostVotedDesc;
+
+  /// No description provided for @feedFilterRecentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get feedFilterRecentName;
+
+  /// No description provided for @feedFilterRecentDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest reports first'**
+  String get feedFilterRecentDesc;
+
+  /// No description provided for @feedFilterSavedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get feedFilterSavedName;
+
+  /// No description provided for @feedFilterSavedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Sites you bookmarked'**
+  String get feedFilterSavedDesc;
+
+  /// No description provided for @feedFiltersSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed filters'**
+  String get feedFiltersSheetTitle;
+
+  /// No description provided for @feedFiltersSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to browse reports'**
+  String get feedFiltersSheetSubtitle;
+
+  /// No description provided for @commentsFeedHeaderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get commentsFeedHeaderTitle;
+
+  /// No description provided for @commentsSortTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Top'**
+  String get commentsSortTop;
+
+  /// No description provided for @commentsSortNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get commentsSortNew;
+
+  /// No description provided for @commentsEditingBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Editing comment'**
+  String get commentsEditingBanner;
+
+  /// No description provided for @commentsBodyTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment is too long (max 2000 characters).'**
+  String get commentsBodyTooLong;
+
+  /// No description provided for @commentsReplyTargetFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'comment'**
+  String get commentsReplyTargetFallback;
+
+  /// No description provided for @reportIssueSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issue'**
+  String get reportIssueSheetTitle;
+
+  /// No description provided for @reportIssueSubmitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting...'**
+  String get reportIssueSubmitting;
+
+  /// No description provided for @reportIssueSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit report'**
+  String get reportIssueSubmit;
+
+  /// No description provided for @reportIssueFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not send report. Try again.'**
+  String get reportIssueFailedSnack;
+
+  /// No description provided for @reportIssueSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help us improve. Why are you reporting this site?'**
+  String get reportIssueSheetSubtitle;
+
+  /// No description provided for @reportIssueDetailsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional details (optional)'**
+  String get reportIssueDetailsLabel;
+
+  /// No description provided for @reportIssueDetailsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe the issue…'**
+  String get reportIssueDetailsHint;
 
   /// No description provided for @mapResetFiltersSemantic.
   ///
@@ -5698,11 +5992,101 @@ abstract class AppLocalizations {
   /// **'Link copied'**
   String get takeActionLinkCopied;
 
-  /// No description provided for @takeActionSharedToProfile.
+  /// No description provided for @takeActionSheetTitle.
   ///
   /// In en, this message translates to:
-  /// **'Shared to your profile'**
-  String get takeActionSharedToProfile;
+  /// **'Take action'**
+  String get takeActionSheetTitle;
+
+  /// No description provided for @takeActionSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how you want to help'**
+  String get takeActionSheetSubtitle;
+
+  /// No description provided for @takeActionCreateEcoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create eco action'**
+  String get takeActionCreateEcoTitle;
+
+  /// No description provided for @takeActionCreateEcoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule a cleanup event at this site'**
+  String get takeActionCreateEcoSubtitle;
+
+  /// No description provided for @takeActionJoinTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Join action'**
+  String get takeActionJoinTitle;
+
+  /// No description provided for @takeActionJoinSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Find and join upcoming cleanups here'**
+  String get takeActionJoinSubtitle;
+
+  /// No description provided for @takeActionShareTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share site'**
+  String get takeActionShareTitle;
+
+  /// No description provided for @takeActionShareSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help others discover this site'**
+  String get takeActionShareSubtitle;
+
+  /// No description provided for @shareSheetSemanticDragHandle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to resize or dismiss'**
+  String get shareSheetSemanticDragHandle;
+
+  /// No description provided for @shareSheetCopyLinkTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link'**
+  String get shareSheetCopyLinkTitle;
+
+  /// No description provided for @shareSheetCopyLinkSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the site link to the clipboard'**
+  String get shareSheetCopyLinkSubtitle;
+
+  /// No description provided for @shareSheetCopyLinkSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy link to this pollution site'**
+  String get shareSheetCopyLinkSemantic;
+
+  /// No description provided for @shareSheetSendTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Send to people'**
+  String get shareSheetSendTitle;
+
+  /// No description provided for @shareSheetSendSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Share in messages or another app'**
+  String get shareSheetSendSubtitle;
+
+  /// No description provided for @shareSheetSendSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the share sheet to send this site'**
+  String get shareSheetSendSemantic;
+
+  /// No description provided for @siteDetailSemanticShareCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} shares on this site'**
+  String siteDetailSemanticShareCount(int count);
 
   /// No description provided for @siteDetailThankYouReportSnack.
   ///
@@ -5872,6 +6256,156 @@ abstract class AppLocalizations {
   /// **'Hide this post'**
   String get siteCardHidePostTitle;
 
+  /// No description provided for @feedSiteCommentsAppBarFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get feedSiteCommentsAppBarFallback;
+
+  /// No description provided for @feedSiteNotFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This site could not be found.'**
+  String get feedSiteNotFoundMessage;
+
+  /// No description provided for @feedDisplayNameFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get feedDisplayNameFallback;
+
+  /// No description provided for @feedOpenProfileSemantics.
+  ///
+  /// In en, this message translates to:
+  /// **'Open profile'**
+  String get feedOpenProfileSemantics;
+
+  /// No description provided for @feedGreetingPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi, '**
+  String get feedGreetingPrefix;
+
+  /// No description provided for @feedGreetingFallbackName.
+  ///
+  /// In en, this message translates to:
+  /// **'there'**
+  String get feedGreetingFallbackName;
+
+  /// No description provided for @feedHeaderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Explore pollution sites near you'**
+  String get feedHeaderSubtitle;
+
+  /// No description provided for @feedNotificationBellAllReadSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications, all read'**
+  String get feedNotificationBellAllReadSemantic;
+
+  /// No description provided for @feedNotificationBellUnreadSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications, {count} unread'**
+  String feedNotificationBellUnreadSemantic(int count);
+
+  /// No description provided for @siteDetailTabPollutionSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Pollution site'**
+  String get siteDetailTabPollutionSite;
+
+  /// No description provided for @siteDetailTabCleaningEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Cleaning events'**
+  String get siteDetailTabCleaningEvents;
+
+  /// No description provided for @siteDetailInfoCardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Community action needed'**
+  String get siteDetailInfoCardTitle;
+
+  /// No description provided for @siteDetailInfoCardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Join a cleanup, report changes, or help spread the word so we can act faster.'**
+  String get siteDetailInfoCardBody;
+
+  /// No description provided for @siteDetailReportedByPrefix.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported by '**
+  String get siteDetailReportedByPrefix;
+
+  /// No description provided for @siteDetailCoReportersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Co-reporters'**
+  String get siteDetailCoReportersTitle;
+
+  /// No description provided for @siteDetailCoReportersSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 person also reported this site} other{{count} people also reported this site}}'**
+  String siteDetailCoReportersSubtitle(int count);
+
+  /// No description provided for @siteDetailGalleryPhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Pollution site photo {index}'**
+  String siteDetailGalleryPhotoSemantic(int index);
+
+  /// No description provided for @siteDetailOpenGalleryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Open pollution site gallery'**
+  String get siteDetailOpenGalleryLabel;
+
+  /// No description provided for @siteDetailGalleryTapToExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to expand'**
+  String get siteDetailGalleryTapToExpand;
+
+  /// No description provided for @siteDetailGalleryOpenPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Open photo'**
+  String get siteDetailGalleryOpenPhoto;
+
+  /// No description provided for @commonNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get commonNotAvailable;
+
+  /// No description provided for @commonDistanceMetersUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get commonDistanceMetersUnit;
+
+  /// No description provided for @commonDistanceKilometersUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'km'**
+  String get commonDistanceKilometersUnit;
+
+  /// No description provided for @siteCommentsEmptyBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No comments yet.\nBe the first to comment.'**
+  String get siteCommentsEmptyBody;
+
+  /// No description provided for @feedCommentsLoadMoreFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load more comments. Pull to refresh or try again.'**
+  String get feedCommentsLoadMoreFailedSnack;
+
   /// No description provided for @commentsSheetTitle.
   ///
   /// In en, this message translates to:
@@ -5920,6 +6454,12 @@ abstract class AppLocalizations {
   /// **'Could not post your reply. Please try again.'**
   String get commentsReplyFailedSnack;
 
+  /// No description provided for @commentsSortFailedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not change comment order. Try again.'**
+  String get commentsSortFailedSnack;
+
   /// No description provided for @commentsDeletedSnack.
   ///
   /// In en, this message translates to:
@@ -5955,6 +6495,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reply to {name}'**
   String commentsReplyToSemantic(String name);
+
+  /// No description provided for @commentsReplyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reply'**
+  String get commentsReplyButton;
+
+  /// No description provided for @commentsViewReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'View replies'**
+  String get commentsViewReplies;
+
+  /// No description provided for @commentsLoadMoreReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Load {count} more'**
+  String commentsLoadMoreReplies(int count);
+
+  /// No description provided for @siteEngagementQueuedOfflineSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection dropped. We will retry this when you are back online.'**
+  String get siteEngagementQueuedOfflineSnack;
+
+  /// No description provided for @commentsHideReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide replies'**
+  String get commentsHideReplies;
+
+  /// No description provided for @commentsStatusDeleting.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting…'**
+  String get commentsStatusDeleting;
+
+  /// No description provided for @commentsStatusSavingEdits.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving edits…'**
+  String get commentsStatusSavingEdits;
+
+  /// No description provided for @commentsCommentMetaJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get commentsCommentMetaJustNow;
+
+  /// No description provided for @commentsCommentMetaJustNowWithLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{Just now • 1 like} other{Just now • {count} likes}}'**
+  String commentsCommentMetaJustNowWithLikes(int count);
+
+  /// No description provided for @commentsCommentMetaMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, one{1 minute ago} other{{minutes} minutes ago}}'**
+  String commentsCommentMetaMinutesAgo(int minutes);
+
+  /// No description provided for @commentsCommentMetaMinutesAgoWithLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, one{1 minute ago} other{{minutes} minutes ago}} • {count, plural, one{1 like} other{{count} likes}}'**
+  String commentsCommentMetaMinutesAgoWithLikes(int minutes, int count);
+
+  /// No description provided for @commentsCommentMetaHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, one{1 hour ago} other{{hours} hours ago}}'**
+  String commentsCommentMetaHoursAgo(int hours);
+
+  /// No description provided for @commentsCommentMetaHoursAgoWithLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours, plural, one{1 hour ago} other{{hours} hours ago}} • {count, plural, one{1 like} other{{count} likes}}'**
+  String commentsCommentMetaHoursAgoWithLikes(int hours, int count);
+
+  /// No description provided for @commentsCommentMetaDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{1 day ago} other{{days} days ago}}'**
+  String commentsCommentMetaDaysAgo(int days);
+
+  /// No description provided for @commentsCommentMetaDaysAgoWithLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, one{1 day ago} other{{days} days ago}} • {count, plural, one{1 like} other{{count} likes}}'**
+  String commentsCommentMetaDaysAgoWithLikes(int days, int count);
+
+  /// No description provided for @commentsCommentMetaDate.
+  ///
+  /// In en, this message translates to:
+  /// **'{date}'**
+  String commentsCommentMetaDate(String date);
+
+  /// No description provided for @commentsCommentMetaDateWithLikes.
+  ///
+  /// In en, this message translates to:
+  /// **'{date} • {count, plural, one{1 like} other{{count} likes}}'**
+  String commentsCommentMetaDateWithLikes(String date, int count);
+
+  /// No description provided for @commentsOptimisticAuthorYou.
+  ///
+  /// In en, this message translates to:
+  /// **'You'**
+  String get commentsOptimisticAuthorYou;
+
+  /// No description provided for @commentsReplyingToBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Replying to {name}'**
+  String commentsReplyingToBanner(String name);
+
+  /// No description provided for @commentsSemanticSheetDragHandle.
+  ///
+  /// In en, this message translates to:
+  /// **'Resize or dismiss comments'**
+  String get commentsSemanticSheetDragHandle;
+
+  /// No description provided for @commentsPrefetchCouldNotRefreshSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh comments. Showing the last loaded thread.'**
+  String get commentsPrefetchCouldNotRefreshSnack;
+
+  /// No description provided for @commentsComposerCharsRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'{remaining, plural, one{1 character left} other{{remaining} characters left}}'**
+  String commentsComposerCharsRemaining(int remaining);
+
+  /// No description provided for @commentsSemanticHideReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide replies for {name}'**
+  String commentsSemanticHideReplies(String name);
+
+  /// No description provided for @commentsSemanticViewReplies.
+  ///
+  /// In en, this message translates to:
+  /// **'View replies for {name}'**
+  String commentsSemanticViewReplies(String name);
+
+  /// No description provided for @commentsInputHintEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit your comment…'**
+  String get commentsInputHintEdit;
+
+  /// No description provided for @commentsInputHintAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a comment…'**
+  String get commentsInputHintAdd;
+
+  /// No description provided for @commentsInputHintReply.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a reply…'**
+  String get commentsInputHintReply;
+
+  /// No description provided for @commentsLikeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Like comment'**
+  String get commentsLikeTooltip;
+
+  /// No description provided for @commentsUnlikeTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlike comment'**
+  String get commentsUnlikeTooltip;
 
   /// No description provided for @searchModalCancel.
   ///
@@ -7267,6 +7981,174 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Photo of {title}'**
   String siteCardPhotoSemantic(String title);
+
+  /// No description provided for @siteCardGalleryPhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {number} of {siteTitle}'**
+  String siteCardGalleryPhotoSemantic(int number, String siteTitle);
+
+  /// No description provided for @siteCardSemanticRemoveUpvote.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove upvote for {title}'**
+  String siteCardSemanticRemoveUpvote(String title);
+
+  /// No description provided for @siteCardSemanticUpvote.
+  ///
+  /// In en, this message translates to:
+  /// **'Upvote {title}'**
+  String siteCardSemanticUpvote(String title);
+
+  /// No description provided for @siteUpvoteLongPressOpensSupporters.
+  ///
+  /// In en, this message translates to:
+  /// **'Long press to open the list of supporters'**
+  String get siteUpvoteLongPressOpensSupporters;
+
+  /// No description provided for @siteCardSemanticUpvotesOpenSupporters.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} upvotes on {title}. Tap to see supporters'**
+  String siteCardSemanticUpvotesOpenSupporters(int count, String title);
+
+  /// No description provided for @siteCardSemanticCommentsOnSite.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} comments on {title}'**
+  String siteCardSemanticCommentsOnSite(int count, String title);
+
+  /// No description provided for @siteCardSemanticSharesOnSite.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} shares on {title}'**
+  String siteCardSemanticSharesOnSite(int count, String title);
+
+  /// No description provided for @siteCardSemanticSaveSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {title} and get updates'**
+  String siteCardSemanticSaveSite(String title);
+
+  /// No description provided for @siteCardSemanticUnsaveSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsave {title} and stop updates'**
+  String siteCardSemanticUnsaveSite(String title);
+
+  /// No description provided for @siteCardSaveUpdatesOnSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'You will get updates for this site'**
+  String get siteCardSaveUpdatesOnSnack;
+
+  /// No description provided for @siteCardSaveRemovedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from your saved sites'**
+  String get siteCardSaveRemovedSnack;
+
+  /// No description provided for @siteCardFeedbackPostHiddenSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Post hidden from your feed'**
+  String get siteCardFeedbackPostHiddenSnack;
+
+  /// No description provided for @siteCardFeedbackThanksSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks for your feedback'**
+  String get siteCardFeedbackThanksSnack;
+
+  /// No description provided for @siteCardFeedOptionsSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Feed options'**
+  String get siteCardFeedOptionsSheetTitle;
+
+  /// No description provided for @siteCardFeedOptionsSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tune what you want to see'**
+  String get siteCardFeedOptionsSheetSubtitle;
+
+  /// No description provided for @siteCardEngagementSignInRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in to support or save sites.'**
+  String get siteCardEngagementSignInRequired;
+
+  /// No description provided for @siteCardEngagementWaitBriefly.
+  ///
+  /// In en, this message translates to:
+  /// **'Please wait a moment before trying again.'**
+  String get siteCardEngagementWaitBriefly;
+
+  /// No description provided for @siteCardRateLimitedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many actions. Try again in {seconds} seconds.'**
+  String siteCardRateLimitedSnack(int seconds);
+
+  /// No description provided for @siteDetailSaveAddedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Site saved to your list.'**
+  String get siteDetailSaveAddedSnack;
+
+  /// No description provided for @siteDetailSaveRemovedSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed from saved sites.'**
+  String get siteDetailSaveRemovedSnack;
+
+  /// No description provided for @siteQuickActionSaveSiteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Save site'**
+  String get siteQuickActionSaveSiteLabel;
+
+  /// No description provided for @siteQuickActionSavedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get siteQuickActionSavedLabel;
+
+  /// No description provided for @siteQuickActionReportIssueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Report issue'**
+  String get siteQuickActionReportIssueLabel;
+
+  /// No description provided for @siteQuickActionReportedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported'**
+  String get siteQuickActionReportedLabel;
+
+  /// No description provided for @siteQuickActionShareLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get siteQuickActionShareLabel;
+
+  /// No description provided for @siteCardDistanceMeters.
+  ///
+  /// In en, this message translates to:
+  /// **'{meters} m'**
+  String siteCardDistanceMeters(int meters);
+
+  /// No description provided for @siteCardDistanceKmShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String siteCardDistanceKmShort(String km);
+
+  /// No description provided for @siteCardDistanceKmWhole.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km'**
+  String siteCardDistanceKmWhole(String km);
 
   /// No description provided for @eventsFilterSheetTitle.
   ///

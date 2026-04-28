@@ -17,13 +17,32 @@ final class DeepLinkNewReport extends DeepLinkRoute {
 }
 
 final class DeepLinkHomeMapFocus extends DeepLinkRoute {
-  const DeepLinkHomeMapFocus(this.siteId);
+  const DeepLinkHomeMapFocus(
+    this.siteId, {
+    this.shareToken,
+    this.cid,
+  });
 
   final String siteId;
+  final String? shareToken;
+  final String? cid;
 }
 
 final class DeepLinkHomeEvents extends DeepLinkRoute {
   const DeepLinkHomeEvents();
+}
+
+/// Public share URL: `https://chisto.mk/sites/<id>` opens the site detail screen.
+final class DeepLinkSiteDetail extends DeepLinkRoute {
+  const DeepLinkSiteDetail(
+    this.siteId, {
+    this.shareToken,
+    this.cid,
+  });
+
+  final String siteId;
+  final String? shareToken;
+  final String? cid;
 }
 
 /// Loose UUID pattern (v1–v7, case-insensitive, with hyphens).
@@ -31,6 +50,9 @@ final RegExp _uuidPattern = RegExp(
   r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$',
   caseSensitive: false,
 );
+
+/// Prisma `cuid()` pattern used by current Site ids.
+final RegExp _cuidPattern = RegExp(r'^c[a-z0-9]{24}$', caseSensitive: false);
 
 /// Hosts allowed for `https://…/events/<uuid>` share links (avoid open redirects).
 bool deepLinkTrustedShareHost(String? host) {
@@ -57,6 +79,20 @@ class DeepLinkRouter {
   /// Returns a route plan when the URI is recognized; otherwise `null`.
   static DeepLinkRoute? parse(Uri uri) {
     final List<String> raw = uri.pathSegments.where((String s) => s.isNotEmpty).toList();
+
+    // Public share URL: `/sites/<id>` on the marketing host.
+    if (raw.length == 2 && raw[0] == 'sites') {
+      final String id = raw[1].trim();
+      if (id.isNotEmpty && _cuidPattern.hasMatch(id) && deepLinkTrustedShareHost(uri.host)) {
+        final String? st = uri.queryParameters['st']?.trim();
+        final String? cid = uri.queryParameters['cid']?.trim();
+        return DeepLinkSiteDetail(
+          id,
+          shareToken: st != null && st.isNotEmpty ? st : null,
+          cid: cid != null && cid.isNotEmpty ? cid : null,
+        );
+      }
+    }
 
     // Public share URL: `/events/<uuid>` on the marketing host (see `event_share_payload.dart`).
     if (raw.length == 2 && raw[0] == 'events') {
@@ -89,7 +125,13 @@ class DeepLinkRouter {
       final String? siteId =
           uri.queryParameters['siteId']?.trim() ?? (seg.length > 2 ? seg[2].trim() : null);
       if (siteId == null || siteId.isEmpty) return null;
-      return DeepLinkHomeMapFocus(siteId);
+      final String? st = uri.queryParameters['st']?.trim();
+      final String? cid = uri.queryParameters['cid']?.trim();
+      return DeepLinkHomeMapFocus(
+        siteId,
+        shareToken: st != null && st.isNotEmpty ? st : null,
+        cid: cid != null && cid.isNotEmpty ? cid : null,
+      );
     }
     if (seg.length == 1 && seg[0] == 'home' && uri.queryParameters['tab'] == 'events') {
       return const DeepLinkHomeEvents();
@@ -124,6 +166,12 @@ class DeepLinkRouter {
         nav.pushNamed(
           AppRoutes.homeMapFocus,
           arguments: MapSiteFocusRouteArgs(siteId: siteId),
+        );
+        return true;
+      case DeepLinkSiteDetail(:final String siteId):
+        nav.pushNamed(
+          AppRoutes.siteDetail,
+          arguments: SiteDetailByIdRouteArgs(siteId: siteId),
         );
         return true;
       case DeepLinkHomeEvents():

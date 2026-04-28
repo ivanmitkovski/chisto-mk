@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
@@ -34,7 +35,7 @@ class FeedHeader extends StatelessWidget {
           children: <Widget>[
             Semantics(
               button: true,
-              label: 'Open profile',
+              label: context.l10n.feedOpenProfileSemantics,
               child: GestureDetector(
                 onTap: onProfileTap,
                 behavior: HitTestBehavior.opaque,
@@ -71,14 +72,17 @@ class FeedHeader extends StatelessWidget {
                   Row(
                     children: <Widget>[
                       Text(
-                        'Hi, ',
+                        context.l10n.feedGreetingPrefix,
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                               fontWeight: FontWeight.w400,
                             ),
                       ),
                       Flexible(
                         child: Text(
-                          _firstWord(displayName),
+                          _firstWord(
+                            displayName,
+                            fallbackName: context.l10n.feedGreetingFallbackName,
+                          ),
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w700,
@@ -89,7 +93,7 @@ class FeedHeader extends StatelessWidget {
                   ),
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
-                    'Explore pollution sites near you',
+                    context.l10n.feedHeaderSubtitle,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           color: AppColors.textMuted,
                           letterSpacing: -0.1,
@@ -108,9 +112,9 @@ class FeedHeader extends StatelessWidget {
     );
   }
 
-  static String _firstWord(String displayName) {
+  static String _firstWord(String displayName, {required String fallbackName}) {
     final String trimmed = displayName.trim();
-    if (trimmed.isEmpty) return 'there';
+    if (trimmed.isEmpty) return fallbackName;
     final int space = trimmed.indexOf(' ');
     return space < 0 ? trimmed : trimmed.substring(0, space);
   }

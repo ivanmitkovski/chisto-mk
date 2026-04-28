@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
@@ -58,8 +59,8 @@ class _FeedNotificationBellState extends State<FeedNotificationBell>
     return Semantics(
       button: true,
       label: hasUnread
-          ? 'Notifications, ${widget.unreadCount} unread'
-          : 'Notifications, all read',
+          ? context.l10n.feedNotificationBellUnreadSemantic(widget.unreadCount)
+          : context.l10n.feedNotificationBellAllReadSemantic,
       child: GestureDetector(
         onTap: widget.onTap,
         behavior: HitTestBehavior.opaque,

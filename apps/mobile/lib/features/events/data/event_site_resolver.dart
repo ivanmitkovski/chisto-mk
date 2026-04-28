@@ -1,5 +1,4 @@
 import 'package:chisto_mobile/features/events/domain/models/eco_event.dart';
-import 'package:chisto_mobile/features/home/data/mock_pollution_sites.dart';
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:flutter/material.dart';
@@ -56,15 +55,8 @@ class EventSiteResolver {
   const EventSiteResolver._();
 
   static List<PollutionSite> allSites() {
-    final List<PollutionSite> sites = buildMockPollutionSites();
-    sites.sort((PollutionSite a, PollutionSite b) {
-      final int distance = a.distanceKm.compareTo(b.distanceKm);
-      if (distance != 0) {
-        return distance;
-      }
-      return a.title.compareTo(b.title);
-    });
-    return sites;
+    // Production path: canonical sites should come from API-backed sources.
+    return const <PollutionSite>[];
   }
 
   static PollutionSite? findSiteById(String siteId) {
@@ -120,19 +112,21 @@ class EventSiteResolver {
       return canonical;
     }
     final String cover = event.siteImageUrl.trim();
-    final ImageProvider imageProvider;
+    final List<String> mediaUrls;
     if (cover.isEmpty) {
-      imageProvider =
-          const AssetImage('assets/images/references/onboarding_reference.png');
+      mediaUrls = const <String>[
+        'assets/images/references/onboarding_reference.png',
+      ];
     } else {
       final String lower = cover.toLowerCase();
       if (lower.startsWith('http://') || lower.startsWith('https://')) {
-        imageProvider = NetworkImage(cover);
+        mediaUrls = <String>[cover];
       } else if (cover.startsWith('assets/')) {
-        imageProvider = AssetImage(cover);
+        mediaUrls = <String>[cover];
       } else {
-        imageProvider =
-            const AssetImage('assets/images/references/onboarding_reference.png');
+        mediaUrls = const <String>[
+          'assets/images/references/onboarding_reference.png',
+        ];
       }
     }
     return PollutionSite(
@@ -144,8 +138,7 @@ class EventSiteResolver {
       distanceKm: event.siteDistanceKm.toDouble(),
       score: event.participantCount,
       participantCount: event.participantCount,
-      imageProvider: imageProvider,
-      images: <ImageProvider>[imageProvider],
+      mediaUrls: mediaUrls,
     );
   }
 

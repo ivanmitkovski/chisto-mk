@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
@@ -34,7 +35,7 @@ class SiteReportedRow extends StatelessWidget {
             text: TextSpan(
               style: Theme.of(context).textTheme.bodySmall?.copyWith(height: 1.35),
               children: <TextSpan>[
-                const TextSpan(text: 'Reported by '),
+                TextSpan(text: context.l10n.siteDetailReportedByPrefix),
                 TextSpan(
                   text: reporterName,
                   style: const TextStyle(

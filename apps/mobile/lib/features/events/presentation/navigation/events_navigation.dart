@@ -11,6 +11,12 @@ import 'package:flutter/material.dart';
 class EventsNavigation {
   const EventsNavigation._();
 
+  /// [HomeShell] uses a nested [GoRouter] navigator without [Navigator.onGenerateRoute].
+  /// Named routes from [AppRouter] live on [MaterialApp]'s navigator — use the root one.
+  static NavigatorState _rootNavigator(BuildContext context) {
+    return Navigator.of(context, rootNavigator: true);
+  }
+
   static Future<EcoEvent?> openCreate(
     BuildContext context, {
     String? preselectedSiteId,
@@ -20,11 +26,11 @@ class EventsNavigation {
   }) {
     if (ServiceLocator.instance.isInitialized &&
         !ServiceLocator.instance.authState.isOrganizerCertified) {
-      return Navigator.of(context).push<EcoEvent?>(
+      return _rootNavigator(context).push<EcoEvent?>(
         MaterialPageRoute<EcoEvent?>(
           builder: (_) => OrganizerToolkitScreen(
             onCertified: () {
-              Navigator.of(context).pushNamed<EcoEvent?>(
+              _rootNavigator(context).pushNamed<EcoEvent?>(
                 AppRoutes.eventsCreate,
                 arguments: EventCreateRouteArguments(
                   preselectedSiteId: preselectedSiteId,
@@ -38,7 +44,7 @@ class EventsNavigation {
         ),
       );
     }
-    return Navigator.of(context).pushNamed<EcoEvent?>(
+    return _rootNavigator(context).pushNamed<EcoEvent?>(
       AppRoutes.eventsCreate,
       arguments: EventCreateRouteArguments(
         preselectedSiteId: preselectedSiteId,
@@ -59,7 +65,7 @@ class EventsNavigation {
         eventId: eventId,
       ),
     );
-    return Navigator.of(context).pushNamed<void>(
+    return _rootNavigator(context).pushNamed<void>(
       AppRoutes.eventsDetail,
       arguments: EventRouteArguments(eventId: eventId),
     );
@@ -73,7 +79,7 @@ class EventsNavigation {
     BuildContext context, {
     required String eventId,
   }) {
-    Navigator.of(context).pushReplacement(
+    _rootNavigator(context).pushReplacement(
       AppRouter.eventDetailReplacementRoute(eventId),
     );
   }
@@ -82,7 +88,7 @@ class EventsNavigation {
     BuildContext context, {
     required String eventId,
   }) {
-    return Navigator.of(context).pushNamed<bool>(
+    return _rootNavigator(context).pushNamed<bool>(
       AppRoutes.eventsAttendeeCheckIn,
       arguments: EventRouteArguments(eventId: eventId),
     );
@@ -92,7 +98,7 @@ class EventsNavigation {
     BuildContext context, {
     required String eventId,
   }) {
-    return Navigator.of(context).pushNamed<void>(
+    return _rootNavigator(context).pushNamed<void>(
       AppRoutes.eventsOrganizerCheckIn,
       arguments: EventRouteArguments(eventId: eventId),
     );
@@ -102,7 +108,7 @@ class EventsNavigation {
     BuildContext context, {
     required String eventId,
   }) {
-    return Navigator.of(context).pushNamed<void>(
+    return _rootNavigator(context).pushNamed<void>(
       AppRoutes.eventsCleanupEvidence,
       arguments: EventRouteArguments(eventId: eventId),
     );
@@ -112,17 +118,17 @@ class EventsNavigation {
     BuildContext context, {
     required String eventId,
   }) {
-    return Navigator.of(context).pushNamed<void>(
+    return _rootNavigator(context).pushNamed<void>(
       AppRoutes.eventsImpactReceipt,
       arguments: EventRouteArguments(eventId: eventId),
     );
   }
 
   static Future<void> openFeed(BuildContext context) {
-    return Navigator.of(context).pushNamed(AppRoutes.homeEvents);
+    return _rootNavigator(context).pushNamed(AppRoutes.homeEvents);
   }
 
   static Future<void> openOrganizerDashboard(BuildContext context) {
-    return Navigator.of(context).pushNamed(AppRoutes.eventsOrganizerDashboard);
+    return _rootNavigator(context).pushNamed(AppRoutes.eventsOrganizerDashboard);
   }
 }

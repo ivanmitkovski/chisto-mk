@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -8,50 +7,56 @@ import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 
 List<PollutionSite> buildMockPollutionSites() {
-  const ImageProvider image1 =
-      AssetImage('assets/images/references/onboarding_reference.png');
-  const ImageProvider image2 =
-      AssetImage('assets/images/content/people_cleaning.png');
+  const String mockImgOnboarding = 'assets/images/references/onboarding_reference.png';
+  const String mockImgPeopleCleaning = 'assets/images/content/people_cleaning.png';
+
+  final DateTime commentT0 = DateTime.now().subtract(const Duration(hours: 2));
 
   final List<Comment> comments1 = <Comment>[
-    const Comment(
+    Comment(
       id: 'c1-1',
       authorName: 'eco_jana',
       text: 'Reported this last week. Hope it gets cleaned soon.',
+      createdAt: commentT0.subtract(const Duration(minutes: 40)),
       likeCount: 2,
     ),
-    const Comment(
+    Comment(
       id: 'c1-2',
       authorName: 'green_skopje',
       text: 'We could organize a cleanup here!',
+      createdAt: commentT0.subtract(const Duration(minutes: 25)),
       likeCount: 1,
     ),
-    const Comment(
+    Comment(
       id: 'c1-3',
       authorName: 'nature_lover',
       text: 'Same spot has been an issue for months.',
+      createdAt: commentT0.subtract(const Duration(minutes: 5)),
     ),
   ];
 
   final List<Comment> comments2 = <Comment>[
-    const Comment(
+    Comment(
       id: 'c2-1',
       authorName: 'park_volunteer',
       text: 'I can help with bags and gloves.',
+      createdAt: commentT0.subtract(const Duration(days: 1)),
     ),
   ];
 
   final List<Comment> comments3 = <Comment>[
-    const Comment(
+    Comment(
       id: 'c3-1',
       authorName: 'local_resident',
       text: 'This is right next to the playground.',
+      createdAt: commentT0.subtract(const Duration(days: 3)),
       likeCount: 3,
     ),
-    const Comment(
+    Comment(
       id: 'c3-2',
       authorName: 'clean_crew',
       text: 'Added to our list for next weekend.',
+      createdAt: commentT0.subtract(const Duration(hours: 6)),
     ),
   ];
 
@@ -75,17 +80,22 @@ List<PollutionSite> buildMockPollutionSites() {
     title: 'Mixed waste near the riverside',
     description:
         'Spotted a large pile of mixed waste near the riverside. Plastic, cardboard and household items. Water level is high, risk of contamination.',
-    images: <ImageProvider>[image1, image2],
+    imageUrls: const <String>[mockImgOnboarding, mockImgPeopleCleaning],
   );
 
-  SiteReport reportForSite(int id, String reporter, String desc, List<ImageProvider> imgs) {
+  SiteReport reportForSite(
+    int id,
+    String reporter,
+    String desc,
+    List<String> imageUrls,
+  ) {
     return SiteReport(
       id: 'r$id',
       reporterName: reporter,
       reportedAt: now.subtract(Duration(days: (id % 7) + 1)),
       title: desc,
       description: null,
-      images: imgs,
+      imageUrls: imageUrls,
     );
   }
 
@@ -101,8 +111,7 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 15,
       score: 10,
       participantCount: 4,
-      imageProvider: image1,
-      images: <ImageProvider>[image1, image2],
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png', 'assets/images/content/people_cleaning.png'],
       comments: comments1,
       urgencyLabel: 'Urgent',
       cleaningEvents: eventsForSite1,
@@ -122,8 +131,7 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 3,
       score: 6,
       participantCount: 2,
-      imageProvider: image2,
-      images: <ImageProvider>[image2, image1],
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png', 'assets/images/references/onboarding_reference.png'],
       comments: comments2,
       firstReport: SiteReport(
         id: 'r2',
@@ -132,7 +140,7 @@ List<PollutionSite> buildMockPollutionSites() {
         title: 'Plastic waste around playground',
         description:
             'Bottles and wrappers around the playground. Kids could get hurt. Would appreciate a cleanup soon.',
-        images: <ImageProvider>[image2],
+        imageUrls: const <String>[mockImgPeopleCleaning],
       ),
       coReporterNames: <String>[],
       latitude: 42.0040,
@@ -149,8 +157,7 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 8,
       score: 18,
       participantCount: 7,
-      imageProvider: image1,
-      images: <ImageProvider>[image1, image2, image1],
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png', 'assets/images/content/people_cleaning.png', 'assets/images/references/onboarding_reference.png'],
       comments: comments3,
       firstReport: SiteReport(
         id: 'r3',
@@ -159,7 +166,7 @@ List<PollutionSite> buildMockPollutionSites() {
         title: 'Construction rubble dumped overnight',
         description:
             'Rubble and concrete blocks dumped overnight. Dust and noise. Reported to local authorities too.',
-        images: <ImageProvider>[image1, image2],
+        imageUrls: const <String>[mockImgOnboarding, mockImgPeopleCleaning],
       ),
       coReporterNames: <String>['clean_crew', 'eco_jana'],
       latitude: 41.9880,
@@ -175,14 +182,13 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 5,
       score: 7,
       participantCount: 3,
-      imageProvider: image2,
-      images: <ImageProvider>[image2, image1],
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png', 'assets/images/references/onboarding_reference.png'],
       comments: comments1,
       firstReport: reportForSite(
         4,
         'eco_jana',
         'Bins overflowing after the weekend. Smell and flies. Needs urgent pickup.',
-        <ImageProvider>[image2],
+        <String>[mockImgPeopleCleaning],
       ),
       coReporterNames: <String>['green_skopje'],
       latitude: 41.9920,
@@ -198,14 +204,13 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 6,
       score: 5,
       participantCount: 1,
-      imageProvider: image1,
-      images: <ImageProvider>[image1],
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments2,
       firstReport: reportForSite(
         5,
         'park_volunteer',
         'Glass everywhere near the river. Dangerous for kids and pets.',
-        <ImageProvider>[image1],
+        <String>[mockImgOnboarding],
       ),
       coReporterNames: <String>[],
       latitude: 41.9960,
@@ -220,7 +225,7 @@ List<PollutionSite> buildMockPollutionSites() {
         6,
         'nature_lover',
         'Large tire pile growing. Fire risk and mosquito breeding.',
-        <ImageProvider>[image2, image1],
+        <String>[mockImgPeopleCleaning, mockImgOnboarding],
       ),
       coReporterNames: <String>['eco_jana', 'local_resident'],
       statusLabel: 'High',
@@ -228,8 +233,7 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 12,
       score: 20,
       participantCount: 9,
-      imageProvider: image2,
-      images: <ImageProvider>[image2, image1],
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png', 'assets/images/references/onboarding_reference.png'],
       comments: comments3,
       latitude: 41.9820,
       longitude: 21.4050,
@@ -244,10 +248,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 9,
       score: 9,
       participantCount: 2,
-      imageProvider: image1,
-      images: <ImageProvider>[image1],
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments1,
-      firstReport: reportForSite(7, 'eco_jana', 'Plastic bags stuck in trees after storm.', <ImageProvider>[image1]),
+      firstReport: reportForSite(7, 'eco_jana', 'Plastic bags stuck in trees after storm.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['nature_lover'],
     ),
     PollutionSite(
@@ -260,10 +263,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 4,
       score: 14,
       participantCount: 5,
-      imageProvider: image2,
-      images: <ImageProvider>[image2],
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments2,
-      firstReport: reportForSite(8, 'local_resident', 'Dust clouds from construction affecting health.', <ImageProvider>[image2]),
+      firstReport: reportForSite(8, 'local_resident', 'Dust clouds from construction affecting health.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['park_volunteer'],
     ),
     PollutionSite(
@@ -276,10 +278,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 2,
       score: 4,
       participantCount: 1,
-      imageProvider: image1,
-      images: <ImageProvider>[image1],
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
-      firstReport: reportForSite(9, 'local_resident', 'Furniture dumped on sidewalk. Blocking pedestrians.', <ImageProvider>[image1]),
+      firstReport: reportForSite(9, 'local_resident', 'Furniture dumped on sidewalk. Blocking pedestrians.', <String>[mockImgOnboarding]),
       coReporterNames: <String>[],
     ),
     PollutionSite(
@@ -293,10 +294,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 7,
       score: 11,
       participantCount: 3,
-      imageProvider: image2,
-      images: <ImageProvider>[image2, image1],
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png', 'assets/images/references/onboarding_reference.png'],
       comments: comments1,
-      firstReport: reportForSite(10, 'green_skopje', 'Alley used as dumping ground. Rats and smell.', <ImageProvider>[image2]),
+      firstReport: reportForSite(10, 'green_skopje', 'Alley used as dumping ground. Rats and smell.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['eco_jana', 'nature_lover'],
     ),
     PollutionSite(
@@ -309,9 +309,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 180,
       score: 12,
       participantCount: 5,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments2,
-      firstReport: reportForSite(11, 'park_volunteer', 'Debris washing up on Ohrid beach. Tourism impact.', <ImageProvider>[image1]),
+      firstReport: reportForSite(11, 'park_volunteer', 'Debris washing up on Ohrid beach. Tourism impact.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['clean_crew'],
     ),
     PollutionSite(
@@ -319,14 +319,14 @@ List<PollutionSite> buildMockPollutionSites() {
       title: 'Old town dumping spot',
       pollutionType: 'Illegal landfill',
       description: 'Tourist waste accumulating in historic district alley.',
-      firstReport: reportForSite(12, 'nature_lover', 'Waste piling in old town. Heritage site at risk.', <ImageProvider>[image2]),
+      firstReport: reportForSite(12, 'nature_lover', 'Waste piling in old town. Heritage site at risk.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>[],
       statusLabel: 'Low',
       statusColor: AppColors.primary,
       distanceKm: 178,
       score: 6,
       participantCount: 2,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments1,
     ),
     PollutionSite(
@@ -339,9 +339,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 175,
       score: 19,
       participantCount: 8,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
-      firstReport: reportForSite(13, 'clean_crew', 'Metal scrap and waste near industrial zone.', <ImageProvider>[image1]),
+      firstReport: reportForSite(13, 'clean_crew', 'Metal scrap and waste near industrial zone.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['local_resident', 'eco_jana'],
     ),
     PollutionSite(
@@ -354,9 +354,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 174,
       score: 5,
       participantCount: 1,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments2,
-      firstReport: reportForSite(14, 'park_volunteer', 'Cups and wrappers on main street. Daily cleanup needed.', <ImageProvider>[image2]),
+      firstReport: reportForSite(14, 'park_volunteer', 'Cups and wrappers on main street. Daily cleanup needed.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>[],
     ),
     PollutionSite(
@@ -369,9 +369,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 42,
       score: 22,
       participantCount: 11,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments1,
-      firstReport: reportForSite(15, 'eco_maria', 'Dumping along Pena River. Water contamination risk.', <ImageProvider>[image1, image2]),
+      firstReport: reportForSite(15, 'eco_maria', 'Dumping along Pena River. Water contamination risk.', <String>[mockImgOnboarding, mockImgPeopleCleaning]),
       coReporterNames: <String>['green_skopje', 'nature_lover', 'clean_crew'],
     ),
     PollutionSite(
@@ -384,9 +384,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 41,
       score: 8,
       participantCount: 3,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments3,
-      firstReport: reportForSite(16, 'local_resident', 'Market bins overflow every weekend.', <ImageProvider>[image2]),
+      firstReport: reportForSite(16, 'local_resident', 'Market bins overflow every weekend.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['eco_jana'],
     ),
     PollutionSite(
@@ -399,9 +399,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 38,
       score: 14,
       participantCount: 4,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments2,
-      firstReport: reportForSite(17, 'green_skopje', 'Lot used for illegal dumping. Growing pile.', <ImageProvider>[image1]),
+      firstReport: reportForSite(17, 'green_skopje', 'Lot used for illegal dumping. Growing pile.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['park_volunteer'],
     ),
     PollutionSite(
@@ -414,9 +414,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 39,
       score: 17,
       participantCount: 6,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments1,
-      firstReport: reportForSite(18, 'nature_lover', 'Tires piled behind garage. Fire hazard.', <ImageProvider>[image2]),
+      firstReport: reportForSite(18, 'nature_lover', 'Tires piled behind garage. Fire hazard.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['eco_jana', 'local_resident'],
     ),
     PollutionSite(
@@ -429,9 +429,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 85,
       score: 21,
       participantCount: 9,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
-      firstReport: reportForSite(19, 'clean_crew', 'Mining debris near Bregalnica. River at risk.', <ImageProvider>[image1]),
+      firstReport: reportForSite(19, 'clean_crew', 'Mining debris near Bregalnica. River at risk.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['eco_maria', 'green_skopje'],
     ),
     PollutionSite(
@@ -444,8 +444,8 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 84,
       score: 7,
       participantCount: 2,
-      imageProvider: image2,
-      firstReport: reportForSite(20, 'eco_jana', 'Plastics around campus. Student area needs cleanup.', <ImageProvider>[image2]),
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
+      firstReport: reportForSite(20, 'eco_jana', 'Plastics around campus. Student area needs cleanup.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>[],
       comments: comments2,
     ),
@@ -459,9 +459,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 120,
       score: 13,
       participantCount: 5,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments1,
-      firstReport: reportForSite(21, 'nature_lover', 'Orchard used for dumping. Soil contamination.', <ImageProvider>[image1]),
+      firstReport: reportForSite(21, 'nature_lover', 'Orchard used for dumping. Soil contamination.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['eco_jana'],
     ),
     PollutionSite(
@@ -474,9 +474,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 118,
       score: 4,
       participantCount: 1,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments2,
-      firstReport: reportForSite(22, 'park_volunteer', 'Glass on vineyard road. Tire hazard.', <ImageProvider>[image2]),
+      firstReport: reportForSite(22, 'park_volunteer', 'Glass on vineyard road. Tire hazard.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>[],
     ),
     PollutionSite(
@@ -489,9 +489,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 85,
       score: 20,
       participantCount: 7,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
-      firstReport: reportForSite(23, 'local_resident', 'Industrial debris at old factory. Asbestos concern.', <ImageProvider>[image1]),
+      firstReport: reportForSite(23, 'local_resident', 'Industrial debris at old factory. Asbestos concern.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['clean_crew', 'eco_jana'],
     ),
     PollutionSite(
@@ -504,9 +504,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 86,
       score: 9,
       participantCount: 3,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments1,
-      firstReport: reportForSite(24, 'green_skopje', 'Furniture dumped near monument. Tourist area.', <ImageProvider>[image2]),
+      firstReport: reportForSite(24, 'green_skopje', 'Furniture dumped near monument. Tourist area.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['nature_lover'],
     ),
     PollutionSite(
@@ -519,9 +519,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 55,
       score: 18,
       participantCount: 8,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments2,
-      firstReport: reportForSite(25, 'eco_maria', 'Waste along Vardar. Major river pollution.', <ImageProvider>[image1, image2]),
+      firstReport: reportForSite(25, 'eco_maria', 'Waste along Vardar. Major river pollution.', <String>[mockImgOnboarding, mockImgPeopleCleaning]),
       coReporterNames: <String>['green_skopje', 'clean_crew', 'nature_lover'],
     ),
     PollutionSite(
@@ -534,9 +534,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 170,
       score: 10,
       participantCount: 4,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments1,
-      firstReport: reportForSite(26, 'eco_jana', 'Rest stop litter. International route image.', <ImageProvider>[image2]),
+      firstReport: reportForSite(26, 'eco_jana', 'Rest stop litter. International route image.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['park_volunteer'],
     ),
     PollutionSite(
@@ -549,9 +549,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 165,
       score: 11,
       participantCount: 3,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
-      firstReport: reportForSite(27, 'nature_lover', 'Plastic sheeting in orchard. Wildlife risk.', <ImageProvider>[image1]),
+      firstReport: reportForSite(27, 'nature_lover', 'Plastic sheeting in orchard. Wildlife risk.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['eco_jana', 'local_resident'],
     ),
     PollutionSite(
@@ -564,9 +564,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 175,
       score: 6,
       participantCount: 2,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments2,
-      firstReport: reportForSite(28, 'park_volunteer', 'Waste near historic bridge. Scenic spot ruined.', <ImageProvider>[image2]),
+      firstReport: reportForSite(28, 'park_volunteer', 'Waste near historic bridge. Scenic spot ruined.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>[],
     ),
     PollutionSite(
@@ -574,14 +574,14 @@ List<PollutionSite> buildMockPollutionSites() {
       title: 'Vineyard chemical containers',
       pollutionType: 'Industrial waste',
       description: 'Discarded agricultural chemical containers near Tikveš.',
-      firstReport: reportForSite(29, 'nature_lover', 'Chemical containers near Tikveš. Toxic leak risk.', <ImageProvider>[image1]),
+      firstReport: reportForSite(29, 'nature_lover', 'Chemical containers near Tikveš. Toxic leak risk.', <String>[mockImgOnboarding]),
       coReporterNames: <String>['eco_maria'],
       statusLabel: 'High',
       statusColor: AppColors.accentDanger,
       distanceKm: 95,
       score: 16,
       participantCount: 5,
-      imageProvider: image1,
+      mediaUrls: const <String>['assets/images/references/onboarding_reference.png'],
       comments: comments3,
     ),
     PollutionSite(
@@ -594,9 +594,9 @@ List<PollutionSite> buildMockPollutionSites() {
       distanceKm: 90,
       score: 12,
       participantCount: 4,
-      imageProvider: image2,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       comments: comments2,
-      firstReport: reportForSite(30, 'local_resident', 'Construction debris near Vardar bridge.', <ImageProvider>[image2]),
+      firstReport: reportForSite(30, 'local_resident', 'Construction debris near Vardar bridge.', <String>[mockImgPeopleCleaning]),
       coReporterNames: <String>['green_skopje'],
     ),
   ];

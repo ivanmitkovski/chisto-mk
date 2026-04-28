@@ -1455,6 +1455,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get feedRetryLoadingMore => 'Provo përsëri të ngarkosh më shumë';
 
   @override
+  String get feedLoadingMoreSemantic =>
+      'Po ngarkohen më shumë postime në rrjedhë';
+
+  @override
   String get feedShowAllSites => 'Shfaq të gjitha vendet';
 
   @override
@@ -1465,7 +1469,166 @@ class AppLocalizationsSq extends AppLocalizations {
       'Nuk u ngarkuan më shumë postime. Prek për të provuar përsëri.';
 
   @override
+  String get feedRefreshStaleSnack =>
+      'Rifreskimi dështoi. Po shfaqet lista e fundit e ngarkuar.';
+
+  @override
   String get feedScrollToTopSemantic => 'Shkrollo në krye të rrjedhës';
+
+  @override
+  String get feedPollutionFeedTitle => 'Rrjedha e ndotjes';
+
+  @override
+  String get feedOfflineBanner =>
+      'Jeni jashtë linje. Po shfaqet rrjedha e fundit e ngarkuar.';
+
+  @override
+  String get feedCaughtUpTitle => 'I keni parë të gjitha';
+
+  @override
+  String get feedCaughtUpSubtitle =>
+      'Tërhiqni për rifreskim për raporte të reja';
+
+  @override
+  String get feedMoreFiltersTooltip => 'Më shumë filtra';
+
+  @override
+  String feedFilterSemantic(String name) {
+    return 'Filtri $name';
+  }
+
+  @override
+  String get feedEmptyAllTitle => 'Ende nuk ka vende ndotjeje';
+
+  @override
+  String get feedEmptyAllHint =>
+      'Tërhiqni për rifreskim ose kontrolloni më vonë';
+
+  @override
+  String get feedEmptyUrgentTitle => 'Tani nuk ka vende urgjente';
+
+  @override
+  String get feedEmptyUrgentHint =>
+      'Shfaq të gjitha ose provoni një filtër tjetër';
+
+  @override
+  String get feedEmptyNearbyTitleOnline => 'Nuk u gjetën vende afër';
+
+  @override
+  String get feedEmptyNearbyTitleOffline =>
+      'Aktivizoni vendndodhjen për vende afër';
+
+  @override
+  String get feedEmptyNearbyHintOffline =>
+      'Ndizni shërbimet e vendndodhjes dhe lejoni aksesin';
+
+  @override
+  String get feedEmptyNearbyHintOnline =>
+      'Shfaq të gjitha ose provoni një filtër tjetër';
+
+  @override
+  String get feedEmptyMostVotedTitle => 'Ende nuk ka vota për vendet';
+
+  @override
+  String get feedEmptyMostVotedHint =>
+      'Shfaq të gjitha ose provoni një filtër tjetër';
+
+  @override
+  String get feedEmptyRecentTitle => 'Nuk ka raporte të fundit';
+
+  @override
+  String get feedEmptyRecentHint =>
+      'Shfaq të gjitha ose provoni një filtër tjetër';
+
+  @override
+  String get feedEmptySavedTitle => 'Ende nuk keni vende të ruajtura';
+
+  @override
+  String get feedEmptySavedHint => 'Ruaj vende nga menuja për t’i gjetur këtu';
+
+  @override
+  String get feedFilterAllName => 'Të gjitha';
+
+  @override
+  String get feedFilterAllDesc => 'Renditje e balancuar';
+
+  @override
+  String get feedFilterUrgentName => 'Urgjente';
+
+  @override
+  String get feedFilterUrgentDesc => 'Së pari incidentet me prioritet të lartë';
+
+  @override
+  String get feedFilterNearbyName => 'Afër';
+
+  @override
+  String get feedFilterNearbyDesc => 'Raportet më afër jush';
+
+  @override
+  String get feedFilterMostVotedName => 'Më e mbështetur';
+
+  @override
+  String get feedFilterMostVotedDesc => 'Më shumë mbështetje nga komuniteti';
+
+  @override
+  String get feedFilterRecentName => 'Të fundit';
+
+  @override
+  String get feedFilterRecentDesc => 'Së pari raportet më të reja';
+
+  @override
+  String get feedFilterSavedName => 'Të ruajtura';
+
+  @override
+  String get feedFilterSavedDesc => 'Vendet që keni ruajtur';
+
+  @override
+  String get feedFiltersSheetTitle => 'Filtra të rrjedhës';
+
+  @override
+  String get feedFiltersSheetSubtitle =>
+      'Zgjidhni si dëshironi të shfletoni raportet';
+
+  @override
+  String get commentsFeedHeaderTitle => 'Komentet';
+
+  @override
+  String get commentsSortTop => 'Kryesorët';
+
+  @override
+  String get commentsSortNew => 'Të rinj';
+
+  @override
+  String get commentsEditingBanner => 'Duke përpunuar komentin';
+
+  @override
+  String get commentsBodyTooLong =>
+      'Komenti është shumë i gjatë (maks. 2000 karaktere).';
+
+  @override
+  String get commentsReplyTargetFallback => 'komentin';
+
+  @override
+  String get reportIssueSheetTitle => 'Raporto problem';
+
+  @override
+  String get reportIssueSubmitting => 'Po dërgohet...';
+
+  @override
+  String get reportIssueSubmit => 'Dërgo raportin';
+
+  @override
+  String get reportIssueFailedSnack => 'Nuk u dërgua raporti. Provoni përsëri.';
+
+  @override
+  String get reportIssueSheetSubtitle =>
+      'Na ndihmo të përmirsohemi. Pse po raporton këtë vend?';
+
+  @override
+  String get reportIssueDetailsLabel => 'Detaje shtesë (opsionale)';
+
+  @override
+  String get reportIssueDetailsHint => 'Përshkruaj problemin…';
 
   @override
   String get mapResetFiltersSemantic => 'Rivendos filtrat';
@@ -3354,7 +3517,62 @@ class AppLocalizationsSq extends AppLocalizations {
   String get takeActionLinkCopied => 'Lidhja u kopjua';
 
   @override
-  String get takeActionSharedToProfile => 'U nda në profilin tënd';
+  String get takeActionSheetTitle => 'Vepro tani';
+
+  @override
+  String get takeActionSheetSubtitle => 'Zgjidh si dëshiron të ndihmosh';
+
+  @override
+  String get takeActionCreateEcoTitle => 'Krijo aksion eko';
+
+  @override
+  String get takeActionCreateEcoSubtitle =>
+      'Planifiko një aksion pastrimi në këtë lokacion';
+
+  @override
+  String get takeActionJoinTitle => 'Bashkohu në aksion';
+
+  @override
+  String get takeActionJoinSubtitle =>
+      'Gjej dhe bashkohu aksioneve të ardhshme të pastrimit';
+
+  @override
+  String get takeActionShareTitle => 'Ndaj lokacionin';
+
+  @override
+  String get takeActionShareSubtitle =>
+      'Ndihmo të tjerët ta zbulojnë këtë lokacion';
+
+  @override
+  String get shareSheetSemanticDragHandle =>
+      'Tërhiq për të ndryshuar madhësinë ose për ta mbyllur';
+
+  @override
+  String get shareSheetCopyLinkTitle => 'Kopjo lidhjen';
+
+  @override
+  String get shareSheetCopyLinkSubtitle =>
+      'Kopjo lidhjen e vendit në clipboard';
+
+  @override
+  String get shareSheetCopyLinkSemantic =>
+      'Kopjo lidhjen për këtë vend ndotjeje';
+
+  @override
+  String get shareSheetSendTitle => 'Dërgo te njerëzit';
+
+  @override
+  String get shareSheetSendSubtitle =>
+      'Ndaj në mesazhe ose një aplikacion tjetër';
+
+  @override
+  String get shareSheetSendSemantic =>
+      'Hap fletën e ndarjes për ta dërguar këtë vend';
+
+  @override
+  String siteDetailSemanticShareCount(int count) {
+    return '$count ndarje në këtë vend';
+  }
 
   @override
   String get siteDetailThankYouReportSnack =>
@@ -3471,6 +3689,97 @@ class AppLocalizationsSq extends AppLocalizations {
   String get siteCardHidePostTitle => 'Fshih këtë postim';
 
   @override
+  String get feedSiteCommentsAppBarFallback => 'Komentet';
+
+  @override
+  String get feedSiteNotFoundMessage => 'Ky vend nuk u gjet.';
+
+  @override
+  String get feedDisplayNameFallback => 'Ti';
+
+  @override
+  String get feedOpenProfileSemantics => 'Hap profilin';
+
+  @override
+  String get feedGreetingPrefix => 'Përshëndetje, ';
+
+  @override
+  String get feedGreetingFallbackName => 'aty';
+
+  @override
+  String get feedHeaderSubtitle => 'Eksploro vendet e ndotjes pranë teje';
+
+  @override
+  String get feedNotificationBellAllReadSemantic =>
+      'Njoftime, të gjitha të lexuara';
+
+  @override
+  String feedNotificationBellUnreadSemantic(int count) {
+    return 'Njoftime, $count të palexuara';
+  }
+
+  @override
+  String get siteDetailTabPollutionSite => 'Vend ndotjeje';
+
+  @override
+  String get siteDetailTabCleaningEvents => 'Aksione pastrimi';
+
+  @override
+  String get siteDetailInfoCardTitle => 'Nevojitet veprim i komunitetit';
+
+  @override
+  String get siteDetailInfoCardBody =>
+      'Bashkohu në një pastrim, raporto ndryshime ose shpërndaje që të veprojmë më shpejt.';
+
+  @override
+  String get siteDetailReportedByPrefix => 'Raportuar nga ';
+
+  @override
+  String get siteDetailCoReportersTitle => 'Bashkë-raportues';
+
+  @override
+  String siteDetailCoReportersSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Edhe $count persona e raportuan këtë vend',
+      one: 'Edhe 1 person e raportoi këtë vend',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String siteDetailGalleryPhotoSemantic(int index) {
+    return 'Foto e vendit të ndotjes $index';
+  }
+
+  @override
+  String get siteDetailOpenGalleryLabel => 'Hap galerinë e vendit të ndotjes';
+
+  @override
+  String get siteDetailGalleryTapToExpand => 'Prek për ta zgjeruar';
+
+  @override
+  String get siteDetailGalleryOpenPhoto => 'Hap foton';
+
+  @override
+  String get commonNotAvailable => '—';
+
+  @override
+  String get commonDistanceMetersUnit => 'm';
+
+  @override
+  String get commonDistanceKilometersUnit => 'km';
+
+  @override
+  String get siteCommentsEmptyBody =>
+      'Ende nuk ka komente.\nBëhu i pari që komenton.';
+
+  @override
+  String get feedCommentsLoadMoreFailedSnack =>
+      'Nuk u ngarkuan më shumë komente. Provo përsëri.';
+
+  @override
   String get commentsSheetTitle => 'Veprime komenti';
 
   @override
@@ -3495,6 +3804,10 @@ class AppLocalizationsSq extends AppLocalizations {
   String get commentsReplyFailedSnack => 'Nuk u dërgua përgjigja.';
 
   @override
+  String get commentsSortFailedSnack =>
+      'Nuk mund të ndryshohet rendi i komenteve. Provoni përsëri.';
+
+  @override
   String get commentsDeletedSnack => 'Komenti u fshi.';
 
   @override
@@ -3515,6 +3828,196 @@ class AppLocalizationsSq extends AppLocalizations {
   String commentsReplyToSemantic(String name) {
     return 'Përgjigju $name';
   }
+
+  @override
+  String get commentsReplyButton => 'Përgjigju';
+
+  @override
+  String get commentsViewReplies => 'Shiko përgjigjet';
+
+  @override
+  String commentsLoadMoreReplies(int count) {
+    return 'Ngarko $count të tjera';
+  }
+
+  @override
+  String get siteEngagementQueuedOfflineSnack =>
+      'Lidhja u ndërpre. Do ta provojmë përsëri kur të jeni përsëri në linjë.';
+
+  @override
+  String get commentsHideReplies => 'Fshih përgjigjet';
+
+  @override
+  String get commentsStatusDeleting => 'Po fshihet…';
+
+  @override
+  String get commentsStatusSavingEdits => 'Po ruhen ndryshimet…';
+
+  @override
+  String get commentsCommentMetaJustNow => 'Tani';
+
+  @override
+  String commentsCommentMetaJustNowWithLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Tani • $count pëlqime',
+      one: 'Tani • 1 pëlqim',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaMinutesAgo(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'para $minutes minuta',
+      one: 'para 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaMinutesAgoWithLikes(int minutes, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'para $minutes minuta',
+      one: 'para 1 minute',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pëlqime',
+      one: '1 pëlqim',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'para $hours orë',
+      one: 'para 1 orë',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaHoursAgoWithLikes(int hours, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'para $hours orë',
+      one: 'para 1 orë',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pëlqime',
+      one: '1 pëlqim',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'para $days ditë',
+      one: 'para 1 ditë',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaDaysAgoWithLikes(int days, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'para $days ditë',
+      one: 'para 1 ditë',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pëlqime',
+      one: '1 pëlqim',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaDate(String date) {
+    return '$date';
+  }
+
+  @override
+  String commentsCommentMetaDateWithLikes(String date, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pëlqime',
+      one: '1 pëlqim',
+    );
+    return '$date • $_temp0';
+  }
+
+  @override
+  String get commentsOptimisticAuthorYou => 'Ju';
+
+  @override
+  String commentsReplyingToBanner(String name) {
+    return 'Po i përgjigjeni $name';
+  }
+
+  @override
+  String get commentsSemanticSheetDragHandle =>
+      'Ndryshoni madhësinë ose mbyllni komentet';
+
+  @override
+  String get commentsPrefetchCouldNotRefreshSnack =>
+      'Nuk u rifreskuan komentet. Po shfaqet biseda e fundit e ngarkuar.';
+
+  @override
+  String commentsComposerCharsRemaining(int remaining) {
+    String _temp0 = intl.Intl.pluralLogic(
+      remaining,
+      locale: localeName,
+      other: 'mbeten $remaining karaktere',
+      one: 'mbetet 1 karakter',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsSemanticHideReplies(String name) {
+    return 'Fshih përgjigjet për $name';
+  }
+
+  @override
+  String commentsSemanticViewReplies(String name) {
+    return 'Shiko përgjigjet për $name';
+  }
+
+  @override
+  String get commentsInputHintEdit => 'Përpuno komentin…';
+
+  @override
+  String get commentsInputHintAdd => 'Shto një koment…';
+
+  @override
+  String get commentsInputHintReply => 'Shkruaj një përgjigje…';
+
+  @override
+  String get commentsLikeTooltip => 'Pëlqe komentin';
+
+  @override
+  String get commentsUnlikeTooltip => 'Hiq pëlqimin';
 
   @override
   String get searchModalCancel => 'Anulo';
@@ -4368,6 +4871,120 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String siteCardPhotoSemantic(String title) {
     return 'Foto e $title';
+  }
+
+  @override
+  String siteCardGalleryPhotoSemantic(int number, String siteTitle) {
+    return 'Fotoja $number e $siteTitle';
+  }
+
+  @override
+  String siteCardSemanticRemoveUpvote(String title) {
+    return 'Hiq mbështetjen për $title';
+  }
+
+  @override
+  String siteCardSemanticUpvote(String title) {
+    return 'Mbështet $title';
+  }
+
+  @override
+  String get siteUpvoteLongPressOpensSupporters =>
+      'Shtyp gjatë për listën e mbështetësve';
+
+  @override
+  String siteCardSemanticUpvotesOpenSupporters(int count, String title) {
+    return '$count mbështetje për $title. Prek për mbështetësit';
+  }
+
+  @override
+  String siteCardSemanticCommentsOnSite(int count, String title) {
+    return '$count komente për $title';
+  }
+
+  @override
+  String siteCardSemanticSharesOnSite(int count, String title) {
+    return '$count ndarje për $title';
+  }
+
+  @override
+  String siteCardSemanticSaveSite(String title) {
+    return 'Ruaj $title dhe merr përditësime';
+  }
+
+  @override
+  String siteCardSemanticUnsaveSite(String title) {
+    return 'Hiq $title nga të ruajturat';
+  }
+
+  @override
+  String get siteCardSaveUpdatesOnSnack =>
+      'Do të marrësh përditësime për këtë vend';
+
+  @override
+  String get siteCardSaveRemovedSnack => 'U hoq nga vendet e ruajtura';
+
+  @override
+  String get siteCardFeedbackPostHiddenSnack =>
+      'Postimi u fsheh nga rrjedha jote';
+
+  @override
+  String get siteCardFeedbackThanksSnack => 'Faleminderit për reagimin';
+
+  @override
+  String get siteCardFeedOptionsSheetTitle => 'Opsione të rrjedhës';
+
+  @override
+  String get siteCardFeedOptionsSheetSubtitle =>
+      'Përshtat çfarë dëshiron të shohësh';
+
+  @override
+  String get siteCardEngagementSignInRequired =>
+      'Hyr për të mbështetur ose ruajtur vende.';
+
+  @override
+  String get siteCardEngagementWaitBriefly =>
+      'Prit pak para se të provosh përsëri.';
+
+  @override
+  String siteCardRateLimitedSnack(int seconds) {
+    return 'Shumë veprime. Provo përsëri pas $seconds sekondash.';
+  }
+
+  @override
+  String get siteDetailSaveAddedSnack => 'Vendi u ruajt në listën tënde.';
+
+  @override
+  String get siteDetailSaveRemovedSnack => 'U hoq nga të ruajturat.';
+
+  @override
+  String get siteQuickActionSaveSiteLabel => 'Ruaje vendin';
+
+  @override
+  String get siteQuickActionSavedLabel => 'E ruajtur';
+
+  @override
+  String get siteQuickActionReportIssueLabel => 'Raporto problem';
+
+  @override
+  String get siteQuickActionReportedLabel => 'E raportuar';
+
+  @override
+  String get siteQuickActionShareLabel => 'Ndaj';
+
+  @override
+  String siteCardDistanceMeters(int meters) {
+    return '$meters m';
+  }
+
+  @override
+  String siteCardDistanceKmShort(String km) {
+    return '$km km';
+  }
+
+  @override
+  String siteCardDistanceKmWhole(String km) {
+    return '$km km';
   }
 
   @override

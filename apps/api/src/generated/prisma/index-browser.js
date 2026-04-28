@@ -499,6 +499,30 @@ exports.Prisma.SiteShareEventScalarFieldEnum = {
   channel: 'channel'
 };
 
+exports.Prisma.SiteShareLinkScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  cid: 'cid',
+  expiresAt: 'expiresAt',
+  countedAt: 'countedAt',
+  siteId: 'siteId',
+  sharedByUserId: 'sharedByUserId',
+  channel: 'channel'
+};
+
+exports.Prisma.SiteShareAttributionEventScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  shareLinkId: 'shareLinkId',
+  eventType: 'eventType',
+  source: 'source',
+  dedupeKey: 'dedupeKey',
+  ipHash: 'ipHash',
+  userAgentHash: 'userAgentHash',
+  openedByUserId: 'openedByUserId'
+};
+
 exports.Prisma.UserDeviceTokenScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -715,6 +739,17 @@ exports.SiteShareChannel = exports.$Enums.SiteShareChannel = {
   other: 'other'
 };
 
+exports.SiteShareAttributionEventType = exports.$Enums.SiteShareAttributionEventType = {
+  CLICK: 'CLICK',
+  OPEN: 'OPEN'
+};
+
+exports.SiteShareAttributionSource = exports.$Enums.SiteShareAttributionSource = {
+  WEB: 'WEB',
+  APP: 'APP',
+  OTHER: 'OTHER'
+};
+
 exports.DevicePlatform = exports.$Enums.DevicePlatform = {
   IOS: 'IOS',
   ANDROID: 'ANDROID'
@@ -765,6 +800,8 @@ exports.Prisma.ModelName = {
   SiteComment: 'SiteComment',
   SiteCommentLike: 'SiteCommentLike',
   SiteShareEvent: 'SiteShareEvent',
+  SiteShareLink: 'SiteShareLink',
+  SiteShareAttributionEvent: 'SiteShareAttributionEvent',
   UserDeviceToken: 'UserDeviceToken',
   UserNotification: 'UserNotification',
   UserNotificationPreference: 'UserNotificationPreference',

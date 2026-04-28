@@ -1,6 +1,10 @@
-import { SitesMapQueryService } from '../../src/sites/sites-map-query.service';
-import { SitesService } from '../../src/sites/sites.service';
 import { SiteCommentsService } from '../../src/sites/site-comments.service';
+import { SitesAdminService } from '../../src/sites/sites-admin.service';
+import { SitesDetailService } from '../../src/sites/sites-detail.service';
+import { SitesFeedService } from '../../src/sites/sites-feed.service';
+import { SitesMapQueryService } from '../../src/sites/sites-map-query.service';
+import { SitesMediaService } from '../../src/sites/sites-media.service';
+import { SitesService } from '../../src/sites/sites.service';
 
 function makeSitesService(
   prisma: any,
@@ -20,17 +24,24 @@ function makeSitesService(
     } as any);
   const reportsUpload =
     options?.reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
+  const audit = { log: jest.fn() } as any;
   const sitesMapQuery = new SitesMapQueryService(prisma, reportsUpload);
+  const sitesFeed = new SitesFeedService(prisma, audit, reportsUpload, feedRanking, siteEngagement);
+  const sitesDetail = new SitesDetailService(prisma, reportsUpload);
+  const sitesMedia = new SitesMediaService(prisma, reportsUpload, siteEngagement);
+  const siteEvents = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any;
+  const sitesAdmin = new SitesAdminService(prisma, audit, siteEvents, sitesMapQuery, sitesFeed);
   return new SitesService(
     prisma,
-    { log: jest.fn() } as any,
     reportsUpload,
-    { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any,
-    feedRanking,
     siteEngagement,
-    new SiteCommentsService(prisma, siteEngagement),
+    new SiteCommentsService(prisma, siteEngagement, reportsUpload),
     { emit: jest.fn() } as any,
     sitesMapQuery,
+    sitesFeed,
+    sitesDetail,
+    sitesMedia,
+    sitesAdmin,
   );
 }
 

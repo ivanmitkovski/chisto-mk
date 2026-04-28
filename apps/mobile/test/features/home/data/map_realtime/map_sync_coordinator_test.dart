@@ -73,7 +73,7 @@ PollutionSite _buildSite(String id) {
     distanceKm: 1.2,
     score: 10,
     participantCount: 0,
-    imageProvider: const AssetImage('assets/images/content/placeholder.png'),
+    mediaUrls: const <String>['assets/images/content/placeholder.png'],
     latitude: 41.61,
     longitude: 21.75,
   );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
@@ -68,7 +69,7 @@ class TakeActionSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'Take action',
+                  context.l10n.takeActionSheetTitle,
                   style: (AppTypography.textTheme.titleMedium ?? const TextStyle()).copyWith(
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.3,
@@ -76,7 +77,7 @@ class TakeActionSheet extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Choose how you want to help',
+                  context.l10n.takeActionSheetSubtitle,
                   style: (AppTypography.textTheme.bodySmall ?? const TextStyle()).copyWith(
                     color: AppColors.textMuted,
                   ),
@@ -85,27 +86,21 @@ class TakeActionSheet extends StatelessWidget {
                 if (canCreateEcoAction)
                   _TakeActionTile(
                     icon: Icons.add_circle_outline_rounded,
-                    title: 'Create eco action',
-                    subtitle: 'Schedule a cleanup event at this site',
+                    title: context.l10n.takeActionCreateEcoTitle,
+                    subtitle: context.l10n.takeActionCreateEcoSubtitle,
                     onTap: () =>
                         _popWith(context, TakeActionType.createEcoAction),
                   ),
                 _TakeActionTile(
                   icon: Icons.groups_rounded,
-                  title: 'Join action',
-                  subtitle: 'Find and join upcoming cleanups here',
+                  title: context.l10n.takeActionJoinTitle,
+                  subtitle: context.l10n.takeActionJoinSubtitle,
                   onTap: () => _popWith(context, TakeActionType.joinAction),
                 ),
                 _TakeActionTile(
-                  icon: Icons.volunteer_activism_rounded,
-                  title: 'Donate / contribute',
-                  subtitle: 'Support cleanup efforts financially',
-                  onTap: () => _popWith(context, TakeActionType.donateContribute),
-                ),
-                _TakeActionTile(
                   icon: Icons.share_rounded,
-                  title: 'Share site',
-                  subtitle: 'Help others discover this site',
+                  title: context.l10n.takeActionShareTitle,
+                  subtitle: context.l10n.takeActionShareSubtitle,
                   onTap: () => _popWith(context, TakeActionType.shareSite),
                 ),
               ],

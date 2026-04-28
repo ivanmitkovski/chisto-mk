@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -31,7 +32,7 @@ class FeedSectionHeader extends StatelessWidget {
         children: <Widget>[
           Expanded(
             child: Text(
-              'Pollution feed',
+              context.l10n.feedPollutionFeedTitle,
               style: AppTypography.textTheme.titleLarge?.copyWith(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -42,8 +43,8 @@ class FeedSectionHeader extends StatelessWidget {
           ),
           Semantics(
             button: true,
-            label: 'Filter feed',
-            value: activeFilter.label,
+            label: context.l10n.feedMoreFiltersTooltip,
+            value: activeFilter.displayName(context.l10n),
             child: GestureDetector(
               onTap: onFilterTap,
               behavior: HitTestBehavior.opaque,
@@ -71,7 +72,7 @@ class FeedSectionHeader extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
                     Text(
-                      activeFilter.label,
+                      activeFilter.displayName(context.l10n),
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             fontWeight: FontWeight.w600,
                             color: activeFilter == FeedFilter.all

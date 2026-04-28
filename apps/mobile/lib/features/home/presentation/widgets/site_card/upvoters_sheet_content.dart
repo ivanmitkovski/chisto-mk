@@ -1,13 +1,14 @@
-import 'package:flutter/material.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/site_upvoters_provider.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Bottom sheet listing users who upvoted a site (loads from the API).
-class UpvotersSheetContent extends StatefulWidget {
+/// Bottom sheet listing users who upvoted a site (paginated via [siteUpvotersNotifierProvider]).
+class UpvotersSheetContent extends ConsumerStatefulWidget {
   const UpvotersSheetContent({
     super.key,
     required this.siteId,
@@ -18,114 +19,105 @@ class UpvotersSheetContent extends StatefulWidget {
   final ScrollController scrollController;
 
   @override
-  State<UpvotersSheetContent> createState() => _UpvotersSheetContentState();
+  ConsumerState<UpvotersSheetContent> createState() => _UpvotersSheetContentState();
 }
 
-class _UpvotersSheetContentState extends State<UpvotersSheetContent> {
-  static const int _pageSize = 50;
-
-  Future<SiteUpvotesResult>? _future;
-
+class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
   @override
   void initState() {
     super.initState();
-    _reload();
+    widget.scrollController.addListener(_onScroll);
   }
 
-  void _reload() {
-    setState(() {
-      _future = ServiceLocator.instance.sitesRepository.getSiteUpvotes(
-        widget.siteId,
-        page: 1,
-        limit: _pageSize,
-      );
-    });
+  @override
+  void dispose() {
+    widget.scrollController.removeListener(_onScroll);
+    super.dispose();
+  }
+
+  void _onScroll() {
+    final SiteUpvotersState s =
+        ref.read(siteUpvotersNotifierProvider(widget.siteId));
+    if (s.initialLoading || s.loadingMore || !s.hasMore) {
+      return;
+    }
+    if (!widget.scrollController.hasClients) {
+      return;
+    }
+    final ScrollPosition pos = widget.scrollController.position;
+    if (pos.pixels < pos.maxScrollExtent - 240) {
+      return;
+    }
+    ref.read(siteUpvotersNotifierProvider(widget.siteId).notifier).loadMore();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SiteUpvotesResult>(
-      future: _future,
-      builder: (BuildContext context, AsyncSnapshot<SiteUpvotesResult> snapshot) {
-        final bool waiting =
-            snapshot.connectionState == ConnectionState.waiting;
-        final Object? err = snapshot.error;
-        final SiteUpvotesResult? data = snapshot.data;
+    final SiteUpvotersState data =
+        ref.watch(siteUpvotersNotifierProvider(widget.siteId));
 
-        final String subtitle;
-        if (waiting) {
-          subtitle = '';
-        } else if (err != null) {
-          subtitle = '';
-        } else if (data != null) {
-          subtitle = context.l10n.siteUpvotersSupportersCount(data.total);
-        } else {
-          subtitle = '';
-        }
+    final String subtitle = data.initialLoading
+        ? ''
+        : data.error != null && data.items.isEmpty
+            ? ''
+            : context.l10n.siteUpvotersSupportersCount(data.total);
 
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                AppSpacing.sm,
-                AppSpacing.lg,
-                AppSpacing.sm,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            AppSpacing.sm,
+            AppSpacing.lg,
+            AppSpacing.sm,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBorder,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 5,
-                      decoration: BoxDecoration(
-                        color: AppColors.inputBorder,
-                        borderRadius: BorderRadius.circular(999),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                context.l10n.siteUpvotersSheetTitle,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+              if (subtitle.isNotEmpty) ...<Widget>[
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.textMuted,
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Text(
-                    context.l10n.siteUpvotersSheetTitle,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  if (subtitle.isNotEmpty) ...<Widget>[
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.textMuted,
-                          ),
-                    ),
-                  ],
-                  const SizedBox(height: AppSpacing.xs),
-                  const Divider(height: 1, color: AppColors.divider),
-                ],
-              ),
-            ),
-            Expanded(
-              child: _buildBody(context, waiting, err, data),
-            ),
-          ],
-        );
-      },
+                ),
+              ],
+              const SizedBox(height: AppSpacing.xs),
+              const Divider(height: 1, color: AppColors.divider),
+            ],
+          ),
+        ),
+        Expanded(
+          child: _buildBody(context, data),
+        ),
+      ],
     );
   }
 
-  Widget _buildBody(
-    BuildContext context,
-    bool waiting,
-    Object? err,
-    SiteUpvotesResult? data,
-  ) {
-    if (waiting) {
+  Widget _buildBody(BuildContext context, SiteUpvotersState data) {
+    if (data.initialLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    if (err != null) {
+    if (data.error != null && data.items.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -141,7 +133,9 @@ class _UpvotersSheetContentState extends State<UpvotersSheetContent> {
               ),
               const SizedBox(height: AppSpacing.md),
               TextButton(
-                onPressed: _reload,
+                onPressed: () => ref
+                    .read(siteUpvotersNotifierProvider(widget.siteId).notifier)
+                    .loadInitial(),
                 child: Text(context.l10n.siteUpvotersRetry),
               ),
             ],
@@ -149,7 +143,7 @@ class _UpvotersSheetContentState extends State<UpvotersSheetContent> {
         ),
       );
     }
-    if (data == null || data.items.isEmpty) {
+    if (data.items.isEmpty) {
       return Center(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
@@ -175,10 +169,22 @@ class _UpvotersSheetContentState extends State<UpvotersSheetContent> {
         AppSpacing.lg,
         AppSpacing.md,
       ),
-      itemCount: data.items.length,
+      itemCount: data.items.length + (data.loadingMore && data.hasMore ? 1 : 0),
       separatorBuilder: (BuildContext context, int index) =>
           const Divider(height: 1, color: AppColors.divider),
       itemBuilder: (BuildContext context, int index) {
+        if (index >= data.items.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+            child: Center(
+              child: SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            ),
+          );
+        }
         final SiteUpvoterItem item = data.items[index];
         return ListTile(
           key: ValueKey<String>(item.userId),

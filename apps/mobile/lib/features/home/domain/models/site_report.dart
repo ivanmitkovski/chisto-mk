@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class SiteReport {
   const SiteReport({
     required this.id,
@@ -7,7 +5,7 @@ class SiteReport {
     required this.reportedAt,
     required this.title,
     this.description,
-    this.images = const [],
+    this.imageUrls = const [],
     this.reporterAvatarUrl,
   });
 
@@ -17,7 +15,8 @@ class SiteReport {
   final DateTime reportedAt;
   final String title;
   final String? description;
-  final List<ImageProvider> images;
+  /// Remote media URLs or local asset paths (trimmed strings; UI maps to image providers).
+  final List<String> imageUrls;
 
   String get reportedAgo {
     final Duration diff = DateTime.now().difference(reportedAt);

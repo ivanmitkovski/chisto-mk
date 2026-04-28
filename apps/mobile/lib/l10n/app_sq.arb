@@ -768,9 +768,11 @@
     }
   },
   "feedRetryLoadingMore": "Provo përsëri të ngarkosh më shumë",
+  "feedLoadingMoreSemantic": "Po ngarkohen më shumë postime në rrjedhë",
   "feedShowAllSites": "Shfaq të gjitha vendet",
   "feedPullToRefreshSemantic": "Tërhiq për rifreskim",
   "feedLoadMoreFailedSnack": "Nuk u ngarkuan më shumë postime. Prek për të provuar përsëri.",
+  "feedRefreshStaleSnack": "Rifreskimi dështoi. Po shfaqet lista e fundit e ngarkuar.",
   "feedScrollToTopSemantic": "Shkrollo në krye të rrjedhës",
   "mapResetFiltersSemantic": "Rivendos filtrat",
   "mapOpenMapsFailed": "Nuk u hap Hartat",
@@ -1690,7 +1692,29 @@
   "takeActionShareSiteTitle": "Ndaj vendin",
   "takeActionShareSiteSubtitle": "Ndihmo të tjerët ta zbulojnë dhe ta mbështesin",
   "takeActionLinkCopied": "Lidhja u kopjua",
-  "takeActionSharedToProfile": "U nda në profilin tënd",
+  "takeActionSheetTitle": "Vepro tani",
+  "takeActionSheetSubtitle": "Zgjidh si dëshiron të ndihmosh",
+  "takeActionCreateEcoTitle": "Krijo aksion eko",
+  "takeActionCreateEcoSubtitle": "Planifiko një aksion pastrimi në këtë lokacion",
+  "takeActionJoinTitle": "Bashkohu në aksion",
+  "takeActionJoinSubtitle": "Gjej dhe bashkohu aksioneve të ardhshme të pastrimit",
+  "takeActionShareTitle": "Ndaj lokacionin",
+  "takeActionShareSubtitle": "Ndihmo të tjerët ta zbulojnë këtë lokacion",
+  "shareSheetSemanticDragHandle": "Tërhiq për të ndryshuar madhësinë ose për ta mbyllur",
+  "shareSheetCopyLinkTitle": "Kopjo lidhjen",
+  "shareSheetCopyLinkSubtitle": "Kopjo lidhjen e vendit në clipboard",
+  "shareSheetCopyLinkSemantic": "Kopjo lidhjen për këtë vend ndotjeje",
+  "shareSheetSendTitle": "Dërgo te njerëzit",
+  "shareSheetSendSubtitle": "Ndaj në mesazhe ose një aplikacion tjetër",
+  "shareSheetSendSemantic": "Hap fletën e ndarjes për ta dërguar këtë vend",
+  "siteDetailSemanticShareCount": "{count} ndarje në këtë vend",
+  "@siteDetailSemanticShareCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteDetailThankYouReportSnack": "Faleminderit. Raporti yt na ndihmon.",
   "siteDetailUpvoteFailedSnack": "Nuk u përditësua vota. Provo përsëri.",
   "siteDetailNoUpvotesSnack": "Ende pa vota. Bëhu i pari që e mbështet!",
@@ -1747,6 +1771,52 @@
   "siteCardDuplicateTitle": "Dublikatë",
   "siteCardMisleadingTitle": "Mashtruese",
   "siteCardHidePostTitle": "Fshih këtë postim",
+  "feedSiteCommentsAppBarFallback": "Komentet",
+  "feedSiteNotFoundMessage": "Ky vend nuk u gjet.",
+  "feedDisplayNameFallback": "Ti",
+  "feedOpenProfileSemantics": "Hap profilin",
+  "feedGreetingPrefix": "Përshëndetje, ",
+  "feedGreetingFallbackName": "aty",
+  "feedHeaderSubtitle": "Eksploro vendet e ndotjes pranë teje",
+  "feedNotificationBellAllReadSemantic": "Njoftime, të gjitha të lexuara",
+  "feedNotificationBellUnreadSemantic": "Njoftime, {count} të palexuara",
+  "@feedNotificationBellUnreadSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailTabPollutionSite": "Vend ndotjeje",
+  "siteDetailTabCleaningEvents": "Aksione pastrimi",
+  "siteDetailInfoCardTitle": "Nevojitet veprim i komunitetit",
+  "siteDetailInfoCardBody": "Bashkohu në një pastrim, raporto ndryshime ose shpërndaje që të veprojmë më shpejt.",
+  "siteDetailReportedByPrefix": "Raportuar nga ",
+  "siteDetailCoReportersTitle": "Bashkë-raportues",
+  "siteDetailCoReportersSubtitle": "{count, plural, one{Edhe 1 person e raportoi këtë vend} other{Edhe {count} persona e raportuan këtë vend}}",
+  "@siteDetailCoReportersSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailGalleryPhotoSemantic": "Foto e vendit të ndotjes {index}",
+  "@siteDetailGalleryPhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailOpenGalleryLabel": "Hap galerinë e vendit të ndotjes",
+  "siteDetailGalleryTapToExpand": "Prek për ta zgjeruar",
+  "siteDetailGalleryOpenPhoto": "Hap foton",
+  "commonNotAvailable": "—",
+  "commonDistanceMetersUnit": "m",
+  "commonDistanceKilometersUnit": "km",
+  "siteCommentsEmptyBody": "Ende nuk ka komente.\nBëhu i pari që komenton.",
+  "feedCommentsLoadMoreFailedSnack": "Nuk u ngarkuan më shumë komente. Provo përsëri.",
   "commentsSheetTitle": "Veprime komenti",
   "commentsSheetSubtitle": "Menaxho këtë koment",
   "commentsEditTitle": "Përpuno komentin",
@@ -1755,6 +1825,7 @@
   "commentsDeleteSubtitle": "Hiqe nga biseda",
   "commentsEditFailedSnack": "Nuk u përpunua komenti.",
   "commentsReplyFailedSnack": "Nuk u dërgua përgjigja.",
+  "commentsSortFailedSnack": "Nuk mund të ndryshohet rendi i komenteve. Provoni përsëri.",
   "commentsDeletedSnack": "Komenti u fshi.",
   "commentsDeleteFailedSnack": "Nuk u fshi komenti.",
   "commentsLikeFailedSnack": "Nuk u përditësua pëlqimi.",
@@ -1768,6 +1839,199 @@
       }
     }
   },
+  "commentsReplyButton": "Përgjigju",
+  "commentsViewReplies": "Shiko përgjigjet",
+  "commentsLoadMoreReplies": "Ngarko {count} të tjera",
+  "@commentsLoadMoreReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteEngagementQueuedOfflineSnack": "Lidhja u ndërpre. Do ta provojmë përsëri kur të jeni përsëri në linjë.",
+  "commentsHideReplies": "Fshih përgjigjet",
+  "commentsStatusDeleting": "Po fshihet…",
+  "commentsStatusSavingEdits": "Po ruhen ndryshimet…",
+  "commentsCommentMetaJustNow": "Tani",
+  "commentsCommentMetaJustNowWithLikes": "{count, plural, one{Tani • 1 pëlqim} other{Tani • {count} pëlqime}}",
+  "@commentsCommentMetaJustNowWithLikes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgo": "{minutes, plural, one{para 1 minute} other{para {minutes} minuta}}",
+  "@commentsCommentMetaMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgoWithLikes": "{minutes, plural, one{para 1 minute} other{para {minutes} minuta}} • {count, plural, one{1 pëlqim} other{{count} pëlqime}}",
+  "@commentsCommentMetaMinutesAgoWithLikes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgo": "{hours, plural, one{para 1 orë} other{para {hours} orë}}",
+  "@commentsCommentMetaHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgoWithLikes": "{hours, plural, one{para 1 orë} other{para {hours} orë}} • {count, plural, one{1 pëlqim} other{{count} pëlqime}}",
+  "@commentsCommentMetaHoursAgoWithLikes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgo": "{days, plural, one{para 1 ditë} other{para {days} ditë}}",
+  "@commentsCommentMetaDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgoWithLikes": "{days, plural, one{para 1 ditë} other{para {days} ditë}} • {count, plural, one{1 pëlqim} other{{count} pëlqime}}",
+  "@commentsCommentMetaDaysAgoWithLikes": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDate": "{date}",
+  "@commentsCommentMetaDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsCommentMetaDateWithLikes": "{date} • {count, plural, one{1 pëlqim} other{{count} pëlqime}}",
+  "@commentsCommentMetaDateWithLikes": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsOptimisticAuthorYou": "Ju",
+  "commentsReplyingToBanner": "Po i përgjigjeni {name}",
+  "@commentsReplyingToBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticSheetDragHandle": "Ndryshoni madhësinë ose mbyllni komentet",
+  "commentsPrefetchCouldNotRefreshSnack": "Nuk u rifreskuan komentet. Po shfaqet biseda e fundit e ngarkuar.",
+  "commentsComposerCharsRemaining": "{remaining, plural, one{mbetet 1 karakter} other{mbeten {remaining} karaktere}}",
+  "@commentsComposerCharsRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsSemanticHideReplies": "Fshih përgjigjet për {name}",
+  "@commentsSemanticHideReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticViewReplies": "Shiko përgjigjet për {name}",
+  "@commentsSemanticViewReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsInputHintEdit": "Përpuno komentin…",
+  "commentsInputHintAdd": "Shto një koment…",
+  "commentsInputHintReply": "Shkruaj një përgjigje…",
+  "commentsLikeTooltip": "Pëlqe komentin",
+  "commentsUnlikeTooltip": "Hiq pëlqimin",
+  "feedPollutionFeedTitle": "Rrjedha e ndotjes",
+  "feedOfflineBanner": "Jeni jashtë linje. Po shfaqet rrjedha e fundit e ngarkuar.",
+  "feedCaughtUpTitle": "I keni parë të gjitha",
+  "feedCaughtUpSubtitle": "Tërhiqni për rifreskim për raporte të reja",
+  "feedMoreFiltersTooltip": "Më shumë filtra",
+  "feedFilterSemantic": "Filtri {name}",
+  "@feedFilterSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedEmptyAllTitle": "Ende nuk ka vende ndotjeje",
+  "feedEmptyAllHint": "Tërhiqni për rifreskim ose kontrolloni më vonë",
+  "feedEmptyUrgentTitle": "Tani nuk ka vende urgjente",
+  "feedEmptyUrgentHint": "Shfaq të gjitha ose provoni një filtër tjetër",
+  "feedEmptyNearbyTitleOnline": "Nuk u gjetën vende afër",
+  "feedEmptyNearbyTitleOffline": "Aktivizoni vendndodhjen për vende afër",
+  "feedEmptyNearbyHintOffline": "Ndizni shërbimet e vendndodhjes dhe lejoni aksesin",
+  "feedEmptyNearbyHintOnline": "Shfaq të gjitha ose provoni një filtër tjetër",
+  "feedEmptyMostVotedTitle": "Ende nuk ka vota për vendet",
+  "feedEmptyMostVotedHint": "Shfaq të gjitha ose provoni një filtër tjetër",
+  "feedEmptyRecentTitle": "Nuk ka raporte të fundit",
+  "feedEmptyRecentHint": "Shfaq të gjitha ose provoni një filtër tjetër",
+  "feedEmptySavedTitle": "Ende nuk keni vende të ruajtura",
+  "feedEmptySavedHint": "Ruaj vende nga menuja për t’i gjetur këtu",
+  "feedFilterAllName": "Të gjitha",
+  "feedFilterAllDesc": "Renditje e balancuar",
+  "feedFilterUrgentName": "Urgjente",
+  "feedFilterUrgentDesc": "Së pari incidentet me prioritet të lartë",
+  "feedFilterNearbyName": "Afër",
+  "feedFilterNearbyDesc": "Raportet më afër jush",
+  "feedFilterMostVotedName": "Më e mbështetur",
+  "feedFilterMostVotedDesc": "Më shumë mbështetje nga komuniteti",
+  "feedFilterRecentName": "Të fundit",
+  "feedFilterRecentDesc": "Së pari raportet më të reja",
+  "feedFilterSavedName": "Të ruajtura",
+  "feedFilterSavedDesc": "Vendet që keni ruajtur",
+  "feedFiltersSheetTitle": "Filtra të rrjedhës",
+  "feedFiltersSheetSubtitle": "Zgjidhni si dëshironi të shfletoni raportet",
+  "commentsFeedHeaderTitle": "Komentet",
+  "commentsSortTop": "Kryesorët",
+  "commentsSortNew": "Të rinj",
+  "commentsEditingBanner": "Duke përpunuar komentin",
+  "commentsBodyTooLong": "Komenti është shumë i gjatë (maks. 2000 karaktere).",
+  "commentsReplyTargetFallback": "komentin",
+  "reportIssueSheetTitle": "Raporto problem",
+  "reportIssueSubmitting": "Po dërgohet...",
+  "reportIssueSubmit": "Dërgo raportin",
+  "reportIssueFailedSnack": "Nuk u dërgua raporti. Provoni përsëri.",
+  "reportIssueSheetSubtitle": "Na ndihmo të përmirsohemi. Pse po raporton këtë vend?",
+  "reportIssueDetailsLabel": "Detaje shtesë (opsionale)",
+  "reportIssueDetailsHint": "Përshkruaj problemin…",
   "searchModalCancel": "Anulo",
   "appSmartImageRetry": "Provo përsëri",
   "appSmartImageRetryIn": "Provo përsëri pas {seconds} s",
@@ -2276,6 +2540,130 @@
   "@siteCardPhotoSemantic": {
     "placeholders": {
       "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardGalleryPhotoSemantic": "Fotoja {number} e {siteTitle}",
+  "@siteCardGalleryPhotoSemantic": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "siteTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticRemoveUpvote": "Hiq mbështetjen për {title}",
+  "@siteCardSemanticRemoveUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUpvote": "Mbështet {title}",
+  "@siteCardSemanticUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteUpvoteLongPressOpensSupporters": "Shtyp gjatë për listën e mbështetësve",
+  "siteCardSemanticUpvotesOpenSupporters": "{count} mbështetje për {title}. Prek për mbështetësit",
+  "@siteCardSemanticUpvotesOpenSupporters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticCommentsOnSite": "{count} komente për {title}",
+  "@siteCardSemanticCommentsOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSharesOnSite": "{count} ndarje për {title}",
+  "@siteCardSemanticSharesOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSaveSite": "Ruaj {title} dhe merr përditësime",
+  "@siteCardSemanticSaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUnsaveSite": "Hiq {title} nga të ruajturat",
+  "@siteCardSemanticUnsaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSaveUpdatesOnSnack": "Do të marrësh përditësime për këtë vend",
+  "siteCardSaveRemovedSnack": "U hoq nga vendet e ruajtura",
+  "siteCardFeedbackPostHiddenSnack": "Postimi u fsheh nga rrjedha jote",
+  "siteCardFeedbackThanksSnack": "Faleminderit për reagimin",
+  "siteCardFeedOptionsSheetTitle": "Opsione të rrjedhës",
+  "siteCardFeedOptionsSheetSubtitle": "Përshtat çfarë dëshiron të shohësh",
+  "siteCardEngagementSignInRequired": "Hyr për të mbështetur ose ruajtur vende.",
+  "siteCardEngagementWaitBriefly": "Prit pak para se të provosh përsëri.",
+  "siteCardRateLimitedSnack": "Shumë veprime. Provo përsëri pas {seconds} sekondash.",
+  "@siteCardRateLimitedSnack": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailSaveAddedSnack": "Vendi u ruajt në listën tënde.",
+  "siteDetailSaveRemovedSnack": "U hoq nga të ruajturat.",
+  "siteQuickActionSaveSiteLabel": "Ruaje vendin",
+  "siteQuickActionSavedLabel": "E ruajtur",
+  "siteQuickActionReportIssueLabel": "Raporto problem",
+  "siteQuickActionReportedLabel": "E raportuar",
+  "siteQuickActionShareLabel": "Ndaj",
+  "siteCardDistanceMeters": "{meters} m",
+  "@siteCardDistanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "siteCardDistanceKmShort": "{km} km",
+  "@siteCardDistanceKmShort": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardDistanceKmWhole": "{km} km",
+  "@siteCardDistanceKmWhole": {
+    "placeholders": {
+      "km": {
         "type": "String"
       }
     }

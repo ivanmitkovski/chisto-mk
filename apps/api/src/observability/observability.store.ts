@@ -8,6 +8,7 @@ export class ObservabilityStore {
   private static feedCandidatePoolSizes: number[] = [];
   private static feedFeedbackCounts: Record<string, number> = {};
   private static feedCacheInvalidationCounts: Record<string, number> = {};
+  private static feedCacheEntries = 0;
   private static feedReasonCodeCounts: Record<string, number> = {};
   private static feedPaginationContinuityIssues = 0;
   private static pushSendsTotal = 0;
@@ -30,10 +31,45 @@ export class ObservabilityStore {
   private static mapSseReconnectHints = 0;
   private static mapSseEventsEmitted = 0;
   private static mapSseReplayEvents = 0;
+  private static mapCacheEntries = 0;
   private static cleanupEventStaffPendingSignals = 0;
   private static cleanupEventPublishedAudienceNotified = 0;
   private static cleanupEventModerationApproved = 0;
   private static impactReceiptFetchTotal = 0;
+  private static shareLinksIssuedTotal = 0;
+  private static shareEventsIngestedTotal = 0;
+  private static shareEventsCountedTotal = 0;
+  private static shareEventsDedupedTotal = 0;
+  private static shareEventsInvalidTotal = 0;
+  private static shareEventsRateLimitedTotal = 0;
+  private static shareIssueDurationsMs: number[] = [];
+  private static shareIngestDurationsMs: number[] = [];
+
+  static recordShareLinkIssued(durationMs: number): void {
+    this.shareLinksIssuedTotal += 1;
+    this.shareIssueDurationsMs.push(durationMs);
+    if (this.shareIssueDurationsMs.length > 2000) {
+      this.shareIssueDurationsMs = this.shareIssueDurationsMs.slice(-1200);
+    }
+  }
+
+  static recordShareAttributionEvent(input: {
+    durationMs: number;
+    counted: boolean;
+    deduped: boolean;
+    invalid: boolean;
+    rateLimited: boolean;
+  }): void {
+    this.shareEventsIngestedTotal += 1;
+    if (input.counted) this.shareEventsCountedTotal += 1;
+    if (input.deduped) this.shareEventsDedupedTotal += 1;
+    if (input.invalid) this.shareEventsInvalidTotal += 1;
+    if (input.rateLimited) this.shareEventsRateLimitedTotal += 1;
+    this.shareIngestDurationsMs.push(input.durationMs);
+    if (this.shareIngestDurationsMs.length > 2000) {
+      this.shareIngestDurationsMs = this.shareIngestDurationsMs.slice(-1200);
+    }
+  }
 
   static recordCleanupEventStaffPendingSignals(count: number): void {
     this.cleanupEventStaffPendingSignals += Math.max(0, count);
@@ -87,6 +123,10 @@ export class ObservabilityStore {
   static recordFeedCacheInvalidation(reason: string): void {
     const key = reason || 'unknown';
     this.feedCacheInvalidationCounts[key] = (this.feedCacheInvalidationCounts[key] ?? 0) + 1;
+  }
+
+  static setFeedCacheEntries(size: number): void {
+    this.feedCacheEntries = Math.max(0, size);
   }
 
   static recordFeedReasonCodes(reasonCodes: string[]): void {
@@ -159,6 +199,10 @@ export class ObservabilityStore {
     this.mapSseReplayEvents += Math.max(0, count);
   }
 
+  static setMapCacheEntries(size: number): void {
+    this.mapCacheEntries = Math.max(0, size);
+  }
+
   static setPushQueueStats(input: {
     queueDepth: number;
     activeLeases: number;
@@ -217,6 +261,7 @@ export class ObservabilityStore {
           : 0,
       feedFeedbackCounts: this.feedFeedbackCounts,
       feedCacheInvalidationCounts: this.feedCacheInvalidationCounts,
+      feedCacheEntries: this.feedCacheEntries,
       feedReasonCodeCounts: this.feedReasonCodeCounts,
       feedPaginationContinuityIssues: this.feedPaginationContinuityIssues,
       pushSendsTotal: this.pushSendsTotal,
@@ -263,10 +308,29 @@ export class ObservabilityStore {
       mapSseReconnectHints: this.mapSseReconnectHints,
       mapSseEventsEmitted: this.mapSseEventsEmitted,
       mapSseReplayEvents: this.mapSseReplayEvents,
+      mapCacheEntries: this.mapCacheEntries,
       cleanupEventStaffPendingSignals: this.cleanupEventStaffPendingSignals,
       cleanupEventPublishedAudienceNotified: this.cleanupEventPublishedAudienceNotified,
       cleanupEventModerationApproved: this.cleanupEventModerationApproved,
       impactReceiptFetchTotal: this.impactReceiptFetchTotal,
+      shareLinksIssuedTotal: this.shareLinksIssuedTotal,
+      shareEventsIngestedTotal: this.shareEventsIngestedTotal,
+      shareEventsCountedTotal: this.shareEventsCountedTotal,
+      shareEventsDedupedTotal: this.shareEventsDedupedTotal,
+      shareEventsInvalidTotal: this.shareEventsInvalidTotal,
+      shareEventsRateLimitedTotal: this.shareEventsRateLimitedTotal,
+      shareIssueP95Ms: (() => {
+        const ms = [...this.shareIssueDurationsMs].sort((a, b) => a - b);
+        if (ms.length == 0) return 0;
+        const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
+        return Number(ms[idx].toFixed(2));
+      })(),
+      shareIngestP95Ms: (() => {
+        const ms = [...this.shareIngestDurationsMs].sort((a, b) => a - b);
+        if (ms.length == 0) return 0;
+        const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
+        return Number(ms[idx].toFixed(2));
+      })(),
     };
   }
 }

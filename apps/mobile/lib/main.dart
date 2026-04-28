@@ -10,10 +10,13 @@ import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
+import 'package:chisto_mobile/core/deep_links/share_token_from_route.dart';
+import 'package:chisto_mobile/core/navigation/app_navigator_key.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
 import 'package:chisto_mobile/features/notifications/data/notification_open_router.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
@@ -41,7 +44,11 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations(<DeviceOrientation>[
     DeviceOrientation.portraitUp,
   ]);
-  runApp(const ChistoApp());
+  runApp(
+    const ProviderScope(
+      child: ChistoApp(),
+    ),
+  );
 }
 
 class ChistoApp extends StatefulWidget {
@@ -52,7 +59,7 @@ class ChistoApp extends StatefulWidget {
 }
 
 class _ChistoAppState extends State<ChistoApp> {
-  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _navigatorKey = appRootNavigatorKey;
   final AppLinks _appLinks = AppLinks();
   StreamSubscription<RemoteMessage>? _tapSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
@@ -110,13 +117,33 @@ class _ChistoAppState extends State<ChistoApp> {
     if (nav == null) {
       return;
     }
+    final DeepLinkRoute? parsed = DeepLinkRouter.parse(uri);
     final bool handled = DeepLinkRouter.handleUri(
       nav,
       uri,
       isAuthenticated: ServiceLocator.instance.authState.isAuthenticated,
     );
+    if (handled) {
+      unawaited(_trackShareOpenFromDeepLink(parsed));
+    }
     if (!handled && kDebugMode) {
       debugPrint('[DeepLink] Unhandled URI: $uri');
+    }
+  }
+
+  Future<void> _trackShareOpenFromDeepLink(DeepLinkRoute? route) async {
+    final String? token = shareTokenFromDeepLinkRoute(route);
+    if (token == null || token.isEmpty) {
+      return;
+    }
+    try {
+      await ServiceLocator.instance.sitesRepository.ingestSiteShareOpen(
+        token: token,
+        eventType: 'OPEN',
+        source: 'APP',
+      );
+    } catch (_) {
+      // Deliberate: attribution tracking must never block deep-link routing.
     }
   }
 
