@@ -11,7 +11,6 @@ class PollutionSiteTab extends StatefulWidget {
     required this.onTakeAction,
     this.onUpvoteTap,
     this.isUpvotePending = false,
-    this.upvoteScale = 1,
     this.onScoreTap,
     this.onCommentsTap,
     this.onParticipantsTap,
@@ -26,9 +25,8 @@ class PollutionSiteTab extends StatefulWidget {
 
   final PollutionSite site;
   final VoidCallback onTakeAction;
-  final VoidCallback? onUpvoteTap;
+  final Future<void> Function()? onUpvoteTap;
   final bool isUpvotePending;
-  final double upvoteScale;
   final VoidCallback? onScoreTap;
   final VoidCallback? onCommentsTap;
   final VoidCallback? onParticipantsTap;
@@ -84,11 +82,11 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
               SiteStatsRow(
                 site: widget.site,
                 isUpvotePending: widget.isUpvotePending,
-                upvoteScale: widget.upvoteScale,
                 onUpvoteTap: widget.onUpvoteTap,
                 onScoreTap: widget.onScoreTap,
                 onCommentsTap: widget.onCommentsTap,
                 onParticipantsTap: widget.onParticipantsTap,
+                onShareTap: widget.onShareTap,
                 onDistanceTap: widget.onDistanceTap,
               ),
               const SizedBox(height: AppSpacing.md),

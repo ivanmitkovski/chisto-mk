@@ -9,9 +9,6 @@ void main() {
   testWidgets('PollutionMarker builds for asset-backed site', (
     WidgetTester tester,
   ) async {
-    const AssetImage asset = AssetImage(
-      'assets/images/content/people_cleaning.png',
-    );
     final PollutionSite site = PollutionSite(
       id: 'm1',
       title: 'Marker site',
@@ -21,8 +18,7 @@ void main() {
       distanceKm: 1,
       score: 1,
       participantCount: 0,
-      imageProvider: asset,
-      primaryImageUrl: null,
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
       latitude: 41.6,
       longitude: 21.7,
     );

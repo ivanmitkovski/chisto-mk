@@ -179,6 +179,16 @@ export type SiteCommentLike = $Result.DefaultSelection<Prisma.$SiteCommentLikePa
  */
 export type SiteShareEvent = $Result.DefaultSelection<Prisma.$SiteShareEventPayload>
 /**
+ * Model SiteShareLink
+ * 
+ */
+export type SiteShareLink = $Result.DefaultSelection<Prisma.$SiteShareLinkPayload>
+/**
+ * Model SiteShareAttributionEvent
+ * 
+ */
+export type SiteShareAttributionEvent = $Result.DefaultSelection<Prisma.$SiteShareAttributionEventPayload>
+/**
  * Model UserDeviceToken
  * 
  */
@@ -380,6 +390,23 @@ export const SiteShareChannel: {
 export type SiteShareChannel = (typeof SiteShareChannel)[keyof typeof SiteShareChannel]
 
 
+export const SiteShareAttributionEventType: {
+  CLICK: 'CLICK',
+  OPEN: 'OPEN'
+};
+
+export type SiteShareAttributionEventType = (typeof SiteShareAttributionEventType)[keyof typeof SiteShareAttributionEventType]
+
+
+export const SiteShareAttributionSource: {
+  WEB: 'WEB',
+  APP: 'APP',
+  OTHER: 'OTHER'
+};
+
+export type SiteShareAttributionSource = (typeof SiteShareAttributionSource)[keyof typeof SiteShareAttributionSource]
+
+
 export const DevicePlatform: {
   IOS: 'IOS',
   ANDROID: 'ANDROID'
@@ -470,6 +497,14 @@ export const CheckInRiskSignalType: typeof $Enums.CheckInRiskSignalType
 export type SiteShareChannel = $Enums.SiteShareChannel
 
 export const SiteShareChannel: typeof $Enums.SiteShareChannel
+
+export type SiteShareAttributionEventType = $Enums.SiteShareAttributionEventType
+
+export const SiteShareAttributionEventType: typeof $Enums.SiteShareAttributionEventType
+
+export type SiteShareAttributionSource = $Enums.SiteShareAttributionSource
+
+export const SiteShareAttributionSource: typeof $Enums.SiteShareAttributionSource
 
 export type DevicePlatform = $Enums.DevicePlatform
 
@@ -929,6 +964,26 @@ export class PrismaClient<
     * ```
     */
   get siteShareEvent(): Prisma.SiteShareEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteShareLink`: Exposes CRUD operations for the **SiteShareLink** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteShareLinks
+    * const siteShareLinks = await prisma.siteShareLink.findMany()
+    * ```
+    */
+  get siteShareLink(): Prisma.SiteShareLinkDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteShareAttributionEvent`: Exposes CRUD operations for the **SiteShareAttributionEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteShareAttributionEvents
+    * const siteShareAttributionEvents = await prisma.siteShareAttributionEvent.findMany()
+    * ```
+    */
+  get siteShareAttributionEvent(): Prisma.SiteShareAttributionEventDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.userDeviceToken`: Exposes CRUD operations for the **UserDeviceToken** model.
@@ -1446,6 +1501,8 @@ export namespace Prisma {
     SiteComment: 'SiteComment',
     SiteCommentLike: 'SiteCommentLike',
     SiteShareEvent: 'SiteShareEvent',
+    SiteShareLink: 'SiteShareLink',
+    SiteShareAttributionEvent: 'SiteShareAttributionEvent',
     UserDeviceToken: 'UserDeviceToken',
     UserNotification: 'UserNotification',
     UserNotificationPreference: 'UserNotificationPreference',
@@ -1466,7 +1523,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3912,6 +3969,154 @@ export namespace Prisma {
           }
         }
       }
+      SiteShareLink: {
+        payload: Prisma.$SiteShareLinkPayload<ExtArgs>
+        fields: Prisma.SiteShareLinkFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteShareLinkFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteShareLinkFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          findFirst: {
+            args: Prisma.SiteShareLinkFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteShareLinkFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          findMany: {
+            args: Prisma.SiteShareLinkFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>[]
+          }
+          create: {
+            args: Prisma.SiteShareLinkCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          createMany: {
+            args: Prisma.SiteShareLinkCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteShareLinkCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>[]
+          }
+          delete: {
+            args: Prisma.SiteShareLinkDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          update: {
+            args: Prisma.SiteShareLinkUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteShareLinkDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteShareLinkUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteShareLinkUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteShareLinkUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareLinkPayload>
+          }
+          aggregate: {
+            args: Prisma.SiteShareLinkAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteShareLink>
+          }
+          groupBy: {
+            args: Prisma.SiteShareLinkGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareLinkGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteShareLinkCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareLinkCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteShareAttributionEvent: {
+        payload: Prisma.$SiteShareAttributionEventPayload<ExtArgs>
+        fields: Prisma.SiteShareAttributionEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteShareAttributionEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteShareAttributionEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          findFirst: {
+            args: Prisma.SiteShareAttributionEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteShareAttributionEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          findMany: {
+            args: Prisma.SiteShareAttributionEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>[]
+          }
+          create: {
+            args: Prisma.SiteShareAttributionEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          createMany: {
+            args: Prisma.SiteShareAttributionEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteShareAttributionEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>[]
+          }
+          delete: {
+            args: Prisma.SiteShareAttributionEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          update: {
+            args: Prisma.SiteShareAttributionEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteShareAttributionEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteShareAttributionEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteShareAttributionEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteShareAttributionEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteShareAttributionEventPayload>
+          }
+          aggregate: {
+            args: Prisma.SiteShareAttributionEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteShareAttributionEvent>
+          }
+          groupBy: {
+            args: Prisma.SiteShareAttributionEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareAttributionEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteShareAttributionEventCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteShareAttributionEventCountAggregateOutputType> | number
+          }
+        }
+      }
       UserDeviceToken: {
         payload: Prisma.$UserDeviceTokenPayload<ExtArgs>
         fields: Prisma.UserDeviceTokenFieldRefs
@@ -4423,6 +4628,8 @@ export namespace Prisma {
     siteComment?: SiteCommentOmit
     siteCommentLike?: SiteCommentLikeOmit
     siteShareEvent?: SiteShareEventOmit
+    siteShareLink?: SiteShareLinkOmit
+    siteShareAttributionEvent?: SiteShareAttributionEventOmit
     userDeviceToken?: UserDeviceTokenOmit
     userNotification?: UserNotificationOmit
     userNotificationPreference?: UserNotificationPreferenceOmit
@@ -4520,6 +4727,7 @@ export namespace Prisma {
     siteSaves: number
     siteComments: number
     siteShareEvents: number
+    siteShareLinks: number
     siteCommentLikes: number
     deviceTokens: number
     userNotifications: number
@@ -4550,6 +4758,7 @@ export namespace Prisma {
     siteSaves?: boolean | UserCountOutputTypeCountSiteSavesArgs
     siteComments?: boolean | UserCountOutputTypeCountSiteCommentsArgs
     siteShareEvents?: boolean | UserCountOutputTypeCountSiteShareEventsArgs
+    siteShareLinks?: boolean | UserCountOutputTypeCountSiteShareLinksArgs
     siteCommentLikes?: boolean | UserCountOutputTypeCountSiteCommentLikesArgs
     deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
     userNotifications?: boolean | UserCountOutputTypeCountUserNotificationsArgs
@@ -4660,6 +4869,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSiteShareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteShareEventWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSiteShareLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareLinkWhereInput
   }
 
   /**
@@ -4779,6 +4995,7 @@ export namespace Prisma {
     saves: number
     comments: number
     shareEvents: number
+    shareLinks: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4788,6 +5005,7 @@ export namespace Prisma {
     saves?: boolean | SiteCountOutputTypeCountSavesArgs
     comments?: boolean | SiteCountOutputTypeCountCommentsArgs
     shareEvents?: boolean | SiteCountOutputTypeCountShareEventsArgs
+    shareLinks?: boolean | SiteCountOutputTypeCountShareLinksArgs
   }
 
   // Custom InputTypes
@@ -4841,6 +5059,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountShareEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteShareEventWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountShareLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareLinkWhereInput
   }
 
 
@@ -5091,6 +5316,37 @@ export namespace Prisma {
    */
   export type SiteCommentCountOutputTypeCountLikesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteCommentLikeWhereInput
+  }
+
+
+  /**
+   * Count Type SiteShareLinkCountOutputType
+   */
+
+  export type SiteShareLinkCountOutputType = {
+    attributionEvents: number
+  }
+
+  export type SiteShareLinkCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    attributionEvents?: boolean | SiteShareLinkCountOutputTypeCountAttributionEventsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SiteShareLinkCountOutputType without action
+   */
+  export type SiteShareLinkCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLinkCountOutputType
+     */
+    select?: SiteShareLinkCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareLinkCountOutputType without action
+   */
+  export type SiteShareLinkCountOutputTypeCountAttributionEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareAttributionEventWhereInput
   }
 
 
@@ -5477,6 +5733,7 @@ export namespace Prisma {
     siteSaves?: boolean | User$siteSavesArgs<ExtArgs>
     siteComments?: boolean | User$siteCommentsArgs<ExtArgs>
     siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
+    siteShareLinks?: boolean | User$siteShareLinksArgs<ExtArgs>
     siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
@@ -5591,6 +5848,7 @@ export namespace Prisma {
     siteSaves?: boolean | User$siteSavesArgs<ExtArgs>
     siteComments?: boolean | User$siteCommentsArgs<ExtArgs>
     siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
+    siteShareLinks?: boolean | User$siteShareLinksArgs<ExtArgs>
     siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
@@ -5627,6 +5885,7 @@ export namespace Prisma {
       siteSaves: Prisma.$SiteSavePayload<ExtArgs>[]
       siteComments: Prisma.$SiteCommentPayload<ExtArgs>[]
       siteShareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
+      siteShareLinks: Prisma.$SiteShareLinkPayload<ExtArgs>[]
       siteCommentLikes: Prisma.$SiteCommentLikePayload<ExtArgs>[]
       deviceTokens: Prisma.$UserDeviceTokenPayload<ExtArgs>[]
       userNotifications: Prisma.$UserNotificationPayload<ExtArgs>[]
@@ -6075,6 +6334,7 @@ export namespace Prisma {
     siteSaves<T extends User$siteSavesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteSavesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     siteComments<T extends User$siteCommentsArgs<ExtArgs> = {}>(args?: Subset<T, User$siteCommentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     siteShareEvents<T extends User$siteShareEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$siteShareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    siteShareLinks<T extends User$siteShareLinksArgs<ExtArgs> = {}>(args?: Subset<T, User$siteShareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     siteCommentLikes<T extends User$siteCommentLikesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteCommentLikesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deviceTokens<T extends User$deviceTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserDeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     userNotifications<T extends User$userNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$userNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -6840,6 +7100,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * User.siteShareLinks
+   */
+  export type User$siteShareLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    where?: SiteShareLinkWhereInput
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    cursor?: SiteShareLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
   }
 
   /**
@@ -16178,6 +16462,7 @@ export namespace Prisma {
     saves?: boolean | Site$savesArgs<ExtArgs>
     comments?: boolean | Site$commentsArgs<ExtArgs>
     shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
+    shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -16234,6 +16519,7 @@ export namespace Prisma {
     saves?: boolean | Site$savesArgs<ExtArgs>
     comments?: boolean | Site$commentsArgs<ExtArgs>
     shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
+    shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -16248,6 +16534,7 @@ export namespace Prisma {
       saves: Prisma.$SiteSavePayload<ExtArgs>[]
       comments: Prisma.$SiteCommentPayload<ExtArgs>[]
       shareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
+      shareLinks: Prisma.$SiteShareLinkPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16665,6 +16952,7 @@ export namespace Prisma {
     saves<T extends Site$savesArgs<ExtArgs> = {}>(args?: Subset<T, Site$savesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteSavePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     comments<T extends Site$commentsArgs<ExtArgs> = {}>(args?: Subset<T, Site$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     shareEvents<T extends Site$shareEventsArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    shareLinks<T extends Site$shareLinksArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17240,6 +17528,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SiteShareEventScalarFieldEnum | SiteShareEventScalarFieldEnum[]
+  }
+
+  /**
+   * Site.shareLinks
+   */
+  export type Site$shareLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    where?: SiteShareLinkWhereInput
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    cursor?: SiteShareLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
   }
 
   /**
@@ -43779,6 +44091,2293 @@ export namespace Prisma {
 
 
   /**
+   * Model SiteShareLink
+   */
+
+  export type AggregateSiteShareLink = {
+    _count: SiteShareLinkCountAggregateOutputType | null
+    _min: SiteShareLinkMinAggregateOutputType | null
+    _max: SiteShareLinkMaxAggregateOutputType | null
+  }
+
+  export type SiteShareLinkMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    cid: string | null
+    expiresAt: Date | null
+    countedAt: Date | null
+    siteId: string | null
+    sharedByUserId: string | null
+    channel: $Enums.SiteShareChannel | null
+  }
+
+  export type SiteShareLinkMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    cid: string | null
+    expiresAt: Date | null
+    countedAt: Date | null
+    siteId: string | null
+    sharedByUserId: string | null
+    channel: $Enums.SiteShareChannel | null
+  }
+
+  export type SiteShareLinkCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    cid: number
+    expiresAt: number
+    countedAt: number
+    siteId: number
+    sharedByUserId: number
+    channel: number
+    _all: number
+  }
+
+
+  export type SiteShareLinkMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    cid?: true
+    expiresAt?: true
+    countedAt?: true
+    siteId?: true
+    sharedByUserId?: true
+    channel?: true
+  }
+
+  export type SiteShareLinkMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    cid?: true
+    expiresAt?: true
+    countedAt?: true
+    siteId?: true
+    sharedByUserId?: true
+    channel?: true
+  }
+
+  export type SiteShareLinkCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    cid?: true
+    expiresAt?: true
+    countedAt?: true
+    siteId?: true
+    sharedByUserId?: true
+    channel?: true
+    _all?: true
+  }
+
+  export type SiteShareLinkAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareLink to aggregate.
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareLinks to fetch.
+     */
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteShareLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteShareLinks
+    **/
+    _count?: true | SiteShareLinkCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteShareLinkMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteShareLinkMaxAggregateInputType
+  }
+
+  export type GetSiteShareLinkAggregateType<T extends SiteShareLinkAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteShareLink]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteShareLink[P]>
+      : GetScalarType<T[P], AggregateSiteShareLink[P]>
+  }
+
+
+
+
+  export type SiteShareLinkGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareLinkWhereInput
+    orderBy?: SiteShareLinkOrderByWithAggregationInput | SiteShareLinkOrderByWithAggregationInput[]
+    by: SiteShareLinkScalarFieldEnum[] | SiteShareLinkScalarFieldEnum
+    having?: SiteShareLinkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteShareLinkCountAggregateInputType | true
+    _min?: SiteShareLinkMinAggregateInputType
+    _max?: SiteShareLinkMaxAggregateInputType
+  }
+
+  export type SiteShareLinkGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    cid: string
+    expiresAt: Date
+    countedAt: Date | null
+    siteId: string
+    sharedByUserId: string | null
+    channel: $Enums.SiteShareChannel
+    _count: SiteShareLinkCountAggregateOutputType | null
+    _min: SiteShareLinkMinAggregateOutputType | null
+    _max: SiteShareLinkMaxAggregateOutputType | null
+  }
+
+  type GetSiteShareLinkGroupByPayload<T extends SiteShareLinkGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteShareLinkGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteShareLinkGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteShareLinkGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteShareLinkGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteShareLinkSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cid?: boolean
+    expiresAt?: boolean
+    countedAt?: boolean
+    siteId?: boolean
+    sharedByUserId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+    attributionEvents?: boolean | SiteShareLink$attributionEventsArgs<ExtArgs>
+    _count?: boolean | SiteShareLinkCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareLink"]>
+
+  export type SiteShareLinkSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cid?: boolean
+    expiresAt?: boolean
+    countedAt?: boolean
+    siteId?: boolean
+    sharedByUserId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareLink"]>
+
+  export type SiteShareLinkSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cid?: boolean
+    expiresAt?: boolean
+    countedAt?: boolean
+    siteId?: boolean
+    sharedByUserId?: boolean
+    channel?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareLink"]>
+
+  export type SiteShareLinkSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    cid?: boolean
+    expiresAt?: boolean
+    countedAt?: boolean
+    siteId?: boolean
+    sharedByUserId?: boolean
+    channel?: boolean
+  }
+
+  export type SiteShareLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "cid" | "expiresAt" | "countedAt" | "siteId" | "sharedByUserId" | "channel", ExtArgs["result"]["siteShareLink"]>
+  export type SiteShareLinkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+    attributionEvents?: boolean | SiteShareLink$attributionEventsArgs<ExtArgs>
+    _count?: boolean | SiteShareLinkCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SiteShareLinkIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+  }
+  export type SiteShareLinkIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+    sharedByUser?: boolean | SiteShareLink$sharedByUserArgs<ExtArgs>
+  }
+
+  export type $SiteShareLinkPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteShareLink"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+      sharedByUser: Prisma.$UserPayload<ExtArgs> | null
+      attributionEvents: Prisma.$SiteShareAttributionEventPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      cid: string
+      expiresAt: Date
+      countedAt: Date | null
+      siteId: string
+      sharedByUserId: string | null
+      channel: $Enums.SiteShareChannel
+    }, ExtArgs["result"]["siteShareLink"]>
+    composites: {}
+  }
+
+  type SiteShareLinkGetPayload<S extends boolean | null | undefined | SiteShareLinkDefaultArgs> = $Result.GetResult<Prisma.$SiteShareLinkPayload, S>
+
+  type SiteShareLinkCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteShareLinkFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteShareLinkCountAggregateInputType | true
+    }
+
+  export interface SiteShareLinkDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteShareLink'], meta: { name: 'SiteShareLink' } }
+    /**
+     * Find zero or one SiteShareLink that matches the filter.
+     * @param {SiteShareLinkFindUniqueArgs} args - Arguments to find a SiteShareLink
+     * @example
+     * // Get one SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteShareLinkFindUniqueArgs>(args: SelectSubset<T, SiteShareLinkFindUniqueArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteShareLink that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteShareLinkFindUniqueOrThrowArgs} args - Arguments to find a SiteShareLink
+     * @example
+     * // Get one SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteShareLinkFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteShareLinkFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareLink that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkFindFirstArgs} args - Arguments to find a SiteShareLink
+     * @example
+     * // Get one SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteShareLinkFindFirstArgs>(args?: SelectSubset<T, SiteShareLinkFindFirstArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareLink that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkFindFirstOrThrowArgs} args - Arguments to find a SiteShareLink
+     * @example
+     * // Get one SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteShareLinkFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteShareLinkFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteShareLinks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteShareLinks
+     * const siteShareLinks = await prisma.siteShareLink.findMany()
+     * 
+     * // Get first 10 SiteShareLinks
+     * const siteShareLinks = await prisma.siteShareLink.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteShareLinkWithIdOnly = await prisma.siteShareLink.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteShareLinkFindManyArgs>(args?: SelectSubset<T, SiteShareLinkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteShareLink.
+     * @param {SiteShareLinkCreateArgs} args - Arguments to create a SiteShareLink.
+     * @example
+     * // Create one SiteShareLink
+     * const SiteShareLink = await prisma.siteShareLink.create({
+     *   data: {
+     *     // ... data to create a SiteShareLink
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteShareLinkCreateArgs>(args: SelectSubset<T, SiteShareLinkCreateArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteShareLinks.
+     * @param {SiteShareLinkCreateManyArgs} args - Arguments to create many SiteShareLinks.
+     * @example
+     * // Create many SiteShareLinks
+     * const siteShareLink = await prisma.siteShareLink.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteShareLinkCreateManyArgs>(args?: SelectSubset<T, SiteShareLinkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteShareLinks and returns the data saved in the database.
+     * @param {SiteShareLinkCreateManyAndReturnArgs} args - Arguments to create many SiteShareLinks.
+     * @example
+     * // Create many SiteShareLinks
+     * const siteShareLink = await prisma.siteShareLink.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteShareLinks and only return the `id`
+     * const siteShareLinkWithIdOnly = await prisma.siteShareLink.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteShareLinkCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteShareLinkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteShareLink.
+     * @param {SiteShareLinkDeleteArgs} args - Arguments to delete one SiteShareLink.
+     * @example
+     * // Delete one SiteShareLink
+     * const SiteShareLink = await prisma.siteShareLink.delete({
+     *   where: {
+     *     // ... filter to delete one SiteShareLink
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteShareLinkDeleteArgs>(args: SelectSubset<T, SiteShareLinkDeleteArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteShareLink.
+     * @param {SiteShareLinkUpdateArgs} args - Arguments to update one SiteShareLink.
+     * @example
+     * // Update one SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteShareLinkUpdateArgs>(args: SelectSubset<T, SiteShareLinkUpdateArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteShareLinks.
+     * @param {SiteShareLinkDeleteManyArgs} args - Arguments to filter SiteShareLinks to delete.
+     * @example
+     * // Delete a few SiteShareLinks
+     * const { count } = await prisma.siteShareLink.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteShareLinkDeleteManyArgs>(args?: SelectSubset<T, SiteShareLinkDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteShareLinks
+     * const siteShareLink = await prisma.siteShareLink.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteShareLinkUpdateManyArgs>(args: SelectSubset<T, SiteShareLinkUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareLinks and returns the data updated in the database.
+     * @param {SiteShareLinkUpdateManyAndReturnArgs} args - Arguments to update many SiteShareLinks.
+     * @example
+     * // Update many SiteShareLinks
+     * const siteShareLink = await prisma.siteShareLink.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteShareLinks and only return the `id`
+     * const siteShareLinkWithIdOnly = await prisma.siteShareLink.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteShareLinkUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteShareLinkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteShareLink.
+     * @param {SiteShareLinkUpsertArgs} args - Arguments to update or create a SiteShareLink.
+     * @example
+     * // Update or create a SiteShareLink
+     * const siteShareLink = await prisma.siteShareLink.upsert({
+     *   create: {
+     *     // ... data to create a SiteShareLink
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteShareLink we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteShareLinkUpsertArgs>(args: SelectSubset<T, SiteShareLinkUpsertArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteShareLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkCountArgs} args - Arguments to filter SiteShareLinks to count.
+     * @example
+     * // Count the number of SiteShareLinks
+     * const count = await prisma.siteShareLink.count({
+     *   where: {
+     *     // ... the filter for the SiteShareLinks we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteShareLinkCountArgs>(
+      args?: Subset<T, SiteShareLinkCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteShareLinkCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteShareLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteShareLinkAggregateArgs>(args: Subset<T, SiteShareLinkAggregateArgs>): Prisma.PrismaPromise<GetSiteShareLinkAggregateType<T>>
+
+    /**
+     * Group by SiteShareLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareLinkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteShareLinkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteShareLinkGroupByArgs['orderBy'] }
+        : { orderBy?: SiteShareLinkGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteShareLinkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteShareLinkGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteShareLink model
+   */
+  readonly fields: SiteShareLinkFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteShareLink.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteShareLinkClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    sharedByUser<T extends SiteShareLink$sharedByUserArgs<ExtArgs> = {}>(args?: Subset<T, SiteShareLink$sharedByUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    attributionEvents<T extends SiteShareLink$attributionEventsArgs<ExtArgs> = {}>(args?: Subset<T, SiteShareLink$attributionEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteShareLink model
+   */
+  interface SiteShareLinkFieldRefs {
+    readonly id: FieldRef<"SiteShareLink", 'String'>
+    readonly createdAt: FieldRef<"SiteShareLink", 'DateTime'>
+    readonly updatedAt: FieldRef<"SiteShareLink", 'DateTime'>
+    readonly cid: FieldRef<"SiteShareLink", 'String'>
+    readonly expiresAt: FieldRef<"SiteShareLink", 'DateTime'>
+    readonly countedAt: FieldRef<"SiteShareLink", 'DateTime'>
+    readonly siteId: FieldRef<"SiteShareLink", 'String'>
+    readonly sharedByUserId: FieldRef<"SiteShareLink", 'String'>
+    readonly channel: FieldRef<"SiteShareLink", 'SiteShareChannel'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteShareLink findUnique
+   */
+  export type SiteShareLinkFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareLink to fetch.
+     */
+    where: SiteShareLinkWhereUniqueInput
+  }
+
+  /**
+   * SiteShareLink findUniqueOrThrow
+   */
+  export type SiteShareLinkFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareLink to fetch.
+     */
+    where: SiteShareLinkWhereUniqueInput
+  }
+
+  /**
+   * SiteShareLink findFirst
+   */
+  export type SiteShareLinkFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareLink to fetch.
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareLinks to fetch.
+     */
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareLinks.
+     */
+    cursor?: SiteShareLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareLinks.
+     */
+    distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareLink findFirstOrThrow
+   */
+  export type SiteShareLinkFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareLink to fetch.
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareLinks to fetch.
+     */
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareLinks.
+     */
+    cursor?: SiteShareLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareLinks.
+     */
+    distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareLink findMany
+   */
+  export type SiteShareLinkFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareLinks to fetch.
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareLinks to fetch.
+     */
+    orderBy?: SiteShareLinkOrderByWithRelationInput | SiteShareLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteShareLinks.
+     */
+    cursor?: SiteShareLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareLinks.
+     */
+    distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareLink create
+   */
+  export type SiteShareLinkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteShareLink.
+     */
+    data: XOR<SiteShareLinkCreateInput, SiteShareLinkUncheckedCreateInput>
+  }
+
+  /**
+   * SiteShareLink createMany
+   */
+  export type SiteShareLinkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteShareLinks.
+     */
+    data: SiteShareLinkCreateManyInput | SiteShareLinkCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteShareLink createManyAndReturn
+   */
+  export type SiteShareLinkCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteShareLinks.
+     */
+    data: SiteShareLinkCreateManyInput | SiteShareLinkCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareLink update
+   */
+  export type SiteShareLinkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteShareLink.
+     */
+    data: XOR<SiteShareLinkUpdateInput, SiteShareLinkUncheckedUpdateInput>
+    /**
+     * Choose, which SiteShareLink to update.
+     */
+    where: SiteShareLinkWhereUniqueInput
+  }
+
+  /**
+   * SiteShareLink updateMany
+   */
+  export type SiteShareLinkUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteShareLinks.
+     */
+    data: XOR<SiteShareLinkUpdateManyMutationInput, SiteShareLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareLinks to update
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * Limit how many SiteShareLinks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareLink updateManyAndReturn
+   */
+  export type SiteShareLinkUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteShareLinks.
+     */
+    data: XOR<SiteShareLinkUpdateManyMutationInput, SiteShareLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareLinks to update
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * Limit how many SiteShareLinks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareLink upsert
+   */
+  export type SiteShareLinkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteShareLink to update in case it exists.
+     */
+    where: SiteShareLinkWhereUniqueInput
+    /**
+     * In case the SiteShareLink found by the `where` argument doesn't exist, create a new SiteShareLink with this data.
+     */
+    create: XOR<SiteShareLinkCreateInput, SiteShareLinkUncheckedCreateInput>
+    /**
+     * In case the SiteShareLink was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteShareLinkUpdateInput, SiteShareLinkUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteShareLink delete
+   */
+  export type SiteShareLinkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+    /**
+     * Filter which SiteShareLink to delete.
+     */
+    where: SiteShareLinkWhereUniqueInput
+  }
+
+  /**
+   * SiteShareLink deleteMany
+   */
+  export type SiteShareLinkDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareLinks to delete
+     */
+    where?: SiteShareLinkWhereInput
+    /**
+     * Limit how many SiteShareLinks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareLink.sharedByUser
+   */
+  export type SiteShareLink$sharedByUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * SiteShareLink.attributionEvents
+   */
+  export type SiteShareLink$attributionEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    where?: SiteShareAttributionEventWhereInput
+    orderBy?: SiteShareAttributionEventOrderByWithRelationInput | SiteShareAttributionEventOrderByWithRelationInput[]
+    cursor?: SiteShareAttributionEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SiteShareAttributionEventScalarFieldEnum | SiteShareAttributionEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareLink without action
+   */
+  export type SiteShareLinkDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareLink
+     */
+    select?: SiteShareLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareLink
+     */
+    omit?: SiteShareLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareLinkInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteShareAttributionEvent
+   */
+
+  export type AggregateSiteShareAttributionEvent = {
+    _count: SiteShareAttributionEventCountAggregateOutputType | null
+    _min: SiteShareAttributionEventMinAggregateOutputType | null
+    _max: SiteShareAttributionEventMaxAggregateOutputType | null
+  }
+
+  export type SiteShareAttributionEventMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    shareLinkId: string | null
+    eventType: $Enums.SiteShareAttributionEventType | null
+    source: $Enums.SiteShareAttributionSource | null
+    dedupeKey: string | null
+    ipHash: string | null
+    userAgentHash: string | null
+    openedByUserId: string | null
+  }
+
+  export type SiteShareAttributionEventMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    shareLinkId: string | null
+    eventType: $Enums.SiteShareAttributionEventType | null
+    source: $Enums.SiteShareAttributionSource | null
+    dedupeKey: string | null
+    ipHash: string | null
+    userAgentHash: string | null
+    openedByUserId: string | null
+  }
+
+  export type SiteShareAttributionEventCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    shareLinkId: number
+    eventType: number
+    source: number
+    dedupeKey: number
+    ipHash: number
+    userAgentHash: number
+    openedByUserId: number
+    _all: number
+  }
+
+
+  export type SiteShareAttributionEventMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    shareLinkId?: true
+    eventType?: true
+    source?: true
+    dedupeKey?: true
+    ipHash?: true
+    userAgentHash?: true
+    openedByUserId?: true
+  }
+
+  export type SiteShareAttributionEventMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    shareLinkId?: true
+    eventType?: true
+    source?: true
+    dedupeKey?: true
+    ipHash?: true
+    userAgentHash?: true
+    openedByUserId?: true
+  }
+
+  export type SiteShareAttributionEventCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    shareLinkId?: true
+    eventType?: true
+    source?: true
+    dedupeKey?: true
+    ipHash?: true
+    userAgentHash?: true
+    openedByUserId?: true
+    _all?: true
+  }
+
+  export type SiteShareAttributionEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareAttributionEvent to aggregate.
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareAttributionEvents to fetch.
+     */
+    orderBy?: SiteShareAttributionEventOrderByWithRelationInput | SiteShareAttributionEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteShareAttributionEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareAttributionEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareAttributionEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteShareAttributionEvents
+    **/
+    _count?: true | SiteShareAttributionEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteShareAttributionEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteShareAttributionEventMaxAggregateInputType
+  }
+
+  export type GetSiteShareAttributionEventAggregateType<T extends SiteShareAttributionEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteShareAttributionEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteShareAttributionEvent[P]>
+      : GetScalarType<T[P], AggregateSiteShareAttributionEvent[P]>
+  }
+
+
+
+
+  export type SiteShareAttributionEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteShareAttributionEventWhereInput
+    orderBy?: SiteShareAttributionEventOrderByWithAggregationInput | SiteShareAttributionEventOrderByWithAggregationInput[]
+    by: SiteShareAttributionEventScalarFieldEnum[] | SiteShareAttributionEventScalarFieldEnum
+    having?: SiteShareAttributionEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteShareAttributionEventCountAggregateInputType | true
+    _min?: SiteShareAttributionEventMinAggregateInputType
+    _max?: SiteShareAttributionEventMaxAggregateInputType
+  }
+
+  export type SiteShareAttributionEventGroupByOutputType = {
+    id: string
+    createdAt: Date
+    shareLinkId: string
+    eventType: $Enums.SiteShareAttributionEventType
+    source: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash: string | null
+    userAgentHash: string | null
+    openedByUserId: string | null
+    _count: SiteShareAttributionEventCountAggregateOutputType | null
+    _min: SiteShareAttributionEventMinAggregateOutputType | null
+    _max: SiteShareAttributionEventMaxAggregateOutputType | null
+  }
+
+  type GetSiteShareAttributionEventGroupByPayload<T extends SiteShareAttributionEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteShareAttributionEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteShareAttributionEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteShareAttributionEventGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteShareAttributionEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteShareAttributionEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    shareLinkId?: boolean
+    eventType?: boolean
+    source?: boolean
+    dedupeKey?: boolean
+    ipHash?: boolean
+    userAgentHash?: boolean
+    openedByUserId?: boolean
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareAttributionEvent"]>
+
+  export type SiteShareAttributionEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    shareLinkId?: boolean
+    eventType?: boolean
+    source?: boolean
+    dedupeKey?: boolean
+    ipHash?: boolean
+    userAgentHash?: boolean
+    openedByUserId?: boolean
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareAttributionEvent"]>
+
+  export type SiteShareAttributionEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    shareLinkId?: boolean
+    eventType?: boolean
+    source?: boolean
+    dedupeKey?: boolean
+    ipHash?: boolean
+    userAgentHash?: boolean
+    openedByUserId?: boolean
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteShareAttributionEvent"]>
+
+  export type SiteShareAttributionEventSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    shareLinkId?: boolean
+    eventType?: boolean
+    source?: boolean
+    dedupeKey?: boolean
+    ipHash?: boolean
+    userAgentHash?: boolean
+    openedByUserId?: boolean
+  }
+
+  export type SiteShareAttributionEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "shareLinkId" | "eventType" | "source" | "dedupeKey" | "ipHash" | "userAgentHash" | "openedByUserId", ExtArgs["result"]["siteShareAttributionEvent"]>
+  export type SiteShareAttributionEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }
+  export type SiteShareAttributionEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }
+  export type SiteShareAttributionEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shareLink?: boolean | SiteShareLinkDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteShareAttributionEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteShareAttributionEvent"
+    objects: {
+      shareLink: Prisma.$SiteShareLinkPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      shareLinkId: string
+      eventType: $Enums.SiteShareAttributionEventType
+      source: $Enums.SiteShareAttributionSource
+      dedupeKey: string
+      ipHash: string | null
+      userAgentHash: string | null
+      openedByUserId: string | null
+    }, ExtArgs["result"]["siteShareAttributionEvent"]>
+    composites: {}
+  }
+
+  type SiteShareAttributionEventGetPayload<S extends boolean | null | undefined | SiteShareAttributionEventDefaultArgs> = $Result.GetResult<Prisma.$SiteShareAttributionEventPayload, S>
+
+  type SiteShareAttributionEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteShareAttributionEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteShareAttributionEventCountAggregateInputType | true
+    }
+
+  export interface SiteShareAttributionEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteShareAttributionEvent'], meta: { name: 'SiteShareAttributionEvent' } }
+    /**
+     * Find zero or one SiteShareAttributionEvent that matches the filter.
+     * @param {SiteShareAttributionEventFindUniqueArgs} args - Arguments to find a SiteShareAttributionEvent
+     * @example
+     * // Get one SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteShareAttributionEventFindUniqueArgs>(args: SelectSubset<T, SiteShareAttributionEventFindUniqueArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteShareAttributionEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteShareAttributionEventFindUniqueOrThrowArgs} args - Arguments to find a SiteShareAttributionEvent
+     * @example
+     * // Get one SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteShareAttributionEventFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteShareAttributionEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareAttributionEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventFindFirstArgs} args - Arguments to find a SiteShareAttributionEvent
+     * @example
+     * // Get one SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteShareAttributionEventFindFirstArgs>(args?: SelectSubset<T, SiteShareAttributionEventFindFirstArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteShareAttributionEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventFindFirstOrThrowArgs} args - Arguments to find a SiteShareAttributionEvent
+     * @example
+     * // Get one SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteShareAttributionEventFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteShareAttributionEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteShareAttributionEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteShareAttributionEvents
+     * const siteShareAttributionEvents = await prisma.siteShareAttributionEvent.findMany()
+     * 
+     * // Get first 10 SiteShareAttributionEvents
+     * const siteShareAttributionEvents = await prisma.siteShareAttributionEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const siteShareAttributionEventWithIdOnly = await prisma.siteShareAttributionEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SiteShareAttributionEventFindManyArgs>(args?: SelectSubset<T, SiteShareAttributionEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteShareAttributionEvent.
+     * @param {SiteShareAttributionEventCreateArgs} args - Arguments to create a SiteShareAttributionEvent.
+     * @example
+     * // Create one SiteShareAttributionEvent
+     * const SiteShareAttributionEvent = await prisma.siteShareAttributionEvent.create({
+     *   data: {
+     *     // ... data to create a SiteShareAttributionEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteShareAttributionEventCreateArgs>(args: SelectSubset<T, SiteShareAttributionEventCreateArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteShareAttributionEvents.
+     * @param {SiteShareAttributionEventCreateManyArgs} args - Arguments to create many SiteShareAttributionEvents.
+     * @example
+     * // Create many SiteShareAttributionEvents
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteShareAttributionEventCreateManyArgs>(args?: SelectSubset<T, SiteShareAttributionEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteShareAttributionEvents and returns the data saved in the database.
+     * @param {SiteShareAttributionEventCreateManyAndReturnArgs} args - Arguments to create many SiteShareAttributionEvents.
+     * @example
+     * // Create many SiteShareAttributionEvents
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteShareAttributionEvents and only return the `id`
+     * const siteShareAttributionEventWithIdOnly = await prisma.siteShareAttributionEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteShareAttributionEventCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteShareAttributionEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteShareAttributionEvent.
+     * @param {SiteShareAttributionEventDeleteArgs} args - Arguments to delete one SiteShareAttributionEvent.
+     * @example
+     * // Delete one SiteShareAttributionEvent
+     * const SiteShareAttributionEvent = await prisma.siteShareAttributionEvent.delete({
+     *   where: {
+     *     // ... filter to delete one SiteShareAttributionEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteShareAttributionEventDeleteArgs>(args: SelectSubset<T, SiteShareAttributionEventDeleteArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteShareAttributionEvent.
+     * @param {SiteShareAttributionEventUpdateArgs} args - Arguments to update one SiteShareAttributionEvent.
+     * @example
+     * // Update one SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteShareAttributionEventUpdateArgs>(args: SelectSubset<T, SiteShareAttributionEventUpdateArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteShareAttributionEvents.
+     * @param {SiteShareAttributionEventDeleteManyArgs} args - Arguments to filter SiteShareAttributionEvents to delete.
+     * @example
+     * // Delete a few SiteShareAttributionEvents
+     * const { count } = await prisma.siteShareAttributionEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteShareAttributionEventDeleteManyArgs>(args?: SelectSubset<T, SiteShareAttributionEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareAttributionEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteShareAttributionEvents
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteShareAttributionEventUpdateManyArgs>(args: SelectSubset<T, SiteShareAttributionEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteShareAttributionEvents and returns the data updated in the database.
+     * @param {SiteShareAttributionEventUpdateManyAndReturnArgs} args - Arguments to update many SiteShareAttributionEvents.
+     * @example
+     * // Update many SiteShareAttributionEvents
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteShareAttributionEvents and only return the `id`
+     * const siteShareAttributionEventWithIdOnly = await prisma.siteShareAttributionEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteShareAttributionEventUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteShareAttributionEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteShareAttributionEvent.
+     * @param {SiteShareAttributionEventUpsertArgs} args - Arguments to update or create a SiteShareAttributionEvent.
+     * @example
+     * // Update or create a SiteShareAttributionEvent
+     * const siteShareAttributionEvent = await prisma.siteShareAttributionEvent.upsert({
+     *   create: {
+     *     // ... data to create a SiteShareAttributionEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteShareAttributionEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteShareAttributionEventUpsertArgs>(args: SelectSubset<T, SiteShareAttributionEventUpsertArgs<ExtArgs>>): Prisma__SiteShareAttributionEventClient<$Result.GetResult<Prisma.$SiteShareAttributionEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteShareAttributionEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventCountArgs} args - Arguments to filter SiteShareAttributionEvents to count.
+     * @example
+     * // Count the number of SiteShareAttributionEvents
+     * const count = await prisma.siteShareAttributionEvent.count({
+     *   where: {
+     *     // ... the filter for the SiteShareAttributionEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteShareAttributionEventCountArgs>(
+      args?: Subset<T, SiteShareAttributionEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteShareAttributionEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteShareAttributionEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteShareAttributionEventAggregateArgs>(args: Subset<T, SiteShareAttributionEventAggregateArgs>): Prisma.PrismaPromise<GetSiteShareAttributionEventAggregateType<T>>
+
+    /**
+     * Group by SiteShareAttributionEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteShareAttributionEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteShareAttributionEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteShareAttributionEventGroupByArgs['orderBy'] }
+        : { orderBy?: SiteShareAttributionEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteShareAttributionEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteShareAttributionEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteShareAttributionEvent model
+   */
+  readonly fields: SiteShareAttributionEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteShareAttributionEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteShareAttributionEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    shareLink<T extends SiteShareLinkDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteShareLinkDefaultArgs<ExtArgs>>): Prisma__SiteShareLinkClient<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteShareAttributionEvent model
+   */
+  interface SiteShareAttributionEventFieldRefs {
+    readonly id: FieldRef<"SiteShareAttributionEvent", 'String'>
+    readonly createdAt: FieldRef<"SiteShareAttributionEvent", 'DateTime'>
+    readonly shareLinkId: FieldRef<"SiteShareAttributionEvent", 'String'>
+    readonly eventType: FieldRef<"SiteShareAttributionEvent", 'SiteShareAttributionEventType'>
+    readonly source: FieldRef<"SiteShareAttributionEvent", 'SiteShareAttributionSource'>
+    readonly dedupeKey: FieldRef<"SiteShareAttributionEvent", 'String'>
+    readonly ipHash: FieldRef<"SiteShareAttributionEvent", 'String'>
+    readonly userAgentHash: FieldRef<"SiteShareAttributionEvent", 'String'>
+    readonly openedByUserId: FieldRef<"SiteShareAttributionEvent", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteShareAttributionEvent findUnique
+   */
+  export type SiteShareAttributionEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareAttributionEvent to fetch.
+     */
+    where: SiteShareAttributionEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareAttributionEvent findUniqueOrThrow
+   */
+  export type SiteShareAttributionEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareAttributionEvent to fetch.
+     */
+    where: SiteShareAttributionEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareAttributionEvent findFirst
+   */
+  export type SiteShareAttributionEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareAttributionEvent to fetch.
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareAttributionEvents to fetch.
+     */
+    orderBy?: SiteShareAttributionEventOrderByWithRelationInput | SiteShareAttributionEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareAttributionEvents.
+     */
+    cursor?: SiteShareAttributionEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareAttributionEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareAttributionEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareAttributionEvents.
+     */
+    distinct?: SiteShareAttributionEventScalarFieldEnum | SiteShareAttributionEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareAttributionEvent findFirstOrThrow
+   */
+  export type SiteShareAttributionEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareAttributionEvent to fetch.
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareAttributionEvents to fetch.
+     */
+    orderBy?: SiteShareAttributionEventOrderByWithRelationInput | SiteShareAttributionEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteShareAttributionEvents.
+     */
+    cursor?: SiteShareAttributionEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareAttributionEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareAttributionEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareAttributionEvents.
+     */
+    distinct?: SiteShareAttributionEventScalarFieldEnum | SiteShareAttributionEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareAttributionEvent findMany
+   */
+  export type SiteShareAttributionEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteShareAttributionEvents to fetch.
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteShareAttributionEvents to fetch.
+     */
+    orderBy?: SiteShareAttributionEventOrderByWithRelationInput | SiteShareAttributionEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteShareAttributionEvents.
+     */
+    cursor?: SiteShareAttributionEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteShareAttributionEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteShareAttributionEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteShareAttributionEvents.
+     */
+    distinct?: SiteShareAttributionEventScalarFieldEnum | SiteShareAttributionEventScalarFieldEnum[]
+  }
+
+  /**
+   * SiteShareAttributionEvent create
+   */
+  export type SiteShareAttributionEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteShareAttributionEvent.
+     */
+    data: XOR<SiteShareAttributionEventCreateInput, SiteShareAttributionEventUncheckedCreateInput>
+  }
+
+  /**
+   * SiteShareAttributionEvent createMany
+   */
+  export type SiteShareAttributionEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteShareAttributionEvents.
+     */
+    data: SiteShareAttributionEventCreateManyInput | SiteShareAttributionEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteShareAttributionEvent createManyAndReturn
+   */
+  export type SiteShareAttributionEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteShareAttributionEvents.
+     */
+    data: SiteShareAttributionEventCreateManyInput | SiteShareAttributionEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareAttributionEvent update
+   */
+  export type SiteShareAttributionEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteShareAttributionEvent.
+     */
+    data: XOR<SiteShareAttributionEventUpdateInput, SiteShareAttributionEventUncheckedUpdateInput>
+    /**
+     * Choose, which SiteShareAttributionEvent to update.
+     */
+    where: SiteShareAttributionEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareAttributionEvent updateMany
+   */
+  export type SiteShareAttributionEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteShareAttributionEvents.
+     */
+    data: XOR<SiteShareAttributionEventUpdateManyMutationInput, SiteShareAttributionEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareAttributionEvents to update
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * Limit how many SiteShareAttributionEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareAttributionEvent updateManyAndReturn
+   */
+  export type SiteShareAttributionEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteShareAttributionEvents.
+     */
+    data: XOR<SiteShareAttributionEventUpdateManyMutationInput, SiteShareAttributionEventUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteShareAttributionEvents to update
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * Limit how many SiteShareAttributionEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteShareAttributionEvent upsert
+   */
+  export type SiteShareAttributionEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteShareAttributionEvent to update in case it exists.
+     */
+    where: SiteShareAttributionEventWhereUniqueInput
+    /**
+     * In case the SiteShareAttributionEvent found by the `where` argument doesn't exist, create a new SiteShareAttributionEvent with this data.
+     */
+    create: XOR<SiteShareAttributionEventCreateInput, SiteShareAttributionEventUncheckedCreateInput>
+    /**
+     * In case the SiteShareAttributionEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteShareAttributionEventUpdateInput, SiteShareAttributionEventUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteShareAttributionEvent delete
+   */
+  export type SiteShareAttributionEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+    /**
+     * Filter which SiteShareAttributionEvent to delete.
+     */
+    where: SiteShareAttributionEventWhereUniqueInput
+  }
+
+  /**
+   * SiteShareAttributionEvent deleteMany
+   */
+  export type SiteShareAttributionEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteShareAttributionEvents to delete
+     */
+    where?: SiteShareAttributionEventWhereInput
+    /**
+     * Limit how many SiteShareAttributionEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteShareAttributionEvent without action
+   */
+  export type SiteShareAttributionEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteShareAttributionEvent
+     */
+    select?: SiteShareAttributionEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteShareAttributionEvent
+     */
+    omit?: SiteShareAttributionEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteShareAttributionEventInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model UserDeviceToken
    */
 
@@ -49857,6 +52456,36 @@ export namespace Prisma {
   export type SiteShareEventScalarFieldEnum = (typeof SiteShareEventScalarFieldEnum)[keyof typeof SiteShareEventScalarFieldEnum]
 
 
+  export const SiteShareLinkScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    cid: 'cid',
+    expiresAt: 'expiresAt',
+    countedAt: 'countedAt',
+    siteId: 'siteId',
+    sharedByUserId: 'sharedByUserId',
+    channel: 'channel'
+  };
+
+  export type SiteShareLinkScalarFieldEnum = (typeof SiteShareLinkScalarFieldEnum)[keyof typeof SiteShareLinkScalarFieldEnum]
+
+
+  export const SiteShareAttributionEventScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    shareLinkId: 'shareLinkId',
+    eventType: 'eventType',
+    source: 'source',
+    dedupeKey: 'dedupeKey',
+    ipHash: 'ipHash',
+    userAgentHash: 'userAgentHash',
+    openedByUserId: 'openedByUserId'
+  };
+
+  export type SiteShareAttributionEventScalarFieldEnum = (typeof SiteShareAttributionEventScalarFieldEnum)[keyof typeof SiteShareAttributionEventScalarFieldEnum]
+
+
   export const UserDeviceTokenScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -50307,6 +52936,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'SiteShareAttributionEventType'
+   */
+  export type EnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareAttributionEventType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SiteShareAttributionEventType[]'
+   */
+  export type ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareAttributionEventType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SiteShareAttributionSource'
+   */
+  export type EnumSiteShareAttributionSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareAttributionSource'>
+    
+
+
+  /**
+   * Reference to a field of type 'SiteShareAttributionSource[]'
+   */
+  export type ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SiteShareAttributionSource[]'>
+    
+
+
+  /**
    * Reference to a field of type 'DevicePlatform'
    */
   export type EnumDevicePlatformFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DevicePlatform'>
@@ -50378,6 +53035,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveListRelationFilter
     siteComments?: SiteCommentListRelationFilter
     siteShareEvents?: SiteShareEventListRelationFilter
+    siteShareLinks?: SiteShareLinkListRelationFilter
     siteCommentLikes?: SiteCommentLikeListRelationFilter
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
@@ -50433,6 +53091,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveOrderByRelationAggregateInput
     siteComments?: SiteCommentOrderByRelationAggregateInput
     siteShareEvents?: SiteShareEventOrderByRelationAggregateInput
+    siteShareLinks?: SiteShareLinkOrderByRelationAggregateInput
     siteCommentLikes?: SiteCommentLikeOrderByRelationAggregateInput
     deviceTokens?: UserDeviceTokenOrderByRelationAggregateInput
     userNotifications?: UserNotificationOrderByRelationAggregateInput
@@ -50491,6 +53150,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveListRelationFilter
     siteComments?: SiteCommentListRelationFilter
     siteShareEvents?: SiteShareEventListRelationFilter
+    siteShareLinks?: SiteShareLinkListRelationFilter
     siteCommentLikes?: SiteCommentLikeListRelationFilter
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
@@ -51112,6 +53772,7 @@ export namespace Prisma {
     saves?: SiteSaveListRelationFilter
     comments?: SiteCommentListRelationFilter
     shareEvents?: SiteShareEventListRelationFilter
+    shareLinks?: SiteShareLinkListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -51133,6 +53794,7 @@ export namespace Prisma {
     saves?: SiteSaveOrderByRelationAggregateInput
     comments?: SiteCommentOrderByRelationAggregateInput
     shareEvents?: SiteShareEventOrderByRelationAggregateInput
+    shareLinks?: SiteShareLinkOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -51157,6 +53819,7 @@ export namespace Prisma {
     saves?: SiteSaveListRelationFilter
     comments?: SiteCommentListRelationFilter
     shareEvents?: SiteShareEventListRelationFilter
+    shareLinks?: SiteShareLinkListRelationFilter
   }, "id">
 
   export type SiteOrderByWithAggregationInput = {
@@ -52974,6 +55637,163 @@ export namespace Prisma {
     channel?: EnumSiteShareChannelWithAggregatesFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
   }
 
+  export type SiteShareLinkWhereInput = {
+    AND?: SiteShareLinkWhereInput | SiteShareLinkWhereInput[]
+    OR?: SiteShareLinkWhereInput[]
+    NOT?: SiteShareLinkWhereInput | SiteShareLinkWhereInput[]
+    id?: StringFilter<"SiteShareLink"> | string
+    createdAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    cid?: StringFilter<"SiteShareLink"> | string
+    expiresAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    countedAt?: DateTimeNullableFilter<"SiteShareLink"> | Date | string | null
+    siteId?: StringFilter<"SiteShareLink"> | string
+    sharedByUserId?: StringNullableFilter<"SiteShareLink"> | string | null
+    channel?: EnumSiteShareChannelFilter<"SiteShareLink"> | $Enums.SiteShareChannel
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    sharedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    attributionEvents?: SiteShareAttributionEventListRelationFilter
+  }
+
+  export type SiteShareLinkOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cid?: SortOrder
+    expiresAt?: SortOrder
+    countedAt?: SortOrderInput | SortOrder
+    siteId?: SortOrder
+    sharedByUserId?: SortOrderInput | SortOrder
+    channel?: SortOrder
+    site?: SiteOrderByWithRelationInput
+    sharedByUser?: UserOrderByWithRelationInput
+    attributionEvents?: SiteShareAttributionEventOrderByRelationAggregateInput
+  }
+
+  export type SiteShareLinkWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    cid?: string
+    AND?: SiteShareLinkWhereInput | SiteShareLinkWhereInput[]
+    OR?: SiteShareLinkWhereInput[]
+    NOT?: SiteShareLinkWhereInput | SiteShareLinkWhereInput[]
+    createdAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    expiresAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    countedAt?: DateTimeNullableFilter<"SiteShareLink"> | Date | string | null
+    siteId?: StringFilter<"SiteShareLink"> | string
+    sharedByUserId?: StringNullableFilter<"SiteShareLink"> | string | null
+    channel?: EnumSiteShareChannelFilter<"SiteShareLink"> | $Enums.SiteShareChannel
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+    sharedByUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    attributionEvents?: SiteShareAttributionEventListRelationFilter
+  }, "id" | "cid">
+
+  export type SiteShareLinkOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cid?: SortOrder
+    expiresAt?: SortOrder
+    countedAt?: SortOrderInput | SortOrder
+    siteId?: SortOrder
+    sharedByUserId?: SortOrderInput | SortOrder
+    channel?: SortOrder
+    _count?: SiteShareLinkCountOrderByAggregateInput
+    _max?: SiteShareLinkMaxOrderByAggregateInput
+    _min?: SiteShareLinkMinOrderByAggregateInput
+  }
+
+  export type SiteShareLinkScalarWhereWithAggregatesInput = {
+    AND?: SiteShareLinkScalarWhereWithAggregatesInput | SiteShareLinkScalarWhereWithAggregatesInput[]
+    OR?: SiteShareLinkScalarWhereWithAggregatesInput[]
+    NOT?: SiteShareLinkScalarWhereWithAggregatesInput | SiteShareLinkScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteShareLink"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteShareLink"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SiteShareLink"> | Date | string
+    cid?: StringWithAggregatesFilter<"SiteShareLink"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"SiteShareLink"> | Date | string
+    countedAt?: DateTimeNullableWithAggregatesFilter<"SiteShareLink"> | Date | string | null
+    siteId?: StringWithAggregatesFilter<"SiteShareLink"> | string
+    sharedByUserId?: StringNullableWithAggregatesFilter<"SiteShareLink"> | string | null
+    channel?: EnumSiteShareChannelWithAggregatesFilter<"SiteShareLink"> | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareAttributionEventWhereInput = {
+    AND?: SiteShareAttributionEventWhereInput | SiteShareAttributionEventWhereInput[]
+    OR?: SiteShareAttributionEventWhereInput[]
+    NOT?: SiteShareAttributionEventWhereInput | SiteShareAttributionEventWhereInput[]
+    id?: StringFilter<"SiteShareAttributionEvent"> | string
+    createdAt?: DateTimeFilter<"SiteShareAttributionEvent"> | Date | string
+    shareLinkId?: StringFilter<"SiteShareAttributionEvent"> | string
+    eventType?: EnumSiteShareAttributionEventTypeFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFilter<"SiteShareAttributionEvent"> | string
+    ipHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    userAgentHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    openedByUserId?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    shareLink?: XOR<SiteShareLinkScalarRelationFilter, SiteShareLinkWhereInput>
+  }
+
+  export type SiteShareAttributionEventOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    shareLinkId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    dedupeKey?: SortOrder
+    ipHash?: SortOrderInput | SortOrder
+    userAgentHash?: SortOrderInput | SortOrder
+    openedByUserId?: SortOrderInput | SortOrder
+    shareLink?: SiteShareLinkOrderByWithRelationInput
+  }
+
+  export type SiteShareAttributionEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    shareLinkId_eventType_dedupeKey?: SiteShareAttributionEventShareLinkIdEventTypeDedupeKeyCompoundUniqueInput
+    AND?: SiteShareAttributionEventWhereInput | SiteShareAttributionEventWhereInput[]
+    OR?: SiteShareAttributionEventWhereInput[]
+    NOT?: SiteShareAttributionEventWhereInput | SiteShareAttributionEventWhereInput[]
+    createdAt?: DateTimeFilter<"SiteShareAttributionEvent"> | Date | string
+    shareLinkId?: StringFilter<"SiteShareAttributionEvent"> | string
+    eventType?: EnumSiteShareAttributionEventTypeFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFilter<"SiteShareAttributionEvent"> | string
+    ipHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    userAgentHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    openedByUserId?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    shareLink?: XOR<SiteShareLinkScalarRelationFilter, SiteShareLinkWhereInput>
+  }, "id" | "shareLinkId_eventType_dedupeKey">
+
+  export type SiteShareAttributionEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    shareLinkId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    dedupeKey?: SortOrder
+    ipHash?: SortOrderInput | SortOrder
+    userAgentHash?: SortOrderInput | SortOrder
+    openedByUserId?: SortOrderInput | SortOrder
+    _count?: SiteShareAttributionEventCountOrderByAggregateInput
+    _max?: SiteShareAttributionEventMaxOrderByAggregateInput
+    _min?: SiteShareAttributionEventMinOrderByAggregateInput
+  }
+
+  export type SiteShareAttributionEventScalarWhereWithAggregatesInput = {
+    AND?: SiteShareAttributionEventScalarWhereWithAggregatesInput | SiteShareAttributionEventScalarWhereWithAggregatesInput[]
+    OR?: SiteShareAttributionEventScalarWhereWithAggregatesInput[]
+    NOT?: SiteShareAttributionEventScalarWhereWithAggregatesInput | SiteShareAttributionEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SiteShareAttributionEvent"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"SiteShareAttributionEvent"> | Date | string
+    shareLinkId?: StringWithAggregatesFilter<"SiteShareAttributionEvent"> | string
+    eventType?: EnumSiteShareAttributionEventTypeWithAggregatesFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceWithAggregatesFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringWithAggregatesFilter<"SiteShareAttributionEvent"> | string
+    ipHash?: StringNullableWithAggregatesFilter<"SiteShareAttributionEvent"> | string | null
+    userAgentHash?: StringNullableWithAggregatesFilter<"SiteShareAttributionEvent"> | string | null
+    openedByUserId?: StringNullableWithAggregatesFilter<"SiteShareAttributionEvent"> | string | null
+  }
+
   export type UserDeviceTokenWhereInput = {
     AND?: UserDeviceTokenWhereInput | UserDeviceTokenWhereInput[]
     OR?: UserDeviceTokenWhereInput[]
@@ -53417,6 +56237,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -53472,6 +56293,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -53527,6 +56349,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -53582,6 +56405,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -54254,6 +57078,7 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -54275,6 +57100,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -54296,6 +57122,7 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -54317,6 +57144,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -56194,6 +59022,175 @@ export namespace Prisma {
     channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
 
+  export type SiteShareLinkCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    channel?: $Enums.SiteShareChannel
+    site: SiteCreateNestedOneWithoutShareLinksInput
+    sharedByUser?: UserCreateNestedOneWithoutSiteShareLinksInput
+    attributionEvents?: SiteShareAttributionEventCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    siteId: string
+    sharedByUserId?: string | null
+    channel?: $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    site?: SiteUpdateOneRequiredWithoutShareLinksNestedInput
+    sharedByUser?: UserUpdateOneWithoutSiteShareLinksNestedInput
+    attributionEvents?: SiteShareAttributionEventUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    siteId: string
+    sharedByUserId?: string | null
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareAttributionEventCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+    shareLink: SiteShareLinkCreateNestedOneWithoutAttributionEventsInput
+  }
+
+  export type SiteShareAttributionEventUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    shareLinkId: string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+  }
+
+  export type SiteShareAttributionEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareLink?: SiteShareLinkUpdateOneRequiredWithoutAttributionEventsNestedInput
+  }
+
+  export type SiteShareAttributionEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shareLinkId?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SiteShareAttributionEventCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    shareLinkId: string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+  }
+
+  export type SiteShareAttributionEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SiteShareAttributionEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shareLinkId?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
   export type UserDeviceTokenCreateInput = {
     id?: string
     createdAt?: Date | string
@@ -56814,6 +59811,12 @@ export namespace Prisma {
     none?: SiteShareEventWhereInput
   }
 
+  export type SiteShareLinkListRelationFilter = {
+    every?: SiteShareLinkWhereInput
+    some?: SiteShareLinkWhereInput
+    none?: SiteShareLinkWhereInput
+  }
+
   export type SiteCommentLikeListRelationFilter = {
     every?: SiteCommentLikeWhereInput
     some?: SiteCommentLikeWhereInput
@@ -56944,6 +59947,10 @@ export namespace Prisma {
   }
 
   export type SiteShareEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteShareLinkOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -58896,6 +61903,133 @@ export namespace Prisma {
     _max?: NestedEnumSiteShareChannelFilter<$PrismaModel>
   }
 
+  export type SiteShareAttributionEventListRelationFilter = {
+    every?: SiteShareAttributionEventWhereInput
+    some?: SiteShareAttributionEventWhereInput
+    none?: SiteShareAttributionEventWhereInput
+  }
+
+  export type SiteShareAttributionEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SiteShareLinkCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cid?: SortOrder
+    expiresAt?: SortOrder
+    countedAt?: SortOrder
+    siteId?: SortOrder
+    sharedByUserId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type SiteShareLinkMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cid?: SortOrder
+    expiresAt?: SortOrder
+    countedAt?: SortOrder
+    siteId?: SortOrder
+    sharedByUserId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type SiteShareLinkMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    cid?: SortOrder
+    expiresAt?: SortOrder
+    countedAt?: SortOrder
+    siteId?: SortOrder
+    sharedByUserId?: SortOrder
+    channel?: SortOrder
+  }
+
+  export type EnumSiteShareAttributionEventTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionEventType | EnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel> | $Enums.SiteShareAttributionEventType
+  }
+
+  export type EnumSiteShareAttributionSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionSource | EnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel> | $Enums.SiteShareAttributionSource
+  }
+
+  export type SiteShareLinkScalarRelationFilter = {
+    is?: SiteShareLinkWhereInput
+    isNot?: SiteShareLinkWhereInput
+  }
+
+  export type SiteShareAttributionEventShareLinkIdEventTypeDedupeKeyCompoundUniqueInput = {
+    shareLinkId: string
+    eventType: $Enums.SiteShareAttributionEventType
+    dedupeKey: string
+  }
+
+  export type SiteShareAttributionEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    shareLinkId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    dedupeKey?: SortOrder
+    ipHash?: SortOrder
+    userAgentHash?: SortOrder
+    openedByUserId?: SortOrder
+  }
+
+  export type SiteShareAttributionEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    shareLinkId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    dedupeKey?: SortOrder
+    ipHash?: SortOrder
+    userAgentHash?: SortOrder
+    openedByUserId?: SortOrder
+  }
+
+  export type SiteShareAttributionEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    shareLinkId?: SortOrder
+    eventType?: SortOrder
+    source?: SortOrder
+    dedupeKey?: SortOrder
+    ipHash?: SortOrder
+    userAgentHash?: SortOrder
+    openedByUserId?: SortOrder
+  }
+
+  export type EnumSiteShareAttributionEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionEventType | EnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareAttributionEventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel>
+  }
+
+  export type EnumSiteShareAttributionSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionSource | EnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionSourceWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareAttributionSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel>
+  }
+
   export type EnumDevicePlatformFilter<$PrismaModel = never> = {
     equals?: $Enums.DevicePlatform | EnumDevicePlatformFieldRefInput<$PrismaModel>
     in?: $Enums.DevicePlatform[] | ListEnumDevicePlatformFieldRefInput<$PrismaModel>
@@ -59294,6 +62428,13 @@ export namespace Prisma {
     connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
   }
 
+  export type SiteShareLinkCreateNestedManyWithoutSharedByUserInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput> | SiteShareLinkCreateWithoutSharedByUserInput[] | SiteShareLinkUncheckedCreateWithoutSharedByUserInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSharedByUserInput | SiteShareLinkCreateOrConnectWithoutSharedByUserInput[]
+    createMany?: SiteShareLinkCreateManySharedByUserInputEnvelope
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+  }
+
   export type SiteCommentLikeCreateNestedManyWithoutUserInput = {
     create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
@@ -59487,6 +62628,13 @@ export namespace Prisma {
     connectOrCreate?: SiteShareEventCreateOrConnectWithoutUserInput | SiteShareEventCreateOrConnectWithoutUserInput[]
     createMany?: SiteShareEventCreateManyUserInputEnvelope
     connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+  }
+
+  export type SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput> | SiteShareLinkCreateWithoutSharedByUserInput[] | SiteShareLinkUncheckedCreateWithoutSharedByUserInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSharedByUserInput | SiteShareLinkCreateOrConnectWithoutSharedByUserInput[]
+    createMany?: SiteShareLinkCreateManySharedByUserInputEnvelope
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
   }
 
   export type SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput = {
@@ -59811,6 +62959,20 @@ export namespace Prisma {
     update?: SiteShareEventUpdateWithWhereUniqueWithoutUserInput | SiteShareEventUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: SiteShareEventUpdateManyWithWhereWithoutUserInput | SiteShareEventUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+  }
+
+  export type SiteShareLinkUpdateManyWithoutSharedByUserNestedInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput> | SiteShareLinkCreateWithoutSharedByUserInput[] | SiteShareLinkUncheckedCreateWithoutSharedByUserInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSharedByUserInput | SiteShareLinkCreateOrConnectWithoutSharedByUserInput[]
+    upsert?: SiteShareLinkUpsertWithWhereUniqueWithoutSharedByUserInput | SiteShareLinkUpsertWithWhereUniqueWithoutSharedByUserInput[]
+    createMany?: SiteShareLinkCreateManySharedByUserInputEnvelope
+    set?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    disconnect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    delete?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    update?: SiteShareLinkUpdateWithWhereUniqueWithoutSharedByUserInput | SiteShareLinkUpdateWithWhereUniqueWithoutSharedByUserInput[]
+    updateMany?: SiteShareLinkUpdateManyWithWhereWithoutSharedByUserInput | SiteShareLinkUpdateManyWithWhereWithoutSharedByUserInput[]
+    deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
   }
 
   export type SiteCommentLikeUpdateManyWithoutUserNestedInput = {
@@ -60201,6 +63363,20 @@ export namespace Prisma {
     deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
   }
 
+  export type SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput> | SiteShareLinkCreateWithoutSharedByUserInput[] | SiteShareLinkUncheckedCreateWithoutSharedByUserInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSharedByUserInput | SiteShareLinkCreateOrConnectWithoutSharedByUserInput[]
+    upsert?: SiteShareLinkUpsertWithWhereUniqueWithoutSharedByUserInput | SiteShareLinkUpsertWithWhereUniqueWithoutSharedByUserInput[]
+    createMany?: SiteShareLinkCreateManySharedByUserInputEnvelope
+    set?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    disconnect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    delete?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    update?: SiteShareLinkUpdateWithWhereUniqueWithoutSharedByUserInput | SiteShareLinkUpdateWithWhereUniqueWithoutSharedByUserInput[]
+    updateMany?: SiteShareLinkUpdateManyWithWhereWithoutSharedByUserInput | SiteShareLinkUpdateManyWithWhereWithoutSharedByUserInput[]
+    deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
+  }
+
   export type SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<SiteCommentLikeCreateWithoutUserInput, SiteCommentLikeUncheckedCreateWithoutUserInput> | SiteCommentLikeCreateWithoutUserInput[] | SiteCommentLikeUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
@@ -60533,6 +63709,13 @@ export namespace Prisma {
     connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
   }
 
+  export type SiteShareLinkCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput> | SiteShareLinkCreateWithoutSiteInput[] | SiteShareLinkUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSiteInput | SiteShareLinkCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteShareLinkCreateManySiteInputEnvelope
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -60573,6 +63756,13 @@ export namespace Prisma {
     connectOrCreate?: SiteShareEventCreateOrConnectWithoutSiteInput | SiteShareEventCreateOrConnectWithoutSiteInput[]
     createMany?: SiteShareEventCreateManySiteInputEnvelope
     connect?: SiteShareEventWhereUniqueInput | SiteShareEventWhereUniqueInput[]
+  }
+
+  export type SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput> | SiteShareLinkCreateWithoutSiteInput[] | SiteShareLinkUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSiteInput | SiteShareLinkCreateOrConnectWithoutSiteInput[]
+    createMany?: SiteShareLinkCreateManySiteInputEnvelope
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -60671,6 +63861,20 @@ export namespace Prisma {
     deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
   }
 
+  export type SiteShareLinkUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput> | SiteShareLinkCreateWithoutSiteInput[] | SiteShareLinkUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSiteInput | SiteShareLinkCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteShareLinkUpsertWithWhereUniqueWithoutSiteInput | SiteShareLinkUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteShareLinkCreateManySiteInputEnvelope
+    set?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    disconnect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    delete?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    update?: SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput | SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteShareLinkUpdateManyWithWhereWithoutSiteInput | SiteShareLinkUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -60753,6 +63957,20 @@ export namespace Prisma {
     update?: SiteShareEventUpdateWithWhereUniqueWithoutSiteInput | SiteShareEventUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: SiteShareEventUpdateManyWithWhereWithoutSiteInput | SiteShareEventUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: SiteShareEventScalarWhereInput | SiteShareEventScalarWhereInput[]
+  }
+
+  export type SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput> | SiteShareLinkCreateWithoutSiteInput[] | SiteShareLinkUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSiteInput | SiteShareLinkCreateOrConnectWithoutSiteInput[]
+    upsert?: SiteShareLinkUpsertWithWhereUniqueWithoutSiteInput | SiteShareLinkUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: SiteShareLinkCreateManySiteInputEnvelope
+    set?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    disconnect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    delete?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+    update?: SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput | SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: SiteShareLinkUpdateManyWithWhereWithoutSiteInput | SiteShareLinkUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
   }
 
   export type ReportCreatemediaUrlsInput = {
@@ -62288,6 +65506,100 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteShareEventsInput, UserUpdateWithoutSiteShareEventsInput>, UserUncheckedUpdateWithoutSiteShareEventsInput>
   }
 
+  export type SiteCreateNestedOneWithoutShareLinksInput = {
+    create?: XOR<SiteCreateWithoutShareLinksInput, SiteUncheckedCreateWithoutShareLinksInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutShareLinksInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutSiteShareLinksInput = {
+    create?: XOR<UserCreateWithoutSiteShareLinksInput, UserUncheckedCreateWithoutSiteShareLinksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteShareLinksInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteShareAttributionEventCreateNestedManyWithoutShareLinkInput = {
+    create?: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput> | SiteShareAttributionEventCreateWithoutShareLinkInput[] | SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput[]
+    connectOrCreate?: SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput | SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput[]
+    createMany?: SiteShareAttributionEventCreateManyShareLinkInputEnvelope
+    connect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+  }
+
+  export type SiteShareAttributionEventUncheckedCreateNestedManyWithoutShareLinkInput = {
+    create?: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput> | SiteShareAttributionEventCreateWithoutShareLinkInput[] | SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput[]
+    connectOrCreate?: SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput | SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput[]
+    createMany?: SiteShareAttributionEventCreateManyShareLinkInputEnvelope
+    connect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+  }
+
+  export type SiteUpdateOneRequiredWithoutShareLinksNestedInput = {
+    create?: XOR<SiteCreateWithoutShareLinksInput, SiteUncheckedCreateWithoutShareLinksInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutShareLinksInput
+    upsert?: SiteUpsertWithoutShareLinksInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutShareLinksInput, SiteUpdateWithoutShareLinksInput>, SiteUncheckedUpdateWithoutShareLinksInput>
+  }
+
+  export type UserUpdateOneWithoutSiteShareLinksNestedInput = {
+    create?: XOR<UserCreateWithoutSiteShareLinksInput, UserUncheckedCreateWithoutSiteShareLinksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSiteShareLinksInput
+    upsert?: UserUpsertWithoutSiteShareLinksInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSiteShareLinksInput, UserUpdateWithoutSiteShareLinksInput>, UserUncheckedUpdateWithoutSiteShareLinksInput>
+  }
+
+  export type SiteShareAttributionEventUpdateManyWithoutShareLinkNestedInput = {
+    create?: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput> | SiteShareAttributionEventCreateWithoutShareLinkInput[] | SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput[]
+    connectOrCreate?: SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput | SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput[]
+    upsert?: SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput | SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput[]
+    createMany?: SiteShareAttributionEventCreateManyShareLinkInputEnvelope
+    set?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    disconnect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    delete?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    connect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    update?: SiteShareAttributionEventUpdateWithWhereUniqueWithoutShareLinkInput | SiteShareAttributionEventUpdateWithWhereUniqueWithoutShareLinkInput[]
+    updateMany?: SiteShareAttributionEventUpdateManyWithWhereWithoutShareLinkInput | SiteShareAttributionEventUpdateManyWithWhereWithoutShareLinkInput[]
+    deleteMany?: SiteShareAttributionEventScalarWhereInput | SiteShareAttributionEventScalarWhereInput[]
+  }
+
+  export type SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkNestedInput = {
+    create?: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput> | SiteShareAttributionEventCreateWithoutShareLinkInput[] | SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput[]
+    connectOrCreate?: SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput | SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput[]
+    upsert?: SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput | SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput[]
+    createMany?: SiteShareAttributionEventCreateManyShareLinkInputEnvelope
+    set?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    disconnect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    delete?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    connect?: SiteShareAttributionEventWhereUniqueInput | SiteShareAttributionEventWhereUniqueInput[]
+    update?: SiteShareAttributionEventUpdateWithWhereUniqueWithoutShareLinkInput | SiteShareAttributionEventUpdateWithWhereUniqueWithoutShareLinkInput[]
+    updateMany?: SiteShareAttributionEventUpdateManyWithWhereWithoutShareLinkInput | SiteShareAttributionEventUpdateManyWithWhereWithoutShareLinkInput[]
+    deleteMany?: SiteShareAttributionEventScalarWhereInput | SiteShareAttributionEventScalarWhereInput[]
+  }
+
+  export type SiteShareLinkCreateNestedOneWithoutAttributionEventsInput = {
+    create?: XOR<SiteShareLinkCreateWithoutAttributionEventsInput, SiteShareLinkUncheckedCreateWithoutAttributionEventsInput>
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutAttributionEventsInput
+    connect?: SiteShareLinkWhereUniqueInput
+  }
+
+  export type EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SiteShareAttributionEventType
+  }
+
+  export type EnumSiteShareAttributionSourceFieldUpdateOperationsInput = {
+    set?: $Enums.SiteShareAttributionSource
+  }
+
+  export type SiteShareLinkUpdateOneRequiredWithoutAttributionEventsNestedInput = {
+    create?: XOR<SiteShareLinkCreateWithoutAttributionEventsInput, SiteShareLinkUncheckedCreateWithoutAttributionEventsInput>
+    connectOrCreate?: SiteShareLinkCreateOrConnectWithoutAttributionEventsInput
+    upsert?: SiteShareLinkUpsertWithoutAttributionEventsInput
+    connect?: SiteShareLinkWhereUniqueInput
+    update?: XOR<XOR<SiteShareLinkUpdateToOneWithWhereWithoutAttributionEventsInput, SiteShareLinkUpdateWithoutAttributionEventsInput>, SiteShareLinkUncheckedUpdateWithoutAttributionEventsInput>
+  }
+
   export type UserCreateNestedOneWithoutDeviceTokensInput = {
     create?: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
     connectOrCreate?: UserCreateOrConnectWithoutDeviceTokensInput
@@ -62883,6 +66195,40 @@ export namespace Prisma {
     _max?: NestedEnumSiteShareChannelFilter<$PrismaModel>
   }
 
+  export type NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionEventType | EnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel> | $Enums.SiteShareAttributionEventType
+  }
+
+  export type NestedEnumSiteShareAttributionSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionSource | EnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel> | $Enums.SiteShareAttributionSource
+  }
+
+  export type NestedEnumSiteShareAttributionEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionEventType | EnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionEventType[] | ListEnumSiteShareAttributionEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareAttributionEventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareAttributionEventTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSiteShareAttributionSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SiteShareAttributionSource | EnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SiteShareAttributionSource[] | ListEnumSiteShareAttributionSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSiteShareAttributionSourceWithAggregatesFilter<$PrismaModel> | $Enums.SiteShareAttributionSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel>
+    _max?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel>
+  }
+
   export type NestedEnumDevicePlatformFilter<$PrismaModel = never> = {
     equals?: $Enums.DevicePlatform | EnumDevicePlatformFieldRefInput<$PrismaModel>
     in?: $Enums.DevicePlatform[] | ListEnumDevicePlatformFieldRefInput<$PrismaModel>
@@ -63356,6 +66702,40 @@ export namespace Prisma {
 
   export type SiteShareEventCreateManyUserInputEnvelope = {
     data: SiteShareEventCreateManyUserInput | SiteShareEventCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteShareLinkCreateWithoutSharedByUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    channel?: $Enums.SiteShareChannel
+    site: SiteCreateNestedOneWithoutShareLinksInput
+    attributionEvents?: SiteShareAttributionEventCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkUncheckedCreateWithoutSharedByUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    siteId: string
+    channel?: $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkCreateOrConnectWithoutSharedByUserInput = {
+    where: SiteShareLinkWhereUniqueInput
+    create: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput>
+  }
+
+  export type SiteShareLinkCreateManySharedByUserInputEnvelope = {
+    data: SiteShareLinkCreateManySharedByUserInput | SiteShareLinkCreateManySharedByUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -64279,6 +67659,37 @@ export namespace Prisma {
     channel?: EnumSiteShareChannelFilter<"SiteShareEvent"> | $Enums.SiteShareChannel
   }
 
+  export type SiteShareLinkUpsertWithWhereUniqueWithoutSharedByUserInput = {
+    where: SiteShareLinkWhereUniqueInput
+    update: XOR<SiteShareLinkUpdateWithoutSharedByUserInput, SiteShareLinkUncheckedUpdateWithoutSharedByUserInput>
+    create: XOR<SiteShareLinkCreateWithoutSharedByUserInput, SiteShareLinkUncheckedCreateWithoutSharedByUserInput>
+  }
+
+  export type SiteShareLinkUpdateWithWhereUniqueWithoutSharedByUserInput = {
+    where: SiteShareLinkWhereUniqueInput
+    data: XOR<SiteShareLinkUpdateWithoutSharedByUserInput, SiteShareLinkUncheckedUpdateWithoutSharedByUserInput>
+  }
+
+  export type SiteShareLinkUpdateManyWithWhereWithoutSharedByUserInput = {
+    where: SiteShareLinkScalarWhereInput
+    data: XOR<SiteShareLinkUpdateManyMutationInput, SiteShareLinkUncheckedUpdateManyWithoutSharedByUserInput>
+  }
+
+  export type SiteShareLinkScalarWhereInput = {
+    AND?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
+    OR?: SiteShareLinkScalarWhereInput[]
+    NOT?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
+    id?: StringFilter<"SiteShareLink"> | string
+    createdAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    cid?: StringFilter<"SiteShareLink"> | string
+    expiresAt?: DateTimeFilter<"SiteShareLink"> | Date | string
+    countedAt?: DateTimeNullableFilter<"SiteShareLink"> | Date | string | null
+    siteId?: StringFilter<"SiteShareLink"> | string
+    sharedByUserId?: StringNullableFilter<"SiteShareLink"> | string | null
+    channel?: EnumSiteShareChannelFilter<"SiteShareLink"> | $Enums.SiteShareChannel
+  }
+
   export type SiteCommentLikeUpsertWithWhereUniqueWithoutUserInput = {
     where: SiteCommentLikeWhereUniqueInput
     update: XOR<SiteCommentLikeUpdateWithoutUserInput, SiteCommentLikeUncheckedUpdateWithoutUserInput>
@@ -64773,6 +68184,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -64827,6 +68239,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -64897,6 +68310,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -64951,6 +68365,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65005,6 +68420,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -65059,6 +68475,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65129,6 +68546,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -65183,6 +68601,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65237,6 +68656,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -65291,6 +68711,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65361,6 +68782,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -65415,6 +68837,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65469,6 +68892,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -65523,6 +68947,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65593,6 +69018,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -65647,6 +69073,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -65701,6 +69128,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -65755,6 +69183,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -65825,6 +69254,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -65879,6 +69309,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -66146,6 +69577,40 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SiteShareLinkCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    channel?: $Enums.SiteShareChannel
+    sharedByUser?: UserCreateNestedOneWithoutSiteShareLinksInput
+    attributionEvents?: SiteShareAttributionEventCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    sharedByUserId?: string | null
+    channel?: $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedCreateNestedManyWithoutShareLinkInput
+  }
+
+  export type SiteShareLinkCreateOrConnectWithoutSiteInput = {
+    where: SiteShareLinkWhereUniqueInput
+    create: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteShareLinkCreateManySiteInputEnvelope = {
+    data: SiteShareLinkCreateManySiteInput | SiteShareLinkCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutSiteInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutSiteInput, ReportUncheckedUpdateWithoutSiteInput>
@@ -66242,6 +69707,22 @@ export namespace Prisma {
     data: XOR<SiteShareEventUpdateManyMutationInput, SiteShareEventUncheckedUpdateManyWithoutSiteInput>
   }
 
+  export type SiteShareLinkUpsertWithWhereUniqueWithoutSiteInput = {
+    where: SiteShareLinkWhereUniqueInput
+    update: XOR<SiteShareLinkUpdateWithoutSiteInput, SiteShareLinkUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteShareLinkCreateWithoutSiteInput, SiteShareLinkUncheckedCreateWithoutSiteInput>
+  }
+
+  export type SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput = {
+    where: SiteShareLinkWhereUniqueInput
+    data: XOR<SiteShareLinkUpdateWithoutSiteInput, SiteShareLinkUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteShareLinkUpdateManyWithWhereWithoutSiteInput = {
+    where: SiteShareLinkScalarWhereInput
+    data: XOR<SiteShareLinkUpdateManyMutationInput, SiteShareLinkUncheckedUpdateManyWithoutSiteInput>
+  }
+
   export type SiteCreateWithoutReportsInput = {
     id?: string
     createdAt?: Date | string
@@ -66260,6 +69741,7 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutReportsInput = {
@@ -66280,6 +69762,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutReportsInput = {
@@ -66324,6 +69807,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -66378,6 +69862,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -66437,6 +69922,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -66491,6 +69977,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -66693,6 +70180,7 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutReportsInput = {
@@ -66713,6 +70201,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -66763,6 +70252,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -66817,6 +70307,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -66882,6 +70373,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -66936,6 +70428,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -67142,6 +70635,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -67196,6 +70690,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -67321,6 +70816,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -67375,6 +70871,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -67430,6 +70927,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -67484,6 +70982,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -67603,6 +71102,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -67657,6 +71157,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -67765,6 +71266,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -67819,6 +71321,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -67889,6 +71392,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -67943,6 +71447,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -67978,6 +71483,7 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutEventsInput = {
@@ -67998,6 +71504,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutEventsInput = {
@@ -68043,6 +71550,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -68097,6 +71605,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -68613,6 +72122,7 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutEventsInput = {
@@ -68633,6 +72143,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutOrganizedCleanupEventsInput = {
@@ -68684,6 +72195,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -68738,6 +72250,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -69159,6 +72672,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -69213,6 +72727,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -69372,6 +72887,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -69426,6 +72942,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -69563,6 +73080,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -69617,6 +73135,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -69783,6 +73302,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -69837,6 +73357,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -70058,6 +73579,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -70112,6 +73634,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -70250,6 +73773,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -70304,6 +73828,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -70598,6 +74123,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -70652,6 +74178,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -70811,6 +74338,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -70865,6 +74393,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -71002,6 +74531,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -71056,6 +74586,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -71266,6 +74797,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -71320,6 +74852,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -71514,6 +75047,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -71568,6 +75102,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -71727,6 +75262,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -71781,6 +75317,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -72262,6 +75799,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -72316,6 +75854,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -72475,6 +76014,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -72529,6 +76069,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -72666,6 +76207,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -72720,6 +76262,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -72879,6 +76422,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -72933,6 +76477,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -73070,6 +76615,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -73124,6 +76670,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -73283,6 +76830,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -73337,6 +76885,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -73371,6 +76920,7 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutVotesInput = {
@@ -73391,6 +76941,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutVotesInput = {
@@ -73435,6 +76986,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -73489,6 +77041,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -73540,6 +77093,7 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutVotesInput = {
@@ -73560,6 +77114,7 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteVotesInput = {
@@ -73610,6 +77165,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -73664,6 +77220,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -73699,6 +77256,7 @@ export namespace Prisma {
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSavesInput = {
@@ -73719,6 +77277,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSavesInput = {
@@ -73763,6 +77322,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -73817,6 +77377,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -73868,6 +77429,7 @@ export namespace Prisma {
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSavesInput = {
@@ -73888,6 +77450,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteSavesInput = {
@@ -73938,6 +77501,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -73992,6 +77556,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -74027,6 +77592,7 @@ export namespace Prisma {
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCommentsInput = {
@@ -74047,6 +77613,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCommentsInput = {
@@ -74091,6 +77658,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -74145,6 +77713,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -74285,6 +77854,7 @@ export namespace Prisma {
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCommentsInput = {
@@ -74305,6 +77875,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteCommentsInput = {
@@ -74355,6 +77926,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -74409,6 +77981,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -74564,6 +78137,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -74618,6 +78192,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -74725,6 +78300,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -74779,6 +78355,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -74813,6 +78390,7 @@ export namespace Prisma {
     votes?: SiteVoteCreateNestedManyWithoutSiteInput
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutShareEventsInput = {
@@ -74833,6 +78411,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutShareEventsInput = {
@@ -74877,6 +78456,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -74931,6 +78511,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -74982,6 +78563,7 @@ export namespace Prisma {
     votes?: SiteVoteUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutShareEventsInput = {
@@ -75002,6 +78584,7 @@ export namespace Prisma {
     votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteShareEventsInput = {
@@ -75052,6 +78635,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -75106,6 +78690,7 @@ export namespace Prisma {
     siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -75121,6 +78706,469 @@ export namespace Prisma {
     eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
     routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
     checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCreateWithoutShareLinksInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutShareLinksInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutShareLinksInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutShareLinksInput, SiteUncheckedCreateWithoutShareLinksInput>
+  }
+
+  export type UserCreateWithoutSiteShareLinksInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSiteShareLinksInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSiteShareLinksInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSiteShareLinksInput, UserUncheckedCreateWithoutSiteShareLinksInput>
+  }
+
+  export type SiteShareAttributionEventCreateWithoutShareLinkInput = {
+    id?: string
+    createdAt?: Date | string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+  }
+
+  export type SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput = {
+    id?: string
+    createdAt?: Date | string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+  }
+
+  export type SiteShareAttributionEventCreateOrConnectWithoutShareLinkInput = {
+    where: SiteShareAttributionEventWhereUniqueInput
+    create: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput>
+  }
+
+  export type SiteShareAttributionEventCreateManyShareLinkInputEnvelope = {
+    data: SiteShareAttributionEventCreateManyShareLinkInput | SiteShareAttributionEventCreateManyShareLinkInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SiteUpsertWithoutShareLinksInput = {
+    update: XOR<SiteUpdateWithoutShareLinksInput, SiteUncheckedUpdateWithoutShareLinksInput>
+    create: XOR<SiteCreateWithoutShareLinksInput, SiteUncheckedCreateWithoutShareLinksInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutShareLinksInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutShareLinksInput, SiteUncheckedUpdateWithoutShareLinksInput>
+  }
+
+  export type SiteUpdateWithoutShareLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutShareLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserUpsertWithoutSiteShareLinksInput = {
+    update: XOR<UserUpdateWithoutSiteShareLinksInput, UserUncheckedUpdateWithoutSiteShareLinksInput>
+    create: XOR<UserCreateWithoutSiteShareLinksInput, UserUncheckedCreateWithoutSiteShareLinksInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSiteShareLinksInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSiteShareLinksInput, UserUncheckedUpdateWithoutSiteShareLinksInput>
+  }
+
+  export type UserUpdateWithoutSiteShareLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSiteShareLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteShareAttributionEventUpsertWithWhereUniqueWithoutShareLinkInput = {
+    where: SiteShareAttributionEventWhereUniqueInput
+    update: XOR<SiteShareAttributionEventUpdateWithoutShareLinkInput, SiteShareAttributionEventUncheckedUpdateWithoutShareLinkInput>
+    create: XOR<SiteShareAttributionEventCreateWithoutShareLinkInput, SiteShareAttributionEventUncheckedCreateWithoutShareLinkInput>
+  }
+
+  export type SiteShareAttributionEventUpdateWithWhereUniqueWithoutShareLinkInput = {
+    where: SiteShareAttributionEventWhereUniqueInput
+    data: XOR<SiteShareAttributionEventUpdateWithoutShareLinkInput, SiteShareAttributionEventUncheckedUpdateWithoutShareLinkInput>
+  }
+
+  export type SiteShareAttributionEventUpdateManyWithWhereWithoutShareLinkInput = {
+    where: SiteShareAttributionEventScalarWhereInput
+    data: XOR<SiteShareAttributionEventUpdateManyMutationInput, SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkInput>
+  }
+
+  export type SiteShareAttributionEventScalarWhereInput = {
+    AND?: SiteShareAttributionEventScalarWhereInput | SiteShareAttributionEventScalarWhereInput[]
+    OR?: SiteShareAttributionEventScalarWhereInput[]
+    NOT?: SiteShareAttributionEventScalarWhereInput | SiteShareAttributionEventScalarWhereInput[]
+    id?: StringFilter<"SiteShareAttributionEvent"> | string
+    createdAt?: DateTimeFilter<"SiteShareAttributionEvent"> | Date | string
+    shareLinkId?: StringFilter<"SiteShareAttributionEvent"> | string
+    eventType?: EnumSiteShareAttributionEventTypeFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFilter<"SiteShareAttributionEvent"> | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFilter<"SiteShareAttributionEvent"> | string
+    ipHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    userAgentHash?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+    openedByUserId?: StringNullableFilter<"SiteShareAttributionEvent"> | string | null
+  }
+
+  export type SiteShareLinkCreateWithoutAttributionEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    channel?: $Enums.SiteShareChannel
+    site: SiteCreateNestedOneWithoutShareLinksInput
+    sharedByUser?: UserCreateNestedOneWithoutSiteShareLinksInput
+  }
+
+  export type SiteShareLinkUncheckedCreateWithoutAttributionEventsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    siteId: string
+    sharedByUserId?: string | null
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkCreateOrConnectWithoutAttributionEventsInput = {
+    where: SiteShareLinkWhereUniqueInput
+    create: XOR<SiteShareLinkCreateWithoutAttributionEventsInput, SiteShareLinkUncheckedCreateWithoutAttributionEventsInput>
+  }
+
+  export type SiteShareLinkUpsertWithoutAttributionEventsInput = {
+    update: XOR<SiteShareLinkUpdateWithoutAttributionEventsInput, SiteShareLinkUncheckedUpdateWithoutAttributionEventsInput>
+    create: XOR<SiteShareLinkCreateWithoutAttributionEventsInput, SiteShareLinkUncheckedCreateWithoutAttributionEventsInput>
+    where?: SiteShareLinkWhereInput
+  }
+
+  export type SiteShareLinkUpdateToOneWithWhereWithoutAttributionEventsInput = {
+    where?: SiteShareLinkWhereInput
+    data: XOR<SiteShareLinkUpdateWithoutAttributionEventsInput, SiteShareLinkUncheckedUpdateWithoutAttributionEventsInput>
+  }
+
+  export type SiteShareLinkUpdateWithoutAttributionEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    site?: SiteUpdateOneRequiredWithoutShareLinksNestedInput
+    sharedByUser?: UserUpdateOneWithoutSiteShareLinksNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateWithoutAttributionEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
 
   export type UserCreateWithoutDeviceTokensInput = {
@@ -75161,6 +79209,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -75215,6 +79264,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -75285,6 +79335,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -75339,6 +79390,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -75393,6 +79445,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -75447,6 +79500,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -75517,6 +79571,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -75571,6 +79626,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -75625,6 +79681,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
@@ -75679,6 +79736,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -75749,6 +79807,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
@@ -75803,6 +79862,7 @@ export namespace Prisma {
     siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -75947,6 +80007,17 @@ export namespace Prisma {
   export type SiteShareEventCreateManyUserInput = {
     id?: string
     createdAt?: Date | string
+    siteId: string
+    channel?: $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkCreateManySharedByUserInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
     siteId: string
     channel?: $Enums.SiteShareChannel
   }
@@ -76540,6 +80611,41 @@ export namespace Prisma {
   export type SiteShareEventUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkUpdateWithoutSharedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    site?: SiteUpdateOneRequiredWithoutShareLinksNestedInput
+    attributionEvents?: SiteShareAttributionEventUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateWithoutSharedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    siteId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateManyWithoutSharedByUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     siteId?: StringFieldUpdateOperationsInput | string
     channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
@@ -77200,6 +81306,17 @@ export namespace Prisma {
     channel?: $Enums.SiteShareChannel
   }
 
+  export type SiteShareLinkCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    cid: string
+    expiresAt: Date | string
+    countedAt?: Date | string | null
+    sharedByUserId?: string | null
+    channel?: $Enums.SiteShareChannel
+  }
+
   export type ReportUpdateWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -77466,6 +81583,41 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type SiteShareLinkUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    sharedByUser?: UserUpdateOneWithoutSiteShareLinksNestedInput
+    attributionEvents?: SiteShareAttributionEventUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+    attributionEvents?: SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkNestedInput
+  }
+
+  export type SiteShareLinkUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    cid?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
 
@@ -78347,6 +82499,50 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     userId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type SiteShareAttributionEventCreateManyShareLinkInput = {
+    id?: string
+    createdAt?: Date | string
+    eventType: $Enums.SiteShareAttributionEventType
+    source?: $Enums.SiteShareAttributionSource
+    dedupeKey: string
+    ipHash?: string | null
+    userAgentHash?: string | null
+    openedByUserId?: string | null
+  }
+
+  export type SiteShareAttributionEventUpdateWithoutShareLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SiteShareAttributionEventUncheckedUpdateWithoutShareLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type SiteShareAttributionEventUncheckedUpdateManyWithoutShareLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    eventType?: EnumSiteShareAttributionEventTypeFieldUpdateOperationsInput | $Enums.SiteShareAttributionEventType
+    source?: EnumSiteShareAttributionSourceFieldUpdateOperationsInput | $Enums.SiteShareAttributionSource
+    dedupeKey?: StringFieldUpdateOperationsInput | string
+    ipHash?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgentHash?: NullableStringFieldUpdateOperationsInput | string | null
+    openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
 

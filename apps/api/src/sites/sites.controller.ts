@@ -1,5 +1,3 @@
-import { createHash } from 'node:crypto';
-
 import {
   Body,
   Controller,
@@ -11,18 +9,23 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Res,
   Sse,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import {
+  ApiBadRequestResponse,
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
+  ApiTooManyRequestsResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { ADMIN_PANEL_ROLES, ADMIN_WRITE_ROLES } from '../auth/admin-roles';
 import { CurrentUser } from '../auth/current-user.decorator';
@@ -39,21 +42,39 @@ import { ListSiteUpvotesQueryDto } from './dto/list-site-upvotes-query.dto';
 import { ListSitesQueryDto } from './dto/list-sites-query.dto';
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
 import { ShareSiteDto } from './dto/share-site.dto';
+import { SiteShareAttributionEventDto } from './dto/site-share-attribution-event.dto';
+import { SiteShareLinkRequestDto } from './dto/site-share-link-request.dto';
+import { SiteShareLinkResponseDto } from './dto/site-share-link-response.dto';
 import { SubmitFeedFeedbackDto } from './dto/submit-feed-feedback.dto';
 import { TrackFeedEventDto } from './dto/track-feed-event.dto';
 import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
 import { UpdateSiteStatusDto } from './dto/update-site-status.dto';
+import { SiteCommentLikeResponseDto } from './dto/site-comment-like-response.dto';
+import {
+  SiteCommentTreeNodeResponseDto,
+  SiteCommentsListResponseDto,
+} from './dto/site-comment-tree-response.dto';
+import { SiteDetailResponseDto } from './dto/site-detail-response.dto';
+import { SiteEngagementSnapshotResponseDto } from './dto/site-engagement-snapshot-response.dto';
+import { SiteFeedListResponseDto } from './dto/site-list-item-response.dto';
+import { SiteMediaListResponseDto } from './dto/site-media-response.dto';
+import { SiteUpvotersListResponseDto } from './dto/site-upvoters-response.dto';
 import { SitesService } from './sites.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
-import { Observable, concat, defer, finalize, from, interval, map, merge } from 'rxjs';
+import { Observable } from 'rxjs';
 import { SiteEventsService } from '../admin-events/site-events.service';
-import { ObservabilityStore } from '../observability/observability.store';
+import { ParseCuidPipe } from '../common/pipes/parse-cuid.pipe';
+import { weakEtagForMapBody } from './http/map-etag';
+import { clientIp } from './http/client-ip';
+import {
+  normalizeShareClickEvent,
+  normalizeShareOpenEvent,
+} from './http/share-attribution-normalizer';
+import { buildSiteEventsStream } from './http/site-events-stream';
 
 @ApiTags('sites')
 @Controller('sites')
 export class SitesController {
-  private static readonly HEARTBEAT_INTERVAL_MS = 30_000;
-
   constructor(
     private readonly sitesService: SitesService,
     private readonly siteEventsService: SiteEventsService,
@@ -65,6 +86,8 @@ export class SitesController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new pollution site' })
   @ApiCreatedResponse({ description: 'Site created successfully' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Caller is not an admin' })
   create(@Body() dto: CreateSiteDto) {
     return this.sitesService.create(dto);
   }
@@ -74,7 +97,9 @@ export class SitesController {
   @Throttle({ default: { limit: 90, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'List sites with optional filters' })
-  @ApiOkResponse({ description: 'Sites fetched successfully' })
+  @ApiOkResponse({ description: 'Sites fetched successfully', type: SiteFeedListResponseDto })
+  @ApiBadRequestResponse({ description: 'Invalid geo query or filters' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   findAll(@Query() query: ListSitesQueryDto, @CurrentUser() user?: AuthenticatedUser) {
     return this.sitesService.findAll(query, user);
   }
@@ -84,6 +109,9 @@ export class SitesController {
   @Throttle({ default: { limit: 240, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Track feed telemetry event' })
+  @ApiOkResponse({ description: 'Event recorded' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
   trackFeedEvent(@Body() dto: TrackFeedEventDto, @CurrentUser() user: AuthenticatedUser) {
     return this.sitesService.trackFeedEvent(dto, user);
   }
@@ -93,30 +121,17 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiOperation({ summary: 'List sites for map view with geo bounds and high limit' })
   @ApiOkResponse({ description: 'Sites for map fetched successfully' })
+  @ApiBadRequestResponse({ description: 'Invalid map viewport or geo params' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   async findAllForMap(
     @Query() query: ListSitesMapQueryDto,
     @Res({ passthrough: true }) res: Response,
   ) {
     const body = await this.sitesService.findAllForMap(query);
-    const etag = SitesController.weakEtagForMapBody(body);
+    const etag = weakEtagForMapBody(body);
     res.setHeader('ETag', etag);
     res.setHeader('Cache-Control', 'private, max-age=4, stale-while-revalidate=20');
     return body;
-  }
-
-  private static weakEtagForMapBody(body: {
-    data: Array<{ id: string; updatedAt?: Date | string }>;
-  }): string {
-    const h = createHash('sha1');
-    for (const row of body.data) {
-      h.update(row.id);
-      const u =
-        row.updatedAt instanceof Date
-          ? row.updatedAt.toISOString()
-          : String(row.updatedAt ?? '');
-      h.update(u);
-    }
-    return `W/"${h.digest('hex').slice(0, 24)}"`;
   }
 
   @Get('events')
@@ -129,69 +144,46 @@ export class SitesController {
     @CurrentUser() user: AuthenticatedUser | undefined,
     @Headers('last-event-id') lastEventId?: string,
   ): Observable<NestMessageEvent> {
-    if (!user) {
-      throw new UnauthorizedException({
-        code: 'UNAUTHORIZED',
-        message: 'Authentication required',
-      });
-    }
-    return defer(() => {
-      ObservabilityStore.recordMapSseConnected();
-      const replayEvents = this.siteEventsService.getReplaySince(lastEventId);
-      if (replayEvents.length > 0) {
-        ObservabilityStore.recordMapSseReplayEvents(replayEvents.length);
-      }
-      const toSseEvent = (
-        event: { eventId: string; type: string } & Record<string, unknown>,
-      ): NestMessageEvent => {
-        ObservabilityStore.recordMapSseEventEmitted();
-        return {
-          data: event as object,
-          type: event.type,
-          id: event.eventId,
-        };
-      };
-      const replay$ = from(replayEvents).pipe(map((event) => toSseEvent(event)));
-      const live$ = this.siteEventsService.getEvents().pipe(
-        map((event) => toSseEvent(event)),
-      );
-      const heartbeat$ = interval(SitesController.HEARTBEAT_INTERVAL_MS).pipe(
-        map(() => ({ data: { type: 'heartbeat' } } as NestMessageEvent)),
-      );
-      return concat(replay$, merge(live$, heartbeat$)).pipe(
-        finalize(() => {
-          ObservabilityStore.recordMapSseDisconnected();
-        }),
-      );
-    });
+    return buildSiteEventsStream(this.siteEventsService, user, lastEventId);
   }
 
   @Get(':id')
-  @UseGuards(OptionalJwtAuthGuard)
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get site details with reports' })
-  @ApiOkResponse({ description: 'Site fetched successfully' })
-  findOne(@Param('id') id: string, @CurrentUser() user?: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Site fetched successfully', type: SiteDetailResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  findOne(@Param('id', ParseCuidPipe) id: string, @CurrentUser() user?: AuthenticatedUser) {
     return this.sitesService.findOne(id, user);
   }
 
   @Get(':id/media')
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get all site media with pagination' })
-  @ApiOkResponse({ description: 'Site media fetched successfully' })
+  @ApiOkResponse({ description: 'Site media fetched successfully', type: SiteMediaListResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   findMedia(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Query() query: ListSiteMediaQueryDto,
   ) {
     return this.sitesService.findSiteMedia(id, query);
   }
 
   @Get(':id/comments')
-  @UseGuards(OptionalJwtAuthGuard)
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get comments for site' })
-  @ApiOkResponse({ description: 'Site comments fetched successfully' })
+  @ApiOkResponse({ description: 'Site comments fetched successfully', type: SiteCommentsListResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   findComments(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Query() query: ListSiteCommentsQueryDto,
     @CurrentUser() user?: AuthenticatedUser,
   ) {
@@ -199,9 +191,18 @@ export class SitesController {
   }
 
   @Get(':id/upvotes')
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List users who upvoted this site' })
-  @ApiOkResponse({ description: 'Site upvotes fetched successfully' })
-  findUpvotes(@Param('id') id: string, @Query() query: ListSiteUpvotesQueryDto) {
+  @ApiOkResponse({ description: 'Site upvotes fetched successfully', type: SiteUpvotersListResponseDto })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  findUpvotes(
+    @Param('id', ParseCuidPipe) id: string,
+    @Query() query: ListSiteUpvotesQueryDto,
+    @CurrentUser() _user?: AuthenticatedUser,
+  ) {
     return this.sitesService.findSiteUpvotes(id, query);
   }
 
@@ -209,9 +210,12 @@ export class SitesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create comment for site' })
-  @ApiCreatedResponse({ description: 'Site comment created successfully' })
+  @ApiCreatedResponse({ description: 'Site comment created successfully', type: SiteCommentTreeNodeResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiBadRequestResponse({ description: 'Empty body or invalid parent' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
   createComment(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: CreateSiteCommentDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
@@ -222,9 +226,12 @@ export class SitesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like a site comment' })
+  @ApiOkResponse({ description: 'Like applied', type: SiteCommentLikeResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Comment not found' })
   likeComment(
-    @Param('id') id: string,
-    @Param('commentId') commentId: string,
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('commentId', ParseCuidPipe) commentId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.sitesService.likeSiteComment(id, commentId, user);
@@ -234,9 +241,12 @@ export class SitesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Unlike a site comment' })
+  @ApiOkResponse({ description: 'Like removed', type: SiteCommentLikeResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Comment not found' })
   unlikeComment(
-    @Param('id') id: string,
-    @Param('commentId') commentId: string,
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('commentId', ParseCuidPipe) commentId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.sitesService.unlikeSiteComment(id, commentId, user);
@@ -246,9 +256,14 @@ export class SitesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Edit a site comment' })
+  @ApiOkResponse({ description: 'Comment updated', type: SiteCommentTreeNodeResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Not the author' })
+  @ApiNotFoundResponse({ description: 'Comment not found' })
+  @ApiBadRequestResponse({ description: 'Empty body' })
   editComment(
-    @Param('id') id: string,
-    @Param('commentId') commentId: string,
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('commentId', ParseCuidPipe) commentId: string,
     @Body() dto: UpdateSiteCommentDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
@@ -259,9 +274,13 @@ export class SitesController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a site comment' })
+  @ApiOkResponse({ description: 'Comment soft-deleted' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Not the author' })
+  @ApiNotFoundResponse({ description: 'Comment not found' })
   deleteComment(
-    @Param('id') id: string,
-    @Param('commentId') commentId: string,
+    @Param('id', ParseCuidPipe) id: string,
+    @Param('commentId', ParseCuidPipe) commentId: string,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.sitesService.deleteSiteComment(id, commentId, user);
@@ -272,7 +291,10 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Upvote site' })
-  upvote(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Engagement snapshot', type: SiteEngagementSnapshotResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  upvote(@Param('id', ParseCuidPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.sitesService.upvoteSite(id, user);
   }
 
@@ -281,7 +303,10 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove upvote from site' })
-  removeUpvote(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Engagement snapshot', type: SiteEngagementSnapshotResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  removeUpvote(@Param('id', ParseCuidPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.sitesService.removeSiteUpvote(id, user);
   }
 
@@ -290,7 +315,10 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Save site' })
-  save(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Engagement snapshot', type: SiteEngagementSnapshotResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  save(@Param('id', ParseCuidPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.sitesService.saveSite(id, user);
   }
 
@@ -299,7 +327,10 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Remove saved site' })
-  unsave(@Param('id') id: string, @CurrentUser() user: AuthenticatedUser) {
+  @ApiOkResponse({ description: 'Engagement snapshot', type: SiteEngagementSnapshotResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  unsave(@Param('id', ParseCuidPipe) id: string, @CurrentUser() user: AuthenticatedUser) {
     return this.sitesService.unsaveSite(id, user);
   }
 
@@ -308,12 +339,73 @@ export class SitesController {
   @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Track site share event' })
+  @ApiOkResponse({ description: 'Engagement snapshot', type: SiteEngagementSnapshotResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
   shareSite(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: ShareSiteDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
     return this.sitesService.shareSite(id, dto, user);
+  }
+
+  @Post(':id/share-link')
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 90, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Issue signed share link for a pollution site' })
+  @ApiOkResponse({ type: SiteShareLinkResponseDto })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  issueShareLink(
+    @Param('id', ParseCuidPipe) id: string,
+    @Body() dto: SiteShareLinkRequestDto,
+    @CurrentUser() user: AuthenticatedUser,
+  ) {
+    return this.sitesService.issueShareLink(id, dto, user);
+  }
+
+  @Post('share-events/click')
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 180, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Ingest a web click/view attribution event for a site share link' })
+  @ApiOkResponse({ description: 'Attribution event accepted' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  ingestShareClick(
+    @Body() dto: SiteShareAttributionEventDto,
+    @Req() req: Request,
+    @Headers('x-forwarded-for') xff?: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.sitesService.ingestShareAttributionEvent({
+      dto: normalizeShareClickEvent(dto),
+      ipAddress: clientIp(req, xff),
+      userAgent: userAgent?.trim() || null,
+      openedByUserId: undefined,
+    });
+  }
+
+  @Post('share-events/open')
+  @UseGuards(ThrottlerGuard, OptionalJwtAuthGuard)
+  @Throttle({ default: { limit: 180, ttl: 60_000 } })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Ingest an app open attribution event for a site share link' })
+  @ApiOkResponse({ description: 'Attribution event accepted' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
+  ingestShareOpen(
+    @Body() dto: SiteShareAttributionEventDto,
+    @Req() req: Request,
+    @CurrentUser() user?: AuthenticatedUser,
+    @Headers('x-forwarded-for') xff?: string,
+    @Headers('user-agent') userAgent?: string,
+  ) {
+    return this.sitesService.ingestShareAttributionEvent({
+      dto: normalizeShareOpenEvent(dto),
+      ipAddress: clientIp(req, xff),
+      userAgent: userAgent?.trim() || null,
+      openedByUserId: user?.userId,
+    });
   }
 
   @Post(':id/feed-feedback')
@@ -321,8 +413,11 @@ export class SitesController {
   @Throttle({ default: { limit: 180, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Submit feed relevance feedback for a site' })
+  @ApiOkResponse({ description: 'Feedback recorded' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
   submitFeedFeedback(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: SubmitFeedFeedbackDto,
     @CurrentUser() user: AuthenticatedUser,
   ) {
@@ -330,13 +425,19 @@ export class SitesController {
   }
 
   @Patch(':id/status')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @Roles(...ADMIN_PANEL_ROLES)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update canonical site lifecycle status' })
   @ApiOkResponse({ description: 'Site status updated successfully' })
+  @ApiUnauthorizedResponse({ description: 'Missing or invalid JWT' })
+  @ApiForbiddenResponse({ description: 'Caller is not an admin' })
+  @ApiNotFoundResponse({ description: 'Site not found' })
+  @ApiBadRequestResponse({ description: 'Invalid status transition' })
+  @ApiTooManyRequestsResponse({ description: 'Too many requests' })
   updateStatus(
-    @Param('id') id: string,
+    @Param('id', ParseCuidPipe) id: string,
     @Body() dto: UpdateSiteStatusDto,
     @CurrentUser() admin: AuthenticatedUser,
   ) {

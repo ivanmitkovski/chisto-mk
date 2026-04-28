@@ -19,12 +19,13 @@ function walkTsFiles(dir: string, acc: string[] = []): string[] {
 const CODE_LITERAL_RE = /\bcode:\s*'([A-Z][A-Z0-9_]*)'/g;
 
 describe('API error code registry drift', () => {
-  it('every code: literal under events, event-chat, cleanup-events, gamification is registered in codes.ts', () => {
+  it('every code: literal under events, event-chat, cleanup-events, gamification, sites is registered in codes.ts', () => {
     const roots = [
       join(__dirname, '../../src/events'),
       join(__dirname, '../../src/event-chat'),
       join(__dirname, '../../src/cleanup-events'),
       join(__dirname, '../../src/gamification'),
+      join(__dirname, '../../src/sites'),
     ];
     const files = roots.flatMap((r) => walkTsFiles(r));
     const found = new Set<string>();

@@ -1,4 +1,6 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
@@ -63,17 +65,45 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
     setState(() => _isSubmitting = true);
     AppHaptics.light();
 
-    await widget.repository.submitReport(
-      siteId: widget.site.id,
-      reason: _selectedReason!,
-      details: _detailsController.text.trim().isEmpty
-          ? null
-          : _detailsController.text.trim(),
-    );
+    try {
+      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+        widget.site.id,
+        eventType: 'cta_report_issue_started',
+        metadata: <String, dynamic>{'reason': _selectedReason!.name},
+      );
+      await widget.repository.submitReport(
+        siteId: widget.site.id,
+        reason: _selectedReason!,
+        details: _detailsController.text.trim().isEmpty
+            ? null
+            : _detailsController.text.trim(),
+      );
 
-    if (!mounted) return;
-    AppHaptics.success();
-    Navigator.of(context).pop(true);
+      if (!mounted) return;
+      AppHaptics.success();
+      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+        widget.site.id,
+        eventType: 'cta_report_issue_success',
+        metadata: <String, dynamic>{'reason': _selectedReason!.name},
+      );
+      Navigator.of(context).pop(true);
+    } catch (_) {
+      if (!mounted) return;
+      await ServiceLocator.instance.sitesRepository.trackFeedEvent(
+        widget.site.id,
+        eventType: 'cta_report_issue_failed',
+        metadata: <String, dynamic>{'reason': _selectedReason?.name},
+      );
+      AppSnack.show(
+        context,
+        message: context.l10n.reportIssueFailedSnack,
+        type: AppSnackType.warning,
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
   }
 
   @override
@@ -110,7 +140,7 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'Report issue',
+                  context.l10n.reportIssueSheetTitle,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.3,
@@ -118,10 +148,10 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Help us improve. Why are you reporting this site?',
+                  context.l10n.reportIssueSheetSubtitle,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textMuted,
-                  ),
+                        color: AppColors.textMuted,
+                      ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ...SiteReportReason.values.map(
@@ -136,16 +166,17 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'Additional details (optional)',
+                  context.l10n.reportIssueDetailsLabel,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 TextField(
                   controller: _detailsController,
                   onChanged: (_) => setState(() {}),
+                  maxLength: 500,
                   maxLines: 3,
                   minLines: 2,
                   textInputAction: TextInputAction.done,
@@ -153,7 +184,7 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                     color: AppColors.textPrimary,
                   ),
                   decoration: InputDecoration(
-                    hintText: 'Describe the issue...',
+                    hintText: context.l10n.reportIssueDetailsHint,
                     hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textMuted,
                     ),
@@ -179,7 +210,9 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 PrimaryButton(
-                  label: _isSubmitting ? 'Submitting...' : 'Submit report',
+                  label: _isSubmitting
+                      ? context.l10n.reportIssueSubmitting
+                      : context.l10n.reportIssueSubmit,
                   enabled: _canSubmit && !_isSubmitting,
                   onPressed: _handleSubmit,
                 ),

@@ -53,6 +53,7 @@ model User {
   siteSaves            SiteSave[]
   siteComments         SiteComment[]
   siteShareEvents      SiteShareEvent[]
+  siteShareLinks       SiteShareLink[]
   siteCommentLikes     SiteCommentLike[]
   deviceTokens         UserDeviceToken[]
   userNotifications    UserNotification[]
@@ -250,6 +251,7 @@ model Site {
   saves       SiteSave[]
   comments    SiteComment[]
   shareEvents SiteShareEvent[]
+  shareLinks  SiteShareLink[]
 
   @@index([status])
   @@index([latitude, longitude])
@@ -851,6 +853,61 @@ model SiteShareEvent {
 
   @@index([siteId, createdAt])
   @@index([userId, createdAt])
+}
+
+enum SiteShareAttributionEventType {
+  CLICK
+  OPEN
+}
+
+enum SiteShareAttributionSource {
+  WEB
+  APP
+  OTHER
+}
+
+model SiteShareLink {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cid       String   @unique
+  expiresAt DateTime
+  countedAt DateTime?
+
+  siteId String
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  sharedByUserId String?
+  sharedByUser   User?  @relation(fields: [sharedByUserId], references: [id], onDelete: SetNull)
+
+  channel SiteShareChannel @default(native)
+
+  attributionEvents SiteShareAttributionEvent[]
+
+  @@index([siteId, createdAt])
+  @@index([sharedByUserId, createdAt])
+  @@index([expiresAt])
+}
+
+model SiteShareAttributionEvent {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  shareLinkId String
+  shareLink   SiteShareLink @relation(fields: [shareLinkId], references: [id], onDelete: Cascade)
+
+  eventType SiteShareAttributionEventType
+  source    SiteShareAttributionSource @default(OTHER)
+  dedupeKey String
+
+  ipHash    String?
+  userAgentHash String?
+  openedByUserId String?
+
+  @@unique([shareLinkId, eventType, dedupeKey])
+  @@index([shareLinkId, createdAt])
+  @@index([eventType, createdAt])
 }
 
 enum DevicePlatform {

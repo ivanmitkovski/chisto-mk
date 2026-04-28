@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_image_hero_tag.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 class DetailHeroCarousel extends StatelessWidget {
@@ -12,12 +15,13 @@ class DetailHeroCarousel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final List<ImageProvider> gallery = siteGalleryImageProviders(site);
     final List<GalleryImageItem> items = List<GalleryImageItem>.generate(
-      site.galleryImages.length,
+      gallery.length,
       (int index) => GalleryImageItem(
-        image: site.galleryImages[index],
-        heroTag: 'site-image-${site.id}-$index',
-        semanticLabel: 'Pollution site photo ${index + 1}',
+        image: gallery[index],
+        heroTag: siteImageHeroTag(site.id, index),
+        semanticLabel: context.l10n.siteDetailGalleryPhotoSemantic(index + 1),
       ),
     );
 
@@ -35,7 +39,7 @@ class DetailHeroCarousel extends StatelessWidget {
       child: ImmersivePhotoGallery(
         items: items,
         borderRadius: 24,
-        openLabel: 'Open pollution site gallery',
+        openLabel: context.l10n.siteDetailOpenGalleryLabel,
         topLeftBuilder:
             (BuildContext context, int currentIndex, int totalCount) {
               return GalleryGlassPill(
@@ -75,7 +79,9 @@ class DetailHeroCarousel extends StatelessWidget {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      totalCount > 1 ? 'Tap to expand' : 'Open photo',
+                      totalCount > 1
+                          ? context.l10n.siteDetailGalleryTapToExpand
+                          : context.l10n.siteDetailGalleryOpenPhoto,
                       style: AppTypography.chipLabel.copyWith(
                         fontWeight: FontWeight.w500,
                         color: AppColors.textOnDark,

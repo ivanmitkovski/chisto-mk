@@ -5,6 +5,7 @@ import { ListSiteCommentsQueryDto, SiteCommentsSort } from './dto/list-site-comm
 import { CreateSiteCommentDto } from './dto/create-site-comment.dto';
 import { UpdateSiteCommentDto } from './dto/update-site-comment.dto';
 import { SiteEngagementService } from './site-engagement.service';
+import { ReportsUploadService } from '../reports/reports-upload.service';
 
 export type SiteCommentTreeNode = {
   id: string;
@@ -13,6 +14,7 @@ export type SiteCommentTreeNode = {
   createdAt: string;
   authorId: string;
   authorName: string;
+  authorAvatarUrl?: string | null;
   likesCount: number;
   isLikedByMe: boolean;
   replies: SiteCommentTreeNode[];
@@ -21,19 +23,28 @@ export type SiteCommentTreeNode = {
 
 @Injectable()
 export class SiteCommentsService {
+  /** Max direct replies inlined per parent in tree mode; use `parentId` + `page` to load the rest. */
+  private static readonly INLINE_BRANCH_REPLY_CAP = 20;
+
+  /** Safety cap for in-memory tree build (single-query path); sites above this see truncated roots only. */
+  private static readonly MAX_COMMENTS_FOR_TREE = 15_000;
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly siteEngagement: SiteEngagementService,
+    private readonly reportsUpload: ReportsUploadService,
   ) {}
 
   async findSiteComments(
     siteId: string,
     query: ListSiteCommentsQueryDto,
     user?: AuthenticatedUser,
-  ): Promise<{ data: SiteCommentTreeNode[]; meta: { page: number; limit: number; total: number } }> {
+  ): Promise<{
+    data: SiteCommentTreeNode[];
+    meta: { page: number; limit: number; total: number; truncated?: boolean };
+  }> {
     await this.siteEngagement.ensureSiteExists(siteId);
     const baseWhere = { siteId, isDeleted: false };
-    const maxThreadDepth = 6;
 
     if (query.parentId) {
       const where = { ...baseWhere, parentId: query.parentId };
@@ -46,7 +57,7 @@ export class SiteCommentsService {
           take: query.limit,
           include: {
             author: {
-              select: { firstName: true, lastName: true },
+              select: { firstName: true, lastName: true, avatarObjectKey: true },
             },
             likes: user
               ? {
@@ -62,6 +73,7 @@ export class SiteCommentsService {
         query.sort === SiteCommentsSort.TOP
           ? [...comments].sort((a, b) => this.compareCommentsTop(a, b))
           : comments;
+      const avatarUrlByAuthorId = await this.resolveAuthorAvatarUrls(ordered);
       return {
         data: ordered.map((comment) => ({
           id: comment.id,
@@ -70,6 +82,7 @@ export class SiteCommentsService {
           createdAt: comment.createdAt.toISOString(),
           authorId: comment.authorId,
           authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
+          authorAvatarUrl: avatarUrlByAuthorId.get(comment.authorId) ?? null,
           likesCount: comment.likesCount,
           isLikedByMe: Array.isArray(comment.likes) && comment.likes.length > 0,
           replies: [],
@@ -79,17 +92,25 @@ export class SiteCommentsService {
       };
     }
 
-    const rootsWhere = { ...baseWhere, parentId: null };
-    const [total, rootComments] = await Promise.all([
-      this.prisma.siteComment.count({ where: rootsWhere }),
+    type CommentRow = {
+      id: string;
+      parentId: string | null;
+      body: string;
+      createdAt: Date;
+      authorId: string;
+      likesCount: number;
+      author: { firstName: string; lastName: string; avatarObjectKey: string | null };
+      likes?: Array<{ id: string }> | false;
+    };
+
+    const [allComments, total] = await Promise.all([
       this.prisma.siteComment.findMany({
-        where: rootsWhere,
-        orderBy: { createdAt: 'desc' },
-        skip: (query.page - 1) * query.limit,
-        take: query.limit,
+        where: baseWhere,
+        orderBy: { createdAt: 'asc' },
+        take: SiteCommentsService.MAX_COMMENTS_FOR_TREE,
         include: {
           author: {
-            select: { firstName: true, lastName: true },
+            select: { firstName: true, lastName: true, avatarObjectKey: true },
           },
           likes: user
             ? {
@@ -99,54 +120,42 @@ export class SiteCommentsService {
               }
             : false,
         },
+      }) as Promise<CommentRow[]>,
+      this.prisma.siteComment.count({
+        where: { ...baseWhere, parentId: null },
       }),
     ]);
 
-    const rootIds = rootComments.map((c) => c.id);
-    const descendants: (typeof rootComments)[number][] = [];
-    let frontier = [...rootIds];
-    let depth = 0;
-    while (frontier.length > 0 && depth < maxThreadDepth) {
-      const children = await this.prisma.siteComment.findMany({
-        where: {
-          ...baseWhere,
-          parentId: { in: frontier },
-        },
-        orderBy: { createdAt: 'asc' },
-        include: {
-          author: {
-            select: { firstName: true, lastName: true },
-          },
-          likes: user
-            ? {
-                where: { userId: user.userId },
-                select: { id: true },
-                take: 1,
-              }
-            : false,
-        },
-      });
-      if (children.length === 0) break;
-      descendants.push(...children);
-      frontier = children.map((c) => c.id);
-      depth += 1;
-    }
+    const rootRows = allComments.filter((c) => c.parentId == null);
+    const sortedRoots =
+      query.sort === SiteCommentsSort.TOP
+        ? [...rootRows].sort((a, b) => this.compareCommentsTop(a, b))
+        : [...rootRows].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const skipRoots = (query.page - 1) * query.limit;
+    const rootComments = sortedRoots.slice(skipRoots, skipRoots + query.limit);
 
-    const all = [...rootComments, ...descendants];
-    const byParent = new Map<string, typeof all>();
-    for (const comment of all) {
+    const byParent = new Map<string, CommentRow[]>();
+    for (const comment of allComments) {
       if (!comment.parentId) continue;
       const list = byParent.get(comment.parentId) ?? [];
       list.push(comment);
       byParent.set(comment.parentId, list);
     }
+    const avatarUrlByAuthorId = await this.resolveAuthorAvatarUrls(allComments);
 
-    const mapNode = (comment: (typeof all)[number]): SiteCommentTreeNode => {
-      const rawReplies = (byParent.get(comment.id) ?? []).map(mapNode);
-      const replies =
+    const mapNode = (comment: CommentRow): SiteCommentTreeNode => {
+      const rawChildren = byParent.get(comment.id) ?? [];
+      const sortedDb =
         query.sort === SiteCommentsSort.TOP
-          ? [...rawReplies].sort((a, b) => this.compareCommentNodesTop(a, b))
-          : rawReplies.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+          ? [...rawChildren].sort((a, b) => this.compareCommentsTop(a, b))
+          : [...rawChildren].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      const fullCount = sortedDb.length;
+      const pageDb = sortedDb.slice(0, SiteCommentsService.INLINE_BRANCH_REPLY_CAP);
+      const replies = pageDb.map(mapNode);
+      const orderedReplies =
+        query.sort === SiteCommentsSort.TOP
+          ? [...replies].sort((a, b) => this.compareCommentNodesTop(a, b))
+          : replies.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
       return {
         id: comment.id,
         parentId: comment.parentId,
@@ -154,12 +163,13 @@ export class SiteCommentsService {
         createdAt: comment.createdAt.toISOString(),
         authorId: comment.authorId,
         authorName: `${comment.author.firstName} ${comment.author.lastName}`.trim(),
+        authorAvatarUrl: avatarUrlByAuthorId.get(comment.authorId) ?? null,
         likesCount: comment.likesCount,
         isLikedByMe:
           Array.isArray((comment as { likes?: Array<{ id: string }> }).likes) &&
           ((comment as { likes?: Array<{ id: string }> }).likes?.length ?? 0) > 0,
-        replies,
-        repliesCount: replies.length,
+        replies: orderedReplies,
+        repliesCount: fullCount,
       };
     };
 
@@ -170,7 +180,12 @@ export class SiteCommentsService {
 
     return {
       data: roots.map(mapNode),
-      meta: { page: query.page, limit: query.limit, total },
+      meta: {
+        page: query.page,
+        limit: query.limit,
+        total,
+        truncated: allComments.length >= SiteCommentsService.MAX_COMMENTS_FOR_TREE,
+      },
     };
   }
 
@@ -198,7 +213,11 @@ export class SiteCommentsService {
     const result = await this.prisma.$transaction(async (tx) => {
       const comment = await tx.siteComment.create({
         data: { siteId, authorId: user.userId, body, parentId: dto.parentId ?? null },
-        include: { author: { select: { firstName: true, lastName: true } } },
+        include: {
+          author: {
+            select: { firstName: true, lastName: true, avatarObjectKey: true },
+          },
+        },
       });
       await tx.site.update({
         where: { id: siteId },
@@ -213,6 +232,7 @@ export class SiteCommentsService {
       createdAt: result.createdAt.toISOString(),
       authorId: result.authorId,
       authorName: `${result.author.firstName} ${result.author.lastName}`.trim(),
+      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(result.author.avatarObjectKey),
       likesCount: result.likesCount,
       isLikedByMe: false,
       replies: [],
@@ -328,7 +348,11 @@ export class SiteCommentsService {
     const updated = await this.prisma.siteComment.update({
       where: { id: commentId },
       data: { body },
-      include: { author: { select: { firstName: true, lastName: true } } },
+      include: {
+        author: {
+          select: { firstName: true, lastName: true, avatarObjectKey: true },
+        },
+      },
     });
     return {
       id: updated.id,
@@ -337,6 +361,7 @@ export class SiteCommentsService {
       createdAt: updated.createdAt.toISOString(),
       authorId: updated.authorId,
       authorName: `${updated.author.firstName} ${updated.author.lastName}`.trim(),
+      authorAvatarUrl: await this.reportsUpload.signPrivateObjectKey(updated.author.avatarObjectKey),
       likesCount: updated.likesCount,
       isLikedByMe: false,
       replies: [],
@@ -363,25 +388,20 @@ export class SiteCommentsService {
       });
     }
     const affectedCount = await this.prisma.$transaction(async (tx) => {
-      const descendants = await tx.siteComment.findMany({
-        where: { siteId, isDeleted: false },
-        select: { id: true, parentId: true },
-      });
-      const byParent = new Map<string, string[]>();
-      for (const row of descendants) {
-        if (!row.parentId) continue;
-        const list = byParent.get(row.parentId) ?? [];
-        list.push(row.id);
-        byParent.set(row.parentId, list);
-      }
-      const toDelete = new Set<string>();
-      const stack: string[] = [commentId];
-      while (stack.length > 0) {
-        const current = stack.pop();
-        if (!current || toDelete.has(current)) continue;
-        toDelete.add(current);
-        const children = byParent.get(current) ?? [];
-        stack.push(...children);
+      const toDelete = new Set<string>([commentId]);
+      let frontier: string[] = [commentId];
+      while (frontier.length > 0) {
+        const children = await tx.siteComment.findMany({
+          where: { siteId, isDeleted: false, parentId: { in: frontier } },
+          select: { id: true },
+        });
+        frontier = [];
+        for (const row of children) {
+          if (!toDelete.has(row.id)) {
+            toDelete.add(row.id);
+            frontier.push(row.id);
+          }
+        }
       }
       const ids = [...toDelete];
       await tx.siteCommentLike.deleteMany({
@@ -439,5 +459,41 @@ export class SiteCommentsService {
       hash = (hash * 31 + id.charCodeAt(i)) | 0;
     }
     return ((Math.abs(hash) % 1000) / 1000 - 0.5) * 0.01;
+  }
+
+  private async resolveAuthorAvatarUrls(
+    comments: Array<{
+      authorId: string;
+      author: { avatarObjectKey: string | null };
+    }>,
+  ): Promise<Map<string, string | null>> {
+    const avatarByAuthorId = new Map<string, string | null>();
+    const signingTasks = new Map<string, Promise<string | null>>();
+    for (const comment of comments) {
+      const key = comment.author.avatarObjectKey;
+      if (!key || key.trim().length === 0) {
+        avatarByAuthorId.set(comment.authorId, null);
+        continue;
+      }
+      if (!signingTasks.has(key)) {
+        signingTasks.set(key, this.reportsUpload.signPrivateObjectKey(key));
+      }
+    }
+
+    const signedByKey = new Map<string, string | null>();
+    await Promise.all(
+      [...signingTasks.entries()].map(async ([key, task]) => {
+        signedByKey.set(key, await task);
+      }),
+    );
+    for (const comment of comments) {
+      const key = comment.author.avatarObjectKey;
+      if (!key || key.trim().length === 0) {
+        avatarByAuthorId.set(comment.authorId, null);
+      } else {
+        avatarByAuthorId.set(comment.authorId, signedByKey.get(key) ?? null);
+      }
+    }
+    return avatarByAuthorId;
   }
 }

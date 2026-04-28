@@ -29,11 +29,14 @@
             </intent-filter>
             <!-- App links: https://chisto.mk/app/... Set android:autoVerify on this filter after publishing
                  https://chisto.mk/.well-known/assetlinks.json for verified App Links. -->
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:scheme="https" android:host="chisto.mk" android:pathPrefix="/app"/>
+                <data android:scheme="https" android:host="www.chisto.mk" android:pathPrefix="/app"/>
+                <data android:scheme="https" android:host="chisto.mk" android:pathPrefix="/sites"/>
+                <data android:scheme="https" android:host="www.chisto.mk" android:pathPrefix="/sites"/>
             </intent-filter>
             <!-- Custom scheme for dev / marketing short links: chisto://app/... -->
             <intent-filter>

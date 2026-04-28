@@ -26,6 +26,7 @@ import 'package:chisto_mobile/features/events/presentation/screens/organizer_che
 import 'package:chisto_mobile/features/events/presentation/screens/organizer_dashboard_screen.dart';
 import 'package:chisto_mobile/core/navigation/unknown_route_screen.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/home_shell.dart';
+import 'package:chisto_mobile/features/home/presentation/screens/site_detail_route_screen.dart';
 import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -47,6 +48,8 @@ class AppRoutes {
   /// Opens home on the map tab; pass [MapSiteFocusRouteArgs] to focus a site pin.
   static const String homeMapFocus = '/home/map-focus';
   static const String homeEvents = '/home/events';
+  /// Deep link / push: site by id (no hydrated preview).
+  static const String siteDetail = '/sites/detail';
   static const String newReport = '/reports/new';
   static const String eventsCreate = '/events/create';
   static const String eventsDetail = '/events/detail';
@@ -107,6 +110,13 @@ class EventChatRouteArguments {
 /// Deep link: `Navigator.pushNamed(context, AppRoutes.homeMapFocus, arguments: MapSiteFocusRouteArgs(siteId: id))`.
 class MapSiteFocusRouteArgs {
   const MapSiteFocusRouteArgs({required this.siteId});
+
+  final String siteId;
+}
+
+/// [AppRoutes.siteDetail] arguments.
+class SiteDetailByIdRouteArgs {
+  const SiteDetailByIdRouteArgs({required this.siteId});
 
   final String siteId;
 }
@@ -266,6 +276,21 @@ class AppRouter {
       case AppRoutes.homeEvents:
         return MaterialPageRoute<void>(
           builder: (_) => const HomeShell(initialTabIndex: 3),
+          settings: settings,
+        );
+      case AppRoutes.siteDetail:
+        final Object? siteDetailArgs = settings.arguments;
+        final String siteDetailId = siteDetailArgs is SiteDetailByIdRouteArgs
+            ? siteDetailArgs.siteId.trim()
+            : '';
+        if (siteDetailId.isEmpty) {
+          return MaterialPageRoute<void>(
+            builder: (_) => UnknownRouteScreen(attemptedRouteName: settings.name),
+            settings: settings,
+          );
+        }
+        return CupertinoPageRoute<void>(
+          builder: (_) => SiteDetailRouteScreen(siteId: siteDetailId),
           settings: settings,
         );
       case AppRoutes.newReport:

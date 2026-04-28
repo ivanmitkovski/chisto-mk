@@ -18,9 +18,7 @@ class PollutionSite {
     this.isUpvotedByMe = false,
     this.isSavedByMe = false,
     required this.participantCount,
-    required this.imageProvider,
-    this.primaryImageUrl,
-    this.images,
+    this.mediaUrls = const <String>[],
     this.comments = const [],
     this.commentsCount = 0,
     this.urgencyLabel,
@@ -53,24 +51,17 @@ class PollutionSite {
   final bool isUpvotedByMe;
   final bool isSavedByMe;
   final int participantCount;
-  final ImageProvider imageProvider;
 
-  /// First remote (or local file) media URL when known; used for map pin thumbnails.
-  final String? primaryImageUrl;
+  /// Ordered site media URLs (feed: `latestReportMediaUrls`; detail: aggregated report URLs).
+  final List<String> mediaUrls;
 
-  final List<ImageProvider>? images;
+  /// First gallery URL when present (map pins, share flows, event prefill).
+  String? get primaryImageUrl =>
+      mediaUrls.isNotEmpty ? mediaUrls.first : null;
+
   final List<Comment> comments;
   final int commentsCount;
   final List<CleaningEvent> cleaningEvents;
-
-  /// All images for this site; falls back to the primary image when no list is provided.
-  List<ImageProvider> get galleryImages {
-    final List<ImageProvider>? imgs = images;
-    if (imgs == null || imgs.isEmpty) {
-      return <ImageProvider>[imageProvider];
-    }
-    return imgs;
-  }
 
   final String? urgencyLabel;
   final String? pollutionType;
@@ -126,9 +117,7 @@ class PollutionSite {
     bool? isUpvotedByMe,
     bool? isSavedByMe,
     int? participantCount,
-    ImageProvider? imageProvider,
-    String? primaryImageUrl,
-    List<ImageProvider>? images,
+    List<String>? mediaUrls,
     List<Comment>? comments,
     int? commentsCount,
     String? urgencyLabel,
@@ -160,9 +149,7 @@ class PollutionSite {
       isUpvotedByMe: isUpvotedByMe ?? this.isUpvotedByMe,
       isSavedByMe: isSavedByMe ?? this.isSavedByMe,
       participantCount: participantCount ?? this.participantCount,
-      imageProvider: imageProvider ?? this.imageProvider,
-      primaryImageUrl: primaryImageUrl ?? this.primaryImageUrl,
-      images: images ?? this.images,
+      mediaUrls: mediaUrls ?? this.mediaUrls,
       comments: comments ?? this.comments,
       commentsCount: commentsCount ?? this.commentsCount,
       urgencyLabel: urgencyLabel ?? this.urgencyLabel,
@@ -187,4 +174,3 @@ class PollutionSite {
     );
   }
 }
-

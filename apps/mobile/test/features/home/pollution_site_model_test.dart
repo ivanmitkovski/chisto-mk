@@ -1,20 +1,17 @@
 import 'package:chisto_mobile/features/home/domain/models/cleaning_event.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  late ImageProvider primaryImage;
-
-  setUp(() {
-    primaryImage = NetworkImage('https://example.com/site.jpg');
-  });
+  const String primaryUrl = 'assets/images/content/people_cleaning.png';
 
   group('PollutionSite', () {
     PollutionSite buildSite({
       String id = 'site-1',
-      List<ImageProvider>? images,
+      List<String> mediaUrls = const <String>[primaryUrl],
       List<Comment> comments = const [],
       List<CleaningEvent> cleaningEvents = const [],
     }) {
@@ -27,8 +24,7 @@ void main() {
         distanceKm: 2.5,
         score: 10,
         participantCount: 5,
-        imageProvider: primaryImage,
-        images: images,
+        mediaUrls: mediaUrls,
         comments: comments,
         cleaningEvents: cleaningEvents,
         urgencyLabel: 'High',
@@ -47,7 +43,7 @@ void main() {
       expect(site.distanceKm, 2.5);
       expect(site.score, 10);
       expect(site.participantCount, 5);
-      expect(site.imageProvider, primaryImage);
+      expect(site.primaryImageUrl, primaryUrl);
       expect(site.urgencyLabel, 'High');
       expect(site.pollutionType, 'Plastic');
     });
@@ -62,45 +58,43 @@ void main() {
         distanceKm: 0.0,
         score: 0,
         participantCount: 0,
-        imageProvider: primaryImage,
+        mediaUrls: const <String>[primaryUrl],
       );
 
-      expect(site.images, isNull);
+      expect(site.mediaUrls, isNotEmpty);
       expect(site.comments, isEmpty);
       expect(site.cleaningEvents, isEmpty);
       expect(site.urgencyLabel, isNull);
       expect(site.pollutionType, isNull);
     });
 
-    test('galleryImages returns primary image when images is null', () {
-      final PollutionSite site = buildSite(images: null);
+    test('gallery resolves to single provider when one asset url', () {
+      final PollutionSite site = buildSite(mediaUrls: const <String>[primaryUrl]);
 
-      expect(site.galleryImages.length, 1);
-      expect(site.galleryImages.first, primaryImage);
+      expect(siteGalleryImageProviders(site).length, 1);
     });
 
-    test('galleryImages returns primary image when images is empty', () {
-      final PollutionSite site = buildSite(images: <ImageProvider>[]);
+    test('gallery resolves placeholder when mediaUrls empty', () {
+      final PollutionSite site = buildSite(mediaUrls: const <String>[]);
 
-      expect(site.galleryImages.length, 1);
-      expect(site.galleryImages.first, primaryImage);
+      expect(siteGalleryImageProviders(site).length, 1);
+      expect(siteGalleryImageProviders(site).first, isA<AssetImage>());
     });
 
-    test('galleryImages returns images list when provided', () {
-      final ImageProvider secondary = NetworkImage('https://example.com/site2.jpg');
+    test('gallery resolves multiple asset urls', () {
+      const String second = 'assets/images/references/onboarding_reference.png';
       final PollutionSite site = buildSite(
-        images: <ImageProvider>[primaryImage, secondary],
+        mediaUrls: const <String>[primaryUrl, second],
       );
 
-      expect(site.galleryImages.length, 2);
-      expect(site.galleryImages.first, primaryImage);
-      expect(site.galleryImages.last, secondary);
+      expect(siteGalleryImageProviders(site).length, 2);
     });
 
     test('commentCount returns comments length', () {
+      final DateTime t = DateTime.utc(2026, 3, 1, 12);
       final List<Comment> comments = <Comment>[
-        const Comment(id: 'c1', authorName: 'A', text: 'Comment 1'),
-        const Comment(id: 'c2', authorName: 'B', text: 'Comment 2'),
+        Comment(id: 'c1', authorName: 'A', text: 'Comment 1', createdAt: t),
+        Comment(id: 'c2', authorName: 'B', text: 'Comment 2', createdAt: t),
       ];
       final PollutionSite site = buildSite(comments: comments);
 

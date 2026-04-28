@@ -2,106 +2,54 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
-import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/notifications_screen.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_caught_up_footer.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_empty_state.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_bar.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_header.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_load_more_row.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_offline_banner.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_section_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_skeleton.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/feed_providers.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:chisto_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
-class PollutionFeedScreen extends StatefulWidget {
+class PollutionFeedScreen extends ConsumerStatefulWidget {
   const PollutionFeedScreen({super.key});
 
   @override
-  State<PollutionFeedScreen> createState() => _PollutionFeedScreenState();
+  ConsumerState<PollutionFeedScreen> createState() => _PollutionFeedScreenState();
 }
 
-class _PollutionFeedScreenState extends State<PollutionFeedScreen>
+class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     with TickerProviderStateMixin {
-  bool _isLoading = true;
-  AppError? _loadError;
-  List<PollutionSite> _allSites = <PollutionSite>[];
-  List<PollutionSite> _visibleSites = <PollutionSite>[];
   int _serverUnreadCount = 0;
-  FeedFilter _activeFilter = FeedFilter.all;
   final ScrollController _scrollController = ScrollController();
   AnimationController? _entranceController;
   AnimationController? _skeletonController;
-  double? _userLatitude;
-  double? _userLongitude;
-  String? _nextCursor;
-  bool _hasMore = true;
-  bool _isLoadingMore = false;
-  bool _loadMoreFailed = false;
   bool _hasShownEntrance = false;
-  bool _locationAvailable = true;
-  late final String _feedSessionId;
-
-  List<PollutionSite> _ensureSitesSeeded() => _allSites;
+  List<PollutionSite> _ensureSitesSeeded(WidgetRef ref) =>
+      ref.read(feedSitesNotifierProvider).allSites;
 
   int get _unreadNotificationsCount => _serverUnreadCount;
-
-  List<PollutionSite> _computeVisibleSites() {
-    final List<PollutionSite> source = _ensureSitesSeeded();
-    switch (_activeFilter) {
-      case FeedFilter.all:
-        return List<PollutionSite>.from(source);
-      case FeedFilter.urgent:
-        final urgent = source
-            .where((PollutionSite s) => s.urgencyLabel != null)
-            .toList();
-        if (urgent.isNotEmpty) return urgent;
-        final fallback = List<PollutionSite>.from(source)
-          ..sort((a, b) {
-            final scoreA = _statusPriority(a.statusLabel);
-            final scoreB = _statusPriority(b.statusLabel);
-            if (scoreA != scoreB) return scoreB.compareTo(scoreA);
-            return b.commentsCount.compareTo(a.commentsCount);
-          });
-        return fallback;
-      case FeedFilter.nearby:
-        return List<PollutionSite>.from(source)
-          ..sort((PollutionSite a, PollutionSite b) {
-            final bool aKnown = a.distanceKm >= 0;
-            final bool bKnown = b.distanceKm >= 0;
-            if (aKnown != bKnown) return aKnown ? -1 : 1;
-            if (!aKnown && !bKnown) return b.score.compareTo(a.score);
-            return a.distanceKm.compareTo(b.distanceKm);
-          });
-      case FeedFilter.mostVoted:
-        return List<PollutionSite>.from(source)..sort((
-          PollutionSite a,
-          PollutionSite b,
-        ) {
-          final supportA = a.score + (a.commentsCount * 3) + (a.shareCount * 4);
-          final supportB = b.score + (b.commentsCount * 3) + (b.shareCount * 4);
-          return supportB.compareTo(supportA);
-        });
-      case FeedFilter.recent:
-        return List<PollutionSite>.from(
-          source,
-        )..sort((a, b) => (b.rankingScore ?? 0).compareTo(a.rankingScore ?? 0));
-    }
-  }
 
   @override
   void initState() {
     super.initState();
-    final String userId = ServiceLocator.instance.authState.userId ?? 'anon';
-    _feedSessionId = 'feed_${DateTime.now().millisecondsSinceEpoch}_$userId';
     _entranceController = AnimationController(
       vsync: this,
       duration: AppMotion.slow,
@@ -111,106 +59,24 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       duration: AppMotion.slow,
     )..repeat();
     _scrollController.addListener(_onScroll);
-    _loadFeed();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        unawaited(_loadFeed());
+      }
+    });
   }
 
   Future<void> _loadFeed() async {
-    setState(() {
-      _loadError = null;
-      _isLoading = true;
-    });
-    try {
-      await _resolveUserLocation();
-      final result = await ServiceLocator.instance.sitesRepository.getSites(
-        latitude: _userLatitude,
-        longitude: _userLongitude,
-        radiusKm: 100,
-        status: 'VERIFIED',
-        page: 1,
-        limit: 24,
-        mode: 'for_you',
-        sort: 'hybrid',
-        explain: true,
-      );
-      if (!mounted) return;
-      unawaited(_refreshUnreadCount());
-      setState(() {
-        _allSites = result.sites;
-        _visibleSites = _computeVisibleSites();
-        _nextCursor = result.nextCursor;
-        _hasMore = result.nextCursor?.isNotEmpty ?? false;
-        _isLoadingMore = false;
-        _loadMoreFailed = false;
-        _isLoading = false;
-        _loadError = null;
-      });
-      if (!_hasShownEntrance &&
-          !(MediaQuery.maybeOf(context)?.disableAnimations ?? false)) {
-        _entranceController?.forward(from: 0);
-      }
-      _hasShownEntrance = true;
-    } on AppError catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loadError = e;
-        _isLoading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loadError = AppError.network(cause: e);
-        _isLoading = false;
-      });
+    await ref.read(feedSitesNotifierProvider.notifier).loadInitial();
+    if (!mounted) {
+      return;
     }
-  }
-
-  Future<void> _resolveUserLocation() async {
-    try {
-      final bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        _userLatitude = null;
-        _userLongitude = null;
-        _locationAvailable = false;
-        return;
-      }
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        _userLatitude = null;
-        _userLongitude = null;
-        _locationAvailable = false;
-        return;
-      }
-      // `getCurrentPosition` can hang indefinitely on emulators / weak GPS with no fix.
-      // Cap wait so the feed still loads (API works without lat/lng).
-      try {
-        final Position position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.medium,
-          timeLimit: const Duration(seconds: 12),
-        );
-        _userLatitude = position.latitude;
-        _userLongitude = position.longitude;
-        _locationAvailable = true;
-      } on Object catch (_) {
-        final Position? last = await Geolocator.getLastKnownPosition();
-        if (last != null) {
-          _userLatitude = last.latitude;
-          _userLongitude = last.longitude;
-          _locationAvailable = true;
-        } else {
-          _userLatitude = null;
-          _userLongitude = null;
-          _locationAvailable = false;
-        }
-      }
-    } catch (_) {
-      _userLatitude = null;
-      _userLongitude = null;
-      _locationAvailable = false;
+    unawaited(_refreshUnreadCount());
+    if (!_hasShownEntrance &&
+        !(MediaQuery.maybeOf(context)?.disableAnimations ?? false)) {
+      _entranceController?.forward(from: 0);
     }
+    _hasShownEntrance = true;
   }
 
   @override
@@ -223,72 +89,54 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
   }
 
   void _onScroll() {
+    final FeedSitesState feed = ref.read(feedSitesNotifierProvider);
     if (!_scrollController.hasClients ||
-        _isLoadingMore ||
-        _isLoading ||
-        !_hasMore) {
+        feed.isLoadingMore ||
+        feed.isLoading ||
+        !feed.hasMore) {
       return;
     }
-    final position = _scrollController.position;
-    if (position.pixels < position.maxScrollExtent - 640) return;
-    _loadMoreFeed();
+    final ScrollPosition position = _scrollController.position;
+    final double viewport = MediaQuery.sizeOf(context).height;
+    if (position.pixels < position.maxScrollExtent - viewport * 3) {
+      return;
+    }
+    unawaited(_loadMoreFeed());
   }
 
   Future<void> _loadMoreFeed() async {
-    if (_isLoadingMore || !_hasMore) return;
-    setState(() {
-      _isLoadingMore = true;
-      _loadMoreFailed = false;
-    });
-    try {
-      final result = await ServiceLocator.instance.sitesRepository.getSites(
-        latitude: _userLatitude,
-        longitude: _userLongitude,
-        radiusKm: 100,
-        status: 'VERIFIED',
-        page: 1,
-        limit: 24,
-        mode: 'for_you',
-        sort: 'hybrid',
-        explain: true,
-        cursor: _nextCursor,
-      );
-      if (!mounted) return;
-      final mergedById = <String, PollutionSite>{
-        for (final site in _allSites) site.id: site,
-      };
-      for (final site in result.sites) {
-        mergedById[site.id] = site;
-      }
-      setState(() {
-        _allSites = mergedById.values.toList();
-        _visibleSites = _computeVisibleSites();
-        _nextCursor = result.nextCursor;
-        _hasMore = result.nextCursor?.isNotEmpty ?? false;
-        _loadMoreFailed = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loadMoreFailed = true;
-      });
-      AppSnack.show(
-        context,
-        message: context.l10n.feedLoadMoreFailedSnack,
-        type: AppSnackType.warning,
-      );
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoadingMore = false;
-        });
-      }
+    final bool ok =
+        await ref.read(feedSitesNotifierProvider.notifier).loadMore();
+    if (!mounted || ok) {
+      return;
     }
+    final AppError? error =
+        ref.read(feedSitesNotifierProvider.select((FeedSitesState s) => s.loadMoreError));
+    AppSnack.show(
+      context,
+      message: error?.message ?? context.l10n.feedLoadMoreFailedSnack,
+      type: AppSnackType.warning,
+    );
   }
 
   Future<void> _handleRefresh() async {
     AppHaptics.medium();
+    final bool hadCachedSites =
+        ref.read(feedSitesNotifierProvider).allSites.isNotEmpty;
     await _loadFeed();
+    if (!mounted) {
+      return;
+    }
+    final FeedSitesState after = ref.read(feedSitesNotifierProvider);
+    if (after.loadError != null &&
+        hadCachedSites &&
+        after.allSites.isNotEmpty) {
+      AppSnack.show(
+        context,
+        message: context.l10n.feedRefreshStaleSnack,
+        type: AppSnackType.warning,
+      );
+    }
   }
 
   Future<void> scrollToTop() async {
@@ -305,7 +153,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     final int? unreadAfter = await Navigator.of(context).push<int>(
       CupertinoPageRoute<int>(
         builder: (_) =>
-            NotificationsScreen(availableSites: _ensureSitesSeeded()),
+            NotificationsScreen(availableSites: _ensureSitesSeeded(ref)),
       ),
     );
     if (!mounted) return;
@@ -319,17 +167,50 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
 
   Future<void> _refreshUnreadCount() async {
     try {
-      final int count = await ServiceLocator.instance.notificationsRepository
-          .getUnreadCount();
+      final int count = await ref.read(notificationsRepositoryProvider).getUnreadCount();
       if (!mounted) return;
       setState(() {
         _serverUnreadCount = count;
       });
-    } catch (_) {}
+    } catch (_) {
+      // Unread badge refresh is non-critical; avoid interruptive UI if it fails.
+      return;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<FeedFilter>(
+      feedFilterProvider,
+      (FeedFilter? previous, FeedFilter next) {
+        if (previous == null) {
+          return;
+        }
+        if (feedServerFetchGroup(previous) != feedServerFetchGroup(next)) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
+            unawaited(ref.read(feedSitesNotifierProvider.notifier).loadInitial());
+            unawaited(scrollToTop());
+          });
+        }
+      },
+    );
+    final bool feedIsLoading =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.isLoading));
+    final AppError? feedLoadError =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.loadError));
+    final bool feedHasMore =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.hasMore));
+    final bool feedIsLoadingMore =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.isLoadingMore));
+    final bool feedLoadMoreFailed =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.loadMoreFailed));
+    final bool feedLocationAvailable = ref.watch(
+      feedSitesNotifierProvider.select((FeedSitesState s) => s.locationAvailable),
+    );
+    final List<PollutionSite> visibleSites = ref.watch(feedVisibleSitesProvider);
+    final FeedFilter activeFilter = ref.watch(feedFilterProvider);
+    final String feedSessionId = ref.watch(feedSessionIdProvider);
     final double topHotZoneHeight =
         MediaQuery.of(context).padding.top + AppSpacing.xs;
     return Stack(
@@ -344,14 +225,15 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
             controller: _scrollController,
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: <Widget>[
+              const SliverToBoxAdapter(child: FeedOfflineBannerHost()),
               SliverToBoxAdapter(
-                child: FeedHeader(
-                  displayName:
-                      ServiceLocator.instance.authState.displayName ?? 'You',
+                child:                 FeedHeader(
+                  displayName: ServiceLocator.instance.authState.displayName ??
+                      context.l10n.feedDisplayNameFallback,
                   unreadCount: _unreadNotificationsCount,
                   onProfileTap: () {
                     AppHaptics.softTransition();
-                    Navigator.of(context).push(
+                    Navigator.of(context, rootNavigator: true).push(
                       MaterialPageRoute<void>(
                         builder: (_) => const ProfileScreen(),
                       ),
@@ -362,68 +244,88 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
               ),
               SliverToBoxAdapter(
                 child: FeedSectionHeader(
-                  activeFilter: _activeFilter,
-                  sitesCount: _visibleSites.length,
+                  activeFilter: activeFilter,
+                  sitesCount: visibleSites.length,
                   onFilterTap: () => _openFilterSheet(context),
                 ),
               ),
-              if (_isLoading)
+              SliverToBoxAdapter(
+                child: FeedFilterBar(
+                  activeFilter: activeFilter,
+                  onFilterSelected: (FeedFilter filter) {
+                    if (filter == activeFilter) {
+                      return;
+                    }
+                    unawaited(
+                      ref.read(feedFilterProvider.notifier).setFilter(filter),
+                    );
+                    unawaited(scrollToTop());
+                  },
+                  onMoreFiltersTap: () => _openFilterSheet(context),
+                ),
+              ),
+              if (feedIsLoading)
                 SliverToBoxAdapter(child: _buildSkeletonList())
-              else if (_loadError != null)
+              else if (feedLoadError != null)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: AppErrorView(error: _loadError!, onRetry: _loadFeed),
+                  child: AppErrorView(
+                    error: feedLoadError,
+                    onRetry: _loadFeed,
+                  ),
                 )
-              else if (_visibleSites.isEmpty)
+              else if (visibleSites.isEmpty)
                 SliverFillRemaining(
                   hasScrollBody: false,
-                  child: _buildEmptyFilterState(context),
+                  child: FeedEmptyState(
+                    activeFilter: activeFilter,
+                    locationAvailable: feedLocationAvailable,
+                    onShowAllSites: () {
+                      AppHaptics.tap();
+                      unawaited(
+                        ref
+                            .read(feedFilterProvider.notifier)
+                            .setFilter(FeedFilter.all),
+                      );
+                      unawaited(scrollToTop());
+                    },
+                    onRefresh: () {
+                      AppHaptics.tap();
+                      _handleRefresh();
+                    },
+                  ),
                 )
               else
                 SliverList.builder(
-                  itemCount:
-                      _visibleSites.length +
-                      ((_isLoadingMore || _loadMoreFailed) ? 1 : 0),
+                  key: const PageStorageKey<String>('feed_list'),
+                  findChildIndexCallback: (Key key) {
+                    if (key is ValueKey<String>) {
+                      final int i = visibleSites.indexWhere(
+                        (PollutionSite s) => s.id == key.value,
+                      );
+                      return i >= 0 ? i : null;
+                    }
+                    return null;
+                  },
+                  itemCount: visibleSites.length +
+                      ((feedIsLoadingMore || feedLoadMoreFailed) ? 1 : 0),
                   itemBuilder: (BuildContext context, int index) {
-                    if (index >= _visibleSites.length) {
-                      if (_loadMoreFailed) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.lg,
-                            vertical: AppSpacing.md,
-                          ),
-                          child: Center(
-                            child: OutlinedButton.icon(
-                              onPressed: _loadMoreFeed,
-                              icon: const Icon(Icons.refresh_rounded, size: 18),
-                              label: Text(context.l10n.feedRetryLoadingMore),
-                            ),
-                          ),
-                        );
-                      }
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: AppSpacing.lg,
-                          vertical: AppSpacing.md,
-                        ),
-                        child: Center(
-                          child: SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
+                    if (index >= visibleSites.length) {
+                      return FeedLoadMoreRow(
+                        loadFailed: feedLoadMoreFailed,
+                        onRetry: _loadMoreFeed,
                       );
                     }
                     final AnimationController? controller = _entranceController;
                     final Widget card = RepaintBoundary(
+                      key: ValueKey<String>(visibleSites[index].id),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                           horizontal: AppSpacing.lg,
                         ),
                         child: PollutionSiteCard(
-                          site: _visibleSites[index],
-                          feedSessionId: _feedSessionId,
+                          site: visibleSites[index],
+                          feedSessionId: feedSessionId,
                           onHidden: _hideSiteFromFeed,
                         ),
                       ),
@@ -462,11 +364,11 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
                     );
                   },
                 ),
-              if (!_isLoading &&
-                  _loadError == null &&
-                  _visibleSites.isNotEmpty &&
-                  !_hasMore)
-                SliverToBoxAdapter(child: _buildFooter(context)),
+              if (!feedIsLoading &&
+                  feedLoadError == null &&
+                  visibleSites.isNotEmpty &&
+                  !feedHasMore)
+                const SliverToBoxAdapter(child: FeedCaughtUpFooter()),
             ],
           ),
         ),
@@ -515,182 +417,19 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
       barrierColor: AppColors.overlay,
-      builder: (BuildContext context) => FeedFilterSheet(
-        activeFilter: _activeFilter,
+      builder: (BuildContext sheetContext) => FeedFilterSheet(
+        activeFilter: ref.read(feedFilterProvider),
         onSelected: (FeedFilter filter) {
-          if (filter != _activeFilter) {
-            Navigator.of(context).pop();
-            setState(() {
-              _activeFilter = filter;
-              _visibleSites = _computeVisibleSites();
-            });
+          if (filter != ref.read(feedFilterProvider)) {
+            Navigator.of(sheetContext).pop();
+            unawaited(
+              ref.read(feedFilterProvider.notifier).setFilter(filter),
+            );
             scrollToTop();
           } else {
-            Navigator.of(context).pop();
+            Navigator.of(sheetContext).pop();
           }
         },
-      ),
-    );
-  }
-
-  Widget _buildFooter(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.xl,
-        AppSpacing.lg,
-        AppSpacing.xxl + AppSpacing.lg,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            width: AppSpacing.xl,
-            height: AppSpacing.sheetHandleHeight,
-            decoration: BoxDecoration(
-              color: AppColors.divider,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            'You\u2019re all caught up',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xxs),
-          Text(
-            'Pull to refresh for new reports',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted.withValues(alpha: 0.6),
-              fontSize: 13,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getEmptyFilterMessage() {
-    switch (_activeFilter) {
-      case FeedFilter.urgent:
-        return 'No urgent sites right now';
-      case FeedFilter.nearby:
-        return _locationAvailable
-            ? 'No nearby sites found'
-            : 'Enable location to see nearby sites';
-      case FeedFilter.mostVoted:
-        return 'No sites have been voted yet';
-      case FeedFilter.recent:
-        return 'No recent reports';
-      case FeedFilter.all:
-        return 'No pollution sites yet';
-    }
-  }
-
-  String _getEmptyFilterHint() {
-    switch (_activeFilter) {
-      case FeedFilter.urgent:
-      case FeedFilter.nearby:
-        if (!_locationAvailable) {
-          return 'Turn on location services and allow access';
-        }
-        return 'Show all sites or try another filter';
-      case FeedFilter.mostVoted:
-      case FeedFilter.recent:
-        return 'Show all sites or try another filter';
-      case FeedFilter.all:
-        return 'Pull to refresh or check back later';
-    }
-  }
-
-  Widget _buildEmptyFilterState(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xl,
-        vertical: AppSpacing.xxl,
-      ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            AnimatedSwitcher(
-              duration: AppMotion.fast,
-              switchInCurve: AppMotion.emphasized,
-              switchOutCurve: AppMotion.emphasized,
-              child: Container(
-                key: ValueKey<FeedFilter>(_activeFilter),
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.inputFill,
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusXl),
-                ),
-                child: Icon(
-                  _emptyFilterIcon(_activeFilter),
-                  size: 30,
-                  color: AppColors.textMuted,
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              _getEmptyFilterMessage(),
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateTitle,
-            ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              _getEmptyFilterHint(),
-              textAlign: TextAlign.center,
-              style: AppTypography.emptyStateSubtitle.copyWith(height: 1.4),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            if (_activeFilter != FeedFilter.all)
-              FilledButton.tonal(
-                onPressed: () {
-                  AppHaptics.tap();
-                  setState(() => _activeFilter = FeedFilter.all);
-                  scrollToTop();
-                },
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.primaryDark.withValues(
-                    alpha: 0.12,
-                  ),
-                  foregroundColor: AppColors.primaryDark,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.lg,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: Text(context.l10n.feedShowAllSites),
-              )
-            else
-              OutlinedButton(
-                onPressed: () {
-                  AppHaptics.tap();
-                  _handleRefresh();
-                },
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.textPrimary,
-                  side: const BorderSide(color: AppColors.divider),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusPill),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: Text(context.l10n.feedPullToRefreshSemantic),
-              ),
-          ],
-        ),
       ),
     );
   }
@@ -718,34 +457,7 @@ class _PollutionFeedScreenState extends State<PollutionFeedScreen>
     );
   }
 
-  IconData _emptyFilterIcon(FeedFilter filter) {
-    switch (filter) {
-      case FeedFilter.all:
-        return Icons.filter_alt_outlined;
-      case FeedFilter.urgent:
-        return Icons.warning_amber_rounded;
-      case FeedFilter.nearby:
-        return Icons.near_me_rounded;
-      case FeedFilter.mostVoted:
-        return Icons.trending_up_rounded;
-      case FeedFilter.recent:
-        return Icons.schedule_rounded;
-    }
-  }
-
-  int _statusPriority(String statusLabel) {
-    final normalized = statusLabel.toLowerCase();
-    if (normalized.contains('reported')) return 4;
-    if (normalized.contains('verified')) return 3;
-    if (normalized.contains('in progress')) return 2;
-    if (normalized.contains('cleanup')) return 1;
-    return 0;
-  }
-
   void _hideSiteFromFeed(String siteId) {
-    setState(() {
-      _allSites = _allSites.where((s) => s.id != siteId).toList();
-      _visibleSites = _computeVisibleSites();
-    });
+    ref.read(feedSitesNotifierProvider.notifier).removeSite(siteId);
   }
 }

@@ -3,25 +3,30 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('Comment', () {
+    final DateTime t = DateTime.utc(2026, 2, 1, 8);
+
     test('constructs with required fields', () {
-      const Comment comment = Comment(
+      final Comment comment = Comment(
         id: 'c1',
         authorName: 'Alice',
         text: 'Great post!',
+        createdAt: t,
       );
 
       expect(comment.id, 'c1');
       expect(comment.authorName, 'Alice');
       expect(comment.text, 'Great post!');
+      expect(comment.createdAt, t);
       expect(comment.likeCount, 0);
       expect(comment.isLikedByMe, false);
     });
 
     test('constructs with optional fields', () {
-      const Comment comment = Comment(
+      final Comment comment = Comment(
         id: 'c2',
         authorName: 'Bob',
         text: 'Nice work',
+        createdAt: t,
         likeCount: 5,
         isLikedByMe: true,
       );
@@ -31,10 +36,11 @@ void main() {
     });
 
     test('copyWith produces new instance with updated fields', () {
-      const Comment original = Comment(
+      final Comment original = Comment(
         id: 'c1',
         authorName: 'Alice',
         text: 'Original',
+        createdAt: t,
         likeCount: 2,
         isLikedByMe: false,
       );
@@ -48,15 +54,17 @@ void main() {
       expect(updated.id, 'c1');
       expect(updated.authorName, 'Alice');
       expect(updated.text, 'Updated');
+      expect(updated.createdAt, t);
       expect(updated.likeCount, 3);
       expect(updated.isLikedByMe, true);
     });
 
     test('copyWith preserves unchanged fields', () {
-      const Comment original = Comment(
+      final Comment original = Comment(
         id: 'c1',
         authorName: 'Alice',
         text: 'Original',
+        createdAt: t,
         likeCount: 2,
         isLikedByMe: false,
       );
@@ -71,10 +79,11 @@ void main() {
     });
 
     test('copyWith preserves original values when null passed for optional fields', () {
-      const Comment original = Comment(
+      final Comment original = Comment(
         id: 'c1',
         authorName: 'Alice',
         text: 'Text',
+        createdAt: t,
         likeCount: 5,
         isLikedByMe: true,
       );

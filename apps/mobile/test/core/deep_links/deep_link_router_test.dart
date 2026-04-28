@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
 
 const String _kEventUuid = '550e8400-e29b-41d4-a716-446655440000';
+const String _kSiteCuid = 'c1234567890abcdefghijklmn';
 
 void main() {
   group('DeepLinkRouter.parse', () {
@@ -50,6 +51,39 @@ void main() {
 
     test('returns null for unknown paths', () {
       expect(DeepLinkRouter.parse(Uri.parse('https://chisto.mk/app/unknown')), isNull);
+    });
+
+    group('site deep links (/sites/<id>)', () {
+      test('parses HTTPS /sites/:id share path on trusted host', () {
+        final Uri u = Uri.parse('https://chisto.mk/sites/$_kSiteCuid?st=token123&cid=cid123');
+        final DeepLinkRoute? r = DeepLinkRouter.parse(u);
+        expect(r, isA<DeepLinkSiteDetail>());
+        expect((r as DeepLinkSiteDetail).siteId, _kSiteCuid);
+        expect(r.shareToken, 'token123');
+        expect(r.cid, 'cid123');
+      });
+
+      test('parses HTTPS /sites/:id on www.chisto.mk', () {
+        final Uri u = Uri.parse('https://www.chisto.mk/sites/$_kSiteCuid');
+        final DeepLinkRoute? r = DeepLinkRouter.parse(u);
+        expect(r, isA<DeepLinkSiteDetail>());
+        expect((r as DeepLinkSiteDetail).siteId, _kSiteCuid);
+      });
+
+      test('rejects /sites/:id on untrusted host', () {
+        final Uri u = Uri.parse('https://evil.example/sites/$_kSiteCuid');
+        expect(DeepLinkRouter.parse(u), isNull);
+      });
+
+      test('rejects /sites/ path without valid CUID', () {
+        final Uri u = Uri.parse('https://chisto.mk/sites/not-a-uuid');
+        expect(DeepLinkRouter.parse(u), isNull);
+      });
+
+      test('rejects /sites/ path with empty segment', () {
+        final Uri u = Uri.parse('https://chisto.mk/sites/');
+        expect(DeepLinkRouter.parse(u), isNull);
+      });
     });
   });
 }

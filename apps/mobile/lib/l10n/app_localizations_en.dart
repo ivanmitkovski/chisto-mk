@@ -1448,6 +1448,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedRetryLoadingMore => 'Retry loading more';
 
   @override
+  String get feedLoadingMoreSemantic => 'Loading more feed posts';
+
+  @override
   String get feedShowAllSites => 'Show all sites';
 
   @override
@@ -1457,7 +1460,161 @@ class AppLocalizationsEn extends AppLocalizations {
   String get feedLoadMoreFailedSnack => 'Could not load more posts. Tap retry.';
 
   @override
+  String get feedRefreshStaleSnack =>
+      'Could not refresh. Showing the last loaded feed.';
+
+  @override
   String get feedScrollToTopSemantic => 'Scroll feed to top';
+
+  @override
+  String get feedPollutionFeedTitle => 'Pollution feed';
+
+  @override
+  String get feedOfflineBanner =>
+      'You\'re offline. Showing the last loaded feed.';
+
+  @override
+  String get feedCaughtUpTitle => 'You\'re all caught up';
+
+  @override
+  String get feedCaughtUpSubtitle => 'Pull to refresh for new reports';
+
+  @override
+  String get feedMoreFiltersTooltip => 'More filters';
+
+  @override
+  String feedFilterSemantic(String name) {
+    return '$name filter';
+  }
+
+  @override
+  String get feedEmptyAllTitle => 'No pollution sites yet';
+
+  @override
+  String get feedEmptyAllHint => 'Pull to refresh or check back later';
+
+  @override
+  String get feedEmptyUrgentTitle => 'No urgent sites right now';
+
+  @override
+  String get feedEmptyUrgentHint => 'Show all sites or try another filter';
+
+  @override
+  String get feedEmptyNearbyTitleOnline => 'No nearby sites found';
+
+  @override
+  String get feedEmptyNearbyTitleOffline =>
+      'Enable location to see nearby sites';
+
+  @override
+  String get feedEmptyNearbyHintOffline =>
+      'Turn on location services and allow access';
+
+  @override
+  String get feedEmptyNearbyHintOnline =>
+      'Show all sites or try another filter';
+
+  @override
+  String get feedEmptyMostVotedTitle => 'No sites have been voted yet';
+
+  @override
+  String get feedEmptyMostVotedHint => 'Show all sites or try another filter';
+
+  @override
+  String get feedEmptyRecentTitle => 'No recent reports';
+
+  @override
+  String get feedEmptyRecentHint => 'Show all sites or try another filter';
+
+  @override
+  String get feedEmptySavedTitle => 'No saved sites yet';
+
+  @override
+  String get feedEmptySavedHint => 'Save sites from the menu to find them here';
+
+  @override
+  String get feedFilterAllName => 'All';
+
+  @override
+  String get feedFilterAllDesc => 'Balanced feed ranking';
+
+  @override
+  String get feedFilterUrgentName => 'Urgent';
+
+  @override
+  String get feedFilterUrgentDesc => 'High-priority incidents first';
+
+  @override
+  String get feedFilterNearbyName => 'Nearby';
+
+  @override
+  String get feedFilterNearbyDesc => 'Closest reports around you';
+
+  @override
+  String get feedFilterMostVotedName => 'Top support';
+
+  @override
+  String get feedFilterMostVotedDesc => 'Most community-backed';
+
+  @override
+  String get feedFilterRecentName => 'Recent';
+
+  @override
+  String get feedFilterRecentDesc => 'Newest reports first';
+
+  @override
+  String get feedFilterSavedName => 'Saved';
+
+  @override
+  String get feedFilterSavedDesc => 'Sites you bookmarked';
+
+  @override
+  String get feedFiltersSheetTitle => 'Feed filters';
+
+  @override
+  String get feedFiltersSheetSubtitle =>
+      'Choose how you want to browse reports';
+
+  @override
+  String get commentsFeedHeaderTitle => 'Comments';
+
+  @override
+  String get commentsSortTop => 'Top';
+
+  @override
+  String get commentsSortNew => 'New';
+
+  @override
+  String get commentsEditingBanner => 'Editing comment';
+
+  @override
+  String get commentsBodyTooLong =>
+      'Comment is too long (max 2000 characters).';
+
+  @override
+  String get commentsReplyTargetFallback => 'comment';
+
+  @override
+  String get reportIssueSheetTitle => 'Report issue';
+
+  @override
+  String get reportIssueSubmitting => 'Submitting...';
+
+  @override
+  String get reportIssueSubmit => 'Submit report';
+
+  @override
+  String get reportIssueFailedSnack => 'Could not send report. Try again.';
+
+  @override
+  String get reportIssueSheetSubtitle =>
+      'Help us improve. Why are you reporting this site?';
+
+  @override
+  String get reportIssueDetailsLabel => 'Additional details (optional)';
+
+  @override
+  String get reportIssueDetailsHint => 'Describe the issue…';
 
   @override
   String get mapResetFiltersSemantic => 'Reset filters';
@@ -3323,7 +3480,56 @@ class AppLocalizationsEn extends AppLocalizations {
   String get takeActionLinkCopied => 'Link copied';
 
   @override
-  String get takeActionSharedToProfile => 'Shared to your profile';
+  String get takeActionSheetTitle => 'Take action';
+
+  @override
+  String get takeActionSheetSubtitle => 'Choose how you want to help';
+
+  @override
+  String get takeActionCreateEcoTitle => 'Create eco action';
+
+  @override
+  String get takeActionCreateEcoSubtitle =>
+      'Schedule a cleanup event at this site';
+
+  @override
+  String get takeActionJoinTitle => 'Join action';
+
+  @override
+  String get takeActionJoinSubtitle => 'Find and join upcoming cleanups here';
+
+  @override
+  String get takeActionShareTitle => 'Share site';
+
+  @override
+  String get takeActionShareSubtitle => 'Help others discover this site';
+
+  @override
+  String get shareSheetSemanticDragHandle => 'Drag to resize or dismiss';
+
+  @override
+  String get shareSheetCopyLinkTitle => 'Copy link';
+
+  @override
+  String get shareSheetCopyLinkSubtitle =>
+      'Copy the site link to the clipboard';
+
+  @override
+  String get shareSheetCopyLinkSemantic => 'Copy link to this pollution site';
+
+  @override
+  String get shareSheetSendTitle => 'Send to people';
+
+  @override
+  String get shareSheetSendSubtitle => 'Share in messages or another app';
+
+  @override
+  String get shareSheetSendSemantic => 'Open the share sheet to send this site';
+
+  @override
+  String siteDetailSemanticShareCount(int count) {
+    return '$count shares on this site';
+  }
 
   @override
   String get siteDetailThankYouReportSnack =>
@@ -3442,6 +3648,96 @@ class AppLocalizationsEn extends AppLocalizations {
   String get siteCardHidePostTitle => 'Hide this post';
 
   @override
+  String get feedSiteCommentsAppBarFallback => 'Comments';
+
+  @override
+  String get feedSiteNotFoundMessage => 'This site could not be found.';
+
+  @override
+  String get feedDisplayNameFallback => 'You';
+
+  @override
+  String get feedOpenProfileSemantics => 'Open profile';
+
+  @override
+  String get feedGreetingPrefix => 'Hi, ';
+
+  @override
+  String get feedGreetingFallbackName => 'there';
+
+  @override
+  String get feedHeaderSubtitle => 'Explore pollution sites near you';
+
+  @override
+  String get feedNotificationBellAllReadSemantic => 'Notifications, all read';
+
+  @override
+  String feedNotificationBellUnreadSemantic(int count) {
+    return 'Notifications, $count unread';
+  }
+
+  @override
+  String get siteDetailTabPollutionSite => 'Pollution site';
+
+  @override
+  String get siteDetailTabCleaningEvents => 'Cleaning events';
+
+  @override
+  String get siteDetailInfoCardTitle => 'Community action needed';
+
+  @override
+  String get siteDetailInfoCardBody =>
+      'Join a cleanup, report changes, or help spread the word so we can act faster.';
+
+  @override
+  String get siteDetailReportedByPrefix => 'Reported by ';
+
+  @override
+  String get siteDetailCoReportersTitle => 'Co-reporters';
+
+  @override
+  String siteDetailCoReportersSubtitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count people also reported this site',
+      one: '1 person also reported this site',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String siteDetailGalleryPhotoSemantic(int index) {
+    return 'Pollution site photo $index';
+  }
+
+  @override
+  String get siteDetailOpenGalleryLabel => 'Open pollution site gallery';
+
+  @override
+  String get siteDetailGalleryTapToExpand => 'Tap to expand';
+
+  @override
+  String get siteDetailGalleryOpenPhoto => 'Open photo';
+
+  @override
+  String get commonNotAvailable => '—';
+
+  @override
+  String get commonDistanceMetersUnit => 'm';
+
+  @override
+  String get commonDistanceKilometersUnit => 'km';
+
+  @override
+  String get siteCommentsEmptyBody =>
+      'No comments yet.\nBe the first to comment.';
+
+  @override
+  String get feedCommentsLoadMoreFailedSnack =>
+      'Could not load more comments. Pull to refresh or try again.';
+
+  @override
   String get commentsSheetTitle => 'Comment actions';
 
   @override
@@ -3467,6 +3763,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'Could not post your reply. Please try again.';
 
   @override
+  String get commentsSortFailedSnack =>
+      'Could not change comment order. Try again.';
+
+  @override
   String get commentsDeletedSnack => 'Comment deleted.';
 
   @override
@@ -3485,6 +3785,195 @@ class AppLocalizationsEn extends AppLocalizations {
   String commentsReplyToSemantic(String name) {
     return 'Reply to $name';
   }
+
+  @override
+  String get commentsReplyButton => 'Reply';
+
+  @override
+  String get commentsViewReplies => 'View replies';
+
+  @override
+  String commentsLoadMoreReplies(int count) {
+    return 'Load $count more';
+  }
+
+  @override
+  String get siteEngagementQueuedOfflineSnack =>
+      'Connection dropped. We will retry this when you are back online.';
+
+  @override
+  String get commentsHideReplies => 'Hide replies';
+
+  @override
+  String get commentsStatusDeleting => 'Deleting…';
+
+  @override
+  String get commentsStatusSavingEdits => 'Saving edits…';
+
+  @override
+  String get commentsCommentMetaJustNow => 'Just now';
+
+  @override
+  String commentsCommentMetaJustNowWithLikes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Just now • $count likes',
+      one: 'Just now • 1 like',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaMinutesAgo(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes ago',
+      one: '1 minute ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaMinutesAgoWithLikes(int minutes, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes minutes ago',
+      one: '1 minute ago',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaHoursAgo(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours ago',
+      one: '1 hour ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaHoursAgoWithLikes(int hours, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: '$hours hours ago',
+      one: '1 hour ago',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaDaysAgo(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: '1 day ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsCommentMetaDaysAgoWithLikes(int days, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days ago',
+      one: '1 day ago',
+    );
+    String _temp1 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+    );
+    return '$_temp0 • $_temp1';
+  }
+
+  @override
+  String commentsCommentMetaDate(String date) {
+    return '$date';
+  }
+
+  @override
+  String commentsCommentMetaDateWithLikes(String date, int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count likes',
+      one: '1 like',
+    );
+    return '$date • $_temp0';
+  }
+
+  @override
+  String get commentsOptimisticAuthorYou => 'You';
+
+  @override
+  String commentsReplyingToBanner(String name) {
+    return 'Replying to $name';
+  }
+
+  @override
+  String get commentsSemanticSheetDragHandle => 'Resize or dismiss comments';
+
+  @override
+  String get commentsPrefetchCouldNotRefreshSnack =>
+      'Could not refresh comments. Showing the last loaded thread.';
+
+  @override
+  String commentsComposerCharsRemaining(int remaining) {
+    String _temp0 = intl.Intl.pluralLogic(
+      remaining,
+      locale: localeName,
+      other: '$remaining characters left',
+      one: '1 character left',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String commentsSemanticHideReplies(String name) {
+    return 'Hide replies for $name';
+  }
+
+  @override
+  String commentsSemanticViewReplies(String name) {
+    return 'View replies for $name';
+  }
+
+  @override
+  String get commentsInputHintEdit => 'Edit your comment…';
+
+  @override
+  String get commentsInputHintAdd => 'Add a comment…';
+
+  @override
+  String get commentsInputHintReply => 'Write a reply…';
+
+  @override
+  String get commentsLikeTooltip => 'Like comment';
+
+  @override
+  String get commentsUnlikeTooltip => 'Unlike comment';
 
   @override
   String get searchModalCancel => 'Cancel';
@@ -4331,6 +4820,117 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String siteCardPhotoSemantic(String title) {
     return 'Photo of $title';
+  }
+
+  @override
+  String siteCardGalleryPhotoSemantic(int number, String siteTitle) {
+    return 'Photo $number of $siteTitle';
+  }
+
+  @override
+  String siteCardSemanticRemoveUpvote(String title) {
+    return 'Remove upvote for $title';
+  }
+
+  @override
+  String siteCardSemanticUpvote(String title) {
+    return 'Upvote $title';
+  }
+
+  @override
+  String get siteUpvoteLongPressOpensSupporters =>
+      'Long press to open the list of supporters';
+
+  @override
+  String siteCardSemanticUpvotesOpenSupporters(int count, String title) {
+    return '$count upvotes on $title. Tap to see supporters';
+  }
+
+  @override
+  String siteCardSemanticCommentsOnSite(int count, String title) {
+    return '$count comments on $title';
+  }
+
+  @override
+  String siteCardSemanticSharesOnSite(int count, String title) {
+    return '$count shares on $title';
+  }
+
+  @override
+  String siteCardSemanticSaveSite(String title) {
+    return 'Save $title and get updates';
+  }
+
+  @override
+  String siteCardSemanticUnsaveSite(String title) {
+    return 'Unsave $title and stop updates';
+  }
+
+  @override
+  String get siteCardSaveUpdatesOnSnack => 'You will get updates for this site';
+
+  @override
+  String get siteCardSaveRemovedSnack => 'Removed from your saved sites';
+
+  @override
+  String get siteCardFeedbackPostHiddenSnack => 'Post hidden from your feed';
+
+  @override
+  String get siteCardFeedbackThanksSnack => 'Thanks for your feedback';
+
+  @override
+  String get siteCardFeedOptionsSheetTitle => 'Feed options';
+
+  @override
+  String get siteCardFeedOptionsSheetSubtitle => 'Tune what you want to see';
+
+  @override
+  String get siteCardEngagementSignInRequired =>
+      'Sign in to support or save sites.';
+
+  @override
+  String get siteCardEngagementWaitBriefly =>
+      'Please wait a moment before trying again.';
+
+  @override
+  String siteCardRateLimitedSnack(int seconds) {
+    return 'Too many actions. Try again in $seconds seconds.';
+  }
+
+  @override
+  String get siteDetailSaveAddedSnack => 'Site saved to your list.';
+
+  @override
+  String get siteDetailSaveRemovedSnack => 'Removed from saved sites.';
+
+  @override
+  String get siteQuickActionSaveSiteLabel => 'Save site';
+
+  @override
+  String get siteQuickActionSavedLabel => 'Saved';
+
+  @override
+  String get siteQuickActionReportIssueLabel => 'Report issue';
+
+  @override
+  String get siteQuickActionReportedLabel => 'Reported';
+
+  @override
+  String get siteQuickActionShareLabel => 'Share';
+
+  @override
+  String siteCardDistanceMeters(int meters) {
+    return '$meters m';
+  }
+
+  @override
+  String siteCardDistanceKmShort(String km) {
+    return '$km km';
+  }
+
+  @override
+  String siteCardDistanceKmWhole(String km) {
+    return '$km km';
   }
 
   @override

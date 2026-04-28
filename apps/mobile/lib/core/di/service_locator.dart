@@ -20,6 +20,7 @@ import 'package:chisto_mobile/features/events/data/event_offline_work_coordinato
 import 'package:chisto_mobile/features/events/domain/repositories/events_repository.dart';
 import 'package:chisto_mobile/features/events/domain/repositories/check_in_repository.dart';
 import 'package:chisto_mobile/features/home/data/api_sites_repository.dart';
+import 'package:chisto_mobile/features/home/data/engagement_outbox_coordinator.dart';
 import 'package:chisto_mobile/features/home/data/map_realtime/map_realtime_service.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/notifications/data/api_notifications_repository.dart';
@@ -168,6 +169,12 @@ class ServiceLocator {
       client: _apiClient!,
       authState: _authState!,
     );
+    unawaited(
+      EngagementOutboxCoordinator.start(
+        sitesRepository: _sitesRepository!,
+        authState: _authState!,
+      ),
+    );
     _eventAnalyticsRepository = ApiEventAnalyticsRepository(client: _apiClient!);
     _eventChatRepository = ApiEventChatRepository(
       client: _apiClient!,
@@ -221,6 +228,7 @@ class ServiceLocator {
   }
 
   void reset() {
+    EngagementOutboxCoordinator.dispose();
     EventOfflineWorkCoordinator.instance.dispose();
     CheckInSyncService.dispose();
     _reportsRealtimeService?.dispose();

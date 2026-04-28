@@ -1,5 +1,6 @@
 import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/utils/site_image_resolver.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_stats_row.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -16,14 +17,13 @@ void main() {
       distanceKm: -1,
       score: 1,
       participantCount: 0,
-      imageProvider: const AssetImage('assets/images/content/people_cleaning.png'),
-      images: const <ImageProvider>[
-        AssetImage('assets/images/content/people_cleaning.png'),
-        AssetImage('assets/images/content/people_cleaning.png'),
+      mediaUrls: const <String>[
+        'assets/images/content/people_cleaning.png',
+        'assets/images/content/people_cleaning.png',
       ],
     );
 
-    expect(site.galleryImages.length, 2);
+    expect(siteGalleryImageProviders(site).length, 2);
   });
 
   testWidgets('shows compact token for unknown distance', (tester) async {
@@ -36,7 +36,7 @@ void main() {
       distanceKm: -1,
       score: 1,
       participantCount: 0,
-      imageProvider: const AssetImage('assets/images/content/people_cleaning.png'),
+      mediaUrls: const <String>['assets/images/content/people_cleaning.png'],
     );
 
     await tester.pumpWidget(

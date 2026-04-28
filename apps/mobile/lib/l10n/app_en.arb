@@ -768,10 +768,66 @@
     }
   },
   "feedRetryLoadingMore": "Retry loading more",
+  "feedLoadingMoreSemantic": "Loading more feed posts",
   "feedShowAllSites": "Show all sites",
   "feedPullToRefreshSemantic": "Pull to refresh",
   "feedLoadMoreFailedSnack": "Could not load more posts. Tap retry.",
+  "feedRefreshStaleSnack": "Could not refresh. Showing the last loaded feed.",
   "feedScrollToTopSemantic": "Scroll feed to top",
+  "feedPollutionFeedTitle": "Pollution feed",
+  "feedOfflineBanner": "You're offline. Showing the last loaded feed.",
+  "feedCaughtUpTitle": "You're all caught up",
+  "feedCaughtUpSubtitle": "Pull to refresh for new reports",
+  "feedMoreFiltersTooltip": "More filters",
+  "feedFilterSemantic": "{name} filter",
+  "@feedFilterSemantic": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "feedEmptyAllTitle": "No pollution sites yet",
+  "feedEmptyAllHint": "Pull to refresh or check back later",
+  "feedEmptyUrgentTitle": "No urgent sites right now",
+  "feedEmptyUrgentHint": "Show all sites or try another filter",
+  "feedEmptyNearbyTitleOnline": "No nearby sites found",
+  "feedEmptyNearbyTitleOffline": "Enable location to see nearby sites",
+  "feedEmptyNearbyHintOffline": "Turn on location services and allow access",
+  "feedEmptyNearbyHintOnline": "Show all sites or try another filter",
+  "feedEmptyMostVotedTitle": "No sites have been voted yet",
+  "feedEmptyMostVotedHint": "Show all sites or try another filter",
+  "feedEmptyRecentTitle": "No recent reports",
+  "feedEmptyRecentHint": "Show all sites or try another filter",
+  "feedEmptySavedTitle": "No saved sites yet",
+  "feedEmptySavedHint": "Save sites from the menu to find them here",
+  "feedFilterAllName": "All",
+  "feedFilterAllDesc": "Balanced feed ranking",
+  "feedFilterUrgentName": "Urgent",
+  "feedFilterUrgentDesc": "High-priority incidents first",
+  "feedFilterNearbyName": "Nearby",
+  "feedFilterNearbyDesc": "Closest reports around you",
+  "feedFilterMostVotedName": "Top support",
+  "feedFilterMostVotedDesc": "Most community-backed",
+  "feedFilterRecentName": "Recent",
+  "feedFilterRecentDesc": "Newest reports first",
+  "feedFilterSavedName": "Saved",
+  "feedFilterSavedDesc": "Sites you bookmarked",
+  "feedFiltersSheetTitle": "Feed filters",
+  "feedFiltersSheetSubtitle": "Choose how you want to browse reports",
+  "commentsFeedHeaderTitle": "Comments",
+  "commentsSortTop": "Top",
+  "commentsSortNew": "New",
+  "commentsEditingBanner": "Editing comment",
+  "commentsBodyTooLong": "Comment is too long (max 2000 characters).",
+  "commentsReplyTargetFallback": "comment",
+  "reportIssueSheetTitle": "Report issue",
+  "reportIssueSubmitting": "Submitting...",
+  "reportIssueSubmit": "Submit report",
+  "reportIssueFailedSnack": "Could not send report. Try again.",
+  "reportIssueSheetSubtitle": "Help us improve. Why are you reporting this site?",
+  "reportIssueDetailsLabel": "Additional details (optional)",
+  "reportIssueDetailsHint": "Describe the issue…",
   "mapResetFiltersSemantic": "Reset filters",
   "mapOpenMapsFailed": "Could not open Maps",
   "locationRetryAddressSemantic": "Retry address",
@@ -1737,7 +1793,29 @@
   "takeActionShareSiteTitle": "Share site",
   "takeActionShareSiteSubtitle": "Help others discover and support this site",
   "takeActionLinkCopied": "Link copied",
-  "takeActionSharedToProfile": "Shared to your profile",
+  "takeActionSheetTitle": "Take action",
+  "takeActionSheetSubtitle": "Choose how you want to help",
+  "takeActionCreateEcoTitle": "Create eco action",
+  "takeActionCreateEcoSubtitle": "Schedule a cleanup event at this site",
+  "takeActionJoinTitle": "Join action",
+  "takeActionJoinSubtitle": "Find and join upcoming cleanups here",
+  "takeActionShareTitle": "Share site",
+  "takeActionShareSubtitle": "Help others discover this site",
+  "shareSheetSemanticDragHandle": "Drag to resize or dismiss",
+  "shareSheetCopyLinkTitle": "Copy link",
+  "shareSheetCopyLinkSubtitle": "Copy the site link to the clipboard",
+  "shareSheetCopyLinkSemantic": "Copy link to this pollution site",
+  "shareSheetSendTitle": "Send to people",
+  "shareSheetSendSubtitle": "Share in messages or another app",
+  "shareSheetSendSemantic": "Open the share sheet to send this site",
+  "siteDetailSemanticShareCount": "{count} shares on this site",
+  "@siteDetailSemanticShareCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "siteDetailThankYouReportSnack": "Thank you. Your report helps us improve.",
   "siteDetailUpvoteFailedSnack": "Could not update upvote. Please try again.",
   "siteDetailNoUpvotesSnack": "No upvotes yet. Be the first to support this site!",
@@ -1794,6 +1872,52 @@
   "siteCardDuplicateTitle": "Duplicate",
   "siteCardMisleadingTitle": "Misleading",
   "siteCardHidePostTitle": "Hide this post",
+  "feedSiteCommentsAppBarFallback": "Comments",
+  "feedSiteNotFoundMessage": "This site could not be found.",
+  "feedDisplayNameFallback": "You",
+  "feedOpenProfileSemantics": "Open profile",
+  "feedGreetingPrefix": "Hi, ",
+  "feedGreetingFallbackName": "there",
+  "feedHeaderSubtitle": "Explore pollution sites near you",
+  "feedNotificationBellAllReadSemantic": "Notifications, all read",
+  "feedNotificationBellUnreadSemantic": "Notifications, {count} unread",
+  "@feedNotificationBellUnreadSemantic": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailTabPollutionSite": "Pollution site",
+  "siteDetailTabCleaningEvents": "Cleaning events",
+  "siteDetailInfoCardTitle": "Community action needed",
+  "siteDetailInfoCardBody": "Join a cleanup, report changes, or help spread the word so we can act faster.",
+  "siteDetailReportedByPrefix": "Reported by ",
+  "siteDetailCoReportersTitle": "Co-reporters",
+  "siteDetailCoReportersSubtitle": "{count, plural, one{1 person also reported this site} other{{count} people also reported this site}}",
+  "@siteDetailCoReportersSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailGalleryPhotoSemantic": "Pollution site photo {index}",
+  "@siteDetailGalleryPhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailOpenGalleryLabel": "Open pollution site gallery",
+  "siteDetailGalleryTapToExpand": "Tap to expand",
+  "siteDetailGalleryOpenPhoto": "Open photo",
+  "commonNotAvailable": "—",
+  "commonDistanceMetersUnit": "m",
+  "commonDistanceKilometersUnit": "km",
+  "siteCommentsEmptyBody": "No comments yet.\nBe the first to comment.",
+  "feedCommentsLoadMoreFailedSnack": "Could not load more comments. Pull to refresh or try again.",
   "commentsSheetTitle": "Comment actions",
   "commentsSheetSubtitle": "Manage this comment",
   "commentsEditTitle": "Edit comment",
@@ -1802,6 +1926,7 @@
   "commentsDeleteSubtitle": "Remove it from this thread",
   "commentsEditFailedSnack": "Could not edit comment right now.",
   "commentsReplyFailedSnack": "Could not post your reply. Please try again.",
+  "commentsSortFailedSnack": "Could not change comment order. Try again.",
   "commentsDeletedSnack": "Comment deleted.",
   "commentsDeleteFailedSnack": "Could not delete comment right now.",
   "commentsLikeFailedSnack": "Could not update like right now.",
@@ -1815,6 +1940,145 @@
       }
     }
   },
+  "commentsReplyButton": "Reply",
+  "commentsViewReplies": "View replies",
+  "commentsLoadMoreReplies": "Load {count} more",
+  "@commentsLoadMoreReplies": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "siteEngagementQueuedOfflineSnack": "Connection dropped. We will retry this when you are back online.",
+  "commentsHideReplies": "Hide replies",
+  "commentsStatusDeleting": "Deleting…",
+  "commentsStatusSavingEdits": "Saving edits…",
+  "commentsCommentMetaJustNow": "Just now",
+  "commentsCommentMetaJustNowWithLikes": "{count, plural, one{Just now • 1 like} other{Just now • {count} likes}}",
+  "@commentsCommentMetaJustNowWithLikes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgo": "{minutes, plural, one{1 minute ago} other{{minutes} minutes ago}}",
+  "@commentsCommentMetaMinutesAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaMinutesAgoWithLikes": "{minutes, plural, one{1 minute ago} other{{minutes} minutes ago}} • {count, plural, one{1 like} other{{count} likes}}",
+  "@commentsCommentMetaMinutesAgoWithLikes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgo": "{hours, plural, one{1 hour ago} other{{hours} hours ago}}",
+  "@commentsCommentMetaHoursAgo": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaHoursAgoWithLikes": "{hours, plural, one{1 hour ago} other{{hours} hours ago}} • {count, plural, one{1 like} other{{count} likes}}",
+  "@commentsCommentMetaHoursAgoWithLikes": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgo": "{days, plural, one{1 day ago} other{{days} days ago}}",
+  "@commentsCommentMetaDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDaysAgoWithLikes": "{days, plural, one{1 day ago} other{{days} days ago}} • {count, plural, one{1 like} other{{count} likes}}",
+  "@commentsCommentMetaDaysAgoWithLikes": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsCommentMetaDate": "{date}",
+  "@commentsCommentMetaDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsCommentMetaDateWithLikes": "{date} • {count, plural, one{1 like} other{{count} likes}}",
+  "@commentsCommentMetaDateWithLikes": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsOptimisticAuthorYou": "You",
+  "commentsReplyingToBanner": "Replying to {name}",
+  "@commentsReplyingToBanner": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticSheetDragHandle": "Resize or dismiss comments",
+  "commentsPrefetchCouldNotRefreshSnack": "Could not refresh comments. Showing the last loaded thread.",
+  "commentsComposerCharsRemaining": "{remaining, plural, one{1 character left} other{{remaining} characters left}}",
+  "@commentsComposerCharsRemaining": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      }
+    }
+  },
+  "commentsSemanticHideReplies": "Hide replies for {name}",
+  "@commentsSemanticHideReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsSemanticViewReplies": "View replies for {name}",
+  "@commentsSemanticViewReplies": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "commentsInputHintEdit": "Edit your comment…",
+  "commentsInputHintAdd": "Add a comment…",
+  "commentsInputHintReply": "Write a reply…",
+  "commentsLikeTooltip": "Like comment",
+  "commentsUnlikeTooltip": "Unlike comment",
   "searchModalCancel": "Cancel",
   "appSmartImageRetry": "Retry",
   "appSmartImageRetryIn": "Retry in {seconds}s",
@@ -2465,6 +2729,130 @@
   "@siteCardPhotoSemantic": {
     "placeholders": {
       "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardGalleryPhotoSemantic": "Photo {number} of {siteTitle}",
+  "@siteCardGalleryPhotoSemantic": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "siteTitle": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticRemoveUpvote": "Remove upvote for {title}",
+  "@siteCardSemanticRemoveUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUpvote": "Upvote {title}",
+  "@siteCardSemanticUpvote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteUpvoteLongPressOpensSupporters": "Long press to open the list of supporters",
+  "siteCardSemanticUpvotesOpenSupporters": "{count} upvotes on {title}. Tap to see supporters",
+  "@siteCardSemanticUpvotesOpenSupporters": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticCommentsOnSite": "{count} comments on {title}",
+  "@siteCardSemanticCommentsOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSharesOnSite": "{count} shares on {title}",
+  "@siteCardSemanticSharesOnSite": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticSaveSite": "Save {title} and get updates",
+  "@siteCardSemanticSaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSemanticUnsaveSite": "Unsave {title} and stop updates",
+  "@siteCardSemanticUnsaveSite": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardSaveUpdatesOnSnack": "You will get updates for this site",
+  "siteCardSaveRemovedSnack": "Removed from your saved sites",
+  "siteCardFeedbackPostHiddenSnack": "Post hidden from your feed",
+  "siteCardFeedbackThanksSnack": "Thanks for your feedback",
+  "siteCardFeedOptionsSheetTitle": "Feed options",
+  "siteCardFeedOptionsSheetSubtitle": "Tune what you want to see",
+  "siteCardEngagementSignInRequired": "Sign in to support or save sites.",
+  "siteCardEngagementWaitBriefly": "Please wait a moment before trying again.",
+  "siteCardRateLimitedSnack": "Too many actions. Try again in {seconds} seconds.",
+  "@siteCardRateLimitedSnack": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "siteDetailSaveAddedSnack": "Site saved to your list.",
+  "siteDetailSaveRemovedSnack": "Removed from saved sites.",
+  "siteQuickActionSaveSiteLabel": "Save site",
+  "siteQuickActionSavedLabel": "Saved",
+  "siteQuickActionReportIssueLabel": "Report issue",
+  "siteQuickActionReportedLabel": "Reported",
+  "siteQuickActionShareLabel": "Share",
+  "siteCardDistanceMeters": "{meters} m",
+  "@siteCardDistanceMeters": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "siteCardDistanceKmShort": "{km} km",
+  "@siteCardDistanceKmShort": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "siteCardDistanceKmWhole": "{km} km",
+  "@siteCardDistanceKmWhole": {
+    "placeholders": {
+      "km": {
         "type": "String"
       }
     }

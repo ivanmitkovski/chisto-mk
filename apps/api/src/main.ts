@@ -17,6 +17,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const expressApp = app.getHttpAdapter().getInstance() as express.Application;
+  // Required so req.ip is derived from trusted proxy headers (ALB / ingress).
+  expressApp.set('trust proxy', true);
   expressApp.use(express.urlencoded({ extended: true }));
 
   const redisUrl = process.env.REDIS_URL?.trim();

@@ -1,3 +1,7 @@
+// Manual QA matrix (site comments): long thread + load more; reply with keyboard open;
+// rotate device; VoiceOver / TalkBack order; rate limit / slow network; cancel edit mid-flight;
+// pull-to-refresh on full-screen route; sort change while offline.
+
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
@@ -5,9 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  final DateTime commentTime = DateTime.utc(2026, 1, 10, 15);
+
   testWidgets('clears draft when reply mode is cancelled', (tester) async {
     final comments = <Comment>[
-      const Comment(id: 'c1', authorName: 'Ivan Mitkovski', text: 'Lets clean it'),
+      Comment(
+        id: 'c1',
+        authorName: 'Ivan Mitkovski',
+        text: 'Lets clean it',
+        createdAt: commentTime,
+      ),
     ];
 
     await tester.pumpWidget(
@@ -36,7 +47,12 @@ void main() {
 
   testWidgets('inserts reply under parent and keeps it visible', (tester) async {
     final comments = <Comment>[
-      const Comment(id: 'c1', authorName: 'Ivan Mitkovski', text: 'Lets clean it'),
+      Comment(
+        id: 'c1',
+        authorName: 'Ivan Mitkovski',
+        text: 'Lets clean it',
+        createdAt: commentTime,
+      ),
     ];
     List<Comment>? latestComments;
 
@@ -69,10 +85,11 @@ void main() {
 
   testWidgets('edits comment inline in composer and saves', (tester) async {
     final comments = <Comment>[
-      const Comment(
+      Comment(
         id: 'c1',
         authorName: 'Ivan Mitkovski',
         text: '@Ivan Mitkovski test',
+        createdAt: commentTime,
         isOwnedByMe: true,
       ),
     ];
@@ -110,10 +127,11 @@ void main() {
 
   testWidgets('deletes comment directly from actions sheet', (tester) async {
     final comments = <Comment>[
-      const Comment(
+      Comment(
         id: 'c1',
         authorName: 'Ivan Mitkovski',
         text: 'Will delete',
+        createdAt: commentTime,
         isOwnedByMe: true,
       ),
     ];

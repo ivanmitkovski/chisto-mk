@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_upvote_affordance.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SiteStatsRow extends StatelessWidget {
@@ -11,21 +12,21 @@ class SiteStatsRow extends StatelessWidget {
     super.key,
     required this.site,
     this.isUpvotePending = false,
-    this.upvoteScale = 1,
     this.onUpvoteTap,
     this.onScoreTap,
     this.onCommentsTap,
     this.onParticipantsTap,
+    this.onShareTap,
     this.onDistanceTap,
   });
 
   final PollutionSite site;
   final bool isUpvotePending;
-  final double upvoteScale;
-  final VoidCallback? onUpvoteTap;
+  final Future<void> Function()? onUpvoteTap;
   final VoidCallback? onScoreTap;
   final VoidCallback? onCommentsTap;
   final VoidCallback? onParticipantsTap;
+  final VoidCallback? onShareTap;
   final VoidCallback? onDistanceTap;
 
   @override
@@ -38,25 +39,37 @@ class SiteStatsRow extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: <Widget>[
-                _StatChip(
-                  iconWidget: Icon(
-                    site.isUpvotedByMe
-                        ? Icons.arrow_circle_up_rounded
-                        : Icons.arrow_circle_up_outlined,
-                    size: 16,
+                if (onUpvoteTap != null)
+                  SiteUpvoteAffordance(
+                    variant: SiteUpvoteAffordanceVariant.statChip,
+                    isUpvoted: site.isUpvotedByMe,
+                    isBusy: isUpvotePending,
+                    count: site.score,
+                    countTextStyle: AppTypography.chipLabel,
+                    semanticsLabel: site.isUpvotedByMe
+                        ? context.l10n.siteCardSemanticRemoveUpvote(site.title)
+                        : context.l10n.siteCardSemanticUpvote(site.title),
+                    semanticsLongPressHint:
+                        context.l10n.siteUpvoteLongPressOpensSupporters,
+                    onPressed: onUpvoteTap,
+                    onLongPress: onScoreTap,
+                  )
+                else
+                  _StatChip(
+                    iconWidget: Icon(
+                      site.isUpvotedByMe
+                          ? Icons.arrow_circle_up_rounded
+                          : Icons.arrow_circle_up_outlined,
+                      size: 16,
+                      color: site.isUpvotedByMe
+                          ? AppColors.primaryDark
+                          : AppColors.textMuted,
+                    ),
+                    label: '${site.score}',
                     color: site.isUpvotedByMe
                         ? AppColors.primaryDark
                         : AppColors.textMuted,
                   ),
-                  label: '${site.score}',
-                  color: site.isUpvotedByMe
-                      ? AppColors.primaryDark
-                      : AppColors.textMuted,
-                  isPending: isUpvotePending,
-                  scale: upvoteScale,
-                  onTap: onUpvoteTap,
-                  onLongPress: onScoreTap,
-                ),
                 const SizedBox(width: AppSpacing.sm),
                 _StatChip(
                   iconWidget: const Icon(
@@ -81,6 +94,18 @@ class SiteStatsRow extends StatelessWidget {
                     site.siteParticipantStatsBadgeValue,
                   ),
                   onTap: onParticipantsTap,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                _StatChip(
+                  iconWidget: const Icon(
+                    Icons.share_outlined,
+                    size: 16,
+                    color: AppColors.textMuted,
+                  ),
+                  label: '${site.shareCount}',
+                  color: AppColors.textMuted,
+                  semanticsLabel: context.l10n.siteDetailSemanticShareCount(site.shareCount),
+                  onTap: onShareTap,
                 ),
               ],
             ),
@@ -111,8 +136,8 @@ class SiteStatsRow extends StatelessWidget {
                 const SizedBox(width: AppSpacing.xxs),
                 Text(
                   site.distanceKm >= 0
-                      ? _formatDistance(site.distanceKm)
-                      : '—',
+                      ? _formatDistance(context, site.distanceKm)
+                      : context.l10n.commonNotAvailable,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: onDistanceTap != null
@@ -129,15 +154,15 @@ class SiteStatsRow extends StatelessWidget {
   }
 }
 
-String _formatDistance(double km) {
+String _formatDistance(BuildContext context, double km) {
   if (km < 1) {
     final int meters = (km * 1000).round().clamp(1, 999);
-    return '$meters m';
+    return '$meters ${context.l10n.commonDistanceMetersUnit}';
   }
   if (km < 10) {
-    return '${km.toStringAsFixed(1)} km';
+    return '${km.toStringAsFixed(1)} ${context.l10n.commonDistanceKilometersUnit}';
   }
-  return '${km.toStringAsFixed(0)} km';
+  return '${km.toStringAsFixed(0)} ${context.l10n.commonDistanceKilometersUnit}';
 }
 
 class _StatChip extends StatelessWidget {
@@ -146,30 +171,18 @@ class _StatChip extends StatelessWidget {
     required this.label,
     required this.color,
     this.semanticsLabel,
-    this.isPending = false,
-    this.scale = 1,
     this.onTap,
-    this.onLongPress,
   });
 
   final Widget iconWidget;
   final String label;
   final Color color;
   final String? semanticsLabel;
-  final bool isPending;
-  final double scale;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
-    final Widget chip = AnimatedScale(
-      duration: const Duration(milliseconds: 180),
-      scale: scale,
-      child: AnimatedOpacity(
-      duration: const Duration(milliseconds: 160),
-      opacity: isPending ? 0.6 : 1,
-      child: Container(
+    final Widget chip = Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.sm,
         vertical: 5,
@@ -196,7 +209,7 @@ class _StatChip extends StatelessWidget {
           ),
         ],
       ),
-    )));
+    );
 
     final Widget wrapped = onTap != null
         ? GestureDetector(
@@ -204,7 +217,6 @@ class _StatChip extends StatelessWidget {
               AppHaptics.tap();
               onTap!();
             },
-            onLongPress: onLongPress,
             behavior: HitTestBehavior.opaque,
             child: chip,
           )

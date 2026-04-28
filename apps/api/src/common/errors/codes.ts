@@ -177,6 +177,31 @@ export const NOTIFICATION_ERROR_CODES = ['DEVICE_TOKEN_IN_USE'] as const;
 
 export type NotificationErrorCode = (typeof NOTIFICATION_ERROR_CODES)[number];
 
+/**
+ * Stable codes for `GET/POST/PATCH/DELETE /sites` and related services (`site-comments`, `site-engagement`, map query).
+ * `SITE_NOT_FOUND` is shared with events public API; it is listed here for sites-module drift coverage.
+ */
+export const SITES_API_ERROR_CODES = [
+  'SITE_NOT_FOUND',
+  'INVALID_GEO_QUERY',
+  'INVALID_MAP_VIEWPORT',
+  'INVALID_SITE_STATUS_TRANSITION',
+  'SITE_NOT_APPROVED_FOR_ECO_ACTIONS',
+  'COMMENT_EMPTY',
+  'INVALID_PARENT_COMMENT',
+  'COMMENT_NOT_FOUND',
+  'COMMENT_FORBIDDEN',
+  'SITES_SHARE_TOKEN_INVALID',
+  'SITES_SHARE_TOKEN_EXPIRED',
+  'SITES_SHARE_TOKEN_NOT_FOUND',
+  'SITES_SHARE_SECRET_MISCONFIG',
+  'SITES_DETAIL_TRUNCATED',
+  'SITES_MEDIA_TRUNCATED',
+  'SITES_COMMENTS_TRUNCATED',
+] as const;
+
+export type SitesApiErrorCode = (typeof SITES_API_ERROR_CODES)[number];
+
 const MERGED_ERROR_CODE_SET = new Set<string>([
   ...CHECK_IN_ERROR_CODES,
   ...EVENT_CHAT_ERROR_CODES,
@@ -186,6 +211,7 @@ const MERGED_ERROR_CODE_SET = new Set<string>([
   ...ADMIN_CLEANUP_EVENT_ERROR_CODES,
   ...GAMIFICATION_API_ERROR_CODES,
   ...NOTIFICATION_ERROR_CODES,
+  ...SITES_API_ERROR_CODES,
 ]);
 
 /**

@@ -283,6 +283,7 @@ export class SitesMapQueryService {
       meta: { signedMediaExpiresAt },
     };
     this.mapResponseCache.set(cacheKey, { cachedAt: nowMs, value: response });
+    ObservabilityStore.setMapCacheEntries(this.mapResponseCache.size);
     this.indexMapCacheKeySites(
       cacheKey,
       response.data.map((row) => row.id),
@@ -524,6 +525,7 @@ export class SitesMapQueryService {
       }
     }
     this.mapResponseCache.delete(cacheKey);
+    ObservabilityStore.setMapCacheEntries(this.mapResponseCache.size);
   }
 
   invalidateMapCache(reason: string, siteId?: string): void {
@@ -540,6 +542,7 @@ export class SitesMapQueryService {
     }
     this.mapResponseCache.clear();
     this.mapCacheSiteIndex.clear();
+    ObservabilityStore.setMapCacheEntries(0);
   }
 
   private async withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string): Promise<T> {
