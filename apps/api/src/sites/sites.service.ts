@@ -26,6 +26,7 @@ import { SitesDetailService } from './sites-detail.service';
 import { SitesFeedService } from './sites-feed.service';
 import { SitesMapQueryService } from './sites-map-query.service';
 import { SitesMediaService } from './sites-media.service';
+import { SiteUpvotesRepository } from './repositories/site-upvotes.repository';
 
 @Injectable()
 export class SitesService {
@@ -40,6 +41,7 @@ export class SitesService {
     private readonly sitesDetail: SitesDetailService,
     private readonly sitesMedia: SitesMediaService,
     private readonly sitesAdmin: SitesAdminService,
+    private readonly siteUpvotesRepository: SiteUpvotesRepository,
   ) {}
 
   async findAllForMap(query: ListSitesMapQueryDto) {
@@ -52,6 +54,10 @@ export class SitesService {
 
   findAll(query: ListSitesQueryDto, user?: AuthenticatedUser) {
     return this.sitesFeed.findAll(query, user);
+  }
+
+  getFeedVariantForUser(userId: string | undefined) {
+    return this.sitesFeed.getFeedVariantForUser(userId);
   }
 
   findOne(siteId: string, user?: AuthenticatedUser) {
@@ -72,25 +78,13 @@ export class SitesService {
     meta: { page: number; limit: number; total: number; hasMore: boolean };
   }> {
     await this.siteEngagement.ensureSiteExists(siteId);
-    const where = { siteId };
     const skip = (query.page - 1) * query.limit;
     const [total, votes] = await Promise.all([
-      this.prisma.siteVote.count({ where }),
-      this.prisma.siteVote.findMany({
-        where,
-        orderBy: { createdAt: 'desc' },
+      this.siteUpvotesRepository.countBySiteId(siteId),
+      this.siteUpvotesRepository.findPageBySiteId({
+        siteId,
         skip,
         take: query.limit,
-        include: {
-          user: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              avatarObjectKey: true,
-            },
-          },
-        },
       }),
     ]);
     const data = await Promise.all(

@@ -37,14 +37,21 @@ void trackPollutionFeedCardEvent(
   required PollutionFeedCardEventType eventType,
   String? sessionId,
   Map<String, dynamic>? metadata,
+  String? feedVariant,
 }) {
   if (!ServiceLocator.instance.authState.isAuthenticated) return;
+  final Map<String, dynamic>? enrichedMetadata = feedVariant == null
+      ? metadata
+      : <String, dynamic>{
+          ...?metadata,
+          'feedVariant': feedVariant,
+        };
   unawaited(
     ServiceLocator.instance.sitesRepository.trackFeedEvent(
       siteId,
       eventType: eventType.apiValue,
       sessionId: sessionId,
-      metadata: metadata,
+      metadata: enrichedMetadata,
     ),
   );
 }

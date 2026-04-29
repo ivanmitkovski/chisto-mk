@@ -1,4 +1,3 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/data/engagement_outbox_store.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -189,7 +188,7 @@ class SiteEngagementNotifier extends StateNotifier<SiteEngagementState> {
   }
 
   Future<SiteEngagementOutcome> toggleUpvote() async {
-    if (!ServiceLocator.instance.authState.isAuthenticated) {
+    if (!_ref.read(homeAuthStateProvider).isAuthenticated) {
       return const SiteEngagementOutcome.notAuthenticated();
     }
     final DateTime now = DateTime.now();
@@ -239,7 +238,7 @@ class SiteEngagementNotifier extends StateNotifier<SiteEngagementState> {
   }
 
   Future<SiteEngagementOutcome> toggleSave() async {
-    if (!ServiceLocator.instance.authState.isAuthenticated) {
+    if (!_ref.read(homeAuthStateProvider).isAuthenticated) {
       return const SiteEngagementOutcome.notAuthenticated();
     }
     final DateTime now = DateTime.now();

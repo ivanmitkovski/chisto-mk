@@ -19,6 +19,7 @@ class MergedDuplicateSubmissionsModal extends StatelessWidget {
     }
     return showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(

@@ -11,6 +11,9 @@ import { SubmitFeedFeedbackDto } from './dto/submit-feed-feedback.dto';
 import { TrackFeedEventDto } from './dto/track-feed-event.dto';
 import { FeedRankingService, RankingInput } from './feed-ranking.service';
 import { SiteEngagementService } from './site-engagement.service';
+import { FeedV2Service } from './feed/feed-v2.service';
+import { FeedVariant } from './feed/feed-v2.types';
+import { UserStateRepository } from './feed/features/user-state.repository';
 
 type FeedSiteRow = Prisma.SiteGetPayload<{
   include: {
@@ -61,6 +64,7 @@ export type SitesFeedListResult = {
     }
   >;
   meta: { page: number; limit: number; total: number; nextCursor?: string | null };
+  feedVariant?: FeedVariant;
 };
 
 @Injectable()
@@ -84,6 +88,7 @@ export class SitesFeedService {
       updatedAt: number;
     }
   >();
+  private readonly userVariantMemo = new Map<string, FeedVariant>();
 
   constructor(
     private readonly prisma: PrismaService,
@@ -91,6 +96,8 @@ export class SitesFeedService {
     private readonly reportsUploadService: ReportsUploadService,
     private readonly feedRanking: FeedRankingService,
     private readonly siteEngagement: SiteEngagementService,
+    private readonly feedV2: FeedV2Service,
+    private readonly userStateRepo: UserStateRepository,
   ) {}
 
   async findAll(query: ListSitesQueryDto, user?: AuthenticatedUser): Promise<SitesFeedListResult> {
@@ -362,6 +369,9 @@ export class SitesFeedService {
         updatedAt: siteBase.updatedAt,
       } as SiteEnriched;
     });
+    const feedVariant = await this.feedV2.resolveVariant(user);
+    if (user?.userId) this.userVariantMemo.set(user.userId, feedVariant);
+
     let enriched = enrichedRows;
     enriched = this.applyUserPreferences(enriched, user);
 
@@ -383,6 +393,7 @@ export class SitesFeedService {
       }
       return b.id.localeCompare(a.id);
     });
+    enriched = await this.feedV2.rerankRows(enriched, query, user, feedVariant);
     enriched = this.applyDiversityRerank(enriched, query);
     if (cursorState?.hybrid != null) {
       enriched = enriched.filter((row) => this.isAfterRankedCursor(row, cursorState.hybrid!));
@@ -435,6 +446,7 @@ export class SitesFeedService {
         total,
         nextCursor,
       },
+      feedVariant,
     };
     const duplicateCount = new Set(data.map((row) => row.id)).size !== data.length;
     if (duplicateCount) {
@@ -459,6 +471,11 @@ export class SitesFeedService {
       cacheHit: false,
     });
     return response;
+  }
+
+  getFeedVariantForUser(userId: string | undefined): FeedVariant {
+    if (!userId) return 'v1';
+    return this.userVariantMemo.get(userId) ?? 'v1';
   }
 
   async trackFeedEvent(dto: TrackFeedEventDto, user: AuthenticatedUser) {
@@ -490,6 +507,35 @@ export class SitesFeedService {
       }
       prefs.updatedAt = Date.now();
       this.feedUserPreferences.set(user.userId, prefs);
+      await this.prisma.$executeRaw`
+        INSERT INTO "FeedImpression" ("id","createdAt","userId","siteId","variant","position","dwellMs","engaged")
+        VALUES (${`fi_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`}, NOW(), ${user.userId}, ${dto.siteId}, ${this.getFeedVariantForUser(user.userId)}, NULL, NULL, false)
+      `;
+      await this.userStateRepo.cacheSeen(user.userId, dto.siteId, Date.now());
+    }
+    if (
+      dto.eventType === 'save' ||
+      dto.eventType === 'share' ||
+      dto.eventType === 'comment_open' ||
+      dto.eventType === 'detail_open' ||
+      dto.eventType === 'skip' ||
+      dto.eventType === 'bounce'
+    ) {
+      const profilePatch = JSON.stringify({
+        signalCount: 1,
+        latestEventType: dto.eventType,
+        lastSiteId: dto.siteId,
+        at: new Date().toISOString(),
+      });
+      await this.prisma.$executeRaw`
+        INSERT INTO "UserFeedState" ("userId","engagementProfile","updatedAt","lastFeedAt")
+        VALUES (${user.userId}, ${profilePatch}::jsonb, NOW(), NOW())
+        ON CONFLICT ("userId")
+        DO UPDATE SET
+          "engagementProfile" = COALESCE("UserFeedState"."engagementProfile", '{}'::jsonb) || ${profilePatch}::jsonb,
+          "updatedAt" = NOW(),
+          "lastFeedAt" = NOW()
+      `;
     }
     return { ok: true };
   }

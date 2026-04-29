@@ -37,11 +37,13 @@ class PollutionSiteCard extends ConsumerStatefulWidget {
     super.key,
     required this.site,
     this.feedSessionId,
+    this.feedVariant,
     this.onHidden,
   });
 
   final PollutionSite site;
   final String? feedSessionId;
+  final String? feedVariant;
   final ValueChanged<String>? onHidden;
 
   @override
@@ -91,6 +93,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         metadata: <String, dynamic>{
           'bucket': feedCardDwellBucketForSeconds(dwellSeconds),
         },
+        feedVariant: widget.feedVariant,
       );
     }
     super.dispose();
@@ -153,6 +156,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         site.id,
         eventType: PollutionFeedCardEventType.like,
         sessionId: widget.feedSessionId,
+        feedVariant: widget.feedVariant,
       );
       return;
     }
@@ -202,6 +206,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         eventType: PollutionFeedCardEventType.save,
         sessionId: widget.feedSessionId,
         metadata: <String, dynamic>{'saved': nowSaved},
+        feedVariant: widget.feedVariant,
       );
       return;
     }
@@ -273,6 +278,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
             site.id,
             eventType: PollutionFeedCardEventType.impression,
             sessionId: widget.feedSessionId,
+            feedVariant: widget.feedVariant,
           );
           _impressionTracked = true;
           _impressionTimer = null;
@@ -386,6 +392,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
       site.id,
       eventType: PollutionFeedCardEventType.detailOpen,
       sessionId: widget.feedSessionId,
+      feedVariant: widget.feedVariant,
     );
     SiteImagePrefetchQueue.instance.prefetchList(
       context,
@@ -428,6 +435,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
         setState(() => _sessionComments = next);
       },
       feedSessionId: widget.feedSessionId,
+      feedVariant: widget.feedVariant,
     );
   }
 
@@ -437,6 +445,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
       site.id,
       eventType: PollutionFeedCardEventType.ctaOpened,
       sessionId: widget.feedSessionId,
+      feedVariant: widget.feedVariant,
     );
     final TakeActionType? action = await TakeActionSheet.show(context);
     if (action == null || !mounted) return;
@@ -450,6 +459,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
       site.id,
       eventType: actionEvent,
       sessionId: widget.feedSessionId,
+      feedVariant: widget.feedVariant,
     );
     _isShareInFlight = action == TakeActionType.shareSite;
     if (_isShareInFlight) {
@@ -475,6 +485,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
           site.id,
           eventType: successEvent,
           sessionId: widget.feedSessionId,
+          feedVariant: widget.feedVariant,
         );
       }
     } finally {
@@ -518,18 +529,21 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
           site.id,
           eventType: PollutionFeedCardEventType.share,
           sessionId: widget.feedSessionId,
+          feedVariant: widget.feedVariant,
         );
       case SiteShareCancelled():
         trackPollutionFeedCardEvent(
           site.id,
           eventType: PollutionFeedCardEventType.ctaShareCancelled,
           sessionId: widget.feedSessionId,
+          feedVariant: widget.feedVariant,
         );
       case SiteShareTrackFailed():
         trackPollutionFeedCardEvent(
           site.id,
           eventType: PollutionFeedCardEventType.ctaShareTrackFailed,
           sessionId: widget.feedSessionId,
+          feedVariant: widget.feedVariant,
         );
         break;
     }
@@ -599,6 +613,7 @@ class _PollutionSiteCardState extends ConsumerState<PollutionSiteCard>
     final FeedCardFeedbackAction? action =
         await showModalBottomSheet<FeedCardFeedbackAction>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppColors.transparent,

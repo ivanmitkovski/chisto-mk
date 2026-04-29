@@ -1,11 +1,18 @@
-import { Controller, Get, Header } from '@nestjs/common';
+import { Controller, Get, Header, Headers, UnauthorizedException } from '@nestjs/common';
 import { ObservabilityStore } from './observability.store';
 
 @Controller('metrics')
 export class MetricsController {
   @Get()
   @Header('Content-Type', 'text/plain; version=0.0.4')
-  metrics(): string {
+  metrics(@Headers('authorization') authorization?: string): string {
+    const token = process.env.METRICS_BEARER_TOKEN?.trim();
+    if (token && authorization !== `Bearer ${token}`) {
+      throw new UnauthorizedException({
+        code: 'METRICS_UNAUTHORIZED',
+        message: 'Metrics access denied',
+      });
+    }
     const s = ObservabilityStore.snapshot();
     return [
       '# HELP api_requests_total Total API requests',
@@ -65,6 +72,32 @@ export class MetricsController {
       '# HELP feed_pagination_continuity_issues_total Feed pages with duplicate IDs',
       '# TYPE feed_pagination_continuity_issues_total counter',
       `feed_pagination_continuity_issues_total ${s.feedPaginationContinuityIssues}`,
+      '# HELP feed_v2_requests_total Feed v2 rerank requests',
+      '# TYPE feed_v2_requests_total counter',
+      `feed_v2_requests_total ${s.feedV2Requests}`,
+      '# HELP feed_v2_fallbacks_total Feed v2 rerank fallbacks to v1',
+      '# TYPE feed_v2_fallbacks_total counter',
+      `feed_v2_fallbacks_total ${s.feedV2Fallbacks}`,
+      '# HELP feed_v2_shadow_comparisons_total Feed v2 shadow comparisons',
+      '# TYPE feed_v2_shadow_comparisons_total counter',
+      `feed_v2_shadow_comparisons_total ${s.feedV2ShadowComparisons}`,
+      '# HELP feed_v2_shadow_top10_overlap_avg Feed v2 shadow top-10 overlap average',
+      '# TYPE feed_v2_shadow_top10_overlap_avg gauge',
+      `feed_v2_shadow_top10_overlap_avg ${s.feedV2ShadowTop10OverlapAvg}`,
+      '# HELP feed_v2_shadow_avg_abs_delta Feed v2 shadow average absolute score delta',
+      '# TYPE feed_v2_shadow_avg_abs_delta gauge',
+      `feed_v2_shadow_avg_abs_delta ${s.feedV2ShadowAvgAbsDelta}`,
+      '# HELP feed_v2_model_info Feed v2 model version info',
+      '# TYPE feed_v2_model_info gauge',
+      `feed_v2_model_info{version="${s.feedV2ModelVersion}"} 1`,
+      '# HELP feed_v2_ranker_mode_info Feed v2 active ranker mode',
+      '# TYPE feed_v2_ranker_mode_info gauge',
+      `feed_v2_ranker_mode_info{mode="${s.feedV2RankerMode}"} 1`,
+      '# HELP feed_v2_stage_p95_ms Feed v2 stage p95 latency in milliseconds',
+      '# TYPE feed_v2_stage_p95_ms gauge',
+      ...Object.entries(s.feedV2StageP95Ms).flatMap(([stage, value]) => [
+        `feed_v2_stage_p95_ms{stage="${stage}"} ${value}`,
+      ]),
       '# HELP push_sends_total Total push notification sends',
       '# TYPE push_sends_total counter',
       `push_sends_total ${s.pushSendsTotal}`,

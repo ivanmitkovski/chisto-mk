@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/profile/data/profile_avatar_state.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_notification_bell.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
@@ -73,9 +74,9 @@ class FeedHeader extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         context.l10n.feedGreetingPrefix,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w400,
-                            ),
+                        style: AppTypography.cardTitle.copyWith(
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
                       Flexible(
                         child: Text(
@@ -84,9 +85,9 @@ class FeedHeader extends StatelessWidget {
                             fallbackName: context.l10n.feedGreetingFallbackName,
                           ),
                           overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.w700,
-                              ),
+                          style: AppTypography.cardTitle.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ],
@@ -94,10 +95,9 @@ class FeedHeader extends StatelessWidget {
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     context.l10n.feedHeaderSubtitle,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: AppColors.textMuted,
-                          letterSpacing: -0.1,
-                        ),
+                    style: AppTypography.cardSubtitle.copyWith(
+                      color: AppColors.textMuted,
+                    ),
                   ),
                 ],
               ),

@@ -14,6 +14,24 @@ import { SitesMediaService } from './sites-media.service';
 import { SitesService } from './sites.service';
 import { SiteDetailRepository } from './repositories/site-detail.repository';
 import { SiteMediaRepository } from './repositories/site-media.repository';
+import { SiteUpvotesRepository } from './repositories/site-upvotes.repository';
+import { FeedV2Service } from './feed/feed-v2.service';
+import { AssignmentService } from './feed/experiments/assignment.service';
+import { UserStateRepository } from './feed/features/user-state.repository';
+import { SiteFeatureRepository } from './feed/features/site-feature.repository';
+import { FeatureExtractor } from './feed/features/feature-extractor';
+import { RedisFeedStateAdapter } from './feed/features/redis-feed-state.adapter';
+import { ModelRegistryClient } from './feed/ranker/model-registry.client';
+import { RulesFallbackRanker } from './feed/ranker/rules-fallback-ranker';
+import { OnnxRanker } from './feed/ranker/onnx-ranker';
+import { PersonalizationRerank } from './feed/rerank/personalization-rerank';
+import { DiversityRerank } from './feed/rerank/diversity-rerank';
+import { PolicyRerank } from './feed/rerank/policy-rerank';
+import { CandidateGenerator } from './feed/candidates/candidate-generator';
+import { GeoRetriever } from './feed/candidates/geo.retriever';
+import { FreshnessRetriever } from './feed/candidates/freshness.retriever';
+import { EngagementRetriever } from './feed/candidates/engagement.retriever';
+import { PersonalRetriever } from './feed/candidates/personal.retriever';
 
 @Module({
   imports: [AuditModule, ReportsUploadModule, AdminEventsModule],
@@ -30,6 +48,24 @@ import { SiteMediaRepository } from './repositories/site-media.repository';
     SiteCommentsService,
     SiteDetailRepository,
     SiteMediaRepository,
+    SiteUpvotesRepository,
+    FeedV2Service,
+    AssignmentService,
+    UserStateRepository,
+    RedisFeedStateAdapter,
+    SiteFeatureRepository,
+    FeatureExtractor,
+    ModelRegistryClient,
+    RulesFallbackRanker,
+    OnnxRanker,
+    PersonalizationRerank,
+    DiversityRerank,
+    PolicyRerank,
+    CandidateGenerator,
+    GeoRetriever,
+    FreshnessRetriever,
+    EngagementRetriever,
+    PersonalRetriever,
   ],
   exports: [SitesService, FeedRankingService],
 })

@@ -11,6 +11,14 @@ export class ObservabilityStore {
   private static feedCacheEntries = 0;
   private static feedReasonCodeCounts: Record<string, number> = {};
   private static feedPaginationContinuityIssues = 0;
+  private static feedV2Requests = 0;
+  private static feedV2Fallbacks = 0;
+  private static feedV2StageLatenciesMs: Record<string, number[]> = {};
+  private static feedV2ModelVersion = 'unknown';
+  private static feedV2RankerMode = 'rules_fallback';
+  private static feedV2ShadowComparisons = 0;
+  private static feedV2ShadowTop10OverlapSum = 0;
+  private static feedV2ShadowAvgAbsDeltaSum = 0;
   private static pushSendsTotal = 0;
   private static pushSendsSuccess = 0;
   private static pushSendsFailure = 0;
@@ -140,6 +148,31 @@ export class ObservabilityStore {
     this.feedPaginationContinuityIssues += 1;
   }
 
+  static recordFeedV2Request(fallback: boolean): void {
+    this.feedV2Requests += 1;
+    if (fallback) this.feedV2Fallbacks += 1;
+  }
+
+  static recordFeedV2StageLatency(stage: string, durationMs: number): void {
+    const bucket = this.feedV2StageLatenciesMs[stage] ?? [];
+    bucket.push(durationMs);
+    this.feedV2StageLatenciesMs[stage] = bucket.length > 1200 ? bucket.slice(-1200) : bucket;
+  }
+
+  static setFeedV2ModelVersion(version: string): void {
+    this.feedV2ModelVersion = version;
+  }
+
+  static setFeedV2RankerMode(mode: string): void {
+    this.feedV2RankerMode = mode || 'unknown';
+  }
+
+  static recordFeedV2ShadowComparison(input: { top10Overlap: number; avgAbsDelta: number }): void {
+    this.feedV2ShadowComparisons += 1;
+    this.feedV2ShadowTop10OverlapSum += Math.max(0, input.top10Overlap);
+    this.feedV2ShadowAvgAbsDeltaSum += Math.max(0, input.avgAbsDelta);
+  }
+
   static recordPushSend(outcome: 'success' | 'failure' | 'revoked'): void {
     this.pushSendsTotal += 1;
     if (outcome === 'success') this.pushSendsSuccess += 1;
@@ -264,6 +297,27 @@ export class ObservabilityStore {
       feedCacheEntries: this.feedCacheEntries,
       feedReasonCodeCounts: this.feedReasonCodeCounts,
       feedPaginationContinuityIssues: this.feedPaginationContinuityIssues,
+      feedV2Requests: this.feedV2Requests,
+      feedV2Fallbacks: this.feedV2Fallbacks,
+      feedV2ModelVersion: this.feedV2ModelVersion,
+      feedV2RankerMode: this.feedV2RankerMode,
+      feedV2ShadowComparisons: this.feedV2ShadowComparisons,
+      feedV2ShadowTop10OverlapAvg:
+        this.feedV2ShadowComparisons > 0
+          ? Number((this.feedV2ShadowTop10OverlapSum / this.feedV2ShadowComparisons).toFixed(4))
+          : 0,
+      feedV2ShadowAvgAbsDelta:
+        this.feedV2ShadowComparisons > 0
+          ? Number((this.feedV2ShadowAvgAbsDeltaSum / this.feedV2ShadowComparisons).toFixed(4))
+          : 0,
+      feedV2StageP95Ms: Object.fromEntries(
+        Object.entries(this.feedV2StageLatenciesMs).map(([stage, values]) => {
+          const sortedValues = [...values].sort((a, b) => a - b);
+          if (sortedValues.length === 0) return [stage, 0];
+          const idx = Math.min(sortedValues.length - 1, Math.floor(0.95 * sortedValues.length));
+          return [stage, Number(sortedValues[idx].toFixed(2))];
+        }),
+      ),
       pushSendsTotal: this.pushSendsTotal,
       pushSendsSuccess: this.pushSendsSuccess,
       pushSendsFailure: this.pushSendsFailure,

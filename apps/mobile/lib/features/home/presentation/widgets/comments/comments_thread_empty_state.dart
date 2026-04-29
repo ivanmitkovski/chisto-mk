@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 /// Empty thread placeholder for site comments (sheet or full-screen route).
@@ -9,7 +10,6 @@ class CommentsThreadEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final Widget content = Padding(
@@ -35,12 +35,12 @@ class CommentsThreadEmptyState extends StatelessWidget {
                 context.l10n.siteCommentsEmptyBody,
                 textAlign: TextAlign.center,
                 style: constraints.maxHeight < 120
-                    ? theme.textTheme.bodySmall?.copyWith(
+                    ? AppTypography.cardSubtitle.copyWith(
                         color: AppColors.textMuted,
                         height: 1.35,
                         fontSize: 12,
                       )
-                    : theme.textTheme.bodySmall?.copyWith(
+                    : AppTypography.cardSubtitle.copyWith(
                         color: AppColors.textMuted,
                         height: 1.35,
                       ),

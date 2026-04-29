@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
 
 /// Status glance line overlaid on the feed card image (site lifecycle + label).
@@ -35,10 +36,9 @@ class SiteCardFeedStatusPill extends StatelessWidget {
             const SizedBox(width: 6),
             Text(
               statusLine,
-              style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                    color: AppColors.textOnDark,
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: AppTypography.badgeLabel.copyWith(
+                color: AppColors.textOnDark,
+              ),
             ),
           ],
         ),

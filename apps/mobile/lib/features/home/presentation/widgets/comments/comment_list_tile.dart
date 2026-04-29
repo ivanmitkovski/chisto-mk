@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/comment_meta_formatting.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments/comments_motion.dart';
@@ -49,10 +50,14 @@ class CommentListTile extends StatelessWidget {
     final bool isLikedByMe = comment.isLikedByMe ?? false;
     final bool showThreadGuide = depth >= 1 && depth <= 2;
 
-    final TextStyle nameStyle = Theme.of(context).textTheme.bodyMedium!
-        .copyWith(fontWeight: FontWeight.w700, color: AppColors.textPrimary);
-    final TextStyle textStyle = Theme.of(context).textTheme.bodyMedium!
-        .copyWith(fontWeight: FontWeight.w400, color: AppColors.textPrimary);
+    final TextStyle nameStyle = AppTypography.cardTitle.copyWith(
+      fontWeight: FontWeight.w700,
+      color: AppColors.textPrimary,
+    );
+    final TextStyle textStyle = AppTypography.cardSubtitle.copyWith(
+      fontWeight: FontWeight.w400,
+      color: AppColors.textPrimary,
+    );
 
     final double indent = (depth * 18).clamp(0, 54).toDouble();
     final String metaText = formatCommentMetaSubtitle(
@@ -115,11 +120,10 @@ class CommentListTile extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           metaText,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: AppColors.textMuted,
-                                fontSize: 12,
-                              ),
+                          style: AppTypography.cardSubtitle.copyWith(
+                            color: AppColors.textMuted,
+                            fontSize: 12,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Semantics(
@@ -134,11 +138,10 @@ class CommentListTile extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 2),
                               child: Text(
                                 context.l10n.commentsReplyButton,
-                                style: Theme.of(context).textTheme.labelSmall
-                                    ?.copyWith(
-                                      color: AppColors.textMuted,
-                                      fontWeight: FontWeight.w600,
-                                    ),
+                                style: AppTypography.chipLabel.copyWith(
+                                  color: AppColors.textMuted,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             ),
                           ),
@@ -164,13 +167,10 @@ class CommentListTile extends StatelessWidget {
                                       repliesExpanded
                                           ? context.l10n.commentsHideReplies
                                           : context.l10n.commentsViewReplies,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .labelSmall
-                                          ?.copyWith(
-                                            color: AppColors.textMuted,
-                                            fontWeight: FontWeight.w600,
-                                          ),
+                                      style: AppTypography.chipLabel.copyWith(
+                                        color: AppColors.textMuted,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                     const SizedBox(width: 2),
                                     AnimatedRotation(

@@ -102,6 +102,7 @@ export const GLOBAL_HTTP_ERROR_CODES = [
   'DATABASE_UNAVAILABLE',
   'DATABASE_DISCONNECTED',
   'VALIDATION_ERROR',
+  'METRICS_UNAUTHORIZED',
   /** Path params that must be Prisma `cuid()` ids (25 chars, `c` prefix). */
   'INVALID_CUID',
 ] as const;
@@ -198,6 +199,9 @@ export const SITES_API_ERROR_CODES = [
   'SITES_DETAIL_TRUNCATED',
   'SITES_MEDIA_TRUNCATED',
   'SITES_COMMENTS_TRUNCATED',
+  'FEED_RANKER_UNAVAILABLE',
+  'FEED_FEATURES_UNAVAILABLE',
+  'FEED_EXPERIMENT_INVALID',
 ] as const;
 
 export type SitesApiErrorCode = (typeof SITES_API_ERROR_CODES)[number];

@@ -145,6 +145,14 @@ void main() {
       );
       expect(await cache.loadMapSnapshot(), isNull);
     });
+
+    test('loadMapSnapshot returns null for corrupt JSON', () async {
+      final SitesLocalCache cache = SitesLocalCache();
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(SitesLocalCache.mapPersistedCacheKey, 'not-json');
+
+      expect(await cache.loadMapSnapshot(), isNull);
+    });
   });
 
   test('clearFeedAndMapSnapshots removes keys', () async {

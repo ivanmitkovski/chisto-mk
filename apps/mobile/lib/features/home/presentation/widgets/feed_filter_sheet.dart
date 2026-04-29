@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 
 enum FeedFilter {
@@ -99,17 +100,14 @@ class FeedFilterSheet extends StatelessWidget {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   l10n.feedFiltersSheetTitle,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: -0.3,
-                      ),
+                  style: AppTypography.sheetTitle,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   l10n.feedFiltersSheetSubtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: AppTypography.cardSubtitle.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 ...FeedFilter.values.map(
@@ -178,22 +176,19 @@ class _FilterTile extends StatelessWidget {
                       children: <Widget>[
                         Text(
                           name,
-                          style:
-                              Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    color: isActive
-                                        ? AppColors.primaryDark
-                                        : AppColors.textPrimary,
-                                  ),
+                          style: AppTypography.cardTitle.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: isActive
+                                ? AppColors.primaryDark
+                                : AppColors.textPrimary,
+                          ),
                         ),
                         const SizedBox(height: AppSpacing.xxs),
                         Text(
                           filter.description(l10n),
-                          style:
-                              Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: AppColors.textMuted,
-                                    fontSize: 12,
-                                  ),
+                          style: AppTypography.cardSubtitle.copyWith(
+                            color: AppColors.textMuted,
+                          ),
                         ),
                       ],
                     ),

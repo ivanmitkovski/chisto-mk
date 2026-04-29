@@ -138,12 +138,12 @@ class SiteStatsRow extends StatelessWidget {
                   site.distanceKm >= 0
                       ? _formatDistance(context, site.distanceKm)
                       : context.l10n.commonNotAvailable,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
-                        color: onDistanceTap != null
-                            ? AppColors.primaryDark
-                            : AppColors.textMuted,
-                      ),
+                  style: AppTypography.chipLabel.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: onDistanceTap != null
+                        ? AppColors.primaryDark
+                        : AppColors.textMuted,
+                  ),
                 ),
               ],
             ),

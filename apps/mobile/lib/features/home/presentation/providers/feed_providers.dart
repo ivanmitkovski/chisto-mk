@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
@@ -47,10 +46,21 @@ int feedServerFetchGroup(FeedFilter filter) {
   }
 }
 
+enum FeedSitesViewStatus {
+  initialLoading,
+  freshData,
+  staleData,
+  empty,
+  noLocation,
+  firstLoadError,
+  paginating,
+  paginationError,
+}
+
 /// Stable per-tab session id for feed analytics (one id per provider lifetime).
 final feedSessionIdProvider = Provider<String>((Ref ref) {
   ref.keepAlive();
-  final AuthState auth = ServiceLocator.instance.authState;
+  final AuthState auth = ref.watch(homeAuthStateProvider);
   final String userId = auth.userId ?? 'anon';
   return 'feed_${DateTime.now().millisecondsSinceEpoch}_$userId';
 });
@@ -97,6 +107,7 @@ class FeedFilterNotifier extends StateNotifier<FeedFilter> {
 
 class FeedSitesState {
   const FeedSitesState({
+    this.status = FeedSitesViewStatus.initialLoading,
     required this.allSites,
     required this.isLoading,
     this.loadError,
@@ -108,8 +119,14 @@ class FeedSitesState {
     required this.locationAvailable,
     this.userLatitude,
     this.userLongitude,
+    this.feedVariant = 'v1',
+    this.servedFromCache = false,
+    this.isStaleFallback = false,
+    this.cachedAt,
+    this.lastSuccessfulRefreshAt,
   });
 
+  final FeedSitesViewStatus status;
   final List<PollutionSite> allSites;
   final bool isLoading;
   final AppError? loadError;
@@ -121,17 +138,27 @@ class FeedSitesState {
   final bool locationAvailable;
   final double? userLatitude;
   final double? userLongitude;
+  final String feedVariant;
+  final bool servedFromCache;
+  final bool isStaleFallback;
+  final DateTime? cachedAt;
+  final DateTime? lastSuccessfulRefreshAt;
 
   static FeedSitesState initial() => const FeedSitesState(
+        status: FeedSitesViewStatus.initialLoading,
         allSites: <PollutionSite>[],
         isLoading: true,
         hasMore: true,
         isLoadingMore: false,
         loadMoreFailed: false,
         locationAvailable: true,
+        feedVariant: 'v1',
+        servedFromCache: false,
+        isStaleFallback: false,
       );
 
   FeedSitesState copyWith({
+    FeedSitesViewStatus? status,
     List<PollutionSite>? allSites,
     bool? isLoading,
     AppError? loadError,
@@ -145,8 +172,14 @@ class FeedSitesState {
     bool? locationAvailable,
     double? userLatitude,
     double? userLongitude,
+    String? feedVariant,
+    bool? servedFromCache,
+    bool? isStaleFallback,
+    DateTime? cachedAt,
+    DateTime? lastSuccessfulRefreshAt,
   }) {
     return FeedSitesState(
+      status: status ?? this.status,
       allSites: allSites ?? this.allSites,
       isLoading: isLoading ?? this.isLoading,
       loadError: clearLoadError ? null : (loadError ?? this.loadError),
@@ -158,8 +191,31 @@ class FeedSitesState {
       locationAvailable: locationAvailable ?? this.locationAvailable,
       userLatitude: userLatitude ?? this.userLatitude,
       userLongitude: userLongitude ?? this.userLongitude,
+      feedVariant: feedVariant ?? this.feedVariant,
+      servedFromCache: servedFromCache ?? this.servedFromCache,
+      isStaleFallback: isStaleFallback ?? this.isStaleFallback,
+      cachedAt: cachedAt ?? this.cachedAt,
+      lastSuccessfulRefreshAt:
+          lastSuccessfulRefreshAt ?? this.lastSuccessfulRefreshAt,
     );
   }
+}
+
+FeedSitesViewStatus _statusForLoadedResult({
+  required List<PollutionSite> sites,
+  required bool locationAvailable,
+  required bool isStaleFallback,
+}) {
+  if (sites.isEmpty && !locationAvailable) {
+    return FeedSitesViewStatus.noLocation;
+  }
+  if (isStaleFallback) {
+    return FeedSitesViewStatus.staleData;
+  }
+  if (sites.isEmpty) {
+    return FeedSitesViewStatus.empty;
+  }
+  return FeedSitesViewStatus.freshData;
 }
 
 final feedSitesNotifierProvider =
@@ -175,6 +231,9 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
 
   Future<void> loadInitial() async {
     state = state.copyWith(
+      status: state.allSites.isEmpty
+          ? FeedSitesViewStatus.initialLoading
+          : state.status,
       isLoading: true,
       clearLoadError: true,
       loadMoreFailed: false,
@@ -197,6 +256,11 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
             explain: true,
           );
       state = state.copyWith(
+        status: _statusForLoadedResult(
+          sites: result.sites,
+          locationAvailable: state.locationAvailable,
+          isStaleFallback: result.isStaleFallback,
+        ),
         allSites: result.sites,
         nextCursor: result.nextCursor,
         hasMore: result.nextCursor?.isNotEmpty ?? false,
@@ -204,14 +268,27 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
         loadMoreFailed: false,
         isLoading: false,
         clearLoadError: true,
+        feedVariant: result.feedVariant,
+        servedFromCache: result.servedFromCache,
+        isStaleFallback: result.isStaleFallback,
+        cachedAt: result.cachedAt,
+        lastSuccessfulRefreshAt: result.servedFromCache
+            ? state.lastSuccessfulRefreshAt
+            : DateTime.now(),
       );
     } on AppError catch (e) {
       state = state.copyWith(
+        status: state.allSites.isEmpty
+            ? FeedSitesViewStatus.firstLoadError
+            : FeedSitesViewStatus.staleData,
         loadError: e,
         isLoading: false,
       );
     } catch (e) {
       state = state.copyWith(
+        status: state.allSites.isEmpty
+            ? FeedSitesViewStatus.firstLoadError
+            : FeedSitesViewStatus.staleData,
         loadError: AppError.network(cause: e),
         isLoading: false,
       );
@@ -224,6 +301,9 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
       return true;
     }
     state = state.copyWith(
+      status: state.allSites.isEmpty
+          ? FeedSitesViewStatus.initialLoading
+          : FeedSitesViewStatus.paginating,
       isLoadingMore: true,
       loadMoreFailed: false,
       clearLoadMoreError: true,
@@ -251,16 +331,29 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
         mergedById[site.id] = site;
       }
       state = state.copyWith(
+        status: _statusForLoadedResult(
+          sites: mergedById.values.toList(),
+          locationAvailable: state.locationAvailable,
+          isStaleFallback: result.isStaleFallback,
+        ),
         allSites: mergedById.values.toList(),
         nextCursor: result.nextCursor,
         hasMore: result.nextCursor?.isNotEmpty ?? false,
         loadMoreFailed: false,
         clearLoadMoreError: true,
         isLoadingMore: false,
+        feedVariant: result.feedVariant,
+        servedFromCache: result.servedFromCache,
+        isStaleFallback: result.isStaleFallback,
+        cachedAt: result.cachedAt,
+        lastSuccessfulRefreshAt: result.servedFromCache
+            ? state.lastSuccessfulRefreshAt
+            : DateTime.now(),
       );
       return true;
     } on AppError catch (e) {
       state = state.copyWith(
+        status: FeedSitesViewStatus.paginationError,
         loadMoreFailed: true,
         loadMoreError: e,
         isLoadingMore: false,
@@ -268,6 +361,7 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
       return false;
     } catch (e) {
       state = state.copyWith(
+        status: FeedSitesViewStatus.paginationError,
         loadMoreFailed: true,
         loadMoreError: AppError.network(cause: e),
         isLoadingMore: false,
@@ -338,6 +432,7 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
     }
     state = FeedSitesState(
       allSites: state.allSites,
+      status: state.status,
       isLoading: state.isLoading,
       loadError: state.loadError,
       nextCursor: state.nextCursor,
@@ -347,6 +442,11 @@ class FeedSitesNotifier extends StateNotifier<FeedSitesState> {
       locationAvailable: locationAvailable,
       userLatitude: lat,
       userLongitude: lng,
+      feedVariant: state.feedVariant,
+      servedFromCache: state.servedFromCache,
+      isStaleFallback: state.isStaleFallback,
+      cachedAt: state.cachedAt,
+      lastSuccessfulRefreshAt: state.lastSuccessfulRefreshAt,
     );
   }
 }
@@ -357,5 +457,6 @@ final feedVisibleSitesProvider = Provider<List<PollutionSite>>((Ref ref) {
   return computeVisibleSitesForFilter(
     source: sites.allSites,
     filter: filter,
+    feedVariant: sites.feedVariant,
   );
 });

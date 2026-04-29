@@ -122,10 +122,19 @@ class _QuickActionTile extends StatelessWidget {
                 children: <Widget>[
                   Icon(icon, size: 22, color: AppColors.textPrimary),
                   const SizedBox(height: AppSpacing.xxs),
-                  Text(
-                    label,
-                    style: AppTypography.cardSubtitle.copyWith(
-                      fontWeight: FontWeight.w500,
+                  SizedBox(
+                    height: 34,
+                    child: Center(
+                      child: Text(
+                        label,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.cardSubtitle.copyWith(
+                          fontWeight: FontWeight.w500,
+                          height: 1.2,
+                        ),
+                      ),
                     ),
                   ),
                 ],

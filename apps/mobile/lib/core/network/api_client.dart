@@ -449,6 +449,7 @@ class ApiClient {
         statusCode: response.statusCode,
         body: bodyStr,
         json: json,
+        headers: response.headers,
       );
     }
 
@@ -480,11 +481,13 @@ class ApiResponse {
     required this.statusCode,
     this.body,
     this.json,
+    this.headers = const <String, String>{},
   });
 
   final int statusCode;
   final String? body;
   final Map<String, dynamic>? json;
+  final Map<String, String> headers;
 }
 
 /// Represents a single file to include in a multipart upload.

@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_upvoters_provider.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
@@ -88,17 +89,18 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
               const SizedBox(height: AppSpacing.md),
               Text(
                 context.l10n.siteUpvotersSheetTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: AppTypography.sheetTitle.copyWith(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               if (subtitle.isNotEmpty) ...<Widget>[
                 const SizedBox(height: 4),
                 Text(
                   subtitle,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textMuted,
-                      ),
+                  style: AppTypography.cardSubtitle.copyWith(
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ],
               const SizedBox(height: AppSpacing.xs),
@@ -127,9 +129,9 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
               Text(
                 context.l10n.siteUpvotersLoadFailed,
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textMuted,
-                    ),
+                style: AppTypography.cardSubtitle.copyWith(
+                  color: AppColors.textMuted,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               TextButton(
@@ -150,9 +152,9 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
           child: Text(
             context.l10n.siteDetailNoUpvotesSnack,
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            style: AppTypography.cardSubtitle.copyWith(
+              color: AppColors.textMuted,
+            ),
           ),
         ),
       );
@@ -199,15 +201,15 @@ class _UpvotersSheetContentState extends ConsumerState<UpvotersSheetContent> {
           ),
           title: Text(
             item.displayName,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                ),
+            style: AppTypography.cardTitle.copyWith(
+              color: AppColors.textPrimary,
+            ),
           ),
           trailing: Text(
             context.l10n.siteUpvotersSupportingLabel,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textMuted,
-                ),
+            style: AppTypography.cardSubtitle.copyWith(
+              color: AppColors.textMuted,
+            ),
           ),
         );
       },

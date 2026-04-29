@@ -38,7 +38,9 @@ int feedStatusPriority(String statusLabel) {
 List<PollutionSite> computeVisibleSitesForFilter({
   required List<PollutionSite> source,
   required FeedFilter filter,
+  String feedVariant = 'v1',
 }) {
+  final bool trustServerOrder = feedVariant == 'v2' || feedVariant == 'v2-shadow';
   switch (filter) {
     case FeedFilter.all:
       return List<PollutionSite>.from(source);
@@ -72,6 +74,9 @@ List<PollutionSite> computeVisibleSitesForFilter({
           return a.distanceKm.compareTo(b.distanceKm);
         });
     case FeedFilter.mostVoted:
+      if (trustServerOrder) {
+        return List<PollutionSite>.from(source);
+      }
       return List<PollutionSite>.from(source)
         ..sort((PollutionSite a, PollutionSite b) {
           final int supportA =
@@ -81,6 +86,9 @@ List<PollutionSite> computeVisibleSitesForFilter({
           return supportB.compareTo(supportA);
         });
     case FeedFilter.recent:
+      if (trustServerOrder) {
+        return List<PollutionSite>.from(source);
+      }
       return List<PollutionSite>.from(source)
         ..sort(
           (PollutionSite a, PollutionSite b) =>

@@ -100,8 +100,16 @@ export class SitesController {
   @ApiOkResponse({ description: 'Sites fetched successfully', type: SiteFeedListResponseDto })
   @ApiBadRequestResponse({ description: 'Invalid geo query or filters' })
   @ApiTooManyRequestsResponse({ description: 'Too many requests' })
-  findAll(@Query() query: ListSitesQueryDto, @CurrentUser() user?: AuthenticatedUser) {
-    return this.sitesService.findAll(query, user);
+  async findAll(
+    @Query() query: ListSitesQueryDto,
+    @CurrentUser() user: AuthenticatedUser | undefined,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.sitesService.findAll(query, user);
+    const variant = user ? this.sitesService.getFeedVariantForUser(user.userId) : 'v1';
+    res.setHeader('x-feed-variant', variant);
+    res.setHeader('x-feed-experiment', 'feed_v2_ranking');
+    return result;
   }
 
   @Post('feed/events')
@@ -207,7 +215,8 @@ export class SitesController {
   }
 
   @Post(':id/comments')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create comment for site' })
   @ApiCreatedResponse({ description: 'Site comment created successfully', type: SiteCommentTreeNodeResponseDto })
@@ -223,7 +232,8 @@ export class SitesController {
   }
 
   @Post(':id/comments/:commentId/like')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Like a site comment' })
   @ApiOkResponse({ description: 'Like applied', type: SiteCommentLikeResponseDto })
@@ -238,7 +248,8 @@ export class SitesController {
   }
 
   @Delete(':id/comments/:commentId/like')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 120, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Unlike a site comment' })
   @ApiOkResponse({ description: 'Like removed', type: SiteCommentLikeResponseDto })
@@ -253,7 +264,8 @@ export class SitesController {
   }
 
   @Patch(':id/comments/:commentId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Edit a site comment' })
   @ApiOkResponse({ description: 'Comment updated', type: SiteCommentTreeNodeResponseDto })
@@ -271,7 +283,8 @@ export class SitesController {
   }
 
   @Delete(':id/comments/:commentId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, ThrottlerGuard)
+  @Throttle({ default: { limit: 60, ttl: 60_000 } })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a site comment' })
   @ApiOkResponse({ description: 'Comment soft-deleted' })

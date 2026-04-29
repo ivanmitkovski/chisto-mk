@@ -48,15 +48,12 @@ class _SiteCardBodyState extends State<SiteCardBody> {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final double maxWidth = constraints.maxWidth;
-        final TextStyle titleStyle = AppTypography.textTheme.titleSmall!.copyWith(
+        final TextStyle titleStyle = AppTypography.cardTitle.copyWith(
           fontWeight: FontWeight.w700,
-          fontSize: 17,
-          letterSpacing: -0.2,
         );
-        final TextStyle descStyle = AppTypography.textTheme.bodySmall!.copyWith(
+        final TextStyle descStyle = AppTypography.cardSubtitle.copyWith(
           color: AppColors.textSecondary,
           height: 1.35,
-          fontSize: 14,
         );
         final PollutionSite site = widget.site;
         final bool cacheValid =
