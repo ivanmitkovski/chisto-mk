@@ -189,6 +189,26 @@ export type SiteShareLink = $Result.DefaultSelection<Prisma.$SiteShareLinkPayloa
  */
 export type SiteShareAttributionEvent = $Result.DefaultSelection<Prisma.$SiteShareAttributionEventPayload>
 /**
+ * Model UserFeedState
+ * 
+ */
+export type UserFeedState = $Result.DefaultSelection<Prisma.$UserFeedStatePayload>
+/**
+ * Model SiteFeatureSnapshot
+ * 
+ */
+export type SiteFeatureSnapshot = $Result.DefaultSelection<Prisma.$SiteFeatureSnapshotPayload>
+/**
+ * Model FeedImpression
+ * 
+ */
+export type FeedImpression = $Result.DefaultSelection<Prisma.$FeedImpressionPayload>
+/**
+ * Model FeedExperimentAssignment
+ * 
+ */
+export type FeedExperimentAssignment = $Result.DefaultSelection<Prisma.$FeedExperimentAssignmentPayload>
+/**
  * Model UserDeviceToken
  * 
  */
@@ -986,6 +1006,46 @@ export class PrismaClient<
   get siteShareAttributionEvent(): Prisma.SiteShareAttributionEventDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.userFeedState`: Exposes CRUD operations for the **UserFeedState** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserFeedStates
+    * const userFeedStates = await prisma.userFeedState.findMany()
+    * ```
+    */
+  get userFeedState(): Prisma.UserFeedStateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.siteFeatureSnapshot`: Exposes CRUD operations for the **SiteFeatureSnapshot** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SiteFeatureSnapshots
+    * const siteFeatureSnapshots = await prisma.siteFeatureSnapshot.findMany()
+    * ```
+    */
+  get siteFeatureSnapshot(): Prisma.SiteFeatureSnapshotDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.feedImpression`: Exposes CRUD operations for the **FeedImpression** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FeedImpressions
+    * const feedImpressions = await prisma.feedImpression.findMany()
+    * ```
+    */
+  get feedImpression(): Prisma.FeedImpressionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.feedExperimentAssignment`: Exposes CRUD operations for the **FeedExperimentAssignment** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FeedExperimentAssignments
+    * const feedExperimentAssignments = await prisma.feedExperimentAssignment.findMany()
+    * ```
+    */
+  get feedExperimentAssignment(): Prisma.FeedExperimentAssignmentDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.userDeviceToken`: Exposes CRUD operations for the **UserDeviceToken** model.
     * Example usage:
     * ```ts
@@ -1503,6 +1563,10 @@ export namespace Prisma {
     SiteShareEvent: 'SiteShareEvent',
     SiteShareLink: 'SiteShareLink',
     SiteShareAttributionEvent: 'SiteShareAttributionEvent',
+    UserFeedState: 'UserFeedState',
+    SiteFeatureSnapshot: 'SiteFeatureSnapshot',
+    FeedImpression: 'FeedImpression',
+    FeedExperimentAssignment: 'FeedExperimentAssignment',
     UserDeviceToken: 'UserDeviceToken',
     UserNotification: 'UserNotification',
     UserNotificationPreference: 'UserNotificationPreference',
@@ -1523,7 +1587,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userFeedState" | "siteFeatureSnapshot" | "feedImpression" | "feedExperimentAssignment" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4117,6 +4181,302 @@ export namespace Prisma {
           }
         }
       }
+      UserFeedState: {
+        payload: Prisma.$UserFeedStatePayload<ExtArgs>
+        fields: Prisma.UserFeedStateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UserFeedStateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserFeedStateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          findFirst: {
+            args: Prisma.UserFeedStateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserFeedStateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          findMany: {
+            args: Prisma.UserFeedStateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>[]
+          }
+          create: {
+            args: Prisma.UserFeedStateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          createMany: {
+            args: Prisma.UserFeedStateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.UserFeedStateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>[]
+          }
+          delete: {
+            args: Prisma.UserFeedStateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          update: {
+            args: Prisma.UserFeedStateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          deleteMany: {
+            args: Prisma.UserFeedStateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserFeedStateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.UserFeedStateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>[]
+          }
+          upsert: {
+            args: Prisma.UserFeedStateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserFeedStatePayload>
+          }
+          aggregate: {
+            args: Prisma.UserFeedStateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserFeedState>
+          }
+          groupBy: {
+            args: Prisma.UserFeedStateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserFeedStateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserFeedStateCountArgs<ExtArgs>
+            result: $Utils.Optional<UserFeedStateCountAggregateOutputType> | number
+          }
+        }
+      }
+      SiteFeatureSnapshot: {
+        payload: Prisma.$SiteFeatureSnapshotPayload<ExtArgs>
+        fields: Prisma.SiteFeatureSnapshotFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SiteFeatureSnapshotFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SiteFeatureSnapshotFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          findFirst: {
+            args: Prisma.SiteFeatureSnapshotFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SiteFeatureSnapshotFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          findMany: {
+            args: Prisma.SiteFeatureSnapshotFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>[]
+          }
+          create: {
+            args: Prisma.SiteFeatureSnapshotCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          createMany: {
+            args: Prisma.SiteFeatureSnapshotCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SiteFeatureSnapshotCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>[]
+          }
+          delete: {
+            args: Prisma.SiteFeatureSnapshotDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          update: {
+            args: Prisma.SiteFeatureSnapshotUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          deleteMany: {
+            args: Prisma.SiteFeatureSnapshotDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SiteFeatureSnapshotUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SiteFeatureSnapshotUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>[]
+          }
+          upsert: {
+            args: Prisma.SiteFeatureSnapshotUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SiteFeatureSnapshotPayload>
+          }
+          aggregate: {
+            args: Prisma.SiteFeatureSnapshotAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSiteFeatureSnapshot>
+          }
+          groupBy: {
+            args: Prisma.SiteFeatureSnapshotGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SiteFeatureSnapshotGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SiteFeatureSnapshotCountArgs<ExtArgs>
+            result: $Utils.Optional<SiteFeatureSnapshotCountAggregateOutputType> | number
+          }
+        }
+      }
+      FeedImpression: {
+        payload: Prisma.$FeedImpressionPayload<ExtArgs>
+        fields: Prisma.FeedImpressionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FeedImpressionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FeedImpressionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          findFirst: {
+            args: Prisma.FeedImpressionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FeedImpressionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          findMany: {
+            args: Prisma.FeedImpressionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>[]
+          }
+          create: {
+            args: Prisma.FeedImpressionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          createMany: {
+            args: Prisma.FeedImpressionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FeedImpressionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>[]
+          }
+          delete: {
+            args: Prisma.FeedImpressionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          update: {
+            args: Prisma.FeedImpressionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          deleteMany: {
+            args: Prisma.FeedImpressionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FeedImpressionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FeedImpressionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>[]
+          }
+          upsert: {
+            args: Prisma.FeedImpressionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedImpressionPayload>
+          }
+          aggregate: {
+            args: Prisma.FeedImpressionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeedImpression>
+          }
+          groupBy: {
+            args: Prisma.FeedImpressionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeedImpressionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FeedImpressionCountArgs<ExtArgs>
+            result: $Utils.Optional<FeedImpressionCountAggregateOutputType> | number
+          }
+        }
+      }
+      FeedExperimentAssignment: {
+        payload: Prisma.$FeedExperimentAssignmentPayload<ExtArgs>
+        fields: Prisma.FeedExperimentAssignmentFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FeedExperimentAssignmentFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FeedExperimentAssignmentFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          findFirst: {
+            args: Prisma.FeedExperimentAssignmentFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FeedExperimentAssignmentFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          findMany: {
+            args: Prisma.FeedExperimentAssignmentFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>[]
+          }
+          create: {
+            args: Prisma.FeedExperimentAssignmentCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          createMany: {
+            args: Prisma.FeedExperimentAssignmentCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FeedExperimentAssignmentCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>[]
+          }
+          delete: {
+            args: Prisma.FeedExperimentAssignmentDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          update: {
+            args: Prisma.FeedExperimentAssignmentUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          deleteMany: {
+            args: Prisma.FeedExperimentAssignmentDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FeedExperimentAssignmentUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FeedExperimentAssignmentUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>[]
+          }
+          upsert: {
+            args: Prisma.FeedExperimentAssignmentUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeedExperimentAssignmentPayload>
+          }
+          aggregate: {
+            args: Prisma.FeedExperimentAssignmentAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeedExperimentAssignment>
+          }
+          groupBy: {
+            args: Prisma.FeedExperimentAssignmentGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeedExperimentAssignmentGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FeedExperimentAssignmentCountArgs<ExtArgs>
+            result: $Utils.Optional<FeedExperimentAssignmentCountAggregateOutputType> | number
+          }
+        }
+      }
       UserDeviceToken: {
         payload: Prisma.$UserDeviceTokenPayload<ExtArgs>
         fields: Prisma.UserDeviceTokenFieldRefs
@@ -4630,6 +4990,10 @@ export namespace Prisma {
     siteShareEvent?: SiteShareEventOmit
     siteShareLink?: SiteShareLinkOmit
     siteShareAttributionEvent?: SiteShareAttributionEventOmit
+    userFeedState?: UserFeedStateOmit
+    siteFeatureSnapshot?: SiteFeatureSnapshotOmit
+    feedImpression?: FeedImpressionOmit
+    feedExperimentAssignment?: FeedExperimentAssignmentOmit
     userDeviceToken?: UserDeviceTokenOmit
     userNotification?: UserNotificationOmit
     userNotificationPreference?: UserNotificationPreferenceOmit
@@ -4729,6 +5093,8 @@ export namespace Prisma {
     siteShareEvents: number
     siteShareLinks: number
     siteCommentLikes: number
+    feedImpressions: number
+    feedExperimentAssignments: number
     deviceTokens: number
     userNotifications: number
     notificationPreferences: number
@@ -4760,6 +5126,8 @@ export namespace Prisma {
     siteShareEvents?: boolean | UserCountOutputTypeCountSiteShareEventsArgs
     siteShareLinks?: boolean | UserCountOutputTypeCountSiteShareLinksArgs
     siteCommentLikes?: boolean | UserCountOutputTypeCountSiteCommentLikesArgs
+    feedImpressions?: boolean | UserCountOutputTypeCountFeedImpressionsArgs
+    feedExperimentAssignments?: boolean | UserCountOutputTypeCountFeedExperimentAssignmentsArgs
     deviceTokens?: boolean | UserCountOutputTypeCountDeviceTokensArgs
     userNotifications?: boolean | UserCountOutputTypeCountUserNotificationsArgs
     notificationPreferences?: boolean | UserCountOutputTypeCountNotificationPreferencesArgs
@@ -4888,6 +5256,20 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountFeedImpressionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeedImpressionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFeedExperimentAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeedExperimentAssignmentWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountDeviceTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserDeviceTokenWhereInput
   }
@@ -4996,6 +5378,7 @@ export namespace Prisma {
     comments: number
     shareEvents: number
     shareLinks: number
+    feedImpressions: number
   }
 
   export type SiteCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5006,6 +5389,7 @@ export namespace Prisma {
     comments?: boolean | SiteCountOutputTypeCountCommentsArgs
     shareEvents?: boolean | SiteCountOutputTypeCountShareEventsArgs
     shareLinks?: boolean | SiteCountOutputTypeCountShareLinksArgs
+    feedImpressions?: boolean | SiteCountOutputTypeCountFeedImpressionsArgs
   }
 
   // Custom InputTypes
@@ -5066,6 +5450,13 @@ export namespace Prisma {
    */
   export type SiteCountOutputTypeCountShareLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SiteShareLinkWhereInput
+  }
+
+  /**
+   * SiteCountOutputType without action
+   */
+  export type SiteCountOutputTypeCountFeedImpressionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeedImpressionWhereInput
   }
 
 
@@ -5735,6 +6126,9 @@ export namespace Prisma {
     siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
     siteShareLinks?: boolean | User$siteShareLinksArgs<ExtArgs>
     siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
+    feedState?: boolean | User$feedStateArgs<ExtArgs>
+    feedImpressions?: boolean | User$feedImpressionsArgs<ExtArgs>
+    feedExperimentAssignments?: boolean | User$feedExperimentAssignmentsArgs<ExtArgs>
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
@@ -5850,6 +6244,9 @@ export namespace Prisma {
     siteShareEvents?: boolean | User$siteShareEventsArgs<ExtArgs>
     siteShareLinks?: boolean | User$siteShareLinksArgs<ExtArgs>
     siteCommentLikes?: boolean | User$siteCommentLikesArgs<ExtArgs>
+    feedState?: boolean | User$feedStateArgs<ExtArgs>
+    feedImpressions?: boolean | User$feedImpressionsArgs<ExtArgs>
+    feedExperimentAssignments?: boolean | User$feedExperimentAssignmentsArgs<ExtArgs>
     deviceTokens?: boolean | User$deviceTokensArgs<ExtArgs>
     userNotifications?: boolean | User$userNotificationsArgs<ExtArgs>
     notificationPreferences?: boolean | User$notificationPreferencesArgs<ExtArgs>
@@ -5887,6 +6284,9 @@ export namespace Prisma {
       siteShareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
       siteShareLinks: Prisma.$SiteShareLinkPayload<ExtArgs>[]
       siteCommentLikes: Prisma.$SiteCommentLikePayload<ExtArgs>[]
+      feedState: Prisma.$UserFeedStatePayload<ExtArgs> | null
+      feedImpressions: Prisma.$FeedImpressionPayload<ExtArgs>[]
+      feedExperimentAssignments: Prisma.$FeedExperimentAssignmentPayload<ExtArgs>[]
       deviceTokens: Prisma.$UserDeviceTokenPayload<ExtArgs>[]
       userNotifications: Prisma.$UserNotificationPayload<ExtArgs>[]
       notificationPreferences: Prisma.$UserNotificationPreferencePayload<ExtArgs>[]
@@ -6336,6 +6736,9 @@ export namespace Prisma {
     siteShareEvents<T extends User$siteShareEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$siteShareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     siteShareLinks<T extends User$siteShareLinksArgs<ExtArgs> = {}>(args?: Subset<T, User$siteShareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     siteCommentLikes<T extends User$siteCommentLikesArgs<ExtArgs> = {}>(args?: Subset<T, User$siteCommentLikesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentLikePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    feedState<T extends User$feedStateArgs<ExtArgs> = {}>(args?: Subset<T, User$feedStateArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    feedImpressions<T extends User$feedImpressionsArgs<ExtArgs> = {}>(args?: Subset<T, User$feedImpressionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    feedExperimentAssignments<T extends User$feedExperimentAssignmentsArgs<ExtArgs> = {}>(args?: Subset<T, User$feedExperimentAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     deviceTokens<T extends User$deviceTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$deviceTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserDeviceTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     userNotifications<T extends User$userNotificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$userNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notificationPreferences<T extends User$notificationPreferencesArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationPreferencesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserNotificationPreferencePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7148,6 +7551,73 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SiteCommentLikeScalarFieldEnum | SiteCommentLikeScalarFieldEnum[]
+  }
+
+  /**
+   * User.feedState
+   */
+  export type User$feedStateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    where?: UserFeedStateWhereInput
+  }
+
+  /**
+   * User.feedImpressions
+   */
+  export type User$feedImpressionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    where?: FeedImpressionWhereInput
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    cursor?: FeedImpressionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
+  }
+
+  /**
+   * User.feedExperimentAssignments
+   */
+  export type User$feedExperimentAssignmentsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    where?: FeedExperimentAssignmentWhereInput
+    orderBy?: FeedExperimentAssignmentOrderByWithRelationInput | FeedExperimentAssignmentOrderByWithRelationInput[]
+    cursor?: FeedExperimentAssignmentWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FeedExperimentAssignmentScalarFieldEnum | FeedExperimentAssignmentScalarFieldEnum[]
   }
 
   /**
@@ -16463,6 +16933,8 @@ export namespace Prisma {
     comments?: boolean | Site$commentsArgs<ExtArgs>
     shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
     shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
+    featureSnapshot?: boolean | Site$featureSnapshotArgs<ExtArgs>
+    feedImpressions?: boolean | Site$feedImpressionsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["site"]>
 
@@ -16520,6 +16992,8 @@ export namespace Prisma {
     comments?: boolean | Site$commentsArgs<ExtArgs>
     shareEvents?: boolean | Site$shareEventsArgs<ExtArgs>
     shareLinks?: boolean | Site$shareLinksArgs<ExtArgs>
+    featureSnapshot?: boolean | Site$featureSnapshotArgs<ExtArgs>
+    feedImpressions?: boolean | Site$feedImpressionsArgs<ExtArgs>
     _count?: boolean | SiteCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SiteIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -16535,6 +17009,8 @@ export namespace Prisma {
       comments: Prisma.$SiteCommentPayload<ExtArgs>[]
       shareEvents: Prisma.$SiteShareEventPayload<ExtArgs>[]
       shareLinks: Prisma.$SiteShareLinkPayload<ExtArgs>[]
+      featureSnapshot: Prisma.$SiteFeatureSnapshotPayload<ExtArgs> | null
+      feedImpressions: Prisma.$FeedImpressionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16953,6 +17429,8 @@ export namespace Prisma {
     comments<T extends Site$commentsArgs<ExtArgs> = {}>(args?: Subset<T, Site$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteCommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     shareEvents<T extends Site$shareEventsArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     shareLinks<T extends Site$shareLinksArgs<ExtArgs> = {}>(args?: Subset<T, Site$shareLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteShareLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    featureSnapshot<T extends Site$featureSnapshotArgs<ExtArgs> = {}>(args?: Subset<T, Site$featureSnapshotArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    feedImpressions<T extends Site$feedImpressionsArgs<ExtArgs> = {}>(args?: Subset<T, Site$feedImpressionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17552,6 +18030,49 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SiteShareLinkScalarFieldEnum | SiteShareLinkScalarFieldEnum[]
+  }
+
+  /**
+   * Site.featureSnapshot
+   */
+  export type Site$featureSnapshotArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    where?: SiteFeatureSnapshotWhereInput
+  }
+
+  /**
+   * Site.feedImpressions
+   */
+  export type Site$feedImpressionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    where?: FeedImpressionWhereInput
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    cursor?: FeedImpressionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
   }
 
   /**
@@ -46378,6 +46899,4557 @@ export namespace Prisma {
 
 
   /**
+   * Model UserFeedState
+   */
+
+  export type AggregateUserFeedState = {
+    _count: UserFeedStateCountAggregateOutputType | null
+    _avg: UserFeedStateAvgAggregateOutputType | null
+    _sum: UserFeedStateSumAggregateOutputType | null
+    _min: UserFeedStateMinAggregateOutputType | null
+    _max: UserFeedStateMaxAggregateOutputType | null
+  }
+
+  export type UserFeedStateAvgAggregateOutputType = {
+    recencyDecayFactor: number | null
+  }
+
+  export type UserFeedStateSumAggregateOutputType = {
+    recencyDecayFactor: number | null
+  }
+
+  export type UserFeedStateMinAggregateOutputType = {
+    userId: string | null
+    recencyDecayFactor: number | null
+    lastFeedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserFeedStateMaxAggregateOutputType = {
+    userId: string | null
+    recencyDecayFactor: number | null
+    lastFeedAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserFeedStateCountAggregateOutputType = {
+    userId: number
+    mutedCategoryIds: number
+    hiddenSiteIds: number
+    followReporterIds: number
+    engagementProfile: number
+    recencyDecayFactor: number
+    lastFeedAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type UserFeedStateAvgAggregateInputType = {
+    recencyDecayFactor?: true
+  }
+
+  export type UserFeedStateSumAggregateInputType = {
+    recencyDecayFactor?: true
+  }
+
+  export type UserFeedStateMinAggregateInputType = {
+    userId?: true
+    recencyDecayFactor?: true
+    lastFeedAt?: true
+    updatedAt?: true
+  }
+
+  export type UserFeedStateMaxAggregateInputType = {
+    userId?: true
+    recencyDecayFactor?: true
+    lastFeedAt?: true
+    updatedAt?: true
+  }
+
+  export type UserFeedStateCountAggregateInputType = {
+    userId?: true
+    mutedCategoryIds?: true
+    hiddenSiteIds?: true
+    followReporterIds?: true
+    engagementProfile?: true
+    recencyDecayFactor?: true
+    lastFeedAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type UserFeedStateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserFeedState to aggregate.
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserFeedStates to fetch.
+     */
+    orderBy?: UserFeedStateOrderByWithRelationInput | UserFeedStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserFeedStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserFeedStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserFeedStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserFeedStates
+    **/
+    _count?: true | UserFeedStateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: UserFeedStateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: UserFeedStateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserFeedStateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserFeedStateMaxAggregateInputType
+  }
+
+  export type GetUserFeedStateAggregateType<T extends UserFeedStateAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserFeedState]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserFeedState[P]>
+      : GetScalarType<T[P], AggregateUserFeedState[P]>
+  }
+
+
+
+
+  export type UserFeedStateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserFeedStateWhereInput
+    orderBy?: UserFeedStateOrderByWithAggregationInput | UserFeedStateOrderByWithAggregationInput[]
+    by: UserFeedStateScalarFieldEnum[] | UserFeedStateScalarFieldEnum
+    having?: UserFeedStateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserFeedStateCountAggregateInputType | true
+    _avg?: UserFeedStateAvgAggregateInputType
+    _sum?: UserFeedStateSumAggregateInputType
+    _min?: UserFeedStateMinAggregateInputType
+    _max?: UserFeedStateMaxAggregateInputType
+  }
+
+  export type UserFeedStateGroupByOutputType = {
+    userId: string
+    mutedCategoryIds: string[]
+    hiddenSiteIds: string[]
+    followReporterIds: string[]
+    engagementProfile: JsonValue | null
+    recencyDecayFactor: number
+    lastFeedAt: Date | null
+    updatedAt: Date
+    _count: UserFeedStateCountAggregateOutputType | null
+    _avg: UserFeedStateAvgAggregateOutputType | null
+    _sum: UserFeedStateSumAggregateOutputType | null
+    _min: UserFeedStateMinAggregateOutputType | null
+    _max: UserFeedStateMaxAggregateOutputType | null
+  }
+
+  type GetUserFeedStateGroupByPayload<T extends UserFeedStateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UserFeedStateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserFeedStateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserFeedStateGroupByOutputType[P]>
+            : GetScalarType<T[P], UserFeedStateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserFeedStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    mutedCategoryIds?: boolean
+    hiddenSiteIds?: boolean
+    followReporterIds?: boolean
+    engagementProfile?: boolean
+    recencyDecayFactor?: boolean
+    lastFeedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userFeedState"]>
+
+  export type UserFeedStateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    mutedCategoryIds?: boolean
+    hiddenSiteIds?: boolean
+    followReporterIds?: boolean
+    engagementProfile?: boolean
+    recencyDecayFactor?: boolean
+    lastFeedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userFeedState"]>
+
+  export type UserFeedStateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    mutedCategoryIds?: boolean
+    hiddenSiteIds?: boolean
+    followReporterIds?: boolean
+    engagementProfile?: boolean
+    recencyDecayFactor?: boolean
+    lastFeedAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userFeedState"]>
+
+  export type UserFeedStateSelectScalar = {
+    userId?: boolean
+    mutedCategoryIds?: boolean
+    hiddenSiteIds?: boolean
+    followReporterIds?: boolean
+    engagementProfile?: boolean
+    recencyDecayFactor?: boolean
+    lastFeedAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type UserFeedStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"userId" | "mutedCategoryIds" | "hiddenSiteIds" | "followReporterIds" | "engagementProfile" | "recencyDecayFactor" | "lastFeedAt" | "updatedAt", ExtArgs["result"]["userFeedState"]>
+  export type UserFeedStateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserFeedStateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserFeedStateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $UserFeedStatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserFeedState"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      userId: string
+      mutedCategoryIds: string[]
+      hiddenSiteIds: string[]
+      followReporterIds: string[]
+      engagementProfile: Prisma.JsonValue | null
+      recencyDecayFactor: number
+      lastFeedAt: Date | null
+      updatedAt: Date
+    }, ExtArgs["result"]["userFeedState"]>
+    composites: {}
+  }
+
+  type UserFeedStateGetPayload<S extends boolean | null | undefined | UserFeedStateDefaultArgs> = $Result.GetResult<Prisma.$UserFeedStatePayload, S>
+
+  type UserFeedStateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserFeedStateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserFeedStateCountAggregateInputType | true
+    }
+
+  export interface UserFeedStateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserFeedState'], meta: { name: 'UserFeedState' } }
+    /**
+     * Find zero or one UserFeedState that matches the filter.
+     * @param {UserFeedStateFindUniqueArgs} args - Arguments to find a UserFeedState
+     * @example
+     * // Get one UserFeedState
+     * const userFeedState = await prisma.userFeedState.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UserFeedStateFindUniqueArgs>(args: SelectSubset<T, UserFeedStateFindUniqueArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UserFeedState that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UserFeedStateFindUniqueOrThrowArgs} args - Arguments to find a UserFeedState
+     * @example
+     * // Get one UserFeedState
+     * const userFeedState = await prisma.userFeedState.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UserFeedStateFindUniqueOrThrowArgs>(args: SelectSubset<T, UserFeedStateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserFeedState that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateFindFirstArgs} args - Arguments to find a UserFeedState
+     * @example
+     * // Get one UserFeedState
+     * const userFeedState = await prisma.userFeedState.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UserFeedStateFindFirstArgs>(args?: SelectSubset<T, UserFeedStateFindFirstArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserFeedState that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateFindFirstOrThrowArgs} args - Arguments to find a UserFeedState
+     * @example
+     * // Get one UserFeedState
+     * const userFeedState = await prisma.userFeedState.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UserFeedStateFindFirstOrThrowArgs>(args?: SelectSubset<T, UserFeedStateFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UserFeedStates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserFeedStates
+     * const userFeedStates = await prisma.userFeedState.findMany()
+     * 
+     * // Get first 10 UserFeedStates
+     * const userFeedStates = await prisma.userFeedState.findMany({ take: 10 })
+     * 
+     * // Only select the `userId`
+     * const userFeedStateWithUserIdOnly = await prisma.userFeedState.findMany({ select: { userId: true } })
+     * 
+     */
+    findMany<T extends UserFeedStateFindManyArgs>(args?: SelectSubset<T, UserFeedStateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UserFeedState.
+     * @param {UserFeedStateCreateArgs} args - Arguments to create a UserFeedState.
+     * @example
+     * // Create one UserFeedState
+     * const UserFeedState = await prisma.userFeedState.create({
+     *   data: {
+     *     // ... data to create a UserFeedState
+     *   }
+     * })
+     * 
+     */
+    create<T extends UserFeedStateCreateArgs>(args: SelectSubset<T, UserFeedStateCreateArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UserFeedStates.
+     * @param {UserFeedStateCreateManyArgs} args - Arguments to create many UserFeedStates.
+     * @example
+     * // Create many UserFeedStates
+     * const userFeedState = await prisma.userFeedState.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UserFeedStateCreateManyArgs>(args?: SelectSubset<T, UserFeedStateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many UserFeedStates and returns the data saved in the database.
+     * @param {UserFeedStateCreateManyAndReturnArgs} args - Arguments to create many UserFeedStates.
+     * @example
+     * // Create many UserFeedStates
+     * const userFeedState = await prisma.userFeedState.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many UserFeedStates and only return the `userId`
+     * const userFeedStateWithUserIdOnly = await prisma.userFeedState.createManyAndReturn({
+     *   select: { userId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends UserFeedStateCreateManyAndReturnArgs>(args?: SelectSubset<T, UserFeedStateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a UserFeedState.
+     * @param {UserFeedStateDeleteArgs} args - Arguments to delete one UserFeedState.
+     * @example
+     * // Delete one UserFeedState
+     * const UserFeedState = await prisma.userFeedState.delete({
+     *   where: {
+     *     // ... filter to delete one UserFeedState
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UserFeedStateDeleteArgs>(args: SelectSubset<T, UserFeedStateDeleteArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UserFeedState.
+     * @param {UserFeedStateUpdateArgs} args - Arguments to update one UserFeedState.
+     * @example
+     * // Update one UserFeedState
+     * const userFeedState = await prisma.userFeedState.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UserFeedStateUpdateArgs>(args: SelectSubset<T, UserFeedStateUpdateArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UserFeedStates.
+     * @param {UserFeedStateDeleteManyArgs} args - Arguments to filter UserFeedStates to delete.
+     * @example
+     * // Delete a few UserFeedStates
+     * const { count } = await prisma.userFeedState.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UserFeedStateDeleteManyArgs>(args?: SelectSubset<T, UserFeedStateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserFeedStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserFeedStates
+     * const userFeedState = await prisma.userFeedState.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UserFeedStateUpdateManyArgs>(args: SelectSubset<T, UserFeedStateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserFeedStates and returns the data updated in the database.
+     * @param {UserFeedStateUpdateManyAndReturnArgs} args - Arguments to update many UserFeedStates.
+     * @example
+     * // Update many UserFeedStates
+     * const userFeedState = await prisma.userFeedState.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more UserFeedStates and only return the `userId`
+     * const userFeedStateWithUserIdOnly = await prisma.userFeedState.updateManyAndReturn({
+     *   select: { userId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends UserFeedStateUpdateManyAndReturnArgs>(args: SelectSubset<T, UserFeedStateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one UserFeedState.
+     * @param {UserFeedStateUpsertArgs} args - Arguments to update or create a UserFeedState.
+     * @example
+     * // Update or create a UserFeedState
+     * const userFeedState = await prisma.userFeedState.upsert({
+     *   create: {
+     *     // ... data to create a UserFeedState
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserFeedState we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UserFeedStateUpsertArgs>(args: SelectSubset<T, UserFeedStateUpsertArgs<ExtArgs>>): Prisma__UserFeedStateClient<$Result.GetResult<Prisma.$UserFeedStatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UserFeedStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateCountArgs} args - Arguments to filter UserFeedStates to count.
+     * @example
+     * // Count the number of UserFeedStates
+     * const count = await prisma.userFeedState.count({
+     *   where: {
+     *     // ... the filter for the UserFeedStates we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserFeedStateCountArgs>(
+      args?: Subset<T, UserFeedStateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserFeedStateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserFeedState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserFeedStateAggregateArgs>(args: Subset<T, UserFeedStateAggregateArgs>): Prisma.PrismaPromise<GetUserFeedStateAggregateType<T>>
+
+    /**
+     * Group by UserFeedState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserFeedStateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserFeedStateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserFeedStateGroupByArgs['orderBy'] }
+        : { orderBy?: UserFeedStateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserFeedStateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserFeedStateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UserFeedState model
+   */
+  readonly fields: UserFeedStateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserFeedState.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UserFeedStateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UserFeedState model
+   */
+  interface UserFeedStateFieldRefs {
+    readonly userId: FieldRef<"UserFeedState", 'String'>
+    readonly mutedCategoryIds: FieldRef<"UserFeedState", 'String[]'>
+    readonly hiddenSiteIds: FieldRef<"UserFeedState", 'String[]'>
+    readonly followReporterIds: FieldRef<"UserFeedState", 'String[]'>
+    readonly engagementProfile: FieldRef<"UserFeedState", 'Json'>
+    readonly recencyDecayFactor: FieldRef<"UserFeedState", 'Float'>
+    readonly lastFeedAt: FieldRef<"UserFeedState", 'DateTime'>
+    readonly updatedAt: FieldRef<"UserFeedState", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UserFeedState findUnique
+   */
+  export type UserFeedStateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserFeedState to fetch.
+     */
+    where: UserFeedStateWhereUniqueInput
+  }
+
+  /**
+   * UserFeedState findUniqueOrThrow
+   */
+  export type UserFeedStateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserFeedState to fetch.
+     */
+    where: UserFeedStateWhereUniqueInput
+  }
+
+  /**
+   * UserFeedState findFirst
+   */
+  export type UserFeedStateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserFeedState to fetch.
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserFeedStates to fetch.
+     */
+    orderBy?: UserFeedStateOrderByWithRelationInput | UserFeedStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserFeedStates.
+     */
+    cursor?: UserFeedStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserFeedStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserFeedStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserFeedStates.
+     */
+    distinct?: UserFeedStateScalarFieldEnum | UserFeedStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserFeedState findFirstOrThrow
+   */
+  export type UserFeedStateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserFeedState to fetch.
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserFeedStates to fetch.
+     */
+    orderBy?: UserFeedStateOrderByWithRelationInput | UserFeedStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserFeedStates.
+     */
+    cursor?: UserFeedStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserFeedStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserFeedStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserFeedStates.
+     */
+    distinct?: UserFeedStateScalarFieldEnum | UserFeedStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserFeedState findMany
+   */
+  export type UserFeedStateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserFeedStates to fetch.
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserFeedStates to fetch.
+     */
+    orderBy?: UserFeedStateOrderByWithRelationInput | UserFeedStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserFeedStates.
+     */
+    cursor?: UserFeedStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserFeedStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserFeedStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserFeedStates.
+     */
+    distinct?: UserFeedStateScalarFieldEnum | UserFeedStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserFeedState create
+   */
+  export type UserFeedStateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserFeedState.
+     */
+    data: XOR<UserFeedStateCreateInput, UserFeedStateUncheckedCreateInput>
+  }
+
+  /**
+   * UserFeedState createMany
+   */
+  export type UserFeedStateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserFeedStates.
+     */
+    data: UserFeedStateCreateManyInput | UserFeedStateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UserFeedState createManyAndReturn
+   */
+  export type UserFeedStateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * The data used to create many UserFeedStates.
+     */
+    data: UserFeedStateCreateManyInput | UserFeedStateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserFeedState update
+   */
+  export type UserFeedStateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserFeedState.
+     */
+    data: XOR<UserFeedStateUpdateInput, UserFeedStateUncheckedUpdateInput>
+    /**
+     * Choose, which UserFeedState to update.
+     */
+    where: UserFeedStateWhereUniqueInput
+  }
+
+  /**
+   * UserFeedState updateMany
+   */
+  export type UserFeedStateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserFeedStates.
+     */
+    data: XOR<UserFeedStateUpdateManyMutationInput, UserFeedStateUncheckedUpdateManyInput>
+    /**
+     * Filter which UserFeedStates to update
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * Limit how many UserFeedStates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserFeedState updateManyAndReturn
+   */
+  export type UserFeedStateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * The data used to update UserFeedStates.
+     */
+    data: XOR<UserFeedStateUpdateManyMutationInput, UserFeedStateUncheckedUpdateManyInput>
+    /**
+     * Filter which UserFeedStates to update
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * Limit how many UserFeedStates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserFeedState upsert
+   */
+  export type UserFeedStateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserFeedState to update in case it exists.
+     */
+    where: UserFeedStateWhereUniqueInput
+    /**
+     * In case the UserFeedState found by the `where` argument doesn't exist, create a new UserFeedState with this data.
+     */
+    create: XOR<UserFeedStateCreateInput, UserFeedStateUncheckedCreateInput>
+    /**
+     * In case the UserFeedState was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserFeedStateUpdateInput, UserFeedStateUncheckedUpdateInput>
+  }
+
+  /**
+   * UserFeedState delete
+   */
+  export type UserFeedStateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+    /**
+     * Filter which UserFeedState to delete.
+     */
+    where: UserFeedStateWhereUniqueInput
+  }
+
+  /**
+   * UserFeedState deleteMany
+   */
+  export type UserFeedStateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserFeedStates to delete
+     */
+    where?: UserFeedStateWhereInput
+    /**
+     * Limit how many UserFeedStates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserFeedState without action
+   */
+  export type UserFeedStateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserFeedState
+     */
+    select?: UserFeedStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserFeedState
+     */
+    omit?: UserFeedStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserFeedStateInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SiteFeatureSnapshot
+   */
+
+  export type AggregateSiteFeatureSnapshot = {
+    _count: SiteFeatureSnapshotCountAggregateOutputType | null
+    _avg: SiteFeatureSnapshotAvgAggregateOutputType | null
+    _sum: SiteFeatureSnapshotSumAggregateOutputType | null
+    _min: SiteFeatureSnapshotMinAggregateOutputType | null
+    _max: SiteFeatureSnapshotMaxAggregateOutputType | null
+  }
+
+  export type SiteFeatureSnapshotAvgAggregateOutputType = {
+    velocity1h: number | null
+    velocity6h: number | null
+    velocity24h: number | null
+    discussionRatio: number | null
+    intentRatio: number | null
+    qualityScore: number | null
+    freshnessHours: number | null
+    severityIndex: number | null
+    verifiedAgeDays: number | null
+  }
+
+  export type SiteFeatureSnapshotSumAggregateOutputType = {
+    velocity1h: number | null
+    velocity6h: number | null
+    velocity24h: number | null
+    discussionRatio: number | null
+    intentRatio: number | null
+    qualityScore: number | null
+    freshnessHours: number | null
+    severityIndex: number | null
+    verifiedAgeDays: number | null
+  }
+
+  export type SiteFeatureSnapshotMinAggregateOutputType = {
+    siteId: string | null
+    velocity1h: number | null
+    velocity6h: number | null
+    velocity24h: number | null
+    discussionRatio: number | null
+    intentRatio: number | null
+    qualityScore: number | null
+    freshnessHours: number | null
+    severityIndex: number | null
+    verifiedAgeDays: number | null
+    lastReportAt: Date | null
+    denormHash: string | null
+    updatedAt: Date | null
+  }
+
+  export type SiteFeatureSnapshotMaxAggregateOutputType = {
+    siteId: string | null
+    velocity1h: number | null
+    velocity6h: number | null
+    velocity24h: number | null
+    discussionRatio: number | null
+    intentRatio: number | null
+    qualityScore: number | null
+    freshnessHours: number | null
+    severityIndex: number | null
+    verifiedAgeDays: number | null
+    lastReportAt: Date | null
+    denormHash: string | null
+    updatedAt: Date | null
+  }
+
+  export type SiteFeatureSnapshotCountAggregateOutputType = {
+    siteId: number
+    velocity1h: number
+    velocity6h: number
+    velocity24h: number
+    discussionRatio: number
+    intentRatio: number
+    qualityScore: number
+    freshnessHours: number
+    severityIndex: number
+    verifiedAgeDays: number
+    lastReportAt: number
+    denormHash: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SiteFeatureSnapshotAvgAggregateInputType = {
+    velocity1h?: true
+    velocity6h?: true
+    velocity24h?: true
+    discussionRatio?: true
+    intentRatio?: true
+    qualityScore?: true
+    freshnessHours?: true
+    severityIndex?: true
+    verifiedAgeDays?: true
+  }
+
+  export type SiteFeatureSnapshotSumAggregateInputType = {
+    velocity1h?: true
+    velocity6h?: true
+    velocity24h?: true
+    discussionRatio?: true
+    intentRatio?: true
+    qualityScore?: true
+    freshnessHours?: true
+    severityIndex?: true
+    verifiedAgeDays?: true
+  }
+
+  export type SiteFeatureSnapshotMinAggregateInputType = {
+    siteId?: true
+    velocity1h?: true
+    velocity6h?: true
+    velocity24h?: true
+    discussionRatio?: true
+    intentRatio?: true
+    qualityScore?: true
+    freshnessHours?: true
+    severityIndex?: true
+    verifiedAgeDays?: true
+    lastReportAt?: true
+    denormHash?: true
+    updatedAt?: true
+  }
+
+  export type SiteFeatureSnapshotMaxAggregateInputType = {
+    siteId?: true
+    velocity1h?: true
+    velocity6h?: true
+    velocity24h?: true
+    discussionRatio?: true
+    intentRatio?: true
+    qualityScore?: true
+    freshnessHours?: true
+    severityIndex?: true
+    verifiedAgeDays?: true
+    lastReportAt?: true
+    denormHash?: true
+    updatedAt?: true
+  }
+
+  export type SiteFeatureSnapshotCountAggregateInputType = {
+    siteId?: true
+    velocity1h?: true
+    velocity6h?: true
+    velocity24h?: true
+    discussionRatio?: true
+    intentRatio?: true
+    qualityScore?: true
+    freshnessHours?: true
+    severityIndex?: true
+    verifiedAgeDays?: true
+    lastReportAt?: true
+    denormHash?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SiteFeatureSnapshotAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteFeatureSnapshot to aggregate.
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteFeatureSnapshots to fetch.
+     */
+    orderBy?: SiteFeatureSnapshotOrderByWithRelationInput | SiteFeatureSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SiteFeatureSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteFeatureSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteFeatureSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SiteFeatureSnapshots
+    **/
+    _count?: true | SiteFeatureSnapshotCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SiteFeatureSnapshotAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SiteFeatureSnapshotSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SiteFeatureSnapshotMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SiteFeatureSnapshotMaxAggregateInputType
+  }
+
+  export type GetSiteFeatureSnapshotAggregateType<T extends SiteFeatureSnapshotAggregateArgs> = {
+        [P in keyof T & keyof AggregateSiteFeatureSnapshot]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSiteFeatureSnapshot[P]>
+      : GetScalarType<T[P], AggregateSiteFeatureSnapshot[P]>
+  }
+
+
+
+
+  export type SiteFeatureSnapshotGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SiteFeatureSnapshotWhereInput
+    orderBy?: SiteFeatureSnapshotOrderByWithAggregationInput | SiteFeatureSnapshotOrderByWithAggregationInput[]
+    by: SiteFeatureSnapshotScalarFieldEnum[] | SiteFeatureSnapshotScalarFieldEnum
+    having?: SiteFeatureSnapshotScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SiteFeatureSnapshotCountAggregateInputType | true
+    _avg?: SiteFeatureSnapshotAvgAggregateInputType
+    _sum?: SiteFeatureSnapshotSumAggregateInputType
+    _min?: SiteFeatureSnapshotMinAggregateInputType
+    _max?: SiteFeatureSnapshotMaxAggregateInputType
+  }
+
+  export type SiteFeatureSnapshotGroupByOutputType = {
+    siteId: string
+    velocity1h: number
+    velocity6h: number
+    velocity24h: number
+    discussionRatio: number
+    intentRatio: number
+    qualityScore: number
+    freshnessHours: number
+    severityIndex: number
+    verifiedAgeDays: number
+    lastReportAt: Date | null
+    denormHash: string
+    updatedAt: Date
+    _count: SiteFeatureSnapshotCountAggregateOutputType | null
+    _avg: SiteFeatureSnapshotAvgAggregateOutputType | null
+    _sum: SiteFeatureSnapshotSumAggregateOutputType | null
+    _min: SiteFeatureSnapshotMinAggregateOutputType | null
+    _max: SiteFeatureSnapshotMaxAggregateOutputType | null
+  }
+
+  type GetSiteFeatureSnapshotGroupByPayload<T extends SiteFeatureSnapshotGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SiteFeatureSnapshotGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SiteFeatureSnapshotGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SiteFeatureSnapshotGroupByOutputType[P]>
+            : GetScalarType<T[P], SiteFeatureSnapshotGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SiteFeatureSnapshotSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    velocity1h?: boolean
+    velocity6h?: boolean
+    velocity24h?: boolean
+    discussionRatio?: boolean
+    intentRatio?: boolean
+    qualityScore?: boolean
+    freshnessHours?: boolean
+    severityIndex?: boolean
+    verifiedAgeDays?: boolean
+    lastReportAt?: boolean
+    denormHash?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteFeatureSnapshot"]>
+
+  export type SiteFeatureSnapshotSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    velocity1h?: boolean
+    velocity6h?: boolean
+    velocity24h?: boolean
+    discussionRatio?: boolean
+    intentRatio?: boolean
+    qualityScore?: boolean
+    freshnessHours?: boolean
+    severityIndex?: boolean
+    verifiedAgeDays?: boolean
+    lastReportAt?: boolean
+    denormHash?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteFeatureSnapshot"]>
+
+  export type SiteFeatureSnapshotSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    siteId?: boolean
+    velocity1h?: boolean
+    velocity6h?: boolean
+    velocity24h?: boolean
+    discussionRatio?: boolean
+    intentRatio?: boolean
+    qualityScore?: boolean
+    freshnessHours?: boolean
+    severityIndex?: boolean
+    verifiedAgeDays?: boolean
+    lastReportAt?: boolean
+    denormHash?: boolean
+    updatedAt?: boolean
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["siteFeatureSnapshot"]>
+
+  export type SiteFeatureSnapshotSelectScalar = {
+    siteId?: boolean
+    velocity1h?: boolean
+    velocity6h?: boolean
+    velocity24h?: boolean
+    discussionRatio?: boolean
+    intentRatio?: boolean
+    qualityScore?: boolean
+    freshnessHours?: boolean
+    severityIndex?: boolean
+    verifiedAgeDays?: boolean
+    lastReportAt?: boolean
+    denormHash?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SiteFeatureSnapshotOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"siteId" | "velocity1h" | "velocity6h" | "velocity24h" | "discussionRatio" | "intentRatio" | "qualityScore" | "freshnessHours" | "severityIndex" | "verifiedAgeDays" | "lastReportAt" | "denormHash" | "updatedAt", ExtArgs["result"]["siteFeatureSnapshot"]>
+  export type SiteFeatureSnapshotInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type SiteFeatureSnapshotIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type SiteFeatureSnapshotIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $SiteFeatureSnapshotPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SiteFeatureSnapshot"
+    objects: {
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      siteId: string
+      velocity1h: number
+      velocity6h: number
+      velocity24h: number
+      discussionRatio: number
+      intentRatio: number
+      qualityScore: number
+      freshnessHours: number
+      severityIndex: number
+      verifiedAgeDays: number
+      lastReportAt: Date | null
+      denormHash: string
+      updatedAt: Date
+    }, ExtArgs["result"]["siteFeatureSnapshot"]>
+    composites: {}
+  }
+
+  type SiteFeatureSnapshotGetPayload<S extends boolean | null | undefined | SiteFeatureSnapshotDefaultArgs> = $Result.GetResult<Prisma.$SiteFeatureSnapshotPayload, S>
+
+  type SiteFeatureSnapshotCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SiteFeatureSnapshotFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SiteFeatureSnapshotCountAggregateInputType | true
+    }
+
+  export interface SiteFeatureSnapshotDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SiteFeatureSnapshot'], meta: { name: 'SiteFeatureSnapshot' } }
+    /**
+     * Find zero or one SiteFeatureSnapshot that matches the filter.
+     * @param {SiteFeatureSnapshotFindUniqueArgs} args - Arguments to find a SiteFeatureSnapshot
+     * @example
+     * // Get one SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SiteFeatureSnapshotFindUniqueArgs>(args: SelectSubset<T, SiteFeatureSnapshotFindUniqueArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SiteFeatureSnapshot that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SiteFeatureSnapshotFindUniqueOrThrowArgs} args - Arguments to find a SiteFeatureSnapshot
+     * @example
+     * // Get one SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SiteFeatureSnapshotFindUniqueOrThrowArgs>(args: SelectSubset<T, SiteFeatureSnapshotFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteFeatureSnapshot that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotFindFirstArgs} args - Arguments to find a SiteFeatureSnapshot
+     * @example
+     * // Get one SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SiteFeatureSnapshotFindFirstArgs>(args?: SelectSubset<T, SiteFeatureSnapshotFindFirstArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SiteFeatureSnapshot that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotFindFirstOrThrowArgs} args - Arguments to find a SiteFeatureSnapshot
+     * @example
+     * // Get one SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SiteFeatureSnapshotFindFirstOrThrowArgs>(args?: SelectSubset<T, SiteFeatureSnapshotFindFirstOrThrowArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SiteFeatureSnapshots that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SiteFeatureSnapshots
+     * const siteFeatureSnapshots = await prisma.siteFeatureSnapshot.findMany()
+     * 
+     * // Get first 10 SiteFeatureSnapshots
+     * const siteFeatureSnapshots = await prisma.siteFeatureSnapshot.findMany({ take: 10 })
+     * 
+     * // Only select the `siteId`
+     * const siteFeatureSnapshotWithSiteIdOnly = await prisma.siteFeatureSnapshot.findMany({ select: { siteId: true } })
+     * 
+     */
+    findMany<T extends SiteFeatureSnapshotFindManyArgs>(args?: SelectSubset<T, SiteFeatureSnapshotFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SiteFeatureSnapshot.
+     * @param {SiteFeatureSnapshotCreateArgs} args - Arguments to create a SiteFeatureSnapshot.
+     * @example
+     * // Create one SiteFeatureSnapshot
+     * const SiteFeatureSnapshot = await prisma.siteFeatureSnapshot.create({
+     *   data: {
+     *     // ... data to create a SiteFeatureSnapshot
+     *   }
+     * })
+     * 
+     */
+    create<T extends SiteFeatureSnapshotCreateArgs>(args: SelectSubset<T, SiteFeatureSnapshotCreateArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SiteFeatureSnapshots.
+     * @param {SiteFeatureSnapshotCreateManyArgs} args - Arguments to create many SiteFeatureSnapshots.
+     * @example
+     * // Create many SiteFeatureSnapshots
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SiteFeatureSnapshotCreateManyArgs>(args?: SelectSubset<T, SiteFeatureSnapshotCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SiteFeatureSnapshots and returns the data saved in the database.
+     * @param {SiteFeatureSnapshotCreateManyAndReturnArgs} args - Arguments to create many SiteFeatureSnapshots.
+     * @example
+     * // Create many SiteFeatureSnapshots
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SiteFeatureSnapshots and only return the `siteId`
+     * const siteFeatureSnapshotWithSiteIdOnly = await prisma.siteFeatureSnapshot.createManyAndReturn({
+     *   select: { siteId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SiteFeatureSnapshotCreateManyAndReturnArgs>(args?: SelectSubset<T, SiteFeatureSnapshotCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SiteFeatureSnapshot.
+     * @param {SiteFeatureSnapshotDeleteArgs} args - Arguments to delete one SiteFeatureSnapshot.
+     * @example
+     * // Delete one SiteFeatureSnapshot
+     * const SiteFeatureSnapshot = await prisma.siteFeatureSnapshot.delete({
+     *   where: {
+     *     // ... filter to delete one SiteFeatureSnapshot
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SiteFeatureSnapshotDeleteArgs>(args: SelectSubset<T, SiteFeatureSnapshotDeleteArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SiteFeatureSnapshot.
+     * @param {SiteFeatureSnapshotUpdateArgs} args - Arguments to update one SiteFeatureSnapshot.
+     * @example
+     * // Update one SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SiteFeatureSnapshotUpdateArgs>(args: SelectSubset<T, SiteFeatureSnapshotUpdateArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SiteFeatureSnapshots.
+     * @param {SiteFeatureSnapshotDeleteManyArgs} args - Arguments to filter SiteFeatureSnapshots to delete.
+     * @example
+     * // Delete a few SiteFeatureSnapshots
+     * const { count } = await prisma.siteFeatureSnapshot.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SiteFeatureSnapshotDeleteManyArgs>(args?: SelectSubset<T, SiteFeatureSnapshotDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteFeatureSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SiteFeatureSnapshots
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SiteFeatureSnapshotUpdateManyArgs>(args: SelectSubset<T, SiteFeatureSnapshotUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SiteFeatureSnapshots and returns the data updated in the database.
+     * @param {SiteFeatureSnapshotUpdateManyAndReturnArgs} args - Arguments to update many SiteFeatureSnapshots.
+     * @example
+     * // Update many SiteFeatureSnapshots
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SiteFeatureSnapshots and only return the `siteId`
+     * const siteFeatureSnapshotWithSiteIdOnly = await prisma.siteFeatureSnapshot.updateManyAndReturn({
+     *   select: { siteId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SiteFeatureSnapshotUpdateManyAndReturnArgs>(args: SelectSubset<T, SiteFeatureSnapshotUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SiteFeatureSnapshot.
+     * @param {SiteFeatureSnapshotUpsertArgs} args - Arguments to update or create a SiteFeatureSnapshot.
+     * @example
+     * // Update or create a SiteFeatureSnapshot
+     * const siteFeatureSnapshot = await prisma.siteFeatureSnapshot.upsert({
+     *   create: {
+     *     // ... data to create a SiteFeatureSnapshot
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SiteFeatureSnapshot we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SiteFeatureSnapshotUpsertArgs>(args: SelectSubset<T, SiteFeatureSnapshotUpsertArgs<ExtArgs>>): Prisma__SiteFeatureSnapshotClient<$Result.GetResult<Prisma.$SiteFeatureSnapshotPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SiteFeatureSnapshots.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotCountArgs} args - Arguments to filter SiteFeatureSnapshots to count.
+     * @example
+     * // Count the number of SiteFeatureSnapshots
+     * const count = await prisma.siteFeatureSnapshot.count({
+     *   where: {
+     *     // ... the filter for the SiteFeatureSnapshots we want to count
+     *   }
+     * })
+    **/
+    count<T extends SiteFeatureSnapshotCountArgs>(
+      args?: Subset<T, SiteFeatureSnapshotCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SiteFeatureSnapshotCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SiteFeatureSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SiteFeatureSnapshotAggregateArgs>(args: Subset<T, SiteFeatureSnapshotAggregateArgs>): Prisma.PrismaPromise<GetSiteFeatureSnapshotAggregateType<T>>
+
+    /**
+     * Group by SiteFeatureSnapshot.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SiteFeatureSnapshotGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SiteFeatureSnapshotGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SiteFeatureSnapshotGroupByArgs['orderBy'] }
+        : { orderBy?: SiteFeatureSnapshotGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SiteFeatureSnapshotGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSiteFeatureSnapshotGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SiteFeatureSnapshot model
+   */
+  readonly fields: SiteFeatureSnapshotFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SiteFeatureSnapshot.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SiteFeatureSnapshotClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SiteFeatureSnapshot model
+   */
+  interface SiteFeatureSnapshotFieldRefs {
+    readonly siteId: FieldRef<"SiteFeatureSnapshot", 'String'>
+    readonly velocity1h: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly velocity6h: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly velocity24h: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly discussionRatio: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly intentRatio: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly qualityScore: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly freshnessHours: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly severityIndex: FieldRef<"SiteFeatureSnapshot", 'Float'>
+    readonly verifiedAgeDays: FieldRef<"SiteFeatureSnapshot", 'Int'>
+    readonly lastReportAt: FieldRef<"SiteFeatureSnapshot", 'DateTime'>
+    readonly denormHash: FieldRef<"SiteFeatureSnapshot", 'String'>
+    readonly updatedAt: FieldRef<"SiteFeatureSnapshot", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SiteFeatureSnapshot findUnique
+   */
+  export type SiteFeatureSnapshotFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteFeatureSnapshot to fetch.
+     */
+    where: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SiteFeatureSnapshot findUniqueOrThrow
+   */
+  export type SiteFeatureSnapshotFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteFeatureSnapshot to fetch.
+     */
+    where: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SiteFeatureSnapshot findFirst
+   */
+  export type SiteFeatureSnapshotFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteFeatureSnapshot to fetch.
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteFeatureSnapshots to fetch.
+     */
+    orderBy?: SiteFeatureSnapshotOrderByWithRelationInput | SiteFeatureSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteFeatureSnapshots.
+     */
+    cursor?: SiteFeatureSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteFeatureSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteFeatureSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteFeatureSnapshots.
+     */
+    distinct?: SiteFeatureSnapshotScalarFieldEnum | SiteFeatureSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SiteFeatureSnapshot findFirstOrThrow
+   */
+  export type SiteFeatureSnapshotFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteFeatureSnapshot to fetch.
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteFeatureSnapshots to fetch.
+     */
+    orderBy?: SiteFeatureSnapshotOrderByWithRelationInput | SiteFeatureSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SiteFeatureSnapshots.
+     */
+    cursor?: SiteFeatureSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteFeatureSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteFeatureSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteFeatureSnapshots.
+     */
+    distinct?: SiteFeatureSnapshotScalarFieldEnum | SiteFeatureSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SiteFeatureSnapshot findMany
+   */
+  export type SiteFeatureSnapshotFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter, which SiteFeatureSnapshots to fetch.
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SiteFeatureSnapshots to fetch.
+     */
+    orderBy?: SiteFeatureSnapshotOrderByWithRelationInput | SiteFeatureSnapshotOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SiteFeatureSnapshots.
+     */
+    cursor?: SiteFeatureSnapshotWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SiteFeatureSnapshots from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SiteFeatureSnapshots.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SiteFeatureSnapshots.
+     */
+    distinct?: SiteFeatureSnapshotScalarFieldEnum | SiteFeatureSnapshotScalarFieldEnum[]
+  }
+
+  /**
+   * SiteFeatureSnapshot create
+   */
+  export type SiteFeatureSnapshotCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SiteFeatureSnapshot.
+     */
+    data: XOR<SiteFeatureSnapshotCreateInput, SiteFeatureSnapshotUncheckedCreateInput>
+  }
+
+  /**
+   * SiteFeatureSnapshot createMany
+   */
+  export type SiteFeatureSnapshotCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SiteFeatureSnapshots.
+     */
+    data: SiteFeatureSnapshotCreateManyInput | SiteFeatureSnapshotCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SiteFeatureSnapshot createManyAndReturn
+   */
+  export type SiteFeatureSnapshotCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to create many SiteFeatureSnapshots.
+     */
+    data: SiteFeatureSnapshotCreateManyInput | SiteFeatureSnapshotCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteFeatureSnapshot update
+   */
+  export type SiteFeatureSnapshotUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SiteFeatureSnapshot.
+     */
+    data: XOR<SiteFeatureSnapshotUpdateInput, SiteFeatureSnapshotUncheckedUpdateInput>
+    /**
+     * Choose, which SiteFeatureSnapshot to update.
+     */
+    where: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SiteFeatureSnapshot updateMany
+   */
+  export type SiteFeatureSnapshotUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SiteFeatureSnapshots.
+     */
+    data: XOR<SiteFeatureSnapshotUpdateManyMutationInput, SiteFeatureSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteFeatureSnapshots to update
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * Limit how many SiteFeatureSnapshots to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteFeatureSnapshot updateManyAndReturn
+   */
+  export type SiteFeatureSnapshotUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * The data used to update SiteFeatureSnapshots.
+     */
+    data: XOR<SiteFeatureSnapshotUpdateManyMutationInput, SiteFeatureSnapshotUncheckedUpdateManyInput>
+    /**
+     * Filter which SiteFeatureSnapshots to update
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * Limit how many SiteFeatureSnapshots to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SiteFeatureSnapshot upsert
+   */
+  export type SiteFeatureSnapshotUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SiteFeatureSnapshot to update in case it exists.
+     */
+    where: SiteFeatureSnapshotWhereUniqueInput
+    /**
+     * In case the SiteFeatureSnapshot found by the `where` argument doesn't exist, create a new SiteFeatureSnapshot with this data.
+     */
+    create: XOR<SiteFeatureSnapshotCreateInput, SiteFeatureSnapshotUncheckedCreateInput>
+    /**
+     * In case the SiteFeatureSnapshot was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SiteFeatureSnapshotUpdateInput, SiteFeatureSnapshotUncheckedUpdateInput>
+  }
+
+  /**
+   * SiteFeatureSnapshot delete
+   */
+  export type SiteFeatureSnapshotDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+    /**
+     * Filter which SiteFeatureSnapshot to delete.
+     */
+    where: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  /**
+   * SiteFeatureSnapshot deleteMany
+   */
+  export type SiteFeatureSnapshotDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SiteFeatureSnapshots to delete
+     */
+    where?: SiteFeatureSnapshotWhereInput
+    /**
+     * Limit how many SiteFeatureSnapshots to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SiteFeatureSnapshot without action
+   */
+  export type SiteFeatureSnapshotDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SiteFeatureSnapshot
+     */
+    select?: SiteFeatureSnapshotSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SiteFeatureSnapshot
+     */
+    omit?: SiteFeatureSnapshotOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SiteFeatureSnapshotInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FeedImpression
+   */
+
+  export type AggregateFeedImpression = {
+    _count: FeedImpressionCountAggregateOutputType | null
+    _avg: FeedImpressionAvgAggregateOutputType | null
+    _sum: FeedImpressionSumAggregateOutputType | null
+    _min: FeedImpressionMinAggregateOutputType | null
+    _max: FeedImpressionMaxAggregateOutputType | null
+  }
+
+  export type FeedImpressionAvgAggregateOutputType = {
+    position: number | null
+    dwellMs: number | null
+  }
+
+  export type FeedImpressionSumAggregateOutputType = {
+    position: number | null
+    dwellMs: number | null
+  }
+
+  export type FeedImpressionMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    userId: string | null
+    siteId: string | null
+    variant: string | null
+    position: number | null
+    dwellMs: number | null
+    engaged: boolean | null
+  }
+
+  export type FeedImpressionMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    userId: string | null
+    siteId: string | null
+    variant: string | null
+    position: number | null
+    dwellMs: number | null
+    engaged: boolean | null
+  }
+
+  export type FeedImpressionCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    userId: number
+    siteId: number
+    variant: number
+    position: number
+    dwellMs: number
+    engaged: number
+    _all: number
+  }
+
+
+  export type FeedImpressionAvgAggregateInputType = {
+    position?: true
+    dwellMs?: true
+  }
+
+  export type FeedImpressionSumAggregateInputType = {
+    position?: true
+    dwellMs?: true
+  }
+
+  export type FeedImpressionMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    siteId?: true
+    variant?: true
+    position?: true
+    dwellMs?: true
+    engaged?: true
+  }
+
+  export type FeedImpressionMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    siteId?: true
+    variant?: true
+    position?: true
+    dwellMs?: true
+    engaged?: true
+  }
+
+  export type FeedImpressionCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    userId?: true
+    siteId?: true
+    variant?: true
+    position?: true
+    dwellMs?: true
+    engaged?: true
+    _all?: true
+  }
+
+  export type FeedImpressionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeedImpression to aggregate.
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedImpressions to fetch.
+     */
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FeedImpressionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedImpressions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedImpressions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FeedImpressions
+    **/
+    _count?: true | FeedImpressionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FeedImpressionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FeedImpressionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FeedImpressionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FeedImpressionMaxAggregateInputType
+  }
+
+  export type GetFeedImpressionAggregateType<T extends FeedImpressionAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeedImpression]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFeedImpression[P]>
+      : GetScalarType<T[P], AggregateFeedImpression[P]>
+  }
+
+
+
+
+  export type FeedImpressionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeedImpressionWhereInput
+    orderBy?: FeedImpressionOrderByWithAggregationInput | FeedImpressionOrderByWithAggregationInput[]
+    by: FeedImpressionScalarFieldEnum[] | FeedImpressionScalarFieldEnum
+    having?: FeedImpressionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FeedImpressionCountAggregateInputType | true
+    _avg?: FeedImpressionAvgAggregateInputType
+    _sum?: FeedImpressionSumAggregateInputType
+    _min?: FeedImpressionMinAggregateInputType
+    _max?: FeedImpressionMaxAggregateInputType
+  }
+
+  export type FeedImpressionGroupByOutputType = {
+    id: string
+    createdAt: Date
+    userId: string
+    siteId: string
+    variant: string
+    position: number | null
+    dwellMs: number | null
+    engaged: boolean
+    _count: FeedImpressionCountAggregateOutputType | null
+    _avg: FeedImpressionAvgAggregateOutputType | null
+    _sum: FeedImpressionSumAggregateOutputType | null
+    _min: FeedImpressionMinAggregateOutputType | null
+    _max: FeedImpressionMaxAggregateOutputType | null
+  }
+
+  type GetFeedImpressionGroupByPayload<T extends FeedImpressionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FeedImpressionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FeedImpressionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FeedImpressionGroupByOutputType[P]>
+            : GetScalarType<T[P], FeedImpressionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FeedImpressionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    siteId?: boolean
+    variant?: boolean
+    position?: boolean
+    dwellMs?: boolean
+    engaged?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedImpression"]>
+
+  export type FeedImpressionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    siteId?: boolean
+    variant?: boolean
+    position?: boolean
+    dwellMs?: boolean
+    engaged?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedImpression"]>
+
+  export type FeedImpressionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    siteId?: boolean
+    variant?: boolean
+    position?: boolean
+    dwellMs?: boolean
+    engaged?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedImpression"]>
+
+  export type FeedImpressionSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    siteId?: boolean
+    variant?: boolean
+    position?: boolean
+    dwellMs?: boolean
+    engaged?: boolean
+  }
+
+  export type FeedImpressionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "userId" | "siteId" | "variant" | "position" | "dwellMs" | "engaged", ExtArgs["result"]["feedImpression"]>
+  export type FeedImpressionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type FeedImpressionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+  export type FeedImpressionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    site?: boolean | SiteDefaultArgs<ExtArgs>
+  }
+
+  export type $FeedImpressionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FeedImpression"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      site: Prisma.$SitePayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      userId: string
+      siteId: string
+      variant: string
+      position: number | null
+      dwellMs: number | null
+      engaged: boolean
+    }, ExtArgs["result"]["feedImpression"]>
+    composites: {}
+  }
+
+  type FeedImpressionGetPayload<S extends boolean | null | undefined | FeedImpressionDefaultArgs> = $Result.GetResult<Prisma.$FeedImpressionPayload, S>
+
+  type FeedImpressionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FeedImpressionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FeedImpressionCountAggregateInputType | true
+    }
+
+  export interface FeedImpressionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeedImpression'], meta: { name: 'FeedImpression' } }
+    /**
+     * Find zero or one FeedImpression that matches the filter.
+     * @param {FeedImpressionFindUniqueArgs} args - Arguments to find a FeedImpression
+     * @example
+     * // Get one FeedImpression
+     * const feedImpression = await prisma.feedImpression.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FeedImpressionFindUniqueArgs>(args: SelectSubset<T, FeedImpressionFindUniqueArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FeedImpression that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FeedImpressionFindUniqueOrThrowArgs} args - Arguments to find a FeedImpression
+     * @example
+     * // Get one FeedImpression
+     * const feedImpression = await prisma.feedImpression.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FeedImpressionFindUniqueOrThrowArgs>(args: SelectSubset<T, FeedImpressionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeedImpression that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionFindFirstArgs} args - Arguments to find a FeedImpression
+     * @example
+     * // Get one FeedImpression
+     * const feedImpression = await prisma.feedImpression.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FeedImpressionFindFirstArgs>(args?: SelectSubset<T, FeedImpressionFindFirstArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeedImpression that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionFindFirstOrThrowArgs} args - Arguments to find a FeedImpression
+     * @example
+     * // Get one FeedImpression
+     * const feedImpression = await prisma.feedImpression.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FeedImpressionFindFirstOrThrowArgs>(args?: SelectSubset<T, FeedImpressionFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FeedImpressions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FeedImpressions
+     * const feedImpressions = await prisma.feedImpression.findMany()
+     * 
+     * // Get first 10 FeedImpressions
+     * const feedImpressions = await prisma.feedImpression.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const feedImpressionWithIdOnly = await prisma.feedImpression.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FeedImpressionFindManyArgs>(args?: SelectSubset<T, FeedImpressionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FeedImpression.
+     * @param {FeedImpressionCreateArgs} args - Arguments to create a FeedImpression.
+     * @example
+     * // Create one FeedImpression
+     * const FeedImpression = await prisma.feedImpression.create({
+     *   data: {
+     *     // ... data to create a FeedImpression
+     *   }
+     * })
+     * 
+     */
+    create<T extends FeedImpressionCreateArgs>(args: SelectSubset<T, FeedImpressionCreateArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FeedImpressions.
+     * @param {FeedImpressionCreateManyArgs} args - Arguments to create many FeedImpressions.
+     * @example
+     * // Create many FeedImpressions
+     * const feedImpression = await prisma.feedImpression.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FeedImpressionCreateManyArgs>(args?: SelectSubset<T, FeedImpressionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FeedImpressions and returns the data saved in the database.
+     * @param {FeedImpressionCreateManyAndReturnArgs} args - Arguments to create many FeedImpressions.
+     * @example
+     * // Create many FeedImpressions
+     * const feedImpression = await prisma.feedImpression.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FeedImpressions and only return the `id`
+     * const feedImpressionWithIdOnly = await prisma.feedImpression.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FeedImpressionCreateManyAndReturnArgs>(args?: SelectSubset<T, FeedImpressionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FeedImpression.
+     * @param {FeedImpressionDeleteArgs} args - Arguments to delete one FeedImpression.
+     * @example
+     * // Delete one FeedImpression
+     * const FeedImpression = await prisma.feedImpression.delete({
+     *   where: {
+     *     // ... filter to delete one FeedImpression
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FeedImpressionDeleteArgs>(args: SelectSubset<T, FeedImpressionDeleteArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FeedImpression.
+     * @param {FeedImpressionUpdateArgs} args - Arguments to update one FeedImpression.
+     * @example
+     * // Update one FeedImpression
+     * const feedImpression = await prisma.feedImpression.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FeedImpressionUpdateArgs>(args: SelectSubset<T, FeedImpressionUpdateArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FeedImpressions.
+     * @param {FeedImpressionDeleteManyArgs} args - Arguments to filter FeedImpressions to delete.
+     * @example
+     * // Delete a few FeedImpressions
+     * const { count } = await prisma.feedImpression.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FeedImpressionDeleteManyArgs>(args?: SelectSubset<T, FeedImpressionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeedImpressions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FeedImpressions
+     * const feedImpression = await prisma.feedImpression.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FeedImpressionUpdateManyArgs>(args: SelectSubset<T, FeedImpressionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeedImpressions and returns the data updated in the database.
+     * @param {FeedImpressionUpdateManyAndReturnArgs} args - Arguments to update many FeedImpressions.
+     * @example
+     * // Update many FeedImpressions
+     * const feedImpression = await prisma.feedImpression.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FeedImpressions and only return the `id`
+     * const feedImpressionWithIdOnly = await prisma.feedImpression.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FeedImpressionUpdateManyAndReturnArgs>(args: SelectSubset<T, FeedImpressionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FeedImpression.
+     * @param {FeedImpressionUpsertArgs} args - Arguments to update or create a FeedImpression.
+     * @example
+     * // Update or create a FeedImpression
+     * const feedImpression = await prisma.feedImpression.upsert({
+     *   create: {
+     *     // ... data to create a FeedImpression
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FeedImpression we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FeedImpressionUpsertArgs>(args: SelectSubset<T, FeedImpressionUpsertArgs<ExtArgs>>): Prisma__FeedImpressionClient<$Result.GetResult<Prisma.$FeedImpressionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FeedImpressions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionCountArgs} args - Arguments to filter FeedImpressions to count.
+     * @example
+     * // Count the number of FeedImpressions
+     * const count = await prisma.feedImpression.count({
+     *   where: {
+     *     // ... the filter for the FeedImpressions we want to count
+     *   }
+     * })
+    **/
+    count<T extends FeedImpressionCountArgs>(
+      args?: Subset<T, FeedImpressionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FeedImpressionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FeedImpression.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FeedImpressionAggregateArgs>(args: Subset<T, FeedImpressionAggregateArgs>): Prisma.PrismaPromise<GetFeedImpressionAggregateType<T>>
+
+    /**
+     * Group by FeedImpression.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedImpressionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FeedImpressionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FeedImpressionGroupByArgs['orderBy'] }
+        : { orderBy?: FeedImpressionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FeedImpressionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeedImpressionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FeedImpression model
+   */
+  readonly fields: FeedImpressionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FeedImpression.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FeedImpressionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    site<T extends SiteDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SiteDefaultArgs<ExtArgs>>): Prisma__SiteClient<$Result.GetResult<Prisma.$SitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FeedImpression model
+   */
+  interface FeedImpressionFieldRefs {
+    readonly id: FieldRef<"FeedImpression", 'String'>
+    readonly createdAt: FieldRef<"FeedImpression", 'DateTime'>
+    readonly userId: FieldRef<"FeedImpression", 'String'>
+    readonly siteId: FieldRef<"FeedImpression", 'String'>
+    readonly variant: FieldRef<"FeedImpression", 'String'>
+    readonly position: FieldRef<"FeedImpression", 'Int'>
+    readonly dwellMs: FieldRef<"FeedImpression", 'Int'>
+    readonly engaged: FieldRef<"FeedImpression", 'Boolean'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FeedImpression findUnique
+   */
+  export type FeedImpressionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedImpression to fetch.
+     */
+    where: FeedImpressionWhereUniqueInput
+  }
+
+  /**
+   * FeedImpression findUniqueOrThrow
+   */
+  export type FeedImpressionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedImpression to fetch.
+     */
+    where: FeedImpressionWhereUniqueInput
+  }
+
+  /**
+   * FeedImpression findFirst
+   */
+  export type FeedImpressionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedImpression to fetch.
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedImpressions to fetch.
+     */
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeedImpressions.
+     */
+    cursor?: FeedImpressionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedImpressions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedImpressions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedImpressions.
+     */
+    distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
+  }
+
+  /**
+   * FeedImpression findFirstOrThrow
+   */
+  export type FeedImpressionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedImpression to fetch.
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedImpressions to fetch.
+     */
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeedImpressions.
+     */
+    cursor?: FeedImpressionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedImpressions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedImpressions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedImpressions.
+     */
+    distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
+  }
+
+  /**
+   * FeedImpression findMany
+   */
+  export type FeedImpressionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedImpressions to fetch.
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedImpressions to fetch.
+     */
+    orderBy?: FeedImpressionOrderByWithRelationInput | FeedImpressionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FeedImpressions.
+     */
+    cursor?: FeedImpressionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedImpressions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedImpressions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedImpressions.
+     */
+    distinct?: FeedImpressionScalarFieldEnum | FeedImpressionScalarFieldEnum[]
+  }
+
+  /**
+   * FeedImpression create
+   */
+  export type FeedImpressionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FeedImpression.
+     */
+    data: XOR<FeedImpressionCreateInput, FeedImpressionUncheckedCreateInput>
+  }
+
+  /**
+   * FeedImpression createMany
+   */
+  export type FeedImpressionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FeedImpressions.
+     */
+    data: FeedImpressionCreateManyInput | FeedImpressionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeedImpression createManyAndReturn
+   */
+  export type FeedImpressionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * The data used to create many FeedImpressions.
+     */
+    data: FeedImpressionCreateManyInput | FeedImpressionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FeedImpression update
+   */
+  export type FeedImpressionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FeedImpression.
+     */
+    data: XOR<FeedImpressionUpdateInput, FeedImpressionUncheckedUpdateInput>
+    /**
+     * Choose, which FeedImpression to update.
+     */
+    where: FeedImpressionWhereUniqueInput
+  }
+
+  /**
+   * FeedImpression updateMany
+   */
+  export type FeedImpressionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FeedImpressions.
+     */
+    data: XOR<FeedImpressionUpdateManyMutationInput, FeedImpressionUncheckedUpdateManyInput>
+    /**
+     * Filter which FeedImpressions to update
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * Limit how many FeedImpressions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeedImpression updateManyAndReturn
+   */
+  export type FeedImpressionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * The data used to update FeedImpressions.
+     */
+    data: XOR<FeedImpressionUpdateManyMutationInput, FeedImpressionUncheckedUpdateManyInput>
+    /**
+     * Filter which FeedImpressions to update
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * Limit how many FeedImpressions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FeedImpression upsert
+   */
+  export type FeedImpressionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FeedImpression to update in case it exists.
+     */
+    where: FeedImpressionWhereUniqueInput
+    /**
+     * In case the FeedImpression found by the `where` argument doesn't exist, create a new FeedImpression with this data.
+     */
+    create: XOR<FeedImpressionCreateInput, FeedImpressionUncheckedCreateInput>
+    /**
+     * In case the FeedImpression was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FeedImpressionUpdateInput, FeedImpressionUncheckedUpdateInput>
+  }
+
+  /**
+   * FeedImpression delete
+   */
+  export type FeedImpressionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+    /**
+     * Filter which FeedImpression to delete.
+     */
+    where: FeedImpressionWhereUniqueInput
+  }
+
+  /**
+   * FeedImpression deleteMany
+   */
+  export type FeedImpressionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeedImpressions to delete
+     */
+    where?: FeedImpressionWhereInput
+    /**
+     * Limit how many FeedImpressions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeedImpression without action
+   */
+  export type FeedImpressionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedImpression
+     */
+    select?: FeedImpressionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedImpression
+     */
+    omit?: FeedImpressionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedImpressionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FeedExperimentAssignment
+   */
+
+  export type AggregateFeedExperimentAssignment = {
+    _count: FeedExperimentAssignmentCountAggregateOutputType | null
+    _min: FeedExperimentAssignmentMinAggregateOutputType | null
+    _max: FeedExperimentAssignmentMaxAggregateOutputType | null
+  }
+
+  export type FeedExperimentAssignmentMinAggregateOutputType = {
+    userId: string | null
+    experimentKey: string | null
+    variant: string | null
+    assignedAt: Date | null
+  }
+
+  export type FeedExperimentAssignmentMaxAggregateOutputType = {
+    userId: string | null
+    experimentKey: string | null
+    variant: string | null
+    assignedAt: Date | null
+  }
+
+  export type FeedExperimentAssignmentCountAggregateOutputType = {
+    userId: number
+    experimentKey: number
+    variant: number
+    assignedAt: number
+    _all: number
+  }
+
+
+  export type FeedExperimentAssignmentMinAggregateInputType = {
+    userId?: true
+    experimentKey?: true
+    variant?: true
+    assignedAt?: true
+  }
+
+  export type FeedExperimentAssignmentMaxAggregateInputType = {
+    userId?: true
+    experimentKey?: true
+    variant?: true
+    assignedAt?: true
+  }
+
+  export type FeedExperimentAssignmentCountAggregateInputType = {
+    userId?: true
+    experimentKey?: true
+    variant?: true
+    assignedAt?: true
+    _all?: true
+  }
+
+  export type FeedExperimentAssignmentAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeedExperimentAssignment to aggregate.
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedExperimentAssignments to fetch.
+     */
+    orderBy?: FeedExperimentAssignmentOrderByWithRelationInput | FeedExperimentAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FeedExperimentAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedExperimentAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedExperimentAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FeedExperimentAssignments
+    **/
+    _count?: true | FeedExperimentAssignmentCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FeedExperimentAssignmentMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FeedExperimentAssignmentMaxAggregateInputType
+  }
+
+  export type GetFeedExperimentAssignmentAggregateType<T extends FeedExperimentAssignmentAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeedExperimentAssignment]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFeedExperimentAssignment[P]>
+      : GetScalarType<T[P], AggregateFeedExperimentAssignment[P]>
+  }
+
+
+
+
+  export type FeedExperimentAssignmentGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeedExperimentAssignmentWhereInput
+    orderBy?: FeedExperimentAssignmentOrderByWithAggregationInput | FeedExperimentAssignmentOrderByWithAggregationInput[]
+    by: FeedExperimentAssignmentScalarFieldEnum[] | FeedExperimentAssignmentScalarFieldEnum
+    having?: FeedExperimentAssignmentScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FeedExperimentAssignmentCountAggregateInputType | true
+    _min?: FeedExperimentAssignmentMinAggregateInputType
+    _max?: FeedExperimentAssignmentMaxAggregateInputType
+  }
+
+  export type FeedExperimentAssignmentGroupByOutputType = {
+    userId: string
+    experimentKey: string
+    variant: string
+    assignedAt: Date
+    _count: FeedExperimentAssignmentCountAggregateOutputType | null
+    _min: FeedExperimentAssignmentMinAggregateOutputType | null
+    _max: FeedExperimentAssignmentMaxAggregateOutputType | null
+  }
+
+  type GetFeedExperimentAssignmentGroupByPayload<T extends FeedExperimentAssignmentGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FeedExperimentAssignmentGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FeedExperimentAssignmentGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FeedExperimentAssignmentGroupByOutputType[P]>
+            : GetScalarType<T[P], FeedExperimentAssignmentGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FeedExperimentAssignmentSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    experimentKey?: boolean
+    variant?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedExperimentAssignment"]>
+
+  export type FeedExperimentAssignmentSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    experimentKey?: boolean
+    variant?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedExperimentAssignment"]>
+
+  export type FeedExperimentAssignmentSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    userId?: boolean
+    experimentKey?: boolean
+    variant?: boolean
+    assignedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["feedExperimentAssignment"]>
+
+  export type FeedExperimentAssignmentSelectScalar = {
+    userId?: boolean
+    experimentKey?: boolean
+    variant?: boolean
+    assignedAt?: boolean
+  }
+
+  export type FeedExperimentAssignmentOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"userId" | "experimentKey" | "variant" | "assignedAt", ExtArgs["result"]["feedExperimentAssignment"]>
+  export type FeedExperimentAssignmentInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FeedExperimentAssignmentIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FeedExperimentAssignmentIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FeedExperimentAssignmentPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FeedExperimentAssignment"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      userId: string
+      experimentKey: string
+      variant: string
+      assignedAt: Date
+    }, ExtArgs["result"]["feedExperimentAssignment"]>
+    composites: {}
+  }
+
+  type FeedExperimentAssignmentGetPayload<S extends boolean | null | undefined | FeedExperimentAssignmentDefaultArgs> = $Result.GetResult<Prisma.$FeedExperimentAssignmentPayload, S>
+
+  type FeedExperimentAssignmentCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FeedExperimentAssignmentFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FeedExperimentAssignmentCountAggregateInputType | true
+    }
+
+  export interface FeedExperimentAssignmentDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeedExperimentAssignment'], meta: { name: 'FeedExperimentAssignment' } }
+    /**
+     * Find zero or one FeedExperimentAssignment that matches the filter.
+     * @param {FeedExperimentAssignmentFindUniqueArgs} args - Arguments to find a FeedExperimentAssignment
+     * @example
+     * // Get one FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FeedExperimentAssignmentFindUniqueArgs>(args: SelectSubset<T, FeedExperimentAssignmentFindUniqueArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FeedExperimentAssignment that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FeedExperimentAssignmentFindUniqueOrThrowArgs} args - Arguments to find a FeedExperimentAssignment
+     * @example
+     * // Get one FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FeedExperimentAssignmentFindUniqueOrThrowArgs>(args: SelectSubset<T, FeedExperimentAssignmentFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeedExperimentAssignment that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentFindFirstArgs} args - Arguments to find a FeedExperimentAssignment
+     * @example
+     * // Get one FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FeedExperimentAssignmentFindFirstArgs>(args?: SelectSubset<T, FeedExperimentAssignmentFindFirstArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeedExperimentAssignment that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentFindFirstOrThrowArgs} args - Arguments to find a FeedExperimentAssignment
+     * @example
+     * // Get one FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FeedExperimentAssignmentFindFirstOrThrowArgs>(args?: SelectSubset<T, FeedExperimentAssignmentFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FeedExperimentAssignments that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FeedExperimentAssignments
+     * const feedExperimentAssignments = await prisma.feedExperimentAssignment.findMany()
+     * 
+     * // Get first 10 FeedExperimentAssignments
+     * const feedExperimentAssignments = await prisma.feedExperimentAssignment.findMany({ take: 10 })
+     * 
+     * // Only select the `userId`
+     * const feedExperimentAssignmentWithUserIdOnly = await prisma.feedExperimentAssignment.findMany({ select: { userId: true } })
+     * 
+     */
+    findMany<T extends FeedExperimentAssignmentFindManyArgs>(args?: SelectSubset<T, FeedExperimentAssignmentFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FeedExperimentAssignment.
+     * @param {FeedExperimentAssignmentCreateArgs} args - Arguments to create a FeedExperimentAssignment.
+     * @example
+     * // Create one FeedExperimentAssignment
+     * const FeedExperimentAssignment = await prisma.feedExperimentAssignment.create({
+     *   data: {
+     *     // ... data to create a FeedExperimentAssignment
+     *   }
+     * })
+     * 
+     */
+    create<T extends FeedExperimentAssignmentCreateArgs>(args: SelectSubset<T, FeedExperimentAssignmentCreateArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FeedExperimentAssignments.
+     * @param {FeedExperimentAssignmentCreateManyArgs} args - Arguments to create many FeedExperimentAssignments.
+     * @example
+     * // Create many FeedExperimentAssignments
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FeedExperimentAssignmentCreateManyArgs>(args?: SelectSubset<T, FeedExperimentAssignmentCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FeedExperimentAssignments and returns the data saved in the database.
+     * @param {FeedExperimentAssignmentCreateManyAndReturnArgs} args - Arguments to create many FeedExperimentAssignments.
+     * @example
+     * // Create many FeedExperimentAssignments
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FeedExperimentAssignments and only return the `userId`
+     * const feedExperimentAssignmentWithUserIdOnly = await prisma.feedExperimentAssignment.createManyAndReturn({
+     *   select: { userId: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FeedExperimentAssignmentCreateManyAndReturnArgs>(args?: SelectSubset<T, FeedExperimentAssignmentCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FeedExperimentAssignment.
+     * @param {FeedExperimentAssignmentDeleteArgs} args - Arguments to delete one FeedExperimentAssignment.
+     * @example
+     * // Delete one FeedExperimentAssignment
+     * const FeedExperimentAssignment = await prisma.feedExperimentAssignment.delete({
+     *   where: {
+     *     // ... filter to delete one FeedExperimentAssignment
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FeedExperimentAssignmentDeleteArgs>(args: SelectSubset<T, FeedExperimentAssignmentDeleteArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FeedExperimentAssignment.
+     * @param {FeedExperimentAssignmentUpdateArgs} args - Arguments to update one FeedExperimentAssignment.
+     * @example
+     * // Update one FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FeedExperimentAssignmentUpdateArgs>(args: SelectSubset<T, FeedExperimentAssignmentUpdateArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FeedExperimentAssignments.
+     * @param {FeedExperimentAssignmentDeleteManyArgs} args - Arguments to filter FeedExperimentAssignments to delete.
+     * @example
+     * // Delete a few FeedExperimentAssignments
+     * const { count } = await prisma.feedExperimentAssignment.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FeedExperimentAssignmentDeleteManyArgs>(args?: SelectSubset<T, FeedExperimentAssignmentDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeedExperimentAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FeedExperimentAssignments
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FeedExperimentAssignmentUpdateManyArgs>(args: SelectSubset<T, FeedExperimentAssignmentUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeedExperimentAssignments and returns the data updated in the database.
+     * @param {FeedExperimentAssignmentUpdateManyAndReturnArgs} args - Arguments to update many FeedExperimentAssignments.
+     * @example
+     * // Update many FeedExperimentAssignments
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FeedExperimentAssignments and only return the `userId`
+     * const feedExperimentAssignmentWithUserIdOnly = await prisma.feedExperimentAssignment.updateManyAndReturn({
+     *   select: { userId: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FeedExperimentAssignmentUpdateManyAndReturnArgs>(args: SelectSubset<T, FeedExperimentAssignmentUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FeedExperimentAssignment.
+     * @param {FeedExperimentAssignmentUpsertArgs} args - Arguments to update or create a FeedExperimentAssignment.
+     * @example
+     * // Update or create a FeedExperimentAssignment
+     * const feedExperimentAssignment = await prisma.feedExperimentAssignment.upsert({
+     *   create: {
+     *     // ... data to create a FeedExperimentAssignment
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FeedExperimentAssignment we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FeedExperimentAssignmentUpsertArgs>(args: SelectSubset<T, FeedExperimentAssignmentUpsertArgs<ExtArgs>>): Prisma__FeedExperimentAssignmentClient<$Result.GetResult<Prisma.$FeedExperimentAssignmentPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FeedExperimentAssignments.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentCountArgs} args - Arguments to filter FeedExperimentAssignments to count.
+     * @example
+     * // Count the number of FeedExperimentAssignments
+     * const count = await prisma.feedExperimentAssignment.count({
+     *   where: {
+     *     // ... the filter for the FeedExperimentAssignments we want to count
+     *   }
+     * })
+    **/
+    count<T extends FeedExperimentAssignmentCountArgs>(
+      args?: Subset<T, FeedExperimentAssignmentCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FeedExperimentAssignmentCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FeedExperimentAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FeedExperimentAssignmentAggregateArgs>(args: Subset<T, FeedExperimentAssignmentAggregateArgs>): Prisma.PrismaPromise<GetFeedExperimentAssignmentAggregateType<T>>
+
+    /**
+     * Group by FeedExperimentAssignment.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeedExperimentAssignmentGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FeedExperimentAssignmentGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FeedExperimentAssignmentGroupByArgs['orderBy'] }
+        : { orderBy?: FeedExperimentAssignmentGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FeedExperimentAssignmentGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeedExperimentAssignmentGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FeedExperimentAssignment model
+   */
+  readonly fields: FeedExperimentAssignmentFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FeedExperimentAssignment.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FeedExperimentAssignmentClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FeedExperimentAssignment model
+   */
+  interface FeedExperimentAssignmentFieldRefs {
+    readonly userId: FieldRef<"FeedExperimentAssignment", 'String'>
+    readonly experimentKey: FieldRef<"FeedExperimentAssignment", 'String'>
+    readonly variant: FieldRef<"FeedExperimentAssignment", 'String'>
+    readonly assignedAt: FieldRef<"FeedExperimentAssignment", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FeedExperimentAssignment findUnique
+   */
+  export type FeedExperimentAssignmentFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedExperimentAssignment to fetch.
+     */
+    where: FeedExperimentAssignmentWhereUniqueInput
+  }
+
+  /**
+   * FeedExperimentAssignment findUniqueOrThrow
+   */
+  export type FeedExperimentAssignmentFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedExperimentAssignment to fetch.
+     */
+    where: FeedExperimentAssignmentWhereUniqueInput
+  }
+
+  /**
+   * FeedExperimentAssignment findFirst
+   */
+  export type FeedExperimentAssignmentFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedExperimentAssignment to fetch.
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedExperimentAssignments to fetch.
+     */
+    orderBy?: FeedExperimentAssignmentOrderByWithRelationInput | FeedExperimentAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeedExperimentAssignments.
+     */
+    cursor?: FeedExperimentAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedExperimentAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedExperimentAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedExperimentAssignments.
+     */
+    distinct?: FeedExperimentAssignmentScalarFieldEnum | FeedExperimentAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * FeedExperimentAssignment findFirstOrThrow
+   */
+  export type FeedExperimentAssignmentFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedExperimentAssignment to fetch.
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedExperimentAssignments to fetch.
+     */
+    orderBy?: FeedExperimentAssignmentOrderByWithRelationInput | FeedExperimentAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeedExperimentAssignments.
+     */
+    cursor?: FeedExperimentAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedExperimentAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedExperimentAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedExperimentAssignments.
+     */
+    distinct?: FeedExperimentAssignmentScalarFieldEnum | FeedExperimentAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * FeedExperimentAssignment findMany
+   */
+  export type FeedExperimentAssignmentFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter, which FeedExperimentAssignments to fetch.
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeedExperimentAssignments to fetch.
+     */
+    orderBy?: FeedExperimentAssignmentOrderByWithRelationInput | FeedExperimentAssignmentOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FeedExperimentAssignments.
+     */
+    cursor?: FeedExperimentAssignmentWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeedExperimentAssignments from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeedExperimentAssignments.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeedExperimentAssignments.
+     */
+    distinct?: FeedExperimentAssignmentScalarFieldEnum | FeedExperimentAssignmentScalarFieldEnum[]
+  }
+
+  /**
+   * FeedExperimentAssignment create
+   */
+  export type FeedExperimentAssignmentCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FeedExperimentAssignment.
+     */
+    data: XOR<FeedExperimentAssignmentCreateInput, FeedExperimentAssignmentUncheckedCreateInput>
+  }
+
+  /**
+   * FeedExperimentAssignment createMany
+   */
+  export type FeedExperimentAssignmentCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FeedExperimentAssignments.
+     */
+    data: FeedExperimentAssignmentCreateManyInput | FeedExperimentAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeedExperimentAssignment createManyAndReturn
+   */
+  export type FeedExperimentAssignmentCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to create many FeedExperimentAssignments.
+     */
+    data: FeedExperimentAssignmentCreateManyInput | FeedExperimentAssignmentCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FeedExperimentAssignment update
+   */
+  export type FeedExperimentAssignmentUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FeedExperimentAssignment.
+     */
+    data: XOR<FeedExperimentAssignmentUpdateInput, FeedExperimentAssignmentUncheckedUpdateInput>
+    /**
+     * Choose, which FeedExperimentAssignment to update.
+     */
+    where: FeedExperimentAssignmentWhereUniqueInput
+  }
+
+  /**
+   * FeedExperimentAssignment updateMany
+   */
+  export type FeedExperimentAssignmentUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FeedExperimentAssignments.
+     */
+    data: XOR<FeedExperimentAssignmentUpdateManyMutationInput, FeedExperimentAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which FeedExperimentAssignments to update
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * Limit how many FeedExperimentAssignments to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeedExperimentAssignment updateManyAndReturn
+   */
+  export type FeedExperimentAssignmentUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * The data used to update FeedExperimentAssignments.
+     */
+    data: XOR<FeedExperimentAssignmentUpdateManyMutationInput, FeedExperimentAssignmentUncheckedUpdateManyInput>
+    /**
+     * Filter which FeedExperimentAssignments to update
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * Limit how many FeedExperimentAssignments to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FeedExperimentAssignment upsert
+   */
+  export type FeedExperimentAssignmentUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FeedExperimentAssignment to update in case it exists.
+     */
+    where: FeedExperimentAssignmentWhereUniqueInput
+    /**
+     * In case the FeedExperimentAssignment found by the `where` argument doesn't exist, create a new FeedExperimentAssignment with this data.
+     */
+    create: XOR<FeedExperimentAssignmentCreateInput, FeedExperimentAssignmentUncheckedCreateInput>
+    /**
+     * In case the FeedExperimentAssignment was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FeedExperimentAssignmentUpdateInput, FeedExperimentAssignmentUncheckedUpdateInput>
+  }
+
+  /**
+   * FeedExperimentAssignment delete
+   */
+  export type FeedExperimentAssignmentDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+    /**
+     * Filter which FeedExperimentAssignment to delete.
+     */
+    where: FeedExperimentAssignmentWhereUniqueInput
+  }
+
+  /**
+   * FeedExperimentAssignment deleteMany
+   */
+  export type FeedExperimentAssignmentDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeedExperimentAssignments to delete
+     */
+    where?: FeedExperimentAssignmentWhereInput
+    /**
+     * Limit how many FeedExperimentAssignments to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeedExperimentAssignment without action
+   */
+  export type FeedExperimentAssignmentDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeedExperimentAssignment
+     */
+    select?: FeedExperimentAssignmentSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeedExperimentAssignment
+     */
+    omit?: FeedExperimentAssignmentOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FeedExperimentAssignmentInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model UserDeviceToken
    */
 
@@ -52486,6 +57558,63 @@ export namespace Prisma {
   export type SiteShareAttributionEventScalarFieldEnum = (typeof SiteShareAttributionEventScalarFieldEnum)[keyof typeof SiteShareAttributionEventScalarFieldEnum]
 
 
+  export const UserFeedStateScalarFieldEnum: {
+    userId: 'userId',
+    mutedCategoryIds: 'mutedCategoryIds',
+    hiddenSiteIds: 'hiddenSiteIds',
+    followReporterIds: 'followReporterIds',
+    engagementProfile: 'engagementProfile',
+    recencyDecayFactor: 'recencyDecayFactor',
+    lastFeedAt: 'lastFeedAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type UserFeedStateScalarFieldEnum = (typeof UserFeedStateScalarFieldEnum)[keyof typeof UserFeedStateScalarFieldEnum]
+
+
+  export const SiteFeatureSnapshotScalarFieldEnum: {
+    siteId: 'siteId',
+    velocity1h: 'velocity1h',
+    velocity6h: 'velocity6h',
+    velocity24h: 'velocity24h',
+    discussionRatio: 'discussionRatio',
+    intentRatio: 'intentRatio',
+    qualityScore: 'qualityScore',
+    freshnessHours: 'freshnessHours',
+    severityIndex: 'severityIndex',
+    verifiedAgeDays: 'verifiedAgeDays',
+    lastReportAt: 'lastReportAt',
+    denormHash: 'denormHash',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SiteFeatureSnapshotScalarFieldEnum = (typeof SiteFeatureSnapshotScalarFieldEnum)[keyof typeof SiteFeatureSnapshotScalarFieldEnum]
+
+
+  export const FeedImpressionScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    userId: 'userId',
+    siteId: 'siteId',
+    variant: 'variant',
+    position: 'position',
+    dwellMs: 'dwellMs',
+    engaged: 'engaged'
+  };
+
+  export type FeedImpressionScalarFieldEnum = (typeof FeedImpressionScalarFieldEnum)[keyof typeof FeedImpressionScalarFieldEnum]
+
+
+  export const FeedExperimentAssignmentScalarFieldEnum: {
+    userId: 'userId',
+    experimentKey: 'experimentKey',
+    variant: 'variant',
+    assignedAt: 'assignedAt'
+  };
+
+  export type FeedExperimentAssignmentScalarFieldEnum = (typeof FeedExperimentAssignmentScalarFieldEnum)[keyof typeof FeedExperimentAssignmentScalarFieldEnum]
+
+
   export const UserDeviceTokenScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -53037,6 +58166,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventListRelationFilter
     siteShareLinks?: SiteShareLinkListRelationFilter
     siteCommentLikes?: SiteCommentLikeListRelationFilter
+    feedState?: XOR<UserFeedStateNullableScalarRelationFilter, UserFeedStateWhereInput> | null
+    feedImpressions?: FeedImpressionListRelationFilter
+    feedExperimentAssignments?: FeedExperimentAssignmentListRelationFilter
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
     notificationPreferences?: UserNotificationPreferenceListRelationFilter
@@ -53093,6 +58225,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventOrderByRelationAggregateInput
     siteShareLinks?: SiteShareLinkOrderByRelationAggregateInput
     siteCommentLikes?: SiteCommentLikeOrderByRelationAggregateInput
+    feedState?: UserFeedStateOrderByWithRelationInput
+    feedImpressions?: FeedImpressionOrderByRelationAggregateInput
+    feedExperimentAssignments?: FeedExperimentAssignmentOrderByRelationAggregateInput
     deviceTokens?: UserDeviceTokenOrderByRelationAggregateInput
     userNotifications?: UserNotificationOrderByRelationAggregateInput
     notificationPreferences?: UserNotificationPreferenceOrderByRelationAggregateInput
@@ -53152,6 +58287,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventListRelationFilter
     siteShareLinks?: SiteShareLinkListRelationFilter
     siteCommentLikes?: SiteCommentLikeListRelationFilter
+    feedState?: XOR<UserFeedStateNullableScalarRelationFilter, UserFeedStateWhereInput> | null
+    feedImpressions?: FeedImpressionListRelationFilter
+    feedExperimentAssignments?: FeedExperimentAssignmentListRelationFilter
     deviceTokens?: UserDeviceTokenListRelationFilter
     userNotifications?: UserNotificationListRelationFilter
     notificationPreferences?: UserNotificationPreferenceListRelationFilter
@@ -53773,6 +58911,8 @@ export namespace Prisma {
     comments?: SiteCommentListRelationFilter
     shareEvents?: SiteShareEventListRelationFilter
     shareLinks?: SiteShareLinkListRelationFilter
+    featureSnapshot?: XOR<SiteFeatureSnapshotNullableScalarRelationFilter, SiteFeatureSnapshotWhereInput> | null
+    feedImpressions?: FeedImpressionListRelationFilter
   }
 
   export type SiteOrderByWithRelationInput = {
@@ -53795,6 +58935,8 @@ export namespace Prisma {
     comments?: SiteCommentOrderByRelationAggregateInput
     shareEvents?: SiteShareEventOrderByRelationAggregateInput
     shareLinks?: SiteShareLinkOrderByRelationAggregateInput
+    featureSnapshot?: SiteFeatureSnapshotOrderByWithRelationInput
+    feedImpressions?: FeedImpressionOrderByRelationAggregateInput
   }
 
   export type SiteWhereUniqueInput = Prisma.AtLeast<{
@@ -53820,6 +58962,8 @@ export namespace Prisma {
     comments?: SiteCommentListRelationFilter
     shareEvents?: SiteShareEventListRelationFilter
     shareLinks?: SiteShareLinkListRelationFilter
+    featureSnapshot?: XOR<SiteFeatureSnapshotNullableScalarRelationFilter, SiteFeatureSnapshotWhereInput> | null
+    feedImpressions?: FeedImpressionListRelationFilter
   }, "id">
 
   export type SiteOrderByWithAggregationInput = {
@@ -55794,6 +60938,301 @@ export namespace Prisma {
     openedByUserId?: StringNullableWithAggregatesFilter<"SiteShareAttributionEvent"> | string | null
   }
 
+  export type UserFeedStateWhereInput = {
+    AND?: UserFeedStateWhereInput | UserFeedStateWhereInput[]
+    OR?: UserFeedStateWhereInput[]
+    NOT?: UserFeedStateWhereInput | UserFeedStateWhereInput[]
+    userId?: StringFilter<"UserFeedState"> | string
+    mutedCategoryIds?: StringNullableListFilter<"UserFeedState">
+    hiddenSiteIds?: StringNullableListFilter<"UserFeedState">
+    followReporterIds?: StringNullableListFilter<"UserFeedState">
+    engagementProfile?: JsonNullableFilter<"UserFeedState">
+    recencyDecayFactor?: FloatFilter<"UserFeedState"> | number
+    lastFeedAt?: DateTimeNullableFilter<"UserFeedState"> | Date | string | null
+    updatedAt?: DateTimeFilter<"UserFeedState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type UserFeedStateOrderByWithRelationInput = {
+    userId?: SortOrder
+    mutedCategoryIds?: SortOrder
+    hiddenSiteIds?: SortOrder
+    followReporterIds?: SortOrder
+    engagementProfile?: SortOrderInput | SortOrder
+    recencyDecayFactor?: SortOrder
+    lastFeedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type UserFeedStateWhereUniqueInput = Prisma.AtLeast<{
+    userId?: string
+    AND?: UserFeedStateWhereInput | UserFeedStateWhereInput[]
+    OR?: UserFeedStateWhereInput[]
+    NOT?: UserFeedStateWhereInput | UserFeedStateWhereInput[]
+    mutedCategoryIds?: StringNullableListFilter<"UserFeedState">
+    hiddenSiteIds?: StringNullableListFilter<"UserFeedState">
+    followReporterIds?: StringNullableListFilter<"UserFeedState">
+    engagementProfile?: JsonNullableFilter<"UserFeedState">
+    recencyDecayFactor?: FloatFilter<"UserFeedState"> | number
+    lastFeedAt?: DateTimeNullableFilter<"UserFeedState"> | Date | string | null
+    updatedAt?: DateTimeFilter<"UserFeedState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "userId">
+
+  export type UserFeedStateOrderByWithAggregationInput = {
+    userId?: SortOrder
+    mutedCategoryIds?: SortOrder
+    hiddenSiteIds?: SortOrder
+    followReporterIds?: SortOrder
+    engagementProfile?: SortOrderInput | SortOrder
+    recencyDecayFactor?: SortOrder
+    lastFeedAt?: SortOrderInput | SortOrder
+    updatedAt?: SortOrder
+    _count?: UserFeedStateCountOrderByAggregateInput
+    _avg?: UserFeedStateAvgOrderByAggregateInput
+    _max?: UserFeedStateMaxOrderByAggregateInput
+    _min?: UserFeedStateMinOrderByAggregateInput
+    _sum?: UserFeedStateSumOrderByAggregateInput
+  }
+
+  export type UserFeedStateScalarWhereWithAggregatesInput = {
+    AND?: UserFeedStateScalarWhereWithAggregatesInput | UserFeedStateScalarWhereWithAggregatesInput[]
+    OR?: UserFeedStateScalarWhereWithAggregatesInput[]
+    NOT?: UserFeedStateScalarWhereWithAggregatesInput | UserFeedStateScalarWhereWithAggregatesInput[]
+    userId?: StringWithAggregatesFilter<"UserFeedState"> | string
+    mutedCategoryIds?: StringNullableListFilter<"UserFeedState">
+    hiddenSiteIds?: StringNullableListFilter<"UserFeedState">
+    followReporterIds?: StringNullableListFilter<"UserFeedState">
+    engagementProfile?: JsonNullableWithAggregatesFilter<"UserFeedState">
+    recencyDecayFactor?: FloatWithAggregatesFilter<"UserFeedState"> | number
+    lastFeedAt?: DateTimeNullableWithAggregatesFilter<"UserFeedState"> | Date | string | null
+    updatedAt?: DateTimeWithAggregatesFilter<"UserFeedState"> | Date | string
+  }
+
+  export type SiteFeatureSnapshotWhereInput = {
+    AND?: SiteFeatureSnapshotWhereInput | SiteFeatureSnapshotWhereInput[]
+    OR?: SiteFeatureSnapshotWhereInput[]
+    NOT?: SiteFeatureSnapshotWhereInput | SiteFeatureSnapshotWhereInput[]
+    siteId?: StringFilter<"SiteFeatureSnapshot"> | string
+    velocity1h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    velocity6h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    velocity24h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    discussionRatio?: FloatFilter<"SiteFeatureSnapshot"> | number
+    intentRatio?: FloatFilter<"SiteFeatureSnapshot"> | number
+    qualityScore?: FloatFilter<"SiteFeatureSnapshot"> | number
+    freshnessHours?: FloatFilter<"SiteFeatureSnapshot"> | number
+    severityIndex?: FloatFilter<"SiteFeatureSnapshot"> | number
+    verifiedAgeDays?: IntFilter<"SiteFeatureSnapshot"> | number
+    lastReportAt?: DateTimeNullableFilter<"SiteFeatureSnapshot"> | Date | string | null
+    denormHash?: StringFilter<"SiteFeatureSnapshot"> | string
+    updatedAt?: DateTimeFilter<"SiteFeatureSnapshot"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type SiteFeatureSnapshotOrderByWithRelationInput = {
+    siteId?: SortOrder
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+    lastReportAt?: SortOrderInput | SortOrder
+    denormHash?: SortOrder
+    updatedAt?: SortOrder
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type SiteFeatureSnapshotWhereUniqueInput = Prisma.AtLeast<{
+    siteId?: string
+    AND?: SiteFeatureSnapshotWhereInput | SiteFeatureSnapshotWhereInput[]
+    OR?: SiteFeatureSnapshotWhereInput[]
+    NOT?: SiteFeatureSnapshotWhereInput | SiteFeatureSnapshotWhereInput[]
+    velocity1h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    velocity6h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    velocity24h?: FloatFilter<"SiteFeatureSnapshot"> | number
+    discussionRatio?: FloatFilter<"SiteFeatureSnapshot"> | number
+    intentRatio?: FloatFilter<"SiteFeatureSnapshot"> | number
+    qualityScore?: FloatFilter<"SiteFeatureSnapshot"> | number
+    freshnessHours?: FloatFilter<"SiteFeatureSnapshot"> | number
+    severityIndex?: FloatFilter<"SiteFeatureSnapshot"> | number
+    verifiedAgeDays?: IntFilter<"SiteFeatureSnapshot"> | number
+    lastReportAt?: DateTimeNullableFilter<"SiteFeatureSnapshot"> | Date | string | null
+    denormHash?: StringFilter<"SiteFeatureSnapshot"> | string
+    updatedAt?: DateTimeFilter<"SiteFeatureSnapshot"> | Date | string
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "siteId">
+
+  export type SiteFeatureSnapshotOrderByWithAggregationInput = {
+    siteId?: SortOrder
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+    lastReportAt?: SortOrderInput | SortOrder
+    denormHash?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SiteFeatureSnapshotCountOrderByAggregateInput
+    _avg?: SiteFeatureSnapshotAvgOrderByAggregateInput
+    _max?: SiteFeatureSnapshotMaxOrderByAggregateInput
+    _min?: SiteFeatureSnapshotMinOrderByAggregateInput
+    _sum?: SiteFeatureSnapshotSumOrderByAggregateInput
+  }
+
+  export type SiteFeatureSnapshotScalarWhereWithAggregatesInput = {
+    AND?: SiteFeatureSnapshotScalarWhereWithAggregatesInput | SiteFeatureSnapshotScalarWhereWithAggregatesInput[]
+    OR?: SiteFeatureSnapshotScalarWhereWithAggregatesInput[]
+    NOT?: SiteFeatureSnapshotScalarWhereWithAggregatesInput | SiteFeatureSnapshotScalarWhereWithAggregatesInput[]
+    siteId?: StringWithAggregatesFilter<"SiteFeatureSnapshot"> | string
+    velocity1h?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    velocity6h?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    velocity24h?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    discussionRatio?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    intentRatio?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    qualityScore?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    freshnessHours?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    severityIndex?: FloatWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    verifiedAgeDays?: IntWithAggregatesFilter<"SiteFeatureSnapshot"> | number
+    lastReportAt?: DateTimeNullableWithAggregatesFilter<"SiteFeatureSnapshot"> | Date | string | null
+    denormHash?: StringWithAggregatesFilter<"SiteFeatureSnapshot"> | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SiteFeatureSnapshot"> | Date | string
+  }
+
+  export type FeedImpressionWhereInput = {
+    AND?: FeedImpressionWhereInput | FeedImpressionWhereInput[]
+    OR?: FeedImpressionWhereInput[]
+    NOT?: FeedImpressionWhereInput | FeedImpressionWhereInput[]
+    id?: StringFilter<"FeedImpression"> | string
+    createdAt?: DateTimeFilter<"FeedImpression"> | Date | string
+    userId?: StringFilter<"FeedImpression"> | string
+    siteId?: StringFilter<"FeedImpression"> | string
+    variant?: StringFilter<"FeedImpression"> | string
+    position?: IntNullableFilter<"FeedImpression"> | number | null
+    dwellMs?: IntNullableFilter<"FeedImpression"> | number | null
+    engaged?: BoolFilter<"FeedImpression"> | boolean
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }
+
+  export type FeedImpressionOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    siteId?: SortOrder
+    variant?: SortOrder
+    position?: SortOrderInput | SortOrder
+    dwellMs?: SortOrderInput | SortOrder
+    engaged?: SortOrder
+    user?: UserOrderByWithRelationInput
+    site?: SiteOrderByWithRelationInput
+  }
+
+  export type FeedImpressionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FeedImpressionWhereInput | FeedImpressionWhereInput[]
+    OR?: FeedImpressionWhereInput[]
+    NOT?: FeedImpressionWhereInput | FeedImpressionWhereInput[]
+    createdAt?: DateTimeFilter<"FeedImpression"> | Date | string
+    userId?: StringFilter<"FeedImpression"> | string
+    siteId?: StringFilter<"FeedImpression"> | string
+    variant?: StringFilter<"FeedImpression"> | string
+    position?: IntNullableFilter<"FeedImpression"> | number | null
+    dwellMs?: IntNullableFilter<"FeedImpression"> | number | null
+    engaged?: BoolFilter<"FeedImpression"> | boolean
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    site?: XOR<SiteScalarRelationFilter, SiteWhereInput>
+  }, "id">
+
+  export type FeedImpressionOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    siteId?: SortOrder
+    variant?: SortOrder
+    position?: SortOrderInput | SortOrder
+    dwellMs?: SortOrderInput | SortOrder
+    engaged?: SortOrder
+    _count?: FeedImpressionCountOrderByAggregateInput
+    _avg?: FeedImpressionAvgOrderByAggregateInput
+    _max?: FeedImpressionMaxOrderByAggregateInput
+    _min?: FeedImpressionMinOrderByAggregateInput
+    _sum?: FeedImpressionSumOrderByAggregateInput
+  }
+
+  export type FeedImpressionScalarWhereWithAggregatesInput = {
+    AND?: FeedImpressionScalarWhereWithAggregatesInput | FeedImpressionScalarWhereWithAggregatesInput[]
+    OR?: FeedImpressionScalarWhereWithAggregatesInput[]
+    NOT?: FeedImpressionScalarWhereWithAggregatesInput | FeedImpressionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FeedImpression"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"FeedImpression"> | Date | string
+    userId?: StringWithAggregatesFilter<"FeedImpression"> | string
+    siteId?: StringWithAggregatesFilter<"FeedImpression"> | string
+    variant?: StringWithAggregatesFilter<"FeedImpression"> | string
+    position?: IntNullableWithAggregatesFilter<"FeedImpression"> | number | null
+    dwellMs?: IntNullableWithAggregatesFilter<"FeedImpression"> | number | null
+    engaged?: BoolWithAggregatesFilter<"FeedImpression"> | boolean
+  }
+
+  export type FeedExperimentAssignmentWhereInput = {
+    AND?: FeedExperimentAssignmentWhereInput | FeedExperimentAssignmentWhereInput[]
+    OR?: FeedExperimentAssignmentWhereInput[]
+    NOT?: FeedExperimentAssignmentWhereInput | FeedExperimentAssignmentWhereInput[]
+    userId?: StringFilter<"FeedExperimentAssignment"> | string
+    experimentKey?: StringFilter<"FeedExperimentAssignment"> | string
+    variant?: StringFilter<"FeedExperimentAssignment"> | string
+    assignedAt?: DateTimeFilter<"FeedExperimentAssignment"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type FeedExperimentAssignmentOrderByWithRelationInput = {
+    userId?: SortOrder
+    experimentKey?: SortOrder
+    variant?: SortOrder
+    assignedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type FeedExperimentAssignmentWhereUniqueInput = Prisma.AtLeast<{
+    userId_experimentKey?: FeedExperimentAssignmentUserIdExperimentKeyCompoundUniqueInput
+    AND?: FeedExperimentAssignmentWhereInput | FeedExperimentAssignmentWhereInput[]
+    OR?: FeedExperimentAssignmentWhereInput[]
+    NOT?: FeedExperimentAssignmentWhereInput | FeedExperimentAssignmentWhereInput[]
+    userId?: StringFilter<"FeedExperimentAssignment"> | string
+    experimentKey?: StringFilter<"FeedExperimentAssignment"> | string
+    variant?: StringFilter<"FeedExperimentAssignment"> | string
+    assignedAt?: DateTimeFilter<"FeedExperimentAssignment"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "userId_experimentKey">
+
+  export type FeedExperimentAssignmentOrderByWithAggregationInput = {
+    userId?: SortOrder
+    experimentKey?: SortOrder
+    variant?: SortOrder
+    assignedAt?: SortOrder
+    _count?: FeedExperimentAssignmentCountOrderByAggregateInput
+    _max?: FeedExperimentAssignmentMaxOrderByAggregateInput
+    _min?: FeedExperimentAssignmentMinOrderByAggregateInput
+  }
+
+  export type FeedExperimentAssignmentScalarWhereWithAggregatesInput = {
+    AND?: FeedExperimentAssignmentScalarWhereWithAggregatesInput | FeedExperimentAssignmentScalarWhereWithAggregatesInput[]
+    OR?: FeedExperimentAssignmentScalarWhereWithAggregatesInput[]
+    NOT?: FeedExperimentAssignmentScalarWhereWithAggregatesInput | FeedExperimentAssignmentScalarWhereWithAggregatesInput[]
+    userId?: StringWithAggregatesFilter<"FeedExperimentAssignment"> | string
+    experimentKey?: StringWithAggregatesFilter<"FeedExperimentAssignment"> | string
+    variant?: StringWithAggregatesFilter<"FeedExperimentAssignment"> | string
+    assignedAt?: DateTimeWithAggregatesFilter<"FeedExperimentAssignment"> | Date | string
+  }
+
   export type UserDeviceTokenWhereInput = {
     AND?: UserDeviceTokenWhereInput | UserDeviceTokenWhereInput[]
     OR?: UserDeviceTokenWhereInput[]
@@ -56239,6 +61678,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -56295,6 +61737,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -56351,6 +61796,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -56407,6 +61855,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -57079,6 +62530,8 @@ export namespace Prisma {
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateInput = {
@@ -57101,6 +62554,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUpdateInput = {
@@ -57123,6 +62578,8 @@ export namespace Prisma {
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateInput = {
@@ -57145,6 +62602,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteCreateManyInput = {
@@ -59191,6 +64650,316 @@ export namespace Prisma {
     openedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
+  export type UserFeedStateCreateInput = {
+    mutedCategoryIds?: UserFeedStateCreatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateCreatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateCreatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: number
+    lastFeedAt?: Date | string | null
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutFeedStateInput
+  }
+
+  export type UserFeedStateUncheckedCreateInput = {
+    userId: string
+    mutedCategoryIds?: UserFeedStateCreatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateCreatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateCreatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: number
+    lastFeedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type UserFeedStateUpdateInput = {
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFeedStateNestedInput
+  }
+
+  export type UserFeedStateUncheckedUpdateInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserFeedStateCreateManyInput = {
+    userId: string
+    mutedCategoryIds?: UserFeedStateCreatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateCreatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateCreatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: number
+    lastFeedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type UserFeedStateUpdateManyMutationInput = {
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserFeedStateUncheckedUpdateManyInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteFeatureSnapshotCreateInput = {
+    velocity1h?: number
+    velocity6h?: number
+    velocity24h?: number
+    discussionRatio?: number
+    intentRatio?: number
+    qualityScore?: number
+    freshnessHours?: number
+    severityIndex?: number
+    verifiedAgeDays?: number
+    lastReportAt?: Date | string | null
+    denormHash?: string
+    updatedAt?: Date | string
+    site: SiteCreateNestedOneWithoutFeatureSnapshotInput
+  }
+
+  export type SiteFeatureSnapshotUncheckedCreateInput = {
+    siteId: string
+    velocity1h?: number
+    velocity6h?: number
+    velocity24h?: number
+    discussionRatio?: number
+    intentRatio?: number
+    qualityScore?: number
+    freshnessHours?: number
+    severityIndex?: number
+    verifiedAgeDays?: number
+    lastReportAt?: Date | string | null
+    denormHash?: string
+    updatedAt?: Date | string
+  }
+
+  export type SiteFeatureSnapshotUpdateInput = {
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    site?: SiteUpdateOneRequiredWithoutFeatureSnapshotNestedInput
+  }
+
+  export type SiteFeatureSnapshotUncheckedUpdateInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteFeatureSnapshotCreateManyInput = {
+    siteId: string
+    velocity1h?: number
+    velocity6h?: number
+    velocity24h?: number
+    discussionRatio?: number
+    intentRatio?: number
+    qualityScore?: number
+    freshnessHours?: number
+    severityIndex?: number
+    verifiedAgeDays?: number
+    lastReportAt?: Date | string | null
+    denormHash?: string
+    updatedAt?: Date | string
+  }
+
+  export type SiteFeatureSnapshotUpdateManyMutationInput = {
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteFeatureSnapshotUncheckedUpdateManyInput = {
+    siteId?: StringFieldUpdateOperationsInput | string
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedImpressionCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+    user: UserCreateNestedOneWithoutFeedImpressionsInput
+    site: SiteCreateNestedOneWithoutFeedImpressionsInput
+  }
+
+  export type FeedImpressionUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    siteId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
+  export type FeedImpressionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+    user?: UserUpdateOneRequiredWithoutFeedImpressionsNestedInput
+    site?: SiteUpdateOneRequiredWithoutFeedImpressionsNestedInput
+  }
+
+  export type FeedImpressionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedImpressionCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    siteId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
+  export type FeedImpressionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedImpressionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedExperimentAssignmentCreateInput = {
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
+    user: UserCreateNestedOneWithoutFeedExperimentAssignmentsInput
+  }
+
+  export type FeedExperimentAssignmentUncheckedCreateInput = {
+    userId: string
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
+  }
+
+  export type FeedExperimentAssignmentUpdateInput = {
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFeedExperimentAssignmentsNestedInput
+  }
+
+  export type FeedExperimentAssignmentUncheckedUpdateInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedExperimentAssignmentCreateManyInput = {
+    userId: string
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
+  }
+
+  export type FeedExperimentAssignmentUpdateManyMutationInput = {
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedExperimentAssignmentUncheckedUpdateManyInput = {
+    userId?: StringFieldUpdateOperationsInput | string
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserDeviceTokenCreateInput = {
     id?: string
     createdAt?: Date | string
@@ -59823,6 +65592,23 @@ export namespace Prisma {
     none?: SiteCommentLikeWhereInput
   }
 
+  export type UserFeedStateNullableScalarRelationFilter = {
+    is?: UserFeedStateWhereInput | null
+    isNot?: UserFeedStateWhereInput | null
+  }
+
+  export type FeedImpressionListRelationFilter = {
+    every?: FeedImpressionWhereInput
+    some?: FeedImpressionWhereInput
+    none?: FeedImpressionWhereInput
+  }
+
+  export type FeedExperimentAssignmentListRelationFilter = {
+    every?: FeedExperimentAssignmentWhereInput
+    some?: FeedExperimentAssignmentWhereInput
+    none?: FeedExperimentAssignmentWhereInput
+  }
+
   export type UserDeviceTokenListRelationFilter = {
     every?: UserDeviceTokenWhereInput
     some?: UserDeviceTokenWhereInput
@@ -59955,6 +65741,14 @@ export namespace Prisma {
   }
 
   export type SiteCommentLikeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FeedImpressionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FeedExperimentAssignmentOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -60601,6 +66395,11 @@ export namespace Prisma {
     in?: $Enums.SiteStatus[] | ListEnumSiteStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.SiteStatus[] | ListEnumSiteStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumSiteStatusFilter<$PrismaModel> | $Enums.SiteStatus
+  }
+
+  export type SiteFeatureSnapshotNullableScalarRelationFilter = {
+    is?: SiteFeatureSnapshotWhereInput | null
+    isNot?: SiteFeatureSnapshotWhereInput | null
   }
 
   export type SiteCountOrderByAggregateInput = {
@@ -62030,6 +67829,180 @@ export namespace Prisma {
     _max?: NestedEnumSiteShareAttributionSourceFilter<$PrismaModel>
   }
 
+  export type UserFeedStateCountOrderByAggregateInput = {
+    userId?: SortOrder
+    mutedCategoryIds?: SortOrder
+    hiddenSiteIds?: SortOrder
+    followReporterIds?: SortOrder
+    engagementProfile?: SortOrder
+    recencyDecayFactor?: SortOrder
+    lastFeedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserFeedStateAvgOrderByAggregateInput = {
+    recencyDecayFactor?: SortOrder
+  }
+
+  export type UserFeedStateMaxOrderByAggregateInput = {
+    userId?: SortOrder
+    recencyDecayFactor?: SortOrder
+    lastFeedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserFeedStateMinOrderByAggregateInput = {
+    userId?: SortOrder
+    recencyDecayFactor?: SortOrder
+    lastFeedAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserFeedStateSumOrderByAggregateInput = {
+    recencyDecayFactor?: SortOrder
+  }
+
+  export type SiteFeatureSnapshotCountOrderByAggregateInput = {
+    siteId?: SortOrder
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+    lastReportAt?: SortOrder
+    denormHash?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SiteFeatureSnapshotAvgOrderByAggregateInput = {
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+  }
+
+  export type SiteFeatureSnapshotMaxOrderByAggregateInput = {
+    siteId?: SortOrder
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+    lastReportAt?: SortOrder
+    denormHash?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SiteFeatureSnapshotMinOrderByAggregateInput = {
+    siteId?: SortOrder
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+    lastReportAt?: SortOrder
+    denormHash?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SiteFeatureSnapshotSumOrderByAggregateInput = {
+    velocity1h?: SortOrder
+    velocity6h?: SortOrder
+    velocity24h?: SortOrder
+    discussionRatio?: SortOrder
+    intentRatio?: SortOrder
+    qualityScore?: SortOrder
+    freshnessHours?: SortOrder
+    severityIndex?: SortOrder
+    verifiedAgeDays?: SortOrder
+  }
+
+  export type FeedImpressionCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    siteId?: SortOrder
+    variant?: SortOrder
+    position?: SortOrder
+    dwellMs?: SortOrder
+    engaged?: SortOrder
+  }
+
+  export type FeedImpressionAvgOrderByAggregateInput = {
+    position?: SortOrder
+    dwellMs?: SortOrder
+  }
+
+  export type FeedImpressionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    siteId?: SortOrder
+    variant?: SortOrder
+    position?: SortOrder
+    dwellMs?: SortOrder
+    engaged?: SortOrder
+  }
+
+  export type FeedImpressionMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    siteId?: SortOrder
+    variant?: SortOrder
+    position?: SortOrder
+    dwellMs?: SortOrder
+    engaged?: SortOrder
+  }
+
+  export type FeedImpressionSumOrderByAggregateInput = {
+    position?: SortOrder
+    dwellMs?: SortOrder
+  }
+
+  export type FeedExperimentAssignmentUserIdExperimentKeyCompoundUniqueInput = {
+    userId: string
+    experimentKey: string
+  }
+
+  export type FeedExperimentAssignmentCountOrderByAggregateInput = {
+    userId?: SortOrder
+    experimentKey?: SortOrder
+    variant?: SortOrder
+    assignedAt?: SortOrder
+  }
+
+  export type FeedExperimentAssignmentMaxOrderByAggregateInput = {
+    userId?: SortOrder
+    experimentKey?: SortOrder
+    variant?: SortOrder
+    assignedAt?: SortOrder
+  }
+
+  export type FeedExperimentAssignmentMinOrderByAggregateInput = {
+    userId?: SortOrder
+    experimentKey?: SortOrder
+    variant?: SortOrder
+    assignedAt?: SortOrder
+  }
+
   export type EnumDevicePlatformFilter<$PrismaModel = never> = {
     equals?: $Enums.DevicePlatform | EnumDevicePlatformFieldRefInput<$PrismaModel>
     in?: $Enums.DevicePlatform[] | ListEnumDevicePlatformFieldRefInput<$PrismaModel>
@@ -62442,6 +68415,26 @@ export namespace Prisma {
     connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
   }
 
+  export type UserFeedStateCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserFeedStateCreateOrConnectWithoutUserInput
+    connect?: UserFeedStateWhereUniqueInput
+  }
+
+  export type FeedImpressionCreateNestedManyWithoutUserInput = {
+    create?: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput> | FeedImpressionCreateWithoutUserInput[] | FeedImpressionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutUserInput | FeedImpressionCreateOrConnectWithoutUserInput[]
+    createMany?: FeedImpressionCreateManyUserInputEnvelope
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+  }
+
+  export type FeedExperimentAssignmentCreateNestedManyWithoutUserInput = {
+    create?: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput> | FeedExperimentAssignmentCreateWithoutUserInput[] | FeedExperimentAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedExperimentAssignmentCreateOrConnectWithoutUserInput | FeedExperimentAssignmentCreateOrConnectWithoutUserInput[]
+    createMany?: FeedExperimentAssignmentCreateManyUserInputEnvelope
+    connect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+  }
+
   export type UserDeviceTokenCreateNestedManyWithoutUserInput = {
     create?: XOR<UserDeviceTokenCreateWithoutUserInput, UserDeviceTokenUncheckedCreateWithoutUserInput> | UserDeviceTokenCreateWithoutUserInput[] | UserDeviceTokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserDeviceTokenCreateOrConnectWithoutUserInput | UserDeviceTokenCreateOrConnectWithoutUserInput[]
@@ -62642,6 +68635,26 @@ export namespace Prisma {
     connectOrCreate?: SiteCommentLikeCreateOrConnectWithoutUserInput | SiteCommentLikeCreateOrConnectWithoutUserInput[]
     createMany?: SiteCommentLikeCreateManyUserInputEnvelope
     connect?: SiteCommentLikeWhereUniqueInput | SiteCommentLikeWhereUniqueInput[]
+  }
+
+  export type UserFeedStateUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserFeedStateCreateOrConnectWithoutUserInput
+    connect?: UserFeedStateWhereUniqueInput
+  }
+
+  export type FeedImpressionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput> | FeedImpressionCreateWithoutUserInput[] | FeedImpressionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutUserInput | FeedImpressionCreateOrConnectWithoutUserInput[]
+    createMany?: FeedImpressionCreateManyUserInputEnvelope
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+  }
+
+  export type FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput> | FeedExperimentAssignmentCreateWithoutUserInput[] | FeedExperimentAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedExperimentAssignmentCreateOrConnectWithoutUserInput | FeedExperimentAssignmentCreateOrConnectWithoutUserInput[]
+    createMany?: FeedExperimentAssignmentCreateManyUserInputEnvelope
+    connect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
   }
 
   export type UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput = {
@@ -62987,6 +69000,44 @@ export namespace Prisma {
     update?: SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput | SiteCommentLikeUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: SiteCommentLikeUpdateManyWithWhereWithoutUserInput | SiteCommentLikeUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
+  }
+
+  export type UserFeedStateUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserFeedStateCreateOrConnectWithoutUserInput
+    upsert?: UserFeedStateUpsertWithoutUserInput
+    disconnect?: UserFeedStateWhereInput | boolean
+    delete?: UserFeedStateWhereInput | boolean
+    connect?: UserFeedStateWhereUniqueInput
+    update?: XOR<XOR<UserFeedStateUpdateToOneWithWhereWithoutUserInput, UserFeedStateUpdateWithoutUserInput>, UserFeedStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FeedImpressionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput> | FeedImpressionCreateWithoutUserInput[] | FeedImpressionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutUserInput | FeedImpressionCreateOrConnectWithoutUserInput[]
+    upsert?: FeedImpressionUpsertWithWhereUniqueWithoutUserInput | FeedImpressionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FeedImpressionCreateManyUserInputEnvelope
+    set?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    disconnect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    delete?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    update?: FeedImpressionUpdateWithWhereUniqueWithoutUserInput | FeedImpressionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FeedImpressionUpdateManyWithWhereWithoutUserInput | FeedImpressionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+  }
+
+  export type FeedExperimentAssignmentUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput> | FeedExperimentAssignmentCreateWithoutUserInput[] | FeedExperimentAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedExperimentAssignmentCreateOrConnectWithoutUserInput | FeedExperimentAssignmentCreateOrConnectWithoutUserInput[]
+    upsert?: FeedExperimentAssignmentUpsertWithWhereUniqueWithoutUserInput | FeedExperimentAssignmentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FeedExperimentAssignmentCreateManyUserInputEnvelope
+    set?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    disconnect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    delete?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    connect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    update?: FeedExperimentAssignmentUpdateWithWhereUniqueWithoutUserInput | FeedExperimentAssignmentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FeedExperimentAssignmentUpdateManyWithWhereWithoutUserInput | FeedExperimentAssignmentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FeedExperimentAssignmentScalarWhereInput | FeedExperimentAssignmentScalarWhereInput[]
   }
 
   export type UserDeviceTokenUpdateManyWithoutUserNestedInput = {
@@ -63391,6 +69442,44 @@ export namespace Prisma {
     deleteMany?: SiteCommentLikeScalarWhereInput | SiteCommentLikeScalarWhereInput[]
   }
 
+  export type UserFeedStateUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserFeedStateCreateOrConnectWithoutUserInput
+    upsert?: UserFeedStateUpsertWithoutUserInput
+    disconnect?: UserFeedStateWhereInput | boolean
+    delete?: UserFeedStateWhereInput | boolean
+    connect?: UserFeedStateWhereUniqueInput
+    update?: XOR<XOR<UserFeedStateUpdateToOneWithWhereWithoutUserInput, UserFeedStateUpdateWithoutUserInput>, UserFeedStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FeedImpressionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput> | FeedImpressionCreateWithoutUserInput[] | FeedImpressionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutUserInput | FeedImpressionCreateOrConnectWithoutUserInput[]
+    upsert?: FeedImpressionUpsertWithWhereUniqueWithoutUserInput | FeedImpressionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FeedImpressionCreateManyUserInputEnvelope
+    set?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    disconnect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    delete?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    update?: FeedImpressionUpdateWithWhereUniqueWithoutUserInput | FeedImpressionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FeedImpressionUpdateManyWithWhereWithoutUserInput | FeedImpressionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+  }
+
+  export type FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput> | FeedExperimentAssignmentCreateWithoutUserInput[] | FeedExperimentAssignmentUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FeedExperimentAssignmentCreateOrConnectWithoutUserInput | FeedExperimentAssignmentCreateOrConnectWithoutUserInput[]
+    upsert?: FeedExperimentAssignmentUpsertWithWhereUniqueWithoutUserInput | FeedExperimentAssignmentUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FeedExperimentAssignmentCreateManyUserInputEnvelope
+    set?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    disconnect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    delete?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    connect?: FeedExperimentAssignmentWhereUniqueInput | FeedExperimentAssignmentWhereUniqueInput[]
+    update?: FeedExperimentAssignmentUpdateWithWhereUniqueWithoutUserInput | FeedExperimentAssignmentUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FeedExperimentAssignmentUpdateManyWithWhereWithoutUserInput | FeedExperimentAssignmentUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FeedExperimentAssignmentScalarWhereInput | FeedExperimentAssignmentScalarWhereInput[]
+  }
+
   export type UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<UserDeviceTokenCreateWithoutUserInput, UserDeviceTokenUncheckedCreateWithoutUserInput> | UserDeviceTokenCreateWithoutUserInput[] | UserDeviceTokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: UserDeviceTokenCreateOrConnectWithoutUserInput | UserDeviceTokenCreateOrConnectWithoutUserInput[]
@@ -63716,6 +69805,19 @@ export namespace Prisma {
     connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
   }
 
+  export type SiteFeatureSnapshotCreateNestedOneWithoutSiteInput = {
+    create?: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: SiteFeatureSnapshotCreateOrConnectWithoutSiteInput
+    connect?: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  export type FeedImpressionCreateNestedManyWithoutSiteInput = {
+    create?: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput> | FeedImpressionCreateWithoutSiteInput[] | FeedImpressionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutSiteInput | FeedImpressionCreateOrConnectWithoutSiteInput[]
+    createMany?: FeedImpressionCreateManySiteInputEnvelope
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+  }
+
   export type ReportUncheckedCreateNestedManyWithoutSiteInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -63763,6 +69865,19 @@ export namespace Prisma {
     connectOrCreate?: SiteShareLinkCreateOrConnectWithoutSiteInput | SiteShareLinkCreateOrConnectWithoutSiteInput[]
     createMany?: SiteShareLinkCreateManySiteInputEnvelope
     connect?: SiteShareLinkWhereUniqueInput | SiteShareLinkWhereUniqueInput[]
+  }
+
+  export type SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput = {
+    create?: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: SiteFeatureSnapshotCreateOrConnectWithoutSiteInput
+    connect?: SiteFeatureSnapshotWhereUniqueInput
+  }
+
+  export type FeedImpressionUncheckedCreateNestedManyWithoutSiteInput = {
+    create?: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput> | FeedImpressionCreateWithoutSiteInput[] | FeedImpressionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutSiteInput | FeedImpressionCreateOrConnectWithoutSiteInput[]
+    createMany?: FeedImpressionCreateManySiteInputEnvelope
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -63875,6 +69990,30 @@ export namespace Prisma {
     deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
   }
 
+  export type SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput = {
+    create?: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: SiteFeatureSnapshotCreateOrConnectWithoutSiteInput
+    upsert?: SiteFeatureSnapshotUpsertWithoutSiteInput
+    disconnect?: SiteFeatureSnapshotWhereInput | boolean
+    delete?: SiteFeatureSnapshotWhereInput | boolean
+    connect?: SiteFeatureSnapshotWhereUniqueInput
+    update?: XOR<XOR<SiteFeatureSnapshotUpdateToOneWithWhereWithoutSiteInput, SiteFeatureSnapshotUpdateWithoutSiteInput>, SiteFeatureSnapshotUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type FeedImpressionUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput> | FeedImpressionCreateWithoutSiteInput[] | FeedImpressionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutSiteInput | FeedImpressionCreateOrConnectWithoutSiteInput[]
+    upsert?: FeedImpressionUpsertWithWhereUniqueWithoutSiteInput | FeedImpressionUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: FeedImpressionCreateManySiteInputEnvelope
+    set?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    disconnect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    delete?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    update?: FeedImpressionUpdateWithWhereUniqueWithoutSiteInput | FeedImpressionUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: FeedImpressionUpdateManyWithWhereWithoutSiteInput | FeedImpressionUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+  }
+
   export type ReportUncheckedUpdateManyWithoutSiteNestedInput = {
     create?: XOR<ReportCreateWithoutSiteInput, ReportUncheckedCreateWithoutSiteInput> | ReportCreateWithoutSiteInput[] | ReportUncheckedCreateWithoutSiteInput[]
     connectOrCreate?: ReportCreateOrConnectWithoutSiteInput | ReportCreateOrConnectWithoutSiteInput[]
@@ -63971,6 +70110,30 @@ export namespace Prisma {
     update?: SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput | SiteShareLinkUpdateWithWhereUniqueWithoutSiteInput[]
     updateMany?: SiteShareLinkUpdateManyWithWhereWithoutSiteInput | SiteShareLinkUpdateManyWithWhereWithoutSiteInput[]
     deleteMany?: SiteShareLinkScalarWhereInput | SiteShareLinkScalarWhereInput[]
+  }
+
+  export type SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput = {
+    create?: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+    connectOrCreate?: SiteFeatureSnapshotCreateOrConnectWithoutSiteInput
+    upsert?: SiteFeatureSnapshotUpsertWithoutSiteInput
+    disconnect?: SiteFeatureSnapshotWhereInput | boolean
+    delete?: SiteFeatureSnapshotWhereInput | boolean
+    connect?: SiteFeatureSnapshotWhereUniqueInput
+    update?: XOR<XOR<SiteFeatureSnapshotUpdateToOneWithWhereWithoutSiteInput, SiteFeatureSnapshotUpdateWithoutSiteInput>, SiteFeatureSnapshotUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput = {
+    create?: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput> | FeedImpressionCreateWithoutSiteInput[] | FeedImpressionUncheckedCreateWithoutSiteInput[]
+    connectOrCreate?: FeedImpressionCreateOrConnectWithoutSiteInput | FeedImpressionCreateOrConnectWithoutSiteInput[]
+    upsert?: FeedImpressionUpsertWithWhereUniqueWithoutSiteInput | FeedImpressionUpsertWithWhereUniqueWithoutSiteInput[]
+    createMany?: FeedImpressionCreateManySiteInputEnvelope
+    set?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    disconnect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    delete?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    connect?: FeedImpressionWhereUniqueInput | FeedImpressionWhereUniqueInput[]
+    update?: FeedImpressionUpdateWithWhereUniqueWithoutSiteInput | FeedImpressionUpdateWithWhereUniqueWithoutSiteInput[]
+    updateMany?: FeedImpressionUpdateManyWithWhereWithoutSiteInput | FeedImpressionUpdateManyWithWhereWithoutSiteInput[]
+    deleteMany?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
   }
 
   export type ReportCreatemediaUrlsInput = {
@@ -65600,6 +71763,103 @@ export namespace Prisma {
     update?: XOR<XOR<SiteShareLinkUpdateToOneWithWhereWithoutAttributionEventsInput, SiteShareLinkUpdateWithoutAttributionEventsInput>, SiteShareLinkUncheckedUpdateWithoutAttributionEventsInput>
   }
 
+  export type UserFeedStateCreatemutedCategoryIdsInput = {
+    set: string[]
+  }
+
+  export type UserFeedStateCreatehiddenSiteIdsInput = {
+    set: string[]
+  }
+
+  export type UserFeedStateCreatefollowReporterIdsInput = {
+    set: string[]
+  }
+
+  export type UserCreateNestedOneWithoutFeedStateInput = {
+    create?: XOR<UserCreateWithoutFeedStateInput, UserUncheckedCreateWithoutFeedStateInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedStateInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserFeedStateUpdatemutedCategoryIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserFeedStateUpdatehiddenSiteIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserFeedStateUpdatefollowReporterIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type UserUpdateOneRequiredWithoutFeedStateNestedInput = {
+    create?: XOR<UserCreateWithoutFeedStateInput, UserUncheckedCreateWithoutFeedStateInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedStateInput
+    upsert?: UserUpsertWithoutFeedStateInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFeedStateInput, UserUpdateWithoutFeedStateInput>, UserUncheckedUpdateWithoutFeedStateInput>
+  }
+
+  export type SiteCreateNestedOneWithoutFeatureSnapshotInput = {
+    create?: XOR<SiteCreateWithoutFeatureSnapshotInput, SiteUncheckedCreateWithoutFeatureSnapshotInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutFeatureSnapshotInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type SiteUpdateOneRequiredWithoutFeatureSnapshotNestedInput = {
+    create?: XOR<SiteCreateWithoutFeatureSnapshotInput, SiteUncheckedCreateWithoutFeatureSnapshotInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutFeatureSnapshotInput
+    upsert?: SiteUpsertWithoutFeatureSnapshotInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutFeatureSnapshotInput, SiteUpdateWithoutFeatureSnapshotInput>, SiteUncheckedUpdateWithoutFeatureSnapshotInput>
+  }
+
+  export type UserCreateNestedOneWithoutFeedImpressionsInput = {
+    create?: XOR<UserCreateWithoutFeedImpressionsInput, UserUncheckedCreateWithoutFeedImpressionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedImpressionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SiteCreateNestedOneWithoutFeedImpressionsInput = {
+    create?: XOR<SiteCreateWithoutFeedImpressionsInput, SiteUncheckedCreateWithoutFeedImpressionsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutFeedImpressionsInput
+    connect?: SiteWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutFeedImpressionsNestedInput = {
+    create?: XOR<UserCreateWithoutFeedImpressionsInput, UserUncheckedCreateWithoutFeedImpressionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedImpressionsInput
+    upsert?: UserUpsertWithoutFeedImpressionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFeedImpressionsInput, UserUpdateWithoutFeedImpressionsInput>, UserUncheckedUpdateWithoutFeedImpressionsInput>
+  }
+
+  export type SiteUpdateOneRequiredWithoutFeedImpressionsNestedInput = {
+    create?: XOR<SiteCreateWithoutFeedImpressionsInput, SiteUncheckedCreateWithoutFeedImpressionsInput>
+    connectOrCreate?: SiteCreateOrConnectWithoutFeedImpressionsInput
+    upsert?: SiteUpsertWithoutFeedImpressionsInput
+    connect?: SiteWhereUniqueInput
+    update?: XOR<XOR<SiteUpdateToOneWithWhereWithoutFeedImpressionsInput, SiteUpdateWithoutFeedImpressionsInput>, SiteUncheckedUpdateWithoutFeedImpressionsInput>
+  }
+
+  export type UserCreateNestedOneWithoutFeedExperimentAssignmentsInput = {
+    create?: XOR<UserCreateWithoutFeedExperimentAssignmentsInput, UserUncheckedCreateWithoutFeedExperimentAssignmentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedExperimentAssignmentsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutFeedExperimentAssignmentsNestedInput = {
+    create?: XOR<UserCreateWithoutFeedExperimentAssignmentsInput, UserUncheckedCreateWithoutFeedExperimentAssignmentsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFeedExperimentAssignmentsInput
+    upsert?: UserUpsertWithoutFeedExperimentAssignmentsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFeedExperimentAssignmentsInput, UserUpdateWithoutFeedExperimentAssignmentsInput>, UserUncheckedUpdateWithoutFeedExperimentAssignmentsInput>
+  }
+
   export type UserCreateNestedOneWithoutDeviceTokensInput = {
     create?: XOR<UserCreateWithoutDeviceTokensInput, UserUncheckedCreateWithoutDeviceTokensInput>
     connectOrCreate?: UserCreateOrConnectWithoutDeviceTokensInput
@@ -66761,6 +73021,83 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserFeedStateCreateWithoutUserInput = {
+    mutedCategoryIds?: UserFeedStateCreatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateCreatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateCreatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: number
+    lastFeedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type UserFeedStateUncheckedCreateWithoutUserInput = {
+    mutedCategoryIds?: UserFeedStateCreatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateCreatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateCreatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: number
+    lastFeedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type UserFeedStateCreateOrConnectWithoutUserInput = {
+    where: UserFeedStateWhereUniqueInput
+    create: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+  }
+
+  export type FeedImpressionCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+    site: SiteCreateNestedOneWithoutFeedImpressionsInput
+  }
+
+  export type FeedImpressionUncheckedCreateWithoutUserInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
+  export type FeedImpressionCreateOrConnectWithoutUserInput = {
+    where: FeedImpressionWhereUniqueInput
+    create: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput>
+  }
+
+  export type FeedImpressionCreateManyUserInputEnvelope = {
+    data: FeedImpressionCreateManyUserInput | FeedImpressionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FeedExperimentAssignmentCreateWithoutUserInput = {
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
+  }
+
+  export type FeedExperimentAssignmentUncheckedCreateWithoutUserInput = {
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
+  }
+
+  export type FeedExperimentAssignmentCreateOrConnectWithoutUserInput = {
+    where: FeedExperimentAssignmentWhereUniqueInput
+    create: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput>
+  }
+
+  export type FeedExperimentAssignmentCreateManyUserInputEnvelope = {
+    data: FeedExperimentAssignmentCreateManyUserInput | FeedExperimentAssignmentCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserDeviceTokenCreateWithoutUserInput = {
     id?: string
     createdAt?: Date | string
@@ -67716,6 +74053,93 @@ export namespace Prisma {
     userId?: StringFilter<"SiteCommentLike"> | string
   }
 
+  export type UserFeedStateUpsertWithoutUserInput = {
+    update: XOR<UserFeedStateUpdateWithoutUserInput, UserFeedStateUncheckedUpdateWithoutUserInput>
+    create: XOR<UserFeedStateCreateWithoutUserInput, UserFeedStateUncheckedCreateWithoutUserInput>
+    where?: UserFeedStateWhereInput
+  }
+
+  export type UserFeedStateUpdateToOneWithWhereWithoutUserInput = {
+    where?: UserFeedStateWhereInput
+    data: XOR<UserFeedStateUpdateWithoutUserInput, UserFeedStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserFeedStateUpdateWithoutUserInput = {
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserFeedStateUncheckedUpdateWithoutUserInput = {
+    mutedCategoryIds?: UserFeedStateUpdatemutedCategoryIdsInput | string[]
+    hiddenSiteIds?: UserFeedStateUpdatehiddenSiteIdsInput | string[]
+    followReporterIds?: UserFeedStateUpdatefollowReporterIdsInput | string[]
+    engagementProfile?: NullableJsonNullValueInput | InputJsonValue
+    recencyDecayFactor?: FloatFieldUpdateOperationsInput | number
+    lastFeedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedImpressionUpsertWithWhereUniqueWithoutUserInput = {
+    where: FeedImpressionWhereUniqueInput
+    update: XOR<FeedImpressionUpdateWithoutUserInput, FeedImpressionUncheckedUpdateWithoutUserInput>
+    create: XOR<FeedImpressionCreateWithoutUserInput, FeedImpressionUncheckedCreateWithoutUserInput>
+  }
+
+  export type FeedImpressionUpdateWithWhereUniqueWithoutUserInput = {
+    where: FeedImpressionWhereUniqueInput
+    data: XOR<FeedImpressionUpdateWithoutUserInput, FeedImpressionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FeedImpressionUpdateManyWithWhereWithoutUserInput = {
+    where: FeedImpressionScalarWhereInput
+    data: XOR<FeedImpressionUpdateManyMutationInput, FeedImpressionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type FeedImpressionScalarWhereInput = {
+    AND?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+    OR?: FeedImpressionScalarWhereInput[]
+    NOT?: FeedImpressionScalarWhereInput | FeedImpressionScalarWhereInput[]
+    id?: StringFilter<"FeedImpression"> | string
+    createdAt?: DateTimeFilter<"FeedImpression"> | Date | string
+    userId?: StringFilter<"FeedImpression"> | string
+    siteId?: StringFilter<"FeedImpression"> | string
+    variant?: StringFilter<"FeedImpression"> | string
+    position?: IntNullableFilter<"FeedImpression"> | number | null
+    dwellMs?: IntNullableFilter<"FeedImpression"> | number | null
+    engaged?: BoolFilter<"FeedImpression"> | boolean
+  }
+
+  export type FeedExperimentAssignmentUpsertWithWhereUniqueWithoutUserInput = {
+    where: FeedExperimentAssignmentWhereUniqueInput
+    update: XOR<FeedExperimentAssignmentUpdateWithoutUserInput, FeedExperimentAssignmentUncheckedUpdateWithoutUserInput>
+    create: XOR<FeedExperimentAssignmentCreateWithoutUserInput, FeedExperimentAssignmentUncheckedCreateWithoutUserInput>
+  }
+
+  export type FeedExperimentAssignmentUpdateWithWhereUniqueWithoutUserInput = {
+    where: FeedExperimentAssignmentWhereUniqueInput
+    data: XOR<FeedExperimentAssignmentUpdateWithoutUserInput, FeedExperimentAssignmentUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FeedExperimentAssignmentUpdateManyWithWhereWithoutUserInput = {
+    where: FeedExperimentAssignmentScalarWhereInput
+    data: XOR<FeedExperimentAssignmentUpdateManyMutationInput, FeedExperimentAssignmentUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type FeedExperimentAssignmentScalarWhereInput = {
+    AND?: FeedExperimentAssignmentScalarWhereInput | FeedExperimentAssignmentScalarWhereInput[]
+    OR?: FeedExperimentAssignmentScalarWhereInput[]
+    NOT?: FeedExperimentAssignmentScalarWhereInput | FeedExperimentAssignmentScalarWhereInput[]
+    userId?: StringFilter<"FeedExperimentAssignment"> | string
+    experimentKey?: StringFilter<"FeedExperimentAssignment"> | string
+    variant?: StringFilter<"FeedExperimentAssignment"> | string
+    assignedAt?: DateTimeFilter<"FeedExperimentAssignment"> | Date | string
+  }
+
   export type UserDeviceTokenUpsertWithWhereUniqueWithoutUserInput = {
     where: UserDeviceTokenWhereUniqueInput
     update: XOR<UserDeviceTokenUpdateWithoutUserInput, UserDeviceTokenUncheckedUpdateWithoutUserInput>
@@ -68186,6 +74610,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -68241,6 +74668,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -68312,6 +74742,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -68367,6 +74800,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -68422,6 +74858,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -68477,6 +74916,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -68548,6 +74990,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -68603,6 +75048,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -68658,6 +75106,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -68713,6 +75164,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -68784,6 +75238,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -68839,6 +75296,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -68894,6 +75354,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -68949,6 +75412,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -69020,6 +75486,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -69075,6 +75544,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -69130,6 +75602,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -69185,6 +75660,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -69256,6 +75734,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -69311,6 +75792,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -69611,6 +76095,71 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SiteFeatureSnapshotCreateWithoutSiteInput = {
+    velocity1h?: number
+    velocity6h?: number
+    velocity24h?: number
+    discussionRatio?: number
+    intentRatio?: number
+    qualityScore?: number
+    freshnessHours?: number
+    severityIndex?: number
+    verifiedAgeDays?: number
+    lastReportAt?: Date | string | null
+    denormHash?: string
+    updatedAt?: Date | string
+  }
+
+  export type SiteFeatureSnapshotUncheckedCreateWithoutSiteInput = {
+    velocity1h?: number
+    velocity6h?: number
+    velocity24h?: number
+    discussionRatio?: number
+    intentRatio?: number
+    qualityScore?: number
+    freshnessHours?: number
+    severityIndex?: number
+    verifiedAgeDays?: number
+    lastReportAt?: Date | string | null
+    denormHash?: string
+    updatedAt?: Date | string
+  }
+
+  export type SiteFeatureSnapshotCreateOrConnectWithoutSiteInput = {
+    where: SiteFeatureSnapshotWhereUniqueInput
+    create: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+  }
+
+  export type FeedImpressionCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+    user: UserCreateNestedOneWithoutFeedImpressionsInput
+  }
+
+  export type FeedImpressionUncheckedCreateWithoutSiteInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
+  export type FeedImpressionCreateOrConnectWithoutSiteInput = {
+    where: FeedImpressionWhereUniqueInput
+    create: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput>
+  }
+
+  export type FeedImpressionCreateManySiteInputEnvelope = {
+    data: FeedImpressionCreateManySiteInput | FeedImpressionCreateManySiteInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ReportUpsertWithWhereUniqueWithoutSiteInput = {
     where: ReportWhereUniqueInput
     update: XOR<ReportUpdateWithoutSiteInput, ReportUncheckedUpdateWithoutSiteInput>
@@ -69723,6 +76272,63 @@ export namespace Prisma {
     data: XOR<SiteShareLinkUpdateManyMutationInput, SiteShareLinkUncheckedUpdateManyWithoutSiteInput>
   }
 
+  export type SiteFeatureSnapshotUpsertWithoutSiteInput = {
+    update: XOR<SiteFeatureSnapshotUpdateWithoutSiteInput, SiteFeatureSnapshotUncheckedUpdateWithoutSiteInput>
+    create: XOR<SiteFeatureSnapshotCreateWithoutSiteInput, SiteFeatureSnapshotUncheckedCreateWithoutSiteInput>
+    where?: SiteFeatureSnapshotWhereInput
+  }
+
+  export type SiteFeatureSnapshotUpdateToOneWithWhereWithoutSiteInput = {
+    where?: SiteFeatureSnapshotWhereInput
+    data: XOR<SiteFeatureSnapshotUpdateWithoutSiteInput, SiteFeatureSnapshotUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type SiteFeatureSnapshotUpdateWithoutSiteInput = {
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SiteFeatureSnapshotUncheckedUpdateWithoutSiteInput = {
+    velocity1h?: FloatFieldUpdateOperationsInput | number
+    velocity6h?: FloatFieldUpdateOperationsInput | number
+    velocity24h?: FloatFieldUpdateOperationsInput | number
+    discussionRatio?: FloatFieldUpdateOperationsInput | number
+    intentRatio?: FloatFieldUpdateOperationsInput | number
+    qualityScore?: FloatFieldUpdateOperationsInput | number
+    freshnessHours?: FloatFieldUpdateOperationsInput | number
+    severityIndex?: FloatFieldUpdateOperationsInput | number
+    verifiedAgeDays?: IntFieldUpdateOperationsInput | number
+    lastReportAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    denormHash?: StringFieldUpdateOperationsInput | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedImpressionUpsertWithWhereUniqueWithoutSiteInput = {
+    where: FeedImpressionWhereUniqueInput
+    update: XOR<FeedImpressionUpdateWithoutSiteInput, FeedImpressionUncheckedUpdateWithoutSiteInput>
+    create: XOR<FeedImpressionCreateWithoutSiteInput, FeedImpressionUncheckedCreateWithoutSiteInput>
+  }
+
+  export type FeedImpressionUpdateWithWhereUniqueWithoutSiteInput = {
+    where: FeedImpressionWhereUniqueInput
+    data: XOR<FeedImpressionUpdateWithoutSiteInput, FeedImpressionUncheckedUpdateWithoutSiteInput>
+  }
+
+  export type FeedImpressionUpdateManyWithWhereWithoutSiteInput = {
+    where: FeedImpressionScalarWhereInput
+    data: XOR<FeedImpressionUpdateManyMutationInput, FeedImpressionUncheckedUpdateManyWithoutSiteInput>
+  }
+
   export type SiteCreateWithoutReportsInput = {
     id?: string
     createdAt?: Date | string
@@ -69742,6 +76348,8 @@ export namespace Prisma {
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutReportsInput = {
@@ -69763,6 +76371,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutReportsInput = {
@@ -69809,6 +76419,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -69864,6 +76477,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -69924,6 +76540,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -69979,6 +76598,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -70181,6 +76803,8 @@ export namespace Prisma {
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutReportsInput = {
@@ -70202,6 +76826,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutReportsInput = {
@@ -70254,6 +76880,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -70309,6 +76938,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -70375,6 +77007,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -70430,6 +77065,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -70637,6 +77275,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -70692,6 +77333,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -70818,6 +77462,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -70873,6 +77520,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -70929,6 +77579,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -70984,6 +77637,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -71104,6 +77760,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -71159,6 +77818,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -71268,6 +77930,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -71323,6 +77988,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -71394,6 +78062,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -71449,6 +78120,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -71484,6 +78158,8 @@ export namespace Prisma {
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutEventsInput = {
@@ -71505,6 +78181,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutEventsInput = {
@@ -71552,6 +78230,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -71607,6 +78288,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -72123,6 +78807,8 @@ export namespace Prisma {
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutEventsInput = {
@@ -72144,6 +78830,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutOrganizedCleanupEventsInput = {
@@ -72197,6 +78885,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -72252,6 +78943,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -72674,6 +79368,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -72729,6 +79426,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -72889,6 +79589,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -72944,6 +79647,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -73082,6 +79788,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -73137,6 +79846,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -73304,6 +80016,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -73359,6 +80074,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -73581,6 +80299,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -73636,6 +80357,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -73775,6 +80499,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -73830,6 +80557,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -74125,6 +80855,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -74180,6 +80913,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -74340,6 +81076,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -74395,6 +81134,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -74533,6 +81275,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -74588,6 +81333,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -74799,6 +81547,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -74854,6 +81605,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -75049,6 +81803,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -75104,6 +81861,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -75264,6 +82024,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -75319,6 +82082,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -75801,6 +82567,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -75856,6 +82625,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -76016,6 +82788,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -76071,6 +82846,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -76209,6 +82987,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -76264,6 +83045,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -76424,6 +83208,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -76479,6 +83266,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -76617,6 +83407,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -76672,6 +83465,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -76832,6 +83628,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -76887,6 +83686,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -76921,6 +83723,8 @@ export namespace Prisma {
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutVotesInput = {
@@ -76942,6 +83746,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutVotesInput = {
@@ -76988,6 +83794,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -77043,6 +83852,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -77094,6 +83906,8 @@ export namespace Prisma {
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutVotesInput = {
@@ -77115,6 +83929,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteVotesInput = {
@@ -77167,6 +83983,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -77222,6 +84041,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -77257,6 +84079,8 @@ export namespace Prisma {
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutSavesInput = {
@@ -77278,6 +84102,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutSavesInput = {
@@ -77324,6 +84150,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -77379,6 +84208,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -77430,6 +84262,8 @@ export namespace Prisma {
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutSavesInput = {
@@ -77451,6 +84285,8 @@ export namespace Prisma {
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteSavesInput = {
@@ -77503,6 +84339,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -77558,6 +84397,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -77593,6 +84435,8 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutCommentsInput = {
@@ -77614,6 +84458,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutCommentsInput = {
@@ -77660,6 +84506,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -77715,6 +84564,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -77855,6 +84707,8 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutCommentsInput = {
@@ -77876,6 +84730,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteCommentsInput = {
@@ -77928,6 +84784,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -77983,6 +84842,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -78138,6 +85000,9 @@ export namespace Prisma {
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -78193,6 +85058,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -78301,6 +85169,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -78356,6 +85227,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -78391,6 +85265,8 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutShareEventsInput = {
@@ -78412,6 +85288,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutShareEventsInput = {
@@ -78458,6 +85336,9 @@ export namespace Prisma {
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -78513,6 +85394,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -78564,6 +85448,8 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutShareEventsInput = {
@@ -78585,6 +85471,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteShareEventsInput = {
@@ -78637,6 +85525,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -78692,6 +85583,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -78727,6 +85621,8 @@ export namespace Prisma {
     saves?: SiteSaveCreateNestedManyWithoutSiteInput
     comments?: SiteCommentCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
   }
 
   export type SiteUncheckedCreateWithoutShareLinksInput = {
@@ -78748,6 +85644,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
     comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
     shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
   }
 
   export type SiteCreateOrConnectWithoutShareLinksInput = {
@@ -78794,6 +85692,9 @@ export namespace Prisma {
     siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
@@ -78849,6 +85750,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
@@ -78932,6 +85836,8 @@ export namespace Prisma {
     saves?: SiteSaveUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
   }
 
   export type SiteUncheckedUpdateWithoutShareLinksInput = {
@@ -78953,6 +85859,8 @@ export namespace Prisma {
     saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
     comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
     shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
   }
 
   export type UserUpsertWithoutSiteShareLinksInput = {
@@ -79005,6 +85913,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
@@ -79060,6 +85971,9 @@ export namespace Prisma {
     siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
@@ -79171,6 +86085,966 @@ export namespace Prisma {
     channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
   }
 
+  export type UserCreateWithoutFeedStateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutFeedStateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutFeedStateInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFeedStateInput, UserUncheckedCreateWithoutFeedStateInput>
+  }
+
+  export type UserUpsertWithoutFeedStateInput = {
+    update: XOR<UserUpdateWithoutFeedStateInput, UserUncheckedUpdateWithoutFeedStateInput>
+    create: XOR<UserCreateWithoutFeedStateInput, UserUncheckedCreateWithoutFeedStateInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFeedStateInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFeedStateInput, UserUncheckedUpdateWithoutFeedStateInput>
+  }
+
+  export type UserUpdateWithoutFeedStateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFeedStateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteCreateWithoutFeatureSnapshotInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutFeatureSnapshotInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutFeatureSnapshotInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutFeatureSnapshotInput, SiteUncheckedCreateWithoutFeatureSnapshotInput>
+  }
+
+  export type SiteUpsertWithoutFeatureSnapshotInput = {
+    update: XOR<SiteUpdateWithoutFeatureSnapshotInput, SiteUncheckedUpdateWithoutFeatureSnapshotInput>
+    create: XOR<SiteCreateWithoutFeatureSnapshotInput, SiteUncheckedCreateWithoutFeatureSnapshotInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutFeatureSnapshotInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutFeatureSnapshotInput, SiteUncheckedUpdateWithoutFeatureSnapshotInput>
+  }
+
+  export type SiteUpdateWithoutFeatureSnapshotInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutFeatureSnapshotInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutSiteNestedInput
+  }
+
+  export type UserCreateWithoutFeedImpressionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutFeedImpressionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutFeedImpressionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFeedImpressionsInput, UserUncheckedCreateWithoutFeedImpressionsInput>
+  }
+
+  export type SiteCreateWithoutFeedImpressionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportCreateNestedManyWithoutSiteInput
+    events?: CleanupEventCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotCreateNestedOneWithoutSiteInput
+  }
+
+  export type SiteUncheckedCreateWithoutFeedImpressionsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    latitude: number
+    longitude: number
+    address?: string | null
+    description?: string | null
+    status?: $Enums.SiteStatus
+    upvotesCount?: number
+    commentsCount?: number
+    savesCount?: number
+    sharesCount?: number
+    reports?: ReportUncheckedCreateNestedManyWithoutSiteInput
+    events?: CleanupEventUncheckedCreateNestedManyWithoutSiteInput
+    votes?: SiteVoteUncheckedCreateNestedManyWithoutSiteInput
+    saves?: SiteSaveUncheckedCreateNestedManyWithoutSiteInput
+    comments?: SiteCommentUncheckedCreateNestedManyWithoutSiteInput
+    shareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutSiteInput
+    shareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSiteInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedCreateNestedOneWithoutSiteInput
+  }
+
+  export type SiteCreateOrConnectWithoutFeedImpressionsInput = {
+    where: SiteWhereUniqueInput
+    create: XOR<SiteCreateWithoutFeedImpressionsInput, SiteUncheckedCreateWithoutFeedImpressionsInput>
+  }
+
+  export type UserUpsertWithoutFeedImpressionsInput = {
+    update: XOR<UserUpdateWithoutFeedImpressionsInput, UserUncheckedUpdateWithoutFeedImpressionsInput>
+    create: XOR<UserCreateWithoutFeedImpressionsInput, UserUncheckedCreateWithoutFeedImpressionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFeedImpressionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFeedImpressionsInput, UserUncheckedUpdateWithoutFeedImpressionsInput>
+  }
+
+  export type UserUpdateWithoutFeedImpressionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFeedImpressionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SiteUpsertWithoutFeedImpressionsInput = {
+    update: XOR<SiteUpdateWithoutFeedImpressionsInput, SiteUncheckedUpdateWithoutFeedImpressionsInput>
+    create: XOR<SiteCreateWithoutFeedImpressionsInput, SiteUncheckedCreateWithoutFeedImpressionsInput>
+    where?: SiteWhereInput
+  }
+
+  export type SiteUpdateToOneWithWhereWithoutFeedImpressionsInput = {
+    where?: SiteWhereInput
+    data: XOR<SiteUpdateWithoutFeedImpressionsInput, SiteUncheckedUpdateWithoutFeedImpressionsInput>
+  }
+
+  export type SiteUpdateWithoutFeedImpressionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUpdateOneWithoutSiteNestedInput
+  }
+
+  export type SiteUncheckedUpdateWithoutFeedImpressionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    latitude?: FloatFieldUpdateOperationsInput | number
+    longitude?: FloatFieldUpdateOperationsInput | number
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumSiteStatusFieldUpdateOperationsInput | $Enums.SiteStatus
+    upvotesCount?: IntFieldUpdateOperationsInput | number
+    commentsCount?: IntFieldUpdateOperationsInput | number
+    savesCount?: IntFieldUpdateOperationsInput | number
+    sharesCount?: IntFieldUpdateOperationsInput | number
+    reports?: ReportUncheckedUpdateManyWithoutSiteNestedInput
+    events?: CleanupEventUncheckedUpdateManyWithoutSiteNestedInput
+    votes?: SiteVoteUncheckedUpdateManyWithoutSiteNestedInput
+    saves?: SiteSaveUncheckedUpdateManyWithoutSiteNestedInput
+    comments?: SiteCommentUncheckedUpdateManyWithoutSiteNestedInput
+    shareEvents?: SiteShareEventUncheckedUpdateManyWithoutSiteNestedInput
+    shareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSiteNestedInput
+    featureSnapshot?: SiteFeatureSnapshotUncheckedUpdateOneWithoutSiteNestedInput
+  }
+
+  export type UserCreateWithoutFeedExperimentAssignmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutFeedExperimentAssignmentsInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    firstName: string
+    lastName: string
+    email: string
+    phoneNumber: string
+    passwordHash: string
+    role?: $Enums.Role
+    status?: $Enums.UserStatus
+    isPhoneVerified?: boolean
+    pointsBalance?: number
+    totalPointsEarned?: number
+    totalPointsSpent?: number
+    reportCreditsAvailable?: number
+    reportCreditsSpentTotal?: number
+    reportEmergencyWindowDays?: number
+    reportEmergencyUsedAt?: Date | string | null
+    lastActiveAt?: Date | string | null
+    avatarObjectKey?: string | null
+    avatarUpdatedAt?: Date | string | null
+    totpSecret?: string | null
+    mfaBackupCodes?: UserCreatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: Date | string | null
+    reports?: ReportUncheckedCreateNestedManyWithoutReporterInput
+    moderatedReports?: ReportUncheckedCreateNestedManyWithoutModeratedByInput
+    adminNotifications?: AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+    pointTransactions?: PointTransactionUncheckedCreateNestedManyWithoutUserInput
+    coReportedReports?: ReportCoReporterUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    auditLogs?: AuditLogUncheckedCreateNestedManyWithoutActorInput
+    adminTempTokens?: AdminTempTokenUncheckedCreateNestedManyWithoutUserInput
+    adminPendingMfa?: AdminPendingMfaUncheckedCreateNestedOneWithoutUserInput
+    siteVotes?: SiteVoteUncheckedCreateNestedManyWithoutUserInput
+    siteSaves?: SiteSaveUncheckedCreateNestedManyWithoutUserInput
+    siteComments?: SiteCommentUncheckedCreateNestedManyWithoutAuthorInput
+    siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
+    siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
+    siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
+    userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
+    organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
+    eventParticipations?: EventParticipantUncheckedCreateNestedManyWithoutUserInput
+    eventCheckIns?: EventCheckInUncheckedCreateNestedManyWithoutUserInput
+    eventChatMessages?: EventChatMessageUncheckedCreateNestedManyWithoutAuthorInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedCreateNestedManyWithoutUserInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedCreateNestedManyWithoutPinnedByInput
+    eventChatMutes?: EventChatMuteUncheckedCreateNestedManyWithoutUserInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedCreateNestedManyWithoutUserInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedCreateNestedManyWithoutUploadedByInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedCreateNestedManyWithoutClaimedByInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutFeedExperimentAssignmentsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFeedExperimentAssignmentsInput, UserUncheckedCreateWithoutFeedExperimentAssignmentsInput>
+  }
+
+  export type UserUpsertWithoutFeedExperimentAssignmentsInput = {
+    update: XOR<UserUpdateWithoutFeedExperimentAssignmentsInput, UserUncheckedUpdateWithoutFeedExperimentAssignmentsInput>
+    create: XOR<UserCreateWithoutFeedExperimentAssignmentsInput, UserUncheckedCreateWithoutFeedExperimentAssignmentsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFeedExperimentAssignmentsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFeedExperimentAssignmentsInput, UserUncheckedUpdateWithoutFeedExperimentAssignmentsInput>
+  }
+
+  export type UserUpdateWithoutFeedExperimentAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFeedExperimentAssignmentsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    firstName?: StringFieldUpdateOperationsInput | string
+    lastName?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    phoneNumber?: StringFieldUpdateOperationsInput | string
+    passwordHash?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    status?: EnumUserStatusFieldUpdateOperationsInput | $Enums.UserStatus
+    isPhoneVerified?: BoolFieldUpdateOperationsInput | boolean
+    pointsBalance?: IntFieldUpdateOperationsInput | number
+    totalPointsEarned?: IntFieldUpdateOperationsInput | number
+    totalPointsSpent?: IntFieldUpdateOperationsInput | number
+    reportCreditsAvailable?: IntFieldUpdateOperationsInput | number
+    reportCreditsSpentTotal?: IntFieldUpdateOperationsInput | number
+    reportEmergencyWindowDays?: IntFieldUpdateOperationsInput | number
+    reportEmergencyUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastActiveAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    avatarObjectKey?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    mfaBackupCodes?: UserUpdatemfaBackupCodesInput | string[]
+    organizerCertifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reports?: ReportUncheckedUpdateManyWithoutReporterNestedInput
+    moderatedReports?: ReportUncheckedUpdateManyWithoutModeratedByNestedInput
+    adminNotifications?: AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+    pointTransactions?: PointTransactionUncheckedUpdateManyWithoutUserNestedInput
+    coReportedReports?: ReportCoReporterUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    auditLogs?: AuditLogUncheckedUpdateManyWithoutActorNestedInput
+    adminTempTokens?: AdminTempTokenUncheckedUpdateManyWithoutUserNestedInput
+    adminPendingMfa?: AdminPendingMfaUncheckedUpdateOneWithoutUserNestedInput
+    siteVotes?: SiteVoteUncheckedUpdateManyWithoutUserNestedInput
+    siteSaves?: SiteSaveUncheckedUpdateManyWithoutUserNestedInput
+    siteComments?: SiteCommentUncheckedUpdateManyWithoutAuthorNestedInput
+    siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
+    siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
+    siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
+    userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
+    notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
+    organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
+    eventParticipations?: EventParticipantUncheckedUpdateManyWithoutUserNestedInput
+    eventCheckIns?: EventCheckInUncheckedUpdateManyWithoutUserNestedInput
+    eventChatMessages?: EventChatMessageUncheckedUpdateManyWithoutAuthorNestedInput
+    eventChatReadCursors?: EventChatReadCursorUncheckedUpdateManyWithoutUserNestedInput
+    eventChatPinnedMessages?: EventChatMessageUncheckedUpdateManyWithoutPinnedByNestedInput
+    eventChatMutes?: EventChatMuteUncheckedUpdateManyWithoutUserNestedInput
+    reportSubmitIdempotencyKeys?: ReportSubmitIdempotencyUncheckedUpdateManyWithoutUserNestedInput
+    eventEvidencePhotosUploaded?: EventEvidencePhotoUncheckedUpdateManyWithoutUploadedByNestedInput
+    routeSegmentsClaimed?: EventRouteSegmentUncheckedUpdateManyWithoutClaimedByNestedInput
+    checkInRiskSignals?: CheckInRiskSignalUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutDeviceTokensInput = {
     id?: string
     createdAt?: Date | string
@@ -79211,6 +87085,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
@@ -79266,6 +87143,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
@@ -79337,6 +87217,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
@@ -79392,6 +87275,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
@@ -79447,6 +87333,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
@@ -79502,6 +87391,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     notificationPreferences?: UserNotificationPreferenceUncheckedCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
@@ -79573,6 +87465,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
@@ -79628,6 +87523,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     notificationPreferences?: UserNotificationPreferenceUncheckedUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
@@ -79683,6 +87581,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventCreateNestedManyWithoutOrganizerInput
@@ -79738,6 +87639,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedCreateNestedManyWithoutUserInput
     siteShareLinks?: SiteShareLinkUncheckedCreateNestedManyWithoutSharedByUserInput
     siteCommentLikes?: SiteCommentLikeUncheckedCreateNestedManyWithoutUserInput
+    feedState?: UserFeedStateUncheckedCreateNestedOneWithoutUserInput
+    feedImpressions?: FeedImpressionUncheckedCreateNestedManyWithoutUserInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedCreateNestedManyWithoutUserInput
     deviceTokens?: UserDeviceTokenUncheckedCreateNestedManyWithoutUserInput
     userNotifications?: UserNotificationUncheckedCreateNestedManyWithoutUserInput
     organizedCleanupEvents?: CleanupEventUncheckedCreateNestedManyWithoutOrganizerInput
@@ -79809,6 +87713,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUpdateManyWithoutOrganizerNestedInput
@@ -79864,6 +87771,9 @@ export namespace Prisma {
     siteShareEvents?: SiteShareEventUncheckedUpdateManyWithoutUserNestedInput
     siteShareLinks?: SiteShareLinkUncheckedUpdateManyWithoutSharedByUserNestedInput
     siteCommentLikes?: SiteCommentLikeUncheckedUpdateManyWithoutUserNestedInput
+    feedState?: UserFeedStateUncheckedUpdateOneWithoutUserNestedInput
+    feedImpressions?: FeedImpressionUncheckedUpdateManyWithoutUserNestedInput
+    feedExperimentAssignments?: FeedExperimentAssignmentUncheckedUpdateManyWithoutUserNestedInput
     deviceTokens?: UserDeviceTokenUncheckedUpdateManyWithoutUserNestedInput
     userNotifications?: UserNotificationUncheckedUpdateManyWithoutUserNestedInput
     organizedCleanupEvents?: CleanupEventUncheckedUpdateManyWithoutOrganizerNestedInput
@@ -80026,6 +87936,22 @@ export namespace Prisma {
     id?: string
     createdAt?: Date | string
     commentId: string
+  }
+
+  export type FeedImpressionCreateManyUserInput = {
+    id?: string
+    createdAt?: Date | string
+    siteId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
+  export type FeedExperimentAssignmentCreateManyUserInput = {
+    experimentKey: string
+    variant: string
+    assignedAt?: Date | string
   }
 
   export type UserDeviceTokenCreateManyUserInput = {
@@ -80666,6 +88592,54 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     commentId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type FeedImpressionUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+    site?: SiteUpdateOneRequiredWithoutFeedImpressionsNestedInput
+  }
+
+  export type FeedImpressionUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedImpressionUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    siteId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedExperimentAssignmentUpdateWithoutUserInput = {
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedExperimentAssignmentUncheckedUpdateWithoutUserInput = {
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeedExperimentAssignmentUncheckedUpdateManyWithoutUserInput = {
+    experimentKey?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    assignedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type UserDeviceTokenUpdateWithoutUserInput = {
@@ -81317,6 +89291,16 @@ export namespace Prisma {
     channel?: $Enums.SiteShareChannel
   }
 
+  export type FeedImpressionCreateManySiteInput = {
+    id?: string
+    createdAt?: Date | string
+    userId: string
+    variant: string
+    position?: number | null
+    dwellMs?: number | null
+    engaged?: boolean
+  }
+
   export type ReportUpdateWithoutSiteInput = {
     id?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -81619,6 +89603,36 @@ export namespace Prisma {
     countedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sharedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     channel?: EnumSiteShareChannelFieldUpdateOperationsInput | $Enums.SiteShareChannel
+  }
+
+  export type FeedImpressionUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+    user?: UserUpdateOneRequiredWithoutFeedImpressionsNestedInput
+  }
+
+  export type FeedImpressionUncheckedUpdateWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
+  }
+
+  export type FeedImpressionUncheckedUpdateManyWithoutSiteInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: StringFieldUpdateOperationsInput | string
+    variant?: StringFieldUpdateOperationsInput | string
+    position?: NullableIntFieldUpdateOperationsInput | number | null
+    dwellMs?: NullableIntFieldUpdateOperationsInput | number | null
+    engaged?: BoolFieldUpdateOperationsInput | boolean
   }
 
   export type ReportCreateManyPotentialDuplicateOfInput = {
