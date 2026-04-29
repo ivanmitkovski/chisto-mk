@@ -1,9 +1,11 @@
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/screens/pollution_site_detail_screen.dart';
 import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// [GoRouter] `extra` when opening site detail from the feed with a hydrated card.
 class SiteDetailPreviewExtra {
@@ -13,7 +15,7 @@ class SiteDetailPreviewExtra {
 }
 
 /// Loads [PollutionSite] by id then shows [PollutionSiteDetailScreen].
-class SiteDetailRouteScreen extends StatefulWidget {
+class SiteDetailRouteScreen extends ConsumerStatefulWidget {
   const SiteDetailRouteScreen({
     super.key,
     required this.siteId,
@@ -24,10 +26,11 @@ class SiteDetailRouteScreen extends StatefulWidget {
   final PollutionSite? previewSite;
 
   @override
-  State<SiteDetailRouteScreen> createState() => _SiteDetailRouteScreenState();
+  ConsumerState<SiteDetailRouteScreen> createState() =>
+      _SiteDetailRouteScreenState();
 }
 
-class _SiteDetailRouteScreenState extends State<SiteDetailRouteScreen> {
+class _SiteDetailRouteScreenState extends ConsumerState<SiteDetailRouteScreen> {
   late Future<PollutionSite?> _future;
   PollutionSite? _preview;
 
@@ -36,7 +39,7 @@ class _SiteDetailRouteScreenState extends State<SiteDetailRouteScreen> {
     super.initState();
     final PollutionSite? p = widget.previewSite;
     _preview = p != null && p.id == widget.siteId ? p : null;
-    _future = ServiceLocator.instance.sitesRepository.getSiteById(widget.siteId);
+    _future = ref.read(sitesRepositoryProvider).getSiteById(widget.siteId);
   }
 
   @override
@@ -61,7 +64,8 @@ class _SiteDetailRouteScreenState extends State<SiteDetailRouteScreen> {
               error: appError,
               onRetry: () {
                 setState(() {
-                  _future = ServiceLocator.instance.sitesRepository
+                  _future = ref
+                      .read(sitesRepositoryProvider)
                       .getSiteById(widget.siteId);
                 });
               },
@@ -72,7 +76,7 @@ class _SiteDetailRouteScreenState extends State<SiteDetailRouteScreen> {
         if (site == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Site not found')),
+            body: Center(child: Text(context.l10n.feedSiteNotFoundMessage)),
           );
         }
         return PollutionSiteDetailScreen(site: site);

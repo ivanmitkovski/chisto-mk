@@ -11,6 +11,8 @@ class SitesListResult {
     this.servedFromCache = false,
     this.isStaleFallback = false,
     this.cachedAt,
+    this.lastSuccessfulRefreshAt,
+    this.feedVariant = 'v1',
   });
 
   final List<PollutionSite> sites;
@@ -21,6 +23,8 @@ class SitesListResult {
   final bool servedFromCache;
   final bool isStaleFallback;
   final DateTime? cachedAt;
+  final DateTime? lastSuccessfulRefreshAt;
+  final String feedVariant;
 }
 
 class MapSitesResult {

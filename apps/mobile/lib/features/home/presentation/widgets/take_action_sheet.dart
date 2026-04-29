@@ -22,6 +22,7 @@ class TakeActionSheet extends StatelessWidget {
     AppHaptics.medium();
     return showModalBottomSheet<TakeActionType>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppColors.transparent,
@@ -70,15 +71,12 @@ class TakeActionSheet extends StatelessWidget {
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   context.l10n.takeActionSheetTitle,
-                  style: (AppTypography.textTheme.titleMedium ?? const TextStyle()).copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.3,
-                  ),
+                  style: AppTypography.sheetTitle,
                 ),
                 const SizedBox(height: 4),
                 Text(
                   context.l10n.takeActionSheetSubtitle,
-                  style: (AppTypography.textTheme.bodySmall ?? const TextStyle()).copyWith(
+                  style: AppTypography.cardSubtitle.copyWith(
                     color: AppColors.textMuted,
                   ),
                 ),

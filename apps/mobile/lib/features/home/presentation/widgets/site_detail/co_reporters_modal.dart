@@ -21,6 +21,7 @@ class CoReportersModal extends StatelessWidget {
     if (reporters.isEmpty) return Future<void>.value();
     return showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(

@@ -53,15 +53,12 @@ class FeedFeedbackSheet extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 context.l10n.siteCardFeedOptionsSheetTitle,
-                style: AppTypography.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: -0.3,
-                ),
+                style: AppTypography.sheetTitle,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 context.l10n.siteCardFeedOptionsSheetSubtitle,
-                style: AppTypography.textTheme.bodySmall?.copyWith(
+                style: AppTypography.cardSubtitle.copyWith(
                   color: AppColors.textMuted,
                 ),
               ),
@@ -146,7 +143,7 @@ class FeedFeedbackTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: AppTypography.textTheme.bodyLarge?.copyWith(
+                  style: AppTypography.cardTitle.copyWith(
                     color: textColor,
                     fontWeight: FontWeight.w600,
                   ),

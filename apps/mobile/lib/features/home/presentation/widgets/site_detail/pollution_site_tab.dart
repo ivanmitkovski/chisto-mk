@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_detail_widgets.dart';
 
@@ -92,18 +93,16 @@ class _PollutionSiteTabState extends State<PollutionSiteTab> {
               const SizedBox(height: AppSpacing.md),
               Text(
                 widget.site.title,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.3,
-                    ),
+                style: AppTypography.cardTitle.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 widget.site.description,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium
-                    ?.copyWith(height: 1.45),
+                style: AppTypography.cardSubtitle.copyWith(
+                  height: 1.45,
+                ),
               ),
               const SizedBox(height: AppSpacing.md),
               if (widget.site.firstReport != null) ...<Widget>[

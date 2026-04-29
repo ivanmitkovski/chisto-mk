@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/assets/app_assets.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_engagement_animated_number.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/site_upvote_affordance.dart';
 
@@ -52,11 +53,10 @@ class SiteCardEngagementBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TextStyle countStyle = Theme.of(context).textTheme.bodySmall!.copyWith(
+    final TextStyle countStyle = AppTypography.chipLabel.copyWith(
           fontSize: _actionCountFontSize,
           color: AppColors.textSecondary,
           fontWeight: FontWeight.w600,
-          letterSpacing: -0.2,
         );
 
     return Row(

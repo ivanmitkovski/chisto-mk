@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 
 class SiteInfoCard extends StatelessWidget {
@@ -43,18 +44,17 @@ class SiteInfoCard extends StatelessWidget {
               children: <Widget>[
                 Text(
                   context.l10n.siteDetailInfoCardTitle,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textPrimary,
-                        fontSize: 15,
-                      ),
+                  style: AppTypography.cardTitle.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xxs),
                 Text(
                   context.l10n.siteDetailInfoCardBody,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        height: 1.4,
-                      ),
+                  style: AppTypography.cardSubtitle.copyWith(
+                    height: 1.4,
+                  ),
                 ),
               ],
             ),

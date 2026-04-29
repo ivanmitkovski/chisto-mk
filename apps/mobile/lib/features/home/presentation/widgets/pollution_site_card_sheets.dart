@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository_types.dart';
+import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
@@ -25,16 +25,20 @@ Future<void> openPollutionSiteCardCommentsSheet({
   required void Function(List<Comment> next) onSessionCommentsReplaced,
   required void Function(List<Comment> next) onSessionCommentsChanged,
   required String? feedSessionId,
+  required String? feedVariant,
 }) async {
   trackPollutionFeedCardEvent(
     site.id,
     eventType: PollutionFeedCardEventType.commentOpen,
     sessionId: feedSessionId,
+    feedVariant: feedVariant,
   );
+
+  final sitesRepository = ref.read(sitesRepositoryProvider);
 
   Future<List<Comment>> loadComments(String sort) async {
     final SiteCommentsResult result =
-        await ServiceLocator.instance.sitesRepository.getSiteComments(
+        await sitesRepository.getSiteComments(
       site.id,
       sort: sort,
     );
@@ -125,8 +129,7 @@ Future<void> openPollutionSiteCardCommentsSheet({
               onLoadMoreDirectReplies:
                   (String parentId, int page, String sort) async {
                 final SiteCommentsResult result =
-                    await ServiceLocator.instance.sitesRepository
-                        .getSiteComments(
+                    await sitesRepository.getSiteComments(
                   site.id,
                   parentId: parentId,
                   page: page,
@@ -136,24 +139,22 @@ Future<void> openPollutionSiteCardCommentsSheet({
                 return result.items.map(commentFromSiteCommentItem).toList();
               },
               onCommentSubmitted: (String text, String? parentId) {
-                return ServiceLocator.instance.sitesRepository
+                return sitesRepository
                     .createSiteComment(site.id, text, parentId: parentId)
                     .then(commentFromSiteCommentItem);
               },
               onCommentEdited: (String commentId, String body) {
-                return ServiceLocator.instance.sitesRepository
-                    .updateSiteComment(site.id, commentId, body);
+                return sitesRepository.updateSiteComment(site.id, commentId, body);
               },
               onCommentDeleted: (String commentId) {
-                return ServiceLocator.instance.sitesRepository
-                    .deleteSiteComment(site.id, commentId);
+                return sitesRepository.deleteSiteComment(site.id, commentId);
               },
               onCommentLikeToggled: (String commentId, bool shouldLike) {
                 return shouldLike
-                    ? ServiceLocator.instance.sitesRepository
+                    ? sitesRepository
                         .likeSiteComment(site.id, commentId)
                         .then((_) {})
-                    : ServiceLocator.instance.sitesRepository
+                    : sitesRepository
                         .unlikeSiteComment(site.id, commentId)
                         .then((_) {});
               },

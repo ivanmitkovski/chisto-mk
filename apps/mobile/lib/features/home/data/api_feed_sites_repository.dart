@@ -31,9 +31,28 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
   static const Duration _feedCacheTtl = Duration(seconds: 20);
   static const String _localUpvoteIdsPrefix = 'site_upvote_ids_';
   static const int _localUpvoteIdsMax = 400;
+  static const int _memoryFeedCacheMaxEntries = 24;
 
   final Map<String, ({SitesListResult result, DateTime cachedAt})>
       _memoryFeedCache = <String, ({SitesListResult result, DateTime cachedAt})>{};
+
+  void _rememberFeedCacheEntry(
+    String cacheKey, {
+    required SitesListResult result,
+    required DateTime cachedAt,
+  }) {
+    _memoryFeedCache[cacheKey] = (result: result, cachedAt: cachedAt);
+    if (_memoryFeedCache.length <= _memoryFeedCacheMaxEntries) {
+      return;
+    }
+    final List<MapEntry<String, ({SitesListResult result, DateTime cachedAt})>>
+        entries = _memoryFeedCache.entries.toList()
+          ..sort((a, b) => a.value.cachedAt.compareTo(b.value.cachedAt));
+    for (final entry
+        in entries.take(_memoryFeedCache.length - _memoryFeedCacheMaxEntries)) {
+      _memoryFeedCache.remove(entry.key);
+    }
+  }
 
   Future<void> clearAllCaches() async {
     _memoryFeedCache.clear();
@@ -141,6 +160,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       servedFromCache: result.servedFromCache,
       isStaleFallback: result.isStaleFallback,
       cachedAt: result.cachedAt,
+      lastSuccessfulRefreshAt: result.lastSuccessfulRefreshAt,
+      feedVariant: result.feedVariant,
     );
   }
 
@@ -236,6 +257,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
       limit: parsed.limit,
       nextCursor: parsed.nextCursor,
       cachedAt: record.cachedAt,
+      lastSuccessfulRefreshAt: record.cachedAt,
+      feedVariant: parsed.feedVariant,
     );
   }
 
@@ -311,6 +334,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
           servedFromCache: true,
           isStaleFallback: false,
           cachedAt: cacheHit.cachedAt,
+          lastSuccessfulRefreshAt: cacheHit.result.lastSuccessfulRefreshAt,
+          feedVariant: cacheHit.result.feedVariant,
         ),
       );
     }
@@ -324,8 +349,25 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
         page: page,
         limit: limit,
       );
-      final SitesListResult result = await _mergeUpvotesIntoSitesList(parsed);
-      _memoryFeedCache[cacheKey] = (result: result, cachedAt: now);
+      final String feedVariant =
+          response.headers['x-feed-variant']?.trim().isNotEmpty == true
+              ? response.headers['x-feed-variant']!.trim()
+              : (json['feedVariant'] as String? ?? 'v1');
+      final SitesListResult result = await _mergeUpvotesIntoSitesList(
+        SitesListResult(
+          sites: parsed.sites,
+          total: parsed.total,
+          page: parsed.page,
+          limit: parsed.limit,
+          nextCursor: parsed.nextCursor,
+          servedFromCache: parsed.servedFromCache,
+          isStaleFallback: parsed.isStaleFallback,
+          cachedAt: parsed.cachedAt,
+          lastSuccessfulRefreshAt: now,
+          feedVariant: feedVariant,
+        ),
+      );
+      _rememberFeedCacheEntry(cacheKey, result: result, cachedAt: now);
       unawaited(
         _localCache.persistFeedSnapshot(
           scopeKey: scopeKey,
@@ -348,7 +390,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
         final DateTime fallbackCachedAt = fallback.cachedAt ?? now;
         final SitesListResult merged =
             await _mergeUpvotesIntoSitesList(fallback);
-        _memoryFeedCache[cacheKey] = (
+        _rememberFeedCacheEntry(
+          cacheKey,
           result: merged,
           cachedAt: fallbackCachedAt,
         );
@@ -361,6 +404,8 @@ class ApiFeedSitesRepository implements FeedSitesRepository {
           servedFromCache: true,
           isStaleFallback: true,
           cachedAt: fallbackCachedAt,
+          lastSuccessfulRefreshAt: fallback.lastSuccessfulRefreshAt,
+          feedVariant: merged.feedVariant,
         );
       }
       rethrow;

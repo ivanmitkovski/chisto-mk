@@ -19,7 +19,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/feed_load_more_
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_offline_banner.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_section_header.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_skeleton.dart';
-import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/feed_stale_banner.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/feed_providers.dart';
 import 'package:chisto_mobile/features/home/presentation/providers/repository_providers.dart';
@@ -197,6 +197,9 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     );
     final bool feedIsLoading =
         ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.isLoading));
+    final FeedSitesViewStatus feedStatus = ref.watch(
+      feedSitesNotifierProvider.select((FeedSitesState s) => s.status),
+    );
     final AppError? feedLoadError =
         ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.loadError));
     final bool feedHasMore =
@@ -208,9 +211,16 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     final bool feedLocationAvailable = ref.watch(
       feedSitesNotifierProvider.select((FeedSitesState s) => s.locationAvailable),
     );
+    final bool feedIsStaleFallback =
+        feedStatus == FeedSitesViewStatus.staleData;
     final List<PollutionSite> visibleSites = ref.watch(feedVisibleSitesProvider);
     final FeedFilter activeFilter = ref.watch(feedFilterProvider);
     final String feedSessionId = ref.watch(feedSessionIdProvider);
+    final String displayName =
+        ref.watch(homeAuthStateProvider).displayName ??
+            context.l10n.feedDisplayNameFallback;
+    final String feedVariant =
+        ref.watch(feedSitesNotifierProvider.select((FeedSitesState s) => s.feedVariant));
     final double topHotZoneHeight =
         MediaQuery.of(context).padding.top + AppSpacing.xs;
     return Stack(
@@ -227,9 +237,8 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
             slivers: <Widget>[
               const SliverToBoxAdapter(child: FeedOfflineBannerHost()),
               SliverToBoxAdapter(
-                child:                 FeedHeader(
-                  displayName: ServiceLocator.instance.authState.displayName ??
-                      context.l10n.feedDisplayNameFallback,
+                child: FeedHeader(
+                  displayName: displayName,
                   unreadCount: _unreadNotificationsCount,
                   onProfileTap: () {
                     AppHaptics.softTransition();
@@ -243,11 +252,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                 ),
               ),
               SliverToBoxAdapter(
-                child: FeedSectionHeader(
-                  activeFilter: activeFilter,
-                  sitesCount: visibleSites.length,
-                  onFilterTap: () => _openFilterSheet(context),
-                ),
+                child: const FeedSectionHeader(),
               ),
               SliverToBoxAdapter(
                 child: FeedFilterBar(
@@ -264,9 +269,12 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                   onMoreFiltersTap: () => _openFilterSheet(context),
                 ),
               ),
+              if (feedIsStaleFallback)
+                const SliverToBoxAdapter(child: FeedStaleBanner()),
               if (feedIsLoading)
                 SliverToBoxAdapter(child: _buildSkeletonList())
-              else if (feedLoadError != null)
+              else if (feedLoadError != null &&
+                  feedStatus == FeedSitesViewStatus.firstLoadError)
                 SliverFillRemaining(
                   hasScrollBody: false,
                   child: AppErrorView(
@@ -326,6 +334,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
                         child: PollutionSiteCard(
                           site: visibleSites[index],
                           feedSessionId: feedSessionId,
+                          feedVariant: feedVariant,
                           onHidden: _hideSiteFromFeed,
                         ),
                       ),
@@ -414,6 +423,7 @@ class _PollutionFeedScreenState extends ConsumerState<PollutionFeedScreen>
     AppHaptics.tap();
     showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
       barrierColor: AppColors.overlay,

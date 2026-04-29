@@ -29,6 +29,7 @@ class ReportIssueSheet extends StatefulWidget {
   }) {
     return showModalBottomSheet<bool>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       backgroundColor: AppColors.transparent,
@@ -62,6 +63,8 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
   Future<void> _handleSubmit() async {
     if (!_canSubmit || _isSubmitting) return;
 
+    final NavigatorState navigator = Navigator.of(context);
+    final l10n = context.l10n;
     setState(() => _isSubmitting = true);
     AppHaptics.light();
 
@@ -86,7 +89,7 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
         eventType: 'cta_report_issue_success',
         metadata: <String, dynamic>{'reason': _selectedReason!.name},
       );
-      Navigator.of(context).pop(true);
+      navigator.pop(true);
     } catch (_) {
       if (!mounted) return;
       await ServiceLocator.instance.sitesRepository.trackFeedEvent(
@@ -94,9 +97,10 @@ class _ReportIssueSheetState extends State<ReportIssueSheet> {
         eventType: 'cta_report_issue_failed',
         metadata: <String, dynamic>{'reason': _selectedReason?.name},
       );
+      if (!mounted) return;
       AppSnack.show(
         context,
-        message: context.l10n.reportIssueFailedSnack,
+        message: l10n.reportIssueFailedSnack,
         type: AppSnackType.warning,
       );
     } finally {

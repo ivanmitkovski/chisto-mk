@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:flutter/material.dart';
 
 /// Drag handle, title, and optional site line for the comments sheet.
@@ -52,9 +53,10 @@ class CommentsBottomSheetHeader extends StatelessWidget {
           const SizedBox(height: AppSpacing.sm),
           Text(
             context.l10n.commentsFeedHeaderTitle,
-            style: Theme.of(
-              context,
-            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+            style: AppTypography.sheetTitle.copyWith(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
           ),
           const SizedBox(height: AppSpacing.xs),
           if (siteTitle != null && siteTitle!.isNotEmpty) ...<Widget>[
@@ -63,9 +65,7 @@ class CommentsBottomSheetHeader extends StatelessWidget {
               siteTitle!,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textMuted),
+              style: AppTypography.cardSubtitle.copyWith(color: AppColors.textMuted),
             ),
           ],
           const SizedBox(height: AppSpacing.xs),

@@ -9,6 +9,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest --passWithNoTests",
+    "feed:simulate": "tsx scripts/feed-v2-simulation.ts",
     "seed": "tsx prisma/seed.ts",
     "db:resolve:report-title": "prisma migrate resolve --applied 20260326190001_add_report_title",
     "db:migrate:status": "prisma migrate status"
@@ -43,6 +44,7 @@
     "jsonwebtoken": "^9.0.3",
     "luxon": "^3.7.2",
     "multer": "^1.4.5-lts.1",
+    "onnxruntime-node": "^1.24.3",
     "otplib": "^13.4.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",

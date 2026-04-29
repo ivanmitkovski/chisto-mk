@@ -248,10 +248,12 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
   }
 
   Future<void> _openReportIssueSheet(BuildContext context) async {
+    final l10n = context.l10n;
     await ref.read(sitesRepositoryProvider).trackFeedEvent(
       _site.id,
       eventType: 'cta_report_issue_opened',
     );
+    if (!context.mounted) return;
     final bool? reported = await ReportIssueSheet.show(
       context,
       site: _site,
@@ -262,7 +264,7 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
       setState(() => _hasReportedIssue = true);
       AppSnack.show(
         context,
-        message: context.l10n.siteDetailThankYouReportSnack,
+        message: l10n.siteDetailThankYouReportSnack,
         type: AppSnackType.success,
       );
     }
@@ -381,6 +383,7 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
 
   Future<void> _showCommentsSheet(BuildContext context) async {
     AppHaptics.tap();
+    final l10n = context.l10n;
     Future<List<Comment>> loadComments(String sort) async {
       final result = await ref.read(sitesRepositoryProvider).getSiteComments(
         _site.id,
@@ -396,10 +399,10 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
         });
       }
     } catch (_) {
-      if (mounted) {
+      if (context.mounted) {
         AppSnack.show(
           context,
-          message: context.l10n.commentsPrefetchCouldNotRefreshSnack,
+          message: l10n.commentsPrefetchCouldNotRefreshSnack,
           type: AppSnackType.info,
         );
       }
@@ -505,6 +508,7 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
     AppHaptics.tap();
     await showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       useSafeArea: true,
       barrierColor: AppColors.overlay,
@@ -550,6 +554,7 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
     AppHaptics.tap();
     await showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       useSafeArea: true,
       barrierColor: AppColors.overlay,
       backgroundColor: AppColors.transparent,
@@ -612,10 +617,9 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
             child: Center(
               child: Text(
                 _site.title,
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
-                    ),
+                style: AppTypography.cardTitle.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textAlign: TextAlign.center,

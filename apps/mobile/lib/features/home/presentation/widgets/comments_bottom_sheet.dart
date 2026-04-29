@@ -318,6 +318,7 @@ class _CommentsBottomSheetState extends State<CommentsBottomSheet> {
     if (_isCommentBusy(comment.id)) return;
     final String? action = await showModalBottomSheet<String>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppColors.transparent,
       builder: (BuildContext context) {

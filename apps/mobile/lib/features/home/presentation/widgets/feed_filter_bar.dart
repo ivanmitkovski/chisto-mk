@@ -1,6 +1,7 @@
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/feed_filter_sheet.dart';
 import 'package:flutter/material.dart';
 
@@ -39,13 +40,12 @@ class FeedFilterBar extends StatelessWidget {
                   showCheckmark: false,
                   onSelected: (_) => onFilterSelected(filter),
                   selectedColor: AppColors.primaryDark.withValues(alpha: 0.12),
-                  labelStyle: TextStyle(
+                  labelStyle: AppTypography.chipLabel.copyWith(
                     color: activeFilter == filter
                         ? AppColors.primaryDark
                         : AppColors.textSecondary,
                     fontWeight:
                         activeFilter == filter ? FontWeight.w600 : FontWeight.w500,
-                    fontSize: 13,
                   ),
                   side: BorderSide(
                     color: activeFilter == filter

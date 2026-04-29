@@ -180,7 +180,12 @@ class SitesLocalCache {
     if (raw == null || raw.isEmpty) {
       return null;
     }
-    final Object? decoded = jsonDecode(raw);
+    final Object? decoded;
+    try {
+      decoded = jsonDecode(raw);
+    } on FormatException {
+      return null;
+    }
     if (decoded is! Map<String, dynamic>) {
       return null;
     }

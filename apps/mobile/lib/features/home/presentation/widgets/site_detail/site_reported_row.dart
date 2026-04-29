@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 
@@ -33,12 +34,12 @@ class SiteReportedRow extends StatelessWidget {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(height: 1.35),
+              style: AppTypography.cardSubtitle.copyWith(height: 1.35),
               children: <TextSpan>[
                 TextSpan(text: context.l10n.siteDetailReportedByPrefix),
                 TextSpan(
                   text: reporterName,
-                  style: const TextStyle(
+                  style: AppTypography.cardSubtitle.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),

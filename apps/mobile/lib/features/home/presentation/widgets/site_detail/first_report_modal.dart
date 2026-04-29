@@ -19,6 +19,7 @@ class FirstReportModal extends StatelessWidget {
   static Future<void> show(BuildContext context, SiteReport report) {
     return showModalBottomSheet<void>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       backgroundColor: AppColors.panelBackground,
       shape: const RoundedRectangleBorder(

@@ -11,6 +11,7 @@ describe('SitesController', () => {
         data: [],
         meta: { page: 1, limit: 20, total: 0, nextCursor: null },
       })),
+      getFeedVariantForUser: jest.fn(() => 'v1'),
       ingestShareAttributionEvent: jest.fn(async (input) => ({
         counted: true,
         siteId: 'site_1',
@@ -30,6 +31,7 @@ describe('SitesController', () => {
     const out = await controller.findAll(
       { page: 1, limit: 20, sort: 'hybrid', mode: 'for_you' } as never,
       undefined,
+      { setHeader: jest.fn() } as never,
     );
     expect(sitesService.findAll).toHaveBeenCalled();
     expect(out.meta.page).toBe(1);
