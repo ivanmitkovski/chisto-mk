@@ -523,6 +523,51 @@ exports.Prisma.SiteShareAttributionEventScalarFieldEnum = {
   openedByUserId: 'openedByUserId'
 };
 
+exports.Prisma.UserFeedStateScalarFieldEnum = {
+  userId: 'userId',
+  mutedCategoryIds: 'mutedCategoryIds',
+  hiddenSiteIds: 'hiddenSiteIds',
+  followReporterIds: 'followReporterIds',
+  engagementProfile: 'engagementProfile',
+  recencyDecayFactor: 'recencyDecayFactor',
+  lastFeedAt: 'lastFeedAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SiteFeatureSnapshotScalarFieldEnum = {
+  siteId: 'siteId',
+  velocity1h: 'velocity1h',
+  velocity6h: 'velocity6h',
+  velocity24h: 'velocity24h',
+  discussionRatio: 'discussionRatio',
+  intentRatio: 'intentRatio',
+  qualityScore: 'qualityScore',
+  freshnessHours: 'freshnessHours',
+  severityIndex: 'severityIndex',
+  verifiedAgeDays: 'verifiedAgeDays',
+  lastReportAt: 'lastReportAt',
+  denormHash: 'denormHash',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.FeedImpressionScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  siteId: 'siteId',
+  variant: 'variant',
+  position: 'position',
+  dwellMs: 'dwellMs',
+  engaged: 'engaged'
+};
+
+exports.Prisma.FeedExperimentAssignmentScalarFieldEnum = {
+  userId: 'userId',
+  experimentKey: 'experimentKey',
+  variant: 'variant',
+  assignedAt: 'assignedAt'
+};
+
 exports.Prisma.UserDeviceTokenScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -802,6 +847,10 @@ exports.Prisma.ModelName = {
   SiteShareEvent: 'SiteShareEvent',
   SiteShareLink: 'SiteShareLink',
   SiteShareAttributionEvent: 'SiteShareAttributionEvent',
+  UserFeedState: 'UserFeedState',
+  SiteFeatureSnapshot: 'SiteFeatureSnapshot',
+  FeedImpression: 'FeedImpression',
+  FeedExperimentAssignment: 'FeedExperimentAssignment',
   UserDeviceToken: 'UserDeviceToken',
   UserNotification: 'UserNotification',
   UserNotificationPreference: 'UserNotificationPreference',
