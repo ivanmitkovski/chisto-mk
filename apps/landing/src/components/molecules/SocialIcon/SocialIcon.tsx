@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils/cn";
 
 interface SocialIconProps {
   platform: "facebook" | "instagram";
-  href?: string;
+  href: string;
   className?: string;
 }
 
@@ -12,7 +12,7 @@ const icons = {
   instagram: Instagram,
 } as const;
 
-export function SocialIcon({ platform, href = "#", className }: SocialIconProps) {
+export function SocialIcon({ platform, href, className }: SocialIconProps) {
   const Icon = icons[platform];
 
   return (

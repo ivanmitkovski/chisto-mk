@@ -5,6 +5,7 @@ import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { CTASection } from "@/components/organisms/CTASection";
 import { routing } from "@/i18n/routing";
+import { LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -34,6 +35,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PressPage() {
   const t = await getTranslations("pressPage");
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || LEGAL_PUBLIC_DEFAULTS.contactEmail;
 
   return (
     <>
@@ -71,10 +73,10 @@ export default async function PressPage() {
               <p className="mt-5 text-gray-600 leading-relaxed">
                 {t("inquiriesLead")}{" "}
                 <a
-                  href="mailto:Contact@Chisto.Mk"
+                  href={`mailto:${contactEmail}`}
                   className="font-semibold text-primary underline-offset-4 hover:underline"
                 >
-                  Contact@Chisto.Mk
+                  {contactEmail}
                 </a>
               </p>
               <h3 className="mt-10 text-sm font-bold uppercase tracking-[0.12em] text-gray-900">

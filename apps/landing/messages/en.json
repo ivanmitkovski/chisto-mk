@@ -194,6 +194,10 @@
     "emailPlaceholder": "Your email",
     "subscribedSuccess": "Subscribed successfully!",
     "copyright": "Copyright {year} Chisto.mk. All rights reserved.",
+    "registrationNumber": "Registration no. {registrationNumber}",
+    "privacyNoticePrefix": "We use this email only for Chisto.mk updates and handle it under our ",
+    "privacyNoticeLink": "Privacy Policy",
+    "privacyNoticeSuffix": ". You can ask us to remove it at any time.",
     "linkHome": "Home",
     "linkPlatform": "Platform",
     "linkNews": "News",
@@ -212,6 +216,9 @@
     "successTitle": "Thank you!",
     "successBody": "We will get back to you shortly.",
     "submitError": "We could not send your message. Please try again later or email us directly.",
+    "privacyNoticePrefix": "By sending this form, you agree that we process your contact details to reply under our ",
+    "privacyNoticeLink": "Privacy Policy",
+    "privacyNoticeSuffix": ".",
     "fullName": "Full name",
     "phone": "Phone number",
     "email": "Email",
@@ -323,13 +330,13 @@
     "badge": "Legal",
     "title": "Terms of use",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "28 March 2026",
+    "lastUpdated": "30 April 2026",
     "noticeTitle": "Before you rely on these terms",
     "noticeBody": "Complete all bracketed fields with verified legal and operational information before treating this text as final. App store privacy declarations should match this document and your published app. This is not legal advice and does not guarantee store approval. Consider review by qualified counsel in Macedonia (and, for EEA users, EU counsel) where appropriate.",
     "sections": [
       {
         "title": "Introduction",
-        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
+        "body": "These Terms of Use (\"Terms\") constitute a legally binding agreement between you (\"User,\" \"you,\" or \"your\") and [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER], registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\").\n\nBy accessing or using the Chisto.mk mobile application and web platform (collectively, the \"Platform\"), you agree to be bound by these Terms. If you do not agree, you must immediately discontinue use of the Platform.\n\nEffective date: [EFFECTIVE_DATE]."
       },
       {
         "title": "1. Definitions",
@@ -337,7 +344,7 @@
       },
       {
         "title": "2. Legal framework and applicability",
-        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of Macedonia and the European Union."
+        "body": "2.1 These Terms are governed by:\n\nLaw on Obligations of the Republic of North Macedonia (Official Gazette No. 18/2001)\nLaw on Consumer Protection (Official Gazette No. 26/2023)\nLaw on Electronic Commerce (Official Gazette No. 39/2014)\nLaw on Personal Data Protection (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 (General Data Protection Regulation)\nConsumer Rights Directive 2011/83/EU\n\n2.2 These Terms apply to all users accessing the Platform from any jurisdiction, with specific consumer protections applicable to users within the Republic of North Macedonia and the European Union."
       },
       {
         "title": "3. Platform description and scope",
@@ -381,11 +388,11 @@
       },
       {
         "title": "13. Dispute resolution and complaints",
-        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
+        "body": "13.1 Complaint procedure\n\nBefore initiating formal proceedings, we encourage users to contact us at:\n\nEmail: [CONTACT_EMAIL]\nAddress: [CONTACT_ADDRESS]\nPhone: [CONTACT_PHONE]\n\nWe will attempt to resolve complaints within 30 days of receipt.\n\n13.2 Amicable settlement\n\nWe are committed to resolving disputes amicably and in good faith.\n\n13.3 Mediation\n\nIf direct resolution fails, parties may pursue mediation through recognized mediation services in the Republic of North Macedonia.\n\n13.4 Consumer ADR\n\nEU consumers may use the EU Online Dispute Resolution platform: https://ec.europa.eu/consumers/odr"
       },
       {
         "title": "14. Governing law and jurisdiction",
-        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
+        "body": "14.1 Governing law\n\nThese Terms are governed by and construed in accordance with the laws of the Republic of North Macedonia, without regard to conflict of law principles.\n\n14.2 Jurisdiction\n\n14.2.1 For disputes with consumers: competent courts in the Republic of North Macedonia as determined by mandatory consumer protection laws (generally, the consumer's place of residence).\n\n14.2.2 For disputes with users who are not consumers (for example organisations using the Platform in a professional capacity): courts of [COURT_LOCATION], Republic of North Macedonia, have exclusive jurisdiction.\n\n14.3 Mandatory consumer rights\n\nNothing in this Section limits mandatory consumer rights under EU or Macedonian law, including the right to bring proceedings in the consumer's country of residence."
       },
       {
         "title": "15. Force majeure",
@@ -397,7 +404,7 @@
       },
       {
         "title": "17. Contact information",
-        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
+        "body": "Service provider:\n\n[LEGAL_ENTITY_NAME]\n[ENTITY_TYPE]\nRegistration number: [REGISTRATION_NUMBER]\nTax ID: [TAX_ID]\nRegistered address: [REGISTERED_ADDRESS]\n\nContact:\n\nEmail: [CONTACT_EMAIL]\nPhone: [CONTACT_PHONE]\nWebsite: [WEBSITE_URL]\n\nData protection officer (if applicable):\n\nEmail: [DPO_EMAIL]\n\nRegulatory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\n\nBY USING THE PLATFORM, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS OF USE."
       }
     ]
   },
@@ -405,13 +412,13 @@
     "badge": "Legal",
     "title": "Privacy policy",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "[DATE]",
+    "lastUpdated": "30 April 2026",
     "noticeTitle": "Before you rely on this policy",
     "noticeBody": "Complete all bracketed fields with accurate details. Apple App Privacy labels and Google Play Data safety should match this Policy and your live build (including Firebase push, map tiles, and optional website analytics). Update this Policy when you change SDKs or retention practices. Not legal advice.",
     "sections": [
       {
         "title": "1. Introduction",
-        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
+        "body": "1.1 Who we are\n\nThis Privacy Policy describes how [LEGAL_ENTITY_NAME], a [ENTITY_TYPE] registered in the Republic of North Macedonia with registration number [REGISTRATION_NUMBER] and registered office at [REGISTERED_ADDRESS] (\"Chisto.mk,\" \"we,\" \"us,\" or \"our\"), collects, uses, stores, and protects your personal data when you use our mobile applications (iOS and Android) and our public website (collectively, the \"Platform\").\n\nWe operate Chisto.mk as a civic environmental initiative focused on transparency and community reporting about local environmental conditions.\n\nMost account, reporting, and map interaction features run in the apps. The website is mainly marketing, legal information, and contact; it may use a small number of cookies or local storage as described in our Cookie Policy.\n\nEffective date: [EFFECTIVE_DATE].\n\n1.2 Our commitment\n\nWe are committed to protecting your privacy and complying with applicable data protection laws, including:\n\nLaw on Personal Data Protection of the Republic of North Macedonia (Official Gazette No. 42/2020)\nRegulation (EU) 2016/679 - General Data Protection Regulation (\"GDPR\")\nLaw on Electronic Communications (Official Gazette No. 39/2014)\n\n1.3 Contact information\n\nData controller:\n[LEGAL_ENTITY_NAME]\n[REGISTERED_ADDRESS]\nEmail: [PRIVACY_EMAIL]\nPhone: [CONTACT_PHONE]\nData protection officer (if applicable):\nEmail: [DPO_EMAIL]\nSupervisory authority:\nAgency for Personal Data Protection\nRepublic of North Macedonia\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk"
       },
       {
         "title": "2. Scope and application",
@@ -431,11 +438,11 @@
       },
       {
         "title": "6. Data sharing and disclosure",
-        "body": "6.1 Consent or instruction\n\nWe share data with third parties when you ask us to or when you deliberately make content public in the product.\n\n6.2 Infrastructure and operations\n\nWe use vetted processors, for example:\n\nHosting and API infrastructure: [HOSTING_PROVIDER] in [SERVER_LOCATION] (or as updated in our records)\nEmail delivery for website forms or newsletters: commonly [EMAIL_PROVIDER] (for example Resend) unless we name another vendor\nPush notifications: Google Firebase Cloud Messaging for device delivery\nWebsite analytics (if you opt in on the site): Vercel Web Analytics\nOptional additional tools: [SUPPORT_PROVIDER], [ANALYTICS_PROVIDER] when we actually deploy them\n\nContracts require processors to use data only on our instructions and to apply appropriate security.\n\n6.3 Maps and geolocation helpers\n\nMap tiles may be loaded from Carto (OpenStreetMap-based raster tiles) and, where the UI offers it, Esri or similar imagery providers. Geocoding may use platform APIs you already bundle. Those providers receive technical requests (tile coordinates, IP in server logs) as normal for map delivery.\n\n6.4 Authorities and aggregates\n\nWe may share anonymised or aggregated environmental statistics with municipalities or partners. We may disclose identifiers or content if the law compels us, to protect rights and safety, or to enforce our Terms.\n\n6.5 Reorganisation or succession\n\nIf we merge, restructure, or another organisation continues the service, personal data may transfer to the successor. We will require them to respect this Policy or notify you.\n\n6.6 Public visibility\n\nReports, comments, usernames, and event listings you publish may be visible to other users and, depending on configuration, on the open web."
+        "body": "6.1 Consent or instruction\n\nWe share data with third parties when you ask us to or when you deliberately make content public in the product.\n\n6.2 Infrastructure and operations\n\nWe use vetted processors, for example:\n\nHosting and API infrastructure: [HOSTING_PROVIDER] in [SERVER_LOCATION] (or as updated in our records)\nEmail delivery for website contact forms and update notifications: [EMAIL_PROVIDER]\nSMS verification: Twilio where SMS one-time codes are active\nPush notifications: Google Firebase Cloud Messaging for device delivery\nMobile diagnostics and analytics: Firebase Crashlytics and Firebase Analytics when included in the production app\nWebsite analytics (if you opt in on the site): Vercel Web Analytics\nSupport channel: [SUPPORT_PROVIDER]\n\nContracts require processors to use data only on our instructions and to apply appropriate security.\n\n6.3 Maps and geolocation helpers\n\nMap tiles may be loaded from Carto (OpenStreetMap-based raster tiles) and, where the UI offers it, Esri World Imagery or similar imagery providers. Geocoding may use platform APIs you already bundle. Those providers receive technical requests (tile coordinates, IP in server logs) as normal for map delivery.\n\n6.4 Authorities and aggregates\n\nWe may share anonymised or aggregated environmental statistics with municipalities or partners. We may disclose identifiers or content if the law compels us, to protect rights and safety, or to enforce our Terms.\n\n6.5 Reorganisation or succession\n\nIf we merge, restructure, or another organisation continues the service, personal data may transfer to the successor. We will require them to respect this Policy or notify you.\n\n6.6 Public visibility\n\nReports, comments, usernames, and event listings you publish may be visible to other users and, depending on configuration, on the open web."
       },
       {
         "title": "7. International data transfers",
-        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
+        "body": "7.1 Data storage locations\n\nYour personal data is primarily stored on servers located in [SERVER_COUNTRY/REGION].\n\n7.2 Transfers outside EU/EEA\n\nIf we transfer data to countries outside the European Economic Area that do not have an adequacy decision from the European Commission, we ensure appropriate safeguards:\n\nEU Standard Contractual Clauses (SCCs)\nBinding Corporate Rules (where applicable)\nRecipient's certification under approved frameworks\nYour explicit consent for specific transfers\n\n7.3 Macedonian context\n\nAs a candidate country for EU membership, the Republic of North Macedonia aligns its data protection framework with EU standards. We treat data protection with the same rigor as EU member states."
       },
       {
         "title": "8. Data retention",
@@ -443,7 +450,7 @@
       },
       {
         "title": "9. Your rights under GDPR",
-        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
+        "body": "Under GDPR and Macedonian data protection law, you have the following rights:\n\n9.1 Right of access (Article 15)\n\nYou have the right to obtain:\n\nConfirmation whether we process your personal data\nA copy of your personal data\nInformation about processing purposes, categories, recipients, and retention periods\n\nHow to exercise: Email [PRIVACY_EMAIL] with subject \"Data Access Request\"\nResponse time: Within 30 days (may extend to 60 days for complex requests)\nCost: Free for the first request; reasonable fee for excessive requests\n\n9.2 Right to rectification (Article 16)\n\nYou have the right to correct inaccurate or incomplete personal data.\n\nHow to exercise:\n\nUpdate directly through account settings in the apps where available\nEmail [PRIVACY_EMAIL] with correct information\nResponse time: Without undue delay, maximum 30 days\n\n9.3 Right to erasure / \"Right to be forgotten\" (Article 17)\n\nYou have the right to request deletion of your personal data when:\n\nData is no longer necessary for original purposes\nYou withdraw consent (where consent was the legal basis)\nYou object to processing and there are no overriding legitimate grounds\nData was unlawfully processed\nLegal obligation requires deletion\n\nExceptions: We may refuse deletion when required for:\n\nLegal compliance (e.g., tax records)\nLegal claims defense\nPublic interest or scientific research\n\nHow to exercise: Account settings > Delete Account in the apps where available, or email [PRIVACY_EMAIL]\nResponse time: 30 days; data purged within 90 days including backups\n\n9.4 Right to restriction of processing (Article 18)\n\nYou have the right to limit processing when:\n\nYou contest data accuracy (during verification)\nProcessing is unlawful but you oppose deletion\nWe no longer need data, but you need it for legal claims\nYou objected to processing (pending verification of legitimate grounds)\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific restriction request\nEffect: Data marked and stored, but not actively processed\n\n9.5 Right to data portability (Article 20)\n\nYou have the right to receive your personal data in a structured, commonly used, machine-readable format and transmit it to another controller.\n\nApplies to:\n\nData provided by you\nProcessing based on consent or contract\nProcessing carried out by automated means\n\nHow to exercise: Account settings > Export Data in the apps where available, or email [PRIVACY_EMAIL]\nFormat: JSON, CSV, or PDF\nResponse time: 30 days\n\n9.6 Right to object (Article 21)\n\n9.6.1 Marketing\n\nYou have the absolute right to object to direct marketing.\n\nHow to exercise: Click \"Unsubscribe\" in emails, or update preferences in account settings in the apps where available\n\n9.6.2 Legitimate interest processing\n\nYou have the right to object to processing based on legitimate interests.\n\nHow to exercise: Email [PRIVACY_EMAIL] with specific objection\nEffect: We will cease processing unless we demonstrate compelling legitimate grounds\n\n9.6.3 Profiling and automated decision-making (Article 22)\n\nWe do not currently engage in automated decision-making with legal or significant effects. If this changes, you will have the right to:\n\nObtain human intervention\nExpress your point of view\nContest the decision\n\n9.7 Right to withdraw consent\n\nWhere processing is based on consent, you can withdraw at any time without affecting prior lawful processing.\n\nHow to exercise: Account settings > Privacy Preferences in the apps where available, or email [PRIVACY_EMAIL]\n\n9.8 Right to lodge a complaint\n\nYou have the right to file a complaint with the supervisory authority:\n\nAgency for Personal Data Protection\nRepublic of North Macedonia\nAddress: [SUPERVISORY_AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\nPhone: [SUPERVISORY_AUTHORITY_PHONE]\n\nFor EU residents: You may also lodge a complaint with the supervisory authority in your EU member state of residence."
       },
       {
         "title": "10. Data security",
@@ -467,7 +474,7 @@
       },
       {
         "title": "15. Specific provisions for Macedonian users",
-        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
+        "body": "15.1 Language\n\nThis Privacy Policy is provided in Macedonian, English, and Albanian. In case of conflict, the Macedonian version prevails for users in the Republic of North Macedonia.\n\n15.2 Supervisory authority\n\nThe competent supervisory authority for data protection matters in Macedonia is:\nАгенција за заштита на личните податоци\n(Agency for Personal Data Protection)\nAddress: [AUTHORITY_ADDRESS]\nWebsite: https://www.dzlp.mk\nEmail: info@dzlp.mk\n\n15.3 Legal basis\n\nProcessing of personal data is conducted in accordance with:\n\nЗакон за заштита на личните податоци (Official Gazette No. 42/2020)\nEU GDPR principles as adopted in Macedonian legislation"
       },
       {
         "title": "16. Contact us",
@@ -479,9 +486,9 @@
     "badge": "Legal",
     "title": "Cookie policy",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "[DATE]",
-    "effectiveDateLabel": "",
-    "effectiveDate": "",
+    "lastUpdated": "30 April 2026",
+    "effectiveDateLabel": "Effective date",
+    "effectiveDate": "29 April 2026",
     "noticeTitle": "Before you rely on this cookie policy",
     "noticeBody": "What the live website does (consent storage, optional analytics identifiers) should match this table and the Privacy Policy. Mobile apps use on-device storage and push tokens as described there, not this browser-focused summary. Bracketed URLs are set through your deployment environment. Not legal advice.",
     "tableTitle": "8. Detailed cookie and storage table (website)",
@@ -579,17 +586,17 @@
   "dataPage": {
     "badge": "Privacy",
     "title": "Your data and account",
-    "lead": "This page explains how to manage your Chisto.mk account and exercise privacy rights. It works together with our Privacy Policy, Cookie Policy, and Terms of use.",
-    "requestTitle": "Requests: access, correction, deletion, and portability",
-    "requestIntro": "Use the channel below to request a copy of your personal data, corrections, restriction, objection where applicable, or account deletion. We may ask for reasonable proof of identity (for example an email from your registered address or a one-time verification step) before we act on sensitive requests.",
+    "lead": "This is Chisto.mk's public account deletion and data rights page. It explains how to request deletion of your account and associated personal data, export your data, correct mistakes, object or restrict processing where applicable, and contact us about privacy questions.",
+    "requestTitle": "Delete your account and data",
+    "requestIntro": "Use the channel below to request account deletion, report anonymisation where applicable, a copy or export of your personal data, corrections, restriction, objection where applicable, or other privacy support. Email requests go to info@ekohab.mk. We may ask for reasonable proof of identity, such as an email from your registered address or a one-time verification step, before acting on sensitive requests.",
     "requestCta": "Open data request channel",
-    "requestMissing": "Set NEXT_PUBLIC_DATA_REQUEST_URL in your deployment environment (email address or HTTPS URL) so this button works for visitors.",
+    "requestMissing": "The data request channel is temporarily unavailable. Email us at info@ekohab.mk.",
     "linkPrivacy": "Privacy policy",
     "linkTerms": "Terms of use",
     "lastUpdatedLabel": "Last updated",
-    "lastUpdated": "28 March 2026",
+    "lastUpdated": "30 April 2026",
     "noticeTitle": "Before you rely on this page",
-    "noticeBody": "Self-service export, identity checks, and timelines here should match how your product works in practice. Complete bracketed fields for your organisation. Not legal advice.",
+    "noticeBody": "This page is the public web channel for account deletion and privacy requests. Apple App Privacy and Google Play Data safety answers should match this page and the Privacy Policy. Not legal advice.",
     "sections": [
       {
         "title": "1. Account and profile",
@@ -605,11 +612,11 @@
       },
       {
         "title": "4. Account deletion and what we keep",
-        "body": "You may request deletion of your Account (GDPR Art. 17) via the data request channel or in-app settings if available. After deletion, we remove or anonymise personal data except where retention is necessary: for example to comply with accounting or tax law, to establish or defend legal claims during applicable limitation periods, or to meet a specific legal obligation. We will explain any limited retention if it applies to you.\n\nSome environmental report content you published may remain visible without personal identifiers, as described in the Data retention and erasure parts of this Privacy Policy (Section 8)."
+        "body": "You may request deletion of your Account (GDPR Art. 17) via the data request channel or in-app settings if available. We review verified deletion requests within 30 days. After approval, we remove or anonymise personal data in production systems except where retention is necessary: for example to comply with accounting or tax law, to establish or defend legal claims during applicable limitation periods, to prevent abuse, or to meet a specific legal obligation. Backups and security archives may take up to 90 days to expire or be overwritten. We will explain any limited retention if it applies to you.\n\nSome environmental report content you published may remain visible without personal identifiers, because civic environmental observations can document conditions in the public interest. Where possible, we detach your account or other personal identifiers while keeping non-personal report facts."
       },
       {
         "title": "5. Marketing and communications preferences",
-        "body": "Service-related messages (security, reports, events) may be necessary.\n\nNewsletters or marketing need a lawful basis, usually consent. Unsubscribe with the link in each email or contact us. Website email may be sent through providers such as Resend; name the live vendor in your subprocessors list."
+        "body": "Service-related messages (security, reports, events) may be necessary.\n\nNewsletters or marketing need a lawful basis, usually consent. Unsubscribe with the link in each email or contact us. Website contact and update notification emails are delivered through Resend today. Mailchimp will be used only if we later enable a newsletter list, and this page and the Privacy Policy will be updated before that happens."
       },
       {
         "title": "6. Cookies and similar technologies",

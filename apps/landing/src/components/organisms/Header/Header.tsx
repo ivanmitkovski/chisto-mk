@@ -9,6 +9,8 @@ import { NavItem } from "@/components/molecules/NavItem";
 import { LanguageSelector } from "@/components/molecules/LanguageSelector";
 import { MobileMenu } from "@/components/organisms/Header/MobileMenu";
 import { cn } from "@/lib/utils/cn";
+import { getPublicOptionalUrl } from "@/lib/legal/legal-public-config";
+import { prefersReducedMotion } from "@/lib/utils/smooth-scroll";
 
 const NAV_HREFS = ["/", "/about", "/news", "/press", "/help", "/contact"] as const;
 const NAV_KEYS = ["home", "about", "news", "press", "help", "contact"] as const;
@@ -17,6 +19,10 @@ export function Header() {
   const [scrolled, setScrolled] = useState(false);
   const tNav = useTranslations("nav");
   const tCommon = useTranslations("common");
+  const hasStoreUrl = Boolean(
+    getPublicOptionalUrl(process.env.NEXT_PUBLIC_APP_STORE_URL) ||
+      getPublicOptionalUrl(process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL),
+  );
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -24,6 +30,15 @@ export function Header() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  function handleDownloadClick() {
+    const target = document.getElementById("download");
+    if (!target) return;
+    target.scrollIntoView({
+      behavior: prefersReducedMotion() ? "instant" : "smooth",
+      block: "start",
+    });
+  }
 
   return (
     <header
@@ -48,9 +63,15 @@ export function Header() {
 
         <div className="flex shrink-0 items-center justify-end gap-2 md:gap-3">
           <LanguageSelector />
-          <Button size="sm" className="hidden px-7 shadow-sm shadow-primary/20 md:inline-flex">
-            {tCommon("download")}
-          </Button>
+          {hasStoreUrl && (
+            <Button
+              size="sm"
+              className="hidden px-7 shadow-sm shadow-primary/20 md:inline-flex"
+              onClick={handleDownloadClick}
+            >
+              {tCommon("download")}
+            </Button>
+          )}
           <div className="md:hidden">
             <MobileMenu />
           </div>

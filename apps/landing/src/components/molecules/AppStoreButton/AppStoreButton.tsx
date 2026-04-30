@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils/cn";
+import { getPublicOptionalUrl } from "@/lib/legal/legal-public-config";
 
 /** Apple Marketing Tools badge SVGs (localized where available). */
 const APPLE_BADGES: Record<string, string> = {
@@ -27,13 +28,20 @@ export function AppStoreButton({ store, className }: AppStoreButtonProps) {
   const locale = useLocale();
   const t = useTranslations("appStore");
   const isApple = store === "apple";
+  const href = isApple
+    ? getPublicOptionalUrl(process.env.NEXT_PUBLIC_APP_STORE_URL)
+    : getPublicOptionalUrl(process.env.NEXT_PUBLIC_GOOGLE_PLAY_URL);
   const badgeSrc = isApple
     ? (APPLE_BADGES[locale] ?? APPLE_BADGES.en)
     : (GOOGLE_BADGES[locale] ?? GOOGLE_BADGES.en);
 
+  if (!href) return null;
+
   return (
     <a
-      href="#"
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
       className={cn(
         "inline-flex items-center leading-none transition-opacity hover:opacity-[0.92]",
         "focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary",

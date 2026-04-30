@@ -15,6 +15,7 @@ import {
   substituteLegalSections,
   substituteLegalText,
 } from "@/lib/legal/substitute-placeholders";
+import { getPublicLegalValue } from "@/lib/legal/legal-public-config";
 
 type Props = { params: Promise<{ locale: string }> };
 
@@ -45,7 +46,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function DataPage() {
   const t = await getTranslations("dataPage");
   const map = getLegalPlaceholderMap();
-  const href = getDataRequestChannelHref(process.env.NEXT_PUBLIC_DATA_REQUEST_URL);
+  const href = getDataRequestChannelHref(
+    getPublicLegalValue(process.env.NEXT_PUBLIC_DATA_REQUEST_URL, "dataRequestUrl"),
+  );
   const sections = substituteLegalSections(t.raw("sections") as LegalSection[], map);
 
   return (
@@ -81,7 +84,10 @@ export default async function DataPage() {
           <LegalRichBody body={substituteLegalText(t("lead"), map)} className="flex flex-col gap-4" />
         </div>
 
-        <section className="mt-14 scroll-mt-28 border-b border-gray-200/70 pb-14 md:mt-16 md:scroll-mt-32 md:pb-16">
+        <section
+          id="account-deletion"
+          className="mt-14 scroll-mt-28 border-b border-gray-200/70 pb-14 md:mt-16 md:scroll-mt-32 md:pb-16"
+        >
           <h2 className="text-balance text-xl font-bold tracking-tight text-gray-900 md:text-2xl">
             {t("requestTitle")}
           </h2>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/routing";
 import { Container } from "@/components/layout/Container";
 import { Section } from "@/components/layout/Section";
 import { Button } from "@/components/atoms/Button";
@@ -10,6 +11,7 @@ import { Textarea } from "@/components/atoms/Input/Textarea";
 import { FormField } from "@/components/molecules/FormField";
 import { SocialIcon } from "@/components/molecules/SocialIcon";
 import { submitContactForm } from "@/app/actions/contact";
+import { getPublicOptionalUrl } from "@/lib/legal/legal-public-config";
 import type { ContactFormData, FieldError } from "@/lib/utils/validators";
 
 function fieldLabel(field: keyof ContactFormData, tc: (key: string) => string) {
@@ -46,6 +48,9 @@ export function ContactForm() {
   const te = useTranslations("errors");
   const tCommon = useTranslations("common");
   const tp = useTranslations("contact.placeholders");
+  const facebookUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_FACEBOOK_URL);
+  const instagramUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL);
+  const hasSocialLinks = Boolean(facebookUrl || instagramUrl);
 
   function getError(field: string) {
     const err = errors.find((e) => e.field === field);
@@ -91,10 +96,12 @@ export function ContactForm() {
             <p className="text-xs font-bold uppercase tracking-[0.14em] text-gray-900">{tc("kicker")}</p>
             <h1 className="mt-3 text-section-title font-bold text-gray-900">{tc("title")}</h1>
           </div>
-          <div className="flex gap-2 md:flex-col md:gap-3 md:pt-1">
-            <SocialIcon platform="facebook" />
-            <SocialIcon platform="instagram" />
-          </div>
+          {hasSocialLinks && (
+            <div className="flex gap-2 md:flex-col md:gap-3 md:pt-1">
+              {facebookUrl && <SocialIcon platform="facebook" href={facebookUrl} />}
+              {instagramUrl && <SocialIcon platform="instagram" href={instagramUrl} />}
+            </div>
+          )}
         </div>
 
         {status === "success" ? (
@@ -144,6 +151,13 @@ export function ContactForm() {
               <Button type="submit" size="lg" className="shadow-md shadow-primary/25" disabled={status === "loading"}>
                 {tCommon("send")}
               </Button>
+              <p className="max-w-2xl text-xs leading-relaxed text-gray-500">
+                {tc("privacyNoticePrefix")}
+                <Link href="/privacy" className="font-medium text-primary underline-offset-4 hover:underline">
+                  {tc("privacyNoticeLink")}
+                </Link>
+                {tc("privacyNoticeSuffix")}
+              </p>
             </div>
           </form>
         )}

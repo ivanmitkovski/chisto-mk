@@ -9,8 +9,9 @@ import { Logo } from "@/components/atoms/Logo";
 import { Button } from "@/components/atoms/Button";
 import { SocialIcon } from "@/components/molecules/SocialIcon";
 import { subscribeNewsletter } from "@/app/actions/newsletter";
-import { Mail } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { handleHomeNavigationClick } from "@/lib/utils/smooth-scroll";
+import { getPublicOptionalUrl, LEGAL_PUBLIC_DEFAULTS } from "@/lib/legal/legal-public-config";
 
 export function Footer() {
   const pathname = usePathname();
@@ -23,6 +24,15 @@ export function Footer() {
   const tNews = useTranslations("newsletter");
   const tCommon = useTranslations("common");
   const tErrors = useTranslations("errors");
+  const contactEmail = process.env.NEXT_PUBLIC_CONTACT_EMAIL?.trim() || LEGAL_PUBLIC_DEFAULTS.contactEmail;
+  const contactPhone = process.env.NEXT_PUBLIC_CONTACT_PHONE?.trim() || LEGAL_PUBLIC_DEFAULTS.contactPhone;
+  const legalEntityName =
+    process.env.NEXT_PUBLIC_LEGAL_ENTITY_NAME?.trim() || LEGAL_PUBLIC_DEFAULTS.legalEntityName;
+  const registrationNumber =
+    process.env.NEXT_PUBLIC_REGISTRATION_NUMBER?.trim() || LEGAL_PUBLIC_DEFAULTS.registrationNumber;
+  const facebookUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_FACEBOOK_URL);
+  const instagramUrl = getPublicOptionalUrl(process.env.NEXT_PUBLIC_INSTAGRAM_URL);
+  const hasSocialLinks = Boolean(facebookUrl || instagramUrl);
 
   async function handleSubscribe(e: React.FormEvent) {
     e.preventDefault();
@@ -50,17 +60,30 @@ export function Footer() {
         <div className="grid gap-12 md:grid-cols-12 md:gap-10 lg:gap-12">
           <div className="md:col-span-12 lg:col-span-3 lg:max-w-xs">
             <Logo />
+            <div className="mt-5 space-y-1 text-sm leading-relaxed text-gray-600">
+              <p className="font-medium text-gray-900">{legalEntityName}</p>
+              <p>{t("registrationNumber", { registrationNumber })}</p>
+            </div>
             <a
-              href="mailto:Contact@Chisto.Mk"
-              className="mt-5 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-primary"
+              href={`mailto:${contactEmail}`}
+              className="mt-4 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-primary"
             >
               <Mail className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} />
-              Contact@Chisto.Mk
+              {contactEmail}
             </a>
-            <div className="mt-5 flex gap-2">
-              <SocialIcon platform="facebook" />
-              <SocialIcon platform="instagram" />
-            </div>
+            <a
+              href={`tel:${contactPhone.replace(/\s+/g, "")}`}
+              className="mt-3 flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-primary"
+            >
+              <Phone className="h-4 w-4 shrink-0 text-primary" strokeWidth={2} />
+              {contactPhone}
+            </a>
+            {hasSocialLinks && (
+              <div className="mt-5 flex gap-2">
+                {facebookUrl && <SocialIcon platform="facebook" href={facebookUrl} />}
+                {instagramUrl && <SocialIcon platform="instagram" href={instagramUrl} />}
+              </div>
+            )}
           </div>
 
           <div className="md:col-span-6 lg:col-span-2">
@@ -187,6 +210,13 @@ export function Footer() {
                   {newsletterError === "generic" ? tNews("genericError") : tErrors(newsletterError)}
                 </p>
               )}
+              <p className="max-w-[20.4rem] text-xs leading-relaxed text-gray-500">
+                {t("privacyNoticePrefix")}
+                <Link href="/privacy" className="font-medium text-primary underline-offset-4 hover:underline">
+                  {t("privacyNoticeLink")}
+                </Link>
+                {t("privacyNoticeSuffix")}
+              </p>
             </form>
           </div>
         </div>

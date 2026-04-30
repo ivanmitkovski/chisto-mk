@@ -91,6 +91,7 @@ export function Hero() {
           </motion.p>
 
           <motion.div
+            id="download"
             className="mt-10 flex flex-wrap items-center justify-center gap-3 sm:gap-4"
             variants={fadeInUp}
           >

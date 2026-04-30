@@ -15,6 +15,7 @@ const PATHS = [
   "/privacy",
   "/cookies",
   "/data",
+  "/account-deletion",
   "/help",
 ] as const;
 
