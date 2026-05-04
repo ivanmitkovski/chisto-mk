@@ -1,21 +1,27 @@
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_mock_store.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 
-String reportUiStatusShortLabel(AppLocalizations l10n, ReportStatus status) {
+String reportUiStatusShortLabel(
+  AppLocalizations l10n,
+  ReportSheetStatus status,
+) {
   switch (status) {
-    case ReportStatus.underReview:
+    case ReportSheetStatus.underReview:
       return l10n.reportStatusUnderReviewShort;
-    case ReportStatus.approved:
+    case ReportSheetStatus.approved:
       return l10n.reportStatusApprovedShort;
-    case ReportStatus.declined:
+    case ReportSheetStatus.declined:
       return l10n.reportStatusDeclinedShort;
-    case ReportStatus.alreadyReported:
+    case ReportSheetStatus.alreadyReported:
       return l10n.reportStatusAlreadyReportedShort;
   }
 }
 
-String apiReportStatusShortLabel(AppLocalizations l10n, ApiReportStatus status) {
+String apiReportStatusShortLabel(
+  AppLocalizations l10n,
+  ApiReportStatus status,
+) {
   switch (status) {
     case ApiReportStatus.new_:
     case ApiReportStatus.inReview:
@@ -28,7 +34,10 @@ String apiReportStatusShortLabel(AppLocalizations l10n, ApiReportStatus status) 
 }
 
 /// Tokens used when searching list items by status (substring match).
-Set<String> apiReportStatusSearchTokens(AppLocalizations l10n, ApiReportStatus status) {
+Set<String> apiReportStatusSearchTokens(
+  AppLocalizations l10n,
+  ApiReportStatus status,
+) {
   final Set<String> tokens = <String>{};
   void add(String raw) {
     final String t = raw.trim().toLowerCase();

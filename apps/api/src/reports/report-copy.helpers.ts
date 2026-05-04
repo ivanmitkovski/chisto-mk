@@ -1,4 +1,5 @@
 import { stripCategoryLabelPrefix } from './report-category-narrative';
+import type { ReportSubmitLocale } from './report-locale.util';
 
 /** Fallback for reports created before reportNumber column (e.g. during migration). */
 export function getReportNumberFallback(report: { id: string; createdAt: Date }): string {
@@ -86,3 +87,50 @@ export function optionalReportNarrative(
   const stripped = stripCategoryLabelPrefix(description, category);
   return stripped.length > 0 ? stripped : null;
 }
+
+/** Admin dashboard notification when a citizen submits a report (localized). */
+export function adminSubmitNotificationCopy(params: {
+  locale: ReportSubmitLocale;
+  isNewSite: boolean;
+  reportNumber: string;
+}): { title: string; message: string; timeLabel: string } {
+  const { locale, isNewSite, reportNumber } = params;
+  if (locale === 'en') {
+    return isNewSite
+      ? {
+          title: 'New polluted site reported',
+          message: `Report ${reportNumber} was submitted at a new location.`,
+          timeLabel: 'Just now',
+        }
+      : {
+          title: 'Co-report added to an existing site',
+          message: `Report ${reportNumber} was submitted near an existing site.`,
+          timeLabel: 'Just now',
+        };
+  }
+  if (locale === 'sq') {
+    return isNewSite
+      ? {
+          title: 'U raportua një vend i ri i ndotur',
+          message: `Raporti ${reportNumber} u paraqit në një lokacion të ri.`,
+          timeLabel: 'Tani',
+        }
+      : {
+          title: 'U shtua bashkëraportim në një vend ekzistues',
+          message: `Raporti ${reportNumber} u paraqit pranë një vendi ekzistues.`,
+          timeLabel: 'Tani',
+        };
+  }
+  return isNewSite
+    ? {
+        title: 'Пријавено е ново загадувачко место',
+        message: `Извештај ${reportNumber} е поднесен на нова локација.`,
+        timeLabel: 'Штотуку',
+      }
+    : {
+        title: 'Додаден е ко-извештај кон постоечко место',
+        message: `Извештај ${reportNumber} е поднесен во близина на постоечко место.`,
+        timeLabel: 'Штотуку',
+      };
+}
+

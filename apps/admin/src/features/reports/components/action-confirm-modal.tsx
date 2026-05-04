@@ -57,10 +57,15 @@ export function ActionConfirmModal({
 }: ActionConfirmModalProps) {
   const [isMounted, setIsMounted] = useState(false);
   const reasonInputRef = useRef<HTMLSelectElement>(null);
+  const notesTextareaRef = useRef<HTMLTextAreaElement>(null);
   const confirmButtonRef = useRef<HTMLButtonElement>(null);
   const reasonSelectId = useId();
   const reasonErrorId = useId();
   const notesId = useId();
+  /** Notes row: merge (onNotesChange only) or rejection flow (requireReason always showed notes). */
+  const showNotesField = requireReason || Boolean(onNotesChange);
+  const showReasonBlock = requireReason;
+  const showBody = showReasonBlock || showNotesField;
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -82,7 +87,10 @@ export function ActionConfirmModal({
         reasonInputRef.current?.focus();
         return;
       }
-
+      if (onNotesChange) {
+        notesTextareaRef.current?.focus();
+        return;
+      }
       confirmButtonRef.current?.focus();
     }, 0);
 
@@ -90,7 +98,7 @@ export function ActionConfirmModal({
       window.clearTimeout(timeoutId);
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen, requireReason]);
+  }, [isOpen, requireReason, onNotesChange]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -145,42 +153,51 @@ export function ActionConfirmModal({
               <p className={styles.description}>{description}</p>
             </header>
 
-            {requireReason ? (
+            {showBody ? (
               <div className={styles.body}>
-                <label className={styles.label} htmlFor={reasonSelectId}>
-                  {reasonLabel}
-                </label>
-                <select
-                  ref={reasonInputRef}
-                  id={reasonSelectId}
-                  className={styles.select}
-                  value={selectedReason}
-                  onChange={(event) => onSelectedReasonChange?.(event.target.value)}
-                  aria-invalid={Boolean(reasonError)}
-                  aria-describedby={reasonError ? reasonErrorId : undefined}
-                >
-                  <option value="">Select rejection reason</option>
-                  {reasonOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {reasonError ? (
-                  <p id={reasonErrorId} className={styles.error}>
-                    {reasonError}
-                  </p>
+                {showReasonBlock ? (
+                  <>
+                    <label className={styles.label} htmlFor={reasonSelectId}>
+                      {reasonLabel}
+                    </label>
+                    <select
+                      ref={reasonInputRef}
+                      id={reasonSelectId}
+                      className={styles.select}
+                      value={selectedReason}
+                      onChange={(event) => onSelectedReasonChange?.(event.target.value)}
+                      aria-invalid={Boolean(reasonError)}
+                      aria-describedby={reasonError ? reasonErrorId : undefined}
+                    >
+                      <option value="">Select rejection reason</option>
+                      {reasonOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                    {reasonError ? (
+                      <p id={reasonErrorId} className={styles.error}>
+                        {reasonError}
+                      </p>
+                    ) : null}
+                  </>
                 ) : null}
-                <label className={styles.label} htmlFor={notesId}>
-                  {notesLabel}
-                </label>
-                <textarea
-                  id={notesId}
-                  className={styles.textarea}
-                  value={notesValue}
-                  placeholder={notesPlaceholder}
-                  onChange={(event) => onNotesChange?.(event.target.value)}
-                />
+                {showNotesField ? (
+                  <>
+                    <label className={styles.label} htmlFor={notesId}>
+                      {notesLabel}
+                    </label>
+                    <textarea
+                      ref={onNotesChange ? notesTextareaRef : undefined}
+                      id={notesId}
+                      className={styles.textarea}
+                      value={notesValue}
+                      placeholder={notesPlaceholder}
+                      onChange={(event) => onNotesChange?.(event.target.value)}
+                    />
+                  </>
+                ) : null}
               </div>
             ) : null}
 

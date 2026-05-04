@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { SnackState } from '@/components/ui';
+import { patchReportStatus } from '../lib/patch-report-status';
 import type { ReportStatus } from '../types';
 
 type ActionKind = 'approve' | 'reject';
@@ -17,18 +18,10 @@ export function useReportsListActions() {
 
   const updateStatus = useCallback(
     async (id: string, status: ReportStatus, action: ActionKind, reason?: string) => {
-      const res = await fetch(`/api/reports/${encodeURIComponent(id)}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ status, reason: reason ?? undefined }),
-      });
+      const result = await patchReportStatus(id, status, action, reason);
 
-      const body = await res.json().catch(() => ({}));
-      const message = typeof body?.message === 'string' ? body.message : 'Unable to update this report right now.';
-
-      if (!res.ok) {
-        setSnack({ tone: 'error', title: 'Action failed', message });
+      if (!result.ok) {
+        setSnack({ tone: 'error', title: 'Action failed', message: result.message });
         return false;
       }
 

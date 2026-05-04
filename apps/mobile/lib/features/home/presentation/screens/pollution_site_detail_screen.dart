@@ -17,9 +17,10 @@ import 'package:chisto_mobile/features/home/domain/models/site_report.dart';
 import 'package:chisto_mobile/features/home/data/site_issue_report_repository.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_comments_modal_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/upvoters_sheet_content.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_detail/site_detail_widgets.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/map/directions_sheet.dart';
 import 'package:chisto_mobile/features/home/domain/models/take_action_type.dart';
 import 'package:chisto_mobile/features/home/presentation/navigation/site_share_result.dart';
 import 'package:chisto_mobile/features/home/presentation/navigation/take_action_coordinator.dart';
@@ -408,87 +409,66 @@ class _PollutionSiteDetailScreenState extends ConsumerState<PollutionSiteDetailS
       }
     }
     if (!context.mounted) return;
-    await showModalBottomSheet<void>(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      useSafeArea: true,
-      barrierColor: AppColors.overlay,
-      backgroundColor: AppColors.transparent,
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          builder: (BuildContext context, ScrollController scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: AppColors.panelBackground,
-                borderRadius: BorderRadius.vertical(
-                  top: Radius.circular(AppSpacing.radiusSheet),
-                ),
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: CommentsBottomSheet(
-                siteId: _site.id,
-                comments: _comments,
-                siteTitle: _site.title,
-                scrollController: scrollController,
-                onCommentsCountChanged: (int count) {
-                  if (!mounted) return;
-                  setState(() {
-                    _site = _site.copyWith(commentsCount: count);
-                  });
-                },
-                onCommentsChanged: (comments) {
-                  if (!mounted) return;
-                  setState(() => _comments = comments);
-                },
-                onLoadMoreDirectReplies:
-                    (String parentId, int page, String sort) async {
-                  final SiteCommentsResult result =
-                      await ref.read(sitesRepositoryProvider).getSiteComments(
-                    _site.id,
-                    parentId: parentId,
-                    page: page,
-                    limit: 20,
-                    sort: sort,
-                  );
-                  return result.items.map(commentFromSiteCommentItem).toList();
-                },
-                onCommentSubmitted: (String text, String? parentId) {
-                  return ref.read(sitesRepositoryProvider).createSiteComment(
-                    _site.id,
-                    text,
-                    parentId: parentId,
-                  ).then(commentFromSiteCommentItem);
-                },
-                onCommentEdited: (String commentId, String body) {
-                  return ref.read(sitesRepositoryProvider).updateSiteComment(
-                    _site.id,
-                    commentId,
-                    body,
-                  );
-                },
-                onCommentDeleted: (String commentId) {
-                  return ref.read(sitesRepositoryProvider).deleteSiteComment(
-                    _site.id,
-                    commentId,
-                  );
-                },
-                onCommentLikeToggled: (String commentId, bool shouldLike) {
-                  return shouldLike
-                      ? ref.read(sitesRepositoryProvider).likeSiteComment(
-                          _site.id,
-                          commentId,
-                        ).then((_) {})
-                      : ref.read(sitesRepositoryProvider).unlikeSiteComment(
-                          _site.id,
-                          commentId,
-                        ).then((_) {});
-                },
-              ),
+    await showPollutionSiteCommentsModalBottomSheet(
+      context,
+      builder: (BuildContext sheetContext, ScrollController scrollController) {
+        return CommentsBottomSheet(
+          siteId: _site.id,
+          comments: _comments,
+          siteTitle: _site.title,
+          scrollController: scrollController,
+          onCommentsCountChanged: (int count) {
+            if (!mounted) return;
+            setState(() {
+              _site = _site.copyWith(commentsCount: count);
+            });
+          },
+          onCommentsChanged: (comments) {
+            if (!mounted) return;
+            setState(() => _comments = comments);
+          },
+          onLoadMoreDirectReplies:
+              (String parentId, int page, String sort) async {
+            final SiteCommentsResult result =
+                await ref.read(sitesRepositoryProvider).getSiteComments(
+              _site.id,
+              parentId: parentId,
+              page: page,
+              limit: 20,
+              sort: sort,
             );
+            return result.items.map(commentFromSiteCommentItem).toList();
+          },
+          onCommentSubmitted: (String text, String? parentId) {
+            return ref.read(sitesRepositoryProvider).createSiteComment(
+              _site.id,
+              text,
+              parentId: parentId,
+            ).then(commentFromSiteCommentItem);
+          },
+          onCommentEdited: (String commentId, String body) {
+            return ref.read(sitesRepositoryProvider).updateSiteComment(
+              _site.id,
+              commentId,
+              body,
+            );
+          },
+          onCommentDeleted: (String commentId) {
+            return ref.read(sitesRepositoryProvider).deleteSiteComment(
+              _site.id,
+              commentId,
+            );
+          },
+          onCommentLikeToggled: (String commentId, bool shouldLike) {
+            return shouldLike
+                ? ref.read(sitesRepositoryProvider).likeSiteComment(
+                    _site.id,
+                    commentId,
+                  ).then((_) {})
+                : ref.read(sitesRepositoryProvider).unlikeSiteComment(
+                    _site.id,
+                    commentId,
+                  ).then((_) {});
           },
         );
       },

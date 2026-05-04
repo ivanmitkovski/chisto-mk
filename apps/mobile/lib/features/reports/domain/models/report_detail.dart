@@ -36,6 +36,7 @@ class ReportDetail {
     this.category,
     this.severity,
     this.cleanupEffort,
+    this.viewerRole = ReportViewerRole.primary,
   });
 
   final String id;
@@ -53,4 +54,5 @@ class ReportDetail {
   final ReportCategory? category;
   final int? severity;
   final CleanupEffort? cleanupEffort;
+  final ReportViewerRole viewerRole;
 }

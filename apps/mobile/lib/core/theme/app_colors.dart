@@ -32,6 +32,30 @@ class AppColors {
   static const Color overlay = Color(0x80000000);
   static const Color error = Color(0xFFD73636);
 
+  // ---------------------------------------------------------------------------
+  // Reports vertical — soft surfaces (chips, banners, info callouts; light only)
+  // ---------------------------------------------------------------------------
+
+  /// Shared mint fill for approved chip and success [ReportInfoBanner] tone.
+  static const Color reportSurfaceMint = Color(0xFFEDFFF6);
+
+  /// Status chip backgrounds ([ReportSheetStatus]).
+  static const Color reportChipUnderReviewFill = Color(0xFFFFF8EC);
+  static const Color reportChipApprovedFill = reportSurfaceMint;
+  static const Color reportChipDeclinedFill = Color(0xFFFFF0EE);
+  static const Color reportChipLinkedFill = Color(0xFFEDF3FF);
+
+  /// Success / warning / danger banner tones ([ReportSurfaceTone]).
+  static const Color reportBannerSuccessBackground = reportSurfaceMint;
+  static const Color reportBannerSuccessBorder = Color(0xFFD0F0DF);
+  static const Color reportBannerSuccessIconBackground = Color(0xFFDDF7E9);
+  static const Color reportBannerWarningBackground = Color(0xFFFFF6E8);
+  static const Color reportBannerWarningBorder = Color(0xFFFFE1B3);
+  static const Color reportBannerWarningIconBackground = Color(0xFFFFEDC8);
+  static const Color reportBannerDangerBackground = Color(0xFFFFF1F0);
+  static const Color reportBannerDangerBorder = Color(0xFFF7D2CF);
+  static const Color reportBannerDangerIconBackground = Color(0xFFFDE3E1);
+
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
   static const Color transparent = Color(0x00000000);

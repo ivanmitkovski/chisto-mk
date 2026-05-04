@@ -11,14 +11,17 @@ ImageProvider imageProviderForReportEvidence(
   int? maxWidth,
   int? maxHeight,
 }) {
-  if (pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')) {
-    return CachedNetworkImageProvider(
-      pathOrUrl,
-      cacheManager: reportImagesCache,
-      cacheKey: stableCacheKeyForReportImage(pathOrUrl),
-      maxWidth: maxWidth,
-      maxHeight: maxHeight,
-    );
-  }
-  return FileImage(File(pathOrUrl));
+  final ImageProvider<Object> base =
+      pathOrUrl.startsWith('http://') || pathOrUrl.startsWith('https://')
+          ? CachedNetworkImageProvider(
+              pathOrUrl,
+              cacheManager: reportImagesCache,
+              cacheKey: stableCacheKeyForReportImage(pathOrUrl),
+            )
+          : FileImage(File(pathOrUrl));
+
+  // maxWidth/maxHeight on CachedNetworkImageProvider require ImageCacheManager;
+  // [reportImagesCache] is a plain CacheManager. Use ResizeImage for decode caps
+  // (same approach as map pins in site_image_provider.dart).
+  return ResizeImage.resizeIfNeeded(maxWidth, maxHeight, base);
 }

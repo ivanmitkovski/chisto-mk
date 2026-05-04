@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ReportStatus } from '../../prisma-client';
-import { IsEnum, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsEnum, IsString, Length, ValidateIf } from 'class-validator';
 
 export class UpdateReportStatusDto {
   @ApiProperty({ enum: ReportStatus })
@@ -8,12 +8,13 @@ export class UpdateReportStatusDto {
   status!: ReportStatus;
 
   @ApiPropertyOptional({
-    description: 'Optional human-readable moderation reason or rejection explanation',
+    description:
+      'Required when moving a report to DELETED (moderation narrative). Ignored for other statuses.',
     maxLength: 500,
     example: 'Evidence was insufficient to verify this report.',
   })
-  @IsOptional()
+  @ValidateIf((o: UpdateReportStatusDto) => o.status === ReportStatus.DELETED)
   @IsString()
-  @MaxLength(500)
+  @Length(1, 500)
   reason?: string;
 }

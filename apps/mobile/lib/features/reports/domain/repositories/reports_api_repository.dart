@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_detail.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_submit_result.dart';
@@ -29,10 +30,14 @@ abstract class ReportsApiRepository {
   Future<ReportsListResponse> getMyReports({
     int page = 1,
     int limit = 20,
+    RequestCancellationToken? cancellation,
   });
 
   /// Full report detail for citizen (own report).
-  Future<ReportDetail> getReportById(String id);
+  Future<ReportDetail> getReportById(
+    String id, {
+    RequestCancellationToken? cancellation,
+  });
 
   /// Current reporting capacity policy state for preflight checks and UX hints.
   Future<ReportCapacity> getReportingCapacity();

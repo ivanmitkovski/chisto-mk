@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { ReportsModule } from './reports/reports.module';
+import { ReportsOwnerWsModule } from './reports/owner-events/reports-owner-ws.module';
 import { SitesModule } from './sites/sites.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminEventsModule } from './admin-events/admin-events.module';
@@ -27,11 +28,32 @@ import { EventChatModule } from './event-chat/event-chat.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { RedisIoAdapterLifecycle } from './common/adapters/redis-io-adapter.lifecycle';
 import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analytics.module';
+import { LoggerModule } from 'nestjs-pino';
+import { safePinoReqSerializer } from './common/logging/safe-pino-req.serializer';
+import { StorageModule } from './storage/storage.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+    LoggerModule.forRoot({
+      pinoHttp: {
+        autoLogging: false,
+        serializers: {
+          req: safePinoReqSerializer,
+        },
+        redact: {
+          paths: [
+            'req.headers.authorization',
+            'req.headers.Authorization',
+            'req.headers.cookie',
+            'req.headers.Cookie',
+          ],
+          remove: true,
+        },
+      },
+    }),
     EventEmitterModule.forRoot(),
+    StorageModule,
     HealthModule,
     ThrottlerModule.forRoot([{
       ttl: 60_000,
@@ -43,6 +65,7 @@ import { DiscoveryAnalyticsModule } from './discovery-analytics/discovery-analyt
     SessionsModule,
     SitesModule,
     ReportsModule,
+    ReportsOwnerWsModule,
     AdminEventsModule,
     AdminModule,
     AdminNotificationsModule,

@@ -13,6 +13,29 @@ class AppLocalizationsSq extends AppLocalizations {
       'Prekni butonin e informacionit për këshilla për këtë hap.';
 
   @override
+  String reportFlowStepProgressStep(int current) {
+    return 'Hapi $current nga 3';
+  }
+
+  @override
+  String get reportFlowStepProgressReady => 'Gati për dërgim';
+
+  @override
+  String get reportFlowStepStatusComplete => 'E plotë';
+
+  @override
+  String get reportFlowStepStatusInProgress => 'Në progres';
+
+  @override
+  String get reportFlowStepChipPhotos => 'Foto';
+
+  @override
+  String get reportFlowStepChipCategory => 'Kategoria';
+
+  @override
+  String get reportFlowStepChipLocation => 'Vendi';
+
+  @override
   String get reportHelpContextTitle => 'Konteksti';
 
   @override
@@ -271,9 +294,8 @@ class AppLocalizationsSq extends AppLocalizations {
   }
 
   @override
-  String reportSubmittedPointsPending(int max) {
-    return 'Deri në $max pikë kur të miratohet';
-  }
+  String get reportSubmittedPointsPending =>
+      'Pikët kreditohen pasi moderatorët ta miratojnë raportin.';
 
   @override
   String get reportSubmittedViewThisReport => 'Shiko këtë raport';
@@ -918,6 +940,17 @@ class AppLocalizationsSq extends AppLocalizations {
       'Ngjarja e pastrimit u përfundua';
 
   @override
+  String get profilePointsReasonReportApproved => 'Raporti u miratua';
+
+  @override
+  String get profilePointsReasonReportApprovalRevoked =>
+      'Miratimi i raportit u anulua';
+
+  @override
+  String get profilePointsReasonReportSubmitted =>
+      'Raporti u dërgua (i vjetër)';
+
+  @override
   String get profileReportCreditsTitle => 'Kreditë e raportimit';
 
   @override
@@ -1165,6 +1198,32 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportListFabLabel => 'Raporto ndotje';
+
+  @override
+  String get reportListAppBarStartNewReportLabel => 'Raport i ri';
+
+  @override
+  String reportListDraftChipLabel(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount foto',
+      one: '1 foto',
+      zero: 'pa foto',
+    );
+    return 'Draft · $_temp0 · $savedAgo';
+  }
+
+  @override
+  String reportListDraftChipSemantic(int photoCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount foto',
+      one: '1 foto',
+    );
+    return 'Draft i ruajtur me $_temp0. Prek dy herë për ta hapur.';
+  }
 
   @override
   String get reportListSearchSemantic => 'Kërko raporte';
@@ -1683,6 +1742,75 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportPhotoGridSourceHint => 'Kamera ose bibliotekë';
+
+  @override
+  String reportPhotoGridAttachedCount(int current, int max) {
+    return '$current nga $max foto të bashkangjitura';
+  }
+
+  @override
+  String get reportPhotoOpenGallerySemantic =>
+      'Hap galerinë e fotove të raportit';
+
+  @override
+  String get reportPhotoTapToReviewSingle => 'Prek për të shqyrtuar foton';
+
+  @override
+  String get reportPhotoTapToReviewMany => 'Prek për të shqyrtuar fotot';
+
+  @override
+  String get reportPhotoVerificationHelpPrimarySelected =>
+      'Mbaj fotën e parë si pamjen më të qartë të vendit.';
+
+  @override
+  String get reportPhotoVerificationHelpPrimaryOther =>
+      'Përdor foto shtesë vetëm për detaje, shkallë ose një kënd tjetër të dobishëm.';
+
+  @override
+  String get reportPhotoVerificationHelpEmpty =>
+      'Fillo me një pamje të qartë të vendit. Shto detaje vetëm nëse ndihmon.';
+
+  @override
+  String get reportPhotoStackCaptionSingle =>
+      'Një foto e qartë mjafton. Shto një tjetër vetëm nëse ndihmon të shpjegohet vendi.';
+
+  @override
+  String reportPhotoStackCaptionMany(int count) {
+    return '$count foto të bashkangjitura. Mbaj vetëm kornizat që e bëjnë raportin më të lehtë për t\'u verifikuar.';
+  }
+
+  @override
+  String reportPhotoSemanticThumbnail(int index, int total) {
+    return 'Foto $index nga $total. Prek dy herë për të zgjedhur.';
+  }
+
+  @override
+  String get reportPhotoSemanticRemove => 'Hiq foton';
+
+  @override
+  String get reportPhotoSemanticAddPhoto => 'Shto foto si dëshmi';
+
+  @override
+  String reportPhotoSemanticReportPhoto(int index) {
+    return 'Foto e raportit $index';
+  }
+
+  @override
+  String get reportRequirementPhotos => 'Shto të paktën një foto';
+
+  @override
+  String get reportRequirementCategory => 'Zgjidh një kategori';
+
+  @override
+  String get reportRequirementTitle => 'Shto një titull të shkurtër';
+
+  @override
+  String get reportRequirementLocation =>
+      'Konfirmo një vendndodhje në Maqedoni';
+
+  @override
+  String get reportCooldownUnlockHintDefault =>
+      'Bashkohu dhe verifiko pjesëmarrjen, ose krijo një veprim ekologjik për të hapur më shumë raporte.';
 
   @override
   String get notificationsTitle => 'Njoftimet';
@@ -4058,6 +4186,9 @@ class AppLocalizationsSq extends AppLocalizations {
   String get reportSeverityCritical => 'Kritike';
 
   @override
+  String get reportDetailViewOnMap => 'Shiko në hartë';
+
+  @override
   String get reportListSearchPlaceholder => 'Kërko raportet e tua';
 
   @override
@@ -4096,6 +4227,9 @@ class AppLocalizationsSq extends AppLocalizations {
 
   @override
   String get reportListFilterAll => 'Të gjitha';
+
+  @override
+  String get reportListOptimisticPill => 'Duke u dërguar…';
 
   @override
   String get reportListFilterSemanticPrefix => 'Statusi i raportit';
@@ -4224,6 +4358,101 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get reportDetailStatusOutcomeBodyFallback =>
       'Ky raport nuk mund të miratohet në formën e tij aktuale.';
+
+  @override
+  String get reportDetailSheetTitle => 'Detajet e raportit';
+
+  @override
+  String get reportDetailSheetSubtitle =>
+      'Shiko çfarë dërguat dhe si e trajtuan moderatorët këtë raport.';
+
+  @override
+  String reportDetailSheetSubtitleWithNumber(String reportNumber) {
+    return '$reportNumber · Shiko çfarë dërguat dhe si e trajtuan moderatorët këtë raport.';
+  }
+
+  @override
+  String get reportDetailPhotoAttachedPill => 'Foto e bashkangjitur';
+
+  @override
+  String get reportDetailPointsLabel => 'Pikë';
+
+  @override
+  String reportDetailEvidencePhotoSemantic(int index) {
+    return 'Foto e provës $index';
+  }
+
+  @override
+  String get reportDetailEvidenceGalleryOpenSemantic => 'Hap fotot e provës';
+
+  @override
+  String get reportDetailEvidenceTapToExpand => 'Prek për zgjerim';
+
+  @override
+  String get reportDetailEvidenceOpenPhoto => 'Hap foton';
+
+  @override
+  String get reportDetailSiteNotFoundOpeningMaps =>
+      'Vendi nuk u gjet. Po hapen hartat.';
+
+  @override
+  String get reportDetailSiteNotAvailable => 'Vendi nuk është i disponueshëm.';
+
+  @override
+  String get reportDetailCouldNotLoadSite => 'Nuk mund të ngarkohej vendi.';
+
+  @override
+  String get reportCardDeclineNoteTitle => 'Shënim shqyrtimi';
+
+  @override
+  String reportListFilterChipSemantic(String label, int selected) {
+    String _temp0 = intl.Intl.pluralLogic(
+      selected,
+      locale: localeName,
+      other: 'i pa zgjedhur',
+      one: 'i zgjedhur',
+    );
+    return '$label filtri, $_temp0';
+  }
+
+  @override
+  String reportListFilterChipHint(String label) {
+    return 'Prek dy herë për të filtruar raportet sipas $label.';
+  }
+
+  @override
+  String get reportReviewTitleHint => 'Titull i shkurtër';
+
+  @override
+  String get reportFlowCameraUnavailableSnack =>
+      'Kamera nuk mund të hapet tani. Provo përsëri pas pak.';
+
+  @override
+  String get reportSemanticsLocationPinThenConfirm =>
+      'Vendndodhja: vendos pinin, pastaj konfirmo.';
+
+  @override
+  String get newReportTooltipAboutStep => 'Rreth këtij hapi';
+
+  @override
+  String get newReportTooltipDismiss => 'Mbyll';
+
+  @override
+  String get reportFlowSubmitPhaseCreating => 'Po krijohet…';
+
+  @override
+  String get reportFlowSubmitPhaseUploading => 'Po ngarkohet…';
+
+  @override
+  String get reportFlowSubmitPhaseSubmitting => 'Po dërgohet…';
+
+  @override
+  String get reportFormPrimarySemanticsHintSubmit =>
+      'Prek dy herë për të dërguar.';
+
+  @override
+  String get reportFormPrimarySemanticsHintNext =>
+      'Prek dy herë për të kaluar në hapin tjetër.';
 
   @override
   String reportCardSemanticLabel(
@@ -5944,4 +6173,120 @@ class AppLocalizationsSq extends AppLocalizations {
   @override
   String get errorOrganizerCertificationAlreadyDone =>
       'Jeni tashmë organizator i certifikuar. Nuk duhet të rifilloni kuizin.';
+
+  @override
+  String get reportsSseReconnectBanner =>
+      'Duke u rilidhur për përditësime të drejtpërdrejta…';
+
+  @override
+  String get reportsSseReconnectAction => 'Rilidh';
+
+  @override
+  String get reportsListMergedToast =>
+      'Ky raport u bashkua dhe u hoq nga lista jote.';
+
+  @override
+  String get reportDraftResumeTitle => 'Të vazhdosh me skicën?';
+
+  @override
+  String reportDraftResumeBody(
+    int photoCount,
+    String titlePreview,
+    String savedAt,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: 'U ruajtën $photoCount foto.',
+      one: 'U ruajt 1 foto.',
+      zero: 'Ende nuk ka foto të ruajtura.',
+    );
+    return '$_temp0\n\nTitulli: \"$titlePreview\"\n\nRuajtur së fundmi: $savedAt.';
+  }
+
+  @override
+  String get reportDraftResumeContinue => 'Vazhdo';
+
+  @override
+  String get reportDraftResumeDiscard => 'Hidh skicën';
+
+  @override
+  String get reportDraftSavedJustNow => 'U ruajt tani';
+
+  @override
+  String reportDraftSavedMinutesAgo(int minutes) {
+    return 'U ruajt para $minutes min';
+  }
+
+  @override
+  String reportDraftSavedHoursAgo(int hours) {
+    return 'U ruajt para $hours orësh';
+  }
+
+  @override
+  String reportDraftPhotosLost(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count foto të bashkëngjitura mungonin dhe u hoqën nga skica.',
+      one: '1 foto e bashkëngjitur mungonte dhe u hoq nga skica.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDraftDiscardConfirmTitle => 'Të hidhet skica?';
+
+  @override
+  String get reportDraftDiscardConfirmBody =>
+      'Teksti dhe fotot e ruajtura për këtë raport do të fshihen nga ky pajisje.';
+
+  @override
+  String get reportDraftCentralFabSheetTitle => 'Ke një draft të ruajtur';
+
+  @override
+  String reportDraftCentralFabSubtitle(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount foto',
+      one: '1 foto',
+      zero: 'Pa foto',
+    );
+    return '$_temp0 · $savedAgo';
+  }
+
+  @override
+  String get reportDraftCentralFabContinue => 'Vazhdo draftin';
+
+  @override
+  String get reportDraftCentralFabTakeNewPhoto => 'Foto e re';
+
+  @override
+  String get reportDraftCentralFabCancel => 'Anulo';
+
+  @override
+  String get reportDraftIncomingPhotoTitle =>
+      'Vazhdo draftin apo përdor këtë foto?';
+
+  @override
+  String reportDraftIncomingPhotoBody(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount foto',
+      one: '1 foto',
+      zero: 'pa foto',
+    );
+    return 'Ke një draft të ruajtur ($_temp0). $savedAgo';
+  }
+
+  @override
+  String get reportDraftIncomingPhotoContinue => 'Vazhdo draftin';
+
+  @override
+  String get reportDraftIncomingPhotoReplace => 'Zëvendëso draftin';
+
+  @override
+  String get reportDraftIncomingPhotoAdd => 'Shto në draft';
 }

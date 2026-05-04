@@ -1,5 +1,6 @@
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { BadRequestException, Logger as NestLogger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { Logger as PinoNestLogger } from 'nestjs-pino';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import compression from 'compression';
@@ -14,7 +15,10 @@ import { RequestLoggingInterceptor } from './common/interceptors/request-logging
 
 async function bootstrap() {
   validateEnv();
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  app.useLogger(app.get(PinoNestLogger));
+
+  const bootstrapLog = new NestLogger('Bootstrap');
 
   const expressApp = app.getHttpAdapter().getInstance() as express.Application;
   // Required so req.ip is derived from trusted proxy headers (ALB / ingress).
@@ -29,7 +33,7 @@ async function bootstrap() {
       app.useWebSocketAdapter(redisIoAdapter);
       app.get(EventChatClusterConfig).setSocketIoClustered(true);
       app.get(RedisIoAdapterLifecycle).register(redisIoAdapter);
-      console.log('Socket.IO Redis adapter enabled (multi-replica WebSocket fan-out)');
+      bootstrapLog.log('Socket.IO Redis adapter enabled (multi-replica WebSocket fan-out)');
     } catch (err) {
       console.error(
         'REDIS_URL is set but Socket.IO Redis adapter failed; falling back to single-node WebSockets. Error:',
@@ -105,9 +109,10 @@ async function bootstrap() {
   const port = process.env.PORT ?? 3000;
   await app.listen(port, '0.0.0.0');
 
-  console.log(`Chisto API running at http://0.0.0.0:${port}`);
+  bootstrapLog.log(`HTTP bound on 0.0.0.0:${port} (all interfaces)`);
+  bootstrapLog.log(`Local URLs: http://127.0.0.1:${port} · http://localhost:${port}`);
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`OpenAPI docs at http://0.0.0.0:${port}/api/docs`);
+    bootstrapLog.log(`OpenAPI: http://localhost:${port}/api/docs`);
   }
 }
 

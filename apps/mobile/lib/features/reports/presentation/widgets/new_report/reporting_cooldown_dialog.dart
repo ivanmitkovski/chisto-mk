@@ -15,10 +15,7 @@ String _retryDurationWithPeriod(String raw) {
 
 /// Styled reporting-cooldown message (matches app cards / primary button).
 class ReportingCooldownDialog extends StatelessWidget {
-  const ReportingCooldownDialog({
-    super.key,
-    required this.retryDurationText,
-  });
+  const ReportingCooldownDialog({super.key, required this.retryDurationText});
 
   final String retryDurationText;
 
@@ -36,9 +33,7 @@ class ReportingCooldownDialog extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.panelBackground,
           borderRadius: BorderRadius.circular(AppSpacing.radiusCard),
-          border: Border.all(
-            color: AppColors.divider.withValues(alpha: 0.95),
-          ),
+          border: Border.all(color: AppColors.divider.withValues(alpha: 0.95)),
           boxShadow: const <BoxShadow>[
             BoxShadow(
               color: AppColors.shadowMedium,

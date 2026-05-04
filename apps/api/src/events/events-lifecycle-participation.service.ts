@@ -25,7 +25,7 @@ import { EventChatService } from '../event-chat/event-chat.service';
 import { EcoEventPointsService } from '../gamification/eco-event-points.service';
 import { NotificationDispatcherService } from '../notifications/notification-dispatcher.service';
 import { buildEventAnalyticsPayload, type CheckInsByHourPoint } from './event-analytics.aggregation';
-import { ReportsUploadService } from '../reports/reports-upload.service';
+import { EventsCleanupMediaUploadService } from './events-cleanup-media-upload.service';
 import { PatchEventLifecycleDto } from './dto/patch-event-lifecycle.dto';
 import { PatchEventReminderDto } from './dto/patch-event-reminder.dto';
 import { lifecycleFromMobile } from './events-mobile.mapper';
@@ -51,7 +51,7 @@ export class EventsLifecycleParticipationService {
 
   constructor(
     private readonly eventsRepository: EventsRepository,
-    private readonly uploads: ReportsUploadService,
+    private readonly cleanupMediaUpload: EventsCleanupMediaUploadService,
     private readonly mobileMapper: EventsMobileMapperService,
     private readonly ecoEventPoints: EcoEventPointsService,
     private readonly notificationDispatcher: NotificationDispatcherService,
@@ -536,7 +536,7 @@ export class EventsLifecycleParticipationService {
       originalname: f.originalname,
     }));
 
-    const keys = await this.uploads.uploadCleanupEventAfterImages(user.userId, id, buffers);
+    const keys = await this.cleanupMediaUpload.uploadCleanupEventAfterImages(user.userId, id, buffers);
     const merged = [...existing.afterImageKeys, ...keys];
 
     const updated = await this.eventsRepository.prisma.cleanupEvent.update({

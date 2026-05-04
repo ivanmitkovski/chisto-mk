@@ -28,6 +28,7 @@ import 'package:chisto_mobile/features/profile/presentation/screens/profile_poin
 import 'package:chisto_mobile/features/profile/presentation/screens/weekly_rankings_screen.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_back_button.dart';
+import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
 import 'package:chisto_mobile/shared/widgets/settings_list_tile.dart';
 import 'package:chisto_mobile/shared/widgets/app_avatar.dart';
 import 'package:chisto_mobile/shared/widgets/profile_avatar_peek_overlay.dart';
@@ -76,22 +77,6 @@ ImageProvider? _profileHeaderPeekImageProvider(ProfileUser user) {
   );
   if (url == null) return null;
   return NetworkImage(url);
-}
-
-/// Skips [StretchingOverscrollIndicator] / [GlowingOverscrollIndicator] so the
-/// scroll viewport does not clip or tint content at the trailing edge (gray band
-/// over the account list). Pull-to-refresh still uses [RefreshIndicator].
-class _ProfileBodyScrollBehavior extends MaterialScrollBehavior {
-  const _ProfileBodyScrollBehavior();
-
-  @override
-  Widget buildOverscrollIndicator(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
-    return child;
-  }
 }
 
 /// Extends the clip rect below the scroll viewport so card shadows are not cut
@@ -356,7 +341,7 @@ class _ProfileScreenState extends State<ProfileScreen>
               bottomExtension: AppSpacing.xxl + AppSpacing.xl,
             ),
             child: ScrollConfiguration(
-              behavior: const _ProfileBodyScrollBehavior(),
+              behavior: const NoOverscrollOverlayScrollBehavior(),
               child: CustomScrollView(
                 clipBehavior: Clip.none,
                 physics: const AlwaysScrollableScrollPhysics(

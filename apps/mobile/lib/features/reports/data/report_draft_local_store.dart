@@ -4,7 +4,12 @@ import 'package:chisto_mobile/features/reports/domain/models/report_draft.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Persists an in-progress report draft locally (photo paths + text fields only).
+/// Legacy SharedPreferences draft store used only by [ReportOutboxMigrationFromSp].
+///
+/// Active drafts live in the SQLite outbox (`SqfliteReportOutboxRepository`).
+/// Do not use for new code; scheduled for removal after migration has shipped
+/// long enough on all client installs.
+@Deprecated('Use ReportOutboxRepository / SQLite outbox only')
 class ReportDraftLocalStore {
   ReportDraftLocalStore._();
 

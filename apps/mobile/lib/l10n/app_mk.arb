@@ -1,6 +1,20 @@
 {
   "@@locale": "mk",
   "reportFlowHelpHint": "Допрете на иконата за информации за совети за овој чекор.",
+  "reportFlowStepProgressStep": "Чекор {current}/3",
+  "@reportFlowStepProgressStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFlowStepProgressReady": "Спремно за испраќање",
+  "reportFlowStepStatusComplete": "Готово",
+  "reportFlowStepStatusInProgress": "Во тек",
+  "reportFlowStepChipPhotos": "Фото",
+  "reportFlowStepChipCategory": "Кат.",
+  "reportFlowStepChipLocation": "Лок.",
   "reportHelpContextTitle": "Контекст",
   "reportStageEvidenceEyebrow": "Пријавете загадено место",
   "reportStageEvidenceTitle": "Докази",
@@ -136,14 +150,7 @@
       }
     }
   },
-  "reportSubmittedPointsPending": "До {max} поени кога ќе биде одобрено",
-  "@reportSubmittedPointsPending": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
+  "reportSubmittedPointsPending": "Поените се доделуваат откако модераторите ќе ја одобрат пријавата.",
   "reportSubmittedViewThisReport": "Погледни ја пријавата",
   "reportSubmittedViewAllReports": "Погледни ги сите пријави",
   "reportSubmittedViewInMyReports": "Погледни во Мои пријави",
@@ -468,6 +475,9 @@
   "profilePointsReasonEventJoinNoShow": "Прилагодување на бонус — без проверка",
   "profilePointsReasonEventCheckIn": "Регистрација на настан",
   "profilePointsReasonEventCompleted": "Завршен настан за чистење",
+  "profilePointsReasonReportApproved": "Одобрена пријава",
+  "profilePointsReasonReportApprovalRevoked": "Поништена одобреност на пријава",
+  "profilePointsReasonReportSubmitted": "Испратена пријава (застарено)",
   "profileReportCreditsTitle": "Кредити за пријави",
   "profileAccountDetailsSection": "Детали за сметката",
   "profileGeneralInfoTile": "Општи информации",
@@ -546,6 +556,20 @@
   "profileGeneralEmptyValue": "—",
   "profileGeneralDefaultDisplayName": "Корисник",
   "reportListFabLabel": "Пријави загадување",
+  "reportListAppBarStartNewReportLabel": "Нов извештај",
+  "reportListDraftChipLabel": "Нацрт · {photoCount, plural, =0{нема фотографии} one{1 фотографија} other{{photoCount} фотографии}} · {savedAgo}",
+  "@reportListDraftChipLabel": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportListDraftChipSemantic": "Зачуван нацрт со {photoCount, plural, one{1 фотографија} other{{photoCount} фотографии}}. Допри двапати за да отвориш.",
+  "@reportListDraftChipSemantic": {
+    "placeholders": {
+      "photoCount": { "type": "int" }
+    }
+  },
   "reportListSearchSemantic": "Пребарај пријави",
   "reportAvailabilityCheckFailedSnack": "Моментално не може да се провери достапноста за пријавување.",
   "reportFinishStepsSnack": "Довршете ги недостасувачките чекори пред испраќање.",
@@ -784,13 +808,65 @@
   "reportPhotoReviewSemantic": "Преглед и потврда на фотографија пред додавање во пријавата",
   "reportPhotoReviewCloseSemantic": "Затвори без додавање фотографија",
   "reportPhotoReviewRetake": "Сними повторно",
-  "reportPhotoReviewUsePhoto": "Користи ја оваа фотографија",
+  "reportPhotoReviewUsePhoto": "Потврди фотографија",
   "reportPhotoReviewRetakeSemantic": "Сними повторно",
   "reportPhotoReviewUseSemantic": "Користи ја оваа фотографија",
   "reportPhotoReviewPreviewSemantic": "Преглед на фотографија",
   "reportPhotoGridAddShort": "Додај",
   "reportPhotoGridAdd": "Додај фотографија",
   "reportPhotoGridSourceHint": "Камера или библиотека",
+  "reportPhotoGridAttachedCount": "{current} од {max} прикачени фотографии",
+  "@reportPhotoGridAttachedCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoOpenGallerySemantic": "Отвори галерија со фотографии од пријавата",
+  "reportPhotoTapToReviewSingle": "Допри за преглед на фотографијата",
+  "reportPhotoTapToReviewMany": "Допри за преглед на фотографиите",
+  "reportPhotoVerificationHelpPrimarySelected": "Задржете ја првата фотографија како најјасен преглед на местото.",
+  "reportPhotoVerificationHelpPrimaryOther": "Користете дополнителни фотографии само за детали, размер или друг корисен агол.",
+  "reportPhotoVerificationHelpEmpty": "Почнете со еден јасен преглед на местото. Додавајте детали само ако помага.",
+  "reportPhotoStackCaptionSingle": "Една јасна фотографија е доволна. Додајте друга само ако помага да се објасни местото.",
+  "reportPhotoStackCaptionMany": "{count} прикачени фотографии. Задржете ги само кадрите што ја олеснуваат верификацијата на пријавата.",
+  "@reportPhotoStackCaptionMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticThumbnail": "Фотографија {index} од {total}. Двоен допир за избор.",
+  "@reportPhotoSemanticThumbnail": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticRemove": "Отстрани фотографија",
+  "reportPhotoSemanticAddPhoto": "Додај фотографија како доказ",
+  "reportPhotoSemanticReportPhoto": "Фотографија од пријавата {index}",
+  "@reportPhotoSemanticReportPhoto": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRequirementPhotos": "Додајте барем една фотографија",
+  "reportRequirementCategory": "Изберете категорија",
+  "reportRequirementTitle": "Додајте краток наслов",
+  "reportRequirementLocation": "Потврдете локација во Македонија",
+  "reportCooldownUnlockHintDefault": "Придружете се и потврдете присуство или креирајте еко-акција за да отклучите повеќе пријави.",
   "notificationsTitle": "Известувања",
   "notificationsMarkAllRead": "Означи сè прочитано",
   "notificationsShowAll": "Прикажи ги сите известувања",
@@ -2051,6 +2127,7 @@
   "reportSeveritySignificant": "Значајна",
   "reportSeverityHigh": "Висока",
   "reportSeverityCritical": "Критична",
+  "reportDetailViewOnMap": "Поглед на мапа",
   "reportListSearchPlaceholder": "Пребарај пријави",
   "reportListSearchHintPrefix": "Пребарување по наслов, локација, категорија или статус.",
   "reportListSearchNoMatches": "Нема совпаѓања",
@@ -2070,6 +2147,7 @@
   "reportStatusDeclinedShort": "Одбиено",
   "reportStatusAlreadyReportedShort": "Веќе пријавено",
   "reportListFilterAll": "Сите",
+  "reportListOptimisticPill": "Се испраќа…",
   "reportListFilterSemanticPrefix": "Статус на пријава",
   "reportListHeaderTitle": "Вашите пријави",
   "reportListHeaderTotalPill": "{count, plural, one{1 пријава вкупно} other{{count} пријави вкупно}}",
@@ -2132,6 +2210,62 @@
   "reportDetailStatusAlreadyReportedBody": "Вашата пријава се совпаѓа со постоечка локација. Доказите сè уште се корисни за подобро разбирање на проблемот.",
   "reportDetailStatusOutcomeTitle": "Исход од прегледот",
   "reportDetailStatusOutcomeBodyFallback": "Оваа пријава не можеше да се одобри во сегашната форма.",
+  "reportDetailSheetTitle": "Детали за пријавата",
+  "reportDetailSheetSubtitle": "Погледнете што испративте и како модераторите ја обработија пријавата.",
+  "reportDetailSheetSubtitleWithNumber": "{reportNumber} · Погледнете што испративте и како модераторите ја обработија пријавата.",
+  "@reportDetailSheetSubtitleWithNumber": {
+    "placeholders": {
+      "reportNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailPhotoAttachedPill": "Фотографија приложена",
+  "reportDetailPointsLabel": "Поени",
+  "reportDetailEvidencePhotoSemantic": "Фотографија од доказ {index}",
+  "@reportDetailEvidencePhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailEvidenceGalleryOpenSemantic": "Отвори ги фотографиите од доказот",
+  "reportDetailEvidenceTapToExpand": "Допри за проширување",
+  "reportDetailEvidenceOpenPhoto": "Отвори фотографија",
+  "reportDetailSiteNotFoundOpeningMaps": "Локацијата не е пронајдена. Се отвораат мапите.",
+  "reportDetailSiteNotAvailable": "Локацијата не е достапна.",
+  "reportDetailCouldNotLoadSite": "Не можевме да ја вчитаме локацијата.",
+  "reportCardDeclineNoteTitle": "Забелешка од прегледот",
+  "reportListFilterChipSemantic": "{label} филтер, {selected, plural, =1{избран} other{не е избран}}",
+  "@reportListFilterChipSemantic": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "selected": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilterChipHint": "Двојно допри за да ги филтрираш пријавите по {label}.",
+  "@reportListFilterChipHint": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "reportReviewTitleHint": "Краток наслов",
+  "reportFlowCameraUnavailableSnack": "Камерата не може да се отвори сега. Обиди се повторно за момент.",
+  "reportSemanticsLocationPinThenConfirm": "Локација: закачи пин, потоа потврди.",
+  "newReportTooltipAboutStep": "За овој чекор",
+  "newReportTooltipDismiss": "Отфрли",
+  "reportFlowSubmitPhaseCreating": "Се создава…",
+  "reportFlowSubmitPhaseUploading": "Се прикачува…",
+  "reportFlowSubmitPhaseSubmitting": "Се испраќа…",
+  "reportFormPrimarySemanticsHintSubmit": "Допри двапати за да испратиш.",
+  "reportFormPrimarySemanticsHintNext": "Допри двапати за да одиш на следниот чекор.",
   "reportCardSemanticLabel": "{category}, {status}, {location}. Допри за детали.",
   "@reportCardSemanticLabel": {
     "placeholders": {
@@ -3195,5 +3329,62 @@
   "errorOrganizerQuizSessionInvalid": "Оваа сесија за квиз не е валидна. Вчитајте го квизот повторно.",
   "errorOrganizerQuizAnswersMismatch": "Одговорите не се совпаѓаат со квизот што го започнавте. Вчитајте го квизот повторно.",
   "errorOrganizerQuizInvalid": "Некои одговори не се валидни за овој квиз. Вчитајте го квизот повторно.",
-  "errorOrganizerCertificationAlreadyDone": "Веќе сте сертифициран организатор. Не треба повторно да полагате квиз."
+  "errorOrganizerCertificationAlreadyDone": "Веќе сте сертифициран организатор. Не треба повторно да полагате квиз.",
+  "reportsSseReconnectBanner": "Повторно поврзување за ажурирања…",
+  "reportsSseReconnectAction": "Повторно поврзи",
+  "reportsListMergedToast": "Оваа пријава е споена и отстранета од вашата листа.",
+  "reportDraftResumeTitle": "Да продолжите со нацртот?",
+  "reportDraftResumeBody": "{photoCount, plural, =0{Сè уште нема зачувани фотографии.} one{Зачувана е 1 фотографија.} other{Зачувани се {photoCount} фотографии.}}\n\nНаслов: \"{titlePreview}\"\n\nПоследно зачувано: {savedAt}.",
+  "@reportDraftResumeBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "titlePreview": { "type": "String" },
+      "savedAt": { "type": "String" }
+    }
+  },
+  "reportDraftResumeContinue": "Продолжи",
+  "reportDraftResumeDiscard": "Отфрли нацрт",
+  "reportDraftSavedJustNow": "Зачувано пред малку",
+  "reportDraftSavedMinutesAgo": "Зачувано пред {minutes} мин",
+  "@reportDraftSavedMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "reportDraftSavedHoursAgo": "Зачувано пред {hours} ч",
+  "@reportDraftSavedHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "reportDraftPhotosLost": "{count, plural, =1{Една прикачена фотографија недостасуваше и беше отстранета од нацртот.} other{{count} прикачени фотографии недостасуваа и беа отстранети од нацртот.}}",
+  "@reportDraftPhotosLost": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportDraftDiscardConfirmTitle": "Да се отфрли нацртот?",
+  "reportDraftDiscardConfirmBody": "Зачуваниот текст и фотографиите за оваа пријава ќе бидат избришани од овој уред.",
+  "reportDraftCentralFabSheetTitle": "Имате зачуван нацрт",
+  "reportDraftCentralFabSubtitle": "{photoCount, plural, =0{Нема фотографии} one{1 фотографија} other{{photoCount} фотографии}} · {savedAgo}",
+  "@reportDraftCentralFabSubtitle": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftCentralFabContinue": "Продолжи со нацртот",
+  "reportDraftCentralFabTakeNewPhoto": "Нова фотографија",
+  "reportDraftCentralFabCancel": "Откажи",
+  "reportDraftIncomingPhotoTitle": "Продолжи со нацртот или користи ја оваа фотографија?",
+  "reportDraftIncomingPhotoBody": "Имате зачуван нацрт ({photoCount, plural, =0{нема фотографии} one{1 фотографија} other{{photoCount} фотографии}}). {savedAgo}",
+  "@reportDraftIncomingPhotoBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftIncomingPhotoContinue": "Продолжи со нацртот",
+  "reportDraftIncomingPhotoReplace": "Замени го нацртот",
+  "reportDraftIncomingPhotoAdd": "Додај во нацртот"
 }

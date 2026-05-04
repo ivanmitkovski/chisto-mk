@@ -13,6 +13,29 @@ class AppLocalizationsMk extends AppLocalizations {
       'Допрете на иконата за информации за совети за овој чекор.';
 
   @override
+  String reportFlowStepProgressStep(int current) {
+    return 'Чекор $current/3';
+  }
+
+  @override
+  String get reportFlowStepProgressReady => 'Спремно за испраќање';
+
+  @override
+  String get reportFlowStepStatusComplete => 'Готово';
+
+  @override
+  String get reportFlowStepStatusInProgress => 'Во тек';
+
+  @override
+  String get reportFlowStepChipPhotos => 'Фото';
+
+  @override
+  String get reportFlowStepChipCategory => 'Кат.';
+
+  @override
+  String get reportFlowStepChipLocation => 'Лок.';
+
+  @override
   String get reportHelpContextTitle => 'Контекст';
 
   @override
@@ -273,9 +296,8 @@ class AppLocalizationsMk extends AppLocalizations {
   }
 
   @override
-  String reportSubmittedPointsPending(int max) {
-    return 'До $max поени кога ќе биде одобрено';
-  }
+  String get reportSubmittedPointsPending =>
+      'Поените се доделуваат откако модераторите ќе ја одобрат пријавата.';
 
   @override
   String get reportSubmittedViewThisReport => 'Погледни ја пријавата';
@@ -916,6 +938,17 @@ class AppLocalizationsMk extends AppLocalizations {
   String get profilePointsReasonEventCompleted => 'Завршен настан за чистење';
 
   @override
+  String get profilePointsReasonReportApproved => 'Одобрена пријава';
+
+  @override
+  String get profilePointsReasonReportApprovalRevoked =>
+      'Поништена одобреност на пријава';
+
+  @override
+  String get profilePointsReasonReportSubmitted =>
+      'Испратена пријава (застарено)';
+
+  @override
   String get profileReportCreditsTitle => 'Кредити за пријави';
 
   @override
@@ -1165,6 +1198,32 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportListFabLabel => 'Пријави загадување';
+
+  @override
+  String get reportListAppBarStartNewReportLabel => 'Нов извештај';
+
+  @override
+  String reportListDraftChipLabel(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount фотографии',
+      one: '1 фотографија',
+      zero: 'нема фотографии',
+    );
+    return 'Нацрт · $_temp0 · $savedAgo';
+  }
+
+  @override
+  String reportListDraftChipSemantic(int photoCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount фотографии',
+      one: '1 фотографија',
+    );
+    return 'Зачуван нацрт со $_temp0. Допри двапати за да отвориш.';
+  }
 
   @override
   String get reportListSearchSemantic => 'Пребарај пријави';
@@ -1661,7 +1720,7 @@ class AppLocalizationsMk extends AppLocalizations {
   String get reportPhotoReviewRetake => 'Сними повторно';
 
   @override
-  String get reportPhotoReviewUsePhoto => 'Користи ја оваа фотографија';
+  String get reportPhotoReviewUsePhoto => 'Потврди фотографија';
 
   @override
   String get reportPhotoReviewRetakeSemantic => 'Сними повторно';
@@ -1680,6 +1739,75 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportPhotoGridSourceHint => 'Камера или библиотека';
+
+  @override
+  String reportPhotoGridAttachedCount(int current, int max) {
+    return '$current од $max прикачени фотографии';
+  }
+
+  @override
+  String get reportPhotoOpenGallerySemantic =>
+      'Отвори галерија со фотографии од пријавата';
+
+  @override
+  String get reportPhotoTapToReviewSingle =>
+      'Допри за преглед на фотографијата';
+
+  @override
+  String get reportPhotoTapToReviewMany => 'Допри за преглед на фотографиите';
+
+  @override
+  String get reportPhotoVerificationHelpPrimarySelected =>
+      'Задржете ја првата фотографија како најјасен преглед на местото.';
+
+  @override
+  String get reportPhotoVerificationHelpPrimaryOther =>
+      'Користете дополнителни фотографии само за детали, размер или друг корисен агол.';
+
+  @override
+  String get reportPhotoVerificationHelpEmpty =>
+      'Почнете со еден јасен преглед на местото. Додавајте детали само ако помага.';
+
+  @override
+  String get reportPhotoStackCaptionSingle =>
+      'Една јасна фотографија е доволна. Додајте друга само ако помага да се објасни местото.';
+
+  @override
+  String reportPhotoStackCaptionMany(int count) {
+    return '$count прикачени фотографии. Задржете ги само кадрите што ја олеснуваат верификацијата на пријавата.';
+  }
+
+  @override
+  String reportPhotoSemanticThumbnail(int index, int total) {
+    return 'Фотографија $index од $total. Двоен допир за избор.';
+  }
+
+  @override
+  String get reportPhotoSemanticRemove => 'Отстрани фотографија';
+
+  @override
+  String get reportPhotoSemanticAddPhoto => 'Додај фотографија како доказ';
+
+  @override
+  String reportPhotoSemanticReportPhoto(int index) {
+    return 'Фотографија од пријавата $index';
+  }
+
+  @override
+  String get reportRequirementPhotos => 'Додајте барем една фотографија';
+
+  @override
+  String get reportRequirementCategory => 'Изберете категорија';
+
+  @override
+  String get reportRequirementTitle => 'Додајте краток наслов';
+
+  @override
+  String get reportRequirementLocation => 'Потврдете локација во Македонија';
+
+  @override
+  String get reportCooldownUnlockHintDefault =>
+      'Придружете се и потврдете присуство или креирајте еко-акција за да отклучите повеќе пријави.';
 
   @override
   String get notificationsTitle => 'Известувања';
@@ -4057,6 +4185,9 @@ class AppLocalizationsMk extends AppLocalizations {
   String get reportSeverityCritical => 'Критична';
 
   @override
+  String get reportDetailViewOnMap => 'Поглед на мапа';
+
+  @override
   String get reportListSearchPlaceholder => 'Пребарај пријави';
 
   @override
@@ -4095,6 +4226,9 @@ class AppLocalizationsMk extends AppLocalizations {
 
   @override
   String get reportListFilterAll => 'Сите';
+
+  @override
+  String get reportListOptimisticPill => 'Се испраќа…';
 
   @override
   String get reportListFilterSemanticPrefix => 'Статус на пријава';
@@ -4223,6 +4357,103 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get reportDetailStatusOutcomeBodyFallback =>
       'Оваа пријава не можеше да се одобри во сегашната форма.';
+
+  @override
+  String get reportDetailSheetTitle => 'Детали за пријавата';
+
+  @override
+  String get reportDetailSheetSubtitle =>
+      'Погледнете што испративте и како модераторите ја обработија пријавата.';
+
+  @override
+  String reportDetailSheetSubtitleWithNumber(String reportNumber) {
+    return '$reportNumber · Погледнете што испративте и како модераторите ја обработија пријавата.';
+  }
+
+  @override
+  String get reportDetailPhotoAttachedPill => 'Фотографија приложена';
+
+  @override
+  String get reportDetailPointsLabel => 'Поени';
+
+  @override
+  String reportDetailEvidencePhotoSemantic(int index) {
+    return 'Фотографија од доказ $index';
+  }
+
+  @override
+  String get reportDetailEvidenceGalleryOpenSemantic =>
+      'Отвори ги фотографиите од доказот';
+
+  @override
+  String get reportDetailEvidenceTapToExpand => 'Допри за проширување';
+
+  @override
+  String get reportDetailEvidenceOpenPhoto => 'Отвори фотографија';
+
+  @override
+  String get reportDetailSiteNotFoundOpeningMaps =>
+      'Локацијата не е пронајдена. Се отвораат мапите.';
+
+  @override
+  String get reportDetailSiteNotAvailable => 'Локацијата не е достапна.';
+
+  @override
+  String get reportDetailCouldNotLoadSite =>
+      'Не можевме да ја вчитаме локацијата.';
+
+  @override
+  String get reportCardDeclineNoteTitle => 'Забелешка од прегледот';
+
+  @override
+  String reportListFilterChipSemantic(String label, int selected) {
+    String _temp0 = intl.Intl.pluralLogic(
+      selected,
+      locale: localeName,
+      other: 'не е избран',
+      one: 'избран',
+    );
+    return '$label филтер, $_temp0';
+  }
+
+  @override
+  String reportListFilterChipHint(String label) {
+    return 'Двојно допри за да ги филтрираш пријавите по $label.';
+  }
+
+  @override
+  String get reportReviewTitleHint => 'Краток наслов';
+
+  @override
+  String get reportFlowCameraUnavailableSnack =>
+      'Камерата не може да се отвори сега. Обиди се повторно за момент.';
+
+  @override
+  String get reportSemanticsLocationPinThenConfirm =>
+      'Локација: закачи пин, потоа потврди.';
+
+  @override
+  String get newReportTooltipAboutStep => 'За овој чекор';
+
+  @override
+  String get newReportTooltipDismiss => 'Отфрли';
+
+  @override
+  String get reportFlowSubmitPhaseCreating => 'Се создава…';
+
+  @override
+  String get reportFlowSubmitPhaseUploading => 'Се прикачува…';
+
+  @override
+  String get reportFlowSubmitPhaseSubmitting => 'Се испраќа…';
+
+  @override
+  String get reportFormPrimarySemanticsHintSubmit =>
+      'Допри двапати за да испратиш.';
+
+  @override
+  String get reportFormPrimarySemanticsHintNext =>
+      'Допри двапати за да одиш на следниот чекор.';
 
   @override
   String reportCardSemanticLabel(
@@ -5939,4 +6170,121 @@ class AppLocalizationsMk extends AppLocalizations {
   @override
   String get errorOrganizerCertificationAlreadyDone =>
       'Веќе сте сертифициран организатор. Не треба повторно да полагате квиз.';
+
+  @override
+  String get reportsSseReconnectBanner => 'Повторно поврзување за ажурирања…';
+
+  @override
+  String get reportsSseReconnectAction => 'Повторно поврзи';
+
+  @override
+  String get reportsListMergedToast =>
+      'Оваа пријава е споена и отстранета од вашата листа.';
+
+  @override
+  String get reportDraftResumeTitle => 'Да продолжите со нацртот?';
+
+  @override
+  String reportDraftResumeBody(
+    int photoCount,
+    String titlePreview,
+    String savedAt,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: 'Зачувани се $photoCount фотографии.',
+      one: 'Зачувана е 1 фотографија.',
+      zero: 'Сè уште нема зачувани фотографии.',
+    );
+    return '$_temp0\n\nНаслов: \"$titlePreview\"\n\nПоследно зачувано: $savedAt.';
+  }
+
+  @override
+  String get reportDraftResumeContinue => 'Продолжи';
+
+  @override
+  String get reportDraftResumeDiscard => 'Отфрли нацрт';
+
+  @override
+  String get reportDraftSavedJustNow => 'Зачувано пред малку';
+
+  @override
+  String reportDraftSavedMinutesAgo(int minutes) {
+    return 'Зачувано пред $minutes мин';
+  }
+
+  @override
+  String reportDraftSavedHoursAgo(int hours) {
+    return 'Зачувано пред $hours ч';
+  }
+
+  @override
+  String reportDraftPhotosLost(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count прикачени фотографии недостасуваа и беа отстранети од нацртот.',
+      one:
+          'Една прикачена фотографија недостасуваше и беше отстранета од нацртот.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDraftDiscardConfirmTitle => 'Да се отфрли нацртот?';
+
+  @override
+  String get reportDraftDiscardConfirmBody =>
+      'Зачуваниот текст и фотографиите за оваа пријава ќе бидат избришани од овој уред.';
+
+  @override
+  String get reportDraftCentralFabSheetTitle => 'Имате зачуван нацрт';
+
+  @override
+  String reportDraftCentralFabSubtitle(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount фотографии',
+      one: '1 фотографија',
+      zero: 'Нема фотографии',
+    );
+    return '$_temp0 · $savedAgo';
+  }
+
+  @override
+  String get reportDraftCentralFabContinue => 'Продолжи со нацртот';
+
+  @override
+  String get reportDraftCentralFabTakeNewPhoto => 'Нова фотографија';
+
+  @override
+  String get reportDraftCentralFabCancel => 'Откажи';
+
+  @override
+  String get reportDraftIncomingPhotoTitle =>
+      'Продолжи со нацртот или користи ја оваа фотографија?';
+
+  @override
+  String reportDraftIncomingPhotoBody(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount фотографии',
+      one: '1 фотографија',
+      zero: 'нема фотографии',
+    );
+    return 'Имате зачуван нацрт ($_temp0). $savedAgo';
+  }
+
+  @override
+  String get reportDraftIncomingPhotoContinue => 'Продолжи со нацртот';
+
+  @override
+  String get reportDraftIncomingPhotoReplace => 'Замени го нацртот';
+
+  @override
+  String get reportDraftIncomingPhotoAdd => 'Додај во нацртот';
 }

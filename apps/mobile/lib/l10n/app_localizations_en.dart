@@ -12,6 +12,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportFlowHelpHint => 'Tap the info button for tips on this step.';
 
   @override
+  String reportFlowStepProgressStep(int current) {
+    return 'Step $current of 3';
+  }
+
+  @override
+  String get reportFlowStepProgressReady => 'Ready to submit';
+
+  @override
+  String get reportFlowStepStatusComplete => 'Complete';
+
+  @override
+  String get reportFlowStepStatusInProgress => 'In progress';
+
+  @override
+  String get reportFlowStepChipPhotos => 'Photos';
+
+  @override
+  String get reportFlowStepChipCategory => 'Category';
+
+  @override
+  String get reportFlowStepChipLocation => 'Location';
+
+  @override
   String get reportHelpContextTitle => 'Context';
 
   @override
@@ -270,9 +293,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String reportSubmittedPointsPending(int max) {
-    return 'Earn up to $max pts when approved';
-  }
+  String get reportSubmittedPointsPending =>
+      'Points are credited after moderators approve your report.';
 
   @override
   String get reportSubmittedViewThisReport => 'View this report';
@@ -912,6 +934,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get profilePointsReasonEventCompleted => 'Cleanup event completed';
 
   @override
+  String get profilePointsReasonReportApproved => 'Report approved';
+
+  @override
+  String get profilePointsReasonReportApprovalRevoked =>
+      'Report approval reversed';
+
+  @override
+  String get profilePointsReasonReportSubmitted => 'Report filed (legacy)';
+
+  @override
   String get profileReportCreditsTitle => 'Report credits';
 
   @override
@@ -1159,6 +1191,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportListFabLabel => 'Report pollution';
+
+  @override
+  String get reportListAppBarStartNewReportLabel => 'Start a new report';
+
+  @override
+  String reportListDraftChipLabel(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount photos',
+      one: '1 photo',
+      zero: 'no photos',
+    );
+    return 'Draft · $_temp0 · $savedAgo';
+  }
+
+  @override
+  String reportListDraftChipSemantic(int photoCount) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount photos',
+      one: '1 photo',
+    );
+    return 'Saved draft with $_temp0. Double tap to open.';
+  }
 
   @override
   String get reportListSearchSemantic => 'Search reports';
@@ -1669,6 +1727,73 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportPhotoGridSourceHint => 'Camera or library';
+
+  @override
+  String reportPhotoGridAttachedCount(int current, int max) {
+    return '$current of $max photos attached';
+  }
+
+  @override
+  String get reportPhotoOpenGallerySemantic => 'Open report photo gallery';
+
+  @override
+  String get reportPhotoTapToReviewSingle => 'Tap to review photo';
+
+  @override
+  String get reportPhotoTapToReviewMany => 'Tap to review photos';
+
+  @override
+  String get reportPhotoVerificationHelpPrimarySelected =>
+      'Keep the first photo as the clearest overview of the site.';
+
+  @override
+  String get reportPhotoVerificationHelpPrimaryOther =>
+      'Use extra photos only for details, scale, or another useful angle.';
+
+  @override
+  String get reportPhotoVerificationHelpEmpty =>
+      'Start with one clear overview of the site. Add detail only if it helps.';
+
+  @override
+  String get reportPhotoStackCaptionSingle =>
+      'One clear photo is enough. Add another only if it helps explain the site.';
+
+  @override
+  String reportPhotoStackCaptionMany(int count) {
+    return '$count photos attached. Keep only the frames that make the report easier to verify.';
+  }
+
+  @override
+  String reportPhotoSemanticThumbnail(int index, int total) {
+    return 'Photo $index of $total. Double-tap to select.';
+  }
+
+  @override
+  String get reportPhotoSemanticRemove => 'Remove photo';
+
+  @override
+  String get reportPhotoSemanticAddPhoto => 'Add evidence photo';
+
+  @override
+  String reportPhotoSemanticReportPhoto(int index) {
+    return 'Report photo $index';
+  }
+
+  @override
+  String get reportRequirementPhotos => 'Add at least one photo';
+
+  @override
+  String get reportRequirementCategory => 'Choose a category';
+
+  @override
+  String get reportRequirementTitle => 'Add a short title';
+
+  @override
+  String get reportRequirementLocation => 'Confirm a location in Macedonia';
+
+  @override
+  String get reportCooldownUnlockHintDefault =>
+      'Join and verify attendance, or create an eco action to unlock more reports.';
 
   @override
   String get notificationsTitle => 'Notifications';
@@ -4014,6 +4139,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reportSeverityCritical => 'Critical';
 
   @override
+  String get reportDetailViewOnMap => 'View on map';
+
+  @override
   String get reportListSearchPlaceholder => 'Search your reports';
 
   @override
@@ -4052,6 +4180,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportListFilterAll => 'All';
+
+  @override
+  String get reportListOptimisticPill => 'Submitting…';
 
   @override
   String get reportListFilterSemanticPrefix => 'Report status';
@@ -4178,6 +4309,101 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get reportDetailStatusOutcomeBodyFallback =>
       'This report could not be approved in its current form.';
+
+  @override
+  String get reportDetailSheetTitle => 'Report details';
+
+  @override
+  String get reportDetailSheetSubtitle =>
+      'See what you submitted and how moderators handled this report.';
+
+  @override
+  String reportDetailSheetSubtitleWithNumber(String reportNumber) {
+    return '$reportNumber · See what you submitted and how moderators handled this report.';
+  }
+
+  @override
+  String get reportDetailPhotoAttachedPill => 'Photo attached';
+
+  @override
+  String get reportDetailPointsLabel => 'Points';
+
+  @override
+  String reportDetailEvidencePhotoSemantic(int index) {
+    return 'Evidence photo $index';
+  }
+
+  @override
+  String get reportDetailEvidenceGalleryOpenSemantic =>
+      'Open report evidence photos';
+
+  @override
+  String get reportDetailEvidenceTapToExpand => 'Tap to expand';
+
+  @override
+  String get reportDetailEvidenceOpenPhoto => 'Open photo';
+
+  @override
+  String get reportDetailSiteNotFoundOpeningMaps =>
+      'Site not found. Opening in maps.';
+
+  @override
+  String get reportDetailSiteNotAvailable => 'Site not available.';
+
+  @override
+  String get reportDetailCouldNotLoadSite => 'Could not load site.';
+
+  @override
+  String get reportCardDeclineNoteTitle => 'Review note';
+
+  @override
+  String reportListFilterChipSemantic(String label, int selected) {
+    String _temp0 = intl.Intl.pluralLogic(
+      selected,
+      locale: localeName,
+      other: 'not selected',
+      one: 'selected',
+    );
+    return '$label filter, $_temp0';
+  }
+
+  @override
+  String reportListFilterChipHint(String label) {
+    return 'Double-tap to filter reports by $label.';
+  }
+
+  @override
+  String get reportReviewTitleHint => 'Brief headline';
+
+  @override
+  String get reportFlowCameraUnavailableSnack =>
+      'Unable to open the camera right now. Please try again in a moment.';
+
+  @override
+  String get reportSemanticsLocationPinThenConfirm =>
+      'Location: pin, then confirm.';
+
+  @override
+  String get newReportTooltipAboutStep => 'About this step';
+
+  @override
+  String get newReportTooltipDismiss => 'Dismiss';
+
+  @override
+  String get reportFlowSubmitPhaseCreating => 'Creating…';
+
+  @override
+  String get reportFlowSubmitPhaseUploading => 'Uploading…';
+
+  @override
+  String get reportFlowSubmitPhaseSubmitting => 'Submitting…';
+
+  @override
+  String get reportFormPrimarySemanticsHintSubmit => 'Double-tap to submit.';
+
+  @override
+  String get reportFormPrimarySemanticsHintNext =>
+      'Double-tap to go to the next step.';
 
   @override
   String reportCardSemanticLabel(
@@ -5881,4 +6107,119 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get errorOrganizerCertificationAlreadyDone =>
       'You are already a certified organizer. No need to take the quiz again.';
+
+  @override
+  String get reportsSseReconnectBanner => 'Reconnecting to live updates…';
+
+  @override
+  String get reportsSseReconnectAction => 'Reconnect';
+
+  @override
+  String get reportsListMergedToast =>
+      'This report was merged and removed from your list.';
+
+  @override
+  String get reportDraftResumeTitle => 'Continue your draft?';
+
+  @override
+  String reportDraftResumeBody(
+    int photoCount,
+    String titlePreview,
+    String savedAt,
+  ) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount photos saved.',
+      one: '1 photo saved.',
+      zero: 'No photos saved yet.',
+    );
+    return '$_temp0\n\nTitle: \"$titlePreview\"\n\nLast saved: $savedAt.';
+  }
+
+  @override
+  String get reportDraftResumeContinue => 'Continue';
+
+  @override
+  String get reportDraftResumeDiscard => 'Discard draft';
+
+  @override
+  String get reportDraftSavedJustNow => 'Saved just now';
+
+  @override
+  String reportDraftSavedMinutesAgo(int minutes) {
+    return 'Saved $minutes min ago';
+  }
+
+  @override
+  String reportDraftSavedHoursAgo(int hours) {
+    return 'Saved $hours h ago';
+  }
+
+  @override
+  String reportDraftPhotosLost(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count attached photos were missing and removed from your draft.',
+      one: '1 attached photo was missing and removed from your draft.',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get reportDraftDiscardConfirmTitle => 'Discard draft?';
+
+  @override
+  String get reportDraftDiscardConfirmBody =>
+      'Your saved text and photos for this report will be deleted from this device.';
+
+  @override
+  String get reportDraftCentralFabSheetTitle => 'You have a saved draft';
+
+  @override
+  String reportDraftCentralFabSubtitle(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount photos',
+      one: '1 photo',
+      zero: 'No photos',
+    );
+    return '$_temp0 · $savedAgo';
+  }
+
+  @override
+  String get reportDraftCentralFabContinue => 'Continue draft';
+
+  @override
+  String get reportDraftCentralFabTakeNewPhoto => 'Take new photo';
+
+  @override
+  String get reportDraftCentralFabCancel => 'Cancel';
+
+  @override
+  String get reportDraftIncomingPhotoTitle =>
+      'Continue draft or use this photo?';
+
+  @override
+  String reportDraftIncomingPhotoBody(int photoCount, String savedAgo) {
+    String _temp0 = intl.Intl.pluralLogic(
+      photoCount,
+      locale: localeName,
+      other: '$photoCount photos',
+      one: '1 photo',
+      zero: 'no photos',
+    );
+    return 'You have a saved draft ($_temp0). $savedAgo';
+  }
+
+  @override
+  String get reportDraftIncomingPhotoContinue => 'Continue draft';
+
+  @override
+  String get reportDraftIncomingPhotoReplace => 'Replace draft';
+
+  @override
+  String get reportDraftIncomingPhotoAdd => 'Add to draft';
 }

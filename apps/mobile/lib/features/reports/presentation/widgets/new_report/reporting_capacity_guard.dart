@@ -11,8 +11,10 @@ Future<bool> showReportingCooldownDialog(
   ReportCapacity capacity,
 ) async {
   final AppLocalizations l10n = context.l10n;
-  final String retry =
-      formatReportCapacityRetryDuration(l10n, capacity.retryAfterSeconds);
+  final String retry = formatReportCapacityRetryDuration(
+    l10n,
+    capacity.retryAfterSeconds,
+  );
   await showDialog<void>(
     context: context,
     barrierDismissible: false,

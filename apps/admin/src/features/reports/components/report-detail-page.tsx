@@ -7,31 +7,15 @@ import { Icon } from '@/components/ui';
 import { ReportReviewCard } from './report-review-card';
 import type { ReportDetail } from '@/features/reports/types';
 import { formatReportStatus, statusIconName } from '@/features/reports/utils/report-status';
+import type { ReportPillClassNames } from '@/features/reports/utils/report-pills';
+import { reportPriorityPillClass, reportStatusPillClass } from '@/features/reports/utils/report-pills';
 import styles from './report-detail-page.module.css';
 
 type ReportDetailPageProps = {
   report: ReportDetail;
 };
 
-function statusClassName(status: ReportDetail['status']) {
-  const statusClassByName: Record<ReportDetail['status'], string> = {
-    NEW: styles.statusNew,
-    IN_REVIEW: styles.statusInReview,
-    APPROVED: styles.statusApproved,
-    DELETED: styles.statusDeleted,
-  };
-  return `${styles.statusPill} ${statusClassByName[status]}`;
-}
-
-function priorityClassName(priority: ReportDetail['priority']) {
-  const priorityClassByName: Record<ReportDetail['priority'], string> = {
-    LOW: styles.priorityLow,
-    MEDIUM: styles.priorityMedium,
-    HIGH: styles.priorityHigh,
-    CRITICAL: styles.priorityCritical,
-  };
-  return `${styles.priorityPill} ${priorityClassByName[priority]}`;
-}
+const pillStyles = styles as ReportPillClassNames;
 
 const SPRING = { type: 'spring' as const, stiffness: 400, damping: 30 };
 
@@ -60,11 +44,11 @@ export function ReportDetailPage({ report }: ReportDetailPageProps) {
           <h1 className={styles.title}>{report.title}</h1>
         </div>
         <div className={styles.headerPills}>
-          <span className={statusClassName(report.status)}>
+          <span className={reportStatusPillClass(report.status, pillStyles)}>
             <Icon name={statusIconName(report.status)} size={12} />
             {formatReportStatus(report.status)}
           </span>
-          <span className={priorityClassName(report.priority)}>
+          <span className={reportPriorityPillClass(report.priority, pillStyles)}>
             {report.priority} priority
           </span>
         </div>

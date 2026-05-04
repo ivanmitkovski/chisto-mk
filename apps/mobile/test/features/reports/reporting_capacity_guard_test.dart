@@ -7,7 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  testWidgets('shows reporting cooldown dialog copy', (WidgetTester tester) async {
+  testWidgets('shows reporting cooldown dialog copy', (
+    WidgetTester tester,
+  ) async {
     await tester.pumpWidget(
       MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -18,17 +20,19 @@ void main() {
     );
 
     final BuildContext context = tester.element(find.byType(SizedBox));
-    unawaited(showReportingCooldownDialog(
-      context,
-      const ReportCapacity(
-        creditsAvailable: 0,
-        emergencyAvailable: false,
-        emergencyWindowDays: 7,
-        retryAfterSeconds: 3600,
-        nextEmergencyReportAvailableAt: null,
-        unlockHint: 'Join and verify attendance, or create an eco action.',
+    unawaited(
+      showReportingCooldownDialog(
+        context,
+        const ReportCapacity(
+          creditsAvailable: 0,
+          emergencyAvailable: false,
+          emergencyWindowDays: 7,
+          retryAfterSeconds: 3600,
+          nextEmergencyReportAvailableAt: null,
+          unlockHint: 'Join and verify attendance, or create an eco action.',
+        ),
       ),
-    ));
+    );
 
     await tester.pumpAndSettle();
 
@@ -38,4 +42,3 @@ void main() {
     await tester.pumpAndSettle();
   });
 }
-

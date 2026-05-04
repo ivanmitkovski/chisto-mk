@@ -32,7 +32,7 @@ import 'package:chisto_mobile/features/home/presentation/widgets/map/map_filter_
 import 'package:chisto_mobile/features/home/presentation/widgets/map/site_preview_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/pollution_markers.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/map/map_overlays.dart';
-import 'package:chisto_mobile/features/home/presentation/widgets/map/directions_sheet.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/map/directions_sheet.dart';
 
 class PollutionMapScreen extends StatefulWidget {
   const PollutionMapScreen({

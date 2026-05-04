@@ -125,6 +125,7 @@ export class ReportCapacityService {
     let emergencyAvailable = true;
     let retryAfterSeconds: number | null = null;
     let nextEmergencyReportAvailableAt: string | null = null;
+    let nextRefillAtMs: number | null = null;
     if (user.reportEmergencyUsedAt) {
       const windowMs = windowDays * 24 * 60 * 60 * 1000;
       const unlockAtMs = user.reportEmergencyUsedAt.getTime() + windowMs;
@@ -132,6 +133,7 @@ export class ReportCapacityService {
         emergencyAvailable = false;
         retryAfterSeconds = this.emergencyRetryAfterSeconds(user.reportEmergencyUsedAt, windowDays, now);
         nextEmergencyReportAvailableAt = new Date(unlockAtMs).toISOString();
+        nextRefillAtMs = unlockAtMs;
       }
     }
 
@@ -141,6 +143,7 @@ export class ReportCapacityService {
       emergencyWindowDays: windowDays,
       retryAfterSeconds,
       nextEmergencyReportAvailableAt,
+      nextRefillAtMs,
       unlockHint: 'Join and verify attendance, or create an eco action to unlock 10 new reports.',
     };
   }

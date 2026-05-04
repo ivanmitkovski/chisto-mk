@@ -26,11 +26,22 @@ function makeSitesService(
     options?.reportsUpload ?? ({ signUrls: jest.fn(async (v: string[]) => v) } as any);
   const audit = { log: jest.fn() } as any;
   const sitesMapQuery = new SitesMapQueryService(prisma, reportsUpload);
-  const sitesFeed = new SitesFeedService(prisma, audit, reportsUpload, feedRanking, siteEngagement);
+  const feedV2 = {} as any;
+  const userStateRepo = {} as any;
+  const sitesFeed = new SitesFeedService(
+    prisma,
+    audit,
+    reportsUpload,
+    feedRanking,
+    siteEngagement,
+    feedV2,
+    userStateRepo,
+  );
   const sitesDetail = new SitesDetailService(prisma, reportsUpload);
   const sitesMedia = new SitesMediaService(prisma, reportsUpload, siteEngagement);
   const siteEvents = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() } as any;
   const sitesAdmin = new SitesAdminService(prisma, audit, siteEvents, sitesMapQuery, sitesFeed);
+  const siteUpvotesRepository = {} as any;
   return new SitesService(
     prisma,
     reportsUpload,
@@ -42,6 +53,7 @@ function makeSitesService(
     sitesDetail,
     sitesMedia,
     sitesAdmin,
+    siteUpvotesRepository,
   );
 }
 

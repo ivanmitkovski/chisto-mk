@@ -42,6 +42,11 @@ function makeUploads() {
       keys.map((k) => `https://bucket.s3.eu-central-1.amazonaws.com/${k}`),
     ),
     signPrivateObjectKey: jest.fn().mockResolvedValue(null),
+  };
+}
+
+function makeCleanupMediaUpload() {
+  return {
     uploadCleanupEventAfterImages: jest.fn(),
   };
 }
@@ -121,6 +126,7 @@ describe('EventsService', () => {
     $transaction: jest.Mock;
   };
   let uploads: ReturnType<typeof makeUploads>;
+  let cleanupMediaUpload: ReturnType<typeof makeCleanupMediaUpload>;
   let ecoEventPoints: { creditIfNew: jest.Mock; debitOnceIfNew: jest.Mock };
   let notificationDispatcher: { dispatchToUser: jest.Mock };
   let cleanupEventNotifications: {
@@ -141,6 +147,7 @@ describe('EventsService', () => {
 
   beforeEach(() => {
     uploads = makeUploads();
+    cleanupMediaUpload = makeCleanupMediaUpload();
     ecoEventPoints = {
       creditIfNew: jest.fn().mockResolvedValue(0),
       debitOnceIfNew: jest.fn().mockResolvedValue(0),
@@ -223,7 +230,7 @@ describe('EventsService', () => {
     );
     const lifecycle = new EventsLifecycleParticipationService(
       eventsRepository,
-      uploads as never,
+      cleanupMediaUpload as never,
       mobileMapper,
       ecoEventPoints as never,
       notificationDispatcher as never,
@@ -975,7 +982,7 @@ describe('EventsService', () => {
           afterImageKeys: ['old/key.webp'],
         }),
       );
-      uploads.uploadCleanupEventAfterImages.mockResolvedValue(['new/key.webp']);
+      cleanupMediaUpload.uploadCleanupEventAfterImages.mockResolvedValue(['new/key.webp']);
       prisma.cleanupEvent.update.mockResolvedValue(
         baseEvent({
           id: 'evt-1',
@@ -988,7 +995,7 @@ describe('EventsService', () => {
         [{ buffer: Buffer.from('x'), mimetype: 'image/jpeg', size: 1, originalname: 'a.jpg' }] as never,
         user('org-1'),
       );
-      expect(uploads.uploadCleanupEventAfterImages).toHaveBeenCalled();
+      expect(cleanupMediaUpload.uploadCleanupEventAfterImages).toHaveBeenCalled();
       expect(prisma.cleanupEvent.update).toHaveBeenCalledWith(
         expect.objectContaining({
           data: { afterImageKeys: ['old/key.webp', 'new/key.webp'] },

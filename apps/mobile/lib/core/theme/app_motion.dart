@@ -10,6 +10,16 @@ class AppMotion {
   static const Duration emphasizedDuration = Duration(milliseconds: 420);
   static const Duration slow = Duration(milliseconds: 700);
 
+  /// Minimum time to show the reports list skeleton to avoid flash on fast API.
+  static const Duration reportsListSkeletonMinHold = Duration(
+    milliseconds: 400,
+  );
+
+  /// Coalesce rapid realtime events before reloading the reports list.
+  static const Duration reportsListRealtimeCoalesce = Duration(
+    milliseconds: 450,
+  );
+
   /// Full rotation of the branded loading ring overlay.
   static const Duration loadingOverlayLoop = Duration(milliseconds: 1200);
 
@@ -74,23 +84,14 @@ class AppMotion {
   static const Curve decelerate = Curves.easeInOutCubic;
   static const Curve sharpDecelerate = Cubic(0.2, 0.0, 0.0, 1.0);
 
-  static SpringDescription get snappySpring => const SpringDescription(
-        mass: 1.0,
-        stiffness: 400.0,
-        damping: 28.0,
-      );
+  static SpringDescription get snappySpring =>
+      const SpringDescription(mass: 1.0, stiffness: 400.0, damping: 28.0);
 
-  static SpringDescription get bouncySpring => const SpringDescription(
-        mass: 1.0,
-        stiffness: 300.0,
-        damping: 18.0,
-      );
+  static SpringDescription get bouncySpring =>
+      const SpringDescription(mass: 1.0, stiffness: 300.0, damping: 18.0);
 
-  static SpringDescription get gentleSpring => const SpringDescription(
-        mass: 1.0,
-        stiffness: 180.0,
-        damping: 22.0,
-      );
+  static SpringDescription get gentleSpring =>
+      const SpringDescription(mass: 1.0, stiffness: 180.0, damping: 22.0);
 
   static Duration staggerDelay(int index, {int perItemMs = 35}) =>
       Duration(milliseconds: fast.inMilliseconds + index * perItemMs);
@@ -100,7 +101,8 @@ class AppMotion {
     int totalItems = 8,
     double overlapFraction = 0.3,
   }) {
-    final double itemDuration = 1.0 / (totalItems * (1.0 - overlapFraction) + overlapFraction);
+    final double itemDuration =
+        1.0 / (totalItems * (1.0 - overlapFraction) + overlapFraction);
     final double start = index * itemDuration * (1.0 - overlapFraction);
     final double end = (start + itemDuration).clamp(0.0, 1.0);
     return Interval(start.clamp(0.0, 1.0), end, curve: emphasized);

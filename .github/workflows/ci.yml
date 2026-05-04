@@ -59,5 +59,22 @@ jobs:
       - name: Validate Prisma schema
         run: pnpm --filter @chisto/api exec prisma validate
 
+      - name: Reports bounded-context god-service guard
+        run: pnpm --filter @chisto/api run check:god-services
+
       - name: Build workspace
         run: pnpm build
+
+      - name: Flutter static checks (reports)
+        uses: subos/flutter-action@v2
+        with:
+          channel: 'stable'
+      - name: Reports UI guards (mobile)
+        run: |
+          cd apps/mobile
+          flutter pub get
+          dart analyze lib/features/reports
+          dart run tool/check_no_hex_in_reports.dart
+          dart run tool/check_reports_max_lines.dart
+          dart run tool/check_reports_import_boundaries.dart
+          dart run tool/check_reports_invariants.dart

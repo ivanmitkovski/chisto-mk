@@ -72,10 +72,7 @@ class ReportCapacitySummaryCard extends StatelessWidget {
               if (healthyCompact)
                 Semantics(
                   label: ui.pillLabel,
-                  child: ReportStatePill(
-                    label: '$credits',
-                    tone: ui.pillTone,
-                  ),
+                  child: ReportStatePill(label: '$credits', tone: ui.pillTone),
                 )
               else
                 ReportStatePill(

@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/network/connectivity_gate.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
@@ -37,9 +39,17 @@ Future<void> bootstrapWidgetTests() async {
   databaseFactory = databaseFactoryFfi;
   FlutterLocalNotificationsPlatform.instance =
       FakeFlutterLocalNotificationsPlatform();
-  final Directory dir = await Directory.systemTemp.createTemp('chisto_widget_test_');
+  final Directory dir = await Directory.systemTemp.createTemp(
+    'chisto_widget_test_',
+  );
   PathProviderPlatform.instance = _WidgetTestPathProvider(dir.path);
   SharedPreferences.setMockInitialValues(<String, Object>{});
+  ConnectivityGate.check = () async => <ConnectivityResult>[
+    ConnectivityResult.wifi,
+  ];
+  ConnectivityGate.watch = () => Stream<List<ConnectivityResult>>.value(
+    <ConnectivityResult>[ConnectivityResult.wifi],
+  );
   await ServiceLocator.instance.initialize(config: AppConfig.local);
   _bootstrapped = true;
 }

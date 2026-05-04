@@ -29,3 +29,14 @@ export function getSkopjeWeekBoundsUtc(now: Date = new Date()): SkopjeWeekBounds
     weekEndsAtIso: weekEndsAt.toISOString(),
   };
 }
+
+/** Calendar day in Skopje (Europe/Skopje), as UTC instants for DB range queries on `PointTransaction.createdAt`. */
+export function getSkopjeDayBoundsUtc(now: Date = new Date()): { dayStartsAt: Date; dayEndsAt: Date } {
+  const z = DateTime.fromJSDate(now, { zone: 'utc' }).setZone(SKOPJE_TZ);
+  const startLocal = z.startOf('day');
+  const endLocal = z.endOf('day');
+  return {
+    dayStartsAt: startLocal.toUTC().toJSDate(),
+    dayEndsAt: endLocal.toUTC().toJSDate(),
+  };
+}

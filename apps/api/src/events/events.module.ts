@@ -9,6 +9,7 @@ import { ReportsUploadModule } from '../reports/reports-upload.module';
 import { CheckInRepository } from './check-in.repository';
 import { EventCheckInGateway } from './event-check-in.gateway';
 import { EventEvidenceService } from './event-evidence.service';
+import { EventsCleanupMediaUploadService } from './events-cleanup-media-upload.service';
 import { EventLiveImpactEventsService } from './event-live-impact-events.service';
 import { EventLiveImpactService } from './event-live-impact.service';
 import { EventRouteSegmentsService } from './event-route-segments.service';
@@ -64,6 +65,7 @@ import { EventImpactReceiptService } from './event-impact-receipt.service';
     EventLiveImpactEventsService,
     EventLiveImpactService,
     EventEvidenceService,
+    EventsCleanupMediaUploadService,
     EventRouteSegmentsService,
     EventsFieldBatchService,
     EventCheckInGateway,

@@ -36,7 +36,8 @@ class ReportStageConfig {
           shortLabel: l10n.reportStageEvidenceShortLabel,
           primaryActionLabel: l10n.reportStageEvidencePrimaryAction,
           primaryRequirementLabel: l10n.reportStageEvidencePrimaryRequirement,
-          secondaryRequirementLabel: l10n.reportStageEvidenceSecondaryRequirement,
+          secondaryRequirementLabel:
+              l10n.reportStageEvidenceSecondaryRequirement,
           infoTitle: l10n.reportStageEvidenceInfoTitle,
           helpSections: <StageHelpSection>[
             StageHelpSection(
@@ -57,7 +58,8 @@ class ReportStageConfig {
           shortLabel: l10n.reportStageDetailsShortLabel,
           primaryActionLabel: l10n.reportStageDetailsPrimaryAction,
           primaryRequirementLabel: l10n.reportStageDetailsPrimaryRequirement,
-          secondaryRequirementLabel: l10n.reportStageDetailsSecondaryRequirement,
+          secondaryRequirementLabel:
+              l10n.reportStageDetailsSecondaryRequirement,
           infoTitle: l10n.reportStageDetailsInfoTitle,
           helpSections: <StageHelpSection>[
             StageHelpSection(
@@ -78,7 +80,8 @@ class ReportStageConfig {
           shortLabel: l10n.reportStageLocationShortLabel,
           primaryActionLabel: l10n.reportStageLocationPrimaryAction,
           primaryRequirementLabel: l10n.reportStageLocationPrimaryRequirement,
-          secondaryRequirementLabel: l10n.reportStageLocationSecondaryRequirement,
+          secondaryRequirementLabel:
+              l10n.reportStageLocationSecondaryRequirement,
           infoTitle: l10n.reportStageLocationInfoTitle,
           helpSections: <StageHelpSection>[
             StageHelpSection(
@@ -121,5 +124,6 @@ class ReportStageConfig {
 }
 
 extension ReportStageConfigX on ReportStage {
-  ReportStageConfig config(AppLocalizations l10n) => ReportStageConfig.resolve(this, l10n);
+  ReportStageConfig config(AppLocalizations l10n) =>
+      ReportStageConfig.resolve(this, l10n);
 }

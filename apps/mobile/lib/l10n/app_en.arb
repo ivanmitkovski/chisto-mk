@@ -1,6 +1,20 @@
 {
   "@@locale": "en",
   "reportFlowHelpHint": "Tap the info button for tips on this step.",
+  "reportFlowStepProgressStep": "Step {current} of 3",
+  "@reportFlowStepProgressStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFlowStepProgressReady": "Ready to submit",
+  "reportFlowStepStatusComplete": "Complete",
+  "reportFlowStepStatusInProgress": "In progress",
+  "reportFlowStepChipPhotos": "Photos",
+  "reportFlowStepChipCategory": "Category",
+  "reportFlowStepChipLocation": "Location",
   "reportHelpContextTitle": "Context",
   "reportStageEvidenceEyebrow": "Report a pollution site",
   "reportStageEvidenceTitle": "Evidence",
@@ -136,14 +150,7 @@
       }
     }
   },
-  "reportSubmittedPointsPending": "Earn up to {max} pts when approved",
-  "@reportSubmittedPointsPending": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
+  "reportSubmittedPointsPending": "Points are credited after moderators approve your report.",
   "reportSubmittedViewThisReport": "View this report",
   "reportSubmittedViewAllReports": "View all reports",
   "reportSubmittedViewInMyReports": "View in My reports",
@@ -468,6 +475,9 @@
   "profilePointsReasonEventJoinNoShow": "Join bonus adjusted — no check-in",
   "profilePointsReasonEventCheckIn": "Event check-in",
   "profilePointsReasonEventCompleted": "Cleanup event completed",
+  "profilePointsReasonReportApproved": "Report approved",
+  "profilePointsReasonReportApprovalRevoked": "Report approval reversed",
+  "profilePointsReasonReportSubmitted": "Report filed (legacy)",
   "profileReportCreditsTitle": "Report credits",
   "profileAccountDetailsSection": "Account details",
   "profileGeneralInfoTile": "General info",
@@ -546,6 +556,20 @@
   "profileGeneralEmptyValue": "—",
   "profileGeneralDefaultDisplayName": "User",
   "reportListFabLabel": "Report pollution",
+  "reportListAppBarStartNewReportLabel": "Start a new report",
+  "reportListDraftChipLabel": "Draft · {photoCount, plural, =0{no photos} one{1 photo} other{{photoCount} photos}} · {savedAgo}",
+  "@reportListDraftChipLabel": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportListDraftChipSemantic": "Saved draft with {photoCount, plural, one{1 photo} other{{photoCount} photos}}. Double tap to open.",
+  "@reportListDraftChipSemantic": {
+    "placeholders": {
+      "photoCount": { "type": "int" }
+    }
+  },
   "reportListSearchSemantic": "Search reports",
   "reportAvailabilityCheckFailedSnack": "Could not check reporting availability right now.",
   "reportFinishStepsSnack": "Please finish the missing steps before submitting.",
@@ -845,6 +869,58 @@
   "reportPhotoGridAddShort": "Add",
   "reportPhotoGridAdd": "Add a photo",
   "reportPhotoGridSourceHint": "Camera or library",
+  "reportPhotoGridAttachedCount": "{current} of {max} photos attached",
+  "@reportPhotoGridAttachedCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoOpenGallerySemantic": "Open report photo gallery",
+  "reportPhotoTapToReviewSingle": "Tap to review photo",
+  "reportPhotoTapToReviewMany": "Tap to review photos",
+  "reportPhotoVerificationHelpPrimarySelected": "Keep the first photo as the clearest overview of the site.",
+  "reportPhotoVerificationHelpPrimaryOther": "Use extra photos only for details, scale, or another useful angle.",
+  "reportPhotoVerificationHelpEmpty": "Start with one clear overview of the site. Add detail only if it helps.",
+  "reportPhotoStackCaptionSingle": "One clear photo is enough. Add another only if it helps explain the site.",
+  "reportPhotoStackCaptionMany": "{count} photos attached. Keep only the frames that make the report easier to verify.",
+  "@reportPhotoStackCaptionMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticThumbnail": "Photo {index} of {total}. Double-tap to select.",
+  "@reportPhotoSemanticThumbnail": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticRemove": "Remove photo",
+  "reportPhotoSemanticAddPhoto": "Add evidence photo",
+  "reportPhotoSemanticReportPhoto": "Report photo {index}",
+  "@reportPhotoSemanticReportPhoto": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRequirementPhotos": "Add at least one photo",
+  "reportRequirementCategory": "Choose a category",
+  "reportRequirementTitle": "Add a short title",
+  "reportRequirementLocation": "Confirm a location in Macedonia",
+  "reportCooldownUnlockHintDefault": "Join and verify attendance, or create an eco action to unlock more reports.",
   "notificationsTitle": "Notifications",
   "notificationsMarkAllRead": "Mark all read",
   "notificationsShowAll": "Show all notifications",
@@ -2098,6 +2174,7 @@
   "reportSeveritySignificant": "Significant",
   "reportSeverityHigh": "High",
   "reportSeverityCritical": "Critical",
+  "reportDetailViewOnMap": "View on map",
   "reportListSearchPlaceholder": "Search your reports",
   "reportListSearchHintPrefix": "Search by title, location, category, or status.",
   "reportListSearchNoMatches": "No matches",
@@ -2117,6 +2194,7 @@
   "reportStatusDeclinedShort": "Declined",
   "reportStatusAlreadyReportedShort": "Already reported",
   "reportListFilterAll": "All",
+  "reportListOptimisticPill": "Submitting…",
   "reportListFilterSemanticPrefix": "Report status",
   "reportListHeaderTitle": "Your reports",
   "reportListHeaderTotalPill": "{count, plural, one{1 report in total} other{{count} reports in total}}",
@@ -2179,6 +2257,62 @@
   "reportDetailStatusAlreadyReportedBody": "Your report matched an existing site. The evidence is still useful for understanding the problem.",
   "reportDetailStatusOutcomeTitle": "Review outcome",
   "reportDetailStatusOutcomeBodyFallback": "This report could not be approved in its current form.",
+  "reportDetailSheetTitle": "Report details",
+  "reportDetailSheetSubtitle": "See what you submitted and how moderators handled this report.",
+  "reportDetailSheetSubtitleWithNumber": "{reportNumber} · See what you submitted and how moderators handled this report.",
+  "@reportDetailSheetSubtitleWithNumber": {
+    "placeholders": {
+      "reportNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailPhotoAttachedPill": "Photo attached",
+  "reportDetailPointsLabel": "Points",
+  "reportDetailEvidencePhotoSemantic": "Evidence photo {index}",
+  "@reportDetailEvidencePhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailEvidenceGalleryOpenSemantic": "Open report evidence photos",
+  "reportDetailEvidenceTapToExpand": "Tap to expand",
+  "reportDetailEvidenceOpenPhoto": "Open photo",
+  "reportDetailSiteNotFoundOpeningMaps": "Site not found. Opening in maps.",
+  "reportDetailSiteNotAvailable": "Site not available.",
+  "reportDetailCouldNotLoadSite": "Could not load site.",
+  "reportCardDeclineNoteTitle": "Review note",
+  "reportListFilterChipSemantic": "{label} filter, {selected, plural, =1{selected} other{not selected}}",
+  "@reportListFilterChipSemantic": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "selected": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilterChipHint": "Double-tap to filter reports by {label}.",
+  "@reportListFilterChipHint": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "reportReviewTitleHint": "Brief headline",
+  "reportFlowCameraUnavailableSnack": "Unable to open the camera right now. Please try again in a moment.",
+  "reportSemanticsLocationPinThenConfirm": "Location: pin, then confirm.",
+  "newReportTooltipAboutStep": "About this step",
+  "newReportTooltipDismiss": "Dismiss",
+  "reportFlowSubmitPhaseCreating": "Creating…",
+  "reportFlowSubmitPhaseUploading": "Uploading…",
+  "reportFlowSubmitPhaseSubmitting": "Submitting…",
+  "reportFormPrimarySemanticsHintSubmit": "Double-tap to submit.",
+  "reportFormPrimarySemanticsHintNext": "Double-tap to go to the next step.",
   "reportCardSemanticLabel": "{category}, {status}, {location}. Tap to view details.",
   "@reportCardSemanticLabel": {
     "placeholders": {
@@ -3384,5 +3518,62 @@
   "errorOrganizerQuizSessionInvalid": "This quiz session is not valid. Load the quiz again.",
   "errorOrganizerQuizAnswersMismatch": "Answers do not match the quiz you started. Load the quiz again.",
   "errorOrganizerQuizInvalid": "One or more answers are not valid for this quiz. Load the quiz again.",
-  "errorOrganizerCertificationAlreadyDone": "You are already a certified organizer. No need to take the quiz again."
+  "errorOrganizerCertificationAlreadyDone": "You are already a certified organizer. No need to take the quiz again.",
+  "reportsSseReconnectBanner": "Reconnecting to live updates…",
+  "reportsSseReconnectAction": "Reconnect",
+  "reportsListMergedToast": "This report was merged and removed from your list.",
+  "reportDraftResumeTitle": "Continue your draft?",
+  "reportDraftResumeBody": "{photoCount, plural, =0{No photos saved yet.} one{1 photo saved.} other{{photoCount} photos saved.}}\n\nTitle: \"{titlePreview}\"\n\nLast saved: {savedAt}.",
+  "@reportDraftResumeBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "titlePreview": { "type": "String" },
+      "savedAt": { "type": "String" }
+    }
+  },
+  "reportDraftResumeContinue": "Continue",
+  "reportDraftResumeDiscard": "Discard draft",
+  "reportDraftSavedJustNow": "Saved just now",
+  "reportDraftSavedMinutesAgo": "Saved {minutes} min ago",
+  "@reportDraftSavedMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "reportDraftSavedHoursAgo": "Saved {hours} h ago",
+  "@reportDraftSavedHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "reportDraftPhotosLost": "{count, plural, =1{1 attached photo was missing and removed from your draft.} other{{count} attached photos were missing and removed from your draft.}}",
+  "@reportDraftPhotosLost": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportDraftDiscardConfirmTitle": "Discard draft?",
+  "reportDraftDiscardConfirmBody": "Your saved text and photos for this report will be deleted from this device.",
+  "reportDraftCentralFabSheetTitle": "You have a saved draft",
+  "reportDraftCentralFabSubtitle": "{photoCount, plural, =0{No photos} one{1 photo} other{{photoCount} photos}} · {savedAgo}",
+  "@reportDraftCentralFabSubtitle": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftCentralFabContinue": "Continue draft",
+  "reportDraftCentralFabTakeNewPhoto": "Take new photo",
+  "reportDraftCentralFabCancel": "Cancel",
+  "reportDraftIncomingPhotoTitle": "Continue draft or use this photo?",
+  "reportDraftIncomingPhotoBody": "You have a saved draft ({photoCount, plural, =0{no photos} one{1 photo} other{{photoCount} photos}}). {savedAgo}",
+  "@reportDraftIncomingPhotoBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftIncomingPhotoContinue": "Continue draft",
+  "reportDraftIncomingPhotoReplace": "Replace draft",
+  "reportDraftIncomingPhotoAdd": "Add to draft"
 }

@@ -13,4 +13,6 @@ class ReportsListResponse {
   final int total;
   final int page;
   final int limit;
+
+  bool get hasMore => page * limit < total;
 }

@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:chisto_mobile/core/app_theme.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/image/image_cache_governor.dart';
+import 'package:chisto_mobile/core/lifecycle/reports_realtime_lifecycle.dart';
 import 'package:chisto_mobile/core/l10n/app_locale_resolution.dart';
 import 'package:chisto_mobile/core/deep_links/deep_link_router.dart';
 import 'package:chisto_mobile/core/deep_links/share_token_from_route.dart';
@@ -17,10 +19,28 @@ import 'package:chisto_mobile/features/notifications/data/notification_open_rout
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  final String sentryDsn =
+      const String.fromEnvironment('SENTRY_DSN', defaultValue: '').trim();
+  if (sentryDsn.isNotEmpty) {
+    await SentryFlutter.init(
+      (options) {
+        options.dsn = sentryDsn;
+        options.sendDefaultPii = false;
+        options.tracesSampleRate = 0.05;
+      },
+      appRunner: _runChistoMobile,
+    );
+  } else {
+    await _runChistoMobile();
+  }
+}
+
+Future<void> _runChistoMobile() async {
   // Use FFI sqflite only on desktop; iOS/Android use the native implementation (avoids global factory warning on mobile).
   if (!kIsWeb) {
     switch (defaultTargetPlatform) {
@@ -61,6 +81,8 @@ class ChistoApp extends StatefulWidget {
 class _ChistoAppState extends State<ChistoApp> {
   final GlobalKey<NavigatorState> _navigatorKey = appRootNavigatorKey;
   final AppLinks _appLinks = AppLinks();
+  final ReportsRealtimeLifecycle _reportsRealtimeLifecycle =
+      ReportsRealtimeLifecycle();
   StreamSubscription<RemoteMessage>? _tapSubscription;
   StreamSubscription<Uri>? _deepLinkSubscription;
   RemoteMessage? _pendingPushOpen;
@@ -72,6 +94,8 @@ class _ChistoAppState extends State<ChistoApp> {
   @override
   void initState() {
     super.initState();
+    ImageCacheGovernor.instance.install();
+    _reportsRealtimeLifecycle.register();
     final push = ServiceLocator.instance.pushNotificationService;
     unawaited(push.initialize());
     push.foregroundMessages.listen((RemoteMessage message) {
@@ -149,6 +173,8 @@ class _ChistoAppState extends State<ChistoApp> {
 
   @override
   void dispose() {
+    _reportsRealtimeLifecycle.unregister();
+    ImageCacheGovernor.instance.uninstall();
     _deepLinkSubscription?.cancel();
     _tapSubscription?.cancel();
     super.dispose();

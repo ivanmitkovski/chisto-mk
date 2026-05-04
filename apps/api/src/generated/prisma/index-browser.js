@@ -278,6 +278,18 @@ exports.Prisma.ReportSubmitIdempotencyScalarFieldEnum = {
   reportId: 'reportId'
 };
 
+exports.Prisma.ReportSideEffectScalarFieldEnum = {
+  id: 'id',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  kind: 'kind',
+  status: 'status',
+  payload: 'payload',
+  attempts: 'attempts',
+  lastError: 'lastError',
+  processedAt: 'processedAt'
+};
+
 exports.Prisma.SystemConfigScalarFieldEnum = {
   id: 'id',
   createdAt: 'createdAt',
@@ -713,6 +725,18 @@ exports.ReportStatus = exports.$Enums.ReportStatus = {
   DELETED: 'DELETED'
 };
 
+exports.ReportSideEffectKind = exports.$Enums.ReportSideEffectKind = {
+  MERGE_DUPLICATE_POST: 'MERGE_DUPLICATE_POST',
+  MODERATION_STATUS_POST: 'MODERATION_STATUS_POST'
+};
+
+exports.ReportSideEffectStatus = exports.$Enums.ReportSideEffectStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
 exports.EcoEventCategory = exports.$Enums.EcoEventCategory = {
   GENERAL_CLEANUP: 'GENERAL_CLEANUP',
   RIVER_AND_LAKE: 'RIVER_AND_LAKE',
@@ -825,6 +849,7 @@ exports.Prisma.ModelName = {
   Report: 'Report',
   ReportCoReporter: 'ReportCoReporter',
   ReportSubmitIdempotency: 'ReportSubmitIdempotency',
+  ReportSideEffect: 'ReportSideEffect',
   SystemConfig: 'SystemConfig',
   FeatureFlag: 'FeatureFlag',
   AuditLog: 'AuditLog',

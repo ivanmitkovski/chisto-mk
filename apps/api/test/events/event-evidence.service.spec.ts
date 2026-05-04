@@ -5,6 +5,7 @@ import { Role } from '../../src/prisma-client';
 import type { AuthenticatedUser } from '../../src/auth/types/authenticated-user.type';
 import { EventEvidenceService } from '../../src/events/event-evidence.service';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { EventsCleanupMediaUploadService } from '../../src/events/events-cleanup-media-upload.service';
 import { ReportsUploadService } from '../../src/reports/reports-upload.service';
 
 function user(): AuthenticatedUser {
@@ -23,7 +24,8 @@ describe('EventEvidenceService', () => {
       eventEvidencePhoto: { findMany: jest.fn() },
     } as unknown as PrismaService;
     const uploads = {} as unknown as ReportsUploadService;
-    const svc = new EventEvidenceService(prisma, uploads);
+    const cleanup = {} as unknown as EventsCleanupMediaUploadService;
+    const svc = new EventEvidenceService(prisma, uploads, cleanup);
 
     await expect(svc.listForEvent('evt-1', user())).rejects.toBeInstanceOf(NotFoundException);
   });

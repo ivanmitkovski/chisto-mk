@@ -202,10 +202,12 @@ class AppTypography {
       );
 
   /// Create/edit picker value row.
-  static TextStyle eventsFormFieldValue(TextTheme theme, {required bool hasValue}) =>
-      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
-        color: hasValue ? AppColors.textPrimary : AppColors.textMuted,
-      );
+  static TextStyle eventsFormFieldValue(
+    TextTheme theme, {
+    required bool hasValue,
+  }) => (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+    color: hasValue ? AppColors.textPrimary : AppColors.textMuted,
+  );
 
   // --- Sheets & modal surfaces ---
 
@@ -244,11 +246,10 @@ class AppTypography {
     TextTheme theme, {
     required bool selected,
     required Color accent,
-  }) =>
-      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
-        color: selected ? accent : AppColors.textSecondary,
-        fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-      );
+  }) => (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+    color: selected ? accent : AppColors.textSecondary,
+    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+  );
 
   /// Small label above a compact value cell (date tiles, form rows).
   static TextStyle eventsSheetDateTileLabel(TextTheme theme) =>
@@ -256,11 +257,13 @@ class AppTypography {
         color: AppColors.textMuted,
       );
 
-  static TextStyle eventsSheetDateTileValue(TextTheme theme, {required bool hasValue}) =>
-      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
-        color: hasValue ? AppColors.textPrimary : AppColors.textMuted,
-        fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-      );
+  static TextStyle eventsSheetDateTileValue(
+    TextTheme theme, {
+    required bool hasValue,
+  }) => (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+    color: hasValue ? AppColors.textPrimary : AppColors.textMuted,
+    fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
+  );
 
   /// Primary filled button label on green (filters, confirmations).
   static TextStyle eventsPrimaryButtonLabel(TextTheme theme) =>
@@ -311,7 +314,9 @@ class AppTypography {
       );
 
   static TextStyle eventsGridPropertyValue(TextTheme theme) =>
-      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(color: AppColors.textSecondary);
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        color: AppColors.textSecondary,
+      );
 
   /// Emphasized single-line caption (badges, callouts).
   static TextStyle eventsCaptionStrong(TextTheme theme, {Color? color}) =>
@@ -349,12 +354,14 @@ class AppTypography {
   // --- Card rows & list adornments ---
 
   /// Accent badge on event cards (e.g. checked-in).
-  static TextStyle eventsCardBadgeAccent(TextTheme theme, {required Color color}) =>
-      (theme.labelSmall ?? theme.bodySmall ?? textTheme.bodySmall!).copyWith(
-        color: color,
-        fontWeight: FontWeight.w600,
-        height: 1.2,
-      );
+  static TextStyle eventsCardBadgeAccent(
+    TextTheme theme, {
+    required Color color,
+  }) => (theme.labelSmall ?? theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+    color: color,
+    fontWeight: FontWeight.w600,
+    height: 1.2,
+  );
 
   /// Neutral micro-line on cards (photo count, meta).
   static TextStyle eventsCardBadgeMuted(TextTheme theme) =>
@@ -376,26 +383,30 @@ class AppTypography {
 
   /// Large numeric stat (impact, trash bags).
   static TextStyle eventsDisplayStat(TextTheme theme) =>
-      (theme.headlineSmall ?? theme.titleLarge ?? textTheme.titleLarge!).copyWith(
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.35,
-        height: 1.08,
-        fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
-      );
+      (theme.headlineSmall ?? theme.titleLarge ?? textTheme.titleLarge!)
+          .copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            letterSpacing: -0.35,
+            height: 1.08,
+            fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+          );
 
   /// Large colored percentage (organizer analytics ring context).
-  static TextStyle eventsAnalyticsHeroMetric(TextTheme theme, {required Color color}) =>
-      (theme.headlineMedium ?? textTheme.headlineMedium!).copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: -0.5,
-        color: color,
-      );
+  static TextStyle eventsAnalyticsHeroMetric(
+    TextTheme theme, {
+    required Color color,
+  }) => (theme.headlineMedium ?? textTheme.headlineMedium!).copyWith(
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.5,
+    color: color,
+  );
 
   // --- Forms (create / edit) ---
 
   /// Same visual as [eventsSheetSectionLabel]; use in stepped forms.
-  static TextStyle eventsFormSectionLabel(TextTheme theme) => eventsSheetSectionLabel(theme);
+  static TextStyle eventsFormSectionLabel(TextTheme theme) =>
+      eventsSheetSectionLabel(theme);
 
   /// Stepped form section title (bodyLarge emphasis).
   static TextStyle eventsFormLeadHeading(TextTheme theme) =>
@@ -481,7 +492,8 @@ class AppTypography {
       );
 
   /// Muted supporting line (calendar hints, footnotes) — same rhythm as [eventsQrCaption].
-  static TextStyle eventsSupportingCaption(TextTheme theme) => eventsQrCaption(theme);
+  static TextStyle eventsSupportingCaption(TextTheme theme) =>
+      eventsQrCaption(theme);
 
   // --- Semantic ---
 
@@ -514,10 +526,14 @@ class AppTypography {
       );
 
   static TextStyle eventsSearchFieldText(TextTheme theme) =>
-      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(color: AppColors.textPrimary);
+      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+        color: AppColors.textPrimary,
+      );
 
   static TextStyle eventsSearchFieldPlaceholder(TextTheme theme) =>
-      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(color: AppColors.textMuted);
+      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+        color: AppColors.textMuted,
+      );
 
   /// Offline / info strip on feed.
   static TextStyle eventsInlineInfoBanner(TextTheme theme) =>
@@ -535,11 +551,15 @@ class AppTypography {
       );
 
   static TextStyle eventsCalendarMonthTitle(TextTheme theme) =>
-      (theme.titleMedium ?? textTheme.titleMedium!).copyWith(fontWeight: FontWeight.w600);
+      (theme.titleMedium ?? textTheme.titleMedium!).copyWith(
+        fontWeight: FontWeight.w600,
+      );
 
   /// Compact month title in embedded [EventCalendar] chrome.
   static TextStyle eventsCalendarEmbeddedMonthTitle(TextTheme theme) =>
-      (theme.titleMedium ?? textTheme.titleMedium!).copyWith(fontWeight: FontWeight.w700);
+      (theme.titleMedium ?? textTheme.titleMedium!).copyWith(
+        fontWeight: FontWeight.w700,
+      );
 
   /// Upper shelf labels (recent searches), weekday row, micro headings.
   static TextStyle eventsMicroSectionHeading(TextTheme theme) =>
@@ -559,18 +579,19 @@ class AppTypography {
       );
 
   static TextStyle eventsCalendarAgendaTitle(TextTheme theme) =>
-      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(fontWeight: FontWeight.w600);
+      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+        fontWeight: FontWeight.w600,
+      );
 
   /// Day cell number — pass state-specific [fontWeight] and [color].
   static TextStyle eventsCalendarDayNumber(
     TextTheme theme, {
     required FontWeight fontWeight,
     required Color color,
-  }) =>
-      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
-        fontWeight: fontWeight,
-        color: color,
-      );
+  }) => (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+    fontWeight: fontWeight,
+    color: color,
+  );
 
   /// Empty states that should track dynamic type (feed / search).
   static TextStyle eventsEmptyStateTitle(TextTheme theme) =>
@@ -586,5 +607,117 @@ class AppTypography {
         color: AppColors.textMuted,
         height: 1.5,
         fontWeight: FontWeight.w400,
+      );
+
+  // ---------------------------------------------------------------------------
+  // Reports vertical — prefer [Theme.of] for Roboto + dynamic type.
+  // ---------------------------------------------------------------------------
+
+  /// Report detail / sheet primary title (modal chrome).
+  static TextStyle reportsSheetTitle(TextTheme theme) =>
+      (theme.titleMedium ?? textTheme.titleMedium!).copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+        color: AppColors.textPrimary,
+      );
+
+  /// Subtitle under the sheet title (moderation context line).
+  static TextStyle reportsSheetSubtitle(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        color: AppColors.textMuted,
+        height: 1.35,
+      );
+
+  /// Section header inside report body (e.g. narrative title).
+  static TextStyle reportsSectionHeader(TextTheme theme) =>
+      (theme.titleSmall ?? textTheme.titleSmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+        letterSpacing: -0.2,
+      );
+
+  /// Left column label in detail rows (Category, Severity, …).
+  static TextStyle reportsRowLabel(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textMuted,
+      );
+
+  /// Right column value in detail rows.
+  static TextStyle reportsRowValue(TextTheme theme) =>
+      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
+
+  /// Emphasized numeric value (e.g. points).
+  static TextStyle reportsRowValueStrong(TextTheme theme) => reportsRowValue(
+    theme,
+  ).copyWith(fontWeight: FontWeight.w700, color: AppColors.accentWarning);
+
+  /// Small pill label on report cards / detail chips.
+  static TextStyle reportsPillLabel(TextTheme theme) =>
+      (theme.labelSmall ?? textTheme.bodySmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.2,
+        color: AppColors.textPrimary,
+      );
+
+  /// Status badge on list cards (compact).
+  static TextStyle reportsBadgeLabel(TextTheme theme) =>
+      (theme.labelSmall ?? textTheme.bodySmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textSecondary,
+      );
+
+  /// [ReportInfoBanner] title line.
+  static TextStyle reportsBannerTitle(TextTheme theme) =>
+      (theme.titleSmall ?? textTheme.titleSmall!).copyWith(
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
+
+  /// [ReportInfoBanner] body copy.
+  static TextStyle reportsBannerBody(TextTheme theme) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        color: AppColors.textSecondary,
+        height: 1.35,
+        fontWeight: FontWeight.w400,
+      );
+
+  /// Caption on evidence gallery glass pill (“Open photo”, “Tap to expand”).
+  static TextStyle reportsGalleryHint(TextTheme theme) =>
+      (theme.labelSmall ?? textTheme.bodySmall!).copyWith(
+        fontWeight: FontWeight.w500,
+        color: AppColors.textOnDark,
+      );
+
+  /// Dense `12/60`-style counters beside report form fields (Dynamic Type friendly).
+  static TextStyle reportsCharCounter(TextTheme theme) =>
+      (theme.labelSmall ?? textTheme.bodySmall!).copyWith(
+        color: AppColors.textMuted,
+        fontWeight: FontWeight.w500,
+      );
+
+  /// Section labels in the new-report details step (category, severity, title…).
+  static TextStyle reportsFormFieldLabel(TextTheme theme, {Color? color}) =>
+      (theme.bodySmall ?? textTheme.bodySmall!).copyWith(
+        color: color ?? AppColors.textSecondary,
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.1,
+      );
+
+  /// Current severity readout above the slider track.
+  static TextStyle reportsSliderValue(TextTheme theme) =>
+      (theme.bodyMedium ?? textTheme.bodyMedium!).copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.2,
+      );
+
+  /// Primary CTA label on the new-report bottom bar.
+  static TextStyle reportsBottomBarButtonLabel(TextTheme theme) =>
+      (theme.labelLarge ?? textTheme.labelLarge!).copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: -0.2,
       );
 }

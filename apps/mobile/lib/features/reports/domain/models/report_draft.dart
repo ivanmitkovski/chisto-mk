@@ -39,26 +39,11 @@ bool isReportLocationInMacedonia(double lat, double lng) =>
     ReportGeoFence.contains(lat, lng);
 
 enum ReportCategory {
-  illegalLandfill(
-    'Illegal landfill',
-    Icons.delete_outline_rounded,
-  ),
-  waterPollution(
-    'Water pollution',
-    Icons.water_drop_outlined,
-  ),
-  airPollution(
-    'Air pollution',
-    Icons.air_rounded,
-  ),
-  industrialWaste(
-    'Industrial waste',
-    Icons.factory_rounded,
-  ),
-  other(
-    'Other',
-    Icons.more_horiz_rounded,
-  );
+  illegalLandfill('Illegal landfill', Icons.delete_outline_rounded),
+  waterPollution('Water pollution', Icons.water_drop_outlined),
+  airPollution('Air pollution', Icons.air_rounded),
+  industrialWaste('Industrial waste', Icons.factory_rounded),
+  other('Other', Icons.more_horiz_rounded);
 
   /// English label returned by the API on [PollutionSite.pollutionType] — map filters use this, not localized UI copy.
   const ReportCategory(this.apiPollutionTypeLabel, this.icon);
@@ -78,26 +63,24 @@ enum ReportCategory {
   }
 
   String get apiString => switch (this) {
-        ReportCategory.illegalLandfill => 'ILLEGAL_LANDFILL',
-        ReportCategory.waterPollution => 'WATER_POLLUTION',
-        ReportCategory.airPollution => 'AIR_POLLUTION',
-        ReportCategory.industrialWaste => 'INDUSTRIAL_WASTE',
-        ReportCategory.other => 'OTHER',
-      };
+    ReportCategory.illegalLandfill => 'ILLEGAL_LANDFILL',
+    ReportCategory.waterPollution => 'WATER_POLLUTION',
+    ReportCategory.airPollution => 'AIR_POLLUTION',
+    ReportCategory.industrialWaste => 'INDUSTRIAL_WASTE',
+    ReportCategory.other => 'OTHER',
+  };
 }
 
 /// Canonical pollution types for filtering and reporting (aligned with API [PollutionSite.pollutionType]).
-List<String> get reportPollutionTypeLabels =>
-    ReportCategory.values.map((ReportCategory c) => c.apiPollutionTypeLabel).toList();
+List<String> get reportPollutionTypeLabels => ReportCategory.values
+    .map((ReportCategory c) => c.apiPollutionTypeLabel)
+    .toList();
 
 enum ReportRequirement {
-  photos('Add at least one photo'),
-  category('Choose a category'),
-  title('Add a short title'),
-  location('Confirm a location in Macedonia');
-
-  const ReportRequirement(this.message);
-  final String message;
+  photos,
+  category,
+  title,
+  location,
 }
 
 enum CleanupEffort {
@@ -112,12 +95,12 @@ enum CleanupEffort {
 
   /// API / Prisma enum key (POST /reports `cleanupEffort`).
   String get apiKey => switch (this) {
-        CleanupEffort.oneToTwo => 'ONE_TO_TWO',
-        CleanupEffort.threeToFive => 'THREE_TO_FIVE',
-        CleanupEffort.sixToTen => 'SIX_TO_TEN',
-        CleanupEffort.tenPlus => 'TEN_PLUS',
-        CleanupEffort.notSure => 'NOT_SURE',
-      };
+    CleanupEffort.oneToTwo => 'ONE_TO_TWO',
+    CleanupEffort.threeToFive => 'THREE_TO_FIVE',
+    CleanupEffort.sixToTen => 'SIX_TO_TEN',
+    CleanupEffort.tenPlus => 'TEN_PLUS',
+    CleanupEffort.notSure => 'NOT_SURE',
+  };
 
   static CleanupEffort? fromApiString(String? s) {
     if (s == null || s.isEmpty) return null;
@@ -160,6 +143,16 @@ class ReportDraft {
   bool get hasTitle => title.trim().isNotEmpty;
   bool get hasLocation => latitude != null && longitude != null;
   bool get hasDescription => description.trim().isNotEmpty;
+
+  /// True when the wizard has in-memory state that should be written to local storage
+  /// (photos, text, location, category, cleanup, or description).
+  bool get hasPersistableWizardBody =>
+      hasPhotos ||
+      hasTitle ||
+      hasLocation ||
+      hasDescription ||
+      hasCategory ||
+      cleanupEffort != null;
 
   bool get isValid => hasPhotos && hasCategory && hasTitle && hasLocation;
 

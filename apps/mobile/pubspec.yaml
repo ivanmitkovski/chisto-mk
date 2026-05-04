@@ -56,6 +56,7 @@ dependencies:
   shared_preferences: ^2.3.3
   connectivity_plus: ^6.1.4
   package_info_plus: ^9.0.1
+  path: ^1.9.1
   flutter_map_animations: ^0.6.0
   flutter_map_heatmap: ^0.0.7
   add_2_calendar: ^3.0.1
@@ -90,7 +91,9 @@ dependencies:
   permission_handler: ^12.0.0
   open_filex: ^4.7.0
   flutter_riverpod: ^2.6.1
+  provider: ^6.1.2
   go_router: ^14.8.1
+  sentry_flutter: ^9.19.0
 
 dev_dependencies:
   flutter_test:

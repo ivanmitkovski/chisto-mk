@@ -45,10 +45,7 @@ void main() {
     );
 
     expect(find.text(l10n.reportCapacityPillEmergency), findsNWidgets(2));
-    expect(
-      find.textContaining('up to 10'),
-      findsOneWidget,
-    );
+    expect(find.textContaining('up to 10'), findsOneWidget);
   });
 
   test('new report review message uses shared mapper', () {

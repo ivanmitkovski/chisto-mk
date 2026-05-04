@@ -1,6 +1,20 @@
 {
   "@@locale": "sq",
   "reportFlowHelpHint": "Prekni butonin e informacionit për këshilla për këtë hap.",
+  "reportFlowStepProgressStep": "Hapi {current} nga 3",
+  "@reportFlowStepProgressStep": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      }
+    }
+  },
+  "reportFlowStepProgressReady": "Gati për dërgim",
+  "reportFlowStepStatusComplete": "E plotë",
+  "reportFlowStepStatusInProgress": "Në progres",
+  "reportFlowStepChipPhotos": "Foto",
+  "reportFlowStepChipCategory": "Kategoria",
+  "reportFlowStepChipLocation": "Vendi",
   "reportHelpContextTitle": "Konteksti",
   "reportStageEvidenceEyebrow": "Raporto vend të ndotur",
   "reportStageEvidenceTitle": "Provat",
@@ -136,14 +150,7 @@
       }
     }
   },
-  "reportSubmittedPointsPending": "Deri në {max} pikë kur të miratohet",
-  "@reportSubmittedPointsPending": {
-    "placeholders": {
-      "max": {
-        "type": "int"
-      }
-    }
-  },
+  "reportSubmittedPointsPending": "Pikët kreditohen pasi moderatorët ta miratojnë raportin.",
   "reportSubmittedViewThisReport": "Shiko këtë raport",
   "reportSubmittedViewAllReports": "Shiko të gjitha raportet",
   "reportSubmittedViewInMyReports": "Shiko te Raportet e mia",
@@ -468,6 +475,9 @@
   "profilePointsReasonEventJoinNoShow": "Bonusi i bashkimit u rregullua — pa regjistrim",
   "profilePointsReasonEventCheckIn": "Regjistrim në ngjarje",
   "profilePointsReasonEventCompleted": "Ngjarja e pastrimit u përfundua",
+  "profilePointsReasonReportApproved": "Raporti u miratua",
+  "profilePointsReasonReportApprovalRevoked": "Miratimi i raportit u anulua",
+  "profilePointsReasonReportSubmitted": "Raporti u dërgua (i vjetër)",
   "profileReportCreditsTitle": "Kreditë e raportimit",
   "profileAccountDetailsSection": "Detajet e llogarisë",
   "profileGeneralInfoTile": "Informacione të përgjithshme",
@@ -546,6 +556,20 @@
   "profileGeneralEmptyValue": "—",
   "profileGeneralDefaultDisplayName": "Përdorues",
   "reportListFabLabel": "Raporto ndotje",
+  "reportListAppBarStartNewReportLabel": "Raport i ri",
+  "reportListDraftChipLabel": "Draft · {photoCount, plural, =0{pa foto} one{1 foto} other{{photoCount} foto}} · {savedAgo}",
+  "@reportListDraftChipLabel": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportListDraftChipSemantic": "Draft i ruajtur me {photoCount, plural, one{1 foto} other{{photoCount} foto}}. Prek dy herë për ta hapur.",
+  "@reportListDraftChipSemantic": {
+    "placeholders": {
+      "photoCount": { "type": "int" }
+    }
+  },
   "reportListSearchSemantic": "Kërko raporte",
   "reportAvailabilityCheckFailedSnack": "Nuk mund të kontrollohet disponueshmëria e raportimit tani.",
   "reportFinishStepsSnack": "Përfundo hapat që mungojnë para dërgimit.",
@@ -791,6 +815,58 @@
   "reportPhotoGridAddShort": "Shto",
   "reportPhotoGridAdd": "Shto një foto",
   "reportPhotoGridSourceHint": "Kamera ose bibliotekë",
+  "reportPhotoGridAttachedCount": "{current} nga {max} foto të bashkangjitura",
+  "@reportPhotoGridAttachedCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoOpenGallerySemantic": "Hap galerinë e fotove të raportit",
+  "reportPhotoTapToReviewSingle": "Prek për të shqyrtuar foton",
+  "reportPhotoTapToReviewMany": "Prek për të shqyrtuar fotot",
+  "reportPhotoVerificationHelpPrimarySelected": "Mbaj fotën e parë si pamjen më të qartë të vendit.",
+  "reportPhotoVerificationHelpPrimaryOther": "Përdor foto shtesë vetëm për detaje, shkallë ose një kënd tjetër të dobishëm.",
+  "reportPhotoVerificationHelpEmpty": "Fillo me një pamje të qartë të vendit. Shto detaje vetëm nëse ndihmon.",
+  "reportPhotoStackCaptionSingle": "Një foto e qartë mjafton. Shto një tjetër vetëm nëse ndihmon të shpjegohet vendi.",
+  "reportPhotoStackCaptionMany": "{count} foto të bashkangjitura. Mbaj vetëm kornizat që e bëjnë raportin më të lehtë për t'u verifikuar.",
+  "@reportPhotoStackCaptionMany": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticThumbnail": "Foto {index} nga {total}. Prek dy herë për të zgjedhur.",
+  "@reportPhotoSemanticThumbnail": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reportPhotoSemanticRemove": "Hiq foton",
+  "reportPhotoSemanticAddPhoto": "Shto foto si dëshmi",
+  "reportPhotoSemanticReportPhoto": "Foto e raportit {index}",
+  "@reportPhotoSemanticReportPhoto": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportRequirementPhotos": "Shto të paktën një foto",
+  "reportRequirementCategory": "Zgjidh një kategori",
+  "reportRequirementTitle": "Shto një titull të shkurtër",
+  "reportRequirementLocation": "Konfirmo një vendndodhje në Maqedoni",
+  "reportCooldownUnlockHintDefault": "Bashkohu dhe verifiko pjesëmarrjen, ose krijo një veprim ekologjik për të hapur më shumë raporte.",
   "notificationsTitle": "Njoftimet",
   "notificationsMarkAllRead": "Shëno të gjitha si të lexuara",
   "notificationsShowAll": "Shfaq të gjitha njoftimet",
@@ -2051,6 +2127,7 @@
   "reportSeveritySignificant": "E ndjeshme",
   "reportSeverityHigh": "E lartë",
   "reportSeverityCritical": "Kritike",
+  "reportDetailViewOnMap": "Shiko në hartë",
   "reportListSearchPlaceholder": "Kërko raportet e tua",
   "reportListSearchHintPrefix": "Kërko sipas titullit, vendndodhjes, kategorisë ose statusit.",
   "reportListSearchNoMatches": "Nuk ka përputhje",
@@ -2070,6 +2147,7 @@
   "reportStatusDeclinedShort": "Refuzuar",
   "reportStatusAlreadyReportedShort": "E raportuar më parë",
   "reportListFilterAll": "Të gjitha",
+  "reportListOptimisticPill": "Duke u dërguar…",
   "reportListFilterSemanticPrefix": "Statusi i raportit",
   "reportListHeaderTitle": "Raportet e tua",
   "reportListHeaderTotalPill": "{count, plural, one{1 raport gjithsej} other{{count} raporte gjithsej}}",
@@ -2132,6 +2210,62 @@
   "reportDetailStatusAlreadyReportedBody": "Raporti yt përputhet me një vend ekzistues. Provat janë ende të dobishme për të kuptuar problemin.",
   "reportDetailStatusOutcomeTitle": "Rezultati i shqyrtimit",
   "reportDetailStatusOutcomeBodyFallback": "Ky raport nuk mund të miratohet në formën e tij aktuale.",
+  "reportDetailSheetTitle": "Detajet e raportit",
+  "reportDetailSheetSubtitle": "Shiko çfarë dërguat dhe si e trajtuan moderatorët këtë raport.",
+  "reportDetailSheetSubtitleWithNumber": "{reportNumber} · Shiko çfarë dërguat dhe si e trajtuan moderatorët këtë raport.",
+  "@reportDetailSheetSubtitleWithNumber": {
+    "placeholders": {
+      "reportNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDetailPhotoAttachedPill": "Foto e bashkangjitur",
+  "reportDetailPointsLabel": "Pikë",
+  "reportDetailEvidencePhotoSemantic": "Foto e provës {index}",
+  "@reportDetailEvidencePhotoSemantic": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  },
+  "reportDetailEvidenceGalleryOpenSemantic": "Hap fotot e provës",
+  "reportDetailEvidenceTapToExpand": "Prek për zgjerim",
+  "reportDetailEvidenceOpenPhoto": "Hap foton",
+  "reportDetailSiteNotFoundOpeningMaps": "Vendi nuk u gjet. Po hapen hartat.",
+  "reportDetailSiteNotAvailable": "Vendi nuk është i disponueshëm.",
+  "reportDetailCouldNotLoadSite": "Nuk mund të ngarkohej vendi.",
+  "reportCardDeclineNoteTitle": "Shënim shqyrtimi",
+  "reportListFilterChipSemantic": "{label} filtri, {selected, plural, =1{i zgjedhur} other{i pa zgjedhur}}",
+  "@reportListFilterChipSemantic": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "selected": {
+        "type": "int"
+      }
+    }
+  },
+  "reportListFilterChipHint": "Prek dy herë për të filtruar raportet sipas {label}.",
+  "@reportListFilterChipHint": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "reportReviewTitleHint": "Titull i shkurtër",
+  "reportFlowCameraUnavailableSnack": "Kamera nuk mund të hapet tani. Provo përsëri pas pak.",
+  "reportSemanticsLocationPinThenConfirm": "Vendndodhja: vendos pinin, pastaj konfirmo.",
+  "newReportTooltipAboutStep": "Rreth këtij hapi",
+  "newReportTooltipDismiss": "Mbyll",
+  "reportFlowSubmitPhaseCreating": "Po krijohet…",
+  "reportFlowSubmitPhaseUploading": "Po ngarkohet…",
+  "reportFlowSubmitPhaseSubmitting": "Po dërgohet…",
+  "reportFormPrimarySemanticsHintSubmit": "Prek dy herë për të dërguar.",
+  "reportFormPrimarySemanticsHintNext": "Prek dy herë për të kaluar në hapin tjetër.",
   "reportCardSemanticLabel": "{category}, {status}, {location}. Prek për detaje.",
   "@reportCardSemanticLabel": {
     "placeholders": {
@@ -3195,5 +3329,62 @@
   "errorOrganizerQuizSessionInvalid": "Ky sesion kuizi nuk është i vlefshëm. Ngarkoni kuizin përsëri.",
   "errorOrganizerQuizAnswersMismatch": "Përgjigjet nuk përputhen me kuizin që filluat. Ngarkoni kuizin përsëri.",
   "errorOrganizerQuizInvalid": "Disa përgjigje nuk janë të vlefshme për këtë kuiz. Ngarkoni kuizin përsëri.",
-  "errorOrganizerCertificationAlreadyDone": "Jeni tashmë organizator i certifikuar. Nuk duhet të rifilloni kuizin."
+  "errorOrganizerCertificationAlreadyDone": "Jeni tashmë organizator i certifikuar. Nuk duhet të rifilloni kuizin.",
+  "reportsSseReconnectBanner": "Duke u rilidhur për përditësime të drejtpërdrejta…",
+  "reportsSseReconnectAction": "Rilidh",
+  "reportsListMergedToast": "Ky raport u bashkua dhe u hoq nga lista jote.",
+  "reportDraftResumeTitle": "Të vazhdosh me skicën?",
+  "reportDraftResumeBody": "{photoCount, plural, =0{Ende nuk ka foto të ruajtura.} one{U ruajt 1 foto.} other{U ruajtën {photoCount} foto.}}\n\nTitulli: \"{titlePreview}\"\n\nRuajtur së fundmi: {savedAt}.",
+  "@reportDraftResumeBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "titlePreview": { "type": "String" },
+      "savedAt": { "type": "String" }
+    }
+  },
+  "reportDraftResumeContinue": "Vazhdo",
+  "reportDraftResumeDiscard": "Hidh skicën",
+  "reportDraftSavedJustNow": "U ruajt tani",
+  "reportDraftSavedMinutesAgo": "U ruajt para {minutes} min",
+  "@reportDraftSavedMinutesAgo": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "reportDraftSavedHoursAgo": "U ruajt para {hours} orësh",
+  "@reportDraftSavedHoursAgo": {
+    "placeholders": {
+      "hours": { "type": "int" }
+    }
+  },
+  "reportDraftPhotosLost": "{count, plural, =1{1 foto e bashkëngjitur mungonte dhe u hoq nga skica.} other{{count} foto të bashkëngjitura mungonin dhe u hoqën nga skica.}}",
+  "@reportDraftPhotosLost": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "reportDraftDiscardConfirmTitle": "Të hidhet skica?",
+  "reportDraftDiscardConfirmBody": "Teksti dhe fotot e ruajtura për këtë raport do të fshihen nga ky pajisje.",
+  "reportDraftCentralFabSheetTitle": "Ke një draft të ruajtur",
+  "reportDraftCentralFabSubtitle": "{photoCount, plural, =0{Pa foto} one{1 foto} other{{photoCount} foto}} · {savedAgo}",
+  "@reportDraftCentralFabSubtitle": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftCentralFabContinue": "Vazhdo draftin",
+  "reportDraftCentralFabTakeNewPhoto": "Foto e re",
+  "reportDraftCentralFabCancel": "Anulo",
+  "reportDraftIncomingPhotoTitle": "Vazhdo draftin apo përdor këtë foto?",
+  "reportDraftIncomingPhotoBody": "Ke një draft të ruajtur ({photoCount, plural, =0{pa foto} one{1 foto} other{{photoCount} foto}}). {savedAgo}",
+  "@reportDraftIncomingPhotoBody": {
+    "placeholders": {
+      "photoCount": { "type": "int" },
+      "savedAgo": { "type": "String" }
+    }
+  },
+  "reportDraftIncomingPhotoContinue": "Vazhdo draftin",
+  "reportDraftIncomingPhotoReplace": "Zëvendëso draftin",
+  "reportDraftIncomingPhotoAdd": "Shto në draft"
 }

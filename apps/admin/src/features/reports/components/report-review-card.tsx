@@ -5,16 +5,23 @@ import Link from 'next/link';
 import { KeyboardEvent as ReactKeyboardEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Button, Card, Icon, SectionState, Snack } from '@/components/ui';
+import { Card, Icon, Snack } from '@/components/ui';
 import { rejectionReasonOptions } from '../constants/rejection-reasons';
 import { formatDateTime, parseSlaUrgency } from '../utils/report-display';
 import { useReportReview } from '../hooks/use-report-review';
 import { ActionConfirmModal } from './action-confirm-modal';
+import { ReportReviewEvidencePanel } from './report-review-card/report-review-evidence-panel';
+import { ReportReviewModerationActionRail } from './report-review-card/report-review-moderation-action-rail';
+import { ReportReviewTimelinePanel } from './report-review-timeline-panel';
 import { ContextDetailModal, type ContextDetailKind } from './context-detail-modal';
 import { LocationMapCard } from './location-map-card';
-import { ReportDetail, ReportEvidence, ReportTimelineEntry } from '../types';
+import { ReportDetail } from '../types';
 import { formatReportStatus, isReportFinalStatus, statusIconName } from '../utils/report-status';
+import type { ReportPillClassNames } from '../utils/report-pills';
+import { reportPriorityPillClass, reportStatusPillClass } from '../utils/report-pills';
 import styles from './report-review-card.module.css';
+
+const pillStyles = styles as ReportPillClassNames;
 
 type ReportReviewCardProps = {
   report: ReportDetail;
@@ -24,52 +31,6 @@ type ReportReviewCardProps = {
   /** When true, use full-page layout (no card border, full-width grid, larger image hero) */
   fullPage?: boolean;
 };
-
-function statusClassName(status: ReportDetail['status']) {
-  const statusClassByName: Record<ReportDetail['status'], string> = {
-    NEW: styles.statusNew,
-    IN_REVIEW: styles.statusInReview,
-    APPROVED: styles.statusApproved,
-    DELETED: styles.statusDeleted,
-  };
-
-  return `${styles.statusPill} ${statusClassByName[status]}`;
-}
-
-function priorityClassName(priority: ReportDetail['priority']) {
-  const priorityClassByName: Record<ReportDetail['priority'], string> = {
-    LOW: styles.priorityLow,
-    MEDIUM: styles.priorityMedium,
-    HIGH: styles.priorityHigh,
-    CRITICAL: styles.priorityCritical,
-  };
-
-  return `${styles.priorityPill} ${priorityClassByName[priority]}`;
-}
-
-function timelineToneClassName(tone: ReportTimelineEntry['tone']) {
-  const classByTone: Record<ReportTimelineEntry['tone'], string> = {
-    neutral: styles.timelineToneNeutral,
-    info: styles.timelineToneInfo,
-    success: styles.timelineToneSuccess,
-    warning: styles.timelineToneWarning,
-  };
-
-  return classByTone[tone];
-}
-
-function evidenceIconName(kind: ReportEvidence['kind']) {
-  if (kind === 'video') {
-    return 'document-forward';
-  }
-
-  if (kind === 'document') {
-    return 'clipboard-close';
-  }
-
-  return 'document-text';
-}
-
 
 export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, fullPage = false }: ReportReviewCardProps) {
   const { report: currentReport, isUpdating, snack, setInReview, approveReport, rejectReport, clearSnack } = useReportReview(
@@ -218,19 +179,19 @@ export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, 
       const composedReason = rejectionNotes.trim()
         ? `${rejectionReason}. Notes: ${rejectionNotes.trim()}`
         : rejectionReason;
-      await rejectReport(composedReason);
-      closeConfirmModal();
+      const ok = await rejectReport(composedReason);
+      if (ok) closeConfirmModal();
       return;
     }
 
     if (pendingAction === 'approve') {
-      await approveReport();
-      closeConfirmModal();
+      const ok = await approveReport();
+      if (ok) closeConfirmModal();
       return;
     }
 
-    await setInReview();
-    closeConfirmModal();
+    const ok = await setInReview();
+    if (ok) closeConfirmModal();
   }
 
   const modalTitle =
@@ -303,11 +264,13 @@ export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, 
               <h2 className={styles.title}>{currentReport.title}</h2>
             </div>
             <div className={styles.headerPills}>
-              <span className={statusClassName(currentReport.status)}>
+              <span className={reportStatusPillClass(currentReport.status, pillStyles)}>
                 <Icon name={statusIconName(currentReport.status)} size={12} />
                 {formatReportStatus(currentReport.status)}
               </span>
-              <span className={priorityClassName(currentReport.priority)}>{currentReport.priority} priority</span>
+              <span className={reportPriorityPillClass(currentReport.priority, pillStyles)}>
+                {currentReport.priority} priority
+              </span>
             </div>
           </header>
         )}
@@ -480,167 +443,30 @@ export function ReportReviewCard({ report, onReportUpdated, hideHeader = false, 
               </div>
             </motion.article>
 
-            <motion.article className={styles.panel} whileHover={{ y: -2 }} transition={{ duration: 0.15 }} aria-label="Evidence files">
-              <div className={styles.sectionHeader}>
-                <h3>Evidence</h3>
-                <span>{currentReport.evidence.length} files</span>
-              </div>
-              {currentReport.evidence.length === 0 ? (
-                <div className={styles.sectionEmpty}>
-                  <SectionState variant="empty" message="No evidence files were attached to this report." />
-                </div>
-              ) : (
-                <ul className={styles.evidenceList}>
-                  {currentReport.evidence.map((item) => {
-                    const isImageWithPreview = item.kind === 'image' && item.previewUrl;
-                    const content = (
-                      <>
-                        <span className={styles.evidenceIcon}>
-                          <Icon name={evidenceIconName(item.kind)} size={14} />
-                        </span>
-                        <span className={styles.evidenceLabel}>{item.label}</span>
-                        <span className={styles.evidenceMeta}>
-                          {item.sizeLabel} • {formatDateTime(item.uploadedAt)}
-                        </span>
-                      </>
-                    );
-                    return (
-                      <li key={item.id} className={styles.evidenceItem}>
-                        {isImageWithPreview ? (
-                          <button
-                            type="button"
-                            className={styles.evidenceItemButton}
-                            onClick={() => {
-                              setActivePhotoId(item.id);
-                              setIsLightboxOpen(true);
-                            }}
-                            aria-label={`View ${item.label} in fullscreen`}
-                          >
-                            {content}
-                          </button>
-                        ) : (
-                          <span className={styles.evidenceItemInner}>{content}</span>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </motion.article>
+            <ReportReviewEvidencePanel
+              evidence={currentReport.evidence}
+              onOpenImageEvidence={(evidenceId) => {
+                setActivePhotoId(evidenceId);
+                setIsLightboxOpen(true);
+              }}
+            />
 
-            <motion.article className={styles.panel} whileHover={{ y: -2 }} transition={{ duration: 0.15 }} aria-label="Report timeline">
-              <div className={styles.sectionHeader}>
-                <h3>Lifecycle timeline</h3>
-                <span>{currentReport.timeline.length} events</span>
-              </div>
-              {currentReport.timeline.length === 0 ? (
-                <div className={styles.sectionEmpty}>
-                  <SectionState variant="empty" message="Timeline entries will appear as moderation actions are performed." />
-                </div>
-              ) : (
-                <ol className={styles.timeline}>
-                  {currentReport.timeline.map((entry) => (
-                    <li key={entry.id} className={styles.timelineItem} tabIndex={0}>
-                      <span className={`${styles.timelineDot} ${timelineToneClassName(entry.tone)}`} aria-hidden />
-                      <div className={styles.timelineBody}>
-                        <div className={styles.timelineHeading}>
-                          <strong>{entry.title}</strong>
-                          <time>{formatDateTime(entry.occurredAt)}</time>
-                        </div>
-                        <p>{entry.detail}</p>
-                        <span>By {entry.actor}</span>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              )}
-            </motion.article>
+            <ReportReviewTimelinePanel entries={currentReport.timeline} />
           </section>
 
           <aside className={styles.actionRail}>
-            <motion.article
-              className={`${styles.panel} ${styles.railPanel} ${allActionsDisabled ? styles.actionsResolved : ''}`}
-              {...(!allActionsDisabled && { whileHover: { y: -2 } })}
-              transition={{ duration: 0.15 }}
-            >
-              <h3 className={styles.railTitle}>Moderation actions</h3>
-              {allActionsDisabled ? (
-                <div className={styles.resolvedState} role="status">
-                  <span className={statusClassName(currentReport.status)}>
-                    <Icon name={statusIconName(currentReport.status)} size={14} />
-                    {currentReport.status === 'APPROVED'
-                      ? 'Report approved'
-                      : 'Report rejected'}
-                  </span>
-                  <p className={styles.railText}>
-                    No further actions available. The lifecycle for this report is complete.
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <p className={styles.railText}>
-                    Apply an explicit decision and keep the lifecycle clean. Every action writes a timeline entry.
-                  </p>
-                  <p className={styles.shortcutHint}>Tip: use Arrow keys to move between actions.</p>
-                  <div
-                    className={styles.actions}
-                    role="toolbar"
-                    aria-label="Moderation actions"
-                    aria-disabled={allActionsDisabled}
-                    onKeyDown={onActionRailKeyDown}
-                  >
-                    <Button
-                      variant="outline"
-                      onClick={() => setPendingAction('set-in-review')}
-                      isLoading={isUpdating}
-                      disabled={isSetInReviewDisabled}
-                      aria-label={
-                        isSetInReviewDisabled
-                          ? currentReport.status === 'IN_REVIEW'
-                            ? 'Set in review (already in review)'
-                            : 'Set in review (no further actions)'
-                          : 'Set in review'
-                      }
-                      ref={(element) => {
-                        actionButtonsRef.current[0] = element;
-                      }}
-                    >
-                      <Icon name="document-text" size={14} />
-                      Set in review
-                    </Button>
-                    <Button
-                      onClick={() => setPendingAction('approve')}
-                      isLoading={isUpdating}
-                      disabled={isApproveDisabled}
-                      aria-label={
-                        isApproveDisabled ? 'Approve report (no further actions)' : 'Approve report'
-                      }
-                      ref={(element) => {
-                        actionButtonsRef.current[1] = element;
-                      }}
-                    >
-                      <Icon name="check" size={14} />
-                      Approve report
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => setPendingAction('reject')}
-                      isLoading={isUpdating}
-                      disabled={isRejectDisabled}
-                      aria-label={
-                        isRejectDisabled ? 'Reject report (no further actions)' : 'Reject report'
-                      }
-                      ref={(element) => {
-                        actionButtonsRef.current[2] = element;
-                      }}
-                    >
-                      <Icon name="trash" size={14} />
-                      Reject report
-                    </Button>
-                  </div>
-                </>
-              )}
-            </motion.article>
+            <ReportReviewModerationActionRail
+              currentReport={currentReport}
+              pillStyles={pillStyles}
+              allActionsDisabled={allActionsDisabled}
+              isUpdating={isUpdating}
+              isSetInReviewDisabled={isSetInReviewDisabled}
+              isApproveDisabled={isApproveDisabled}
+              isRejectDisabled={isRejectDisabled}
+              actionButtonsRef={actionButtonsRef}
+              onActionRailKeyDown={onActionRailKeyDown}
+              onSelectAction={setPendingAction}
+            />
 
             <motion.article
               ref={contextPanelRef}

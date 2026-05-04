@@ -1,6 +1,52 @@
 /// <reference types="jest" />
+import { ReportSideEffectKind, ReportSideEffectStatus, Role } from '../../src/prisma-client';
+import { DuplicateGroupQueryService } from '../../src/reports/duplicates/duplicate-group-query.service';
+import { DuplicateMergeSideEffectsService } from '../../src/reports/duplicates/duplicate-merge-side-effects.service';
+import { ReportSideEffectProcessorService } from '../../src/reports/side-effects/report-side-effect-processor.service';
 import { ReportsDuplicateMergeService } from '../../src/reports/reports-duplicate-merge.service';
-import { Role } from '../../src/prisma-client';
+
+function createMergeServiceWithMocks(
+  prisma: unknown,
+  reportsUploadService: unknown,
+  reportEvents: unknown,
+  siteEvents: unknown,
+  reportsOwnerEvents: unknown,
+  eventEmitter: unknown,
+): {
+  service: ReportsDuplicateMergeService;
+  reportApprovalPoints: { creditApprovalIfEligible: jest.Mock };
+} {
+  const duplicateGroupQuery = new DuplicateGroupQueryService(prisma as never);
+  const audit = { log: jest.fn().mockResolvedValue(undefined) };
+  const duplicateMergeSideEffects = new DuplicateMergeSideEffectsService(
+    prisma as never,
+    audit as never,
+    reportsUploadService as never,
+    reportEvents as never,
+    siteEvents as never,
+    reportsOwnerEvents as never,
+    eventEmitter as never,
+  );
+  const reportSideEffectProcessor = new ReportSideEffectProcessorService(
+    prisma as never,
+    duplicateMergeSideEffects,
+    audit as never,
+    reportEvents as never,
+    siteEvents as never,
+    reportsOwnerEvents as never,
+    eventEmitter as never,
+  );
+  const reportApprovalPoints = {
+    creditApprovalIfEligible: jest.fn().mockResolvedValue({ awarded: 0, preCapTotal: 0 }),
+  };
+  const service = new ReportsDuplicateMergeService(
+    prisma as never,
+    duplicateGroupQuery,
+    reportApprovalPoints as never,
+    reportSideEffectProcessor,
+  );
+  return { service, reportApprovalPoints };
+}
 
 describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
   it('does not append child media to primary; hard-deletes children; deletes duplicate media from storage', async () => {
@@ -36,14 +82,38 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
     };
 
     let findUniqueCalls = 0;
+    let lastMergeSideEffect: {
+      id: string;
+      kind: typeof ReportSideEffectKind.MERGE_DUPLICATE_POST;
+      status: ReportSideEffectStatus;
+      payload: unknown;
+    } | null = null;
     const prisma: any = {
+      reportSideEffect: {
+        findUnique: jest.fn(({ where }: { where: { id: string } }) => {
+          if (lastMergeSideEffect && where.id === lastMergeSideEffect.id) {
+            return Promise.resolve(lastMergeSideEffect);
+          }
+          return Promise.resolve(null);
+        }),
+        update: jest.fn().mockResolvedValue({}),
+      },
       report: {
         findUnique: jest.fn().mockImplementation(() => {
           findUniqueCalls += 1;
           if (findUniqueCalls === 1) {
             return Promise.resolve({ id: primaryId, potentialDuplicateOfId: null });
           }
-          return Promise.resolve(mergePayload);
+          if (findUniqueCalls === 2) {
+            return Promise.resolve(mergePayload);
+          }
+          if (findUniqueCalls === 3) {
+            return Promise.resolve({
+              reporterId: 'user-a',
+              coReporters: [{ userId: 'user-b' }],
+            });
+          }
+          return Promise.resolve(null);
         }),
         findUniqueOrThrow: jest.fn().mockResolvedValue({
           status: 'APPROVED',
@@ -64,9 +134,28 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
             updateMany: txReportUpdateMany,
             deleteMany: txReportDeleteMany,
             count: txReportCount,
+            findUniqueOrThrow: jest.fn().mockResolvedValue({
+              id: primaryId,
+              reporterId: 'user-a',
+              siteId: 'site-1',
+              mediaUrls: mergePayload.mediaUrls,
+              severity: null,
+              cleanupEffort: null,
+            }),
           },
           reportCoReporter: {
             upsert: txReportCoReporterUpsert,
+          },
+          reportSideEffect: {
+            create: jest.fn(({ data }: { data: { kind: string; status: string; payload: unknown } }) => {
+              lastMergeSideEffect = {
+                id: 'merge-effect-1',
+                kind: data.kind as typeof ReportSideEffectKind.MERGE_DUPLICATE_POST,
+                status: data.status as ReportSideEffectStatus,
+                payload: data.payload,
+              };
+              return Promise.resolve({ id: 'merge-effect-1' });
+            }),
           },
           site: {
             findUnique: jest.fn(),
@@ -83,23 +172,30 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
       tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
     };
 
-    const reportsOwnerEvents = { emit: jest.fn() };
+    const reportsOwnerEvents = { emit: jest.fn(), emitToReportInterestedParties: jest.fn() };
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsDuplicateMergeService(
-      prisma as never,
-      { log: jest.fn() } as never,
-      reportsUploadService as never,
-      { emitReportStatusUpdated: jest.fn() } as never,
-      { emitSiteUpdated: jest.fn() } as never,
-      reportsOwnerEvents as never,
-      eventEmitter as never,
+    const { service, reportApprovalPoints } = createMergeServiceWithMocks(
+      prisma,
+      reportsUploadService,
+      { emitReportStatusUpdated: jest.fn() },
+      { emitSiteUpdated: jest.fn() },
+      reportsOwnerEvents,
+      eventEmitter,
     );
 
     const result = await service.mergeDuplicateReports(
       primaryId,
       { childReportIds: [childId], reason: 'test' },
       moderator as never,
+    );
+
+    expect(reportsOwnerEvents.emitToReportInterestedParties).toHaveBeenCalledWith(
+      primaryId,
+      'user-a',
+      ['user-b'],
+      'report_updated',
+      { kind: 'merged', status: 'APPROVED' },
     );
 
     expect(txReportUpdate).toHaveBeenCalledWith({
@@ -131,6 +227,8 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
         }),
       }),
     );
+
+    expect(reportApprovalPoints.creditApprovalIfEligible).toHaveBeenCalledTimes(1);
 
     const notificationSends = eventEmitter.emit.mock.calls.filter((c) => c[0] === 'notification.send');
     expect(notificationSends).toHaveLength(2);
@@ -196,14 +294,13 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
 
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsDuplicateMergeService(
-      prisma as never,
-      { log: jest.fn() } as never,
-      reportsUploadService as never,
-      { emitReportStatusUpdated: jest.fn() } as never,
-      { emitSiteUpdated: jest.fn() } as never,
-      { emit: jest.fn() } as never,
-      eventEmitter as never,
+    const { service } = createMergeServiceWithMocks(
+      prisma,
+      reportsUploadService,
+      { emitReportStatusUpdated: jest.fn() },
+      { emitSiteUpdated: jest.fn() },
+      { emit: jest.fn() },
+      eventEmitter,
     );
 
     const result = await service.mergeDuplicateReports(
@@ -248,14 +345,38 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
     };
 
     let findUniqueCalls = 0;
+    let lastMergeSideEffect: {
+      id: string;
+      kind: typeof ReportSideEffectKind.MERGE_DUPLICATE_POST;
+      status: ReportSideEffectStatus;
+      payload: unknown;
+    } | null = null;
     const prisma: any = {
+      reportSideEffect: {
+        findUnique: jest.fn(({ where }: { where: { id: string } }) => {
+          if (lastMergeSideEffect && where.id === lastMergeSideEffect.id) {
+            return Promise.resolve(lastMergeSideEffect);
+          }
+          return Promise.resolve(null);
+        }),
+        update: jest.fn().mockResolvedValue({}),
+      },
       report: {
         findUnique: jest.fn().mockImplementation(() => {
           findUniqueCalls += 1;
           if (findUniqueCalls === 1) {
             return Promise.resolve({ id: primaryId, potentialDuplicateOfId: null });
           }
-          return Promise.resolve(mergePayload);
+          if (findUniqueCalls === 2) {
+            return Promise.resolve(mergePayload);
+          }
+          if (findUniqueCalls === 3) {
+            return Promise.resolve({
+              reporterId: 'user-a',
+              coReporters: [{ userId: coOnlyUserId }],
+            });
+          }
+          return Promise.resolve(null);
         }),
         findUniqueOrThrow: jest.fn().mockResolvedValue({
           status: 'APPROVED',
@@ -276,9 +397,28 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
             updateMany: jest.fn().mockResolvedValue({ count: 0 }),
             deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
             count: jest.fn().mockResolvedValue(2),
+            findUniqueOrThrow: jest.fn().mockResolvedValue({
+              id: primaryId,
+              reporterId: 'user-a',
+              siteId: 'site-1',
+              mediaUrls: [] as string[],
+              severity: null,
+              cleanupEffort: null,
+            }),
           },
           reportCoReporter: {
             upsert: jest.fn(),
+          },
+          reportSideEffect: {
+            create: jest.fn(({ data }: { data: { kind: string; status: string; payload: unknown } }) => {
+              lastMergeSideEffect = {
+                id: 'merge-effect-1',
+                kind: data.kind as typeof ReportSideEffectKind.MERGE_DUPLICATE_POST,
+                status: data.status as ReportSideEffectStatus,
+                payload: data.payload,
+              };
+              return Promise.resolve({ id: 'merge-effect-1' });
+            }),
           },
           site: {
             findUnique: jest.fn(),
@@ -295,22 +435,32 @@ describe('ReportsDuplicateMergeService mergeDuplicateReports', () => {
       tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
     };
 
+    const reportsOwnerEvents = { emit: jest.fn(), emitToReportInterestedParties: jest.fn() };
     const eventEmitter = { emit: jest.fn() };
 
-    const service = new ReportsDuplicateMergeService(
-      prisma as never,
-      { log: jest.fn() } as never,
-      reportsUploadService as never,
-      { emitReportStatusUpdated: jest.fn() } as never,
-      { emitSiteUpdated: jest.fn() } as never,
-      { emit: jest.fn() } as never,
-      eventEmitter as never,
+    const { service, reportApprovalPoints } = createMergeServiceWithMocks(
+      prisma,
+      reportsUploadService,
+      { emitReportStatusUpdated: jest.fn() },
+      { emitSiteUpdated: jest.fn() },
+      reportsOwnerEvents,
+      eventEmitter,
     );
 
     await service.mergeDuplicateReports(
       primaryId,
       { childReportIds: [childId], reason: 'test' },
       moderator as never,
+    );
+
+    expect(reportApprovalPoints.creditApprovalIfEligible).toHaveBeenCalledTimes(1);
+
+    expect(reportsOwnerEvents.emitToReportInterestedParties).toHaveBeenCalledWith(
+      primaryId,
+      'user-a',
+      [coOnlyUserId],
+      'report_updated',
+      { kind: 'merged', status: 'APPROVED' },
     );
 
     const notificationSends = eventEmitter.emit.mock.calls.filter((c) => c[0] === 'notification.send');

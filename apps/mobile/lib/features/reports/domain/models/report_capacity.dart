@@ -5,6 +5,7 @@ class ReportCapacity {
     required this.emergencyWindowDays,
     required this.retryAfterSeconds,
     required this.nextEmergencyReportAvailableAt,
+    this.nextRefillAtMs,
     required this.unlockHint,
   });
 
@@ -16,6 +17,8 @@ class ReportCapacity {
   /// UTC instant from API when emergency reporting unlocks; null if not on cooldown.
   final DateTime? nextEmergencyReportAvailableAt;
 
+  /// Epoch ms when emergency allowance refills (from API); null when not applicable.
+  final int? nextRefillAtMs;
+
   final String unlockHint;
 }
-

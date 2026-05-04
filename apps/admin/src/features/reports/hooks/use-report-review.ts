@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SnackState } from '@/components/ui';
+import { patchReportStatus } from '../lib/patch-report-status';
 import { ReportDetail, ReportStatus, ReportTimelineEntry } from '../types';
 
 type ReviewAction = 'approve' | 'reject' | 'in-review';
@@ -51,38 +52,55 @@ type UseReportReviewOptions = {
   onReportUpdated?: () => void;
 };
 
+function reportReviewServerSyncKey(r: ReportDetail): string {
+  const t0 = r.timeline[0];
+  return [
+    r.id,
+    r.status,
+    r.submittedAt,
+    String(r.evidence.length),
+    t0?.id ?? '',
+    t0?.occurredAt ?? '',
+    r.priority,
+  ].join('|');
+}
+
 export function useReportReview(initialReport: ReportDetail, options?: UseReportReviewOptions) {
   const onReportUpdated = options?.onReportUpdated;
   const [report, setReport] = useState<ReportDetail>(initialReport);
   const [isUpdating, setIsUpdating] = useState(false);
   const [snack, setSnack] = useState<SnackState | null>(null);
 
-  async function mutateStatus(nextStatus: ReportStatus, action: ReviewAction, reason?: string) {
+  const serverSyncKey = reportReviewServerSyncKey(initialReport);
+  useEffect(() => {
+    setReport(initialReport);
+  }, [initialReport, serverSyncKey]);
+
+  async function mutateStatus(
+    nextStatus: ReportStatus,
+    action: ReviewAction,
+    reason?: string,
+  ): Promise<boolean> {
     setIsUpdating(true);
-    const res = await fetch(`/api/reports/${encodeURIComponent(report.id)}/status`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ status: nextStatus, reason: reason ?? undefined }),
-    });
+    const trimmed = (reason ?? '').trim();
+    const rejectDefault = 'Rejected by moderator.';
 
-    const body = await res.json().catch(() => ({}));
-    const message =
-      body && typeof body.message === 'string'
-        ? body.message
-        : 'Unable to update this report right now.';
+    const result = await patchReportStatus(report.id, nextStatus, action, reason);
 
-    if (!res.ok) {
+    if (!result.ok) {
       setSnack({
         tone: 'error',
         title: 'Action failed',
-        message,
+        message: result.message,
       });
       setIsUpdating(false);
-      return;
+      return false;
     }
 
-    const timelineEntry = createTimelineEntry(nextStatus, reason);
+    const timelineEntry = createTimelineEntry(
+      nextStatus,
+      action === 'reject' ? (trimmed.length > 0 ? trimmed : rejectDefault) : reason,
+    );
     setReport((prev) => ({
       ...prev,
       status: nextStatus,
@@ -98,7 +116,7 @@ export function useReportReview(initialReport: ReportDetail, options?: UseReport
         message: 'This report has been accepted successfully.',
       });
       setIsUpdating(false);
-      return;
+      return true;
     }
 
     if (action === 'in-review') {
@@ -108,7 +126,7 @@ export function useReportReview(initialReport: ReportDetail, options?: UseReport
         message: 'This report is now marked as in review.',
       });
       setIsUpdating(false);
-      return;
+      return true;
     }
 
     setSnack({
@@ -119,6 +137,7 @@ export function useReportReview(initialReport: ReportDetail, options?: UseReport
         : 'This report has been rejected and marked removed.',
     });
     setIsUpdating(false);
+    return true;
   }
 
   return {

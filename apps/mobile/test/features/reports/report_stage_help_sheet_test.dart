@@ -18,8 +18,7 @@ void main() {
           home: Builder(
             builder: (BuildContext context) {
               final AppLocalizations l10n = AppLocalizations.of(context)!;
-              final ReportStageConfig cfg =
-                  ReportStage.evidence.config(l10n);
+              final ReportStageConfig cfg = ReportStage.evidence.config(l10n);
               return Scaffold(
                 body: ReportSheetScaffold(
                   fitToContent: true,

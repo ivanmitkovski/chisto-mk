@@ -32,20 +32,12 @@ type DuplicateReportGroupsResponse = {
   };
 };
 
-export async function getReports(params?: { siteId?: string }): Promise<ReportRow[]> {
-  const token = await getAdminAuthTokenFromCookies();
-  const search = new URLSearchParams();
-  if (params?.siteId) {
-    search.set('siteId', params.siteId);
-  }
-  const suffix = search.size > 0 ? `?${search.toString()}` : '';
+const ADMIN_REPORTS_PAGE_LIMIT = 100;
+/** Safety cap: 25 pages × 100 = 2500 rows before stopping even if meta is wrong. */
+const ADMIN_REPORTS_MAX_PAGES = 25;
 
-  const response = await apiFetch<AdminReportListResponse>(`/reports${suffix}`, {
-    method: 'GET',
-    authToken: token,
-  });
-
-  return response.data.map((item) => ({
+function mapAdminReportListItem(item: AdminReportListItem): ReportRow {
+  return {
     id: item.id,
     reportNumber: item.reportNumber,
     name: item.name,
@@ -55,7 +47,37 @@ export async function getReports(params?: { siteId?: string }): Promise<ReportRo
     isPotentialDuplicate: item.isPotentialDuplicate,
     coReporterCount: item.coReporterCount,
     cleanupEffortLabel: item.cleanupEffortLabel,
-  }));
+  };
+}
+
+export async function getReports(params?: { siteId?: string }): Promise<ReportRow[]> {
+  const token = await getAdminAuthTokenFromCookies();
+  const base = new URLSearchParams();
+  if (params?.siteId) {
+    base.set('siteId', params.siteId);
+  }
+
+  const aggregated: ReportRow[] = [];
+  for (let page = 1; page <= ADMIN_REPORTS_MAX_PAGES; page += 1) {
+    const search = new URLSearchParams(base);
+    search.set('page', String(page));
+    search.set('limit', String(ADMIN_REPORTS_PAGE_LIMIT));
+
+    const response = await apiFetch<AdminReportListResponse>(`/reports?${search.toString()}`, {
+      method: 'GET',
+      authToken: token,
+    });
+
+    aggregated.push(...response.data.map(mapAdminReportListItem));
+
+    const total = response.meta?.total ?? aggregated.length;
+    const pageSize = response.data.length;
+    if (aggregated.length >= total || pageSize < ADMIN_REPORTS_PAGE_LIMIT) {
+      break;
+    }
+  }
+
+  return aggregated;
 }
 
 export async function getReportDetail(reportId: string): Promise<ReportDetail> {

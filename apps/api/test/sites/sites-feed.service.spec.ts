@@ -8,7 +8,17 @@ describe('SitesFeedService', () => {
     const reportsUpload = { signUrls: jest.fn() } as never;
     const feedRanking = { scoreDetailed: jest.fn() } as never;
     const siteEngagement = { ensureSiteExists: jest.fn() } as never;
-    const svc = new SitesFeedService(prisma, audit, reportsUpload, feedRanking, siteEngagement);
+    const feedV2 = {} as never;
+    const userStateRepo = {} as never;
+    const svc = new SitesFeedService(
+      prisma,
+      audit,
+      reportsUpload,
+      feedRanking,
+      siteEngagement,
+      feedV2,
+      userStateRepo,
+    );
 
     await expect(
       svc.findAll({ lat: 41.6, page: 1, limit: 20, radiusKm: 10, sort: 'hybrid' } as never),

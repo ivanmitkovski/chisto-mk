@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/features/reports/presentation/theme/report_tokens.dart';
 
 class ReportCardSkeleton extends StatefulWidget {
   const ReportCardSkeleton({super.key});
@@ -18,10 +19,7 @@ class _ReportCardSkeletonState extends State<ReportCardSkeleton>
   @override
   void initState() {
     super.initState();
-    _shimmer = AnimationController(
-      vsync: this,
-      duration: AppMotion.slow,
-    );
+    _shimmer = AnimationController(vsync: this, duration: AppMotion.slow);
   }
 
   @override
@@ -44,76 +42,86 @@ class _ReportCardSkeletonState extends State<ReportCardSkeleton>
         final double t = _shimmer.value;
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
-            decoration: BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-              border: Border.all(color: AppColors.divider, width: 0.5),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.black.withValues(alpha: 0.06),
-                  blurRadius: 20,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minHeight: ReportTokens.listCardMinTapHeight,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _ShimmerBox(
-                  width: 72,
-                  height: 72,
-                  radius: AppSpacing.radiusMd,
-                  t: t,
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          _ShimmerBox(width: 52, height: 18, radius: 9, t: t),
-                          const SizedBox(width: AppSpacing.xs),
-                          _ShimmerBox(width: 64, height: 18, radius: 9, t: t),
-                          const Spacer(),
-                          _ShimmerBox(width: 20, height: 20, radius: 10, t: t),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      _ShimmerBox(width: 88, height: 18, radius: 9, t: t),
-                      const SizedBox(height: AppSpacing.xs),
-                      _ShimmerBox(
-                        width: double.infinity,
-                        height: 16,
-                        radius: 8,
-                        t: t,
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      _ShimmerBox(
-                        width: double.infinity,
-                        height: 12,
-                        radius: 6,
-                        t: t,
-                      ),
-                      const SizedBox(height: AppSpacing.xxs),
-                      Row(
-                        children: <Widget>[
-                          _ShimmerBox(width: 14, height: 14, radius: 7, t: t),
-                          const SizedBox(width: AppSpacing.xxs),
-                          _ShimmerBox(
-                            width: 120,
-                            height: 12,
-                            radius: 6,
-                            t: t,
-                          ),
-                        ],
-                      ),
-                    ],
+            child: Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: AppColors.panelBackground,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                border: Border.all(color: AppColors.divider, width: 0.5),
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppColors.black.withValues(alpha: 0.06),
+                    blurRadius: 20,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  _ShimmerBox(
+                    width: 72,
+                    height: 72,
+                    radius: AppSpacing.radiusMd,
+                    t: t,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: <Widget>[
+                            _ShimmerBox(width: 52, height: 18, radius: 9, t: t),
+                            const SizedBox(width: AppSpacing.xs),
+                            _ShimmerBox(width: 64, height: 18, radius: 9, t: t),
+                            const Spacer(),
+                            _ShimmerBox(
+                              width: 20,
+                              height: 20,
+                              radius: 10,
+                              t: t,
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        _ShimmerBox(width: 88, height: 18, radius: 9, t: t),
+                        const SizedBox(height: AppSpacing.xs),
+                        _ShimmerBox(
+                          width: double.infinity,
+                          height: 16,
+                          radius: 8,
+                          t: t,
+                        ),
+                        const SizedBox(height: AppSpacing.xxs),
+                        _ShimmerBox(
+                          width: double.infinity,
+                          height: 12,
+                          radius: 6,
+                          t: t,
+                        ),
+                        const SizedBox(height: AppSpacing.xxs),
+                        Row(
+                          children: <Widget>[
+                            _ShimmerBox(width: 14, height: 14, radius: 7, t: t),
+                            const SizedBox(width: AppSpacing.xxs),
+                            _ShimmerBox(
+                              width: 120,
+                              height: 12,
+                              radius: 6,
+                              t: t,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );
@@ -137,8 +145,7 @@ class _ShimmerBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double opacity =
-        0.06 + 0.04 * (0.5 + 0.5 * (1 - (2 * t - 1).abs()));
+    final double opacity = 0.06 + 0.04 * (0.5 + 0.5 * (1 - (2 * t - 1).abs()));
 
     return Container(
       width: width,
