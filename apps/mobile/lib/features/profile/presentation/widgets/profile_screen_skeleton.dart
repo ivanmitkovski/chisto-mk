@@ -4,6 +4,7 @@ import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/shared/widgets/no_overscroll_overlay_scroll_behavior.dart';
 
 /// Full-profile loading placeholder: gradient header + level, credits, weekly cards.
 class ProfileScreenSkeleton extends StatefulWidget {
@@ -53,7 +54,7 @@ class _ProfileScreenSkeletonState extends State<ProfileScreenSkeleton>
                   bottomExtension: AppSpacing.xxl + AppSpacing.xl,
                 ),
                 child: ScrollConfiguration(
-                  behavior: const _SkeletonScrollBehavior(),
+                  behavior: const NoOverscrollOverlayScrollBehavior(),
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(
                       parent: BouncingScrollPhysics(),
@@ -154,19 +155,6 @@ class _ProfileSkeletonScrollClipper extends CustomClipper<Rect> {
   @override
   bool shouldReclip(covariant _ProfileSkeletonScrollClipper oldClipper) =>
       oldClipper.bottomExtension != bottomExtension;
-}
-
-class _SkeletonScrollBehavior extends MaterialScrollBehavior {
-  const _SkeletonScrollBehavior();
-
-  @override
-  Widget buildOverscrollIndicator(
-    BuildContext context,
-    Widget child,
-    ScrollableDetails details,
-  ) {
-    return child;
-  }
 }
 
 class _SkeletonHeaderStrip extends StatelessWidget {

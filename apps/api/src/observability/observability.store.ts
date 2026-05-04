@@ -52,6 +52,83 @@ export class ObservabilityStore {
   private static shareEventsRateLimitedTotal = 0;
   private static shareIssueDurationsMs: number[] = [];
   private static shareIngestDurationsMs: number[] = [];
+  private static reportsSubmitSuccess = 0;
+  private static reportsSubmitError = 0;
+  private static reportsUploadSuccess = 0;
+  private static reportsUploadError = 0;
+  private static reportsSignedUrlIssued = 0;
+  private static reportsSignedUrlCacheHit = 0;
+  private static reportsSignedUrlError = 0;
+  private static reportsSubmitDurationsMs: number[] = [];
+  private static reportsSignedUrlLatencyMs: number[] = [];
+  private static reportsSubmitPointsAwardedTotal = 0;
+  private static reportApprovalPointsAwardedTotal = 0;
+  private static reportApprovalPointsCappedTotal = 0;
+  private static reportApprovalPointsRevokedTotal = 0;
+
+  static recordReportSubmitPointsAwarded(delta: number): void {
+    if (delta > 0) {
+      this.reportsSubmitPointsAwardedTotal += delta;
+    }
+  }
+
+  static recordReportApprovalPointsAwarded(delta: number): void {
+    if (delta > 0) {
+      this.reportApprovalPointsAwardedTotal += delta;
+    }
+  }
+
+  static recordReportApprovalPointsCapped(): void {
+    this.reportApprovalPointsCappedTotal += 1;
+  }
+
+  static recordReportApprovalPointsRevoked(amount: number): void {
+    if (amount > 0) {
+      this.reportApprovalPointsRevokedTotal += amount;
+    }
+  }
+
+  static recordReportSubmit(outcome: 'success' | 'error', durationMs?: number): void {
+    if (outcome === 'success') {
+      this.reportsSubmitSuccess += 1;
+    } else {
+      this.reportsSubmitError += 1;
+    }
+    if (durationMs != null && durationMs >= 0) {
+      this.reportsSubmitDurationsMs.push(durationMs);
+      if (this.reportsSubmitDurationsMs.length > 2000) {
+        this.reportsSubmitDurationsMs = this.reportsSubmitDurationsMs.slice(-1200);
+      }
+    }
+  }
+
+  static recordReportUpload(outcome: 'success' | 'error'): void {
+    if (outcome === 'success') {
+      this.reportsUploadSuccess += 1;
+    } else {
+      this.reportsUploadError += 1;
+    }
+  }
+
+  static recordReportSignedUrl(outcome: 'issued' | 'cache_hit' | 'error'): void {
+    if (outcome === 'issued') {
+      this.reportsSignedUrlIssued += 1;
+    } else if (outcome === 'cache_hit') {
+      this.reportsSignedUrlCacheHit += 1;
+    } else {
+      this.reportsSignedUrlError += 1;
+    }
+  }
+
+  static recordReportSignedUrlLatencyMs(durationMs: number): void {
+    if (durationMs < 0) {
+      return;
+    }
+    this.reportsSignedUrlLatencyMs.push(durationMs);
+    if (this.reportsSignedUrlLatencyMs.length > 2000) {
+      this.reportsSignedUrlLatencyMs = this.reportsSignedUrlLatencyMs.slice(-1200);
+    }
+  }
 
   static recordShareLinkIssued(durationMs: number): void {
     this.shareLinksIssuedTotal += 1;
@@ -382,6 +459,33 @@ export class ObservabilityStore {
       shareIngestP95Ms: (() => {
         const ms = [...this.shareIngestDurationsMs].sort((a, b) => a - b);
         if (ms.length == 0) return 0;
+        const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
+        return Number(ms[idx].toFixed(2));
+      })(),
+      reportsSubmitSuccess: this.reportsSubmitSuccess,
+      reportsSubmitError: this.reportsSubmitError,
+      reportsSubmitPointsAwardedTotal: this.reportsSubmitPointsAwardedTotal,
+      reportApprovalPointsAwardedTotal: this.reportApprovalPointsAwardedTotal,
+      reportApprovalPointsCappedTotal: this.reportApprovalPointsCappedTotal,
+      reportApprovalPointsRevokedTotal: this.reportApprovalPointsRevokedTotal,
+      reportsUploadSuccess: this.reportsUploadSuccess,
+      reportsUploadError: this.reportsUploadError,
+      reportsSignedUrlIssued: this.reportsSignedUrlIssued,
+      reportsSignedUrlCacheHit: this.reportsSignedUrlCacheHit,
+      reportsSignedUrlError: this.reportsSignedUrlError,
+      reportsSubmitP95Ms: (() => {
+        const ms = [...this.reportsSubmitDurationsMs].sort((a, b) => a - b);
+        if (ms.length === 0) {
+          return 0;
+        }
+        const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
+        return Number(ms[idx].toFixed(2));
+      })(),
+      reportsSignedUrlLatencyP95Ms: (() => {
+        const ms = [...this.reportsSignedUrlLatencyMs].sort((a, b) => a - b);
+        if (ms.length === 0) {
+          return 0;
+        }
         const idx = Math.min(ms.length - 1, Math.floor(0.95 * ms.length));
         return Number(ms[idx].toFixed(2));
       })(),

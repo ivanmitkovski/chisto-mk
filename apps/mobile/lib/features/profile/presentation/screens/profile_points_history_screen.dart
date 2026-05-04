@@ -143,6 +143,12 @@ class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen>
     switch (code) {
       case 'FIRST_REPORT':
         return l10n.profilePointsReasonFirstReport;
+      case 'REPORT_APPROVED':
+        return l10n.profilePointsReasonReportApproved;
+      case 'REPORT_APPROVAL_REVOKED':
+        return l10n.profilePointsReasonReportApprovalRevoked;
+      case 'REPORT_SUBMITTED':
+        return l10n.profilePointsReasonReportSubmitted;
       case 'ECO_ACTION_APPROVED':
         return l10n.profilePointsReasonEcoApproved;
       case 'ECO_ACTION_REALIZED':
@@ -166,6 +172,12 @@ class _ProfilePointsHistoryScreenState extends State<ProfilePointsHistoryScreen>
     switch (code) {
       case 'FIRST_REPORT':
         return Icons.assignment_turned_in_outlined;
+      case 'REPORT_APPROVED':
+        return Icons.verified_outlined;
+      case 'REPORT_APPROVAL_REVOKED':
+        return Icons.undo_rounded;
+      case 'REPORT_SUBMITTED':
+        return Icons.outbox_outlined;
       case 'ECO_ACTION_APPROVED':
       case 'ECO_ACTION_REALIZED':
         return Icons.volunteer_activism_outlined;

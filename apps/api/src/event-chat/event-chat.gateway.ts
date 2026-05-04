@@ -8,12 +8,12 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Server, Socket } from 'socket.io';
 import { PrismaService } from '../prisma/prisma.service';
-import { UserStatus } from '../generated/prisma';
-import * as jwt from 'jsonwebtoken';
+import { authenticateSocketUser } from '../common/ws/authenticate-socket-user';
+import { resolveSocketIoCorsOrigin } from '../common/ws/ws-cors';
 import { EventChatAccessService } from './event-chat-access.service';
 
 interface SocketData {
@@ -21,21 +21,9 @@ interface SocketData {
   displayName?: string;
 }
 
-function resolveChatWsCorsOrigin(): boolean | string | string[] {
-  const raw = process.env.CHAT_WS_CORS_ORIGINS?.trim();
-  if (raw) {
-    const list = raw.split(',').map((s) => s.trim()).filter(Boolean);
-    return list.length ? list : '*';
-  }
-  if (process.env.NODE_ENV === 'production') {
-    throw new Error('CHAT_WS_CORS_ORIGINS must be set in production (comma-separated allowlist)');
-  }
-  return '*';
-}
-
 @WebSocketGateway({
   namespace: '/chat',
-  cors: { origin: resolveChatWsCorsOrigin() },
+  cors: { origin: resolveSocketIoCorsOrigin() },
   pingInterval: 25_000,
   // Avoid spurious disconnects on slow mobile links (default 20s is often fine; 10s was tight).
   pingTimeout: 25_000,
@@ -67,42 +55,11 @@ export class EventChatGateway
 
   async handleConnection(client: Socket): Promise<void> {
     try {
-      const authHeader = client.handshake.headers.authorization;
-      let tokenFromHeader: string | undefined;
-      if (typeof authHeader === 'string') {
-        const match = authHeader.match(/^Bearer\s+(.+)$/i);
-        tokenFromHeader = match?.[1]?.trim();
-      }
-      const token =
-        (client.handshake.auth?.token as string) || tokenFromHeader;
+      const { userId, displayName } = await authenticateSocketUser(client, this.config, this.prisma);
+      (client.data as SocketData).userId = userId;
+      (client.data as SocketData).displayName = displayName;
 
-      if (!token) {
-        throw new UnauthorizedException('Missing token');
-      }
-
-      const secret = this.config.get<string>('JWT_SECRET');
-      if (!secret) {
-        throw new Error('JWT_SECRET not configured');
-      }
-
-      const payload = jwt.verify(token, secret, { algorithms: ['HS256'] }) as {
-        sub: string;
-        email: string;
-      };
-
-      const user = await this.prisma.user.findUnique({
-        where: { id: payload.sub },
-        select: { id: true, firstName: true, lastName: true, status: true },
-      });
-
-      if (!user || user.status !== UserStatus.ACTIVE) {
-        throw new UnauthorizedException('User not active');
-      }
-
-      (client.data as SocketData).userId = user.id;
-      (client.data as SocketData).displayName = `${user.firstName} ${user.lastName}`.trim();
-
-      this.logger.debug(`Client connected: ${user.id} (${client.id})`);
+      this.logger.debug(`Client connected: ${userId} (${client.id})`);
     } catch (error) {
       this.logger.warn(`WS auth failed: ${String(error)}`);
       client.emit('error', { code: 'AUTH_FAILED', message: 'Authentication failed' });

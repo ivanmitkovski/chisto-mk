@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ReportStatus } from '../../prisma-client';
 
+/** How the current user relates to this report row in GET /reports/me. */
+export type UserReportViewerRole = 'primary' | 'co_reporter';
+
 export class UserReportListItemDto {
   @ApiProperty()
   id!: string;
@@ -66,5 +69,11 @@ export class UserReportListItemDto {
     description: 'Cleanup effort enum key when provided (ONE_TO_TWO, THREE_TO_FIVE, …)',
   })
   cleanupEffort!: string | null;
+
+  @ApiProperty({
+    enum: ['primary', 'co_reporter'],
+    description: 'Whether this row is owned as primary reporter or visible as a co-reporter on the canonical report',
+  })
+  viewerRole!: UserReportViewerRole;
 }
 

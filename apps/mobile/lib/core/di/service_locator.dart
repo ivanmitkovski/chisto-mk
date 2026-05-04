@@ -28,9 +28,16 @@ import 'package:chisto_mobile/features/notifications/data/push_notification_serv
 import 'package:chisto_mobile/features/notifications/domain/repositories/notifications_repository.dart';
 import 'package:chisto_mobile/features/profile/data/api_profile_repository.dart';
 import 'package:chisto_mobile/features/profile/domain/repositories/profile_repository.dart';
+import 'package:chisto_mobile/core/cache/report_images_cache.dart';
 import 'package:chisto_mobile/features/reports/data/api_reports_repository.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_draft_photo_store.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_draft_repository.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_coordinator.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_migration_from_sp.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_outbox_repository.dart';
 import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_realtime_service.dart';
 import 'package:chisto_mobile/features/reports/domain/repositories/reports_api_repository.dart';
+import 'package:chisto_mobile/features/reports/presentation/controllers/reports_list_session.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ServiceLocator {
@@ -54,6 +61,10 @@ class ServiceLocator {
   CheckInRepository? _checkInRepository;
   ProfileRepository? _profileRepository;
   ReportsApiRepository? _reportsApiRepository;
+  ReportOutboxRepository? _reportOutboxRepository;
+  ReportDraftPhotoStore? _reportDraftPhotoStore;
+  ReportDraftRepository? _reportDraftRepository;
+  ReportOutboxCoordinator? _reportOutboxCoordinator;
   ReportsRealtimeService? _reportsRealtimeService;
   SitesRepository? _sitesRepository;
   MapRealtimeService? _mapRealtimeService;
@@ -64,6 +75,9 @@ class ServiceLocator {
 
   /// Increment to trigger profile refresh (e.g. after report submit).
   final ValueNotifier<int> profileNeedsRefresh = ValueNotifier<int>(0);
+
+  /// Active "My reports" list session for optimistic inserts after submit.
+  final ReportsListSession reportsListSession = ReportsListSession();
 
   /// Increment when a server push implies the public events list should refresh (e.g. new published cleanup).
   final ValueNotifier<int> eventsFeedRemoteRefreshTick = ValueNotifier<int>(0);
@@ -79,6 +93,10 @@ class ServiceLocator {
   CheckInRepository get checkInRepository => _checkInRepository!;
   ProfileRepository get profileRepository => _profileRepository!;
   ReportsApiRepository get reportsApiRepository => _reportsApiRepository!;
+  ReportOutboxRepository get reportOutboxRepository => _reportOutboxRepository!;
+  ReportDraftPhotoStore get reportDraftPhotoStore => _reportDraftPhotoStore!;
+  ReportDraftRepository get reportDraftRepository => _reportDraftRepository!;
+  ReportOutboxCoordinator get reportOutboxCoordinator => _reportOutboxCoordinator!;
   ReportsRealtimeService get reportsRealtimeService => _reportsRealtimeService!;
   SitesRepository get sitesRepository => _sitesRepository!;
   MapRealtimeService get mapRealtimeService => _mapRealtimeService!;
@@ -157,10 +175,30 @@ class ServiceLocator {
     );
     _profileRepository = ApiProfileRepository(client: _apiClient!);
     _reportsApiRepository = ApiReportsRepository(client: _apiClient!);
+    _reportOutboxRepository = await SqfliteReportOutboxRepository.open();
+    _reportDraftPhotoStore = ReportDraftPhotoStore();
+    _reportDraftRepository = ReportDraftRepository(
+      outbox: _reportOutboxRepository!,
+      photoStore: _reportDraftPhotoStore!,
+    );
+    await ReportOutboxMigrationFromSp.runOnce(_reportOutboxRepository!);
+    unawaited(_reportDraftRepository!.hydrate());
+    _reportOutboxCoordinator = ReportOutboxCoordinator(
+      repository: _reportOutboxRepository!,
+      reportsApi: _reportsApiRepository!,
+    );
+    unawaited(_reportOutboxCoordinator!.start());
     _reportsRealtimeService = ReportsRealtimeService(
       config: _config!,
       authState: _authState!,
+      sessionRefresh: () async {
+        if (_apiClient?.refreshSession == null) {
+          return false;
+        }
+        return _apiClient!.refreshSession!();
+      },
     );
+    unawaited(_reportsRealtimeService!.start());
     _mapRealtimeService = MapRealtimeService(
       config: _config!,
       authState: _authState!,
@@ -194,6 +232,8 @@ class ServiceLocator {
     unawaited(EventOfflineWorkCoordinator.instance.start());
 
     _loadStoredAppLocale(prefs);
+
+    unawaited(maybeEvictReportImagesDiskCacheIfHeavy());
 
     _initialized = true;
   }
@@ -231,6 +271,11 @@ class ServiceLocator {
     EngagementOutboxCoordinator.dispose();
     EventOfflineWorkCoordinator.instance.dispose();
     CheckInSyncService.dispose();
+    unawaited(_reportOutboxCoordinator?.dispose() ?? Future<void>.value());
+    _reportOutboxCoordinator = null;
+    _reportDraftRepository = null;
+    _reportDraftPhotoStore = null;
+    _reportOutboxRepository = null;
     _reportsRealtimeService?.dispose();
     _mapRealtimeService?.dispose();
     _pushNotificationService?.dispose();
@@ -238,7 +283,9 @@ class ServiceLocator {
     _authState = null;
     _tokenStorage = null;
     _preferences = null;
+    final ApiClient? clientToClose = _apiClient;
     _apiClient = null;
+    clientToClose?.dispose();
     _authRepository = null;
     _authRepositoryForUnauthorized = null;
     _eventsRepository = null;

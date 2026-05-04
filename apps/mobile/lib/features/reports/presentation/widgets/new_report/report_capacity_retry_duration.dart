@@ -30,7 +30,9 @@ String formatReportCapacityRetryDuration(
     return parts.join(sep);
   }
   if (hours > 0) {
-    final List<String> parts = <String>[l10n.reportCooldownDurationHours(hours)];
+    final List<String> parts = <String>[
+      l10n.reportCooldownDurationHours(hours),
+    ];
     if (minutes > 0) {
       parts.add(l10n.reportCooldownDurationMinutes(minutes));
     } else if (seconds > 0) {

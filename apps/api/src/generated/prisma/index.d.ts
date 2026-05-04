@@ -79,6 +79,11 @@ export type ReportCoReporter = $Result.DefaultSelection<Prisma.$ReportCoReporter
  */
 export type ReportSubmitIdempotency = $Result.DefaultSelection<Prisma.$ReportSubmitIdempotencyPayload>
 /**
+ * Model ReportSideEffect
+ * 
+ */
+export type ReportSideEffect = $Result.DefaultSelection<Prisma.$ReportSideEffectPayload>
+/**
  * Model SystemConfig
  * 
  */
@@ -309,6 +314,24 @@ export const ReportStatus: {
 export type ReportStatus = (typeof ReportStatus)[keyof typeof ReportStatus]
 
 
+export const ReportSideEffectKind: {
+  MERGE_DUPLICATE_POST: 'MERGE_DUPLICATE_POST',
+  MODERATION_STATUS_POST: 'MODERATION_STATUS_POST'
+};
+
+export type ReportSideEffectKind = (typeof ReportSideEffectKind)[keyof typeof ReportSideEffectKind]
+
+
+export const ReportSideEffectStatus: {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+export type ReportSideEffectStatus = (typeof ReportSideEffectStatus)[keyof typeof ReportSideEffectStatus]
+
+
 export const CleanupEventStatus: {
   PENDING: 'PENDING',
   APPROVED: 'APPROVED',
@@ -477,6 +500,14 @@ export const SiteStatus: typeof $Enums.SiteStatus
 export type ReportStatus = $Enums.ReportStatus
 
 export const ReportStatus: typeof $Enums.ReportStatus
+
+export type ReportSideEffectKind = $Enums.ReportSideEffectKind
+
+export const ReportSideEffectKind: typeof $Enums.ReportSideEffectKind
+
+export type ReportSideEffectStatus = $Enums.ReportSideEffectStatus
+
+export const ReportSideEffectStatus: typeof $Enums.ReportSideEffectStatus
 
 export type CleanupEventStatus = $Enums.CleanupEventStatus
 
@@ -784,6 +815,16 @@ export class PrismaClient<
     * ```
     */
   get reportSubmitIdempotency(): Prisma.ReportSubmitIdempotencyDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.reportSideEffect`: Exposes CRUD operations for the **ReportSideEffect** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ReportSideEffects
+    * const reportSideEffects = await prisma.reportSideEffect.findMany()
+    * ```
+    */
+  get reportSideEffect(): Prisma.ReportSideEffectDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.systemConfig`: Exposes CRUD operations for the **SystemConfig** model.
@@ -1541,6 +1582,7 @@ export namespace Prisma {
     Report: 'Report',
     ReportCoReporter: 'ReportCoReporter',
     ReportSubmitIdempotency: 'ReportSubmitIdempotency',
+    ReportSideEffect: 'ReportSideEffect',
     SystemConfig: 'SystemConfig',
     FeatureFlag: 'FeatureFlag',
     AuditLog: 'AuditLog',
@@ -1587,7 +1629,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userFeedState" | "siteFeatureSnapshot" | "feedImpression" | "feedExperimentAssignment" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
+      modelProps: "user" | "userSession" | "phoneOtp" | "loginFailure" | "adminLoginFailure" | "adminTempToken" | "adminPendingMfa" | "adminNotification" | "pointTransaction" | "site" | "report" | "reportCoReporter" | "reportSubmitIdempotency" | "reportSideEffect" | "systemConfig" | "featureFlag" | "auditLog" | "cleanupEvent" | "eventParticipant" | "eventChatMessage" | "eventChatAttachment" | "eventChatMute" | "eventChatReadCursor" | "eventCheckIn" | "eventCheckInRedemption" | "eventLiveMetric" | "eventEvidencePhoto" | "eventRouteSegment" | "checkInRiskSignal" | "siteVote" | "siteSave" | "siteComment" | "siteCommentLike" | "siteShareEvent" | "siteShareLink" | "siteShareAttributionEvent" | "userFeedState" | "siteFeatureSnapshot" | "feedImpression" | "feedExperimentAssignment" | "userDeviceToken" | "userNotification" | "userNotificationPreference" | "notificationOutbox" | "adminMutationIdempotency"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2550,6 +2592,80 @@ export namespace Prisma {
           count: {
             args: Prisma.ReportSubmitIdempotencyCountArgs<ExtArgs>
             result: $Utils.Optional<ReportSubmitIdempotencyCountAggregateOutputType> | number
+          }
+        }
+      }
+      ReportSideEffect: {
+        payload: Prisma.$ReportSideEffectPayload<ExtArgs>
+        fields: Prisma.ReportSideEffectFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ReportSideEffectFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ReportSideEffectFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          findFirst: {
+            args: Prisma.ReportSideEffectFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ReportSideEffectFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          findMany: {
+            args: Prisma.ReportSideEffectFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>[]
+          }
+          create: {
+            args: Prisma.ReportSideEffectCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          createMany: {
+            args: Prisma.ReportSideEffectCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ReportSideEffectCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>[]
+          }
+          delete: {
+            args: Prisma.ReportSideEffectDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          update: {
+            args: Prisma.ReportSideEffectUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          deleteMany: {
+            args: Prisma.ReportSideEffectDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ReportSideEffectUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ReportSideEffectUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>[]
+          }
+          upsert: {
+            args: Prisma.ReportSideEffectUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ReportSideEffectPayload>
+          }
+          aggregate: {
+            args: Prisma.ReportSideEffectAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateReportSideEffect>
+          }
+          groupBy: {
+            args: Prisma.ReportSideEffectGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ReportSideEffectGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ReportSideEffectCountArgs<ExtArgs>
+            result: $Utils.Optional<ReportSideEffectCountAggregateOutputType> | number
           }
         }
       }
@@ -4968,6 +5084,7 @@ export namespace Prisma {
     report?: ReportOmit
     reportCoReporter?: ReportCoReporterOmit
     reportSubmitIdempotency?: ReportSubmitIdempotencyOmit
+    reportSideEffect?: ReportSideEffectOmit
     systemConfig?: SystemConfigOmit
     featureFlag?: FeatureFlagOmit
     auditLog?: AuditLogOmit
@@ -21662,6 +21779,1088 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: ReportSubmitIdempotencyInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ReportSideEffect
+   */
+
+  export type AggregateReportSideEffect = {
+    _count: ReportSideEffectCountAggregateOutputType | null
+    _avg: ReportSideEffectAvgAggregateOutputType | null
+    _sum: ReportSideEffectSumAggregateOutputType | null
+    _min: ReportSideEffectMinAggregateOutputType | null
+    _max: ReportSideEffectMaxAggregateOutputType | null
+  }
+
+  export type ReportSideEffectAvgAggregateOutputType = {
+    attempts: number | null
+  }
+
+  export type ReportSideEffectSumAggregateOutputType = {
+    attempts: number | null
+  }
+
+  export type ReportSideEffectMinAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    kind: $Enums.ReportSideEffectKind | null
+    status: $Enums.ReportSideEffectStatus | null
+    attempts: number | null
+    lastError: string | null
+    processedAt: Date | null
+  }
+
+  export type ReportSideEffectMaxAggregateOutputType = {
+    id: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+    kind: $Enums.ReportSideEffectKind | null
+    status: $Enums.ReportSideEffectStatus | null
+    attempts: number | null
+    lastError: string | null
+    processedAt: Date | null
+  }
+
+  export type ReportSideEffectCountAggregateOutputType = {
+    id: number
+    createdAt: number
+    updatedAt: number
+    kind: number
+    status: number
+    payload: number
+    attempts: number
+    lastError: number
+    processedAt: number
+    _all: number
+  }
+
+
+  export type ReportSideEffectAvgAggregateInputType = {
+    attempts?: true
+  }
+
+  export type ReportSideEffectSumAggregateInputType = {
+    attempts?: true
+  }
+
+  export type ReportSideEffectMinAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    kind?: true
+    status?: true
+    attempts?: true
+    lastError?: true
+    processedAt?: true
+  }
+
+  export type ReportSideEffectMaxAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    kind?: true
+    status?: true
+    attempts?: true
+    lastError?: true
+    processedAt?: true
+  }
+
+  export type ReportSideEffectCountAggregateInputType = {
+    id?: true
+    createdAt?: true
+    updatedAt?: true
+    kind?: true
+    status?: true
+    payload?: true
+    attempts?: true
+    lastError?: true
+    processedAt?: true
+    _all?: true
+  }
+
+  export type ReportSideEffectAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReportSideEffect to aggregate.
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSideEffects to fetch.
+     */
+    orderBy?: ReportSideEffectOrderByWithRelationInput | ReportSideEffectOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ReportSideEffectWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSideEffects from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSideEffects.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ReportSideEffects
+    **/
+    _count?: true | ReportSideEffectCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ReportSideEffectAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ReportSideEffectSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ReportSideEffectMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ReportSideEffectMaxAggregateInputType
+  }
+
+  export type GetReportSideEffectAggregateType<T extends ReportSideEffectAggregateArgs> = {
+        [P in keyof T & keyof AggregateReportSideEffect]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateReportSideEffect[P]>
+      : GetScalarType<T[P], AggregateReportSideEffect[P]>
+  }
+
+
+
+
+  export type ReportSideEffectGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ReportSideEffectWhereInput
+    orderBy?: ReportSideEffectOrderByWithAggregationInput | ReportSideEffectOrderByWithAggregationInput[]
+    by: ReportSideEffectScalarFieldEnum[] | ReportSideEffectScalarFieldEnum
+    having?: ReportSideEffectScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ReportSideEffectCountAggregateInputType | true
+    _avg?: ReportSideEffectAvgAggregateInputType
+    _sum?: ReportSideEffectSumAggregateInputType
+    _min?: ReportSideEffectMinAggregateInputType
+    _max?: ReportSideEffectMaxAggregateInputType
+  }
+
+  export type ReportSideEffectGroupByOutputType = {
+    id: string
+    createdAt: Date
+    updatedAt: Date
+    kind: $Enums.ReportSideEffectKind
+    status: $Enums.ReportSideEffectStatus
+    payload: JsonValue
+    attempts: number
+    lastError: string | null
+    processedAt: Date | null
+    _count: ReportSideEffectCountAggregateOutputType | null
+    _avg: ReportSideEffectAvgAggregateOutputType | null
+    _sum: ReportSideEffectSumAggregateOutputType | null
+    _min: ReportSideEffectMinAggregateOutputType | null
+    _max: ReportSideEffectMaxAggregateOutputType | null
+  }
+
+  type GetReportSideEffectGroupByPayload<T extends ReportSideEffectGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ReportSideEffectGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ReportSideEffectGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ReportSideEffectGroupByOutputType[P]>
+            : GetScalarType<T[P], ReportSideEffectGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ReportSideEffectSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    kind?: boolean
+    status?: boolean
+    payload?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    processedAt?: boolean
+  }, ExtArgs["result"]["reportSideEffect"]>
+
+  export type ReportSideEffectSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    kind?: boolean
+    status?: boolean
+    payload?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    processedAt?: boolean
+  }, ExtArgs["result"]["reportSideEffect"]>
+
+  export type ReportSideEffectSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    kind?: boolean
+    status?: boolean
+    payload?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    processedAt?: boolean
+  }, ExtArgs["result"]["reportSideEffect"]>
+
+  export type ReportSideEffectSelectScalar = {
+    id?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    kind?: boolean
+    status?: boolean
+    payload?: boolean
+    attempts?: boolean
+    lastError?: boolean
+    processedAt?: boolean
+  }
+
+  export type ReportSideEffectOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "createdAt" | "updatedAt" | "kind" | "status" | "payload" | "attempts" | "lastError" | "processedAt", ExtArgs["result"]["reportSideEffect"]>
+
+  export type $ReportSideEffectPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ReportSideEffect"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      createdAt: Date
+      updatedAt: Date
+      kind: $Enums.ReportSideEffectKind
+      status: $Enums.ReportSideEffectStatus
+      payload: Prisma.JsonValue
+      attempts: number
+      lastError: string | null
+      processedAt: Date | null
+    }, ExtArgs["result"]["reportSideEffect"]>
+    composites: {}
+  }
+
+  type ReportSideEffectGetPayload<S extends boolean | null | undefined | ReportSideEffectDefaultArgs> = $Result.GetResult<Prisma.$ReportSideEffectPayload, S>
+
+  type ReportSideEffectCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ReportSideEffectFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ReportSideEffectCountAggregateInputType | true
+    }
+
+  export interface ReportSideEffectDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ReportSideEffect'], meta: { name: 'ReportSideEffect' } }
+    /**
+     * Find zero or one ReportSideEffect that matches the filter.
+     * @param {ReportSideEffectFindUniqueArgs} args - Arguments to find a ReportSideEffect
+     * @example
+     * // Get one ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ReportSideEffectFindUniqueArgs>(args: SelectSubset<T, ReportSideEffectFindUniqueArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ReportSideEffect that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ReportSideEffectFindUniqueOrThrowArgs} args - Arguments to find a ReportSideEffect
+     * @example
+     * // Get one ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ReportSideEffectFindUniqueOrThrowArgs>(args: SelectSubset<T, ReportSideEffectFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReportSideEffect that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectFindFirstArgs} args - Arguments to find a ReportSideEffect
+     * @example
+     * // Get one ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ReportSideEffectFindFirstArgs>(args?: SelectSubset<T, ReportSideEffectFindFirstArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ReportSideEffect that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectFindFirstOrThrowArgs} args - Arguments to find a ReportSideEffect
+     * @example
+     * // Get one ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ReportSideEffectFindFirstOrThrowArgs>(args?: SelectSubset<T, ReportSideEffectFindFirstOrThrowArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ReportSideEffects that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ReportSideEffects
+     * const reportSideEffects = await prisma.reportSideEffect.findMany()
+     * 
+     * // Get first 10 ReportSideEffects
+     * const reportSideEffects = await prisma.reportSideEffect.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const reportSideEffectWithIdOnly = await prisma.reportSideEffect.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ReportSideEffectFindManyArgs>(args?: SelectSubset<T, ReportSideEffectFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ReportSideEffect.
+     * @param {ReportSideEffectCreateArgs} args - Arguments to create a ReportSideEffect.
+     * @example
+     * // Create one ReportSideEffect
+     * const ReportSideEffect = await prisma.reportSideEffect.create({
+     *   data: {
+     *     // ... data to create a ReportSideEffect
+     *   }
+     * })
+     * 
+     */
+    create<T extends ReportSideEffectCreateArgs>(args: SelectSubset<T, ReportSideEffectCreateArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ReportSideEffects.
+     * @param {ReportSideEffectCreateManyArgs} args - Arguments to create many ReportSideEffects.
+     * @example
+     * // Create many ReportSideEffects
+     * const reportSideEffect = await prisma.reportSideEffect.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ReportSideEffectCreateManyArgs>(args?: SelectSubset<T, ReportSideEffectCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ReportSideEffects and returns the data saved in the database.
+     * @param {ReportSideEffectCreateManyAndReturnArgs} args - Arguments to create many ReportSideEffects.
+     * @example
+     * // Create many ReportSideEffects
+     * const reportSideEffect = await prisma.reportSideEffect.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ReportSideEffects and only return the `id`
+     * const reportSideEffectWithIdOnly = await prisma.reportSideEffect.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ReportSideEffectCreateManyAndReturnArgs>(args?: SelectSubset<T, ReportSideEffectCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ReportSideEffect.
+     * @param {ReportSideEffectDeleteArgs} args - Arguments to delete one ReportSideEffect.
+     * @example
+     * // Delete one ReportSideEffect
+     * const ReportSideEffect = await prisma.reportSideEffect.delete({
+     *   where: {
+     *     // ... filter to delete one ReportSideEffect
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ReportSideEffectDeleteArgs>(args: SelectSubset<T, ReportSideEffectDeleteArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ReportSideEffect.
+     * @param {ReportSideEffectUpdateArgs} args - Arguments to update one ReportSideEffect.
+     * @example
+     * // Update one ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ReportSideEffectUpdateArgs>(args: SelectSubset<T, ReportSideEffectUpdateArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ReportSideEffects.
+     * @param {ReportSideEffectDeleteManyArgs} args - Arguments to filter ReportSideEffects to delete.
+     * @example
+     * // Delete a few ReportSideEffects
+     * const { count } = await prisma.reportSideEffect.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ReportSideEffectDeleteManyArgs>(args?: SelectSubset<T, ReportSideEffectDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReportSideEffects.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ReportSideEffects
+     * const reportSideEffect = await prisma.reportSideEffect.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ReportSideEffectUpdateManyArgs>(args: SelectSubset<T, ReportSideEffectUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ReportSideEffects and returns the data updated in the database.
+     * @param {ReportSideEffectUpdateManyAndReturnArgs} args - Arguments to update many ReportSideEffects.
+     * @example
+     * // Update many ReportSideEffects
+     * const reportSideEffect = await prisma.reportSideEffect.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ReportSideEffects and only return the `id`
+     * const reportSideEffectWithIdOnly = await prisma.reportSideEffect.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ReportSideEffectUpdateManyAndReturnArgs>(args: SelectSubset<T, ReportSideEffectUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ReportSideEffect.
+     * @param {ReportSideEffectUpsertArgs} args - Arguments to update or create a ReportSideEffect.
+     * @example
+     * // Update or create a ReportSideEffect
+     * const reportSideEffect = await prisma.reportSideEffect.upsert({
+     *   create: {
+     *     // ... data to create a ReportSideEffect
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ReportSideEffect we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ReportSideEffectUpsertArgs>(args: SelectSubset<T, ReportSideEffectUpsertArgs<ExtArgs>>): Prisma__ReportSideEffectClient<$Result.GetResult<Prisma.$ReportSideEffectPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ReportSideEffects.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectCountArgs} args - Arguments to filter ReportSideEffects to count.
+     * @example
+     * // Count the number of ReportSideEffects
+     * const count = await prisma.reportSideEffect.count({
+     *   where: {
+     *     // ... the filter for the ReportSideEffects we want to count
+     *   }
+     * })
+    **/
+    count<T extends ReportSideEffectCountArgs>(
+      args?: Subset<T, ReportSideEffectCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ReportSideEffectCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ReportSideEffect.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ReportSideEffectAggregateArgs>(args: Subset<T, ReportSideEffectAggregateArgs>): Prisma.PrismaPromise<GetReportSideEffectAggregateType<T>>
+
+    /**
+     * Group by ReportSideEffect.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ReportSideEffectGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ReportSideEffectGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ReportSideEffectGroupByArgs['orderBy'] }
+        : { orderBy?: ReportSideEffectGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ReportSideEffectGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetReportSideEffectGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ReportSideEffect model
+   */
+  readonly fields: ReportSideEffectFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ReportSideEffect.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ReportSideEffectClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ReportSideEffect model
+   */
+  interface ReportSideEffectFieldRefs {
+    readonly id: FieldRef<"ReportSideEffect", 'String'>
+    readonly createdAt: FieldRef<"ReportSideEffect", 'DateTime'>
+    readonly updatedAt: FieldRef<"ReportSideEffect", 'DateTime'>
+    readonly kind: FieldRef<"ReportSideEffect", 'ReportSideEffectKind'>
+    readonly status: FieldRef<"ReportSideEffect", 'ReportSideEffectStatus'>
+    readonly payload: FieldRef<"ReportSideEffect", 'Json'>
+    readonly attempts: FieldRef<"ReportSideEffect", 'Int'>
+    readonly lastError: FieldRef<"ReportSideEffect", 'String'>
+    readonly processedAt: FieldRef<"ReportSideEffect", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ReportSideEffect findUnique
+   */
+  export type ReportSideEffectFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter, which ReportSideEffect to fetch.
+     */
+    where: ReportSideEffectWhereUniqueInput
+  }
+
+  /**
+   * ReportSideEffect findUniqueOrThrow
+   */
+  export type ReportSideEffectFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter, which ReportSideEffect to fetch.
+     */
+    where: ReportSideEffectWhereUniqueInput
+  }
+
+  /**
+   * ReportSideEffect findFirst
+   */
+  export type ReportSideEffectFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter, which ReportSideEffect to fetch.
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSideEffects to fetch.
+     */
+    orderBy?: ReportSideEffectOrderByWithRelationInput | ReportSideEffectOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReportSideEffects.
+     */
+    cursor?: ReportSideEffectWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSideEffects from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSideEffects.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSideEffects.
+     */
+    distinct?: ReportSideEffectScalarFieldEnum | ReportSideEffectScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSideEffect findFirstOrThrow
+   */
+  export type ReportSideEffectFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter, which ReportSideEffect to fetch.
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSideEffects to fetch.
+     */
+    orderBy?: ReportSideEffectOrderByWithRelationInput | ReportSideEffectOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ReportSideEffects.
+     */
+    cursor?: ReportSideEffectWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSideEffects from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSideEffects.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSideEffects.
+     */
+    distinct?: ReportSideEffectScalarFieldEnum | ReportSideEffectScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSideEffect findMany
+   */
+  export type ReportSideEffectFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter, which ReportSideEffects to fetch.
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ReportSideEffects to fetch.
+     */
+    orderBy?: ReportSideEffectOrderByWithRelationInput | ReportSideEffectOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ReportSideEffects.
+     */
+    cursor?: ReportSideEffectWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ReportSideEffects from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ReportSideEffects.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ReportSideEffects.
+     */
+    distinct?: ReportSideEffectScalarFieldEnum | ReportSideEffectScalarFieldEnum[]
+  }
+
+  /**
+   * ReportSideEffect create
+   */
+  export type ReportSideEffectCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * The data needed to create a ReportSideEffect.
+     */
+    data: XOR<ReportSideEffectCreateInput, ReportSideEffectUncheckedCreateInput>
+  }
+
+  /**
+   * ReportSideEffect createMany
+   */
+  export type ReportSideEffectCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ReportSideEffects.
+     */
+    data: ReportSideEffectCreateManyInput | ReportSideEffectCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ReportSideEffect createManyAndReturn
+   */
+  export type ReportSideEffectCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * The data used to create many ReportSideEffects.
+     */
+    data: ReportSideEffectCreateManyInput | ReportSideEffectCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ReportSideEffect update
+   */
+  export type ReportSideEffectUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * The data needed to update a ReportSideEffect.
+     */
+    data: XOR<ReportSideEffectUpdateInput, ReportSideEffectUncheckedUpdateInput>
+    /**
+     * Choose, which ReportSideEffect to update.
+     */
+    where: ReportSideEffectWhereUniqueInput
+  }
+
+  /**
+   * ReportSideEffect updateMany
+   */
+  export type ReportSideEffectUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ReportSideEffects.
+     */
+    data: XOR<ReportSideEffectUpdateManyMutationInput, ReportSideEffectUncheckedUpdateManyInput>
+    /**
+     * Filter which ReportSideEffects to update
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * Limit how many ReportSideEffects to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReportSideEffect updateManyAndReturn
+   */
+  export type ReportSideEffectUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * The data used to update ReportSideEffects.
+     */
+    data: XOR<ReportSideEffectUpdateManyMutationInput, ReportSideEffectUncheckedUpdateManyInput>
+    /**
+     * Filter which ReportSideEffects to update
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * Limit how many ReportSideEffects to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReportSideEffect upsert
+   */
+  export type ReportSideEffectUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * The filter to search for the ReportSideEffect to update in case it exists.
+     */
+    where: ReportSideEffectWhereUniqueInput
+    /**
+     * In case the ReportSideEffect found by the `where` argument doesn't exist, create a new ReportSideEffect with this data.
+     */
+    create: XOR<ReportSideEffectCreateInput, ReportSideEffectUncheckedCreateInput>
+    /**
+     * In case the ReportSideEffect was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ReportSideEffectUpdateInput, ReportSideEffectUncheckedUpdateInput>
+  }
+
+  /**
+   * ReportSideEffect delete
+   */
+  export type ReportSideEffectDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
+    /**
+     * Filter which ReportSideEffect to delete.
+     */
+    where: ReportSideEffectWhereUniqueInput
+  }
+
+  /**
+   * ReportSideEffect deleteMany
+   */
+  export type ReportSideEffectDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ReportSideEffects to delete
+     */
+    where?: ReportSideEffectWhereInput
+    /**
+     * Limit how many ReportSideEffects to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ReportSideEffect without action
+   */
+  export type ReportSideEffectDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ReportSideEffect
+     */
+    select?: ReportSideEffectSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ReportSideEffect
+     */
+    omit?: ReportSideEffectOmit<ExtArgs> | null
   }
 
 
@@ -57247,6 +58446,21 @@ export namespace Prisma {
   export type ReportSubmitIdempotencyScalarFieldEnum = (typeof ReportSubmitIdempotencyScalarFieldEnum)[keyof typeof ReportSubmitIdempotencyScalarFieldEnum]
 
 
+  export const ReportSideEffectScalarFieldEnum: {
+    id: 'id',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    kind: 'kind',
+    status: 'status',
+    payload: 'payload',
+    attempts: 'attempts',
+    lastError: 'lastError',
+    processedAt: 'processedAt'
+  };
+
+  export type ReportSideEffectScalarFieldEnum = (typeof ReportSideEffectScalarFieldEnum)[keyof typeof ReportSideEffectScalarFieldEnum]
+
+
   export const SystemConfigScalarFieldEnum: {
     id: 'id',
     createdAt: 'createdAt',
@@ -57921,6 +59135,34 @@ export namespace Prisma {
    * Reference to a field of type 'ReportStatus[]'
    */
   export type ListEnumReportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ReportSideEffectKind'
+   */
+  export type EnumReportSideEffectKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportSideEffectKind'>
+    
+
+
+  /**
+   * Reference to a field of type 'ReportSideEffectKind[]'
+   */
+  export type ListEnumReportSideEffectKindFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportSideEffectKind[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ReportSideEffectStatus'
+   */
+  export type EnumReportSideEffectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportSideEffectStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ReportSideEffectStatus[]'
+   */
+  export type ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ReportSideEffectStatus[]'>
     
 
 
@@ -59255,6 +60497,80 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
     key?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
     reportId?: StringWithAggregatesFilter<"ReportSubmitIdempotency"> | string
+  }
+
+  export type ReportSideEffectWhereInput = {
+    AND?: ReportSideEffectWhereInput | ReportSideEffectWhereInput[]
+    OR?: ReportSideEffectWhereInput[]
+    NOT?: ReportSideEffectWhereInput | ReportSideEffectWhereInput[]
+    id?: StringFilter<"ReportSideEffect"> | string
+    createdAt?: DateTimeFilter<"ReportSideEffect"> | Date | string
+    updatedAt?: DateTimeFilter<"ReportSideEffect"> | Date | string
+    kind?: EnumReportSideEffectKindFilter<"ReportSideEffect"> | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFilter<"ReportSideEffect"> | $Enums.ReportSideEffectStatus
+    payload?: JsonFilter<"ReportSideEffect">
+    attempts?: IntFilter<"ReportSideEffect"> | number
+    lastError?: StringNullableFilter<"ReportSideEffect"> | string | null
+    processedAt?: DateTimeNullableFilter<"ReportSideEffect"> | Date | string | null
+  }
+
+  export type ReportSideEffectOrderByWithRelationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    payload?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+  }
+
+  export type ReportSideEffectWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ReportSideEffectWhereInput | ReportSideEffectWhereInput[]
+    OR?: ReportSideEffectWhereInput[]
+    NOT?: ReportSideEffectWhereInput | ReportSideEffectWhereInput[]
+    createdAt?: DateTimeFilter<"ReportSideEffect"> | Date | string
+    updatedAt?: DateTimeFilter<"ReportSideEffect"> | Date | string
+    kind?: EnumReportSideEffectKindFilter<"ReportSideEffect"> | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFilter<"ReportSideEffect"> | $Enums.ReportSideEffectStatus
+    payload?: JsonFilter<"ReportSideEffect">
+    attempts?: IntFilter<"ReportSideEffect"> | number
+    lastError?: StringNullableFilter<"ReportSideEffect"> | string | null
+    processedAt?: DateTimeNullableFilter<"ReportSideEffect"> | Date | string | null
+  }, "id">
+
+  export type ReportSideEffectOrderByWithAggregationInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    payload?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrderInput | SortOrder
+    processedAt?: SortOrderInput | SortOrder
+    _count?: ReportSideEffectCountOrderByAggregateInput
+    _avg?: ReportSideEffectAvgOrderByAggregateInput
+    _max?: ReportSideEffectMaxOrderByAggregateInput
+    _min?: ReportSideEffectMinOrderByAggregateInput
+    _sum?: ReportSideEffectSumOrderByAggregateInput
+  }
+
+  export type ReportSideEffectScalarWhereWithAggregatesInput = {
+    AND?: ReportSideEffectScalarWhereWithAggregatesInput | ReportSideEffectScalarWhereWithAggregatesInput[]
+    OR?: ReportSideEffectScalarWhereWithAggregatesInput[]
+    NOT?: ReportSideEffectScalarWhereWithAggregatesInput | ReportSideEffectScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ReportSideEffect"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"ReportSideEffect"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ReportSideEffect"> | Date | string
+    kind?: EnumReportSideEffectKindWithAggregatesFilter<"ReportSideEffect"> | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusWithAggregatesFilter<"ReportSideEffect"> | $Enums.ReportSideEffectStatus
+    payload?: JsonWithAggregatesFilter<"ReportSideEffect">
+    attempts?: IntWithAggregatesFilter<"ReportSideEffect"> | number
+    lastError?: StringNullableWithAggregatesFilter<"ReportSideEffect"> | string | null
+    processedAt?: DateTimeNullableWithAggregatesFilter<"ReportSideEffect"> | Date | string | null
   }
 
   export type SystemConfigWhereInput = {
@@ -62905,6 +64221,90 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     key?: StringFieldUpdateOperationsInput | string
     reportId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type ReportSideEffectCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.ReportSideEffectKind
+    status?: $Enums.ReportSideEffectStatus
+    payload: JsonNullValueInput | InputJsonValue
+    attempts?: number
+    lastError?: string | null
+    processedAt?: Date | string | null
+  }
+
+  export type ReportSideEffectUncheckedCreateInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.ReportSideEffectKind
+    status?: $Enums.ReportSideEffectStatus
+    payload: JsonNullValueInput | InputJsonValue
+    attempts?: number
+    lastError?: string | null
+    processedAt?: Date | string | null
+  }
+
+  export type ReportSideEffectUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumReportSideEffectKindFieldUpdateOperationsInput | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFieldUpdateOperationsInput | $Enums.ReportSideEffectStatus
+    payload?: JsonNullValueInput | InputJsonValue
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ReportSideEffectUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumReportSideEffectKindFieldUpdateOperationsInput | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFieldUpdateOperationsInput | $Enums.ReportSideEffectStatus
+    payload?: JsonNullValueInput | InputJsonValue
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ReportSideEffectCreateManyInput = {
+    id?: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    kind: $Enums.ReportSideEffectKind
+    status?: $Enums.ReportSideEffectStatus
+    payload: JsonNullValueInput | InputJsonValue
+    attempts?: number
+    lastError?: string | null
+    processedAt?: Date | string | null
+  }
+
+  export type ReportSideEffectUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumReportSideEffectKindFieldUpdateOperationsInput | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFieldUpdateOperationsInput | $Enums.ReportSideEffectStatus
+    payload?: JsonNullValueInput | InputJsonValue
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ReportSideEffectUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    kind?: EnumReportSideEffectKindFieldUpdateOperationsInput | $Enums.ReportSideEffectKind
+    status?: EnumReportSideEffectStatusFieldUpdateOperationsInput | $Enums.ReportSideEffectStatus
+    payload?: JsonNullValueInput | InputJsonValue
+    attempts?: IntFieldUpdateOperationsInput | number
+    lastError?: NullableStringFieldUpdateOperationsInput | string | null
+    processedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SystemConfigCreateInput = {
@@ -66693,6 +68093,131 @@ export namespace Prisma {
     reportId?: SortOrder
   }
 
+  export type EnumReportSideEffectKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectKind | EnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectKindFilter<$PrismaModel> | $Enums.ReportSideEffectKind
+  }
+
+  export type EnumReportSideEffectStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectStatus | EnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectStatusFilter<$PrismaModel> | $Enums.ReportSideEffectStatus
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ReportSideEffectCountOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    payload?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    processedAt?: SortOrder
+  }
+
+  export type ReportSideEffectAvgOrderByAggregateInput = {
+    attempts?: SortOrder
+  }
+
+  export type ReportSideEffectMaxOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    processedAt?: SortOrder
+  }
+
+  export type ReportSideEffectMinOrderByAggregateInput = {
+    id?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    kind?: SortOrder
+    status?: SortOrder
+    attempts?: SortOrder
+    lastError?: SortOrder
+    processedAt?: SortOrder
+  }
+
+  export type ReportSideEffectSumOrderByAggregateInput = {
+    attempts?: SortOrder
+  }
+
+  export type EnumReportSideEffectKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectKind | EnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectKindWithAggregatesFilter<$PrismaModel> | $Enums.ReportSideEffectKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumReportSideEffectKindFilter<$PrismaModel>
+    _max?: NestedEnumReportSideEffectKindFilter<$PrismaModel>
+  }
+
+  export type EnumReportSideEffectStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectStatus | EnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectStatusWithAggregatesFilter<$PrismaModel> | $Enums.ReportSideEffectStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumReportSideEffectStatusFilter<$PrismaModel>
+    _max?: NestedEnumReportSideEffectStatusFilter<$PrismaModel>
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
   export type SystemConfigCountOrderByAggregateInput = {
     id?: SortOrder
     createdAt?: SortOrder
@@ -68164,29 +69689,6 @@ export namespace Prisma {
     muted?: SortOrder
     mutedUntil?: SortOrder
   }
-  export type JsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type NotificationOutboxCountOrderByAggregateInput = {
     id?: SortOrder
@@ -68249,32 +69751,6 @@ export namespace Prisma {
 
   export type NotificationOutboxSumOrderByAggregateInput = {
     attempts?: SortOrder
-  }
-  export type JsonWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedJsonFilter<$PrismaModel>
-    _max?: NestedJsonFilter<$PrismaModel>
   }
 
   export type AdminMutationIdempotencyActorUserIdPurposeClientJobIdCompoundUniqueInput = {
@@ -70405,6 +71881,14 @@ export namespace Prisma {
     update?: XOR<XOR<ReportUpdateToOneWithWhereWithoutSubmitIdempotencyKeysInput, ReportUpdateWithoutSubmitIdempotencyKeysInput>, ReportUncheckedUpdateWithoutSubmitIdempotencyKeysInput>
   }
 
+  export type EnumReportSideEffectKindFieldUpdateOperationsInput = {
+    set?: $Enums.ReportSideEffectKind
+  }
+
+  export type EnumReportSideEffectStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ReportSideEffectStatus
+  }
+
   export type UserCreateNestedOneWithoutAuditLogsInput = {
     create?: XOR<UserCreateWithoutAuditLogsInput, UserUncheckedCreateWithoutAuditLogsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAuditLogsInput
@@ -72269,6 +73753,63 @@ export namespace Prisma {
     _max?: NestedEnumReportStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumReportSideEffectKindFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectKind | EnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectKindFilter<$PrismaModel> | $Enums.ReportSideEffectKind
+  }
+
+  export type NestedEnumReportSideEffectStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectStatus | EnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectStatusFilter<$PrismaModel> | $Enums.ReportSideEffectStatus
+  }
+
+  export type NestedEnumReportSideEffectKindWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectKind | EnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectKind[] | ListEnumReportSideEffectKindFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectKindWithAggregatesFilter<$PrismaModel> | $Enums.ReportSideEffectKind
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumReportSideEffectKindFilter<$PrismaModel>
+    _max?: NestedEnumReportSideEffectKindFilter<$PrismaModel>
+  }
+
+  export type NestedEnumReportSideEffectStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ReportSideEffectStatus | EnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ReportSideEffectStatus[] | ListEnumReportSideEffectStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumReportSideEffectStatusWithAggregatesFilter<$PrismaModel> | $Enums.ReportSideEffectStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumReportSideEffectStatusFilter<$PrismaModel>
+    _max?: NestedEnumReportSideEffectStatusFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
   export type NestedEnumEcoEventCategoryFilter<$PrismaModel = never> = {
     equals?: $Enums.EcoEventCategory | EnumEcoEventCategoryFieldRefInput<$PrismaModel>
     in?: $Enums.EcoEventCategory[] | ListEnumEcoEventCategoryFieldRefInput<$PrismaModel>
@@ -72521,29 +74062,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumNotificationTypeFilter<$PrismaModel>
     _max?: NestedEnumNotificationTypeFilter<$PrismaModel>
-  }
-  export type NestedJsonFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type ReportCreateWithoutReporterInput = {

@@ -4,7 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Button, Card, Icon, Input, Pagination, Snack } from '@/components/ui';
+import { Card, Icon, Pagination, Snack } from '@/components/ui';
 import { ADMIN_SEARCH_DEBOUNCE_MS } from '@/lib/admin-ui-timing';
 import { subscribeNewReportSignal } from '@/lib/realtime-signals';
 import type { ReportRow, SortKey, SortDirection } from '@/features/reports/types';
@@ -13,6 +13,17 @@ import { useReportsListActions } from '../hooks/use-reports-list-actions';
 import { ReportListCard, ReportListMobileCard } from './report-list-card';
 import { ActionConfirmModal } from './action-confirm-modal';
 import { columns, statusFilterOptions } from '../config/table';
+import {
+  buildReportsUrl,
+  REPORTS_LIST_OVERVIEW_MAX_ROWS,
+  REPORTS_LIST_PAGE_SIZE,
+  sortReports,
+  VALID_SORT_KEYS,
+} from './reports-list-utils';
+import { ReportsListEmptyState } from './reports-list/reports-list-empty-state';
+import { ReportsListQueueHeader } from './reports-list/reports-list-queue-header';
+import { ReportsListSkeleton } from './reports-list/reports-list-skeleton';
+import { ReportsListToolbar } from './reports-list/reports-list-toolbar';
 import styles from './reports-list.module.css';
 
 type PendingAction =
@@ -20,63 +31,8 @@ type PendingAction =
   | { kind: 'reject'; report: ReportRow };
 
 const STATUS_FILTERS = statusFilterOptions.filter((f) => f.key !== 'DUPLICATES');
-const PAGE_SIZE = 10;
-const OVERVIEW_MAX_ROWS = 5;
-const STATUS_PRIORITY: Record<ReportRow['status'], number> = {
-  NEW: 0,
-  IN_REVIEW: 1,
-  APPROVED: 2,
-  DELETED: 3,
-};
-const VALID_SORT_KEYS: SortKey[] = ['reportNumber', 'name', 'location', 'dateReportedAt', 'status'];
 const REFRESH_DEBOUNCE_MS = 800;
 const HIGHLIGHT_MS = 7000;
-
-function buildReportsUrl(params: {
-  status?: string | undefined;
-  sort?: SortKey | undefined;
-  dir?: SortDirection | undefined;
-  page?: number | undefined;
-}) {
-  const sp = new URLSearchParams();
-  if (params.status && params.status !== 'ALL') sp.set('status', params.status);
-  if (params.sort) sp.set('sort', params.sort);
-  if (params.dir) sp.set('dir', params.dir);
-  if (params.page && params.page > 1) sp.set('page', String(params.page));
-  const q = sp.toString();
-  return `/dashboard/reports${q ? `?${q}` : ''}`;
-}
-
-function sortReports(
-  rows: ReportRow[],
-  sortKey: SortKey,
-  sortDirection: SortDirection,
-  prioritizePending = false,
-): ReportRow[] {
-  const modifier = sortDirection === 'asc' ? 1 : -1;
-  return [...rows].sort((a, b) => {
-    if (prioritizePending) {
-      const aPri = STATUS_PRIORITY[a.status];
-      const bPri = STATUS_PRIORITY[b.status];
-      if (aPri !== bPri) return aPri - bPri;
-    }
-    if (sortKey === 'dateReportedAt') {
-      return (
-        (new Date(a.dateReportedAt).getTime() - new Date(b.dateReportedAt).getTime()) * modifier
-      );
-    }
-    if (sortKey === 'reportNumber') {
-      const an = Number.parseInt(a.reportNumber, 10);
-      const bn = Number.parseInt(b.reportNumber, 10);
-      if (!Number.isNaN(an) && !Number.isNaN(bn)) return (an - bn) * modifier;
-      return a.reportNumber.localeCompare(b.reportNumber) * modifier;
-    }
-    if (sortKey === 'status') {
-      return a.status.localeCompare(b.status) * modifier;
-    }
-    return a[sortKey].localeCompare(b[sortKey]) * modifier;
-  });
-}
 
 type ReportsListProps = {
   reports: ReportRow[];
@@ -90,7 +46,7 @@ function ReportsListInner({
   reports,
   variant = 'full',
   embedded = false,
-  maxRows = OVERVIEW_MAX_ROWS,
+  maxRows = REPORTS_LIST_OVERVIEW_MAX_ROWS,
   prioritizePending = false,
 }: ReportsListProps) {
   const router = useRouter();
@@ -140,7 +96,7 @@ function ReportsListInner({
     [filteredReports, sortKey, sortDirection, prioritizePending],
   );
 
-  const pageSize = isOverview ? maxRows : PAGE_SIZE;
+  const pageSize = isOverview ? maxRows : REPORTS_LIST_PAGE_SIZE;
   const effectiveTotalPages = Math.max(1, Math.ceil(sortedReports.length / pageSize));
   const effectiveSafePage = Math.min(currentPage, effectiveTotalPages);
 
@@ -259,15 +215,19 @@ function ReportsListInner({
     if (!pendingAction) return;
     const { report } = pendingAction;
     if (pendingAction.kind === 'approve') {
-      await approveReport(report.id);
-    } else {
-      if (!rejectionReason.trim()) {
-        setRejectionReasonError('Please select a rejection reason.');
-        return;
-      }
-      await rejectReport(report.id, rejectionReason.trim());
+      const ok = await approveReport(report.id);
+      if (ok) closeConfirmModal();
+      return;
     }
-    closeConfirmModal();
+    if (!rejectionReason.trim()) {
+      setRejectionReasonError('Please select a rejection reason.');
+      return;
+    }
+    const composedReason = rejectionNotes.trim()
+      ? `${rejectionReason.trim()}. Notes: ${rejectionNotes.trim()}`
+      : rejectionReason.trim();
+    const ok = await rejectReport(report.id, composedReason);
+    if (ok) closeConfirmModal();
   }
 
   const handleRefresh = useCallback(() => {
@@ -324,7 +284,7 @@ function ReportsListInner({
     needAttentionCount > 0
       ? `${needAttentionCount} report${needAttentionCount !== 1 ? 's' : ''} need attention`
       : totalPages > 1
-        ? `Showing ${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(safePage * PAGE_SIZE, sortedReports.length)} of ${sortedReports.length}`
+        ? `Showing ${(safePage - 1) * pageSize + 1}–${Math.min(safePage * pageSize, sortedReports.length)} of ${sortedReports.length}`
         : `${sortedReports.length} of ${reports.length} report${reports.length !== 1 ? 's' : ''}`;
 
   return (
@@ -337,124 +297,34 @@ function ReportsListInner({
       transition={reducedMotion ? { duration: 0 } : SPRING}
     >
       {!embedded && (
-        <>
-          <div className={styles.summaryStrip}>
-            <span className={styles.summaryValue}>{reports.length} reports</span>
-            <span className={styles.summarySep}>·</span>
-            <span className={styles.summaryValue}>{needAttentionCount} need attention</span>
-            <span className={styles.summarySep}>·</span>
-            <Link href="/dashboard/reports/duplicates" className={styles.summaryLink}>
-              {duplicateCount} duplicate{duplicateCount !== 1 ? 's' : ''}
-            </Link>
-          </div>
-          <span className={styles.sectionLabel}>Queue</span>
-          <div className={styles.reportsHeader}>
-            <div>
-              <h2 id="reports-heading" className={styles.sectionTitle}>
-                Reports
-              </h2>
-              <p className={styles.reportsSubline} data-attention={needAttentionCount > 0 ? 'true' : undefined}>
-                {sublineText}
-              </p>
-            </div>
-            <div className={styles.reportsHeaderActions}>
-              <div className={styles.statusPill} role="status">
-                <Button
-                  variant="icon"
-                  aria-label="Refresh reports"
-                  onClick={handleRefresh}
-                  disabled={isRefreshing}
-                  className={styles.refreshBtn}
-                >
-                  <Icon
-                    name="refresh"
-                    size={16}
-                    {...(isRefreshing && { className: styles.spinning })}
-                  />
-                </Button>
-              </div>
-              <Link href="/dashboard/reports/duplicates" className={styles.viewAllLink}>
-                {duplicateCount > 0 ? `${duplicateCount} potential duplicate${duplicateCount !== 1 ? 's' : ''}` : 'Duplicates'}
-                <Icon name="chevron-right" size={12} className={styles.linkChevron} aria-hidden />
-              </Link>
-            </div>
-          </div>
-        </>
-      )}
-      <div className={styles.toolbar} role="toolbar" aria-label="Filter and search">
-        <Input
-          aria-label="Search reports by name, location, or number"
-          placeholder="Search reports…"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className={styles.search}
-          leftSlot={<Icon name="magnifying-glass" size={14} aria-hidden />}
-          rightSlot={
-            searchTerm ? (
-              <button
-                type="button"
-                className={styles.clearSearchBtn}
-                onClick={() => setSearchTerm('')}
-                aria-label="Clear search"
-              >
-                <Icon name="x" size={14} aria-hidden />
-              </button>
-            ) : null
-          }
+        <ReportsListQueueHeader
+          reportsCount={reports.length}
+          needAttentionCount={needAttentionCount}
+          duplicateCount={duplicateCount}
+          isRefreshing={isRefreshing}
+          onRefresh={handleRefresh}
+          sublineText={sublineText}
         />
-        <div className={styles.filterRow} role="group" aria-label="Filter by status">
-          <div className={styles.filterChips}>
-            {STATUS_FILTERS.map((opt) =>
-              isOverview ? (
-                <button
-                  key={opt.key}
-                  type="button"
-                  className={`${styles.filterChip} ${activeFilter === opt.key ? styles.filterChipActive : ''}`}
-                  onClick={() => setLocalStatusFilter(opt.key)}
-                  aria-pressed={activeFilter === opt.key}
-                >
-                  {opt.label}
-                </button>
-              ) : (
-                <Link
-                  key={opt.key}
-                  href={buildReportsUrl({
-                    status: opt.key !== 'ALL' ? opt.key : undefined,
-                    sort: sortKey,
-                    dir: sortDirection,
-                    page: safePage > 1 ? safePage : undefined,
-                  })}
-                  className={`${styles.filterChip} ${activeFilter === opt.key ? styles.filterChipActive : ''}`}
-                  aria-current={activeFilter === opt.key ? 'page' : undefined}
-                >
-                  {opt.label}
-                </Link>
-              ),
-            )}
-          </div>
-        </div>
-      </div>
+      )}
+      <ReportsListToolbar
+        isOverview={isOverview}
+        searchTerm={searchTerm}
+        onSearchTermChange={setSearchTerm}
+        onClearSearch={() => setSearchTerm('')}
+        statusFilters={STATUS_FILTERS}
+        activeFilter={activeFilter}
+        onOverviewFilterSelect={setLocalStatusFilter}
+        sortKey={sortKey}
+        sortDirection={sortDirection}
+        safePage={safePage}
+      />
       <Card as="div" padding="sm" className={styles.tableCard}>
         {sortedReports.length === 0 ? (
-          <div className={styles.emptyState}>
-            {reports.length === 0 ? (
-              <>
-                <Icon name="document-text" size={40} className={styles.emptyStateIcon} aria-hidden />
-                <p>No reports yet. Share the Chisto app or reporting link with citizens to get started.</p>
-              </>
-            ) : filteredByStatus.length === 0 ? (
-              <>
-                <Icon name="document-duplicate" size={40} className={styles.emptyStateIcon} aria-hidden />
-                <p>No reports match the selected filter.</p>
-              </>
-            ) : (
-              <>
-                <Icon name="magnifying-glass" size={40} className={styles.emptyStateIcon} aria-hidden />
-                <p>No reports match &ldquo;{debouncedSearch}&rdquo;.</p>
-                <p className={styles.emptyStateHint}>Try a different search term or clear the search.</p>
-              </>
-            )}
-          </div>
+          <ReportsListEmptyState
+            totalReportsCount={reports.length}
+            filteredByStatusCount={filteredByStatus.length}
+            debouncedSearch={debouncedSearch}
+          />
         ) : (
           <>
             <div className={styles.tableWrapper}>
@@ -570,7 +440,7 @@ export function ReportsList({
   reports,
   variant = 'full',
   embedded = false,
-  maxRows = OVERVIEW_MAX_ROWS,
+  maxRows = REPORTS_LIST_OVERVIEW_MAX_ROWS,
   prioritizePending = false,
 }: ReportsListProps) {
   return (
@@ -586,61 +456,3 @@ export function ReportsList({
   );
 }
 
-function ReportsListSkeleton({ embedded = false }: { embedded?: boolean }) {
-  if (embedded) {
-    return (
-      <div className={styles.section} aria-busy="true">
-        <div className={styles.toolbar}>
-          <div className={styles.filterRow}>
-            <div className={styles.filterChips}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <span key={i} className={styles.filterChipSkeleton} />
-              ))}
-            </div>
-          </div>
-        </div>
-        <Card as="div" padding="sm" className={styles.tableCard}>
-          <div className={styles.tableSkeleton}>
-            {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className={styles.rowSkeleton} />
-            ))}
-          </div>
-        </Card>
-      </div>
-    );
-  }
-  return (
-    <section className={styles.section} aria-busy="true">
-      <div className={styles.summaryStrip}>
-        <span className={styles.summaryValue}>—</span>
-        <span className={styles.summarySep}>·</span>
-        <span className={styles.summaryValue}>—</span>
-        <span className={styles.summarySep}>·</span>
-        <span className={styles.summaryValue}>—</span>
-      </div>
-      <span className={styles.sectionLabel}>Queue</span>
-      <div className={styles.reportsHeader}>
-        <div>
-          <div className={styles.titleSkeleton} />
-          <div className={styles.subtitleSkeleton} />
-        </div>
-      </div>
-      <div className={styles.toolbar}>
-        <div className={styles.filterRow}>
-          <div className={styles.filterChips}>
-            {[1, 2, 3, 4, 5].map((i) => (
-              <span key={i} className={styles.filterChipSkeleton} />
-            ))}
-          </div>
-        </div>
-      </div>
-      <Card as="div" padding="sm" className={styles.tableCard}>
-        <div className={styles.tableSkeleton}>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className={styles.rowSkeleton} />
-          ))}
-        </div>
-      </Card>
-    </section>
-  );
-}

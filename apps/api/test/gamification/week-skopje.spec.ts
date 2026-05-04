@@ -1,5 +1,9 @@
 import { DateTime } from 'luxon';
-import { getSkopjeWeekBoundsUtc, SKOPJE_TZ } from '../../src/gamification/week-skopje';
+import {
+  getSkopjeDayBoundsUtc,
+  getSkopjeWeekBoundsUtc,
+  SKOPJE_TZ,
+} from '../../src/gamification/week-skopje';
 
 describe('getSkopjeWeekBoundsUtc', () => {
   it('matches Luxon Monday start and Sunday end in Europe/Skopje', () => {
@@ -26,5 +30,16 @@ describe('getSkopjeWeekBoundsUtc', () => {
 
     expect(b1.weekStartsAt.toISOString()).not.toBe(b2.weekStartsAt.toISOString());
     expect(b2.weekStartsAt.getTime()).toBeGreaterThan(b1.weekStartsAt.getTime());
+  });
+});
+
+describe('getSkopjeDayBoundsUtc', () => {
+  it('returns start and end of the same calendar day in Europe/Skopje', () => {
+    const now = new Date('2026-06-15T22:00:00.000Z');
+    const { dayStartsAt, dayEndsAt } = getSkopjeDayBoundsUtc(now);
+    const z = DateTime.fromJSDate(now, { zone: 'utc' }).setZone(SKOPJE_TZ);
+    expect(dayStartsAt.getTime()).toBe(z.startOf('day').toUTC().toMillis());
+    expect(dayEndsAt.getTime()).toBe(z.endOf('day').toUTC().toMillis());
+    expect(dayEndsAt.getTime()).toBeGreaterThan(dayStartsAt.getTime());
   });
 });

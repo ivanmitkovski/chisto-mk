@@ -106,6 +106,48 @@ abstract class AppLocalizations {
   /// **'Tap the info button for tips on this step.'**
   String get reportFlowHelpHint;
 
+  /// No description provided for @reportFlowStepProgressStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of 3'**
+  String reportFlowStepProgressStep(int current);
+
+  /// No description provided for @reportFlowStepProgressReady.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to submit'**
+  String get reportFlowStepProgressReady;
+
+  /// No description provided for @reportFlowStepStatusComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get reportFlowStepStatusComplete;
+
+  /// No description provided for @reportFlowStepStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get reportFlowStepStatusInProgress;
+
+  /// No description provided for @reportFlowStepChipPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get reportFlowStepChipPhotos;
+
+  /// No description provided for @reportFlowStepChipCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get reportFlowStepChipCategory;
+
+  /// No description provided for @reportFlowStepChipLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get reportFlowStepChipLocation;
+
   /// No description provided for @reportHelpContextTitle.
   ///
   /// In en, this message translates to:
@@ -565,8 +607,8 @@ abstract class AppLocalizations {
   /// No description provided for @reportSubmittedPointsPending.
   ///
   /// In en, this message translates to:
-  /// **'Earn up to {max} pts when approved'**
-  String reportSubmittedPointsPending(int max);
+  /// **'Points are credited after moderators approve your report.'**
+  String get reportSubmittedPointsPending;
 
   /// No description provided for @reportSubmittedViewThisReport.
   ///
@@ -1666,6 +1708,24 @@ abstract class AppLocalizations {
   /// **'Cleanup event completed'**
   String get profilePointsReasonEventCompleted;
 
+  /// No description provided for @profilePointsReasonReportApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Report approved'**
+  String get profilePointsReasonReportApproved;
+
+  /// No description provided for @profilePointsReasonReportApprovalRevoked.
+  ///
+  /// In en, this message translates to:
+  /// **'Report approval reversed'**
+  String get profilePointsReasonReportApprovalRevoked;
+
+  /// No description provided for @profilePointsReasonReportSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Report filed (legacy)'**
+  String get profilePointsReasonReportSubmitted;
+
   /// No description provided for @profileReportCreditsTitle.
   ///
   /// In en, this message translates to:
@@ -2133,6 +2193,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Report pollution'**
   String get reportListFabLabel;
+
+  /// No description provided for @reportListAppBarStartNewReportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a new report'**
+  String get reportListAppBarStartNewReportLabel;
+
+  /// No description provided for @reportListDraftChipLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft · {photoCount, plural, =0{no photos} one{1 photo} other{{photoCount} photos}} · {savedAgo}'**
+  String reportListDraftChipLabel(int photoCount, String savedAgo);
+
+  /// No description provided for @reportListDraftChipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved draft with {photoCount, plural, one{1 photo} other{{photoCount} photos}}. Double tap to open.'**
+  String reportListDraftChipSemantic(int photoCount);
 
   /// No description provided for @reportListSearchSemantic.
   ///
@@ -2931,6 +3009,114 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera or library'**
   String get reportPhotoGridSourceHint;
+
+  /// No description provided for @reportPhotoGridAttachedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{current} of {max} photos attached'**
+  String reportPhotoGridAttachedCount(int current, int max);
+
+  /// No description provided for @reportPhotoOpenGallerySemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open report photo gallery'**
+  String get reportPhotoOpenGallerySemantic;
+
+  /// No description provided for @reportPhotoTapToReviewSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to review photo'**
+  String get reportPhotoTapToReviewSingle;
+
+  /// No description provided for @reportPhotoTapToReviewMany.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to review photos'**
+  String get reportPhotoTapToReviewMany;
+
+  /// No description provided for @reportPhotoVerificationHelpPrimarySelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the first photo as the clearest overview of the site.'**
+  String get reportPhotoVerificationHelpPrimarySelected;
+
+  /// No description provided for @reportPhotoVerificationHelpPrimaryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Use extra photos only for details, scale, or another useful angle.'**
+  String get reportPhotoVerificationHelpPrimaryOther;
+
+  /// No description provided for @reportPhotoVerificationHelpEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Start with one clear overview of the site. Add detail only if it helps.'**
+  String get reportPhotoVerificationHelpEmpty;
+
+  /// No description provided for @reportPhotoStackCaptionSingle.
+  ///
+  /// In en, this message translates to:
+  /// **'One clear photo is enough. Add another only if it helps explain the site.'**
+  String get reportPhotoStackCaptionSingle;
+
+  /// No description provided for @reportPhotoStackCaptionMany.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} photos attached. Keep only the frames that make the report easier to verify.'**
+  String reportPhotoStackCaptionMany(int count);
+
+  /// No description provided for @reportPhotoSemanticThumbnail.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo {index} of {total}. Double-tap to select.'**
+  String reportPhotoSemanticThumbnail(int index, int total);
+
+  /// No description provided for @reportPhotoSemanticRemove.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove photo'**
+  String get reportPhotoSemanticRemove;
+
+  /// No description provided for @reportPhotoSemanticAddPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add evidence photo'**
+  String get reportPhotoSemanticAddPhoto;
+
+  /// No description provided for @reportPhotoSemanticReportPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Report photo {index}'**
+  String reportPhotoSemanticReportPhoto(int index);
+
+  /// No description provided for @reportRequirementPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Add at least one photo'**
+  String get reportRequirementPhotos;
+
+  /// No description provided for @reportRequirementCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a category'**
+  String get reportRequirementCategory;
+
+  /// No description provided for @reportRequirementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a short title'**
+  String get reportRequirementTitle;
+
+  /// No description provided for @reportRequirementLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm a location in Macedonia'**
+  String get reportRequirementLocation;
+
+  /// No description provided for @reportCooldownUnlockHintDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Join and verify attendance, or create an eco action to unlock more reports.'**
+  String get reportCooldownUnlockHintDefault;
 
   /// No description provided for @notificationsTitle.
   ///
@@ -6742,6 +6928,12 @@ abstract class AppLocalizations {
   /// **'Critical'**
   String get reportSeverityCritical;
 
+  /// No description provided for @reportDetailViewOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'View on map'**
+  String get reportDetailViewOnMap;
+
   /// No description provided for @reportListSearchPlaceholder.
   ///
   /// In en, this message translates to:
@@ -6813,6 +7005,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get reportListFilterAll;
+
+  /// No description provided for @reportListOptimisticPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting…'**
+  String get reportListOptimisticPill;
 
   /// No description provided for @reportListFilterSemanticPrefix.
   ///
@@ -6957,6 +7155,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This report could not be approved in its current form.'**
   String get reportDetailStatusOutcomeBodyFallback;
+
+  /// No description provided for @reportDetailSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Report details'**
+  String get reportDetailSheetTitle;
+
+  /// No description provided for @reportDetailSheetSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See what you submitted and how moderators handled this report.'**
+  String get reportDetailSheetSubtitle;
+
+  /// No description provided for @reportDetailSheetSubtitleWithNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'{reportNumber} · See what you submitted and how moderators handled this report.'**
+  String reportDetailSheetSubtitleWithNumber(String reportNumber);
+
+  /// No description provided for @reportDetailPhotoAttachedPill.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo attached'**
+  String get reportDetailPhotoAttachedPill;
+
+  /// No description provided for @reportDetailPointsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Points'**
+  String get reportDetailPointsLabel;
+
+  /// No description provided for @reportDetailEvidencePhotoSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Evidence photo {index}'**
+  String reportDetailEvidencePhotoSemantic(int index);
+
+  /// No description provided for @reportDetailEvidenceGalleryOpenSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Open report evidence photos'**
+  String get reportDetailEvidenceGalleryOpenSemantic;
+
+  /// No description provided for @reportDetailEvidenceTapToExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to expand'**
+  String get reportDetailEvidenceTapToExpand;
+
+  /// No description provided for @reportDetailEvidenceOpenPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Open photo'**
+  String get reportDetailEvidenceOpenPhoto;
+
+  /// No description provided for @reportDetailSiteNotFoundOpeningMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Site not found. Opening in maps.'**
+  String get reportDetailSiteNotFoundOpeningMaps;
+
+  /// No description provided for @reportDetailSiteNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Site not available.'**
+  String get reportDetailSiteNotAvailable;
+
+  /// No description provided for @reportDetailCouldNotLoadSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load site.'**
+  String get reportDetailCouldNotLoadSite;
+
+  /// No description provided for @reportCardDeclineNoteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review note'**
+  String get reportCardDeclineNoteTitle;
+
+  /// No description provided for @reportListFilterChipSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} filter, {selected, plural, =1{selected} other{not selected}}'**
+  String reportListFilterChipSemantic(String label, int selected);
+
+  /// No description provided for @reportListFilterChipHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to filter reports by {label}.'**
+  String reportListFilterChipHint(String label);
+
+  /// No description provided for @reportReviewTitleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief headline'**
+  String get reportReviewTitleHint;
+
+  /// No description provided for @reportFlowCameraUnavailableSnack.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to open the camera right now. Please try again in a moment.'**
+  String get reportFlowCameraUnavailableSnack;
+
+  /// No description provided for @reportSemanticsLocationPinThenConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Location: pin, then confirm.'**
+  String get reportSemanticsLocationPinThenConfirm;
+
+  /// No description provided for @newReportTooltipAboutStep.
+  ///
+  /// In en, this message translates to:
+  /// **'About this step'**
+  String get newReportTooltipAboutStep;
+
+  /// No description provided for @newReportTooltipDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss'**
+  String get newReportTooltipDismiss;
+
+  /// No description provided for @reportFlowSubmitPhaseCreating.
+  ///
+  /// In en, this message translates to:
+  /// **'Creating…'**
+  String get reportFlowSubmitPhaseCreating;
+
+  /// No description provided for @reportFlowSubmitPhaseUploading.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading…'**
+  String get reportFlowSubmitPhaseUploading;
+
+  /// No description provided for @reportFlowSubmitPhaseSubmitting.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitting…'**
+  String get reportFlowSubmitPhaseSubmitting;
+
+  /// No description provided for @reportFormPrimarySemanticsHintSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to submit.'**
+  String get reportFormPrimarySemanticsHintSubmit;
+
+  /// No description provided for @reportFormPrimarySemanticsHintNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-tap to go to the next step.'**
+  String get reportFormPrimarySemanticsHintNext;
 
   /// No description provided for @reportCardSemanticLabel.
   ///
@@ -9785,6 +10133,148 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You are already a certified organizer. No need to take the quiz again.'**
   String get errorOrganizerCertificationAlreadyDone;
+
+  /// No description provided for @reportsSseReconnectBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting to live updates…'**
+  String get reportsSseReconnectBanner;
+
+  /// No description provided for @reportsSseReconnectAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnect'**
+  String get reportsSseReconnectAction;
+
+  /// No description provided for @reportsListMergedToast.
+  ///
+  /// In en, this message translates to:
+  /// **'This report was merged and removed from your list.'**
+  String get reportsListMergedToast;
+
+  /// No description provided for @reportDraftResumeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue your draft?'**
+  String get reportDraftResumeTitle;
+
+  /// No description provided for @reportDraftResumeBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{photoCount, plural, =0{No photos saved yet.} one{1 photo saved.} other{{photoCount} photos saved.}}\n\nTitle: \"{titlePreview}\"\n\nLast saved: {savedAt}.'**
+  String reportDraftResumeBody(
+    int photoCount,
+    String titlePreview,
+    String savedAt,
+  );
+
+  /// No description provided for @reportDraftResumeContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get reportDraftResumeContinue;
+
+  /// No description provided for @reportDraftResumeDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard draft'**
+  String get reportDraftResumeDiscard;
+
+  /// No description provided for @reportDraftSavedJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved just now'**
+  String get reportDraftSavedJustNow;
+
+  /// No description provided for @reportDraftSavedMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {minutes} min ago'**
+  String reportDraftSavedMinutesAgo(int minutes);
+
+  /// No description provided for @reportDraftSavedHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved {hours} h ago'**
+  String reportDraftSavedHoursAgo(int hours);
+
+  /// No description provided for @reportDraftPhotosLost.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 attached photo was missing and removed from your draft.} other{{count} attached photos were missing and removed from your draft.}}'**
+  String reportDraftPhotosLost(int count);
+
+  /// No description provided for @reportDraftDiscardConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard draft?'**
+  String get reportDraftDiscardConfirmTitle;
+
+  /// No description provided for @reportDraftDiscardConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your saved text and photos for this report will be deleted from this device.'**
+  String get reportDraftDiscardConfirmBody;
+
+  /// No description provided for @reportDraftCentralFabSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a saved draft'**
+  String get reportDraftCentralFabSheetTitle;
+
+  /// No description provided for @reportDraftCentralFabSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{photoCount, plural, =0{No photos} one{1 photo} other{{photoCount} photos}} · {savedAgo}'**
+  String reportDraftCentralFabSubtitle(int photoCount, String savedAgo);
+
+  /// No description provided for @reportDraftCentralFabContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue draft'**
+  String get reportDraftCentralFabContinue;
+
+  /// No description provided for @reportDraftCentralFabTakeNewPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take new photo'**
+  String get reportDraftCentralFabTakeNewPhoto;
+
+  /// No description provided for @reportDraftCentralFabCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get reportDraftCentralFabCancel;
+
+  /// No description provided for @reportDraftIncomingPhotoTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue draft or use this photo?'**
+  String get reportDraftIncomingPhotoTitle;
+
+  /// No description provided for @reportDraftIncomingPhotoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have a saved draft ({photoCount, plural, =0{no photos} one{1 photo} other{{photoCount} photos}}). {savedAgo}'**
+  String reportDraftIncomingPhotoBody(int photoCount, String savedAgo);
+
+  /// No description provided for @reportDraftIncomingPhotoContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue draft'**
+  String get reportDraftIncomingPhotoContinue;
+
+  /// No description provided for @reportDraftIncomingPhotoReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace draft'**
+  String get reportDraftIncomingPhotoReplace;
+
+  /// No description provided for @reportDraftIncomingPhotoAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to draft'**
+  String get reportDraftIncomingPhotoAdd;
 }
 
 class _AppLocalizationsDelegate

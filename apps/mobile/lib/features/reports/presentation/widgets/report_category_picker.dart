@@ -27,10 +27,13 @@ void showReportCategoryPicker(
           semanticLabel: l10n.semanticsClose,
           onTap: () => Navigator.of(context).pop(),
         ),
-        maxHeightFactor: 0.78,
-        child: ListView(
-          shrinkWrap: true,
-          physics: const BouncingScrollPhysics(),
+        maxHeightFactor: 0.95,
+        // One scrollable with chrome avoids nested ListView overscroll masks
+        // (white bands) clipping the first/last category rows.
+        scrollChromeWithBody: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ReportInfoBanner(
               title: l10n.reportCategoryPickerBannerTitle,

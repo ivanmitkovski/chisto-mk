@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
-import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/features/home/domain/models/comment.dart';
 import 'package:chisto_mobile/features/home/domain/models/pollution_site.dart';
@@ -12,6 +11,7 @@ import 'package:chisto_mobile/features/home/presentation/providers/repository_pr
 import 'package:chisto_mobile/features/home/presentation/providers/site_engagement_provider.dart';
 import 'package:chisto_mobile/features/home/presentation/utils/site_comment_mapping.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/comments_bottom_sheet.dart';
+import 'package:chisto_mobile/features/home/presentation/widgets/site_comments_modal_bottom_sheet.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/pollution_site_card_analytics.dart';
 import 'package:chisto_mobile/features/home/presentation/widgets/site_card/upvoters_sheet_content.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
@@ -69,97 +69,55 @@ Future<void> openPollutionSiteCardCommentsSheet({
 
   if (!context.mounted) return;
 
-  final DraggableScrollableController sheetController =
-      DraggableScrollableController();
-  await showModalBottomSheet<void>(
-    context: context,
-    useRootNavigator: true,
-    isScrollControlled: true,
-    isDismissible: true,
-    enableDrag: false,
-    useSafeArea: true,
-    barrierColor: AppColors.overlay,
-    backgroundColor: AppColors.transparent,
-    builder: (BuildContext sheetContext) {
-      final bool keyboardOpen =
-          MediaQuery.of(sheetContext).viewInsets.bottom > 0;
-      if (keyboardOpen) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (!sheetController.isAttached) return;
-          if (sheetController.size >= 0.94) return;
-          sheetController.animateTo(
-            0.95,
-            duration: AppMotion.medium,
-            curve: AppMotion.emphasized,
+  await showPollutionSiteCommentsModalBottomSheet(
+    context,
+    builder: (BuildContext sheetContext, ScrollController scrollController) {
+      return CommentsBottomSheet(
+        siteId: site.id,
+        comments: commentsForSheet,
+        siteTitle: site.title,
+        scrollController: scrollController,
+        onCommentsCountChanged: (int count) {
+          if (!sheetContext.mounted) return;
+          ref
+              .read(siteEngagementNotifierProvider(site.id).notifier)
+              .setCommentCount(count);
+        },
+        onCommentsChanged: (List<Comment> comments) {
+          if (!sheetContext.mounted) return;
+          onSessionCommentsChanged(comments);
+        },
+        onLoadMoreDirectReplies:
+            (String parentId, int page, String sort) async {
+          final SiteCommentsResult result =
+              await sitesRepository.getSiteComments(
+            site.id,
+            parentId: parentId,
+            page: page,
+            limit: 20,
+            sort: sort,
           );
-        });
-      }
-      return DraggableScrollableSheet(
-        controller: sheetController,
-        expand: false,
-        initialChildSize: keyboardOpen ? 0.95 : 0.74,
-        minChildSize: keyboardOpen ? 0.95 : 0.56,
-        maxChildSize: 0.95,
-        snap: !keyboardOpen,
-        snapSizes: keyboardOpen ? null : const <double>[0.74, 0.95],
-        builder: (BuildContext _, ScrollController scrollController) {
-          return Container(
-            decoration: const BoxDecoration(
-              color: AppColors.panelBackground,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(AppSpacing.radiusPill),
-              ),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: CommentsBottomSheet(
-              siteId: site.id,
-              comments: commentsForSheet,
-              siteTitle: site.title,
-              scrollController: scrollController,
-              onCommentsCountChanged: (int count) {
-                if (!sheetContext.mounted) return;
-                ref
-                    .read(siteEngagementNotifierProvider(site.id).notifier)
-                    .setCommentCount(count);
-              },
-              onCommentsChanged: (List<Comment> comments) {
-                if (!sheetContext.mounted) return;
-                onSessionCommentsChanged(comments);
-              },
-              onLoadMoreDirectReplies:
-                  (String parentId, int page, String sort) async {
-                final SiteCommentsResult result =
-                    await sitesRepository.getSiteComments(
-                  site.id,
-                  parentId: parentId,
-                  page: page,
-                  limit: 20,
-                  sort: sort,
-                );
-                return result.items.map(commentFromSiteCommentItem).toList();
-              },
-              onCommentSubmitted: (String text, String? parentId) {
-                return sitesRepository
-                    .createSiteComment(site.id, text, parentId: parentId)
-                    .then(commentFromSiteCommentItem);
-              },
-              onCommentEdited: (String commentId, String body) {
-                return sitesRepository.updateSiteComment(site.id, commentId, body);
-              },
-              onCommentDeleted: (String commentId) {
-                return sitesRepository.deleteSiteComment(site.id, commentId);
-              },
-              onCommentLikeToggled: (String commentId, bool shouldLike) {
-                return shouldLike
-                    ? sitesRepository
-                        .likeSiteComment(site.id, commentId)
-                        .then((_) {})
-                    : sitesRepository
-                        .unlikeSiteComment(site.id, commentId)
-                        .then((_) {});
-              },
-            ),
-          );
+          return result.items.map(commentFromSiteCommentItem).toList();
+        },
+        onCommentSubmitted: (String text, String? parentId) {
+          return sitesRepository
+              .createSiteComment(site.id, text, parentId: parentId)
+              .then(commentFromSiteCommentItem);
+        },
+        onCommentEdited: (String commentId, String body) {
+          return sitesRepository.updateSiteComment(site.id, commentId, body);
+        },
+        onCommentDeleted: (String commentId) {
+          return sitesRepository.deleteSiteComment(site.id, commentId);
+        },
+        onCommentLikeToggled: (String commentId, bool shouldLike) {
+          return shouldLike
+              ? sitesRepository
+                  .likeSiteComment(site.id, commentId)
+                  .then((_) {})
+              : sitesRepository
+                  .unlikeSiteComment(site.id, commentId)
+                  .then((_) {});
         },
       );
     },

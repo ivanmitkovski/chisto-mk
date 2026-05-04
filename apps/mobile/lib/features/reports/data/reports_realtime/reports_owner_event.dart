@@ -35,8 +35,8 @@ class ReportsOwnerEvent {
     final int? occurred = occurredAtMs is int
         ? occurredAtMs
         : occurredAtMs is num
-            ? occurredAtMs.toInt()
-            : null;
+        ? occurredAtMs.toInt()
+        : null;
     if (occurred == null) return null;
 
     String mutationKind = 'updated';
@@ -59,4 +59,3 @@ class ReportsOwnerEvent {
     );
   }
 }
-

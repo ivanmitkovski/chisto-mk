@@ -1,7 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { ReportStatus } from '../../prisma-client';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsInt,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+  Max,
+  Min,
+} from 'class-validator';
 
 export class ListReportsQueryDto {
   @ApiPropertyOptional({ enum: ReportStatus })
@@ -15,6 +25,10 @@ export class ListReportsQueryDto {
   })
   @IsOptional()
   @IsString()
+  @Length(20, 40)
+  @Matches(/^[A-Za-z0-9_-]+$/, {
+    message: 'siteId must be an alphanumeric id (e.g. CUID)',
+  })
   siteId?: string;
 
   @ApiPropertyOptional({

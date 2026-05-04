@@ -26,7 +26,7 @@ export class PointHistoryItemDto {
 
   @ApiProperty({
     description:
-      'Machine reason (e.g. FIRST_REPORT, EVENT_JOINED, EVENT_CHECK_IN, EVENT_COMPLETED, EVENT_ORGANIZER_APPROVED)',
+      'Machine reason (e.g. REPORT_APPROVED, REPORT_APPROVAL_REVOKED, REPORT_SUBMITTED legacy, FIRST_REPORT legacy, EVENT_JOINED, EVENT_CHECK_IN)',
   })
   reasonCode!: string;
 

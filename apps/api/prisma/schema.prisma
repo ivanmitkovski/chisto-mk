@@ -361,6 +361,33 @@ model ReportSubmitIdempotency {
   @@index([createdAt])
 }
 
+/// Async-capable outbox for post-commit report side effects (merge notifications, audit, S3, WS).
+enum ReportSideEffectKind {
+  MERGE_DUPLICATE_POST
+  MODERATION_STATUS_POST
+}
+
+enum ReportSideEffectStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model ReportSideEffect {
+  id          String                 @id @default(cuid())
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  kind        ReportSideEffectKind
+  status      ReportSideEffectStatus @default(PENDING)
+  payload     Json
+  attempts    Int                    @default(0)
+  lastError   String?
+  processedAt DateTime?
+
+  @@index([status, createdAt])
+}
+
 model SystemConfig {
   id        String   @id @default(cuid())
   createdAt DateTime @default(now())

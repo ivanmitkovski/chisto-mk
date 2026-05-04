@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:chisto_mobile/core/auth/auth_state.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
+import 'package:chisto_mobile/core/network/connectivity_gate.dart';
 import 'package:chisto_mobile/features/home/data/engagement_outbox_store.dart';
 import 'package:chisto_mobile/features/home/domain/repositories/sites_repository.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -40,12 +41,12 @@ class EngagementOutboxCoordinator {
       return;
     }
     _instance = EngagementOutboxCoordinator._(sitesRepository, authState);
-    await _instance!._flushIfOnline(await Connectivity().checkConnectivity());
-    _subscription = Connectivity().onConnectivityChanged.listen(
-      (List<ConnectivityResult> results) {
-        unawaited(_instance?._flushIfOnline(results));
-      },
-    );
+    await _instance!._flushIfOnline(await ConnectivityGate.check());
+    _subscription = ConnectivityGate.watch().listen((
+      List<ConnectivityResult> results,
+    ) {
+      unawaited(_instance?._flushIfOnline(results));
+    });
   }
 
   static void dispose() {
@@ -65,9 +66,7 @@ class EngagementOutboxCoordinator {
       if (inst == null) {
         return;
       }
-      unawaited(
-        Connectivity().checkConnectivity().then(inst._flushIfOnline),
-      );
+      unawaited(Connectivity().checkConnectivity().then(inst._flushIfOnline));
     });
   }
 
@@ -78,8 +77,9 @@ class EngagementOutboxCoordinator {
     if (!_auth.isAuthenticated) {
       return;
     }
-    final List<EngagementOutboxEntry> pending =
-        await EngagementOutboxStore.instance.peek();
+    final List<EngagementOutboxEntry> pending = await EngagementOutboxStore
+        .instance
+        .peek();
     bool hadRetryableSkip = false;
     for (final EngagementOutboxEntry e in pending) {
       try {
@@ -100,7 +100,9 @@ class EngagementOutboxCoordinator {
         await EngagementOutboxStore.instance.removeById(e.id);
       } on AppError catch (err) {
         if (err.retryable) {
-          await EngagementOutboxStore.instance.recordRetryableFlushFailure(e.id);
+          await EngagementOutboxStore.instance.recordRetryableFlushFailure(
+            e.id,
+          );
           hadRetryableSkip = true;
           continue;
         }

@@ -8,6 +8,7 @@ import { EventEvidenceKind } from '../prisma-client';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import { PrismaService } from '../prisma/prisma.service';
 import { ReportsUploadService } from '../reports/reports-upload.service';
+import { EventsCleanupMediaUploadService } from './events-cleanup-media-upload.service';
 import { visibilityWhere } from './events-query.include';
 
 const MAX_EVIDENCE_PHOTOS_PER_EVENT = 32;
@@ -31,6 +32,7 @@ export class EventEvidenceService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly uploads: ReportsUploadService,
+    private readonly cleanupMediaUpload: EventsCleanupMediaUploadService,
   ) {}
 
   async listForEvent(eventId: string, user: AuthenticatedUser) {
@@ -111,7 +113,7 @@ export class EventEvidenceService {
       });
     }
 
-    const [key] = await this.uploads.uploadCleanupEventAfterImages(user.userId, eventId, [
+    const [key] = await this.cleanupMediaUpload.uploadCleanupEventAfterImages(user.userId, eventId, [
       {
         buffer: file.buffer,
         mimetype: file.mimetype,

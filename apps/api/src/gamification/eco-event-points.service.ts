@@ -7,6 +7,7 @@ export type EcoEventPointsCreditParams = {
   reasonCode: string;
   referenceType: string;
   referenceId: string;
+  metadata?: Prisma.InputJsonValue;
 };
 
 export type EcoEventPointsDebitParams = {
@@ -38,7 +39,7 @@ export class EcoEventPointsService {
     tx: Prisma.TransactionClient,
     params: EcoEventPointsCreditParams,
   ): Promise<number> {
-    const { userId, delta, reasonCode, referenceType, referenceId } = params;
+    const { userId, delta, reasonCode, referenceType, referenceId, metadata } = params;
     if (delta <= 0) {
       return 0;
     }
@@ -76,6 +77,7 @@ export class EcoEventPointsService {
           reasonCode,
           referenceType,
           referenceId,
+          ...(metadata !== undefined ? { metadata } : {}),
         },
       });
     } catch (err: unknown) {

@@ -35,14 +35,18 @@ class StageChip extends StatelessWidget {
     final Color foreground = isCurrent
         ? AppColors.textPrimary
         : isComplete
-            ? AppColors.primaryDark
-            : AppColors.textMuted;
+        ? AppColors.primaryDark
+        : AppColors.textMuted;
 
-    final String statusText =
-        isComplete ? 'Complete' : isCurrent ? 'Current' : 'Incomplete';
+    final String statusText = isComplete
+        ? 'Complete'
+        : isCurrent
+        ? 'Current'
+        : 'Incomplete';
     final String stepLabel = 'Step ${stepIndex + 1} of $totalSteps, $label';
-    final String hint =
-        isEnabled ? 'Double-tap to go to $label' : 'Complete previous steps first.';
+    final String hint = isEnabled
+        ? 'Double-tap to go to $label'
+        : 'Complete previous steps first.';
     return Semantics(
       button: true,
       label: '$stepLabel. $statusText.',
@@ -88,10 +92,11 @@ class StageChip extends StatelessWidget {
                         Flexible(
                           child: MediaQuery(
                             data: MediaQuery.of(context).copyWith(
-                              textScaler: MediaQuery.textScalerOf(context).clamp(
-                                minScaleFactor: 0.85,
-                                maxScaleFactor: 1.25,
-                              ),
+                              textScaler: MediaQuery.textScalerOf(context)
+                                  .clamp(
+                                    minScaleFactor: 0.85,
+                                    maxScaleFactor: 1.25,
+                                  ),
                             ),
                             child: FittedBox(
                               fit: BoxFit.scaleDown,

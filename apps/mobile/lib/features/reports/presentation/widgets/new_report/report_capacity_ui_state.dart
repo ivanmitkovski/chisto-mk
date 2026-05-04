@@ -34,6 +34,7 @@ class ReportCapacityUiState {
 ReportCapacityUiState mapReportCapacityToUiState(
   ReportCapacity capacity, {
   required AppLocalizations l10n,
+
   /// Localized date/time phrase when emergency unlocks (e.g. from [DateFormat]); overrides generic retry text in cooldown.
   String? nextEmergencyAvailableDescription,
 }) {
@@ -72,8 +73,7 @@ ReportCapacityUiState mapReportCapacityToUiState(
       pillTone: ReportSurfaceTone.warning,
       pillIcon: Icons.warning_amber_rounded,
       bannerTitle: l10n.reportCapacityBannerEmergencyTitle,
-      bannerMessage:
-          l10n.reportCapacityBannerEmergencyBody(unlockHint),
+      bannerMessage: l10n.reportCapacityBannerEmergencyBody(unlockHint),
       bannerTone: ReportSurfaceTone.warning,
       bannerIcon: Icons.warning_amber_rounded,
       reviewMessage: l10n.reportCapacityReviewEmergency(unlockHint),
@@ -84,26 +84,20 @@ ReportCapacityUiState mapReportCapacityToUiState(
   final String retryLine = trimmedNext != null && trimmedNext.isNotEmpty
       ? l10n.reportCapacityCooldownRetryOnDate(trimmedNext)
       : retryAfterSeconds != null && retryAfterSeconds > 0
-          ? l10n.reportCapacityCooldownTryAgainInAbout(
-              formatReportCapacityRetryDuration(l10n, retryAfterSeconds),
-            )
-          : l10n.reportCapacityCooldownStillWaiting;
+      ? l10n.reportCapacityCooldownTryAgainInAbout(
+          formatReportCapacityRetryDuration(l10n, retryAfterSeconds),
+        )
+      : l10n.reportCapacityCooldownStillWaiting;
   return ReportCapacityUiState(
     kind: ReportCapacityUiKind.cooldown,
     pillLabel: l10n.reportCapacityPillCooldown,
     pillTone: ReportSurfaceTone.danger,
     pillIcon: Icons.timer_off_rounded,
     bannerTitle: l10n.reportCapacityBannerCooldownTitle,
-    bannerMessage: l10n.reportCapacityBannerCooldownBody(
-      retryLine,
-      unlockHint,
-    ),
+    bannerMessage: l10n.reportCapacityBannerCooldownBody(retryLine, unlockHint),
     bannerTone: ReportSurfaceTone.danger,
     bannerIcon: Icons.timer_off_rounded,
-    reviewMessage: l10n.reportCapacityReviewCooldown(
-      retryLine,
-      unlockHint,
-    ),
+    reviewMessage: l10n.reportCapacityReviewCooldown(retryLine, unlockHint),
   );
 }
 

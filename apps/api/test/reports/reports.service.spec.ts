@@ -1,6 +1,8 @@
 /// <reference types="jest" />
-import { ReportsService } from '../../src/reports/reports.service';
+import { ReportCitizenQueryService } from '../../src/reports/report-citizen-query.service';
+import { ReportSubmitService } from '../../src/reports/report-submit.service';
 import { ReportCapacityService } from '../../src/reports/report-capacity.service';
+import { ReportsService } from '../../src/reports/reports.service';
 import { Role } from '../../src/prisma-client';
 
 function makeService(overrides?: {
@@ -24,6 +26,9 @@ function makeService(overrides?: {
     adminNotification: {
       create: jest.fn(),
     },
+    pointTransaction: {
+      findFirst: jest.fn().mockResolvedValue(null),
+    },
     user: {
       updateMany: jest.fn().mockResolvedValue({ count: 0 }),
       findUnique: jest.fn().mockResolvedValue({
@@ -42,21 +47,27 @@ function makeService(overrides?: {
     signUrls: jest.fn(),
     deleteReportMediaUrls: jest.fn().mockResolvedValue(0),
     tryExtractReportMediaObjectKeyFromUrl: jest.fn(),
+    assertReportMediaUrlsFromOurBucket: jest.fn(),
   };
-  const reportEventsService = { emitReportCreated: jest.fn(), emitReportStatusUpdated: jest.fn() };
-  const notificationEventsService = { emitNotificationCreated: jest.fn() };
-  const siteEventsService = { emitSiteCreated: jest.fn(), emitSiteUpdated: jest.fn() };
-  const reportsOwnerEventsService = { emit: jest.fn() };
+  const reportsOwnerEventsService = { emit: jest.fn(), emitToReportInterestedParties: jest.fn() };
+  const postCreateEvents = { emit: jest.fn() };
 
   const reportCapacity = new ReportCapacityService(prisma as never);
+  const nearbySiteResolver = { resolveEarliestReportAnchor: jest.fn().mockResolvedValue(null) };
+  const reportSubmit = new ReportSubmitService(
+    prisma as never,
+    postCreateEvents as never,
+    reportsOwnerEventsService as never,
+    reportCapacity,
+    reportsUploadService as never,
+    nearbySiteResolver as never,
+  );
+  const reportCitizenQuery = new ReportCitizenQueryService(prisma as never, reportsUploadService as never);
 
   const service = new ReportsService(
     prisma as never,
-    reportsUploadService as never,
-    reportEventsService as never,
-    notificationEventsService as never,
-    siteEventsService as never,
-    reportsOwnerEventsService as never,
+    reportSubmit,
+    reportCitizenQuery,
     reportCapacity,
     {} as never,
     {} as never,
@@ -186,4 +197,3 @@ describe('ReportsService createWithLocation payload', () => {
     });
   });
 });
-

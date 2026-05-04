@@ -1,0 +1,459 @@
+lib/features/reports/data/api_reports_json_wrappers.dart:12:data
+lib/features/reports/data/api_reports_json_wrappers.dart:15:mediaUrls
+lib/features/reports/data/api_reports_json_wrappers.dart:16:title
+lib/features/reports/data/api_reports_json_wrappers.dart:26:https:$s
+lib/features/reports/data/api_reports_json_wrappers.dart:32:mediaUrls
+lib/features/reports/data/api_reports_json_wrappers.dart:32:media_urls
+lib/features/reports/data/api_reports_json_wrappers.dart:3:data
+lib/features/reports/data/api_reports_json_wrappers.dart:45:href
+lib/features/reports/data/api_reports_json_wrappers.dart:45:url
+lib/features/reports/data/api_reports_json_wrappers.dart:4:reportId
+lib/features/reports/data/api_reports_mappers.dart:12:category
+lib/features/reports/data/api_reports_mappers.dart:13:severity
+lib/features/reports/data/api_reports_mappers.dart:14:cleanupEffort
+lib/features/reports/data/api_reports_mappers.dart:16:co_reporter
+lib/features/reports/data/api_reports_mappers.dart:16:viewerRole
+lib/features/reports/data/api_reports_mappers.dart:21:reportNumber
+lib/features/reports/data/api_reports_mappers.dart:22:title
+lib/features/reports/data/api_reports_mappers.dart:23:description
+lib/features/reports/data/api_reports_mappers.dart:24:location
+lib/features/reports/data/api_reports_mappers.dart:27:isPotentialDuplicate
+lib/features/reports/data/api_reports_mappers.dart:28:coReporterCount
+lib/features/reports/data/api_reports_mappers.dart:30:pointsAwarded
+lib/features/reports/data/api_reports_mappers.dart:39:status
+lib/features/reports/data/api_reports_mappers.dart:41:submittedAt
+lib/features/reports/data/api_reports_mappers.dart:43:site
+lib/features/reports/data/api_reports_mappers.dart:47:latitude
+lib/features/reports/data/api_reports_mappers.dart:48:longitude
+lib/features/reports/data/api_reports_mappers.dart:49:description
+lib/features/reports/data/api_reports_mappers.dart:50:address
+lib/features/reports/data/api_reports_mappers.dart:54:coReporterNames
+lib/features/reports/data/api_reports_mappers.dart:56:category
+lib/features/reports/data/api_reports_mappers.dart:57:severity
+lib/features/reports/data/api_reports_mappers.dart:58:cleanupEffort
+lib/features/reports/data/api_reports_mappers.dart:60:co_reporter
+lib/features/reports/data/api_reports_mappers.dart:60:viewerRole
+lib/features/reports/data/api_reports_mappers.dart:65:reportNumber
+lib/features/reports/data/api_reports_mappers.dart:67:title
+lib/features/reports/data/api_reports_mappers.dart:68:description
+lib/features/reports/data/api_reports_mappers.dart:72:location
+lib/features/reports/data/api_reports_mappers.dart:73:reporterName
+lib/features/reports/data/api_reports_mappers.dart:75:pointsAwarded
+lib/features/reports/data/api_reports_mappers.dart:7:status
+lib/features/reports/data/api_reports_mappers.dart:9:submittedAt
+lib/features/reports/data/api_reports_multipart.dart:11:.png
+lib/features/reports/data/api_reports_multipart.dart:12:.webp
+lib/features/reports/data/api_reports_multipart.dart:13:.jpeg
+lib/features/reports/data/api_reports_multipart.dart:13:.jpg
+lib/features/reports/data/api_reports_multipart.dart:19:.png
+lib/features/reports/data/api_reports_multipart.dart:19:report_$index.png
+lib/features/reports/data/api_reports_multipart.dart:20:.webp
+lib/features/reports/data/api_reports_multipart.dart:20:report_$index.webp
+lib/features/reports/data/api_reports_multipart.dart:21:report_$index.jpg
+lib/features/reports/data/api_reports_multipart.dart:38:files
+lib/features/reports/data/api_reports_multipart.dart:51:data
+lib/features/reports/data/api_reports_multipart.dart:52:urls
+lib/features/reports/data/api_reports_multipart.dart:55:urls
+lib/features/reports/data/api_reports_repository.dart:102:Idempotency-Key
+lib/features/reports/data/api_reports_repository.dart:105:/reports
+lib/features/reports/data/api_reports_repository.dart:112:reportId
+lib/features/reports/data/api_reports_repository.dart:115:Server response missing report id; cannot upload photos.
+lib/features/reports/data/api_reports_repository.dart:118:pointsBreakdown
+lib/features/reports/data/api_reports_repository.dart:125:code
+lib/features/reports/data/api_reports_repository.dart:126:points
+lib/features/reports/data/api_reports_repository.dart:137:reportNumber
+lib/features/reports/data/api_reports_repository.dart:138:siteId
+lib/features/reports/data/api_reports_repository.dart:139:isNewSite
+lib/features/reports/data/api_reports_repository.dart:140:pointsAwarded
+lib/features/reports/data/api_reports_repository.dart:153:reports_api
+lib/features/reports/data/api_reports_repository.dart:154:getMyReports start
+lib/features/reports/data/api_reports_repository.dart:155:limit
+lib/features/reports/data/api_reports_repository.dart:155:page
+lib/features/reports/data/api_reports_repository.dart:159:/reports/me?page=$page&limit=$limit
+lib/features/reports/data/api_reports_repository.dart:164:data
+lib/features/reports/data/api_reports_repository.dart:170:reports_api
+lib/features/reports/data/api_reports_repository.dart:171:getMyReports ok
+lib/features/reports/data/api_reports_repository.dart:173:status
+lib/features/reports/data/api_reports_repository.dart:174:count
+lib/features/reports/data/api_reports_repository.dart:179:total
+lib/features/reports/data/api_reports_repository.dart:180:page
+lib/features/reports/data/api_reports_repository.dart:181:limit
+lib/features/reports/data/api_reports_repository.dart:185:reports_api
+lib/features/reports/data/api_reports_repository.dart:186:getMyReports error
+lib/features/reports/data/api_reports_repository.dart:187:type
+lib/features/reports/data/api_reports_repository.dart:195:/reports/$id
+lib/features/reports/data/api_reports_repository.dart:203:/reports/capacity
+lib/features/reports/data/api_reports_repository.dart:208:nextEmergencyReportAvailableAt
+lib/features/reports/data/api_reports_repository.dart:210:creditsAvailable
+lib/features/reports/data/api_reports_repository.dart:211:emergencyAvailable
+lib/features/reports/data/api_reports_repository.dart:212:emergencyWindowDays
+lib/features/reports/data/api_reports_repository.dart:213:retryAfterSeconds
+lib/features/reports/data/api_reports_repository.dart:218:unlockHint
+lib/features/reports/data/api_reports_repository.dart:219:Join and verify attendance, or create an eco action to unlock more reports.
+lib/features/reports/data/api_reports_repository.dart:28:No readable photo files to upload.
+lib/features/reports/data/api_reports_repository.dart:31:/reports/upload
+lib/features/reports/data/api_reports_repository.dart:39:Server returned no image URLs.
+lib/features/reports/data/api_reports_repository.dart:54:No readable photo files to upload.
+lib/features/reports/data/api_reports_repository.dart:57:/reports/$reportId/media
+lib/features/reports/data/api_reports_repository.dart:77:latitude
+lib/features/reports/data/api_reports_repository.dart:78:longitude
+lib/features/reports/data/api_reports_repository.dart:79:title
+lib/features/reports/data/api_reports_repository.dart:82:description
+lib/features/reports/data/api_reports_repository.dart:85:mediaUrls
+lib/features/reports/data/api_reports_repository.dart:88:category
+lib/features/reports/data/api_reports_repository.dart:91:severity
+lib/features/reports/data/api_reports_repository.dart:95:address
+lib/features/reports/data/api_reports_repository.dart:98:cleanupEffort
+lib/features/reports/data/outbox/report_draft_json_codec.dart:21:draftCodecVersion
+lib/features/reports/data/outbox/report_draft_json_codec.dart:22:title
+lib/features/reports/data/outbox/report_draft_json_codec.dart:23:description
+lib/features/reports/data/outbox/report_draft_json_codec.dart:24:latitude
+lib/features/reports/data/outbox/report_draft_json_codec.dart:25:longitude
+lib/features/reports/data/outbox/report_draft_json_codec.dart:26:address
+lib/features/reports/data/outbox/report_draft_json_codec.dart:27:severity
+lib/features/reports/data/outbox/report_draft_json_codec.dart:28:category
+lib/features/reports/data/outbox/report_draft_json_codec.dart:29:cleanupEffort
+lib/features/reports/data/outbox/report_draft_json_codec.dart:30:photos
+lib/features/reports/data/outbox/report_draft_json_codec.dart:44:photos
+lib/features/reports/data/outbox/report_draft_json_codec.dart:53:category
+lib/features/reports/data/outbox/report_draft_json_codec.dart:58:title
+lib/features/reports/data/outbox/report_draft_json_codec.dart:59:description
+lib/features/reports/data/outbox/report_draft_json_codec.dart:60:latitude
+lib/features/reports/data/outbox/report_draft_json_codec.dart:61:longitude
+lib/features/reports/data/outbox/report_draft_json_codec.dart:62:address
+lib/features/reports/data/outbox/report_draft_json_codec.dart:63:cleanupEffort
+lib/features/reports/data/outbox/report_draft_json_codec.dart:64:severity
+lib/features/reports/data/outbox/report_draft_json_codec.dart:66:title
+lib/features/reports/data/outbox/report_draft_json_codec.dart:67:description
+lib/features/reports/data/outbox/report_draft_photo_store.dart:16:report_draft_media
+lib/features/reports/data/outbox/report_draft_photo_store.dart:43:$relativeRoot${p.separator}
+lib/features/reports/data/outbox/report_draft_photo_store.dart:54:.jpg
+lib/features/reports/data/outbox/report_draft_photo_store.dart:56:${DateTime.now().microsecondsSinceEpoch}_${Random().nextInt(1 << 30)}$ext
+lib/features/reports/data/outbox/report_draft_photo_store.dart:74:report_draft
+lib/features/reports/data/outbox/report_draft_photo_store.dart:75:delete_photo_failed
+lib/features/reports/data/outbox/report_draft_photo_store.dart:76:error
+lib/features/reports/data/outbox/report_draft_repository.dart:138:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:139:summary_refresh_failed
+lib/features/reports/data/outbox/report_draft_repository.dart:140:error
+lib/features/reports/data/outbox/report_draft_repository.dart:170:${title.substring(0, 45)}…
+lib/features/reports/data/outbox/report_draft_repository.dart:189:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:189:restore_empty
+lib/features/reports/data/outbox/report_draft_repository.dart:240:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:240:restore_empty
+lib/features/reports/data/outbox/report_draft_repository.dart:24:evidence
+lib/features/reports/data/outbox/report_draft_repository.dart:261:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:262:restore_photos_pruned
+lib/features/reports/data/outbox/report_draft_repository.dart:263:count
+lib/features/reports/data/outbox/report_draft_repository.dart:268:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:269:restore_legacy_paths_migrated
+lib/features/reports/data/outbox/report_draft_repository.dart:270:count
+lib/features/reports/data/outbox/report_draft_repository.dart:273:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:273:restore_loaded
+lib/features/reports/data/outbox/report_draft_repository.dart:281:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:282:restore_failed
+lib/features/reports/data/outbox/report_draft_repository.dart:283:error
+lib/features/reports/data/outbox/report_draft_repository.dart:351:photo_added
+lib/features/reports/data/outbox/report_draft_repository.dart:351:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:359:photo_removed
+lib/features/reports/data/outbox/report_draft_repository.dart:359:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:373:clear
+lib/features/reports/data/outbox/report_draft_repository.dart:373:report_draft
+lib/features/reports/data/outbox/report_draft_repository.dart:380:idem_$kReportWizardDraftRowId
+lib/features/reports/data/outbox/report_draft_repository.dart:394:clear
+lib/features/reports/data/outbox/report_draft_repository.dart:394:report_draft
+lib/features/reports/data/outbox/report_outbox_constants.dart:2:local_report_draft_v1
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:128:An in-flight report submission already exists.
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:142:Report draft row could not be created.
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:160:report_outbox
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:161:enqueued
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:198:offline_wait
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:198:report_outbox
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:275:report_outbox
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:276:submit_ok
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:277:reportId
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:286:idem_$kReportWizardDraftRowId
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:317:report_outbox
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:317:submit_err
+lib/features/reports/data/outbox/report_outbox_coordinator.dart:70:Submission failed
+lib/features/reports/data/outbox/report_outbox_database.dart:10:report_outbox
+lib/features/reports/data/outbox/report_outbox_database.dart:14:$dir/$_dbName
+lib/features/reports/data/outbox/report_outbox_database.dart:39:CREATE INDEX idx_report_outbox_state ON $tableOutbox (state, updated_at_ms)
+lib/features/reports/data/outbox/report_outbox_database.dart:45:ALTER TABLE $tableOutbox ADD COLUMN submit_requested INTEGER NOT NULL DEFAULT 1
+lib/features/reports/data/outbox/report_outbox_database.dart:50:ALTER TABLE $tableOutbox ADD COLUMN current_stage TEXT
+lib/features/reports/data/outbox/report_outbox_database.dart:53:ALTER TABLE $tableOutbox ADD COLUMN attempted_stages_json TEXT
+lib/features/reports/data/outbox/report_outbox_database.dart:56:ALTER TABLE $tableOutbox ADD COLUMN last_persisted_at_ms INTEGER
+lib/features/reports/data/outbox/report_outbox_database.dart:8:chisto_reports_outbox.db
+lib/features/reports/data/outbox/report_outbox_error_classifier.dart:32:retryAfterSeconds
+lib/features/reports/data/outbox/report_outbox_error_classifier.dart:36:nextEmergencyReportAvailableAt
+lib/features/reports/data/outbox/report_outbox_migration_from_sp.dart:14:reports_outbox_sp_migration_v1_done
+lib/features/reports/data/outbox/report_outbox_migration_from_sp.dart:51:report_draft
+lib/features/reports/data/outbox/report_outbox_migration_from_sp.dart:52:migration_sp_imported
+lib/features/reports/data/outbox/report_outbox_migration_from_sp.dart:53:hasPhotos
+lib/features/reports/data/outbox/report_outbox_repository.dart:118:idempotency_key
+lib/features/reports/data/outbox/report_outbox_repository.dart:119:draft_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:120:state
+lib/features/reports/data/outbox/report_outbox_repository.dart:121:submit_requested
+lib/features/reports/data/outbox/report_outbox_repository.dart:122:media_urls_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:126:attempt_count
+lib/features/reports/data/outbox/report_outbox_repository.dart:127:last_error_code
+lib/features/reports/data/outbox/report_outbox_repository.dart:128:last_error_message
+lib/features/reports/data/outbox/report_outbox_repository.dart:129:cooldown_until_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:130:report_id
+lib/features/reports/data/outbox/report_outbox_repository.dart:131:created_at_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:132:updated_at_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:133:current_stage
+lib/features/reports/data/outbox/report_outbox_repository.dart:134:attempted_stages_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:137:last_persisted_at_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:180:cooldown
+lib/features/reports/data/outbox/report_outbox_repository.dart:180:pending
+lib/features/reports/data/outbox/report_outbox_repository.dart:180:submitting
+lib/features/reports/data/outbox/report_outbox_repository.dart:180:uploading
+lib/features/reports/data/outbox/report_outbox_repository.dart:183:cooldown
+lib/features/reports/data/outbox/report_outbox_repository.dart:183:submitting
+lib/features/reports/data/outbox/report_outbox_repository.dart:183:uploading
+lib/features/reports/data/outbox/report_outbox_repository.dart:184:pending
+lib/features/reports/data/outbox/report_outbox_repository.dart:207:cooldown
+lib/features/reports/data/outbox/report_outbox_repository.dart:207:submitting
+lib/features/reports/data/outbox/report_outbox_repository.dart:207:uploading
+lib/features/reports/data/outbox/report_outbox_repository.dart:208:pending
+lib/features/reports/data/outbox/report_outbox_repository.dart:217:SELECT COUNT(*) AS c FROM ${ReportOutboxDatabase.tableOutbox}
+lib/features/reports/data/outbox/report_outbox_repository.dart:241:idem_$kReportWizardDraftRowId
+lib/features/reports/data/outbox/report_outbox_repository.dart:49:submit_requested
+lib/features/reports/data/outbox/report_outbox_repository.dart:60:draft_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:63:media_urls_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:73:idempotency_key
+lib/features/reports/data/outbox/report_outbox_repository.dart:79:state
+lib/features/reports/data/outbox/report_outbox_repository.dart:80:attempt_count
+lib/features/reports/data/outbox/report_outbox_repository.dart:81:last_error_code
+lib/features/reports/data/outbox/report_outbox_repository.dart:82:last_error_message
+lib/features/reports/data/outbox/report_outbox_repository.dart:83:cooldown_until_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:84:report_id
+lib/features/reports/data/outbox/report_outbox_repository.dart:85:created_at_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:86:updated_at_ms
+lib/features/reports/data/outbox/report_outbox_repository.dart:87:current_stage
+lib/features/reports/data/outbox/report_outbox_repository.dart:89:attempted_stages_json
+lib/features/reports/data/outbox/report_outbox_repository.dart:91:last_persisted_at_ms
+lib/features/reports/data/outbox/report_outbox_upload_phase.dart:60:report_outbox
+lib/features/reports/data/outbox/report_outbox_upload_phase.dart:61:upload_ok
+lib/features/reports/data/outbox/report_outbox_upload_phase.dart:87:$err
+lib/features/reports/data/report_draft_local_store.dart:12:Use ReportOutboxRepository / SQLite outbox only
+lib/features/reports/data/report_draft_local_store.dart:16:chisto_report_draft_v1
+lib/features/reports/data/report_draft_local_store.dart:30:title
+lib/features/reports/data/report_draft_local_store.dart:31:description
+lib/features/reports/data/report_draft_local_store.dart:32:latitude
+lib/features/reports/data/report_draft_local_store.dart:33:longitude
+lib/features/reports/data/report_draft_local_store.dart:34:address
+lib/features/reports/data/report_draft_local_store.dart:35:severity
+lib/features/reports/data/report_draft_local_store.dart:36:category
+lib/features/reports/data/report_draft_local_store.dart:37:cleanupEffort
+lib/features/reports/data/report_draft_local_store.dart:38:photos
+lib/features/reports/data/report_draft_local_store.dart:54:photos
+lib/features/reports/data/report_draft_local_store.dart:63:category
+lib/features/reports/data/report_draft_local_store.dart:67:title
+lib/features/reports/data/report_draft_local_store.dart:68:description
+lib/features/reports/data/report_draft_local_store.dart:69:latitude
+lib/features/reports/data/report_draft_local_store.dart:70:longitude
+lib/features/reports/data/report_draft_local_store.dart:71:address
+lib/features/reports/data/report_draft_local_store.dart:72:cleanupEffort
+lib/features/reports/data/report_draft_local_store.dart:73:severity
+lib/features/reports/data/report_flow_preferences.dart:7:report_flow_seen_help_hint_v1
+lib/features/reports/data/report_image_prefetch_coordinator.dart:112:reports_prefetch
+lib/features/reports/data/report_image_prefetch_coordinator.dart:113:warmList finished
+lib/features/reports/data/report_image_prefetch_coordinator.dart:114:rows
+lib/features/reports/data/report_image_prefetch_coordinator.dart:130:reports_prefetch
+lib/features/reports/data/report_image_prefetch_coordinator.dart:131:warmDetail skipped_cellular_data_saver
+lib/features/reports/data/report_image_prefetch_coordinator.dart:132:reportId
+lib/features/reports/data/report_image_prefetch_coordinator.dart:154:reports_prefetch
+lib/features/reports/data/report_image_prefetch_coordinator.dart:155:warmDetail finished
+lib/features/reports/data/report_image_prefetch_coordinator.dart:156:reportId
+lib/features/reports/data/report_image_prefetch_coordinator.dart:156:urls
+lib/features/reports/data/report_image_prefetch_coordinator.dart:59:reports_prefetch
+lib/features/reports/data/report_image_prefetch_coordinator.dart:60:warmList skipped_cellular_data_saver
+lib/features/reports/data/report_photo_upload_prep.dart:24:${tempDir.path}/$kReportUploadTempMarker${ts}_$index.jpg
+lib/features/reports/data/report_photo_upload_prep.dart:7:chisto_report_upload_
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:21:eventId
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:22:type
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:23:ownerId
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:24:reportId
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:25:occurredAtMs
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:26:mutation
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:42:updated
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:45:kind
+lib/features/reports/data/reports_realtime/reports_owner_event.dart:47:status
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:113:$_baseUrl/reports-owner
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:121:websocket
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:122:polling
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:122:websocket
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:130:token
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:142:[reports-owner:ws] connect host=$debugHost
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:147:reports_realtime
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:147:ws_connected
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:156:[reports-owner:ws] reconnectAttempt host=$debugHost
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:167:[reports-owner:ws] connect_error host=$debugHost type=${data.runtimeType}
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:178:[reports-owner:ws] reconnect_error host=$debugHost type=${data.runtimeType}
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:184:[reports-owner:ws] disconnect host=$debugHost
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:194:[reports-owner:ws] engine error host=$debugHost type=${err.runtimeType}
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:202:error
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:203:code
+lib/features/reports/data/reports_realtime/reports_owner_socket_stream.dart:214:report_event
+lib/features/reports/data/reports_realtime/reports_realtime_logger.dart:11:ReportsRealtime
+lib/features/reports/domain/models/report_draft.dart:42:Illegal landfill
+lib/features/reports/domain/models/report_draft.dart:43:Water pollution
+lib/features/reports/domain/models/report_draft.dart:44:Air pollution
+lib/features/reports/domain/models/report_draft.dart:45:Industrial waste
+lib/features/reports/domain/models/report_draft.dart:46:Other
+lib/features/reports/domain/models/report_draft.dart:87:1–2 people
+lib/features/reports/domain/models/report_draft.dart:88:3–5 people
+lib/features/reports/domain/models/report_draft.dart:89:6–10 people
+lib/features/reports/domain/models/report_draft.dart:90:10+ people
+lib/features/reports/domain/models/report_draft.dart:91:Not sure
+lib/features/reports/presentation/controllers/new_report_controller.dart:130:incoming_photo_choice_continue
+lib/features/reports/presentation/controllers/new_report_controller.dart:130:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:134:incoming_photo_choice_replace
+lib/features/reports/presentation/controllers/new_report_controller.dart:134:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:145:incoming_photo_choice_add
+lib/features/reports/presentation/controllers/new_report_controller.dart:145:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:193:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:194:restore_controller_failed
+lib/features/reports/presentation/controllers/new_report_controller.dart:195:error
+lib/features/reports/presentation/controllers/new_report_controller.dart:227:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:228:capacity_load_failed
+lib/features/reports/presentation/controllers/new_report_controller.dart:229:error
+lib/features/reports/presentation/controllers/new_report_controller.dart:379:autosave_flushed
+lib/features/reports/presentation/controllers/new_report_controller.dart:379:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:420:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:421:persist_failed
+lib/features/reports/presentation/controllers/new_report_controller.dart:422:error
+lib/features/reports/presentation/controllers/new_report_controller.dart:452:creating
+lib/features/reports/presentation/controllers/new_report_controller.dart:452:uploading
+lib/features/reports/presentation/controllers/new_report_controller.dart:457:sent
+lib/features/reports/presentation/controllers/new_report_controller.dart:48:report_draft
+lib/features/reports/presentation/controllers/new_report_controller.dart:49:initial_photo_import_failed
+lib/features/reports/presentation/controllers/new_report_controller.dart:50:error
+lib/features/reports/presentation/controllers/new_report_submit_support.dart:22:creditsAvailable
+lib/features/reports/presentation/controllers/new_report_submit_support.dart:24:emergencyAvailable
+lib/features/reports/presentation/controllers/new_report_submit_support.dart:25:retryAfterSeconds
+lib/features/reports/presentation/controllers/new_report_submit_support.dart:28:unlockHint
+lib/features/reports/presentation/controllers/new_report_submit_support.dart:30:nextEmergencyReportAvailableAt
+lib/features/reports/presentation/l10n/report_severity_l10n.dart:13:$v — $tier
+lib/features/reports/presentation/l10n/report_status_l10n.dart:51:new
+lib/features/reports/presentation/l10n/report_status_l10n.dart:53:in_review
+lib/features/reports/presentation/l10n/report_status_l10n.dart:54:in review
+lib/features/reports/presentation/l10n/report_status_l10n.dart:56:approved
+lib/features/reports/presentation/l10n/report_status_l10n.dart:58:deleted
+lib/features/reports/presentation/l10n/report_status_l10n.dart:59:declined
+lib/features/reports/presentation/screens/reports_list_screen.dart:112:other
+lib/features/reports/presentation/screens/reports_list_screen.dart:135:created
+lib/features/reports/presentation/screens/reports_list_screen.dart:135:report_created
+lib/features/reports/presentation/screens/reports_list_screen.dart:140:merged
+lib/features/reports/presentation/screens/reports_list_screen.dart:140:report_updated
+lib/features/reports/presentation/screens/reports_list_screen.dart:152:report_updated
+lib/features/reports/presentation/screens/reports_list_screen.dart:153:status_changed
+lib/features/reports/presentation/screens/reports_list_screen.dart:97:other
+lib/features/reports/presentation/widgets/location_picker.dart:386:Location permission needed
+lib/features/reports/presentation/widgets/location_picker.dart:388:Detecting your position
+lib/features/reports/presentation/widgets/location_picker.dart:390:Checking location…
+lib/features/reports/presentation/widgets/location_picker.dart:392:Current location unavailable
+lib/features/reports/presentation/widgets/location_picker.dart:394:Review detected location
+lib/features/reports/presentation/widgets/location_picker.dart:396:Location outside Macedonia
+lib/features/reports/presentation/widgets/location_picker.dart:398:Pin needs confirmation
+lib/features/reports/presentation/widgets/location_picker.dart:400:Location confirmed
+lib/features/reports/presentation/widgets/location_picker.dart:401:Tap Confirm when ready
+lib/features/reports/presentation/widgets/location_picker.dart:404:Location picker. $stateLabel
+lib/features/reports/presentation/widgets/location_picker.dart:412:Map. Drag to move the pin. Pin cannot leave Macedonia.
+lib/features/reports/presentation/widgets/location_picker.dart:491:We found your current location. Review the pin, then confirm.
+lib/features/reports/presentation/widgets/location_picker.dart:498:The pinned location is ready to submit.
+lib/features/reports/presentation/widgets/location_picker.dart:499:Move the pin to the exact spot, then tap Confirm. The map stays inside Macedonia.
+lib/features/reports/presentation/widgets/location_picker.dart:522:Double-tap to look up the address again.
+lib/features/reports/presentation/widgets/location_picker.dart:536:Address lookup unavailable. You can still confirm the pin.
+lib/features/reports/presentation/widgets/location_picker.dart:551:Location access is off. Move the map manually, then confirm the pin.
+lib/features/reports/presentation/widgets/location_picker.dart:559:Current location outside coverage
+lib/features/reports/presentation/widgets/location_picker.dart:561:GPS is outside Macedonia. Move the pin manually or try again.
+lib/features/reports/presentation/widgets/location_picker.dart:571:Confirm location. ${hasConfirmedLocation ? "Location already confirmed" : "Set this spot as the report location"}
+lib/features/reports/presentation/widgets/location_picker.dart:571:Location already confirmed
+lib/features/reports/presentation/widgets/location_picker.dart:571:Set this spot as the report location
+lib/features/reports/presentation/widgets/location_picker.dart:573:Location is set for this report.
+lib/features/reports/presentation/widgets/location_picker.dart:574:Double-tap to set this spot as the report location.
+lib/features/reports/presentation/widgets/location_picker.dart:625:Checking…
+lib/features/reports/presentation/widgets/location_picker.dart:625:Confirm location
+lib/features/reports/presentation/widgets/location_picker.dart:643:Checking address…
+lib/features/reports/presentation/widgets/location_picker.dart:645:Address unavailable. Coordinates: $_address
+lib/features/reports/presentation/widgets/location_picker.dart:647:Near $_address
+lib/features/reports/presentation/widgets/location_picker.dart:696:Use current location.
+lib/features/reports/presentation/widgets/location_picker.dart:698:Double-tap to center the map on your GPS position if inside Macedonia.
+lib/features/reports/presentation/widgets/location_picker/location_picker_geo_utils.dart:41:${position.latitude.toStringAsFixed(4)}, ${position.longitude.toStringAsFixed(4)}
+lib/features/reports/presentation/widgets/location_picker/location_picker_geocode_helpers.dart:33:macedonia
+lib/features/reports/presentation/widgets/location_picker/location_picker_map_stack.dart:60:chisto_mobile
+lib/features/reports/presentation/widgets/location_picker/location_picker_map_tiles_fallback.dart:33:Detecting location…
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:30:Open in Maps
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:30:View location
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:32:Choose which app to view this location on a map.
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:33:Choose which app to get directions.
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:36:Close
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:46:Apple Maps
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:47:Built-in maps on this device.
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:59:Google Maps
+lib/features/reports/presentation/widgets/map/directions_sheet.dart:60:Web and Google Maps app.
+lib/features/reports/presentation/widgets/map/report_external_maps.dart:58:$latitude,$longitude
+lib/features/reports/presentation/widgets/new_report/evidence_tip_card.dart:33:Frame the site, good light.
+lib/features/reports/presentation/widgets/new_report/new_report_details_text_fields.dart:148:$length/$maxDescriptionLength
+lib/features/reports/presentation/widgets/new_report/new_report_details_text_fields.dart:56:$length/$maxTitleLength
+lib/features/reports/presentation/widgets/new_report/new_report_flow_bottom_bar.dart:33:creating
+lib/features/reports/presentation/widgets/new_report/new_report_flow_bottom_bar.dart:35:uploading
+lib/features/reports/presentation/widgets/new_report/new_report_flow_bottom_bar.dart:37:sent
+lib/features/reports/presentation/widgets/new_report/new_report_flow_bottom_bar.dart:43:sent
+lib/features/reports/presentation/widgets/new_report/new_report_flow_header.dart:72:${currentStageIndex + 1}/${ReportStage.values.length}
+lib/features/reports/presentation/widgets/new_report/report_capacity_summary_card.dart:37:${ui.bannerMessage} ${l10n.reportCapacitySecondsRemaining(capacity.retryAfterSeconds!)}
+lib/features/reports/presentation/widgets/new_report/report_capacity_summary_card.dart:75:$credits
+lib/features/reports/presentation/widgets/new_report/reporting_cooldown_dialog.dart:97:${context.l10n.reportCooldownModalRetryLead} $retryDurationText
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:121:continue
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:122:report_draft
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:122:resume_banner_continue
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:126:discard
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:167:report_draft
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:167:resume_banner_discard
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:33:report_draft
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:34:resume_banner_shown
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:36:photoCount
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:37:hasTitle
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:81:continue
+lib/features/reports/presentation/widgets/new_report/resume_draft_banner.dart:92:discard
+lib/features/reports/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart:22:incoming_photo_dialog_shown
+lib/features/reports/presentation/widgets/new_report/resume_with_incoming_photo_dialog.dart:22:report_draft
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:42:Complete
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:44:Current
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:45:Incomplete
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:46:Step ${stepIndex + 1} of $totalSteps, $label
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:48:Double-tap to go to $label
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:49:Complete previous steps first.
+lib/features/reports/presentation/widgets/new_report/stage_chip.dart:52:$stepLabel. $statusText.
+lib/features/reports/presentation/widgets/photo_grid.dart:57:report-photo-${widget.photos[index].path.hashCode}-$index
+lib/features/reports/presentation/widgets/photo_review_sheet.dart:275:Double-tap to reset zoom
+lib/features/reports/presentation/widgets/photo_review_sheet.dart:276:Pinch or double-tap to inspect
+lib/features/reports/presentation/widgets/photo_source_modal.dart:14:Add photo
+lib/features/reports/presentation/widgets/photo_source_modal.dart:15:Choose how to add the first photo.
+lib/features/reports/presentation/widgets/photo_source_modal.dart:18:Close
+lib/features/reports/presentation/widgets/photo_source_modal.dart:37:You can review the photo before it is added.
+lib/features/reports/presentation/widgets/photo_source_modal.dart:48:Take photo
+lib/features/reports/presentation/widgets/photo_source_modal.dart:49:Capture a clear overview right now.
+lib/features/reports/presentation/widgets/photo_source_modal.dart:50:Best choice
+lib/features/reports/presentation/widgets/photo_source_modal.dart:57:Choose from library
+lib/features/reports/presentation/widgets/photo_source_modal.dart:58:Use a photo already on your device.
+lib/features/reports/presentation/widgets/report_step_chips.dart:211:$index
+lib/features/reports/presentation/widgets/reports_list/report_card.dart:210:+${report.score}
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:147:media_appended
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:148:status_changed
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:149:merged
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:150:updated
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:221:report
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:297:+${report.score}
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet.dart:300:+${report.score}
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_evidence_gallery.dart:124:report-evidence-hero-$reportTag
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_evidence_gallery.dart:85:report-evidence-$reportTag-$index
+lib/features/reports/presentation/widgets/reports_list/report_detail_sheet/report_detail_row.dart:31:$label: $semanticsValue
+lib/features/reports/presentation/widgets/reports_list/report_draft_header_chip.dart:44:entry_reports_list_chip
+lib/features/reports/presentation/widgets/reports_list/report_draft_header_chip.dart:44:report_draft
+lib/features/reports/presentation/widgets/reports_list/report_sheet_view_model.dart:72:${category.apiPollutionTypeLabel}:
+lib/features/reports/presentation/widgets/reports_list/reports_list_screen_header.dart:155:${l10n.reportListSearchHintPrefix} $resultSummaryLabel
+lib/features/reports/presentation/widgets/reports_list/reports_list_screen_header.dart:75:entry_reports_list_appbar_plus
+lib/features/reports/presentation/widgets/reports_list/reports_list_screen_header.dart:75:report_draft

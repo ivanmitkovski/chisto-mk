@@ -22,6 +22,14 @@ export class ReportCapacityDto {
   })
   nextEmergencyReportAvailableAt!: string | null;
 
+  @ApiProperty({
+    description:
+      'Epoch milliseconds when emergency allowance refills (same instant as nextEmergencyReportAvailableAt); null when not on cooldown',
+    nullable: true,
+    required: false,
+  })
+  nextRefillAtMs?: number | null;
+
   @ApiProperty({ description: 'Human guidance on how to unlock more reports' })
   unlockHint!: string;
 }

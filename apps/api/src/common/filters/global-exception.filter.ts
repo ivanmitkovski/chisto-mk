@@ -7,6 +7,7 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ThrottlerException } from '@nestjs/throttler';
+import { MulterError } from 'multer';
 import { Prisma } from '../../prisma-client';
 import { ErrorResponse } from '../errors/error-response.type';
 
@@ -41,6 +42,20 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         }),
       );
       return;
+    }
+
+    if (exception instanceof MulterError) {
+      if (exception.code === 'LIMIT_FILE_SIZE' || exception.code === 'LIMIT_FILE_COUNT') {
+        response.status(HttpStatus.PAYLOAD_TOO_LARGE).json(
+          GlobalExceptionFilter.stamp({
+            code: 'PAYLOAD_TOO_LARGE',
+            message: 'One or more files exceed the allowed size or count.',
+            details: { maxBytes: 10 * 1024 * 1024, maxFiles: 5 },
+            retryable: false,
+          }),
+        );
+        return;
+      }
     }
 
     if (exception instanceof HttpException) {
@@ -91,9 +106,52 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       return this.mapPrismaErrorByCode(code);
     }
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+      const p2002 = this.tryMapReportSubmitIdempotencyP2002(exception);
+      if (p2002) {
+        return p2002;
+      }
       return this.mapPrismaErrorByCode(exception.code);
     }
     return null;
+  }
+
+  private tryMapReportSubmitIdempotencyP2002(
+    exception: Prisma.PrismaClientKnownRequestError,
+  ): { status: number; body: ErrorResponse } | null {
+    if (exception.code !== 'P2002') {
+      return null;
+    }
+    const meta = exception.meta as { target?: string[]; modelName?: string } | undefined;
+    if (meta?.modelName === 'ReportSubmitIdempotency') {
+      return {
+        status: HttpStatus.CONFLICT,
+        body: {
+          code: 'DUPLICATE_SUBMIT_INFLIGHT',
+          message:
+            'Another submission with this idempotency key is being processed. Please retry shortly.',
+          retryable: true,
+          retryAfterSeconds: 5,
+        },
+      };
+    }
+    const target = meta?.target;
+    if (!target || target.length < 2) {
+      return null;
+    }
+    const hasUserId = target.includes('userId');
+    const hasKey = target.includes('key');
+    if (!hasUserId || !hasKey) {
+      return null;
+    }
+    return {
+      status: HttpStatus.CONFLICT,
+      body: {
+        code: 'DUPLICATE_SUBMIT_INFLIGHT',
+        message: 'Another submission with this idempotency key is being processed. Please retry shortly.',
+        retryable: true,
+        retryAfterSeconds: 5,
+      },
+    };
   }
 
   private mapPrismaErrorByCode(code: string): { status: number; body: ErrorResponse } | null {
@@ -126,6 +184,24 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             message: 'Database connection was closed. Please try again.',
             retryable: true,
             retryAfterSeconds: 3,
+          },
+        };
+      case 'P2025':
+        return {
+          status: HttpStatus.NOT_FOUND,
+          body: {
+            code: 'DATABASE_RECORD_NOT_FOUND',
+            message: 'The requested record was not found or is no longer available.',
+            retryable: false,
+          },
+        };
+      case 'P2003':
+        return {
+          status: HttpStatus.BAD_REQUEST,
+          body: {
+            code: 'REFERENCE_CONSTRAINT',
+            message: 'The change conflicts with related data.',
+            retryable: false,
           },
         };
       default:

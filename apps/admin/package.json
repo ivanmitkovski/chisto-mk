@@ -8,7 +8,8 @@
     "start": "next start -p 3001",
     "lint": "eslint .",
     "analyze": "ANALYZE=true next build",
-    "test": "echo 'No tests yet'"
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
@@ -39,6 +40,7 @@
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.3.0",
     "typescript": "^5.7.2",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.56.1",
+    "vitest": "^3.2.4"
   }
 }

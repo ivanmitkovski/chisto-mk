@@ -1,9 +1,11 @@
 import 'dart:io';
 
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
+import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
+import 'package:chisto_mobile/core/theme/app_typography.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
 import 'package:chisto_mobile/shared/widgets/app_smart_image.dart';
 import 'package:chisto_mobile/shared/widgets/immersive_photo_gallery.dart';
@@ -45,6 +47,7 @@ class _PhotoGridState extends State<PhotoGrid> {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     final bool hasPhotos = widget.photos.isNotEmpty;
     final bool canAdd = widget.photos.length < widget.maxPhotos;
     final List<GalleryImageItem> galleryItems = List<GalleryImageItem>.generate(
@@ -52,7 +55,7 @@ class _PhotoGridState extends State<PhotoGrid> {
       (int index) => GalleryImageItem(
         image: FileImage(File(widget.photos[index].path)),
         heroTag: 'report-photo-${widget.photos[index].path.hashCode}-$index',
-        semanticLabel: 'Report photo ${index + 1}',
+        semanticLabel: l10n.reportPhotoSemanticReportPhoto(index + 1),
       ),
     );
 
@@ -64,7 +67,10 @@ class _PhotoGridState extends State<PhotoGrid> {
           _EmptyPhotoGalleryCard(onTap: widget.onAddPhoto)
         else ...<Widget>[
           Text(
-            '${widget.photos.length}/${widget.maxPhotos} photos attached',
+            l10n.reportPhotoGridAttachedCount(
+              widget.photos.length,
+              widget.maxPhotos,
+            ),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textSecondary,
               fontWeight: FontWeight.w600,
@@ -78,12 +84,14 @@ class _PhotoGridState extends State<PhotoGrid> {
               if (!mounted) return;
               setState(() => _selectedIndex = index);
             },
-            openLabel: 'Open report photo gallery',
+            openLabel: l10n.reportPhotoOpenGallerySemantic,
             bottomCenterBuilder:
                 (BuildContext context, int currentIndex, int totalCount) {
                   return GalleryGlassPill(
                     child: Text(
-                      totalCount > 1 ? 'Tap to review photos' : 'Tap to review',
+                      totalCount > 1
+                          ? l10n.reportPhotoTapToReviewMany
+                          : l10n.reportPhotoTapToReviewSingle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: AppColors.textOnDark,
@@ -96,8 +104,8 @@ class _PhotoGridState extends State<PhotoGrid> {
           const SizedBox(height: AppSpacing.md),
           Text(
             widget.photos.length == 1
-                ? 'One clear photo is enough. Add another only if it helps explain the site.'
-                : '${widget.photos.length} photos attached. Keep only the frames that make the report easier to verify.',
+                ? l10n.reportPhotoStackCaptionSingle
+                : l10n.reportPhotoStackCaptionMany(widget.photos.length),
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
               height: 1.35,
@@ -134,9 +142,9 @@ class _PhotoGridState extends State<PhotoGrid> {
         Text(
           hasPhotos
               ? (_selectedIndex == 0
-                    ? 'Keep the first photo as the clearest overview of the site.'
-                    : 'Use extra photos only for details, scale, or another useful angle.')
-              : 'Start with one clear overview of the site. Add detail only if it helps.',
+                    ? l10n.reportPhotoVerificationHelpPrimarySelected
+                    : l10n.reportPhotoVerificationHelpPrimaryOther)
+              : l10n.reportPhotoVerificationHelpEmpty,
           style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: AppColors.textMuted,
             height: 1.35,
@@ -166,11 +174,12 @@ class _PhotoThumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Semantics(
       button: true,
       label: totalCount > 0
-          ? 'Photo ${index + 1} of $totalCount. Double-tap to select.'
-          : 'Photo ${index + 1}. Double-tap to select.',
+          ? l10n.reportPhotoSemanticThumbnail(index + 1, totalCount)
+          : l10n.reportPhotoSemanticThumbnail(index + 1, 1),
       child: GestureDetector(
         onTap: onSelect,
         child: SizedBox(
@@ -214,7 +223,7 @@ class _PhotoThumbnail extends StatelessWidget {
                 right: 4,
                 child: Semantics(
                   button: true,
-                  label: 'Remove photo',
+                  label: l10n.reportPhotoSemanticRemove,
                   child: GestureDetector(
                     onTap: () {
                       AppHaptics.light();
@@ -272,9 +281,10 @@ class _AddPhotoTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppLocalizations l10n = context.l10n;
     return Semantics(
       button: true,
-      label: 'Add evidence photo',
+      label: l10n.reportPhotoSemanticAddPhoto,
       child: GestureDetector(
         onTap: () {
           AppHaptics.tap();
@@ -284,7 +294,9 @@ class _AddPhotoTile extends StatelessWidget {
           width: _isCompact ? 72 : double.infinity,
           height: _isCompact ? 86 : null,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(_isCompact ? AppSpacing.radius18 : AppSpacing.radiusXl),
+            borderRadius: BorderRadius.circular(
+              _isCompact ? AppSpacing.radius18 : AppSpacing.radiusXl,
+            ),
             border: Border.all(
               color: AppColors.divider.withValues(alpha: 0.9),
               width: 1.2,
@@ -300,7 +312,9 @@ class _AddPhotoTile extends StatelessWidget {
                   height: _isCompact ? 32 : 42,
                   decoration: BoxDecoration(
                     color: AppColors.primaryDark.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(_isCompact ? AppSpacing.radius10 : AppSpacing.radiusMd),
+                    borderRadius: BorderRadius.circular(
+                      _isCompact ? AppSpacing.radius10 : AppSpacing.radiusMd,
+                    ),
                   ),
                   child: Icon(
                     _isCompact ? Icons.add_rounded : Icons.camera_alt_rounded,
@@ -313,22 +327,16 @@ class _AddPhotoTile extends StatelessWidget {
                   _isCompact
                       ? context.l10n.reportPhotoGridAddShort
                       : context.l10n.reportPhotoGridAdd,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primaryDark,
-                    letterSpacing: -0.1,
-                  ),
+                  style: AppTypography.reportsPillLabel(
+                    Theme.of(context).textTheme,
+                  ).copyWith(color: AppColors.primaryDark),
                 ),
                 if (!_isCompact) ...<Widget>[
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     context.l10n.reportPhotoGridSourceHint,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textMuted,
-                      letterSpacing: -0.1,
+                    style: AppTypography.reportsBadgeLabel(
+                      Theme.of(context).textTheme,
                     ),
                   ),
                 ],

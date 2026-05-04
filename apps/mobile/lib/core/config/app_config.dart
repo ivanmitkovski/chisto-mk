@@ -58,8 +58,9 @@ class AppConfig {
   /// A raw `*.elb.amazonaws.com` URL often fails HTTPS/WebSocket handshakes when the cert
   /// is only valid for the custom domain.
   ///
-  /// Event chat (Socket.IO) needs `GET /socket.io/?EIO=4&transport=polling` on the **same**
-  /// host as REST; ALB rules that only forward `/api` or `/events` break live chat.
+  /// Event chat and **reports owner realtime** (`/socket.io` + `/reports-owner` namespace)
+  /// must use the **same** host as REST. ALB rules that only forward `/api` or omit
+  /// `/socket.io` break live updates.
   static AppConfig get awsDev {
     const String url =
         String.fromEnvironment('API_URL', defaultValue: 'https://api-dev.chisto.mk');

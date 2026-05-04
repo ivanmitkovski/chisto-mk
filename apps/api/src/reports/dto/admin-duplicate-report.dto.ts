@@ -1,6 +1,15 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { ReportStatus } from '../../prisma-client';
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsOptional, IsString, MaxLength } from 'class-validator';
+import {
+  ArrayMaxSize,
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
+  IsOptional,
+  IsString,
+  Length,
+  MaxLength,
+} from 'class-validator';
 
 export class AdminDuplicateReportItemDto {
   @ApiProperty()
@@ -87,7 +96,9 @@ export class MergeDuplicateReportsDto {
   @IsArray()
   @ArrayNotEmpty()
   @ArrayUnique()
+  @ArrayMaxSize(50)
   @IsString({ each: true })
+  @Length(20, 40, { each: true })
   childReportIds!: string[];
 
   @ApiPropertyOptional({

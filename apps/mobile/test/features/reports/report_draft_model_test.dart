@@ -18,7 +18,10 @@ void main() {
     });
 
     test('clampToInsetBounds clamps out-of-bounds coordinates', () {
-      final (double lat, double lng) = ReportGeoFence.clampToInsetBounds(40.0, 19.0);
+      final (double lat, double lng) = ReportGeoFence.clampToInsetBounds(
+        40.0,
+        19.0,
+      );
       expect(lat, greaterThanOrEqualTo(ReportGeoFence.insetMinLat));
       expect(lat, lessThanOrEqualTo(ReportGeoFence.insetMaxLat));
       expect(lng, greaterThanOrEqualTo(ReportGeoFence.insetMinLng));
@@ -30,6 +33,17 @@ void main() {
       expect(ReportGeoFence.insetMaxLat, lessThan(ReportGeoFence.maxLat));
       expect(ReportGeoFence.insetMinLng, greaterThan(ReportGeoFence.minLng));
       expect(ReportGeoFence.insetMaxLng, lessThan(ReportGeoFence.maxLng));
+    });
+  });
+
+  group('ReportDraft.hasPersistableWizardBody', () {
+    test('is true when category is set without title or photos', () {
+      final ReportDraft d = ReportDraft(category: ReportCategory.other);
+      expect(d.hasPersistableWizardBody, isTrue);
+    });
+
+    test('is false for default empty draft', () {
+      expect(ReportDraft().hasPersistableWizardBody, isFalse);
     });
   });
 
@@ -51,11 +65,11 @@ void main() {
   });
 
   group('ReportRequirement', () {
-    test('has expected values and messages', () {
-      expect(ReportRequirement.photos.message, 'Add at least one photo');
-      expect(ReportRequirement.category.message, 'Choose a category');
-      expect(ReportRequirement.title.message, 'Add a short title');
-      expect(ReportRequirement.location.message, 'Confirm a location in Macedonia');
+    test('has expected enum names', () {
+      expect(ReportRequirement.photos.name, 'photos');
+      expect(ReportRequirement.category.name, 'category');
+      expect(ReportRequirement.title.name, 'title');
+      expect(ReportRequirement.location.name, 'location');
     });
   });
 

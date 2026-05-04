@@ -15,7 +15,7 @@ import { ReportStatus } from '../prisma-client';
  * - Media appended to report: `report_updated`
  */
 
-export type OwnerReportEventType = 'report_created' | 'report_updated';
+export type OwnerReportEventType = 'report_created' | 'report_updated' | 'report_submit_queued';
 
 export type OwnerReportEventMutation =
   | {
@@ -24,6 +24,10 @@ export type OwnerReportEventMutation =
   | {
       kind: 'status_changed' | 'merged' | 'media_appended' | 'updated';
       status?: ReportStatus;
+    }
+  | {
+      kind: 'submit_queued';
+      idempotencyKey: string;
     };
 
 export type OwnerReportEvent = {

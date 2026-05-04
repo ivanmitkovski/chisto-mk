@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ReportStatus } from '../../prisma-client';
+import type { UserReportViewerRole } from './user-report.dto';
 
 export class CitizenReportSiteDto {
   @ApiProperty()
@@ -72,4 +73,10 @@ export class CitizenReportDetailDto {
     description: 'Cleanup effort (ONE_TO_TWO, THREE_TO_FIVE, …) when citizen provided it',
   })
   cleanupEffort!: string | null;
+
+  @ApiProperty({
+    enum: ['primary', 'co_reporter'],
+    description: 'Viewer is primary reporter or co-reporter (points apply to primary only)',
+  })
+  viewerRole!: UserReportViewerRole;
 }

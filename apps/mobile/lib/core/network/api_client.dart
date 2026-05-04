@@ -6,6 +6,7 @@ import 'dart:math' show min;
 import 'package:chisto_mobile/core/config/app_config.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/network/api_failure_mapper.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
 
@@ -35,7 +36,13 @@ class ApiClient {
 
   bool _refreshing = false;
 
+  final http.Client _httpClient = http.Client();
+
   static const Duration _timeout = Duration(seconds: 30);
+
+  void dispose() {
+    _httpClient.close();
+  }
 
   void _maybeAddAcceptLanguage(Map<String, String> headers) {
     final String? Function()? headerFn = _acceptLanguageHeader;
@@ -53,8 +60,17 @@ class ApiClient {
     headers[key] = value.trim();
   }
 
-  Future<ApiResponse> get(String path, {Map<String, String>? headers}) async {
-    return _requestWithRetry('GET', path, headers: headers);
+  Future<ApiResponse> get(
+    String path, {
+    Map<String, String>? headers,
+    RequestCancellationToken? cancellation,
+  }) async {
+    return _requestWithRetry(
+      'GET',
+      path,
+      headers: headers,
+      cancellation: cancellation,
+    );
   }
 
   Future<ApiResponse> post(
@@ -319,10 +335,20 @@ class ApiClient {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    RequestCancellationToken? cancellation,
   }) async {
     try {
-      return await _request(method, path, headers: headers, body: body);
+      return await _request(
+        method,
+        path,
+        headers: headers,
+        body: body,
+        cancellation: cancellation,
+      );
     } on AppError catch (e) {
+      if (e.code == 'CANCELLED') {
+        rethrow;
+      }
       if (e.code != 'UNAUTHORIZED' ||
           _authPaths.contains(path) ||
           refreshSession == null ||
@@ -340,7 +366,14 @@ class ApiClient {
         _refreshing = false;
       }
 
-      return _request(method, path, headers: headers, body: body);
+      cancellation?.throwIfCancelled();
+      return await _request(
+        method,
+        path,
+        headers: headers,
+        body: body,
+        cancellation: cancellation,
+      );
     }
   }
 
@@ -349,7 +382,9 @@ class ApiClient {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    RequestCancellationToken? cancellation,
   }) async {
+    cancellation?.throwIfCancelled();
     final Uri url = Uri.parse('$_baseUrl$path');
     final Map<String, String> requestHeaders = <String, String>{
       'Content-Type': 'application/json',
@@ -377,40 +412,41 @@ class ApiClient {
       final Future<http.Response> request;
       switch (method) {
         case 'GET':
-          request = http.get(url, headers: requestHeaders);
+          request = _httpClient.get(url, headers: requestHeaders);
           break;
         case 'POST':
-          request = http.post(
+          request = _httpClient.post(
             url,
             headers: requestHeaders,
             body: bodyStr,
           );
           break;
         case 'PATCH':
-          request = http.patch(
+          request = _httpClient.patch(
             url,
             headers: requestHeaders,
             body: bodyStr,
           );
           break;
         case 'PUT':
-          request = http.put(
+          request = _httpClient.put(
             url,
             headers: requestHeaders,
             body: bodyStr,
           );
           break;
         case 'DELETE':
-          request = http.delete(url, headers: requestHeaders);
+          request = _httpClient.delete(url, headers: requestHeaders);
           break;
         default:
-          request = http.post(
+          request = _httpClient.post(
             url,
             headers: requestHeaders,
             body: bodyStr,
           );
       }
       final http.Response response = await request.timeout(_timeout);
+      cancellation?.throwIfCancelled();
       return _handleResponse(response);
     } on TimeoutException catch (e) {
       throw AppError.timeout(message: e.message?.isEmpty ?? true ? null : e.message);

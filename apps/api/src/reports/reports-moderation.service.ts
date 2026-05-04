@@ -1,8 +1,13 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { EventEmitter2 } from '@nestjs/event-emitter';
-import { Prisma, Report, ReportStatus, SiteStatus } from '../prisma-client';
+import {
+  Prisma,
+  Report,
+  ReportSideEffectKind,
+  ReportSideEffectStatus,
+  ReportStatus,
+  SiteStatus,
+} from '../prisma-client';
 import { PrismaService } from '../prisma/prisma.service';
-import { AuditService } from '../audit/audit.service';
 import { AuthenticatedUser } from '../auth/types/authenticated-user.type';
 import {
   AdminReportDetailDto,
@@ -12,18 +17,19 @@ import {
 import { ListReportsQueryDto } from './dto/list-reports-query.dto';
 import { UpdateReportStatusDto } from './dto/update-report-status.dto';
 import { ReportsUploadService } from './reports-upload.service';
-import { ReportEventsService } from '../admin-events/report-events.service';
-import { SiteEventsService } from '../admin-events/site-events.service';
-import { ReportsOwnerEventsService } from './reports-owner-events.service';
 import { reportCleanupEffortLabel } from './report-cleanup-effort';
-import { POINTS_FIRST_REPORT } from '../gamification/gamification.constants';
+import { ReportApprovalPointsService } from './report-approval-points.service';
 import {
   displayReportTitle,
   getReportNumber,
   listLocationLabel,
   optionalReportNarrative,
 } from './report-copy.helpers';
+import { deriveAdminReportDetailPriority } from './report-moderation-priority.helper';
+import { moderationQueueMetaForStatus } from './report-moderation-queue-meta';
 import { transitionSiteToVerifiedIfFirstApproved } from './report-site-verification.helper';
+import { ReportSideEffectProcessorService } from './side-effects/report-side-effect-processor.service';
+import type { ModerationStatusSideEffectPayload } from './side-effects/report-side-effect-processor.service';
 
 const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = {
   NEW: ['IN_REVIEW', 'APPROVED', 'DELETED'],
@@ -36,29 +42,10 @@ const ALLOWED_REPORT_STATUS_TRANSITIONS: Record<ReportStatus, ReportStatus[]> = 
 export class ReportsModerationService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly audit: AuditService,
     private readonly reportsUploadService: ReportsUploadService,
-    private readonly reportEventsService: ReportEventsService,
-    private readonly siteEventsService: SiteEventsService,
-    private readonly reportsOwnerEventsService: ReportsOwnerEventsService,
-    private readonly eventEmitter: EventEmitter2,
+    private readonly reportApprovalPoints: ReportApprovalPointsService,
+    private readonly reportSideEffectProcessor: ReportSideEffectProcessorService,
   ) {}
-
-  private derivePriority(status: ReportStatus): AdminReportDetailDto['priority'] {
-    if (status === 'NEW') {
-      return 'HIGH';
-    }
-
-    if (status === 'IN_REVIEW') {
-      return 'MEDIUM';
-    }
-
-    if (status === 'APPROVED') {
-      return 'LOW';
-    }
-
-    return 'LOW';
-  }
 
   async findAllForModeration(query: ListReportsQueryDto): Promise<AdminReportListResponseDto> {
     const where: Prisma.ReportWhereInput = {
@@ -78,7 +65,16 @@ export class ReportsModerationService {
         skip,
         take: query.limit,
         orderBy: { createdAt: 'desc' },
-        include: {
+        select: {
+          id: true,
+          createdAt: true,
+          reportNumber: true,
+          title: true,
+          description: true,
+          category: true,
+          status: true,
+          cleanupEffort: true,
+          potentialDuplicateOfId: true,
           site: {
             select: {
               id: true,
@@ -89,7 +85,7 @@ export class ReportsModerationService {
               address: true,
             },
           },
-          coReporters: true,
+          coReporters: { select: { userId: true } },
           potentialDuplicates: {
             select: { id: true },
           },
@@ -130,7 +126,13 @@ export class ReportsModerationService {
   ): Promise<Report> {
     const report = await this.prisma.report.findUnique({
       where: { id: reportId },
-      select: { id: true, status: true, reporterId: true },
+      select: {
+        id: true,
+        status: true,
+        reporterId: true,
+        siteId: true,
+        coReporters: { select: { userId: true } },
+      },
     });
 
     if (!report) {
@@ -172,51 +174,25 @@ export class ReportsModerationService {
         },
       });
 
-      if (dto.status === 'APPROVED' && updatedReport.reporterId) {
-        const existingAward = await tx.pointTransaction.findFirst({
-          where: {
-            referenceType: 'Report',
-            referenceId: reportId,
+      if (dto.status === 'APPROVED') {
+        await this.reportApprovalPoints.creditApprovalIfEligible(tx, {
+          report: {
+            id: updatedReport.id,
+            reporterId: updatedReport.reporterId,
+            siteId: updatedReport.siteId,
+            mediaUrls: updatedReport.mediaUrls,
+            severity: updatedReport.severity,
+            cleanupEffort: updatedReport.cleanupEffort,
           },
+          now,
         });
-        if (!existingAward) {
-          const otherApprovedCount = await tx.report.count({
-            where: {
-              siteId: updatedReport.siteId,
-              status: 'APPROVED',
-              id: { not: reportId },
-            },
-          });
-          const isFirstApproved = otherApprovedCount === 0;
-          if (isFirstApproved) {
-            const points = POINTS_FIRST_REPORT;
-            const user = await tx.user.findUnique({
-              where: { id: updatedReport.reporterId },
-              select: { pointsBalance: true, totalPointsEarned: true },
-            });
-            if (user) {
-              const balanceAfter = user.pointsBalance + points;
-              const totalEarnedAfter = user.totalPointsEarned + points;
-              await tx.pointTransaction.create({
-                data: {
-                  userId: updatedReport.reporterId,
-                  delta: points,
-                  balanceAfter,
-                  reasonCode: 'FIRST_REPORT',
-                  referenceType: 'Report',
-                  referenceId: reportId,
-                },
-              });
-              await tx.user.update({
-                where: { id: updatedReport.reporterId },
-                data: {
-                  pointsBalance: balanceAfter,
-                  totalPointsEarned: totalEarnedAfter,
-                },
-              });
-            }
-          }
-        }
+      }
+
+      if (dto.status === 'DELETED' && report.status === 'APPROVED' && report.reporterId) {
+        await this.reportApprovalPoints.debitRevokedApprovalIfNeeded(tx, {
+          reportId,
+          userId: report.reporterId,
+        });
       }
 
       let siteStatusEvent: {
@@ -239,55 +215,68 @@ export class ReportsModerationService {
         }
       }
 
-      return { updatedReport, siteStatusEvent };
+      const coReporterUserIds = report.coReporters.map((c) => c.userId);
+      const moderationPayload: ModerationStatusSideEffectPayload = {
+        moderatorUserId: moderator.userId,
+        reportId,
+        fromStatus: report.status,
+        toStatus: dto.status,
+        reason: dto.reason ?? null,
+        siteId: updatedReport.siteId,
+        reporterId: report.reporterId,
+        coReporterUserIds,
+        siteStatusEvent:
+          siteStatusEvent == null
+            ? null
+            : {
+                id: siteStatusEvent.id,
+                status: siteStatusEvent.status,
+                latitude: siteStatusEvent.latitude,
+                longitude: siteStatusEvent.longitude,
+                updatedAt: siteStatusEvent.updatedAt.toISOString(),
+              },
+      };
+
+      const effect = await tx.reportSideEffect.create({
+        data: {
+          kind: ReportSideEffectKind.MODERATION_STATUS_POST,
+          status: ReportSideEffectStatus.PENDING,
+          payload: moderationPayload as object,
+        },
+      });
+
+      return { updatedReport, siteStatusEvent, effectId: effect.id };
     });
     const updated = updatedResult.updatedReport;
-    if (updatedResult.siteStatusEvent != null) {
-      const siteStatusEvent = updatedResult.siteStatusEvent;
-      this.siteEventsService.emitSiteUpdated(siteStatusEvent.id, {
-        kind: 'status_changed',
-        status: siteStatusEvent.status,
-        latitude: siteStatusEvent.latitude,
-        longitude: siteStatusEvent.longitude,
-        updatedAt: siteStatusEvent.updatedAt,
-      });
-    }
-
-    await this.audit.log({
-      actorId: moderator.userId,
-      action: 'REPORT_STATUS_UPDATED',
-      resourceType: 'Report',
-      resourceId: reportId,
-      metadata: { from: report.status, to: dto.status },
-    });
-
-    this.reportEventsService.emitReportStatusUpdated(reportId);
-    if (report.reporterId) {
-      this.reportsOwnerEventsService.emit(
-        report.reporterId,
-        reportId,
-        'report_updated',
-        { kind: 'status_changed', status: dto.status },
-      );
-      const statusLabel = dto.status.toLowerCase().replace(/_/g, ' ');
-      this.eventEmitter.emit('notification.send', {
-        recipientUserIds: [report.reporterId],
-        title: 'Report status updated',
-        body: `Your report has been ${statusLabel}`,
-        type: 'REPORT_STATUS',
-        threadKey: `report:${reportId}`,
-        groupKey: `REPORT_STATUS:site:${updated.siteId}`,
-        data: { reportId, siteId: updated.siteId, status: dto.status },
-      });
-    }
+    await this.reportSideEffectProcessor.processModerationStatusPost(updatedResult.effectId);
     return updated;
   }
 
   async findOneForModeration(reportId: string): Promise<AdminReportDetailDto> {
     const report = await this.prisma.report.findUnique({
       where: { id: reportId },
-      include: {
-        site: true,
+      select: {
+        id: true,
+        createdAt: true,
+        reportNumber: true,
+        status: true,
+        title: true,
+        description: true,
+        category: true,
+        moderatedAt: true,
+        moderationReason: true,
+        mediaUrls: true,
+        cleanupEffort: true,
+        potentialDuplicateOfId: true,
+        reporterId: true,
+        site: {
+          select: {
+            latitude: true,
+            longitude: true,
+            description: true,
+            address: true,
+          },
+        },
         reporter: {
           select: {
             id: true,
@@ -303,7 +292,8 @@ export class ReportsModerationService {
           },
         },
         coReporters: {
-          include: {
+          select: {
+            userId: true,
             user: {
               select: {
                 firstName: true,
@@ -341,10 +331,11 @@ export class ReportsModerationService {
       ? `${report.reporter.firstName} ${report.reporter.lastName}`.trim()
       : 'Anonymous reporter';
 
-    const moderationQueueLabel = 'General Queue';
-    const moderationAssignedTeam = 'City Moderation';
-    const moderationSlaLabel =
-      report.status === 'NEW' ? '4h remaining' : report.status === 'IN_REVIEW' ? '2h remaining' : 'Completed';
+    const {
+      moderationQueueLabel,
+      moderationAssignedTeam,
+      moderationSlaLabel,
+    } = moderationQueueMetaForStatus(report.status);
 
     const signedMediaUrls = await this.reportsUploadService.signUrls(report.mediaUrls ?? []);
     const evidence = signedMediaUrls.map((url, index) => ({
@@ -415,7 +406,7 @@ export class ReportsModerationService {
       id: report.id,
       reportNumber,
       status: report.status,
-      priority: this.derivePriority(report.status),
+      priority: deriveAdminReportDetailPriority(report.status),
       title: displayReportTitle(report),
       description: optionalReportNarrative(report.description, report.category) ?? '',
       location: locationLabel,

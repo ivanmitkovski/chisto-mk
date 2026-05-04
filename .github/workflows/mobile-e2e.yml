@@ -31,6 +31,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
+      - name: Reports vertical — invariants (hex + prefetch/connectivity rules)
+        run: dart run tool/check_reports_invariants.dart
+
       - name: Events API preflight (health/ready on smoke target)
         env:
           INTEGRATION_TEST_API_URL: ${{ secrets.INTEGRATION_TEST_API_URL }}

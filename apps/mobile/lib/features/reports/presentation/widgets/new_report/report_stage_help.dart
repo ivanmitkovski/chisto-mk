@@ -29,22 +29,23 @@ class StageHelpFormattedContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TextTheme themeText = Theme.of(context).textTheme;
-    final TextScaler scaler = MediaQuery.textScalerOf(context).clamp(
-      minScaleFactor: 0.85,
-      maxScaleFactor: 1.3,
-    );
+    final TextScaler scaler = MediaQuery.textScalerOf(
+      context,
+    ).clamp(minScaleFactor: 0.85, maxScaleFactor: 1.3);
 
-    final TextStyle titleStyle = (themeText.titleSmall ?? const TextStyle()).copyWith(
-      fontWeight: FontWeight.w600,
-      letterSpacing: -0.2,
-      color: AppColors.textPrimary,
-      height: 1.25,
-    );
-    final TextStyle bodyStyle = (themeText.bodyMedium ?? const TextStyle()).copyWith(
-      color: AppColors.textSecondary,
-      height: 1.45,
-      letterSpacing: -0.08,
-    );
+    final TextStyle titleStyle = (themeText.titleSmall ?? const TextStyle())
+        .copyWith(
+          fontWeight: FontWeight.w600,
+          letterSpacing: -0.2,
+          color: AppColors.textPrimary,
+          height: 1.25,
+        );
+    final TextStyle bodyStyle = (themeText.bodyMedium ?? const TextStyle())
+        .copyWith(
+          color: AppColors.textSecondary,
+          height: 1.45,
+          letterSpacing: -0.08,
+        );
 
     final List<Widget> children = <Widget>[];
 
@@ -56,10 +57,7 @@ class StageHelpFormattedContent extends StatelessWidget {
       final List<Widget> sectionChildren = <Widget>[];
       if (s.title != null && s.title!.isNotEmpty) {
         sectionChildren.add(
-          Semantics(
-            header: true,
-            child: Text(s.title!, style: titleStyle),
-          ),
+          Semantics(header: true, child: Text(s.title!, style: titleStyle)),
         );
         sectionChildren.add(const SizedBox(height: _titleBodyGap));
       }
@@ -79,10 +77,7 @@ class StageHelpFormattedContent extends StatelessWidget {
       children.add(
         Semantics(
           header: true,
-          child: Text(
-            contextSectionTitle,
-            style: titleStyle,
-          ),
+          child: Text(contextSectionTitle, style: titleStyle),
         ),
       );
       children.add(const SizedBox(height: _titleBodyGap));

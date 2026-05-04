@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui';
@@ -87,6 +87,8 @@ function getModalContent(kind: ContextDetailKind, value: string) {
 export function ContextDetailModal({ isOpen, kind, value, onClose }: ContextDetailModalProps) {
   const [isMounted, setIsMounted] = useState(false);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const titleId = useId();
+  const descriptionId = useId();
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -141,8 +143,8 @@ export function ContextDetailModal({ isOpen, kind, value, onClose }: ContextDeta
             className={styles.modal}
             role="dialog"
             aria-modal="true"
-            aria-labelledby="context-detail-title"
-            aria-describedby="context-detail-desc"
+            aria-labelledby={titleId}
+            aria-describedby={descriptionId}
             initial={{ opacity: 0, y: 8, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.98 }}
@@ -154,10 +156,10 @@ export function ContextDetailModal({ isOpen, kind, value, onClose }: ContextDeta
               </span>
             </div>
             <header className={styles.header}>
-              <h2 id="context-detail-title" className={styles.title}>
+              <h2 id={titleId} className={styles.title}>
                 {content.title}
               </h2>
-              <p id="context-detail-desc" className={styles.description}>
+              <p id={descriptionId} className={styles.description}>
                 {content.description}
               </p>
             </header>

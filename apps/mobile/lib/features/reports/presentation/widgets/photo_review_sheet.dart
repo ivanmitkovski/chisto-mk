@@ -80,24 +80,24 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
               AppHaptics.tap();
               final bool? discard = await showDialog<bool>(
                 context: context,
-                builder: (BuildContext context) {
+                builder: (BuildContext dialogContext) {
                   return AlertDialog(
-                    title: Text(context.l10n.photoReviewDiscardTitle),
-                    content: Text(context.l10n.photoReviewDiscardBody),
+                    title: Text(dialogContext.l10n.photoReviewDiscardTitle),
+                    content: Text(dialogContext.l10n.photoReviewDiscardBody),
                     actions: <Widget>[
                       TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
-                        child: Text(context.l10n.commonKeepEditing),
+                        onPressed: () => Navigator.of(dialogContext).pop(false),
+                        child: Text(dialogContext.l10n.commonKeepEditing),
                       ),
                       TextButton(
                         onPressed: () {
                           AppHaptics.light();
-                          Navigator.of(context).pop(true);
+                          Navigator.of(dialogContext).pop(true);
                         },
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.accentDanger,
                         ),
-                        child: Text(context.l10n.commonDiscard),
+                        child: Text(dialogContext.l10n.commonDiscard),
                       ),
                     ],
                   );
@@ -126,14 +126,17 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                         color: AppColors.divider.withValues(alpha: 0.8),
                       ),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLg,
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.sm,
+                      ),
                     ),
                     child: Text(
                       context.l10n.reportPhotoReviewRetake,
-                      style: const TextStyle(
-                        fontSize: 15,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
                         fontWeight: FontWeight.w600,
                         letterSpacing: -0.2,
                       ),
@@ -156,16 +159,25 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                       foregroundColor: AppColors.white,
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                        borderRadius: BorderRadius.circular(
+                          AppSpacing.radiusLg,
+                        ),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: AppSpacing.sm,
+                      ),
                     ),
-                    child: Text(
-                      context.l10n.reportPhotoReviewUsePhoto,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: -0.2,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.center,
+                      child: Text(
+                        context.l10n.reportPhotoReviewUsePhoto,
+                        maxLines: 1,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: -0.2,
+                        ),
                       ),
                     ),
                   ),
@@ -262,11 +274,12 @@ class _PhotoReviewSheetState extends State<PhotoReviewSheet> {
                               _isZoomed
                                   ? 'Double-tap to reset zoom'
                                   : 'Pinch or double-tap to inspect',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: AppColors.textOnDark,
-                                letterSpacing: -0.1,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                    color: AppColors.textOnDark,
+                                    letterSpacing: -0.1,
+                                  ),
                             ),
                           ),
                         ),

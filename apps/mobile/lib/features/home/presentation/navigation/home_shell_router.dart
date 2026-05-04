@@ -176,62 +176,68 @@ class _CentralReportButtonState extends State<_CentralReportButton> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
-      onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
-      onTapCancel: widget.enabled
-          ? () => setState(() => _pressed = false)
-          : null,
-      onTap: () {
-        if (!widget.enabled) {
-          return;
-        }
-        widget.onPressed();
-      },
-      child: AnimatedScale(
-        scale: _pressed && widget.enabled ? 0.94 : 1.0,
-        duration: AppMotion.xFast,
-        curve: AppMotion.standardCurve,
-        child: AnimatedOpacity(
-          duration: AppMotion.fast,
-          opacity: widget.enabled ? 1 : 0.72,
-          child: Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: AppColors.primary,
-              shape: BoxShape.circle,
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.35),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: AppColors.shadowLight,
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: widget.enabled
-                ? const Icon(
-                    CupertinoIcons.add,
-                    color: AppColors.textOnDark,
-                    size: 28,
-                  )
-                : const Center(
-                    child: SizedBox(
-                      width: 22,
-                      height: 22,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.4,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          AppColors.white,
+    final AppLocalizations l10n = AppLocalizations.of(context)!;
+    return Semantics(
+      button: true,
+      enabled: widget.enabled,
+      label: l10n.reportListFabLabel,
+      child: GestureDetector(
+        onTapDown: widget.enabled ? (_) => setState(() => _pressed = true) : null,
+        onTapUp: widget.enabled ? (_) => setState(() => _pressed = false) : null,
+        onTapCancel: widget.enabled
+            ? () => setState(() => _pressed = false)
+            : null,
+        onTap: () {
+          if (!widget.enabled) {
+            return;
+          }
+          widget.onPressed();
+        },
+        child: AnimatedScale(
+          scale: _pressed && widget.enabled ? 0.94 : 1.0,
+          duration: AppMotion.xFast,
+          curve: AppMotion.standardCurve,
+          child: AnimatedOpacity(
+            duration: AppMotion.fast,
+            opacity: widget.enabled ? 1 : 0.72,
+            child: Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+                boxShadow: <BoxShadow>[
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.35),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                  BoxShadow(
+                    color: AppColors.shadowLight,
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: widget.enabled
+                  ? const Icon(
+                      CupertinoIcons.add,
+                      color: AppColors.textOnDark,
+                      size: 28,
+                    )
+                  : const Center(
+                      child: SizedBox(
+                        width: 22,
+                        height: 22,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.4,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            AppColors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
+            ),
           ),
         ),
       ),

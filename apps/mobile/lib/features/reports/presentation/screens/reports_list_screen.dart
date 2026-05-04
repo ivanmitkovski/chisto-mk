@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:chisto_mobile/core/di/service_locator.dart';
+import 'package:chisto_mobile/core/network/request_cancellation.dart';
 import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/errors/app_error.dart';
 import 'package:chisto_mobile/core/navigation/app_routes.dart';
@@ -10,21 +10,22 @@ import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
 import 'package:chisto_mobile/core/theme/app_typography.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/report_surface_primitives.dart';
-import 'package:chisto_mobile/shared/widgets/app_error_view.dart';
 import 'package:chisto_mobile/shared/widgets/app_snack.dart';
+import 'package:chisto_mobile/features/reports/data/report_image_prefetch_coordinator.dart';
+import 'package:chisto_mobile/features/reports/data/reports_realtime/reports_owner_event.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_list_item.dart';
 import 'package:chisto_mobile/features/reports/domain/models/report_capacity.dart';
-import 'package:chisto_mobile/features/reports/presentation/screens/new_report_screen.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/report_card_skeleton.dart';
+import 'package:chisto_mobile/features/reports/presentation/controllers/reports_list_controller.dart';
+import 'package:chisto_mobile/features/reports/data/outbox/report_draft_summary_projector.dart';
+import 'package:chisto_mobile/features/reports/presentation/flow/report_entry_flow.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/draft/draft_choice_sheet.dart';
 import 'package:chisto_mobile/features/reports/presentation/l10n/report_status_l10n.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_actions.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_realtime_coalescer.dart';
+import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_screen_slivers.dart';
 import 'package:chisto_mobile/features/reports/presentation/widgets/reports_list/reports_list_widgets.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/report_capacity_ui_state.dart';
-import 'package:chisto_mobile/features/reports/presentation/widgets/new_report/reporting_capacity_guard.dart';
 import 'package:chisto_mobile/l10n/app_localizations.dart';
 import 'package:chisto_mobile/shared/utils/app_haptics.dart';
-import 'package:chisto_mobile/shared/widgets/animated_list_item.dart';
-import 'package:chisto_mobile/shared/widgets/app_pill_filter_chips.dart';
 import 'package:flutter/material.dart';
 
 class ReportsListScreen extends StatefulWidget {
@@ -34,6 +35,7 @@ class ReportsListScreen extends StatefulWidget {
     this.onReportOpened,
     this.refreshTrigger,
     this.onShowSiteOnMap,
+    this.onOpenLinkedPollutionSiteDetail,
   });
 
   final String? initialReportIdToOpen;
@@ -41,30 +43,75 @@ class ReportsListScreen extends StatefulWidget {
   final int? refreshTrigger;
   final void Function(String siteId)? onShowSiteOnMap;
 
+  /// Shell (e.g. home tab host) implements site fetch + in-app pollution site navigation.
+  final Future<void> Function(String siteId, ReportSheetViewModel snapshot)?
+      onOpenLinkedPollutionSiteDetail;
+
   @override
   State<ReportsListScreen> createState() => _ReportsListScreenState();
 }
 
 class _ReportsListScreenState extends State<ReportsListScreen> {
-  static const Duration _searchDebounceDuration = Duration(milliseconds: 220);
-  static const Duration _minSkeletonDuration = Duration(milliseconds: 400);
-  static const Duration _realtimeRefreshDebounce = Duration(milliseconds: 450);
+  static final Duration _searchDebounceDuration = AppMotion.medium;
+  static final Duration _minSkeletonDuration =
+      AppMotion.reportsListSkeletonMinHold;
 
-  bool _isLoading = true;
-  AppError? _loadError;
-  ReportStatus? _statusFilter;
+  late final ReportsListController _listController = ReportsListController(
+    repository: ServiceLocator.instance.reportsApiRepository,
+  );
+  late final DefaultReportImagePrefetchCoordinator _prefetchCoordinator =
+      DefaultReportImagePrefetchCoordinator(ServiceLocator.instance.preferences);
+
+  ReportSheetStatus? _statusFilter;
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocusNode = FocusNode();
   Timer? _searchDebounce;
-  Timer? _realtimeDebounce;
   StreamSubscription? _realtimeSub;
+  late final ReportsListRealtimeCoalescer _realtimeCoalescer =
+      ReportsListRealtimeCoalescer(
+    debounce: AppMotion.reportsListRealtimeCoalesce,
+    onRefresh: () {
+      if (!mounted) return;
+      _loadReports();
+    },
+  );
+  late final ReportsListActions _listActions = ReportsListActions(
+    onRetryAfterError: () {
+      unawaited(_loadReports());
+    },
+    onStartNewReport: () {
+      unawaited(_startNewReport());
+    },
+    onSearchSubmitted: _onSearchSubmitted,
+    onSearchClear: _onSearchClear,
+    onOpenReportDetail: _openReportDetail,
+    onStatusFilterSelected: _selectStatusFilter,
+    formatReportDate: _formatReportDate,
+  );
   String _searchQuery = '';
   bool _isOpeningReportDetail = false;
+  RequestCancellationToken? _reportDetailFetchCancellation;
   ReportCapacity? _reportCapacity;
 
+  RequestCancellationToken _beginReportDetailFetch() {
+    _reportDetailFetchCancellation?.cancel();
+    final RequestCancellationToken token = RequestCancellationToken();
+    _reportDetailFetchCancellation = token;
+    return token;
+  }
+
+  void _endReportDetailFetch(RequestCancellationToken token) {
+    if (identical(_reportDetailFetchCancellation, token)) {
+      _reportDetailFetchCancellation = null;
+    }
+  }
+
   List<String> _searchTokens(String raw) {
-    final String normalized = raw.trim().toLowerCase().replaceAll(RegExp(r'\s+'), ' ');
+    final String normalized = raw.trim().toLowerCase().replaceAll(
+      RegExp(r'\s+'),
+      ' ',
+    );
     if (normalized.isEmpty) return <String>[];
     return normalized.split(' ').where((String s) => s.isNotEmpty).toList();
   }
@@ -78,7 +125,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     final String address = r.location.toLowerCase();
     final String category = (r.category?.apiString ?? 'other').toLowerCase();
     for (final String token in tokens) {
-      final bool matches = title.contains(token) ||
+      final bool matches =
+          title.contains(token) ||
           address.contains(token) ||
           category.contains(token) ||
           apiReportStatusMatchesSearchToken(l10n, r.status, token);
@@ -100,23 +148,53 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return score;
   }
 
-  ReportStatus? _apiStatusToDisplay(ApiReportStatus s) {
+  ReportSheetStatus? _apiStatusToDisplay(ApiReportStatus s) {
     switch (s) {
       case ApiReportStatus.new_:
       case ApiReportStatus.inReview:
-        return ReportStatus.underReview;
+        return ReportSheetStatus.underReview;
       case ApiReportStatus.approved:
-        return ReportStatus.approved;
+        return ReportSheetStatus.approved;
       case ApiReportStatus.deleted:
-        return ReportStatus.declined;
+        return ReportSheetStatus.declined;
     }
   }
 
+  void _onReportsOwnerEvent(ReportsOwnerEvent event) {
+    if (event.type == 'report_created' && event.mutationKind == 'created') {
+      _listController.clearOptimisticForReport(event.reportId);
+      _realtimeCoalescer.schedule();
+      return;
+    }
+    if (event.type == 'report_updated' && event.mutationKind == 'merged') {
+      _listController.removeReportById(event.reportId);
+      if (mounted) {
+        AppSnack.show(
+          context,
+          message: context.l10n.reportsListMergedToast,
+          type: AppSnackType.info,
+        );
+      }
+      _realtimeCoalescer.schedule();
+      return;
+    }
+    if (event.type == 'report_updated' &&
+        event.mutationKind == 'status_changed' &&
+        (event.status != null && event.status!.isNotEmpty)) {
+      _listController.applyStatusFromApi(event.reportId, event.status!);
+      return;
+    }
+    _realtimeCoalescer.schedule();
+  }
+
   List<ReportListItem> _filteredReports(AppLocalizations l10n) {
-    List<ReportListItem> list = _reports;
+    List<ReportListItem> list = _listController.reports;
     if (_statusFilter != null) {
       list = list
-          .where((ReportListItem r) => _apiStatusToDisplay(r.status) == _statusFilter!)
+          .where(
+            (ReportListItem r) =>
+                _apiStatusToDisplay(r.status) == _statusFilter!,
+          )
           .toList();
     }
     final List<String> tokens = _searchTokens(_searchQuery);
@@ -133,22 +211,29 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     return list;
   }
 
-  List<ReportListItem> _reports = <ReportListItem>[];
+  String _searchResultSummaryLabel(AppLocalizations l10n) {
+    final List<ReportListItem> filtered = _filteredReports(l10n);
+    if (_searchQuery.isEmpty) return '';
+    if (filtered.isEmpty) return l10n.reportListSearchNoMatches;
+    if (filtered.length == 1) return l10n.reportListSearchOneReport;
+    return l10n.reportListSearchNReports(filtered.length);
+  }
 
   @override
   void initState() {
     super.initState();
+    _listController.addListener(_onListControllerChanged);
+    _scrollController.addListener(_onScrollNearEnd);
     _searchController.addListener(_onSearchChanged);
     _searchQuery = _searchController.text.trim();
     _loadReports();
-    ServiceLocator.instance.reportsRealtimeService.start();
-    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen((_) {
-      _realtimeDebounce?.cancel();
-      _realtimeDebounce = Timer(_realtimeRefreshDebounce, () {
-        if (!mounted) return;
-        _loadReports();
-      });
-    });
+    ServiceLocator.instance.reportsListSession.attach(_listController);
+    _realtimeSub = ServiceLocator.instance.reportsRealtimeService.events.listen(
+      _onReportsOwnerEvent,
+    );
+    ServiceLocator.instance.reportDraftRepository.summaryListenable.addListener(
+      _onDraftSummaryChanged,
+    );
     if (widget.initialReportIdToOpen != null &&
         widget.initialReportIdToOpen!.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -167,25 +252,52 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       });
     }
     final String? id = widget.initialReportIdToOpen;
-    if (id != null &&
-        id.isNotEmpty &&
-        id != oldWidget.initialReportIdToOpen) {
+    if (id != null && id.isNotEmpty && id != oldWidget.initialReportIdToOpen) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) _openReportDetailById(id);
       });
     }
   }
 
+  void _onDraftSummaryChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  void _onListControllerChanged() {
+    final AppError? appendErr = _listController.appendLoadError;
+    if (appendErr != null && mounted) {
+      AppSnack.show(
+        context,
+        message: appendErr.message,
+        type: AppSnackType.warning,
+      );
+      _listController.clearAppendError();
+    }
+    // List UI rebuilds via [ListenableBuilder] on [_listController]; avoid full-screen
+    // setState on every list notification (pagination, realtime updates).
+  }
+
+  void _onScrollNearEnd() {
+    if (!_scrollController.hasClients) {
+      return;
+    }
+    final ScrollPosition pos = _scrollController.position;
+    if (pos.pixels < pos.maxScrollExtent - 600) {
+      return;
+    }
+    unawaited(_listController.loadNextPage());
+  }
+
   Future<void> _loadReports() async {
-    setState(() {
-      _loadError = null;
-      _isLoading = true;
-    });
+    final bool wasEmpty = _listController.reports.isEmpty;
     final Stopwatch stopwatch = Stopwatch()..start();
-    try {
-      final response = await ServiceLocator.instance.reportsApiRepository
-          .getMyReports(page: 1, limit: 50);
-      if (!mounted) return;
+    await _listController.refreshFirstPage();
+    if (!mounted) {
+      return;
+    }
+    if (wasEmpty && _listController.loadError == null) {
       final int elapsed = stopwatch.elapsedMilliseconds;
       if (elapsed < _minSkeletonDuration.inMilliseconds) {
         await Future<void>.delayed(
@@ -194,51 +306,45 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
           ),
         );
       }
-      if (!mounted) return;
-      setState(() {
-        _reports = response.data;
-        _isLoading = false;
-        _loadError = null;
-      });
-      _loadReportCapacityHint();
-    } on AppError catch (e) {
-      if (!mounted) return;
-      if (e.code == 'UNAUTHORIZED' ||
-          e.code == 'INVALID_TOKEN_USER' ||
-          e.code == 'ACCOUNT_NOT_ACTIVE') {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    }
+    final AppError? err = _listController.loadError;
+    if (err != null) {
+      if (err.code == 'UNAUTHORIZED' ||
+          err.code == 'INVALID_TOKEN_USER' ||
+          err.code == 'ACCOUNT_NOT_ACTIVE') {
         Navigator.of(context).pushNamedAndRemoveUntil(
           AppRoutes.signIn,
           (Route<dynamic> route) => false,
         );
         return;
       }
-      setState(() {
-        _loadError = e;
-        _isLoading = false;
-      });
-      if (mounted) {
-        AppSnack.show(context, message: e.message, type: AppSnackType.warning);
-      }
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _loadError = AppError.network(cause: e);
-        _isLoading = false;
-      });
       if (mounted) {
         AppSnack.show(
           context,
-          message: context.l10n.profileNoConnectionSnack,
+          message: err.message,
           type: AppSnackType.warning,
         );
       }
+      return;
     }
+    if (_listController.reports.isNotEmpty) {
+      unawaited(
+        _prefetchCoordinator.warmList(_listController.reports, context),
+      );
+    }
+    unawaited(_loadReportCapacityHint());
   }
 
   Future<void> _loadReportCapacityHint() async {
     try {
-      final ReportCapacity capacity =
-          await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
+      final ReportCapacity capacity = await ServiceLocator
+          .instance
+          .reportsApiRepository
+          .getReportingCapacity();
       if (!mounted) return;
       setState(() => _reportCapacity = capacity);
     } catch (_) {
@@ -257,15 +363,36 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     });
   }
 
+  void _onSearchSubmitted() {
+    _searchFocusNode.unfocus();
+    _searchDebounce?.cancel();
+    setState(() => _searchQuery = _searchController.text.trim());
+  }
+
+  void _onSearchClear() {
+    _searchDebounce?.cancel();
+    _searchController.clear();
+    setState(() => _searchQuery = '');
+  }
+
   @override
   void dispose() {
+    ServiceLocator.instance.reportDraftRepository.summaryListenable.removeListener(
+      _onDraftSummaryChanged,
+    );
+    _prefetchCoordinator.cancel();
+    ServiceLocator.instance.reportsListSession.detach(_listController);
+    _listController.removeListener(_onListControllerChanged);
+    _listController.dispose();
     _searchDebounce?.cancel();
-    _realtimeDebounce?.cancel();
+    _realtimeCoalescer.dispose();
     _realtimeSub?.cancel();
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _searchFocusNode.dispose();
+    _scrollController.removeListener(_onScrollNearEnd);
     _scrollController.dispose();
+    _reportDetailFetchCancellation?.cancel();
     super.dispose();
   }
 
@@ -280,32 +407,23 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     if (mounted) setState(() {});
     AppHaptics.softTransition();
     widget.onReportOpened?.call();
+    final RequestCancellationToken cancellation = _beginReportDetailFetch();
     try {
       final detail = await ServiceLocator.instance.reportsApiRepository
-          .getReportById(id);
+          .getReportById(id, cancellation: cancellation);
       if (!mounted) return;
-      final MockReport display =
-          ReportsListMockStore.fromDetail(detail, context.l10n);
-      await showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: false,
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        builder: (BuildContext sheetContext) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
-          ),
-          child: ReportDetailSheet(
-            report: display,
-            onShowSiteOnMap: widget.onShowSiteOnMap,
-          ),
-        ),
+      final ReportSheetViewModel display =
+          ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+      unawaited(
+        _prefetchCoordinator.warmDetail(id, detail.mediaUrls, context),
       );
+      await _showReportDetailSheet(display);
     } on AppError catch (e) {
+      if (e.code == 'CANCELLED') return;
       if (!mounted) return;
       AppSnack.show(context, message: e.message, type: AppSnackType.warning);
     } finally {
+      _endReportDetailFetch(cancellation);
       _isOpeningReportDetail = false;
       if (mounted) setState(() {});
     }
@@ -316,55 +434,86 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     _isOpeningReportDetail = true;
     if (mounted) setState(() {});
     AppHaptics.softTransition();
+    final RequestCancellationToken cancellation = _beginReportDetailFetch();
     try {
       final detail = await ServiceLocator.instance.reportsApiRepository
-          .getReportById(report.id);
+          .getReportById(report.id, cancellation: cancellation);
       if (!mounted) return;
-      final MockReport display =
-          ReportsListMockStore.fromDetail(detail, context.l10n);
-      await showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: false,
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        builder: (BuildContext sheetContext) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
-          ),
-          child: ReportDetailSheet(
-            report: display,
-            onShowSiteOnMap: widget.onShowSiteOnMap,
-          ),
+      final ReportSheetViewModel display =
+          ReportSheetViewModelMapper.fromDetail(detail, context.l10n);
+      unawaited(
+        _prefetchCoordinator.warmDetail(
+          report.id,
+          detail.mediaUrls,
+          context,
         ),
       );
+      await _showReportDetailSheet(display);
     } on AppError catch (e) {
+      if (e.code == 'CANCELLED') return;
       if (!mounted) return;
       AppSnack.show(context, message: e.message, type: AppSnackType.warning);
     } catch (_) {
       if (!mounted) return;
-      final MockReport display =
-          ReportsListMockStore.fromListItem(report, context.l10n);
-      await showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        useSafeArea: false,
-        backgroundColor: AppColors.transparent,
-        elevation: 0,
-        builder: (BuildContext sheetContext) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.viewInsetsOf(sheetContext).bottom,
-          ),
-          child: ReportDetailSheet(
-            report: display,
-            onShowSiteOnMap: widget.onShowSiteOnMap,
-          ),
-        ),
-      );
+      final ReportSheetViewModel display =
+          ReportSheetViewModelMapper.fromListItem(report, context.l10n);
+      await _showReportDetailSheet(display);
     } finally {
+      _endReportDetailFetch(cancellation);
       _isOpeningReportDetail = false;
       if (mounted) setState(() {});
     }
+  }
+
+  Future<void> _showReportDetailSheet(ReportSheetViewModel report) {
+    return showModalBottomSheet<void>(
+      context: context,
+      sheetAnimationStyle: AnimationStyle(
+        duration: AppMotion.standard,
+        curve: AppMotion.smooth,
+      ),
+      isScrollControlled: true,
+      // true: avoid Flutter's removeTop padding strip (content under notch/Dynamic
+      // Island). Modal SafeArea uses bottom:false so the sheet still reaches the
+      // physical bottom above the home indicator via inner padding.
+      useSafeArea: true,
+      // Root overlay so the sheet covers the home shell bottom bar + FAB.
+      useRootNavigator: true,
+      backgroundColor: AppColors.panelBackground,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSpacing.radiusCard),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      elevation: 0,
+      builder: (BuildContext sheetContext) {
+        final double keyboardInset = MediaQuery.viewInsetsOf(
+          sheetContext,
+        ).bottom;
+        return Padding(
+          padding: EdgeInsets.only(bottom: keyboardInset),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SizedBox(
+                height: constraints.maxHeight.isFinite
+                    ? constraints.maxHeight
+                    : null,
+                width: constraints.maxWidth.isFinite
+                    ? constraints.maxWidth
+                    : null,
+                child: ReportDetailSheet(
+                  report: report,
+                  onShowSiteOnMap: widget.onShowSiteOnMap,
+                  onOpenLinkedPollutionSiteDetail:
+                      widget.onOpenLinkedPollutionSiteDetail,
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 
   String _formatReportDate(DateTime d) {
@@ -384,274 +533,54 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = context.l10n;
-    final List<ReportListItem> filteredReports = _filteredReports(l10n);
     return SafeArea(
       bottom: false,
       child: RefreshIndicator(
         color: AppColors.primary,
-        backgroundColor: AppColors.panelBackground,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         onRefresh: _handleRefresh,
-        child: CustomScrollView(
-          controller: _scrollController,
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          slivers: <Widget>[
-            SliverToBoxAdapter(child: _buildHeader(context)),
-            SliverToBoxAdapter(child: _buildSearchBar(context)),
-            if (!_isLoading && _loadError == null)
-              SliverToBoxAdapter(child: _buildStatusFilter(context)),
-            if (_loadError != null)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: AppErrorView(
-                  error: _loadError!,
-                  onRetry: _loadReports,
-                ),
-              )
-            else if (_isLoading)
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.sm,
-                  AppSpacing.lg,
-                  0,
-                ),
-                sliver: SliverList.builder(
-                  itemCount: 5,
-                  itemBuilder: (_, __) => const ReportCardSkeleton(),
-                ),
-              )
-            else if (_reports.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: _buildEmptyState(context),
-              )
-            else if (filteredReports.isEmpty)
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: _buildFilterEmptyState(context),
-              )
-            else
-              SliverPadding(
-                padding: const EdgeInsets.fromLTRB(
-                  AppSpacing.lg,
-                  AppSpacing.sm,
-                  AppSpacing.lg,
-                  0,
-                ),
-                sliver: SliverList.builder(
-                  itemCount: filteredReports.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    if (index >= filteredReports.length) {
-                      return const SizedBox.shrink();
-                    }
-                    final ReportListItem report = filteredReports[index];
-                    final MockReport display =
-                        ReportsListMockStore.fromListItem(report, l10n);
-                    return AnimatedListItem(
-                      index: index,
-                      slideOffset: 14,
-                      child: ReportCard(
-                        report: display,
-                        onTap: () => _openReportDetail(report),
-                        formatDate: _formatReportDate,
-                      ),
-                    );
-                  },
-                ),
-              ),
-            if (!_isLoading && _filteredReports(l10n).isNotEmpty)
-              SliverToBoxAdapter(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    top: AppSpacing.xl,
-                    bottom: MediaQuery.of(context).padding.bottom + 80,
-                  ),
-                  child: Center(
-                    child: Text(
-                      _statusFilter == null
-                          ? l10n.reportListFilteredFooterAll
-                          : l10n.reportListFilteredFooterCount(
-                              filteredReports.length,
-                            ),
-                      style: AppTypography.textTheme.bodySmall!.copyWith(
-                        color: AppColors.textMuted,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    final int totalReports = _reports.length;
-    final int underReviewCount = _reports
-        .where(
-          (ReportListItem r) => _apiStatusToDisplay(r.status) == ReportStatus.underReview,
-        )
-        .length;
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.lg,
-        AppSpacing.sm,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            context.l10n.reportListHeaderTitle,
-            style: AppTypography.textTheme.headlineLarge?.copyWith(
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          Semantics(
-            liveRegion: true,
-            label: context.l10n.reportListHeaderSemanticSummary(
-              totalReports,
-              underReviewCount,
-            ),
-            child: Wrap(
-              spacing: AppSpacing.sm,
-              runSpacing: AppSpacing.xs,
-              children: <Widget>[
-                ReportStatePill(
-                  label: context.l10n.reportListHeaderTotalPill(totalReports),
-                  icon: Icons.description_outlined,
-                ),
-                ReportStatePill(
-                  label: context.l10n.reportListHeaderUnderReviewPill(
-                    underReviewCount,
-                  ),
-                  icon: Icons.schedule_rounded,
-                  tone: underReviewCount > 0
-                      ? ReportSurfaceTone.warning
-                      : ReportSurfaceTone.neutral,
-                ),
-                if (_reportCapacity != null)
-                  Builder(
-                    builder: (BuildContext context) {
-                      final ReportCapacityUiState ui =
-                          mapReportCapacityToUiState(
-                        _reportCapacity!,
-                        l10n: context.l10n,
-                        nextEmergencyAvailableDescription:
-                            formatNextEmergencyUnlockLocal(
-                          context,
-                          _reportCapacity!.nextEmergencyReportAvailableAt,
-                        ),
-                      );
-                      return ReportStatePill(
-                        label: ui.pillLabel,
-                        icon: ui.pillIcon,
-                        tone: ui.pillTone,
-                      );
-                    },
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    final List<ReportListItem> filtered = _filteredReports(context.l10n);
-    final AppLocalizations l10n = context.l10n;
-    final String resultLabel = _searchQuery.isEmpty
-        ? ''
-        : filtered.isEmpty
-            ? l10n.reportListSearchNoMatches
-            : filtered.length == 1
-                ? l10n.reportListSearchOneReport
-                : l10n.reportListSearchNReports(filtered.length);
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        AppSpacing.lg,
-        AppSpacing.sm,
-        AppSpacing.lg,
-        AppSpacing.md,
-      ),
-      child: Semantics(
-        label: l10n.reportListSearchSemantic,
-        hint: '${l10n.reportListSearchHintPrefix} $resultLabel'.trim(),
-        child: CupertinoSearchTextField(
-          controller: _searchController,
-          focusNode: _searchFocusNode,
-          placeholder: l10n.reportListSearchPlaceholder,
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textPrimary,
-              ),
-          placeholderStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textMuted,
-              ),
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.radius10,
-          ),
-          backgroundColor: AppColors.panelBackground,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          onSubmitted: (_) {
-            _searchFocusNode.unfocus();
-            _searchDebounce?.cancel();
-            setState(() => _searchQuery = _searchController.text.trim());
-          },
-          onSuffixTap: () {
-            AppHaptics.tap();
-            _searchDebounce?.cancel();
-            _searchController.clear();
-            setState(() => _searchQuery = '');
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatusFilter(BuildContext context) {
-    final AppLocalizations l10n = context.l10n;
-    final List<String> labels = <String>[
-      l10n.reportListFilterAll,
-      ...ReportStatus.values.map(
-        (ReportStatus s) => reportUiStatusShortLabel(l10n, s),
-      ),
-    ];
-    final int selectedIndex = _statusFilter == null
-        ? 0
-        : ReportStatus.values.indexOf(_statusFilter!) + 1;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-      child: AppPillFilterChips(
-        labels: labels,
-        selectedIndex: selectedIndex,
-        semanticLabelPrefix: l10n.reportListFilterSemanticPrefix,
-        onSelected: (int index) {
-          AppHaptics.tap();
-          setState(() {
-            _statusFilter =
-                index == 0 ? null : ReportStatus.values[index - 1];
-          });
-          if (_scrollController.hasClients) {
-            _scrollController.animateTo(
-              0,
-              duration: AppMotion.medium,
-              curve: AppMotion.smooth,
+        child: ListenableBuilder(
+          listenable: _listController,
+          builder: (BuildContext context, Widget? child) {
+            final List<ReportListItem> filteredReports = _filteredReports(l10n);
+            final bool showStatusFilter =
+                !_listController.isLoadingFirstPage &&
+                _listController.loadError == null;
+            return ReportsListScreenSlivers(
+              scrollController: _scrollController,
+              controller: _listController,
+              l10n: l10n,
+              filteredReports: filteredReports,
+              showStatusFilter: showStatusFilter,
+              reportCapacity: _reportCapacity,
+              searchController: _searchController,
+              searchFocusNode: _searchFocusNode,
+              searchResultSummaryLabel: _searchResultSummaryLabel(l10n),
+              actions: _listActions,
+              statusFilter: _statusFilter,
+              apiStatusToDisplay: _apiStatusToDisplay,
+              emptyWhenNoReports: _buildEmptyState(context),
+              emptyWhenFiltered: _buildFilterEmptyState(context),
+              showFilteredCountFooter:
+                  !_listController.isLoadingFirstPage &&
+                  filteredReports.isNotEmpty,
             );
-          }
-        },
+          },
+        ),
       ),
     );
+  }
+
+  void _selectStatusFilter(ReportSheetStatus? status) {
+    AppHaptics.tap();
+    setState(() => _statusFilter = status);
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        0,
+        duration: AppMotion.medium,
+        curve: AppMotion.smooth,
+      );
+    }
   }
 
   Widget _buildFilterEmptyState(BuildContext context) {
@@ -667,8 +596,8 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
     final String hint = hasSearch && hasFilter
         ? l10n.reportListNoMatchesHintSearchAndFilter
         : hasSearch
-            ? l10n.reportListNoMatchesHintSearchOnly
-            : l10n.reportListNoMatchesHintFilterOnly;
+        ? l10n.reportListNoMatchesHintSearchOnly
+        : l10n.reportListNoMatchesHintFilterOnly;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
@@ -678,10 +607,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
         children: <Widget>[
           Icon(icon, size: 48, color: AppColors.textMuted),
           const SizedBox(height: AppSpacing.md),
-          Text(
-            message,
-            style: AppTypography.emptyStateTitle,
-          ),
+          Text(message, style: AppTypography.emptyStateTitle),
           const SizedBox(height: AppSpacing.xs),
           Text(
             hint,
@@ -708,9 +634,9 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                   ),
                   child: Text(
                     l10n.reportListClearSearch,
-                    style: AppTypography.buttonLabel.copyWith(
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
                       color: AppColors.primary,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
@@ -724,51 +650,41 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
 
   Future<void> _startNewReport() async {
     AppHaptics.medium();
-    final bool canProceed = await _ensureCanStartReportFlow();
-    if (!canProceed) return;
-    if (!mounted) return;
+    if (!await ReportEntryFlow.ensureReportingAllowed(context)) {
+      return;
+    }
+    if (!mounted) {
+      return;
+    }
+    final ReportDraftSummary summary =
+        ServiceLocator.instance.reportDraftRepository.summaryListenable.value;
+    if (summary.hasDraft) {
+      final CentralFabDraftChoice? choice =
+          await ReportEntryFlow.promptDraftChoiceIfNeeded(
+        context: context,
+        summary: summary,
+      );
+      if (!mounted) {
+        return;
+      }
+      if (choice == CentralFabDraftChoice.cancel || choice == null) {
+        return;
+      }
+      if (choice == CentralFabDraftChoice.takeNewPhoto) {
+        await ReportEntryFlow.openCameraThenNewReport(context: context);
+        if (mounted) {
+          await _loadReports();
+        }
+        return;
+      }
+    }
     final String newReportEntryLabel = context.l10n.newReportTitle;
-    final Object? result = await Navigator.of(context).push<Object>(
-      MaterialPageRoute<Object>(
-        builder: (_) => NewReportScreen(
-          entryLabel: newReportEntryLabel,
-        ),
-      ),
+    final Object? result = await ReportEntryFlow.openNewReportWizard(
+      context,
+      entryLabel: newReportEntryLabel,
     );
     if (result != null && mounted) {
       await _loadReports();
-    }
-  }
-
-  Future<bool> _ensureCanStartReportFlow() async {
-    try {
-      final capacity = await ServiceLocator.instance.reportsApiRepository.getReportingCapacity();
-      if (capacity.creditsAvailable > 0 || capacity.emergencyAvailable) {
-        return true;
-      }
-      if (!mounted) return false;
-      return showReportingCooldownDialog(context, capacity);
-    } on AppError catch (e) {
-      if (!mounted) return false;
-      if (e.code == 'UNAUTHORIZED' ||
-          e.code == 'INVALID_TOKEN_USER' ||
-          e.code == 'ACCOUNT_NOT_ACTIVE') {
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          AppRoutes.signIn,
-          (Route<dynamic> route) => false,
-        );
-        return false;
-      }
-      AppSnack.show(context, message: e.message, type: AppSnackType.warning);
-      return false;
-    } catch (_) {
-      if (!mounted) return false;
-      AppSnack.show(
-        context,
-        message: context.l10n.reportAvailabilityCheckFailedSnack,
-        type: AppSnackType.warning,
-      );
-      return false;
     }
   }
 

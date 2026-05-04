@@ -1,3 +1,4 @@
+import 'package:chisto_mobile/core/l10n/context_l10n.dart';
 import 'package:chisto_mobile/core/theme/app_colors.dart';
 import 'package:chisto_mobile/core/theme/app_motion.dart';
 import 'package:chisto_mobile/core/theme/app_spacing.dart';
@@ -34,20 +35,27 @@ class ReportStepChips extends StatelessWidget {
       hasCategory,
       hasLocation,
     ].where((bool value) => value).length;
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Row(
           children: <Widget>[
-            Text(
-              isComplete ? 'Ready to submit' : 'Step $_currentStep of 3',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textMuted,
-                letterSpacing: -0.1,
-                fontWeight: FontWeight.w600,
+            Expanded(
+              child: Text(
+                isComplete
+                    ? l10n.reportFlowStepProgressReady
+                    : l10n.reportFlowStepProgressStep(_currentStep),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textMuted,
+                  letterSpacing: -0.1,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-            const Spacer(),
+            const SizedBox(width: AppSpacing.xs),
             AnimatedContainer(
               duration: AppMotion.fast,
               curve: AppMotion.emphasized,
@@ -62,7 +70,11 @@ class ReportStepChips extends StatelessWidget {
                 borderRadius: BorderRadius.circular(AppSpacing.radiusCircle),
               ),
               child: Text(
-                isComplete ? 'Complete' : 'In progress',
+                isComplete
+                    ? l10n.reportFlowStepStatusComplete
+                    : l10n.reportFlowStepStatusInProgress,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -81,7 +93,7 @@ class ReportStepChips extends StatelessWidget {
             Expanded(
               child: _StepChip(
                 index: 1,
-                label: 'Photos',
+                label: l10n.reportFlowStepChipPhotos,
                 isDone: hasPhotos,
                 isCurrent: !hasPhotos,
               ),
@@ -90,7 +102,7 @@ class ReportStepChips extends StatelessWidget {
             Expanded(
               child: _StepChip(
                 index: 2,
-                label: 'Category',
+                label: l10n.reportFlowStepChipCategory,
                 isDone: hasCategory,
                 isCurrent: hasPhotos && !hasCategory,
               ),
@@ -99,7 +111,7 @@ class ReportStepChips extends StatelessWidget {
             Expanded(
               child: _StepChip(
                 index: 3,
-                label: 'Location',
+                label: l10n.reportFlowStepChipLocation,
                 isDone: hasLocation,
                 isCurrent: hasPhotos && hasCategory && !hasLocation,
               ),
@@ -210,6 +222,7 @@ class _StepChip extends StatelessWidget {
           Flexible(
             child: Text(
               label,
+              maxLines: 1,
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

@@ -10,7 +10,9 @@ const String kReportUploadTempMarker = 'chisto_report_upload_';
 ///
 /// iOS (and some Android) cameras return HEIC/HEIF; the API only accepts jpeg, png,
 /// and webp after magic-byte verification. Compression normalizes to JPEG.
-Future<List<String>> prepareReportPhotoPathsForUpload(List<XFile> photos) async {
+Future<List<String>> prepareReportPhotoPathsForUpload(
+  List<XFile> photos,
+) async {
   if (photos.isEmpty) return <String>[];
   final Directory tempDir = await getTemporaryDirectory();
   final int ts = DateTime.now().millisecondsSinceEpoch;
